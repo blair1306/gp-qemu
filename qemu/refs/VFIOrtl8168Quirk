@@ -1,0 +1,24 @@
+<def f='codebrowser/hw/vfio/pci-quirks.c' l='831' ll='836'/>
+<size>24</size>
+<doc f='codebrowser/hw/vfio/pci-quirks.c' l='809'>/*
+ * RTL8168 devices have a backdoor that can access the MSI-X table.  At BAR2
+ * offset 0x70 there is a dword data register, offset 0x74 is a dword address
+ * register.  According to the Linux r8169 driver, the MSI-X table is addressed
+ * when the &quot;type&quot; portion of the address register is set to 0x1.  This appears
+ * to be bits 16:30.  Bit 31 is both a write indicator and some sort of
+ * &quot;address latched&quot; indicator.  Bits 12:15 are a mask field, which we can
+ * ignore because the MSI-X table should always be accessed as a dword (full
+ * mask).  Bits 0:11 is offset within the type.
+ *
+ * Example trace:
+ *
+ * Read from MSI-X table offset 0
+ * vfio: vfio_bar_write(0000:05:00.0:BAR2+0x74, 0x1f000, 4) // store read addr
+ * vfio: vfio_bar_read(0000:05:00.0:BAR2+0x74, 4) = 0x8001f000 // latch
+ * vfio: vfio_bar_read(0000:05:00.0:BAR2+0x70, 4) = 0xfee00398 // read data
+ *
+ * Write 0xfee00000 to MSI-X table offset 0
+ * vfio: vfio_bar_write(0000:05:00.0:BAR2+0x70, 0xfee00000, 4) // write data
+ * vfio: vfio_bar_write(0000:05:00.0:BAR2+0x74, 0x8001f000, 4) // do write
+ * vfio: vfio_bar_read(0000:05:00.0:BAR2+0x74, 4) = 0x1f000 // complete
+ */</doc>

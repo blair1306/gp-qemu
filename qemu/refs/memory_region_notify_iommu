@@ -1,0 +1,21 @@
+<dec f='codebrowser/include/exec/memory.h' l='880' type='void memory_region_notify_iommu(IOMMUMemoryRegion * iommu_mr, IOMMUTLBEntry entry)'/>
+<doc f='codebrowser/include/exec/memory.h' l='863'>/**
+ * memory_region_notify_iommu: notify a change in an IOMMU translation entry.
+ *
+ * The notification type will be decided by entry.perm bits:
+ *
+ * - For UNMAP (cache invalidation) notifies: set entry.perm to IOMMU_NONE.
+ * - For MAP (newly added entry) notifies: set entry.perm to the
+ *   permission of the page (which is definitely !IOMMU_NONE).
+ *
+ * Note: for any IOMMU implementation, an in-place mapping change
+ * should be notified with an UNMAP followed by a MAP.
+ *
+ * @iommu_mr: the memory region that was changed
+ * @entry: the new entry in the IOMMU translation table.  The entry
+ *         replaces all old entries for the same virtual I/O address range.
+ *         Deleted entries have .@perm == 0.
+ */</doc>
+<use f='codebrowser/hw/i386/intel_iommu.c' l='1369' u='c' c='vtd_page_invalidate_notify_hook'/>
+<use f='codebrowser/hw/i386/intel_iommu.c' l='1819' u='c' c='vtd_process_device_iotlb_desc'/>
+<def f='codebrowser/memory.c' l='1745' ll='1755' type='void memory_region_notify_iommu(IOMMUMemoryRegion * iommu_mr, IOMMUTLBEntry entry)'/>

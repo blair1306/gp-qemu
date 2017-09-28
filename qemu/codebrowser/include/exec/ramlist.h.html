@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ramlist.h source code [codebrowser/include/exec/ramlist.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="RAMBlockNotifier,RAMList "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/exec/ramlist.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>exec</a>/<a href='ramlist.h.html'>ramlist.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/RAMLIST_H">RAMLIST_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/RAMLIST_H" data-ref="_M/RAMLIST_H">RAMLIST_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="../qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="../qemu/rcu.h.html">"qemu/rcu.h"</a></u></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="../qemu/rcu_queue.h.html">"qemu/rcu_queue.h"</a></u></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a> <dfn class="typedef" id="RAMBlockNotifier" title='RAMBlockNotifier' data-type='struct RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</dfn>;</td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#define <dfn class="macro" id="_M/DIRTY_MEMORY_VGA" data-ref="_M/DIRTY_MEMORY_VGA">DIRTY_MEMORY_VGA</dfn>       0</u></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/DIRTY_MEMORY_CODE" data-ref="_M/DIRTY_MEMORY_CODE">DIRTY_MEMORY_CODE</dfn>      1</u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/DIRTY_MEMORY_MIGRATION" data-ref="_M/DIRTY_MEMORY_MIGRATION">DIRTY_MEMORY_MIGRATION</dfn> 2</u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/DIRTY_MEMORY_NUM" data-ref="_M/DIRTY_MEMORY_NUM">DIRTY_MEMORY_NUM</dfn>       3        /* num of dirty bits */</u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i>/* The dirty memory bitmap is split into fixed-size blocks to allow growth</i></td></tr>
+<tr><th id="17">17</th><td><i> * under RCU.  The bitmap for a block can be accessed as follows:</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> *   rcu_read_lock();</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> *   DirtyMemoryBlocks *blocks =</i></td></tr>
+<tr><th id="22">22</th><td><i> *       atomic_rcu_read(&amp;ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);</i></td></tr>
+<tr><th id="23">23</th><td><i> *</i></td></tr>
+<tr><th id="24">24</th><td><i> *   ram_addr_t idx = (addr &gt;&gt; TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;</i></td></tr>
+<tr><th id="25">25</th><td><i> *   unsigned long *block = blocks.blocks[idx];</i></td></tr>
+<tr><th id="26">26</th><td><i> *   ...access block bitmap...</i></td></tr>
+<tr><th id="27">27</th><td><i> *</i></td></tr>
+<tr><th id="28">28</th><td><i> *   rcu_read_unlock();</i></td></tr>
+<tr><th id="29">29</th><td><i> *</i></td></tr>
+<tr><th id="30">30</th><td><i> * Remember to check for the end of the block when accessing a range of</i></td></tr>
+<tr><th id="31">31</th><td><i> * addresses.  Move on to the next block if you reach the end.</i></td></tr>
+<tr><th id="32">32</th><td><i> *</i></td></tr>
+<tr><th id="33">33</th><td><i> * Organization into blocks allows dirty memory to grow (but not shrink) under</i></td></tr>
+<tr><th id="34">34</th><td><i> * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new</i></td></tr>
+<tr><th id="35">35</th><td><i> * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept</i></td></tr>
+<tr><th id="36">36</th><td><i> * the same.  Other threads can safely access existing blocks while dirty</i></td></tr>
+<tr><th id="37">37</th><td><i> * memory is being grown.  When no threads are using the old DirtyMemoryBlocks</i></td></tr>
+<tr><th id="38">38</th><td><i> * anymore it is freed by RCU (but the underlying blocks stay because they are</i></td></tr>
+<tr><th id="39">39</th><td><i> * pointed to from the new DirtyMemoryBlocks).</i></td></tr>
+<tr><th id="40">40</th><td><i> */</i></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/DIRTY_MEMORY_BLOCK_SIZE" data-ref="_M/DIRTY_MEMORY_BLOCK_SIZE">DIRTY_MEMORY_BLOCK_SIZE</dfn> ((ram_addr_t)256 * 1024 * 8)</u></td></tr>
+<tr><th id="42">42</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="43">43</th><td>    <b>struct</b> <a class="type" href="../qemu/rcu.h.html#rcu_head" title='rcu_head' data-ref="rcu_head">rcu_head</a> <dfn class="decl" id="(anonymous)::rcu" title='(anonymous struct)::rcu' data-ref="(anonymous)::rcu">rcu</dfn>;</td></tr>
+<tr><th id="44">44</th><td>    <em>unsigned</em> <em>long</em> *<dfn class="decl" id="(anonymous)::blocks" title='(anonymous struct)::blocks' data-ref="(anonymous)::blocks">blocks</dfn>[];</td></tr>
+<tr><th id="45">45</th><td>} <dfn class="typedef" id="DirtyMemoryBlocks" title='DirtyMemoryBlocks' data-type='struct DirtyMemoryBlocks' data-ref="DirtyMemoryBlocks">DirtyMemoryBlocks</dfn>;</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="RAMList" title='RAMList' data-ref="RAMList"><a class="type" href="#RAMList" title='RAMList' data-ref="RAMList">RAMList</a></dfn> {</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="RAMList::mutex" title='RAMList::mutex' data-ref="RAMList::mutex">mutex</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#RAMBlock" title='RAMBlock' data-type='struct RAMBlock' data-ref="RAMBlock">RAMBlock</a> *<dfn class="decl" id="RAMList::mru_block" title='RAMList::mru_block' data-ref="RAMList::mru_block">mru_block</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <i>/* RCU-enabled, writes protected by the ramlist lock. */</i></td></tr>
+<tr><th id="51">51</th><td>    <a class="macro" href="../qemu/queue.h.html#86" title="struct { struct RAMBlock *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="../qemu/typedefs.h.html#RAMBlock" title='RAMBlock' data-ref="RAMBlock">RAMBlock</a>) <dfn class="decl" id="RAMList::blocks" title='RAMList::blocks' data-ref="RAMList::blocks">blocks</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="#DirtyMemoryBlocks" title='DirtyMemoryBlocks' data-type='struct DirtyMemoryBlocks' data-ref="DirtyMemoryBlocks">DirtyMemoryBlocks</a> *<dfn class="decl" id="RAMList::dirty_memory" title='RAMList::dirty_memory' data-ref="RAMList::dirty_memory">dirty_memory</dfn>[<a class="macro" href="#14" title="3" data-ref="_M/DIRTY_MEMORY_NUM">DIRTY_MEMORY_NUM</a>];</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="RAMList::version" title='RAMList::version' data-ref="RAMList::version">version</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="macro" href="../qemu/queue.h.html#86" title="struct { struct RAMBlockNotifier *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a>) <dfn class="decl" id="RAMList::ramblock_notifiers" title='RAMList::ramblock_notifiers' data-ref="RAMList::ramblock_notifiers">ramblock_notifiers</dfn>;</td></tr>
+<tr><th id="55">55</th><td>} <dfn class="typedef" id="RAMList" title='RAMList' data-type='struct RAMList' data-ref="RAMList">RAMList</dfn>;</td></tr>
+<tr><th id="56">56</th><td><b>extern</b> <a class="typedef" href="#RAMList" title='RAMList' data-type='struct RAMList' data-ref="RAMList">RAMList</a> <dfn class="decl" id="ram_list" title='ram_list' data-ref="ram_list">ram_list</dfn>;</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><i>/* Should be holding either ram_list.mutex, or the RCU lock. */</i></td></tr>
+<tr><th id="59">59</th><td><u>#define  <dfn class="macro" id="_M/RAMBLOCK_FOREACH" data-ref="_M/RAMBLOCK_FOREACH">RAMBLOCK_FOREACH</dfn>(block)  \</u></td></tr>
+<tr><th id="60">60</th><td><u>    QLIST_FOREACH_RCU(block, &amp;ram_list.blocks, next)</u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_lock_ramlist" title='qemu_mutex_lock_ramlist' data-ref="qemu_mutex_lock_ramlist">qemu_mutex_lock_ramlist</dfn>(<em>void</em>);</td></tr>
+<tr><th id="63">63</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_unlock_ramlist" title='qemu_mutex_unlock_ramlist' data-ref="qemu_mutex_unlock_ramlist">qemu_mutex_unlock_ramlist</dfn>(<em>void</em>);</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><b>struct</b> <dfn class="type def" id="RAMBlockNotifier" title='RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</dfn> {</td></tr>
+<tr><th id="66">66</th><td>    <em>void</em> (*<dfn class="decl" id="RAMBlockNotifier::ram_block_added" title='RAMBlockNotifier::ram_block_added' data-ref="RAMBlockNotifier::ram_block_added">ram_block_added</dfn>)(<a class="typedef" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-type='struct RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a> *<dfn class="local col0 decl" id="8170n" title='n' data-type='RAMBlockNotifier *' data-ref="8170n">n</dfn>, <em>void</em> *<dfn class="local col1 decl" id="8171host" title='host' data-type='void *' data-ref="8171host">host</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col2 decl" id="8172size" title='size' data-type='size_t' data-ref="8172size">size</dfn>);</td></tr>
+<tr><th id="67">67</th><td>    <em>void</em> (*<dfn class="decl" id="RAMBlockNotifier::ram_block_removed" title='RAMBlockNotifier::ram_block_removed' data-ref="RAMBlockNotifier::ram_block_removed">ram_block_removed</dfn>)(<a class="typedef" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-type='struct RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a> *<dfn class="local col3 decl" id="8173n" title='n' data-type='RAMBlockNotifier *' data-ref="8173n">n</dfn>, <em>void</em> *<dfn class="local col4 decl" id="8174host" title='host' data-type='void *' data-ref="8174host">host</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="8175size" title='size' data-type='size_t' data-ref="8175size">size</dfn>);</td></tr>
+<tr><th id="68">68</th><td>    <a class="macro" href="../qemu/queue.h.html#94" title="struct { struct RAMBlockNotifier *le_next; struct RAMBlockNotifier **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a>) <dfn class="decl" id="RAMBlockNotifier::next" title='RAMBlockNotifier::next' data-ref="RAMBlockNotifier::next">next</dfn>;</td></tr>
+<tr><th id="69">69</th><td>};</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><em>void</em> <dfn class="decl" id="ram_block_notifier_add" title='ram_block_notifier_add' data-ref="ram_block_notifier_add">ram_block_notifier_add</dfn>(<a class="typedef" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-type='struct RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a> *<dfn class="local col6 decl" id="8176n" title='n' data-type='RAMBlockNotifier *' data-ref="8176n">n</dfn>);</td></tr>
+<tr><th id="72">72</th><td><em>void</em> <dfn class="decl" id="ram_block_notifier_remove" title='ram_block_notifier_remove' data-ref="ram_block_notifier_remove">ram_block_notifier_remove</dfn>(<a class="typedef" href="#RAMBlockNotifier" title='RAMBlockNotifier' data-type='struct RAMBlockNotifier' data-ref="RAMBlockNotifier">RAMBlockNotifier</a> *<dfn class="local col7 decl" id="8177n" title='n' data-type='RAMBlockNotifier *' data-ref="8177n">n</dfn>);</td></tr>
+<tr><th id="73">73</th><td><em>void</em> <dfn class="decl" id="ram_block_notify_add" title='ram_block_notify_add' data-ref="ram_block_notify_add">ram_block_notify_add</dfn>(<em>void</em> *<dfn class="local col8 decl" id="8178host" title='host' data-type='void *' data-ref="8178host">host</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col9 decl" id="8179size" title='size' data-type='size_t' data-ref="8179size">size</dfn>);</td></tr>
+<tr><th id="74">74</th><td><em>void</em> <dfn class="decl" id="ram_block_notify_remove" title='ram_block_notify_remove' data-ref="ram_block_notify_remove">ram_block_notify_remove</dfn>(<em>void</em> *<dfn class="local col0 decl" id="8180host" title='host' data-type='void *' data-ref="8180host">host</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="8181size" title='size' data-type='size_t' data-ref="8181size">size</dfn>);</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>void</em> <dfn class="decl" id="ram_block_dump" title='ram_block_dump' data-ref="ram_block_dump">ram_block_dump</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Monitor" title='Monitor' data-type='struct Monitor' data-ref="Monitor">Monitor</a> *<dfn class="local col2 decl" id="8182mon" title='mon' data-type='Monitor *' data-ref="8182mon">mon</dfn>);</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><u>#<span data-ppcond="1">endif</span> /* RAMLIST_H */</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

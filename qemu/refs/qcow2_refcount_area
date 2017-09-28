@@ -1,0 +1,19 @@
+<dec f='codebrowser/block/qcow2.h' l='552' type='int64_t qcow2_refcount_area(BlockDriverState * bs, uint64_t offset, uint64_t additional_clusters, _Bool exact_size, int new_refblock_index, uint64_t new_refblock_offset)'/>
+<use f='codebrowser/block/qcow2-refcount.c' l='478' u='c' c='alloc_refcount_block'/>
+<def f='codebrowser/block/qcow2-refcount.c' l='516' ll='717' type='int64_t qcow2_refcount_area(BlockDriverState * bs, uint64_t start_offset, uint64_t additional_clusters, _Bool exact_size, int new_refblock_index, uint64_t new_refblock_offset)'/>
+<doc f='codebrowser/block/qcow2-refcount.c' l='501'>/*
+ * Starting at @start_offset, this function creates new self-covering refcount
+ * structures: A new refcount table and refcount blocks which cover all of
+ * themselves, and a number of @additional_clusters beyond their end.
+ * @start_offset must be at the end of the image file, that is, there must be
+ * only empty space beyond it.
+ * If @exact_size is false, the refcount table will have 50 % more entries than
+ * necessary so it will not need to grow again soon.
+ * If @new_refblock_offset is not zero, it contains the offset of a refcount
+ * block that should be entered into the new refcount table at index
+ * @new_refblock_index.
+ *
+ * Returns: The offset after the new refcount structures (i.e. where the
+ *          @additional_clusters may be placed) on success, -errno on error.
+ */</doc>
+<use f='codebrowser/block/qcow2.c' l='3184' u='c' c='qcow2_truncate'/>

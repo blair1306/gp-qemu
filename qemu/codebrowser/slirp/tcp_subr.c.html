@@ -1,0 +1,992 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tcp_subr.c source code [codebrowser/slirp/tcp_subr.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/tcp_subr.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='tcp_subr.c.html'>tcp_subr.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1982, 1986, 1988, 1990, 1993</i></td></tr>
+<tr><th id="3">3</th><td><i> *	The Regents of the University of California.  All rights reserved.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="6">6</th><td><i> * modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="7">7</th><td><i> * are met:</i></td></tr>
+<tr><th id="8">8</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="9">9</th><td><i> *    notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="10">10</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="11">11</th><td><i> *    notice, this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="12">12</th><td><i> *    documentation and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="13">13</th><td><i> * 3. Neither the name of the University nor the names of its contributors</i></td></tr>
+<tr><th id="14">14</th><td><i> *    may be used to endorse or promote products derived from this software</i></td></tr>
+<tr><th id="15">15</th><td><i> *    without specific prior written permission.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND</i></td></tr>
+<tr><th id="18">18</th><td><i> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</i></td></tr>
+<tr><th id="19">19</th><td><i> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</i></td></tr>
+<tr><th id="20">20</th><td><i> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE</i></td></tr>
+<tr><th id="21">21</th><td><i> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</i></td></tr>
+<tr><th id="22">22</th><td><i> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</i></td></tr>
+<tr><th id="23">23</th><td><i> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</i></td></tr>
+<tr><th id="24">24</th><td><i> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</i></td></tr>
+<tr><th id="25">25</th><td><i> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</i></td></tr>
+<tr><th id="26">26</th><td><i> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</i></td></tr>
+<tr><th id="27">27</th><td><i> * SUCH DAMAGE.</i></td></tr>
+<tr><th id="28">28</th><td><i> *</i></td></tr>
+<tr><th id="29">29</th><td><i> *	@(#)tcp_subr.c	8.1 (Berkeley) 6/10/93</i></td></tr>
+<tr><th id="30">30</th><td><i> * tcp_subr.c,v 1.5 1994/10/08 22:39:58 phk Exp</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>/*</i></td></tr>
+<tr><th id="34">34</th><td><i> * Changes and additions relating to SLiRP</i></td></tr>
+<tr><th id="35">35</th><td><i> * Copyright (c) 1995 Danny Gasparovski.</i></td></tr>
+<tr><th id="36">36</th><td><i> *</i></td></tr>
+<tr><th id="37">37</th><td><i> * Please read the file COPYRIGHT for the</i></td></tr>
+<tr><th id="38">38</th><td><i> * terms and conditions of the copyright.</i></td></tr>
+<tr><th id="39">39</th><td><i> */</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i>/* patchable/settable parameters for tcp */</i></td></tr>
+<tr><th id="45">45</th><td><i>/* Don't do rfc1323 performance enhancements */</i></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/TCP_DO_RFC1323" data-ref="_M/TCP_DO_RFC1323">TCP_DO_RFC1323</dfn> 0</u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><i>/*</i></td></tr>
+<tr><th id="49">49</th><td><i> * Tcp initialization</i></td></tr>
+<tr><th id="50">50</th><td><i> */</i></td></tr>
+<tr><th id="51">51</th><td><em>void</em></td></tr>
+<tr><th id="52">52</th><td><dfn class="decl def" id="tcp_init" title='tcp_init' data-ref="tcp_init">tcp_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col1 decl" id="1slirp" title='slirp' data-type='Slirp *' data-ref="1slirp">slirp</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_iss" title='Slirp::tcp_iss' data-ref="Slirp::tcp_iss">tcp_iss</a> = <var>1</var>;		<i>/* wrong */</i></td></tr>
+<tr><th id="55">55</th><td>    <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a> = <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>.<a class="ref" href="socket.h.html#socket::so_prev" title='socket::so_prev' data-ref="socket::so_prev">so_prev</a> = &amp;<a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>;</td></tr>
+<tr><th id="56">56</th><td>    <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_last_so" title='Slirp::tcp_last_so' data-ref="Slirp::tcp_last_so">tcp_last_so</a> = &amp;<a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>;</td></tr>
+<tr><th id="57">57</th><td>}</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><em>void</em> <dfn class="decl def" id="tcp_cleanup" title='tcp_cleanup' data-ref="tcp_cleanup">tcp_cleanup</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col2 decl" id="2slirp" title='slirp' data-type='Slirp *' data-ref="2slirp">slirp</dfn>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>    <b>while</b> (<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a> != &amp;<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>) {</td></tr>
+<tr><th id="62">62</th><td>        <a class="ref" href="#tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</a>(<a class="macro" href="tcp_var.h.html#129" title="((slirp-&gt;tcb.so_next)-&gt;so_tcpcb)" data-ref="_M/sototcpcb">sototcpcb</a>(<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a>));</td></tr>
+<tr><th id="63">63</th><td>    }</td></tr>
+<tr><th id="64">64</th><td>}</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><i>/*</i></td></tr>
+<tr><th id="67">67</th><td><i> * Create template to be used to send tcp packets on a connection.</i></td></tr>
+<tr><th id="68">68</th><td><i> * Call after host entry created, fills</i></td></tr>
+<tr><th id="69">69</th><td><i> * in a skeletal tcp/ip header, minimizing the amount of work</i></td></tr>
+<tr><th id="70">70</th><td><i> * necessary when the connection is used.</i></td></tr>
+<tr><th id="71">71</th><td><i> */</i></td></tr>
+<tr><th id="72">72</th><td><em>void</em></td></tr>
+<tr><th id="73">73</th><td><dfn class="decl def" id="tcp_template" title='tcp_template' data-ref="tcp_template">tcp_template</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col3 decl" id="3tp" title='tp' data-type='struct tcpcb *' data-ref="3tp">tp</dfn>)</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>	<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col4 decl" id="4so" title='so' data-type='struct socket *' data-ref="4so">so</dfn> = <a class="local col3 ref" href="#3tp" title='tp' data-ref="3tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</a>;</td></tr>
+<tr><th id="76">76</th><td>	<em>register</em> <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="local col5 decl" id="5n" title='n' data-type='struct tcpiphdr *' data-ref="5n">n</dfn> = &amp;<a class="local col3 ref" href="#3tp" title='tp' data-ref="3tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_template" title='tcpcb::t_template' data-ref="tcpcb::t_template">t_template</a>;</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#59" title="ih_mbuf.mptr" data-ref="_M/ti_mbuf">ti_mbuf</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="79">79</th><td>	<a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti" title='tcpiphdr::ti' data-ref="tcpiphdr::ti">ti</a>, <var>0</var>, <b>sizeof</b>(<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti" title='tcpiphdr::ti' data-ref="tcpiphdr::ti">ti</a>));</td></tr>
+<tr><th id="80">80</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti_x0" title='tcpiphdr::ti_x0' data-ref="tcpiphdr::ti_x0">ti_x0</a> = <var>0</var>;</td></tr>
+<tr><th id="81">81</th><td>	<b>switch</b> (<a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#45" title="fhost.ss.ss_family" data-ref="_M/so_ffamily">so_ffamily</a>) {</td></tr>
+<tr><th id="82">82</th><td>	<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>:</td></tr>
+<tr><th id="83">83</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#60" title="ti.ti_i4.ih_pr" data-ref="_M/ti_pr">ti_pr</a> = <a class="macro" href="../../include/netinet/in.h.html#51" title="IPPROTO_TCP" data-ref="_M/IPPROTO_TCP">IPPROTO_TCP</a>;</td></tr>
+<tr><th id="84">84</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti_len" title='tcpiphdr::ti_len' data-ref="tcpiphdr::ti_len">ti_len</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>));</td></tr>
+<tr><th id="85">85</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#61" title="ti.ti_i4.ih_src" data-ref="_M/ti_src">ti_src</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>;</td></tr>
+<tr><th id="86">86</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#62" title="ti.ti_i4.ih_dst" data-ref="_M/ti_dst">ti_dst</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a>;</td></tr>
+<tr><th id="87">87</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#66" title="ti_t.th_sport" data-ref="_M/ti_sport">ti_sport</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>;</td></tr>
+<tr><th id="88">88</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#67" title="ti_t.th_dport" data-ref="_M/ti_dport">ti_dport</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#49" title="lhost.sin.sin_port" data-ref="_M/so_lport">so_lport</a>;</td></tr>
+<tr><th id="89">89</th><td>	    <b>break</b>;</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>	<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#100" title="10" data-ref="_M/AF_INET6">AF_INET6</a>:</td></tr>
+<tr><th id="92">92</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#65" title="ti.ti_i6.ih_nh" data-ref="_M/ti_nh6">ti_nh6</a> = <a class="macro" href="../../include/netinet/in.h.html#51" title="IPPROTO_TCP" data-ref="_M/IPPROTO_TCP">IPPROTO_TCP</a>;</td></tr>
+<tr><th id="93">93</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti_len" title='tcpiphdr::ti_len' data-ref="tcpiphdr::ti_len">ti_len</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>));</td></tr>
+<tr><th id="94">94</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#63" title="ti.ti_i6.ih_src" data-ref="_M/ti_src6">ti_src6</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#43" title="fhost.sin6.sin6_addr" data-ref="_M/so_faddr6">so_faddr6</a>;</td></tr>
+<tr><th id="95">95</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#64" title="ti.ti_i6.ih_dst" data-ref="_M/ti_dst6">ti_dst6</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#50" title="lhost.sin6.sin6_addr" data-ref="_M/so_laddr6">so_laddr6</a>;</td></tr>
+<tr><th id="96">96</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#66" title="ti_t.th_sport" data-ref="_M/ti_sport">ti_sport</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#44" title="fhost.sin6.sin6_port" data-ref="_M/so_fport6">so_fport6</a>;</td></tr>
+<tr><th id="97">97</th><td>	    <a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#67" title="ti_t.th_dport" data-ref="_M/ti_dport">ti_dport</a> = <a class="local col4 ref" href="#4so" title='so' data-ref="4so">so</a>-&gt;<a class="macro" href="socket.h.html#51" title="lhost.sin6.sin6_port" data-ref="_M/so_lport6">so_lport6</a>;</td></tr>
+<tr><th id="98">98</th><td>	    <b>break</b>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>	<b>default</b>:</td></tr>
+<tr><th id="101">101</th><td>	    <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/slirp/tcp_subr.c&quot;, 101, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="102">102</th><td>	}</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#68" title="ti_t.th_seq" data-ref="_M/ti_seq">ti_seq</a> = <var>0</var>;</td></tr>
+<tr><th id="105">105</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#69" title="ti_t.th_ack" data-ref="_M/ti_ack">ti_ack</a> = <var>0</var>;</td></tr>
+<tr><th id="106">106</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#70" title="ti_t.th_x2" data-ref="_M/ti_x2">ti_x2</a> = <var>0</var>;</td></tr>
+<tr><th id="107">107</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#71" title="ti_t.th_off" data-ref="_M/ti_off">ti_off</a> = <var>5</var>;</td></tr>
+<tr><th id="108">108</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#72" title="ti_t.th_flags" data-ref="_M/ti_flags">ti_flags</a> = <var>0</var>;</td></tr>
+<tr><th id="109">109</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#73" title="ti_t.th_win" data-ref="_M/ti_win">ti_win</a> = <var>0</var>;</td></tr>
+<tr><th id="110">110</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#74" title="ti_t.th_sum" data-ref="_M/ti_sum">ti_sum</a> = <var>0</var>;</td></tr>
+<tr><th id="111">111</th><td>	<a class="local col5 ref" href="#5n" title='n' data-ref="5n">n</a>-&gt;<a class="macro" href="tcpip.h.html#75" title="ti_t.th_urp" data-ref="_M/ti_urp">ti_urp</a> = <var>0</var>;</td></tr>
+<tr><th id="112">112</th><td>}</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><i>/*</i></td></tr>
+<tr><th id="115">115</th><td><i> * Send a single message to the TCP at address specified by</i></td></tr>
+<tr><th id="116">116</th><td><i> * the given TCP/IP header.  If m == 0, then we make a copy</i></td></tr>
+<tr><th id="117">117</th><td><i> * of the tcpiphdr at ti and send directly to the addressed host.</i></td></tr>
+<tr><th id="118">118</th><td><i> * This is used to force keep alive messages out using the TCP</i></td></tr>
+<tr><th id="119">119</th><td><i> * template for a connection tp-&gt;t_template.  If flags are given</i></td></tr>
+<tr><th id="120">120</th><td><i> * then we send a message back to the TCP which originated the</i></td></tr>
+<tr><th id="121">121</th><td><i> * segment ti, and discard the mbuf containing it and any other</i></td></tr>
+<tr><th id="122">122</th><td><i> * attached mbufs.</i></td></tr>
+<tr><th id="123">123</th><td><i> *</i></td></tr>
+<tr><th id="124">124</th><td><i> * In any case the ack and sequence number of the transmitted</i></td></tr>
+<tr><th id="125">125</th><td><i> * segment are as specified by the parameters.</i></td></tr>
+<tr><th id="126">126</th><td><i> */</i></td></tr>
+<tr><th id="127">127</th><td><em>void</em></td></tr>
+<tr><th id="128">128</th><td><dfn class="decl def" id="tcp_respond" title='tcp_respond' data-ref="tcp_respond">tcp_respond</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col6 decl" id="6tp" title='tp' data-type='struct tcpcb *' data-ref="6tp">tp</dfn>, <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="local col7 decl" id="7ti" title='ti' data-type='struct tcpiphdr *' data-ref="7ti">ti</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col8 decl" id="8m" title='m' data-type='struct mbuf *' data-ref="8m">m</dfn>,</td></tr>
+<tr><th id="129">129</th><td>            <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a> <dfn class="local col9 decl" id="9ack" title='ack' data-type='tcp_seq' data-ref="9ack">ack</dfn>, <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a> <dfn class="local col0 decl" id="10seq" title='seq' data-type='tcp_seq' data-ref="10seq">seq</dfn>, <em>int</em> <dfn class="local col1 decl" id="11flags" title='flags' data-type='int' data-ref="11flags">flags</dfn>, <em>unsigned</em> <em>short</em> <dfn class="local col2 decl" id="12af" title='af' data-type='unsigned short' data-ref="12af">af</dfn>)</td></tr>
+<tr><th id="130">130</th><td>{</td></tr>
+<tr><th id="131">131</th><td>	<em>register</em> <em>int</em> <dfn class="local col3 decl" id="13tlen" title='tlen' data-type='int' data-ref="13tlen">tlen</dfn>;</td></tr>
+<tr><th id="132">132</th><td>	<em>int</em> <dfn class="local col4 decl" id="14win" title='win' data-type='int' data-ref="14win">win</dfn> = <var>0</var>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_respond"</q>);</td></tr>
+<tr><th id="135">135</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"tp = %p"</q>, tp);</td></tr>
+<tr><th id="136">136</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"ti = %p"</q>, ti);</td></tr>
+<tr><th id="137">137</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m = %p"</q>, m);</td></tr>
+<tr><th id="138">138</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"ack = %u"</q>, ack);</td></tr>
+<tr><th id="139">139</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"seq = %u"</q>, seq);</td></tr>
+<tr><th id="140">140</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"flags = %x"</q>, flags);</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>	<b>if</b> (<a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a>)</td></tr>
+<tr><th id="143">143</th><td>		<a class="local col4 ref" href="#14win" title='win' data-ref="14win">win</a> = <a class="macro" href="sbuf.h.html#12" title="((&amp;tp-&gt;t_socket-&gt;so_rcv)-&gt;sb_datalen - (&amp;tp-&gt;t_socket-&gt;so_rcv)-&gt;sb_cc)" data-ref="_M/sbspace">sbspace</a>(&amp;<a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>);</td></tr>
+<tr><th id="144">144</th><td>        <b>if</b> (<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="145">145</th><td>		<b>if</b> (!<a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a> || (<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a> = <a class="ref" href="mbuf.h.html#m_get" title='m_get' data-ref="m_get">m_get</a>(<a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)</td></tr>
+<tr><th id="146">146</th><td>			<b>return</b>;</td></tr>
+<tr><th id="147">147</th><td>		<a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a> = <var>0</var>;</td></tr>
+<tr><th id="148">148</th><td>		<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="macro" href="if.h.html#21" title="(2 + 14)" data-ref="_M/IF_MAXLINKHDR">IF_MAXLINKHDR</a>;</td></tr>
+<tr><th id="149">149</th><td>		*<a class="macro" href="mbuf.h.html#42" title="((struct tcpiphdr *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *) = *<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>;</td></tr>
+<tr><th id="150">150</th><td>		<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a> = <a class="macro" href="mbuf.h.html#42" title="((struct tcpiphdr *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *);</td></tr>
+<tr><th id="151">151</th><td>		<a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti" title='tcpiphdr::ti' data-ref="tcpiphdr::ti">ti</a>, <var>0</var>, <b>sizeof</b>(<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti" title='tcpiphdr::ti' data-ref="tcpiphdr::ti">ti</a>));</td></tr>
+<tr><th id="152">152</th><td>		<a class="local col1 ref" href="#11flags" title='flags' data-ref="11flags">flags</a> = <a class="macro" href="../include/net/eth.h.html#178" title="0x10" data-ref="_M/TH_ACK">TH_ACK</a>;</td></tr>
+<tr><th id="153">153</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="154">154</th><td>		<i>/*</i></td></tr>
+<tr><th id="155">155</th><td><i>		 * ti points into m so the next line is just making</i></td></tr>
+<tr><th id="156">156</th><td><i>		 * the mbuf point to ti</i></td></tr>
+<tr><th id="157">157</th><td><i>		 */</i></td></tr>
+<tr><th id="158">158</th><td>		<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> = (<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#caddr_t" title='caddr_t' data-type='__caddr_t' data-ref="caddr_t">caddr_t</a>)<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>;</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>		<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <b>sizeof</b> (<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>);</td></tr>
+<tr><th id="161">161</th><td>		<a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a> = <var>0</var>;</td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/xchg" data-ref="_M/xchg">xchg</dfn>(a,b,type) { type <dfn class="local col5 decl" id="15t" title='t' data-type='uint32_t' data-ref="15t"><dfn class="local col6 decl" id="16t" title='t' data-type='uint16_t' data-ref="16t"><dfn class="local col7 decl" id="17t" title='t' data-type='struct in6_addr' data-ref="17t"><dfn class="local col8 decl" id="18t" title='t' data-type='uint16_t' data-ref="18t">t</dfn></dfn></dfn></dfn>; <a class="local col5 ref" href="#165" title='t' data-ref="15t"><a class="local col6 ref" href="#166" title='t' data-ref="16t"><a class="local col7 ref" href="#169" title='t' data-ref="17t"><a class="local col8 ref" href="#170" title='t' data-ref="18t">t</a></a></a></a>=a; a=b; b=<a class="local col5 ref" href="#165" title='t' data-ref="15t"><a class="local col6 ref" href="#166" title='t' data-ref="16t"><a class="local col7 ref" href="#169" title='t' data-ref="17t"><a class="local col8 ref" href="#170" title='t' data-ref="18t">t</a></a></a></a>; }</u></td></tr>
+<tr><th id="163">163</th><td>		<b>switch</b> (<a class="local col2 ref" href="#12af" title='af' data-ref="12af">af</a>) {</td></tr>
+<tr><th id="164">164</th><td>		<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>:</td></tr>
+<tr><th id="165">165</th><td>		    <a class="macro" href="#162" title="{ uint32_t t; t=ti-&gt;ti.ti_i4.ih_dst.s_addr; ti-&gt;ti.ti_i4.ih_dst.s_addr=ti-&gt;ti.ti_i4.ih_src.s_addr; ti-&gt;ti.ti_i4.ih_src.s_addr=t; }" data-ref="_M/xchg">xchg</a>(<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#62" title="ti.ti_i4.ih_dst" data-ref="_M/ti_dst">ti_dst</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>, <a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#61" title="ti.ti_i4.ih_src" data-ref="_M/ti_src">ti_src</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>);</td></tr>
+<tr><th id="166">166</th><td>		    <a class="macro" href="#162" title="{ uint16_t t; t=ti-&gt;ti_t.th_dport; ti-&gt;ti_t.th_dport=ti-&gt;ti_t.th_sport; ti-&gt;ti_t.th_sport=t; }" data-ref="_M/xchg">xchg</a>(<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#67" title="ti_t.th_dport" data-ref="_M/ti_dport">ti_dport</a>, <a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#66" title="ti_t.th_sport" data-ref="_M/ti_sport">ti_sport</a>, <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>);</td></tr>
+<tr><th id="167">167</th><td>		    <b>break</b>;</td></tr>
+<tr><th id="168">168</th><td>		<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#100" title="10" data-ref="_M/AF_INET6">AF_INET6</a>:</td></tr>
+<tr><th id="169">169</th><td>		    <a class="macro" href="#162" title="{ struct in6_addr t; t=ti-&gt;ti.ti_i6.ih_dst; ti-&gt;ti.ti_i6.ih_dst=ti-&gt;ti.ti_i6.ih_src; ti-&gt;ti.ti_i6.ih_src=t; }" data-ref="_M/xchg">xchg</a>(<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#64" title="ti.ti_i6.ih_dst" data-ref="_M/ti_dst6">ti_dst6</a>, <a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#63" title="ti.ti_i6.ih_src" data-ref="_M/ti_src6">ti_src6</a>, <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a>);</td></tr>
+<tr><th id="170">170</th><td>		    <a class="macro" href="#162" title="{ uint16_t t; t=ti-&gt;ti_t.th_dport; ti-&gt;ti_t.th_dport=ti-&gt;ti_t.th_sport; ti-&gt;ti_t.th_sport=t; }" data-ref="_M/xchg">xchg</a>(<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#67" title="ti_t.th_dport" data-ref="_M/ti_dport">ti_dport</a>, <a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#66" title="ti_t.th_sport" data-ref="_M/ti_sport">ti_sport</a>, <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>);</td></tr>
+<tr><th id="171">171</th><td>		    <b>break</b>;</td></tr>
+<tr><th id="172">172</th><td>		<b>default</b>:</td></tr>
+<tr><th id="173">173</th><td>		    <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/slirp/tcp_subr.c&quot;, 173, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="174">174</th><td>		}</td></tr>
+<tr><th id="175">175</th><td><u>#undef <a class="macro" href="#162" data-ref="_M/xchg">xchg</a></u></td></tr>
+<tr><th id="176">176</th><td>	}</td></tr>
+<tr><th id="177">177</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti_len" title='tcpiphdr::ti_len' data-ref="tcpiphdr::ti_len">ti_len</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>((<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_short" title='u_short' data-type='__u_short' data-ref="u_short">u_short</a>)(<b>sizeof</b> (<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>) + <a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a>));</td></tr>
+<tr><th id="178">178</th><td>	<a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a> += <b>sizeof</b> (<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>);</td></tr>
+<tr><th id="179">179</th><td>	<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a>;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#59" title="ih_mbuf.mptr" data-ref="_M/ti_mbuf">ti_mbuf</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="182">182</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="ref" href="tcpip.h.html#tcpiphdr::ti_x0" title='tcpiphdr::ti_x0' data-ref="tcpiphdr::ti_x0">ti_x0</a> = <var>0</var>;</td></tr>
+<tr><th id="183">183</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#68" title="ti_t.th_seq" data-ref="_M/ti_seq">ti_seq</a> = <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<a class="local col0 ref" href="#10seq" title='seq' data-ref="10seq">seq</a>);</td></tr>
+<tr><th id="184">184</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#69" title="ti_t.th_ack" data-ref="_M/ti_ack">ti_ack</a> = <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<a class="local col9 ref" href="#9ack" title='ack' data-ref="9ack">ack</a>);</td></tr>
+<tr><th id="185">185</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#70" title="ti_t.th_x2" data-ref="_M/ti_x2">ti_x2</a> = <var>0</var>;</td></tr>
+<tr><th id="186">186</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#71" title="ti_t.th_off" data-ref="_M/ti_off">ti_off</a> = <b>sizeof</b> (<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>) &gt;&gt; <var>2</var>;</td></tr>
+<tr><th id="187">187</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#72" title="ti_t.th_flags" data-ref="_M/ti_flags">ti_flags</a> = <a class="local col1 ref" href="#11flags" title='flags' data-ref="11flags">flags</a>;</td></tr>
+<tr><th id="188">188</th><td>	<b>if</b> (<a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a>)</td></tr>
+<tr><th id="189">189</th><td>		<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#73" title="ti_t.th_win" data-ref="_M/ti_win">ti_win</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>((<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>) (<a class="local col4 ref" href="#14win" title='win' data-ref="14win">win</a> &gt;&gt; <a class="local col6 ref" href="#6tp" title='tp' data-ref="6tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::rcv_scale" title='tcpcb::rcv_scale' data-ref="tcpcb::rcv_scale">rcv_scale</a>));</td></tr>
+<tr><th id="190">190</th><td>	<b>else</b></td></tr>
+<tr><th id="191">191</th><td>		<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#73" title="ti_t.th_win" data-ref="_M/ti_win">ti_win</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>((<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>)<a class="local col4 ref" href="#14win" title='win' data-ref="14win">win</a>);</td></tr>
+<tr><th id="192">192</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#75" title="ti_t.th_urp" data-ref="_M/ti_urp">ti_urp</a> = <var>0</var>;</td></tr>
+<tr><th id="193">193</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#74" title="ti_t.th_sum" data-ref="_M/ti_sum">ti_sum</a> = <var>0</var>;</td></tr>
+<tr><th id="194">194</th><td>	<a class="local col7 ref" href="#7ti" title='ti' data-ref="7ti">ti</a>-&gt;<a class="macro" href="tcpip.h.html#74" title="ti_t.th_sum" data-ref="_M/ti_sum">ti_sum</a> = <a class="ref" href="slirp.h.html#cksum" title='cksum' data-ref="cksum">cksum</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <a class="local col3 ref" href="#13tlen" title='tlen' data-ref="13tlen">tlen</a>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>	<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> <dfn class="local col9 decl" id="19tcpiph_save" title='tcpiph_save' data-type='struct tcpiphdr' data-ref="19tcpiph_save">tcpiph_save</dfn> = *(<a class="macro" href="mbuf.h.html#42" title="((struct tcpiphdr *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *));</td></tr>
+<tr><th id="197">197</th><td>	<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col0 decl" id="20ip" title='ip' data-type='struct ip *' data-ref="20ip">ip</dfn>;</td></tr>
+<tr><th id="198">198</th><td>	<b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a> *<dfn class="local col1 decl" id="21ip6" title='ip6' data-type='struct ip6 *' data-ref="21ip6">ip6</dfn>;</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>	<b>switch</b> (<a class="local col2 ref" href="#12af" title='af' data-ref="12af">af</a>) {</td></tr>
+<tr><th id="201">201</th><td>	<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>:</td></tr>
+<tr><th id="202">202</th><td>	    <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <b>sizeof</b>(<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>) - <b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>)</td></tr>
+<tr><th id="203">203</th><td>	                                         - <b>sizeof</b>(<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a>);</td></tr>
+<tr><th id="204">204</th><td>	    <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>  -= <b>sizeof</b>(<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>) - <b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>)</td></tr>
+<tr><th id="205">205</th><td>	                                         - <b>sizeof</b>(<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a>);</td></tr>
+<tr><th id="206">206</th><td>	    <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a> = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="207">207</th><td>	    <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a> = <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;</td></tr>
+<tr><th id="208">208</th><td>	    <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#62" title="ti.ti_i4.ih_dst" data-ref="_M/ti_dst">ti_dst</a>;</td></tr>
+<tr><th id="209">209</th><td>	    <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#61" title="ti.ti_i4.ih_src" data-ref="_M/ti_src">ti_src</a>;</td></tr>
+<tr><th id="210">210</th><td>	    <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_p" title='ip::ip_p' data-ref="ip::ip_p">ip_p</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#60" title="ti.ti_i4.ih_pr" data-ref="_M/ti_pr">ti_pr</a>;</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>	    <b>if</b> (<a class="local col1 ref" href="#11flags" title='flags' data-ref="11flags">flags</a> &amp; <a class="macro" href="../include/net/eth.h.html#176" title="0x04" data-ref="_M/TH_RST">TH_RST</a>) {</td></tr>
+<tr><th id="213">213</th><td>	        <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_ttl" title='ip::ip_ttl' data-ref="ip::ip_ttl">ip_ttl</a> = <a class="macro" href="ip.h.html#171" title="255" data-ref="_M/MAXTTL">MAXTTL</a>;</td></tr>
+<tr><th id="214">214</th><td>	    } <b>else</b> {</td></tr>
+<tr><th id="215">215</th><td>	        <a class="local col0 ref" href="#20ip" title='ip' data-ref="20ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_ttl" title='ip::ip_ttl' data-ref="ip::ip_ttl">ip_ttl</a> = <a class="macro" href="ip.h.html#172" title="64" data-ref="_M/IPDEFTTL">IPDEFTTL</a>;</td></tr>
+<tr><th id="216">216</th><td>	    }</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>	    <a class="ref" href="slirp.h.html#ip_output" title='ip_output' data-ref="ip_output">ip_output</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>);</td></tr>
+<tr><th id="219">219</th><td>	    <b>break</b>;</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>	<b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#100" title="10" data-ref="_M/AF_INET6">AF_INET6</a>:</td></tr>
+<tr><th id="222">222</th><td>	    <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <b>sizeof</b>(<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>) - <b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>)</td></tr>
+<tr><th id="223">223</th><td>	                                         - <b>sizeof</b>(<b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a>);</td></tr>
+<tr><th id="224">224</th><td>	    <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>  -= <b>sizeof</b>(<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>) - <b>sizeof</b>(<b>struct</b> <a class="macro" href="tcp.h.html#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a>)</td></tr>
+<tr><th id="225">225</th><td>	                                         - <b>sizeof</b>(<b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a>);</td></tr>
+<tr><th id="226">226</th><td>	    <a class="local col1 ref" href="#21ip6" title='ip6' data-ref="21ip6">ip6</a> = <a class="macro" href="mbuf.h.html#42" title="((struct ip6 *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a> *);</td></tr>
+<tr><th id="227">227</th><td>	    <a class="local col1 ref" href="#21ip6" title='ip6' data-ref="21ip6">ip6</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_pl" title='ip6::ip_pl' data-ref="ip6::ip_pl">ip_pl</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="ref" href="tcpip.h.html#tcpiphdr::ti_len" title='tcpiphdr::ti_len' data-ref="tcpiphdr::ti_len">ti_len</a>;</td></tr>
+<tr><th id="228">228</th><td>	    <a class="local col1 ref" href="#21ip6" title='ip6' data-ref="21ip6">ip6</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_dst" title='ip6::ip_dst' data-ref="ip6::ip_dst">ip_dst</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#64" title="ti.ti_i6.ih_dst" data-ref="_M/ti_dst6">ti_dst6</a>;</td></tr>
+<tr><th id="229">229</th><td>	    <a class="local col1 ref" href="#21ip6" title='ip6' data-ref="21ip6">ip6</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_src" title='ip6::ip_src' data-ref="ip6::ip_src">ip_src</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#63" title="ti.ti_i6.ih_src" data-ref="_M/ti_src6">ti_src6</a>;</td></tr>
+<tr><th id="230">230</th><td>	    <a class="local col1 ref" href="#21ip6" title='ip6' data-ref="21ip6">ip6</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_nh" title='ip6::ip_nh' data-ref="ip6::ip_nh">ip_nh</a> = <a class="local col9 ref" href="#19tcpiph_save" title='tcpiph_save' data-ref="19tcpiph_save">tcpiph_save</a>.<a class="macro" href="tcpip.h.html#65" title="ti.ti_i6.ih_nh" data-ref="_M/ti_nh6">ti_nh6</a>;</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td>	    <a class="ref" href="slirp.h.html#ip6_output" title='ip6_output' data-ref="ip6_output">ip6_output</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col8 ref" href="#8m" title='m' data-ref="8m">m</a>, <var>0</var>);</td></tr>
+<tr><th id="233">233</th><td>	    <b>break</b>;</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>	<b>default</b>:</td></tr>
+<tr><th id="236">236</th><td>	    <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/slirp/tcp_subr.c&quot;, 236, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="237">237</th><td>	}</td></tr>
+<tr><th id="238">238</th><td>}</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><i>/*</i></td></tr>
+<tr><th id="241">241</th><td><i> * Create a new TCP control block, making an</i></td></tr>
+<tr><th id="242">242</th><td><i> * empty reassembly queue and hooking it to the argument</i></td></tr>
+<tr><th id="243">243</th><td><i> * protocol control block.</i></td></tr>
+<tr><th id="244">244</th><td><i> */</i></td></tr>
+<tr><th id="245">245</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *</td></tr>
+<tr><th id="246">246</th><td><dfn class="decl def" id="tcp_newtcpcb" title='tcp_newtcpcb' data-ref="tcp_newtcpcb">tcp_newtcpcb</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col2 decl" id="22so" title='so' data-type='struct socket *' data-ref="22so">so</dfn>)</td></tr>
+<tr><th id="247">247</th><td>{</td></tr>
+<tr><th id="248">248</th><td>	<em>register</em> <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col3 decl" id="23tp" title='tp' data-type='struct tcpcb *' data-ref="23tp">tp</dfn>;</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a> = (<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *)<a class="ref" href="../../include/stdlib.h.html#malloc" title='malloc' data-ref="malloc">malloc</a>(<b>sizeof</b>(*<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>));</td></tr>
+<tr><th id="251">251</th><td>	<b>if</b> (<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)</td></tr>
+<tr><th id="252">252</th><td>		<b>return</b> ((<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *)<var>0</var>);</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>	<a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>((<em>char</em> *) <a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>, <var>0</var>, <b>sizeof</b>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a>));</td></tr>
+<tr><th id="255">255</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::seg_next" title='tcpcb::seg_next' data-ref="tcpcb::seg_next">seg_next</a> = <a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::seg_prev" title='tcpcb::seg_prev' data-ref="tcpcb::seg_prev">seg_prev</a> = (<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a>*)<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>;</td></tr>
+<tr><th id="256">256</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_maxseg" title='tcpcb::t_maxseg' data-ref="tcpcb::t_maxseg">t_maxseg</a> = (<a class="local col2 ref" href="#22so" title='so' data-ref="22so">so</a>-&gt;<a class="macro" href="socket.h.html#45" title="fhost.ss.ss_family" data-ref="_M/so_ffamily">so_ffamily</a> == <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>) ? <a class="macro" href="tcp.h.html#108" title="1460" data-ref="_M/TCP_MSS">TCP_MSS</a> : <a class="macro" href="tcp.h.html#110" title="1440" data-ref="_M/TCP6_MSS">TCP6_MSS</a>;</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_flags" title='tcpcb::t_flags' data-ref="tcpcb::t_flags">t_flags</a> = <a class="macro" href="#46" title="0" data-ref="_M/TCP_DO_RFC1323">TCP_DO_RFC1323</a> ? (<a class="macro" href="tcp_var.h.html#58" title="0x0020" data-ref="_M/TF_REQ_SCALE">TF_REQ_SCALE</a>|<a class="macro" href="tcp_var.h.html#60" title="0x0080" data-ref="_M/TF_REQ_TSTMP">TF_REQ_TSTMP</a>) : <var>0</var>;</td></tr>
+<tr><th id="259">259</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</a> = <a class="local col2 ref" href="#22so" title='so' data-ref="22so">so</a>;</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>	<i>/*</i></td></tr>
+<tr><th id="262">262</th><td><i>	 * Init srtt to TCPTV_SRTTBASE (0), so we can tell that we have no</i></td></tr>
+<tr><th id="263">263</th><td><i>	 * rtt estimate.  Set rttvar so that srtt + 2 * rttvar gives</i></td></tr>
+<tr><th id="264">264</th><td><i>	 * reasonable initial retransmit time.</i></td></tr>
+<tr><th id="265">265</th><td><i>	 */</i></td></tr>
+<tr><th id="266">266</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_srtt" title='tcpcb::t_srtt' data-ref="tcpcb::t_srtt">t_srtt</a> = <a class="macro" href="tcp_timer.h.html#88" title="0" data-ref="_M/TCPTV_SRTTBASE">TCPTV_SRTTBASE</a>;</td></tr>
+<tr><th id="267">267</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_rttvar" title='tcpcb::t_rttvar' data-ref="tcpcb::t_rttvar">t_rttvar</a> = <a class="macro" href="tcp_timer.h.html#90" title="( 3*2)" data-ref="_M/TCPTV_SRTTDFLT">TCPTV_SRTTDFLT</a> &lt;&lt; <var>2</var>;</td></tr>
+<tr><th id="268">268</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_rttmin" title='tcpcb::t_rttmin' data-ref="tcpcb::t_rttmin">t_rttmin</a> = <a class="macro" href="tcp_timer.h.html#100" title="( 1*2)" data-ref="_M/TCPTV_MIN">TCPTV_MIN</a>;</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>	<a class="macro" href="tcp_timer.h.html#111" title="{ (tp-&gt;t_rxtcur) = (((0 &gt;&gt; 2) + (( 3*2) &lt;&lt; 2)) &gt;&gt; 1); if ((tp-&gt;t_rxtcur) &lt; (( 1*2))) (tp-&gt;t_rxtcur) = (( 1*2)); else if ((tp-&gt;t_rxtcur) &gt; (( 12*2))) (tp-&gt;t_rxtcur) = (( 12*2)); }" data-ref="_M/TCPT_RANGESET">TCPT_RANGESET</a>(<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_rxtcur" title='tcpcb::t_rxtcur' data-ref="tcpcb::t_rxtcur">t_rxtcur</a>,</td></tr>
+<tr><th id="271">271</th><td>	    ((<a class="macro" href="tcp_timer.h.html#88" title="0" data-ref="_M/TCPTV_SRTTBASE">TCPTV_SRTTBASE</a> &gt;&gt; <var>2</var>) + (<a class="macro" href="tcp_timer.h.html#90" title="( 3*2)" data-ref="_M/TCPTV_SRTTDFLT">TCPTV_SRTTDFLT</a> &lt;&lt; <var>2</var>)) &gt;&gt; <var>1</var>,</td></tr>
+<tr><th id="272">272</th><td>	    <a class="macro" href="tcp_timer.h.html#100" title="( 1*2)" data-ref="_M/TCPTV_MIN">TCPTV_MIN</a>, <a class="macro" href="tcp_timer.h.html#101" title="( 12*2)" data-ref="_M/TCPTV_REXMTMAX">TCPTV_REXMTMAX</a>);</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::snd_cwnd" title='tcpcb::snd_cwnd' data-ref="tcpcb::snd_cwnd">snd_cwnd</a> = <a class="macro" href="tcp.h.html#113" title="65535" data-ref="_M/TCP_MAXWIN">TCP_MAXWIN</a> &lt;&lt; <a class="macro" href="tcp.h.html#116" title="14" data-ref="_M/TCP_MAX_WINSHIFT">TCP_MAX_WINSHIFT</a>;</td></tr>
+<tr><th id="275">275</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::snd_ssthresh" title='tcpcb::snd_ssthresh' data-ref="tcpcb::snd_ssthresh">snd_ssthresh</a> = <a class="macro" href="tcp.h.html#113" title="65535" data-ref="_M/TCP_MAXWIN">TCP_MAXWIN</a> &lt;&lt; <a class="macro" href="tcp.h.html#116" title="14" data-ref="_M/TCP_MAX_WINSHIFT">TCP_MAX_WINSHIFT</a>;</td></tr>
+<tr><th id="276">276</th><td>	<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#136" title="0" data-ref="_M/TCPS_CLOSED">TCPS_CLOSED</a>;</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td>	<a class="local col2 ref" href="#22so" title='so' data-ref="22so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_tcpcb" title='socket::so_tcpcb' data-ref="socket::so_tcpcb">so_tcpcb</a> = <a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>;</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>	<b>return</b> (<a class="local col3 ref" href="#23tp" title='tp' data-ref="23tp">tp</a>);</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td><i>/*</i></td></tr>
+<tr><th id="284">284</th><td><i> * Drop a TCP connection, reporting</i></td></tr>
+<tr><th id="285">285</th><td><i> * the specified error.  If connection is synchronized,</i></td></tr>
+<tr><th id="286">286</th><td><i> * then send a RST to peer.</i></td></tr>
+<tr><th id="287">287</th><td><i> */</i></td></tr>
+<tr><th id="288">288</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="decl def" id="tcp_drop" title='tcp_drop' data-ref="tcp_drop">tcp_drop</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col4 decl" id="24tp" title='tp' data-type='struct tcpcb *' data-ref="24tp">tp</dfn>, <em>int</em> <dfn class="local col5 decl" id="25err" title='err' data-type='int' data-ref="25err">err</dfn>)</td></tr>
+<tr><th id="289">289</th><td>{</td></tr>
+<tr><th id="290">290</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_drop"</q>);</td></tr>
+<tr><th id="291">291</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"tp = %p"</q>, tp);</td></tr>
+<tr><th id="292">292</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"errno = %d"</q>, errno);</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>	<b>if</b> (<a class="macro" href="tcp.h.html#151" title="((tp-&gt;t_state) &gt;= 3)" data-ref="_M/TCPS_HAVERCVDSYN">TCPS_HAVERCVDSYN</a>(<a class="local col4 ref" href="#24tp" title='tp' data-ref="24tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a>)) {</td></tr>
+<tr><th id="295">295</th><td>		<a class="local col4 ref" href="#24tp" title='tp' data-ref="24tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#136" title="0" data-ref="_M/TCPS_CLOSED">TCPS_CLOSED</a>;</td></tr>
+<tr><th id="296">296</th><td>		(<em>void</em>) <a class="ref" href="slirp.h.html#tcp_output" title='tcp_output' data-ref="tcp_output">tcp_output</a>(<a class="local col4 ref" href="#24tp" title='tp' data-ref="24tp">tp</a>);</td></tr>
+<tr><th id="297">297</th><td>	}</td></tr>
+<tr><th id="298">298</th><td>	<b>return</b> (<a class="ref" href="#tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</a>(<a class="local col4 ref" href="#24tp" title='tp' data-ref="24tp">tp</a>));</td></tr>
+<tr><th id="299">299</th><td>}</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><i>/*</i></td></tr>
+<tr><th id="302">302</th><td><i> * Close a TCP control block:</i></td></tr>
+<tr><th id="303">303</th><td><i> *	discard all space held by the tcp</i></td></tr>
+<tr><th id="304">304</th><td><i> *	discard internet protocol block</i></td></tr>
+<tr><th id="305">305</th><td><i> *	wake up any sleepers</i></td></tr>
+<tr><th id="306">306</th><td><i> */</i></td></tr>
+<tr><th id="307">307</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *</td></tr>
+<tr><th id="308">308</th><td><dfn class="decl def" id="tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col6 decl" id="26tp" title='tp' data-type='struct tcpcb *' data-ref="26tp">tp</dfn>)</td></tr>
+<tr><th id="309">309</th><td>{</td></tr>
+<tr><th id="310">310</th><td>	<em>register</em> <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="local col7 decl" id="27t" title='t' data-type='struct tcpiphdr *' data-ref="27t">t</dfn>;</td></tr>
+<tr><th id="311">311</th><td>	<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col8 decl" id="28so" title='so' data-type='struct socket *' data-ref="28so">so</dfn> = <a class="local col6 ref" href="#26tp" title='tp' data-ref="26tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</a>;</td></tr>
+<tr><th id="312">312</th><td>	<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col9 decl" id="29slirp" title='slirp' data-type='Slirp *' data-ref="29slirp">slirp</dfn> = <a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>;</td></tr>
+<tr><th id="313">313</th><td>	<em>register</em> <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col0 decl" id="30m" title='m' data-type='struct mbuf *' data-ref="30m">m</dfn>;</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_close"</q>);</td></tr>
+<tr><th id="316">316</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"tp = %p"</q>, tp);</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td>	<i>/* free the reassembly queue, if any */</i></td></tr>
+<tr><th id="319">319</th><td>	<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a> = <a class="macro" href="tcpip.h.html#81" title="((struct tcpiphdr*)(((char*)((tp)-&gt;seg_next)) + sizeof(struct qlink)))" data-ref="_M/tcpfrag_list_first">tcpfrag_list_first</a>(<a class="local col6 ref" href="#26tp" title='tp' data-ref="26tp">tp</a>);</td></tr>
+<tr><th id="320">320</th><td>	<b>while</b> (!<a class="macro" href="tcpip.h.html#82" title="(((struct qlink*)(((char*)(t)) - sizeof(struct qlink))) == (struct qlink*)(tp))" data-ref="_M/tcpfrag_list_end">tcpfrag_list_end</a>(<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a>, <a class="local col6 ref" href="#26tp" title='tp' data-ref="26tp">tp</a>)) {</td></tr>
+<tr><th id="321">321</th><td>		<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a> = <a class="macro" href="tcpip.h.html#79" title="((struct tcpiphdr*)(((char*)(((struct qlink*)(((char*)(t)) - sizeof(struct qlink)))-&gt;next)) + sizeof(struct qlink)))" data-ref="_M/tcpiphdr_next">tcpiphdr_next</a>(<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a>);</td></tr>
+<tr><th id="322">322</th><td>		<a class="local col0 ref" href="#30m" title='m' data-ref="30m">m</a> = <a class="macro" href="tcpip.h.html#80" title="((struct tcpiphdr*)(((char*)(((struct qlink*)(((char*)(t)) - sizeof(struct qlink)))-&gt;prev)) + sizeof(struct qlink)))" data-ref="_M/tcpiphdr_prev">tcpiphdr_prev</a>(<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a>)-&gt;<a class="macro" href="tcpip.h.html#59" title="ih_mbuf.mptr" data-ref="_M/ti_mbuf">ti_mbuf</a>;</td></tr>
+<tr><th id="323">323</th><td>		<a class="macro" href="slirp.h.html#65" title="slirp_remque" data-ref="_M/remque">remque</a>(<a class="macro" href="tcpip.h.html#77" title="((struct qlink*)(((char*)(((struct tcpiphdr*)(((char*)(((struct qlink*)(((char*)(t)) - sizeof(struct qlink)))-&gt;prev)) + sizeof(struct qlink))))) - sizeof(struct qlink)))" data-ref="_M/tcpiphdr2qlink">tcpiphdr2qlink</a>(<a class="macro" href="tcpip.h.html#80" title="((struct tcpiphdr*)(((char*)(((struct qlink*)(((char*)(t)) - sizeof(struct qlink)))-&gt;prev)) + sizeof(struct qlink)))" data-ref="_M/tcpiphdr_prev">tcpiphdr_prev</a>(<a class="local col7 ref" href="#27t" title='t' data-ref="27t">t</a>)));</td></tr>
+<tr><th id="324">324</th><td>		<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col0 ref" href="#30m" title='m' data-ref="30m">m</a>);</td></tr>
+<tr><th id="325">325</th><td>	}</td></tr>
+<tr><th id="326">326</th><td>	<a class="ref" href="../../include/stdlib.h.html#free" title='free' data-ref="free">free</a>(<a class="local col6 ref" href="#26tp" title='tp' data-ref="26tp">tp</a>);</td></tr>
+<tr><th id="327">327</th><td>        <a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_tcpcb" title='socket::so_tcpcb' data-ref="socket::so_tcpcb">so_tcpcb</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="328">328</th><td>	<i>/* clobber input socket cache if we're closing the cached connection */</i></td></tr>
+<tr><th id="329">329</th><td>	<b>if</b> (<a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a> == <a class="local col9 ref" href="#29slirp" title='slirp' data-ref="29slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_last_so" title='Slirp::tcp_last_so' data-ref="Slirp::tcp_last_so">tcp_last_so</a>)</td></tr>
+<tr><th id="330">330</th><td>		<a class="local col9 ref" href="#29slirp" title='slirp' data-ref="29slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_last_so" title='Slirp::tcp_last_so' data-ref="Slirp::tcp_last_so">tcp_last_so</a> = &amp;<a class="local col9 ref" href="#29slirp" title='slirp' data-ref="29slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>;</td></tr>
+<tr><th id="331">331</th><td>	<a class="macro" href="../include/sysemu/os-posix.h.html#48" title="close(so-&gt;s)" data-ref="_M/closesocket">closesocket</a>(<a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>);</td></tr>
+<tr><th id="332">332</th><td>	<a class="ref" href="sbuf.h.html#sbfree" title='sbfree' data-ref="sbfree">sbfree</a>(&amp;<a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>);</td></tr>
+<tr><th id="333">333</th><td>	<a class="ref" href="sbuf.h.html#sbfree" title='sbfree' data-ref="sbfree">sbfree</a>(&amp;<a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_snd" title='socket::so_snd' data-ref="socket::so_snd">so_snd</a>);</td></tr>
+<tr><th id="334">334</th><td>	<a class="ref" href="socket.h.html#sofree" title='sofree' data-ref="sofree">sofree</a>(<a class="local col8 ref" href="#28so" title='so' data-ref="28so">so</a>);</td></tr>
+<tr><th id="335">335</th><td>	<b>return</b> ((<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *)<var>0</var>);</td></tr>
+<tr><th id="336">336</th><td>}</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td><i>/*</i></td></tr>
+<tr><th id="339">339</th><td><i> * TCP protocol interface to socket abstraction.</i></td></tr>
+<tr><th id="340">340</th><td><i> */</i></td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td><i>/*</i></td></tr>
+<tr><th id="343">343</th><td><i> * User issued close, and wish to trail through shutdown states:</i></td></tr>
+<tr><th id="344">344</th><td><i> * if never received SYN, just forget it.  If got a SYN from peer,</i></td></tr>
+<tr><th id="345">345</th><td><i> * but haven't sent FIN, then go to FIN_WAIT_1 state to send peer a FIN.</i></td></tr>
+<tr><th id="346">346</th><td><i> * If already got a FIN from peer, then almost done; go to LAST_ACK</i></td></tr>
+<tr><th id="347">347</th><td><i> * state.  In all other cases, have already sent FIN to peer (e.g.</i></td></tr>
+<tr><th id="348">348</th><td><i> * after PRU_SHUTDOWN), and just have to play tedious game waiting</i></td></tr>
+<tr><th id="349">349</th><td><i> * for peer to send FIN or not respond to keep-alives, etc.</i></td></tr>
+<tr><th id="350">350</th><td><i> * We can let the user exit from the close as soon as the FIN is acked.</i></td></tr>
+<tr><th id="351">351</th><td><i> */</i></td></tr>
+<tr><th id="352">352</th><td><em>void</em></td></tr>
+<tr><th id="353">353</th><td><dfn class="decl def" id="tcp_sockclosed" title='tcp_sockclosed' data-ref="tcp_sockclosed">tcp_sockclosed</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col1 decl" id="31tp" title='tp' data-type='struct tcpcb *' data-ref="31tp">tp</dfn>)</td></tr>
+<tr><th id="354">354</th><td>{</td></tr>
+<tr><th id="355">355</th><td></td></tr>
+<tr><th id="356">356</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_sockclosed"</q>);</td></tr>
+<tr><th id="357">357</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"tp = %p"</q>, tp);</td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td>	<b>if</b> (!<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>) {</td></tr>
+<tr><th id="360">360</th><td>		<b>return</b>;</td></tr>
+<tr><th id="361">361</th><td>	}</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td>	<b>switch</b> (<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a>) {</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#136" title="0" data-ref="_M/TCPS_CLOSED">TCPS_CLOSED</a>:</td></tr>
+<tr><th id="366">366</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#137" title="1" data-ref="_M/TCPS_LISTEN">TCPS_LISTEN</a>:</td></tr>
+<tr><th id="367">367</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#138" title="2" data-ref="_M/TCPS_SYN_SENT">TCPS_SYN_SENT</a>:</td></tr>
+<tr><th id="368">368</th><td>		<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#136" title="0" data-ref="_M/TCPS_CLOSED">TCPS_CLOSED</a>;</td></tr>
+<tr><th id="369">369</th><td>		<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a> = <a class="ref" href="#tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</a>(<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>);</td></tr>
+<tr><th id="370">370</th><td>		<b>break</b>;</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#139" title="3" data-ref="_M/TCPS_SYN_RECEIVED">TCPS_SYN_RECEIVED</a>:</td></tr>
+<tr><th id="373">373</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#141" title="4" data-ref="_M/TCPS_ESTABLISHED">TCPS_ESTABLISHED</a>:</td></tr>
+<tr><th id="374">374</th><td>		<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#144" title="6" data-ref="_M/TCPS_FIN_WAIT_1">TCPS_FIN_WAIT_1</a>;</td></tr>
+<tr><th id="375">375</th><td>		<b>break</b>;</td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td>	<b>case</b> <a class="macro" href="tcp.h.html#142" title="5" data-ref="_M/TCPS_CLOSE_WAIT">TCPS_CLOSE_WAIT</a>:</td></tr>
+<tr><th id="378">378</th><td>		<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#146" title="8" data-ref="_M/TCPS_LAST_ACK">TCPS_LAST_ACK</a>;</td></tr>
+<tr><th id="379">379</th><td>		<b>break</b>;</td></tr>
+<tr><th id="380">380</th><td>	}</td></tr>
+<tr><th id="381">381</th><td>	<a class="ref" href="slirp.h.html#tcp_output" title='tcp_output' data-ref="tcp_output">tcp_output</a>(<a class="local col1 ref" href="#31tp" title='tp' data-ref="31tp">tp</a>);</td></tr>
+<tr><th id="382">382</th><td>}</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td><i>/*</i></td></tr>
+<tr><th id="385">385</th><td><i> * Connect to a host on the Internet</i></td></tr>
+<tr><th id="386">386</th><td><i> * Called by tcp_input</i></td></tr>
+<tr><th id="387">387</th><td><i> * Only do a connect, the tcp fields will be set in tcp_input</i></td></tr>
+<tr><th id="388">388</th><td><i> * return 0 if there's a result of the connect,</i></td></tr>
+<tr><th id="389">389</th><td><i> * else return -1 means we're still connecting</i></td></tr>
+<tr><th id="390">390</th><td><i> * The return value is almost always -1 since the socket is</i></td></tr>
+<tr><th id="391">391</th><td><i> * nonblocking.  Connect returns after the SYN is sent, and does</i></td></tr>
+<tr><th id="392">392</th><td><i> * not wait for ACK+SYN.</i></td></tr>
+<tr><th id="393">393</th><td><i> */</i></td></tr>
+<tr><th id="394">394</th><td><em>int</em> <dfn class="decl def" id="tcp_fconnect" title='tcp_fconnect' data-ref="tcp_fconnect">tcp_fconnect</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col2 decl" id="32so" title='so' data-type='struct socket *' data-ref="32so">so</dfn>, <em>unsigned</em> <em>short</em> <dfn class="local col3 decl" id="33af" title='af' data-type='unsigned short' data-ref="33af">af</dfn>)</td></tr>
+<tr><th id="395">395</th><td>{</td></tr>
+<tr><th id="396">396</th><td>  <em>int</em> <dfn class="local col4 decl" id="34ret" title='ret' data-type='int' data-ref="34ret">ret</dfn>=<var>0</var>;</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td>  <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_fconnect"</q>);</td></tr>
+<tr><th id="399">399</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %p"</q>, so);</td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td>  <a class="local col4 ref" href="#34ret" title='ret' data-ref="34ret">ret</a> = <a class="local col2 ref" href="#32so" title='so' data-ref="32so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a> = <a class="ref" href="../include/qemu/sockets.h.html#qemu_socket" title='qemu_socket' data-ref="qemu_socket">qemu_socket</a>(<a class="local col3 ref" href="#33af" title='af' data-ref="33af">af</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket_type.h.html#28" title="SOCK_STREAM" data-ref="_M/SOCK_STREAM">SOCK_STREAM</a>, <var>0</var>);</td></tr>
+<tr><th id="402">402</th><td>  <b>if</b> (<a class="local col4 ref" href="#34ret" title='ret' data-ref="34ret">ret</a> &gt;= <var>0</var>) {</td></tr>
+<tr><th id="403">403</th><td>    <em>int</em> <dfn class="local col5 decl" id="35opt" title='opt' data-type='int' data-ref="35opt">opt</dfn>, <dfn class="local col6 decl" id="36s" title='s' data-type='int' data-ref="36s">s</dfn>=<a class="local col2 ref" href="#32so" title='so' data-ref="32so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>;</td></tr>
+<tr><th id="404">404</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> <dfn class="local col7 decl" id="37addr" title='addr' data-type='struct sockaddr_storage' data-ref="37addr">addr</dfn>;</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#qemu_set_nonblock" title='qemu_set_nonblock' data-ref="qemu_set_nonblock">qemu_set_nonblock</a>(<a class="local col6 ref" href="#36s" title='s' data-ref="36s">s</a>);</td></tr>
+<tr><th id="407">407</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#socket_set_fast_reuse" title='socket_set_fast_reuse' data-ref="socket_set_fast_reuse">socket_set_fast_reuse</a>(<a class="local col6 ref" href="#36s" title='s' data-ref="36s">s</a>);</td></tr>
+<tr><th id="408">408</th><td>    <a class="local col5 ref" href="#35opt" title='opt' data-ref="35opt">opt</a> = <var>1</var>;</td></tr>
+<tr><th id="409">409</th><td>    <a class="macro" href="../include/qemu-common.h.html#72" title="setsockopt(s, 1, 10, &amp;opt, sizeof(opt))" data-ref="_M/qemu_setsockopt">qemu_setsockopt</a>(<a class="local col6 ref" href="#36s" title='s' data-ref="36s">s</a>, <a class="macro" href="../../include/asm-generic/socket.h.html#7" title="1" data-ref="_M/SOL_SOCKET">SOL_SOCKET</a>, <a class="macro" href="../../include/asm-generic/socket.h.html#20" title="10" data-ref="_M/SO_OOBINLINE">SO_OOBINLINE</a>, &amp;<a class="local col5 ref" href="#35opt" title='opt' data-ref="35opt">opt</a>, <b>sizeof</b>(<a class="local col5 ref" href="#35opt" title='opt' data-ref="35opt">opt</a>));</td></tr>
+<tr><th id="410">410</th><td></td></tr>
+<tr><th id="411">411</th><td>    <a class="local col7 ref" href="#37addr" title='addr' data-ref="37addr">addr</a> = <a class="local col2 ref" href="#32so" title='so' data-ref="32so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::fhost" title='socket::fhost' data-ref="socket::fhost">fhost</a>.<a class="ref" href="socket.h.html#slirp_sockaddr::ss" title='slirp_sockaddr::ss' data-ref="slirp_sockaddr::ss">ss</a>;</td></tr>
+<tr><th id="412">412</th><td>    <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>" connect()ing"</q>)</td></tr>
+<tr><th id="413">413</th><td>    <a class="ref" href="socket.h.html#sotranslate_out" title='sotranslate_out' data-ref="sotranslate_out">sotranslate_out</a>(<a class="local col2 ref" href="#32so" title='so' data-ref="32so">so</a>, &amp;<a class="local col7 ref" href="#37addr" title='addr' data-ref="37addr">addr</a>);</td></tr>
+<tr><th id="414">414</th><td></td></tr>
+<tr><th id="415">415</th><td>    <i>/* We don't care what port we get */</i></td></tr>
+<tr><th id="416">416</th><td>    <a class="local col4 ref" href="#34ret" title='ret' data-ref="34ret">ret</a> = <a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#connect" title='connect' data-ref="connect">connect</a>(<a class="local col6 ref" href="#36s" title='s' data-ref="36s">s</a>, (<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col7 ref" href="#37addr" title='addr' data-ref="37addr">addr</a>, <a class="ref" href="socket.h.html#sockaddr_size" title='sockaddr_size' data-ref="sockaddr_size">sockaddr_size</a>(&amp;<a class="local col7 ref" href="#37addr" title='addr' data-ref="37addr">addr</a>));</td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td>    <i>/*</i></td></tr>
+<tr><th id="419">419</th><td><i>     * If it's not in progress, it failed, so we just return 0,</i></td></tr>
+<tr><th id="420">420</th><td><i>     * without clearing SS_NOFDREF</i></td></tr>
+<tr><th id="421">421</th><td><i>     */</i></td></tr>
+<tr><th id="422">422</th><td>    <a class="ref" href="socket.h.html#soisfconnecting" title='soisfconnecting' data-ref="soisfconnecting">soisfconnecting</a>(<a class="local col2 ref" href="#32so" title='so' data-ref="32so">so</a>);</td></tr>
+<tr><th id="423">423</th><td>  }</td></tr>
+<tr><th id="424">424</th><td></td></tr>
+<tr><th id="425">425</th><td>  <b>return</b>(<a class="local col4 ref" href="#34ret" title='ret' data-ref="34ret">ret</a>);</td></tr>
+<tr><th id="426">426</th><td>}</td></tr>
+<tr><th id="427">427</th><td></td></tr>
+<tr><th id="428">428</th><td><i>/*</i></td></tr>
+<tr><th id="429">429</th><td><i> * Accept the socket and connect to the local-host</i></td></tr>
+<tr><th id="430">430</th><td><i> *</i></td></tr>
+<tr><th id="431">431</th><td><i> * We have a problem. The correct thing to do would be</i></td></tr>
+<tr><th id="432">432</th><td><i> * to first connect to the local-host, and only if the</i></td></tr>
+<tr><th id="433">433</th><td><i> * connection is accepted, then do an accept() here.</i></td></tr>
+<tr><th id="434">434</th><td><i> * But, a) we need to know who's trying to connect</i></td></tr>
+<tr><th id="435">435</th><td><i> * to the socket to be able to SYN the local-host, and</i></td></tr>
+<tr><th id="436">436</th><td><i> * b) we are already connected to the foreign host by</i></td></tr>
+<tr><th id="437">437</th><td><i> * the time it gets to accept(), so... We simply accept</i></td></tr>
+<tr><th id="438">438</th><td><i> * here and SYN the local-host.</i></td></tr>
+<tr><th id="439">439</th><td><i> */</i></td></tr>
+<tr><th id="440">440</th><td><em>void</em> <dfn class="decl def" id="tcp_connect" title='tcp_connect' data-ref="tcp_connect">tcp_connect</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col8 decl" id="38inso" title='inso' data-type='struct socket *' data-ref="38inso">inso</dfn>)</td></tr>
+<tr><th id="441">441</th><td>{</td></tr>
+<tr><th id="442">442</th><td>    <a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col9 decl" id="39slirp" title='slirp' data-type='Slirp *' data-ref="39slirp">slirp</dfn> = <a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>;</td></tr>
+<tr><th id="443">443</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col0 decl" id="40so" title='so' data-type='struct socket *' data-ref="40so">so</dfn>;</td></tr>
+<tr><th id="444">444</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> <dfn class="local col1 decl" id="41addr" title='addr' data-type='struct sockaddr_storage' data-ref="41addr">addr</dfn>;</td></tr>
+<tr><th id="445">445</th><td>    <a class="typedef" href="../../include/unistd.h.html#socklen_t" title='socklen_t' data-type='__socklen_t' data-ref="socklen_t">socklen_t</a> <dfn class="local col2 decl" id="42addrlen" title='addrlen' data-type='socklen_t' data-ref="42addrlen">addrlen</dfn> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a>);</td></tr>
+<tr><th id="446">446</th><td>    <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col3 decl" id="43tp" title='tp' data-type='struct tcpcb *' data-ref="43tp">tp</dfn>;</td></tr>
+<tr><th id="447">447</th><td>    <em>int</em> <dfn class="local col4 decl" id="44s" title='s' data-type='int' data-ref="44s">s</dfn>, <dfn class="local col5 decl" id="45opt" title='opt' data-type='int' data-ref="45opt">opt</dfn>;</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>    <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_connect"</q>);</td></tr>
+<tr><th id="450">450</th><td>    <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"inso = %p"</q>, inso);</td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td>    <i>/*</i></td></tr>
+<tr><th id="453">453</th><td><i>     * If it's an SS_ACCEPTONCE socket, no need to socreate()</i></td></tr>
+<tr><th id="454">454</th><td><i>     * another socket, just use the accept() socket.</i></td></tr>
+<tr><th id="455">455</th><td><i>     */</i></td></tr>
+<tr><th id="456">456</th><td>    <b>if</b> (<a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> &amp; <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>) {</td></tr>
+<tr><th id="457">457</th><td>        <i>/* FACCEPTONCE already have a tcpcb */</i></td></tr>
+<tr><th id="458">458</th><td>        <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a> = <a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>;</td></tr>
+<tr><th id="459">459</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="460">460</th><td>        <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a> = <a class="ref" href="socket.h.html#socreate" title='socreate' data-ref="socreate">socreate</a>(<a class="local col9 ref" href="#39slirp" title='slirp' data-ref="39slirp">slirp</a>);</td></tr>
+<tr><th id="461">461</th><td>        <b>if</b> (<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="462">462</th><td>            <i>/* If it failed, get rid of the pending connection */</i></td></tr>
+<tr><th id="463">463</th><td>            <a class="macro" href="../include/sysemu/os-posix.h.html#48" title="close(accept(inso-&gt;s, (struct sockaddr *)&amp;addr, &amp;addrlen))" data-ref="_M/closesocket">closesocket</a>(<a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#accept" title='accept' data-ref="accept">accept</a>(<a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>, (<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col1 ref" href="#41addr" title='addr' data-ref="41addr">addr</a>, &amp;<a class="local col2 ref" href="#42addrlen" title='addrlen' data-ref="42addrlen">addrlen</a>));</td></tr>
+<tr><th id="464">464</th><td>            <b>return</b>;</td></tr>
+<tr><th id="465">465</th><td>        }</td></tr>
+<tr><th id="466">466</th><td>        <b>if</b> (<a class="ref" href="#tcp_attach" title='tcp_attach' data-ref="tcp_attach">tcp_attach</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="467">467</th><td>            <a class="ref" href="../../include/stdlib.h.html#free" title='free' data-ref="free">free</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>); <i>/* NOT sofree */</i></td></tr>
+<tr><th id="468">468</th><td>            <b>return</b>;</td></tr>
+<tr><th id="469">469</th><td>        }</td></tr>
+<tr><th id="470">470</th><td>        <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::lhost" title='socket::lhost' data-ref="socket::lhost">lhost</a> = <a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::lhost" title='socket::lhost' data-ref="socket::lhost">lhost</a>;</td></tr>
+<tr><th id="471">471</th><td>        <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="macro" href="socket.h.html#45" title="fhost.ss.ss_family" data-ref="_M/so_ffamily">so_ffamily</a> = <a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="macro" href="socket.h.html#45" title="fhost.ss.ss_family" data-ref="_M/so_ffamily">so_ffamily</a>;</td></tr>
+<tr><th id="472">472</th><td>    }</td></tr>
+<tr><th id="473">473</th><td></td></tr>
+<tr><th id="474">474</th><td>    <a class="ref" href="slirp.h.html#tcp_mss" title='tcp_mss' data-ref="tcp_mss">tcp_mss</a>(<a class="macro" href="tcp_var.h.html#129" title="((so)-&gt;so_tcpcb)" data-ref="_M/sototcpcb">sototcpcb</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>), <var>0</var>);</td></tr>
+<tr><th id="475">475</th><td></td></tr>
+<tr><th id="476">476</th><td>    <a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a> = <a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#accept" title='accept' data-ref="accept">accept</a>(<a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>, (<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col1 ref" href="#41addr" title='addr' data-ref="41addr">addr</a>, &amp;<a class="local col2 ref" href="#42addrlen" title='addrlen' data-ref="42addrlen">addrlen</a>);</td></tr>
+<tr><th id="477">477</th><td>    <b>if</b> (<a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="478">478</th><td>        <a class="ref" href="#tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</a>(<a class="macro" href="tcp_var.h.html#129" title="((so)-&gt;so_tcpcb)" data-ref="_M/sototcpcb">sototcpcb</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>)); <i>/* This will sofree() as well */</i></td></tr>
+<tr><th id="479">479</th><td>        <b>return</b>;</td></tr>
+<tr><th id="480">480</th><td>    }</td></tr>
+<tr><th id="481">481</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#qemu_set_nonblock" title='qemu_set_nonblock' data-ref="qemu_set_nonblock">qemu_set_nonblock</a>(<a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a>);</td></tr>
+<tr><th id="482">482</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#socket_set_fast_reuse" title='socket_set_fast_reuse' data-ref="socket_set_fast_reuse">socket_set_fast_reuse</a>(<a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a>);</td></tr>
+<tr><th id="483">483</th><td>    <a class="local col5 ref" href="#45opt" title='opt' data-ref="45opt">opt</a> = <var>1</var>;</td></tr>
+<tr><th id="484">484</th><td>    <a class="macro" href="../include/qemu-common.h.html#72" title="setsockopt(s, 1, 10, &amp;opt, sizeof(int))" data-ref="_M/qemu_setsockopt">qemu_setsockopt</a>(<a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a>, <a class="macro" href="../../include/asm-generic/socket.h.html#7" title="1" data-ref="_M/SOL_SOCKET">SOL_SOCKET</a>, <a class="macro" href="../../include/asm-generic/socket.h.html#20" title="10" data-ref="_M/SO_OOBINLINE">SO_OOBINLINE</a>, &amp;<a class="local col5 ref" href="#45opt" title='opt' data-ref="45opt">opt</a>, <b>sizeof</b>(<em>int</em>));</td></tr>
+<tr><th id="485">485</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#socket_set_nodelay" title='socket_set_nodelay' data-ref="socket_set_nodelay">socket_set_nodelay</a>(<a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a>);</td></tr>
+<tr><th id="486">486</th><td></td></tr>
+<tr><th id="487">487</th><td>    <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::fhost" title='socket::fhost' data-ref="socket::fhost">fhost</a>.<a class="ref" href="socket.h.html#slirp_sockaddr::ss" title='slirp_sockaddr::ss' data-ref="slirp_sockaddr::ss">ss</a> = <a class="local col1 ref" href="#41addr" title='addr' data-ref="41addr">addr</a>;</td></tr>
+<tr><th id="488">488</th><td>    <a class="ref" href="socket.h.html#sotranslate_accept" title='sotranslate_accept' data-ref="sotranslate_accept">sotranslate_accept</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>);</td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td>    <i>/* Close the accept() socket, set right state */</i></td></tr>
+<tr><th id="491">491</th><td>    <b>if</b> (<a class="local col8 ref" href="#38inso" title='inso' data-ref="38inso">inso</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> &amp; <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>) {</td></tr>
+<tr><th id="492">492</th><td>        <i>/* If we only accept once, close the accept() socket */</i></td></tr>
+<tr><th id="493">493</th><td>        <a class="macro" href="../include/sysemu/os-posix.h.html#48" title="close(so-&gt;s)" data-ref="_M/closesocket">closesocket</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>);</td></tr>
+<tr><th id="494">494</th><td></td></tr>
+<tr><th id="495">495</th><td>        <i>/* Don't select it yet, even though we have an FD */</i></td></tr>
+<tr><th id="496">496</th><td>        <i>/* if it's not FACCEPTONCE, it's already NOFDREF */</i></td></tr>
+<tr><th id="497">497</th><td>        <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> = <a class="macro" href="socket.h.html#78" title="0x001" data-ref="_M/SS_NOFDREF">SS_NOFDREF</a>;</td></tr>
+<tr><th id="498">498</th><td>    }</td></tr>
+<tr><th id="499">499</th><td>    <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a> = <a class="local col4 ref" href="#44s" title='s' data-ref="44s">s</a>;</td></tr>
+<tr><th id="500">500</th><td>    <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> |= <a class="macro" href="socket.h.html#92" title="0x2000" data-ref="_M/SS_INCOMING">SS_INCOMING</a>;</td></tr>
+<tr><th id="501">501</th><td></td></tr>
+<tr><th id="502">502</th><td>    <a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_iptos" title='socket::so_iptos' data-ref="socket::so_iptos">so_iptos</a> = <a class="ref" href="#tcp_tos" title='tcp_tos' data-ref="tcp_tos">tcp_tos</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>);</td></tr>
+<tr><th id="503">503</th><td>    <a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a> = <a class="macro" href="tcp_var.h.html#129" title="((so)-&gt;so_tcpcb)" data-ref="_M/sototcpcb">sototcpcb</a>(<a class="local col0 ref" href="#40so" title='so' data-ref="40so">so</a>);</td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>    <a class="ref" href="#tcp_template" title='tcp_template' data-ref="tcp_template">tcp_template</a>(<a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>);</td></tr>
+<tr><th id="506">506</th><td></td></tr>
+<tr><th id="507">507</th><td>    <a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</a> = <a class="macro" href="tcp.h.html#138" title="2" data-ref="_M/TCPS_SYN_SENT">TCPS_SYN_SENT</a>;</td></tr>
+<tr><th id="508">508</th><td>    <a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::t_timer" title='tcpcb::t_timer' data-ref="tcpcb::t_timer">t_timer</a>[<a class="macro" href="tcp_timer.h.html#44" title="2" data-ref="_M/TCPT_KEEP">TCPT_KEEP</a>] = <a class="macro" href="tcp_timer.h.html#95" title="( 75*2)" data-ref="_M/TCPTV_KEEP_INIT">TCPTV_KEEP_INIT</a>;</td></tr>
+<tr><th id="509">509</th><td>    <a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>-&gt;<a class="ref" href="tcp_var.h.html#tcpcb::iss" title='tcpcb::iss' data-ref="tcpcb::iss">iss</a> = <a class="local col9 ref" href="#39slirp" title='slirp' data-ref="39slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_iss" title='Slirp::tcp_iss' data-ref="Slirp::tcp_iss">tcp_iss</a>;</td></tr>
+<tr><th id="510">510</th><td>    <a class="local col9 ref" href="#39slirp" title='slirp' data-ref="39slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcp_iss" title='Slirp::tcp_iss' data-ref="Slirp::tcp_iss">tcp_iss</a> += <a class="macro" href="tcp.h.html#176" title="(125*1024)" data-ref="_M/TCP_ISSINCR">TCP_ISSINCR</a>/<var>2</var>;</td></tr>
+<tr><th id="511">511</th><td>    <a class="macro" href="tcp.h.html#173" title="(tp)-&gt;snd_una = (tp)-&gt;snd_nxt = (tp)-&gt;snd_max = (tp)-&gt;snd_up = (tp)-&gt;iss" data-ref="_M/tcp_sendseqinit">tcp_sendseqinit</a>(<a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>);</td></tr>
+<tr><th id="512">512</th><td>    <a class="ref" href="slirp.h.html#tcp_output" title='tcp_output' data-ref="tcp_output">tcp_output</a>(<a class="local col3 ref" href="#43tp" title='tp' data-ref="43tp">tp</a>);</td></tr>
+<tr><th id="513">513</th><td>}</td></tr>
+<tr><th id="514">514</th><td></td></tr>
+<tr><th id="515">515</th><td><i>/*</i></td></tr>
+<tr><th id="516">516</th><td><i> * Attach a TCPCB to a socket.</i></td></tr>
+<tr><th id="517">517</th><td><i> */</i></td></tr>
+<tr><th id="518">518</th><td><em>int</em></td></tr>
+<tr><th id="519">519</th><td><dfn class="decl def" id="tcp_attach" title='tcp_attach' data-ref="tcp_attach">tcp_attach</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col6 decl" id="46so" title='so' data-type='struct socket *' data-ref="46so">so</dfn>)</td></tr>
+<tr><th id="520">520</th><td>{</td></tr>
+<tr><th id="521">521</th><td>	<b>if</b> ((<a class="local col6 ref" href="#46so" title='so' data-ref="46so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_tcpcb" title='socket::so_tcpcb' data-ref="socket::so_tcpcb">so_tcpcb</a> = <a class="ref" href="#tcp_newtcpcb" title='tcp_newtcpcb' data-ref="tcp_newtcpcb">tcp_newtcpcb</a>(<a class="local col6 ref" href="#46so" title='so' data-ref="46so">so</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)</td></tr>
+<tr><th id="522">522</th><td>	   <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="523">523</th><td></td></tr>
+<tr><th id="524">524</th><td>	<a class="macro" href="slirp.h.html#64" title="slirp_insque" data-ref="_M/insque">insque</a>(<a class="local col6 ref" href="#46so" title='so' data-ref="46so">so</a>, &amp;<a class="local col6 ref" href="#46so" title='so' data-ref="46so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>);</td></tr>
+<tr><th id="525">525</th><td></td></tr>
+<tr><th id="526">526</th><td>	<b>return</b> <var>0</var>;</td></tr>
+<tr><th id="527">527</th><td>}</td></tr>
+<tr><th id="528">528</th><td></td></tr>
+<tr><th id="529">529</th><td><i  data-doc="tcptos">/*</i></td></tr>
+<tr><th id="530">530</th><td><i  data-doc="tcptos"> * Set the socket's type of service field</i></td></tr>
+<tr><th id="531">531</th><td><i  data-doc="tcptos"> */</i></td></tr>
+<tr><th id="532">532</th><td><em>static</em> <em>const</em> <b>struct</b> <a class="type" href="misc.h.html#tos_t" title='tos_t' data-ref="tos_t">tos_t</a> <dfn class="tu decl def" id="tcptos" title='tcptos' data-type='const struct tos_t [13]' data-ref="tcptos">tcptos</dfn>[] = {</td></tr>
+<tr><th id="533">533</th><td>	  {<var>0</var>, <var>20</var>, <a class="macro" href="ip.h.html#98" title="0x08" data-ref="_M/IPTOS_THROUGHPUT">IPTOS_THROUGHPUT</a>, <var>0</var>},	<i>/* ftp data */</i></td></tr>
+<tr><th id="534">534</th><td>	  {<var>21</var>, <var>21</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>,  <a class="macro" href="misc.h.html#23" title="0x2" data-ref="_M/EMU_FTP">EMU_FTP</a>},	<i>/* ftp control */</i></td></tr>
+<tr><th id="535">535</th><td>	  {<var>0</var>, <var>23</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <var>0</var>},	<i>/* telnet */</i></td></tr>
+<tr><th id="536">536</th><td>	  {<var>0</var>, <var>80</var>, <a class="macro" href="ip.h.html#98" title="0x08" data-ref="_M/IPTOS_THROUGHPUT">IPTOS_THROUGHPUT</a>, <var>0</var>},	<i>/* WWW */</i></td></tr>
+<tr><th id="537">537</th><td>	  {<var>0</var>, <var>513</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <a class="macro" href="misc.h.html#27" title="0x6" data-ref="_M/EMU_RLOGIN">EMU_RLOGIN</a>|<a class="macro" href="misc.h.html#31" title="0x10" data-ref="_M/EMU_NOCONNECT">EMU_NOCONNECT</a>},	<i>/* rlogin */</i></td></tr>
+<tr><th id="538">538</th><td>	  {<var>0</var>, <var>514</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <a class="macro" href="misc.h.html#29" title="0x8" data-ref="_M/EMU_RSH">EMU_RSH</a>|<a class="macro" href="misc.h.html#31" title="0x10" data-ref="_M/EMU_NOCONNECT">EMU_NOCONNECT</a>},	<i>/* shell */</i></td></tr>
+<tr><th id="539">539</th><td>	  {<var>0</var>, <var>544</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <a class="macro" href="misc.h.html#24" title="0x3" data-ref="_M/EMU_KSH">EMU_KSH</a>},		<i>/* kshell */</i></td></tr>
+<tr><th id="540">540</th><td>	  {<var>0</var>, <var>543</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <var>0</var>},	<i>/* klogin */</i></td></tr>
+<tr><th id="541">541</th><td>	  {<var>0</var>, <var>6667</var>, <a class="macro" href="ip.h.html#98" title="0x08" data-ref="_M/IPTOS_THROUGHPUT">IPTOS_THROUGHPUT</a>, <a class="macro" href="misc.h.html#25" title="0x4" data-ref="_M/EMU_IRC">EMU_IRC</a>},	<i>/* IRC */</i></td></tr>
+<tr><th id="542">542</th><td>	  {<var>0</var>, <var>6668</var>, <a class="macro" href="ip.h.html#98" title="0x08" data-ref="_M/IPTOS_THROUGHPUT">IPTOS_THROUGHPUT</a>, <a class="macro" href="misc.h.html#25" title="0x4" data-ref="_M/EMU_IRC">EMU_IRC</a>},	<i>/* IRC undernet */</i></td></tr>
+<tr><th id="543">543</th><td>	  {<var>0</var>, <var>7070</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <a class="macro" href="misc.h.html#26" title="0x5" data-ref="_M/EMU_REALAUDIO">EMU_REALAUDIO</a> }, <i>/* RealAudio control */</i></td></tr>
+<tr><th id="544">544</th><td>	  {<var>0</var>, <var>113</var>, <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>, <a class="macro" href="misc.h.html#28" title="0x7" data-ref="_M/EMU_IDENT">EMU_IDENT</a> }, <i>/* identd protocol */</i></td></tr>
+<tr><th id="545">545</th><td>	  {<var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>}</td></tr>
+<tr><th id="546">546</th><td>};</td></tr>
+<tr><th id="547">547</th><td></td></tr>
+<tr><th id="548">548</th><td><em>static</em> <b>struct</b> <a class="type" href="misc.h.html#emu_t" title='emu_t' data-ref="emu_t">emu_t</a> *<dfn class="tu decl def" id="tcpemu" title='tcpemu' data-type='struct emu_t *' data-ref="tcpemu">tcpemu</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td><i>/*</i></td></tr>
+<tr><th id="551">551</th><td><i> * Return TOS according to the above table</i></td></tr>
+<tr><th id="552">552</th><td><i> */</i></td></tr>
+<tr><th id="553">553</th><td><a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a></td></tr>
+<tr><th id="554">554</th><td><dfn class="decl def" id="tcp_tos" title='tcp_tos' data-ref="tcp_tos">tcp_tos</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col7 decl" id="47so" title='so' data-type='struct socket *' data-ref="47so">so</dfn>)</td></tr>
+<tr><th id="555">555</th><td>{</td></tr>
+<tr><th id="556">556</th><td>	<em>int</em> <dfn class="local col8 decl" id="48i" title='i' data-type='int' data-ref="48i">i</dfn> = <var>0</var>;</td></tr>
+<tr><th id="557">557</th><td>	<b>struct</b> <a class="type" href="misc.h.html#emu_t" title='emu_t' data-ref="emu_t">emu_t</a> *<dfn class="local col9 decl" id="49emup" title='emup' data-type='struct emu_t *' data-ref="49emup">emup</dfn>;</td></tr>
+<tr><th id="558">558</th><td></td></tr>
+<tr><th id="559">559</th><td>	<b>while</b>(<a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::tos" title='tos_t::tos' data-ref="tos_t::tos">tos</a>) {</td></tr>
+<tr><th id="560">560</th><td>		<b>if</b> ((<a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::fport" title='tos_t::fport' data-ref="tos_t::fport">fport</a> &amp;&amp; (<a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>) == <a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::fport" title='tos_t::fport' data-ref="tos_t::fport">fport</a>)) ||</td></tr>
+<tr><th id="561">561</th><td>		    (<a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::lport" title='tos_t::lport' data-ref="tos_t::lport">lport</a> &amp;&amp; (<a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="macro" href="socket.h.html#49" title="lhost.sin.sin_port" data-ref="_M/so_lport">so_lport</a>) == <a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::lport" title='tos_t::lport' data-ref="tos_t::lport">lport</a>))) {</td></tr>
+<tr><th id="562">562</th><td>			<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</a> = <a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::emu" title='tos_t::emu' data-ref="tos_t::emu">emu</a>;</td></tr>
+<tr><th id="563">563</th><td>			<b>return</b> <a class="tu ref" href="#tcptos" title='tcptos' data-use='m' data-ref="tcptos">tcptos</a>[<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>].<a class="ref" href="misc.h.html#tos_t::tos" title='tos_t::tos' data-ref="tos_t::tos">tos</a>;</td></tr>
+<tr><th id="564">564</th><td>		}</td></tr>
+<tr><th id="565">565</th><td>		<a class="local col8 ref" href="#48i" title='i' data-ref="48i">i</a>++;</td></tr>
+<tr><th id="566">566</th><td>	}</td></tr>
+<tr><th id="567">567</th><td></td></tr>
+<tr><th id="568">568</th><td>	<i>/* Nope, lets see if there's a user-added one */</i></td></tr>
+<tr><th id="569">569</th><td>	<b>for</b> (<a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a> = <a class="tu ref" href="#tcpemu" title='tcpemu' data-use='r' data-ref="tcpemu">tcpemu</a>; <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>; <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a> = <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::next" title='emu_t::next' data-ref="emu_t::next">next</a>) {</td></tr>
+<tr><th id="570">570</th><td>		<b>if</b> ((<a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::fport" title='emu_t::fport' data-ref="emu_t::fport">fport</a> &amp;&amp; (<a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>) == <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::fport" title='emu_t::fport' data-ref="emu_t::fport">fport</a>)) ||</td></tr>
+<tr><th id="571">571</th><td>		    (<a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::lport" title='emu_t::lport' data-ref="emu_t::lport">lport</a> &amp;&amp; (<a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="macro" href="socket.h.html#49" title="lhost.sin.sin_port" data-ref="_M/so_lport">so_lport</a>) == <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::lport" title='emu_t::lport' data-ref="emu_t::lport">lport</a>))) {</td></tr>
+<tr><th id="572">572</th><td>			<a class="local col7 ref" href="#47so" title='so' data-ref="47so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</a> = <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::emu" title='emu_t::emu' data-ref="emu_t::emu">emu</a>;</td></tr>
+<tr><th id="573">573</th><td>			<b>return</b> <a class="local col9 ref" href="#49emup" title='emup' data-ref="49emup">emup</a>-&gt;<a class="ref" href="misc.h.html#emu_t::tos" title='emu_t::tos' data-ref="emu_t::tos">tos</a>;</td></tr>
+<tr><th id="574">574</th><td>		}</td></tr>
+<tr><th id="575">575</th><td>	}</td></tr>
+<tr><th id="576">576</th><td></td></tr>
+<tr><th id="577">577</th><td>	<b>return</b> <var>0</var>;</td></tr>
+<tr><th id="578">578</th><td>}</td></tr>
+<tr><th id="579">579</th><td></td></tr>
+<tr><th id="580">580</th><td><i>/*</i></td></tr>
+<tr><th id="581">581</th><td><i> * Emulate programs that try and connect to us</i></td></tr>
+<tr><th id="582">582</th><td><i> * This includes ftp (the data connection is</i></td></tr>
+<tr><th id="583">583</th><td><i> * initiated by the server) and IRC (DCC CHAT and</i></td></tr>
+<tr><th id="584">584</th><td><i> * DCC SEND) for now</i></td></tr>
+<tr><th id="585">585</th><td><i> *</i></td></tr>
+<tr><th id="586">586</th><td><i> * NOTE: It's possible to crash SLiRP by sending it</i></td></tr>
+<tr><th id="587">587</th><td><i> * unstandard strings to emulate... if this is a problem,</i></td></tr>
+<tr><th id="588">588</th><td><i> * more checks are needed here</i></td></tr>
+<tr><th id="589">589</th><td><i> *</i></td></tr>
+<tr><th id="590">590</th><td><i> * XXX Assumes the whole command came in one packet</i></td></tr>
+<tr><th id="591">591</th><td><i> *</i></td></tr>
+<tr><th id="592">592</th><td><i> * XXX Some ftp clients will have their TOS set to</i></td></tr>
+<tr><th id="593">593</th><td><i> * LOWDELAY and so Nagel will kick in.  Because of this,</i></td></tr>
+<tr><th id="594">594</th><td><i> * we'll get the first letter, followed by the rest, so</i></td></tr>
+<tr><th id="595">595</th><td><i> * we simply scan for ORT instead of PORT...</i></td></tr>
+<tr><th id="596">596</th><td><i> * DCC doesn't have this problem because there's other stuff</i></td></tr>
+<tr><th id="597">597</th><td><i> * in the packet before the DCC command.</i></td></tr>
+<tr><th id="598">598</th><td><i> *</i></td></tr>
+<tr><th id="599">599</th><td><i> * Return 1 if the mbuf m is still valid and should be</i></td></tr>
+<tr><th id="600">600</th><td><i> * sbappend()ed</i></td></tr>
+<tr><th id="601">601</th><td><i> *</i></td></tr>
+<tr><th id="602">602</th><td><i> * NOTE: if you return 0 you MUST m_free() the mbuf!</i></td></tr>
+<tr><th id="603">603</th><td><i> */</i></td></tr>
+<tr><th id="604">604</th><td><em>int</em></td></tr>
+<tr><th id="605">605</th><td><dfn class="decl def" id="tcp_emu" title='tcp_emu' data-ref="tcp_emu">tcp_emu</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col0 decl" id="50so" title='so' data-type='struct socket *' data-ref="50so">so</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col1 decl" id="51m" title='m' data-type='struct mbuf *' data-ref="51m">m</dfn>)</td></tr>
+<tr><th id="606">606</th><td>{</td></tr>
+<tr><th id="607">607</th><td>	<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col2 decl" id="52slirp" title='slirp' data-type='Slirp *' data-ref="52slirp">slirp</dfn> = <a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>;</td></tr>
+<tr><th id="608">608</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a> <dfn class="local col3 decl" id="53n1" title='n1' data-type='u_int' data-ref="53n1">n1</dfn>, <dfn class="local col4 decl" id="54n2" title='n2' data-type='u_int' data-ref="54n2">n2</dfn>, <dfn class="local col5 decl" id="55n3" title='n3' data-type='u_int' data-ref="55n3">n3</dfn>, <dfn class="local col6 decl" id="56n4" title='n4' data-type='u_int' data-ref="56n4">n4</dfn>, <dfn class="local col7 decl" id="57n5" title='n5' data-type='u_int' data-ref="57n5">n5</dfn>, <dfn class="local col8 decl" id="58n6" title='n6' data-type='u_int' data-ref="58n6">n6</dfn>;</td></tr>
+<tr><th id="609">609</th><td>        <em>char</em> <dfn class="local col9 decl" id="59buff" title='buff' data-type='char [257]' data-ref="59buff">buff</dfn>[<var>257</var>];</td></tr>
+<tr><th id="610">610</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="60laddr" title='laddr' data-type='uint32_t' data-ref="60laddr">laddr</dfn>;</td></tr>
+<tr><th id="611">611</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a> <dfn class="local col1 decl" id="61lport" title='lport' data-type='u_int' data-ref="61lport">lport</dfn>;</td></tr>
+<tr><th id="612">612</th><td>	<em>char</em> *<dfn class="local col2 decl" id="62bptr" title='bptr' data-type='char *' data-ref="62bptr">bptr</dfn>;</td></tr>
+<tr><th id="613">613</th><td></td></tr>
+<tr><th id="614">614</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_emu"</q>);</td></tr>
+<tr><th id="615">615</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %p"</q>, so);</td></tr>
+<tr><th id="616">616</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m = %p"</q>, m);</td></tr>
+<tr><th id="617">617</th><td></td></tr>
+<tr><th id="618">618</th><td>	<b>switch</b>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</a>) {</td></tr>
+<tr><th id="619">619</th><td>		<em>int</em> <dfn class="local col3 decl" id="63x" title='x' data-type='int' data-ref="63x">x</dfn>, <dfn class="local col4 decl" id="64i" title='i' data-type='int' data-ref="64i">i</dfn>;</td></tr>
+<tr><th id="620">620</th><td></td></tr>
+<tr><th id="621">621</th><td>	 <b>case</b> <a class="macro" href="misc.h.html#28" title="0x7" data-ref="_M/EMU_IDENT">EMU_IDENT</a>:</td></tr>
+<tr><th id="622">622</th><td>		<i>/*</i></td></tr>
+<tr><th id="623">623</th><td><i>		 * Identification protocol as per rfc-1413</i></td></tr>
+<tr><th id="624">624</th><td><i>		 */</i></td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td>		{</td></tr>
+<tr><th id="627">627</th><td>			<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col5 decl" id="65tmpso" title='tmpso' data-type='struct socket *' data-ref="65tmpso">tmpso</dfn>;</td></tr>
+<tr><th id="628">628</th><td>			<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> <dfn class="local col6 decl" id="66addr" title='addr' data-type='struct sockaddr_in' data-ref="66addr">addr</dfn>;</td></tr>
+<tr><th id="629">629</th><td>			<a class="typedef" href="../../include/unistd.h.html#socklen_t" title='socklen_t' data-type='__socklen_t' data-ref="socklen_t">socklen_t</a> <dfn class="local col7 decl" id="67addrlen" title='addrlen' data-type='socklen_t' data-ref="67addrlen">addrlen</dfn> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a>);</td></tr>
+<tr><th id="630">630</th><td>			<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col8 decl" id="68so_rcv" title='so_rcv' data-type='struct sbuf *' data-ref="68so_rcv">so_rcv</dfn> = &amp;<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>;</td></tr>
+<tr><th id="631">631</th><td></td></tr>
+<tr><th id="632">632</th><td>			<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>);</td></tr>
+<tr><th id="633">633</th><td>			<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> += <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;</td></tr>
+<tr><th id="634">634</th><td>			<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> += <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;</td></tr>
+<tr><th id="635">635</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>[<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>] = <var>0</var>; <i>/* NULL terminate */</i></td></tr>
+<tr><th id="636">636</th><td>			<b>if</b> (<a class="ref" href="../../include/string.h.html#strchr" title='strchr' data-ref="strchr">strchr</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <kbd>'\r'</kbd>) || <a class="ref" href="../../include/string.h.html#strchr" title='strchr' data-ref="strchr">strchr</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <kbd>'\n'</kbd>)) {</td></tr>
+<tr><th id="637">637</th><td>				<b>if</b> (<a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>, <q>"%u%*[ ,]%u"</q>, &amp;<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, &amp;<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>) == <var>2</var>) {</td></tr>
+<tr><th id="638">638</th><td>					<a class="macro" href="ip.h.html#56" title="((n1) = htons((uint16_t)(n1)))" data-ref="_M/HTONS">HTONS</a>(<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>);</td></tr>
+<tr><th id="639">639</th><td>					<a class="macro" href="ip.h.html#56" title="((n2) = htons((uint16_t)(n2)))" data-ref="_M/HTONS">HTONS</a>(<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>);</td></tr>
+<tr><th id="640">640</th><td>					<i>/* n2 is the one on our host */</i></td></tr>
+<tr><th id="641">641</th><td>					<b>for</b> (<a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a> = <a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a>;</td></tr>
+<tr><th id="642">642</th><td>					     <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a> != &amp;<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</a>;</td></tr>
+<tr><th id="643">643</th><td>					     <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a> = <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a>) {</td></tr>
+<tr><th id="644">644</th><td>						<b>if</b> (<a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> &amp;&amp;</td></tr>
+<tr><th id="645">645</th><td>						    <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="macro" href="socket.h.html#49" title="lhost.sin.sin_port" data-ref="_M/so_lport">so_lport</a> == <a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> &amp;&amp;</td></tr>
+<tr><th id="646">646</th><td>						    <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> &amp;&amp;</td></tr>
+<tr><th id="647">647</th><td>						    <a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a> == <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>) {</td></tr>
+<tr><th id="648">648</th><td>							<b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#getsockname" title='getsockname' data-ref="getsockname">getsockname</a>(<a class="local col5 ref" href="#65tmpso" title='tmpso' data-ref="65tmpso">tmpso</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>,</td></tr>
+<tr><th id="649">649</th><td>								(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col6 ref" href="#66addr" title='addr' data-ref="66addr">addr</a>, &amp;<a class="local col7 ref" href="#67addrlen" title='addrlen' data-ref="67addrlen">addrlen</a>) == <var>0</var>)</td></tr>
+<tr><th id="650">650</th><td>							   <a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col6 ref" href="#66addr" title='addr' data-ref="66addr">addr</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_port" title='sockaddr_in::sin_port' data-ref="sockaddr_in::sin_port">sin_port</a>);</td></tr>
+<tr><th id="651">651</th><td>							<b>break</b>;</td></tr>
+<tr><th id="652">652</th><td>						}</td></tr>
+<tr><th id="653">653</th><td>					}</td></tr>
+<tr><th id="654">654</th><td>				}</td></tr>
+<tr><th id="655">655</th><td>                                <a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> = <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>,</td></tr>
+<tr><th id="656">656</th><td>                                                         <a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>,</td></tr>
+<tr><th id="657">657</th><td>                                                         <q>"%d,%d\r\n"</q>, <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, <a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>);</td></tr>
+<tr><th id="658">658</th><td>				<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> = <a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>;</td></tr>
+<tr><th id="659">659</th><td>				<a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> = <a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col8 ref" href="#68so_rcv" title='so_rcv' data-ref="68so_rcv">so_rcv</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>;</td></tr>
+<tr><th id="660">660</th><td>			}</td></tr>
+<tr><th id="661">661</th><td>			<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>);</td></tr>
+<tr><th id="662">662</th><td>			<b>return</b> <var>0</var>;</td></tr>
+<tr><th id="663">663</th><td>		}</td></tr>
+<tr><th id="664">664</th><td></td></tr>
+<tr><th id="665">665</th><td>        <b>case</b> <a class="macro" href="misc.h.html#23" title="0x2" data-ref="_M/EMU_FTP">EMU_FTP</a>: <i>/* ftp */</i></td></tr>
+<tr><th id="666">666</th><td>                *(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>+<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>) = <var>0</var>; <i>/* NUL terminate for strstr */</i></td></tr>
+<tr><th id="667">667</th><td>		<b>if</b> ((<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> = (<em>char</em> *)<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <q>"ORT"</q>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="668">668</th><td>			<i>/*</i></td></tr>
+<tr><th id="669">669</th><td><i>			 * Need to emulate the PORT command</i></td></tr>
+<tr><th id="670">670</th><td><i>			 */</i></td></tr>
+<tr><th id="671">671</th><td>			<a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a> = <a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <q>"ORT %u,%u,%u,%u,%u,%u\r\n%256[^\177]"</q>,</td></tr>
+<tr><th id="672">672</th><td>				   &amp;<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, &amp;<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>, &amp;<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a>, &amp;<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>, &amp;<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a>, &amp;<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>);</td></tr>
+<tr><th id="673">673</th><td>			<b>if</b> (<a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a> &lt; <var>6</var>)</td></tr>
+<tr><th id="674">674</th><td>			   <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="675">675</th><td></td></tr>
+<tr><th id="676">676</th><td>			<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> = <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>((<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a> &lt;&lt; <var>24</var>) | (<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> &lt;&lt; <var>16</var>) | (<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a> &lt;&lt; <var>8</var>) | (<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>));</td></tr>
+<tr><th id="677">677</th><td>			<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>((<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a> &lt;&lt; <var>8</var>) | (<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>));</td></tr>
+<tr><th id="678">678</th><td></td></tr>
+<tr><th id="679">679</th><td>			<b>if</b> ((<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>, <a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>,</td></tr>
+<tr><th id="680">680</th><td>			                     <a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>, <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="681">681</th><td>			   <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="682">682</th><td>			}</td></tr>
+<tr><th id="683">683</th><td>			<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>);</td></tr>
+<tr><th id="684">684</th><td></td></tr>
+<tr><th id="685">685</th><td>			<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a> = (<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> &gt;&gt; <var>8</var>) &amp; <var>0xff</var>;</td></tr>
+<tr><th id="686">686</th><td>			<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> &amp;= <var>0xff</var>;</td></tr>
+<tr><th id="687">687</th><td></td></tr>
+<tr><th id="688">688</th><td>			<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>);</td></tr>
+<tr><th id="689">689</th><td></td></tr>
+<tr><th id="690">690</th><td>			<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>24</var>) &amp; <var>0xff</var>);</td></tr>
+<tr><th id="691">691</th><td>			<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>16</var>) &amp; <var>0xff</var>);</td></tr>
+<tr><th id="692">692</th><td>			<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>8</var>)  &amp; <var>0xff</var>);</td></tr>
+<tr><th id="693">693</th><td>			<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a> =  (<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &amp; <var>0xff</var>);</td></tr>
+<tr><th id="694">694</th><td></td></tr>
+<tr><th id="695">695</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>; <i>/* Adjust length */</i></td></tr>
+<tr><th id="696">696</th><td>                        <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>,</td></tr>
+<tr><th id="697">697</th><td>                                             <q>"ORT %d,%d,%d,%d,%d,%d\r\n%s"</q>,</td></tr>
+<tr><th id="698">698</th><td>                                             <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, <a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>, <a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a>, <a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>, <a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a>, <a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>, <a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a>==<var>7</var>?<a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>:<q>""</q>);</td></tr>
+<tr><th id="699">699</th><td>			<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="700">700</th><td>		} <b>else</b> <b>if</b> ((<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> = (<em>char</em> *)<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <q>"27 Entering"</q>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="701">701</th><td>			<i>/*</i></td></tr>
+<tr><th id="702">702</th><td><i>			 * Need to emulate the PASV response</i></td></tr>
+<tr><th id="703">703</th><td><i>			 */</i></td></tr>
+<tr><th id="704">704</th><td>			<a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a> = <a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <q>"27 Entering Passive Mode (%u,%u,%u,%u,%u,%u)\r\n%256[^\177]"</q>,</td></tr>
+<tr><th id="705">705</th><td>				   &amp;<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, &amp;<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>, &amp;<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a>, &amp;<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>, &amp;<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a>, &amp;<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>);</td></tr>
+<tr><th id="706">706</th><td>			<b>if</b> (<a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a> &lt; <var>6</var>)</td></tr>
+<tr><th id="707">707</th><td>			   <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="708">708</th><td></td></tr>
+<tr><th id="709">709</th><td>			<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> = <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>((<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a> &lt;&lt; <var>24</var>) | (<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> &lt;&lt; <var>16</var>) | (<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a> &lt;&lt; <var>8</var>) | (<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>));</td></tr>
+<tr><th id="710">710</th><td>			<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>((<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a> &lt;&lt; <var>8</var>) | (<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>));</td></tr>
+<tr><th id="711">711</th><td></td></tr>
+<tr><th id="712">712</th><td>			<b>if</b> ((<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>, <a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>,</td></tr>
+<tr><th id="713">713</th><td>			                     <a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>, <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="714">714</th><td>			   <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="715">715</th><td>			}</td></tr>
+<tr><th id="716">716</th><td>			<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>);</td></tr>
+<tr><th id="717">717</th><td></td></tr>
+<tr><th id="718">718</th><td>			<a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a> = (<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> &gt;&gt; <var>8</var>) &amp; <var>0xff</var>;</td></tr>
+<tr><th id="719">719</th><td>			<a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a> &amp;= <var>0xff</var>;</td></tr>
+<tr><th id="720">720</th><td></td></tr>
+<tr><th id="721">721</th><td>			<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>);</td></tr>
+<tr><th id="722">722</th><td></td></tr>
+<tr><th id="723">723</th><td>			<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>24</var>) &amp; <var>0xff</var>);</td></tr>
+<tr><th id="724">724</th><td>			<a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>16</var>) &amp; <var>0xff</var>);</td></tr>
+<tr><th id="725">725</th><td>			<a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a> = ((<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &gt;&gt; <var>8</var>)  &amp; <var>0xff</var>);</td></tr>
+<tr><th id="726">726</th><td>			<a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a> =  (<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a> &amp; <var>0xff</var>);</td></tr>
+<tr><th id="727">727</th><td></td></tr>
+<tr><th id="728">728</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>; <i>/* Adjust length */</i></td></tr>
+<tr><th id="729">729</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>,</td></tr>
+<tr><th id="730">730</th><td>                                             <q>"27 Entering Passive Mode (%d,%d,%d,%d,%d,%d)\r\n%s"</q>,</td></tr>
+<tr><th id="731">731</th><td>                                             <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, <a class="local col4 ref" href="#54n2" title='n2' data-ref="54n2">n2</a>, <a class="local col5 ref" href="#55n3" title='n3' data-ref="55n3">n3</a>, <a class="local col6 ref" href="#56n4" title='n4' data-ref="56n4">n4</a>, <a class="local col7 ref" href="#57n5" title='n5' data-ref="57n5">n5</a>, <a class="local col8 ref" href="#58n6" title='n6' data-ref="58n6">n6</a>, <a class="local col3 ref" href="#63x" title='x' data-ref="63x">x</a>==<var>7</var>?<a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>:<q>""</q>);</td></tr>
+<tr><th id="732">732</th><td></td></tr>
+<tr><th id="733">733</th><td>			<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="734">734</th><td>		}</td></tr>
+<tr><th id="735">735</th><td></td></tr>
+<tr><th id="736">736</th><td>		<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="737">737</th><td></td></tr>
+<tr><th id="738">738</th><td>	 <b>case</b> <a class="macro" href="misc.h.html#24" title="0x3" data-ref="_M/EMU_KSH">EMU_KSH</a>:</td></tr>
+<tr><th id="739">739</th><td>		<i>/*</i></td></tr>
+<tr><th id="740">740</th><td><i>		 * The kshell (Kerberos rsh) and shell services both pass</i></td></tr>
+<tr><th id="741">741</th><td><i>		 * a local port port number to carry signals to the server</i></td></tr>
+<tr><th id="742">742</th><td><i>		 * and stderr to the client.  It is passed at the beginning</i></td></tr>
+<tr><th id="743">743</th><td><i>		 * of the connection as a NUL-terminated decimal ASCII string.</i></td></tr>
+<tr><th id="744">744</th><td><i>		 */</i></td></tr>
+<tr><th id="745">745</th><td>		<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</a> = <var>0</var>;</td></tr>
+<tr><th id="746">746</th><td>		<b>for</b> (<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> = <var>0</var>, <a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a> = <var>0</var>; <a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a> &lt; <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>-<var>1</var>; ++<a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a>) {</td></tr>
+<tr><th id="747">747</th><td>			<b>if</b> (<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>[<a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a>] &lt; <kbd>'0'</kbd> || <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>[<a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a>] &gt; <kbd>'9'</kbd>)</td></tr>
+<tr><th id="748">748</th><td>				<b>return</b> <var>1</var>;       <i>/* invalid number */</i></td></tr>
+<tr><th id="749">749</th><td>			<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> *= <var>10</var>;</td></tr>
+<tr><th id="750">750</th><td>			<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> += <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>[<a class="local col4 ref" href="#64i" title='i' data-ref="64i">i</a>] - <kbd>'0'</kbd>;</td></tr>
+<tr><th id="751">751</th><td>		}</td></tr>
+<tr><th id="752">752</th><td>		<b>if</b> (<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>[<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>-<var>1</var>] == <kbd>'\0'</kbd> &amp;&amp; <a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> != <var>0</var> &amp;&amp;</td></tr>
+<tr><th id="753">753</th><td>		    (<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>, <a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>,</td></tr>
+<tr><th id="754">754</th><td>		                     <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>), <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)</td></tr>
+<tr><th id="755">755</th><td>                    <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>, <q>"%d"</q>,</td></tr>
+<tr><th id="756">756</th><td>                                        <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>)) + <var>1</var>;</td></tr>
+<tr><th id="757">757</th><td>		<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="758">758</th><td></td></tr>
+<tr><th id="759">759</th><td>	 <b>case</b> <a class="macro" href="misc.h.html#25" title="0x4" data-ref="_M/EMU_IRC">EMU_IRC</a>:</td></tr>
+<tr><th id="760">760</th><td>		<i>/*</i></td></tr>
+<tr><th id="761">761</th><td><i>		 * Need to emulate DCC CHAT, DCC SEND and DCC MOVE</i></td></tr>
+<tr><th id="762">762</th><td><i>		 */</i></td></tr>
+<tr><th id="763">763</th><td>		*(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>+<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>) = <var>0</var>; <i>/* NULL terminate the string for strstr */</i></td></tr>
+<tr><th id="764">764</th><td>		<b>if</b> ((<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> = (<em>char</em> *)<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <q>"DCC"</q>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)</td></tr>
+<tr><th id="765">765</th><td>			 <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="766">766</th><td></td></tr>
+<tr><th id="767">767</th><td>		<i>/* The %256s is for the broken mIRC */</i></td></tr>
+<tr><th id="768">768</th><td>		<b>if</b> (<a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <q>"DCC CHAT %256s %u %u"</q>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>, &amp;<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>, &amp;<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>) == <var>3</var>) {</td></tr>
+<tr><th id="769">769</th><td>			<b>if</b> ((<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>,</td></tr>
+<tr><th id="770">770</th><td>			                     <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>), <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>),</td></tr>
+<tr><th id="771">771</th><td>			                     <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="772">772</th><td>				<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="773">773</th><td>			}</td></tr>
+<tr><th id="774">774</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>; <i>/* Adjust length */</i></td></tr>
+<tr><th id="775">775</th><td>                        <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>,</td></tr>
+<tr><th id="776">776</th><td>                                             <q>"DCC CHAT chat %lu %u%c\n"</q>,</td></tr>
+<tr><th id="777">777</th><td>                                             (<em>unsigned</em> <em>long</em>)<a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>),</td></tr>
+<tr><th id="778">778</th><td>                                             <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>), <var>1</var>);</td></tr>
+<tr><th id="779">779</th><td>		} <b>else</b> <b>if</b> (<a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <q>"DCC SEND %256s %u %u %u"</q>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>, &amp;<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>, &amp;<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>, &amp;<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>) == <var>4</var>) {</td></tr>
+<tr><th id="780">780</th><td>			<b>if</b> ((<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>,</td></tr>
+<tr><th id="781">781</th><td>			                     <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>), <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>),</td></tr>
+<tr><th id="782">782</th><td>			                     <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="783">783</th><td>				<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="784">784</th><td>			}</td></tr>
+<tr><th id="785">785</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>; <i>/* Adjust length */</i></td></tr>
+<tr><th id="786">786</th><td>                        <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>,</td></tr>
+<tr><th id="787">787</th><td>                                             <q>"DCC SEND %s %lu %u %u%c\n"</q>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>,</td></tr>
+<tr><th id="788">788</th><td>                                             (<em>unsigned</em> <em>long</em>)<a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>),</td></tr>
+<tr><th id="789">789</th><td>                                             <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>), <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, <var>1</var>);</td></tr>
+<tr><th id="790">790</th><td>		} <b>else</b> <b>if</b> (<a class="ref" href="../../include/stdio.h.html#sscanf" title='sscanf' data-ref="sscanf">sscanf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <q>"DCC MOVE %256s %u %u %u"</q>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>, &amp;<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>, &amp;<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>, &amp;<a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>) == <var>4</var>) {</td></tr>
+<tr><th id="791">791</th><td>			<b>if</b> ((<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a> = <a class="ref" href="socket.h.html#tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>, <var>0</var>,</td></tr>
+<tr><th id="792">792</th><td>			                     <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<a class="local col0 ref" href="#60laddr" title='laddr' data-ref="60laddr">laddr</a>), <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>),</td></tr>
+<tr><th id="793">793</th><td>			                     <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="794">794</th><td>				<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="795">795</th><td>			}</td></tr>
+<tr><th id="796">796</th><td>			<a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> - <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>; <i>/* Adjust length */</i></td></tr>
+<tr><th id="797">797</th><td>                        <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>, <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>,</td></tr>
+<tr><th id="798">798</th><td>                                             <q>"DCC MOVE %s %lu %u %u%c\n"</q>, <a class="local col9 ref" href="#59buff" title='buff' data-ref="59buff">buff</a>,</td></tr>
+<tr><th id="799">799</th><td>                                             (<em>unsigned</em> <em>long</em>)<a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>),</td></tr>
+<tr><th id="800">800</th><td>                                             <a class="ref" href="../../include/netinet/in.h.html#ntohs" title='ntohs' data-ref="ntohs">ntohs</a>(<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a>), <a class="local col3 ref" href="#53n1" title='n1' data-ref="53n1">n1</a>, <var>1</var>);</td></tr>
+<tr><th id="801">801</th><td>		}</td></tr>
+<tr><th id="802">802</th><td>		<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="803">803</th><td></td></tr>
+<tr><th id="804">804</th><td>	 <b>case</b> <a class="macro" href="misc.h.html#26" title="0x5" data-ref="_M/EMU_REALAUDIO">EMU_REALAUDIO</a>:</td></tr>
+<tr><th id="805">805</th><td>                <i>/*</i></td></tr>
+<tr><th id="806">806</th><td><i>		 * RealAudio emulation - JP. We must try to parse the incoming</i></td></tr>
+<tr><th id="807">807</th><td><i>		 * data and try to find the two characters that contain the</i></td></tr>
+<tr><th id="808">808</th><td><i>		 * port number. Then we redirect an udp port and replace the</i></td></tr>
+<tr><th id="809">809</th><td><i>		 * number with the real port we got.</i></td></tr>
+<tr><th id="810">810</th><td><i>		 *</i></td></tr>
+<tr><th id="811">811</th><td><i>		 * The 1.0 beta versions of the player are not supported</i></td></tr>
+<tr><th id="812">812</th><td><i>		 * any more.</i></td></tr>
+<tr><th id="813">813</th><td><i>		 *</i></td></tr>
+<tr><th id="814">814</th><td><i>		 * A typical packet for player version 1.0 (release version):</i></td></tr>
+<tr><th id="815">815</th><td><i>		 *</i></td></tr>
+<tr><th id="816">816</th><td><i>		 * 0000:50 4E 41 00 05</i></td></tr>
+<tr><th id="817">817</th><td><i>		 * 0000:00 01 00 02 1B D7 00 00 67 E6 6C DC 63 00 12 50 ........g.l.c..P</i></td></tr>
+<tr><th id="818">818</th><td><i>		 * 0010:4E 43 4C 49 45 4E 54 20 31 30 31 20 41 4C 50 48 NCLIENT 101 ALPH</i></td></tr>
+<tr><th id="819">819</th><td><i>		 * 0020:41 6C 00 00 52 00 17 72 61 66 69 6C 65 73 2F 76 Al..R..rafiles/v</i></td></tr>
+<tr><th id="820">820</th><td><i>		 * 0030:6F 61 2F 65 6E 67 6C 69 73 68 5F 2E 72 61 79 42 oa/english_.rayB</i></td></tr>
+<tr><th id="821">821</th><td><i>		 *</i></td></tr>
+<tr><th id="822">822</th><td><i>		 * Now the port number 0x1BD7 is found at offset 0x04 of the</i></td></tr>
+<tr><th id="823">823</th><td><i>		 * Now the port number 0x1BD7 is found at offset 0x04 of the</i></td></tr>
+<tr><th id="824">824</th><td><i>		 * second packet. This time we received five bytes first and</i></td></tr>
+<tr><th id="825">825</th><td><i>		 * then the rest. You never know how many bytes you get.</i></td></tr>
+<tr><th id="826">826</th><td><i>		 *</i></td></tr>
+<tr><th id="827">827</th><td><i>		 * A typical packet for player version 2.0 (beta):</i></td></tr>
+<tr><th id="828">828</th><td><i>		 *</i></td></tr>
+<tr><th id="829">829</th><td><i>		 * 0000:50 4E 41 00 06 00 02 00 00 00 01 00 02 1B C1 00 PNA.............</i></td></tr>
+<tr><th id="830">830</th><td><i>		 * 0010:00 67 75 78 F5 63 00 0A 57 69 6E 32 2E 30 2E 30 .gux.c..Win2.0.0</i></td></tr>
+<tr><th id="831">831</th><td><i>		 * 0020:2E 35 6C 00 00 52 00 1C 72 61 66 69 6C 65 73 2F .5l..R..rafiles/</i></td></tr>
+<tr><th id="832">832</th><td><i>		 * 0030:77 65 62 73 69 74 65 2F 32 30 72 65 6C 65 61 73 website/20releas</i></td></tr>
+<tr><th id="833">833</th><td><i>		 * 0040:65 2E 72 61 79 53 00 00 06 36 42                e.rayS...6B</i></td></tr>
+<tr><th id="834">834</th><td><i>		 *</i></td></tr>
+<tr><th id="835">835</th><td><i>		 * Port number 0x1BC1 is found at offset 0x0d.</i></td></tr>
+<tr><th id="836">836</th><td><i>		 *</i></td></tr>
+<tr><th id="837">837</th><td><i>		 * This is just a horrible switch statement. Variable ra tells</i></td></tr>
+<tr><th id="838">838</th><td><i>		 * us where we're going.</i></td></tr>
+<tr><th id="839">839</th><td><i>		 */</i></td></tr>
+<tr><th id="840">840</th><td></td></tr>
+<tr><th id="841">841</th><td>		<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> = <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>;</td></tr>
+<tr><th id="842">842</th><td>		<b>while</b> (<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> &lt; <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> + <a class="local col1 ref" href="#51m" title='m' data-ref="51m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>) {</td></tr>
+<tr><th id="843">843</th><td>			<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_short" title='u_short' data-type='__u_short' data-ref="u_short">u_short</a> <dfn class="local col9 decl" id="69p" title='p' data-type='u_short' data-ref="69p">p</dfn>;</td></tr>
+<tr><th id="844">844</th><td>			<em>static</em> <em>int</em> <dfn class="local col0 decl" id="70ra" title='ra' data-type='int' data-ref="70ra">ra</dfn> = <var>0</var>;</td></tr>
+<tr><th id="845">845</th><td>			<em>char</em> <dfn class="local col1 decl" id="71ra_tbl" title='ra_tbl' data-type='char [4]' data-ref="71ra_tbl">ra_tbl</dfn>[<var>4</var>];</td></tr>
+<tr><th id="846">846</th><td></td></tr>
+<tr><th id="847">847</th><td>			<a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<var>0</var>] = <var>0x50</var>;</td></tr>
+<tr><th id="848">848</th><td>			<a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<var>1</var>] = <var>0x4e</var>;</td></tr>
+<tr><th id="849">849</th><td>			<a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<var>2</var>] = <var>0x41</var>;</td></tr>
+<tr><th id="850">850</th><td>			<a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<var>3</var>] = <var>0</var>;</td></tr>
+<tr><th id="851">851</th><td></td></tr>
+<tr><th id="852">852</th><td>			<b>switch</b> (<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a>) {</td></tr>
+<tr><th id="853">853</th><td>			 <b>case</b> <var>0</var>:</td></tr>
+<tr><th id="854">854</th><td>			 <b>case</b> <var>2</var>:</td></tr>
+<tr><th id="855">855</th><td>			 <b>case</b> <var>3</var>:</td></tr>
+<tr><th id="856">856</th><td>				<b>if</b> (*<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>++ != <a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a>]) {</td></tr>
+<tr><th id="857">857</th><td>					<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a> = <var>0</var>;</td></tr>
+<tr><th id="858">858</th><td>					<b>continue</b>;</td></tr>
+<tr><th id="859">859</th><td>				}</td></tr>
+<tr><th id="860">860</th><td>				<b>break</b>;</td></tr>
+<tr><th id="861">861</th><td></td></tr>
+<tr><th id="862">862</th><td>			 <b>case</b> <var>1</var>:</td></tr>
+<tr><th id="863">863</th><td>				<i>/*</i></td></tr>
+<tr><th id="864">864</th><td><i>				 * We may get 0x50 several times, ignore them</i></td></tr>
+<tr><th id="865">865</th><td><i>				 */</i></td></tr>
+<tr><th id="866">866</th><td>				<b>if</b> (*<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> == <var>0x50</var>) {</td></tr>
+<tr><th id="867">867</th><td>					<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a> = <var>1</var>;</td></tr>
+<tr><th id="868">868</th><td>					<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>++;</td></tr>
+<tr><th id="869">869</th><td>					<b>continue</b>;</td></tr>
+<tr><th id="870">870</th><td>				} <b>else</b> <b>if</b> (*<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>++ != <a class="local col1 ref" href="#71ra_tbl" title='ra_tbl' data-ref="71ra_tbl">ra_tbl</a>[<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a>]) {</td></tr>
+<tr><th id="871">871</th><td>					<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a> = <var>0</var>;</td></tr>
+<tr><th id="872">872</th><td>					<b>continue</b>;</td></tr>
+<tr><th id="873">873</th><td>				}</td></tr>
+<tr><th id="874">874</th><td>				<b>break</b>;</td></tr>
+<tr><th id="875">875</th><td></td></tr>
+<tr><th id="876">876</th><td>			 <b>case</b> <var>4</var>:</td></tr>
+<tr><th id="877">877</th><td>				<i>/*</i></td></tr>
+<tr><th id="878">878</th><td><i>				 * skip version number</i></td></tr>
+<tr><th id="879">879</th><td><i>				 */</i></td></tr>
+<tr><th id="880">880</th><td>				<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>++;</td></tr>
+<tr><th id="881">881</th><td>				<b>break</b>;</td></tr>
+<tr><th id="882">882</th><td></td></tr>
+<tr><th id="883">883</th><td>			 <b>case</b> <var>5</var>:</td></tr>
+<tr><th id="884">884</th><td>				<i>/*</i></td></tr>
+<tr><th id="885">885</th><td><i>				 * The difference between versions 1.0 and</i></td></tr>
+<tr><th id="886">886</th><td><i>				 * 2.0 is here. For future versions of</i></td></tr>
+<tr><th id="887">887</th><td><i>				 * the player this may need to be modified.</i></td></tr>
+<tr><th id="888">888</th><td><i>				 */</i></td></tr>
+<tr><th id="889">889</th><td>				<b>if</b> (*(<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> + <var>1</var>) == <var>0x02</var>)</td></tr>
+<tr><th id="890">890</th><td>				   <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> += <var>8</var>;</td></tr>
+<tr><th id="891">891</th><td>				<b>else</b></td></tr>
+<tr><th id="892">892</th><td>				   <a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> += <var>4</var>;</td></tr>
+<tr><th id="893">893</th><td>				<b>break</b>;</td></tr>
+<tr><th id="894">894</th><td></td></tr>
+<tr><th id="895">895</th><td>			 <b>case</b> <var>6</var>:</td></tr>
+<tr><th id="896">896</th><td>				<i>/* This is the field containing the port</i></td></tr>
+<tr><th id="897">897</th><td><i>				 * number that RA-player is listening to.</i></td></tr>
+<tr><th id="898">898</th><td><i>				 */</i></td></tr>
+<tr><th id="899">899</th><td>				<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> = (((<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a>*)<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>)[<var>0</var>] &lt;&lt; <var>8</var>)</td></tr>
+<tr><th id="900">900</th><td>				+ ((<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> *)<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>)[<var>1</var>];</td></tr>
+<tr><th id="901">901</th><td>				<b>if</b> (<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> &lt; <var>6970</var>)</td></tr>
+<tr><th id="902">902</th><td>				   <a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> += <var>256</var>;   <i>/* don't know why */</i></td></tr>
+<tr><th id="903">903</th><td>				<b>if</b> (<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> &lt; <var>6970</var> || <a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a> &gt; <var>7170</var>)</td></tr>
+<tr><th id="904">904</th><td>				   <b>return</b> <var>1</var>;       <i>/* failed */</i></td></tr>
+<tr><th id="905">905</th><td></td></tr>
+<tr><th id="906">906</th><td>				<i>/* try to get udp port between 6970 - 7170 */</i></td></tr>
+<tr><th id="907">907</th><td>				<b>for</b> (<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> = <var>6970</var>; <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> &lt; <var>7071</var>; <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>++) {</td></tr>
+<tr><th id="908">908</th><td>					<b>if</b> (<a class="ref" href="udp.h.html#udp_listen" title='udp_listen' data-ref="udp_listen">udp_listen</a>(<a class="local col2 ref" href="#52slirp" title='slirp' data-ref="52slirp">slirp</a>, <a class="macro" href="../../include/netinet/in.h.html#190" title="((in_addr_t) 0x00000000)" data-ref="_M/INADDR_ANY">INADDR_ANY</a>,</td></tr>
+<tr><th id="909">909</th><td>						       <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>),</td></tr>
+<tr><th id="910">910</th><td>						       <a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>,</td></tr>
+<tr><th id="911">911</th><td>						       <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<a class="local col1 ref" href="#61lport" title='lport' data-ref="61lport">lport</a>),</td></tr>
+<tr><th id="912">912</th><td>						       <a class="macro" href="socket.h.html#88" title="0x200" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</a>)) {</td></tr>
+<tr><th id="913">913</th><td>						<b>break</b>;</td></tr>
+<tr><th id="914">914</th><td>					}</td></tr>
+<tr><th id="915">915</th><td>				}</td></tr>
+<tr><th id="916">916</th><td>				<b>if</b> (<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> == <var>7071</var>)</td></tr>
+<tr><th id="917">917</th><td>				   <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> = <var>0</var>;</td></tr>
+<tr><th id="918">918</th><td>				*(<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> *)<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a>++ = (<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> &gt;&gt; <var>8</var>) &amp; <var>0xff</var>;</td></tr>
+<tr><th id="919">919</th><td>                                *(<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> *)<a class="local col2 ref" href="#62bptr" title='bptr' data-ref="62bptr">bptr</a> = <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a> &amp; <var>0xff</var>;</td></tr>
+<tr><th id="920">920</th><td>				<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a> = <var>0</var>;</td></tr>
+<tr><th id="921">921</th><td>				<b>return</b> <var>1</var>;   <i>/* port redirected, we're done */</i></td></tr>
+<tr><th id="922">922</th><td>				<b>break</b>;</td></tr>
+<tr><th id="923">923</th><td></td></tr>
+<tr><th id="924">924</th><td>			 <b>default</b>:</td></tr>
+<tr><th id="925">925</th><td>				<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a> = <var>0</var>;</td></tr>
+<tr><th id="926">926</th><td>			}</td></tr>
+<tr><th id="927">927</th><td>			<a class="local col0 ref" href="#70ra" title='ra' data-ref="70ra">ra</a>++;</td></tr>
+<tr><th id="928">928</th><td>		}</td></tr>
+<tr><th id="929">929</th><td>		<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="930">930</th><td></td></tr>
+<tr><th id="931">931</th><td>	 <b>default</b>:</td></tr>
+<tr><th id="932">932</th><td>		<i>/* Ooops, not emulated, won't call tcp_emu again */</i></td></tr>
+<tr><th id="933">933</th><td>		<a class="local col0 ref" href="#50so" title='so' data-ref="50so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</a> = <var>0</var>;</td></tr>
+<tr><th id="934">934</th><td>		<b>return</b> <var>1</var>;</td></tr>
+<tr><th id="935">935</th><td>	}</td></tr>
+<tr><th id="936">936</th><td>}</td></tr>
+<tr><th id="937">937</th><td></td></tr>
+<tr><th id="938">938</th><td><i>/*</i></td></tr>
+<tr><th id="939">939</th><td><i> * Do misc. config of SLiRP while its running.</i></td></tr>
+<tr><th id="940">940</th><td><i> * Return 0 if this connections is to be closed, 1 otherwise,</i></td></tr>
+<tr><th id="941">941</th><td><i> * return 2 if this is a command-line connection</i></td></tr>
+<tr><th id="942">942</th><td><i> */</i></td></tr>
+<tr><th id="943">943</th><td><em>int</em> <dfn class="decl def" id="tcp_ctl" title='tcp_ctl' data-ref="tcp_ctl">tcp_ctl</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col2 decl" id="72so" title='so' data-type='struct socket *' data-ref="72so">so</dfn>)</td></tr>
+<tr><th id="944">944</th><td>{</td></tr>
+<tr><th id="945">945</th><td>    <a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col3 decl" id="73slirp" title='slirp' data-type='Slirp *' data-ref="73slirp">slirp</dfn> = <a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>;</td></tr>
+<tr><th id="946">946</th><td>    <b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col4 decl" id="74sb" title='sb' data-type='struct sbuf *' data-ref="74sb">sb</dfn> = &amp;<a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_snd" title='socket::so_snd' data-ref="socket::so_snd">so_snd</a>;</td></tr>
+<tr><th id="947">947</th><td>    <b>struct</b> <a class="type" href="misc.h.html#ex_list" title='ex_list' data-ref="ex_list">ex_list</a> *<dfn class="local col5 decl" id="75ex_ptr" title='ex_ptr' data-type='struct ex_list *' data-ref="75ex_ptr">ex_ptr</dfn>;</td></tr>
+<tr><th id="948">948</th><td>    <em>int</em> <dfn class="local col6 decl" id="76do_pty" title='do_pty' data-type='int' data-ref="76do_pty">do_pty</dfn>;</td></tr>
+<tr><th id="949">949</th><td></td></tr>
+<tr><th id="950">950</th><td>    <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"tcp_ctl"</q>);</td></tr>
+<tr><th id="951">951</th><td>    <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %p"</q>, so);</td></tr>
+<tr><th id="952">952</th><td></td></tr>
+<tr><th id="953">953</th><td>    <b>if</b> (<a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> != <a class="local col3 ref" href="#73slirp" title='slirp' data-ref="73slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vhost_addr" title='Slirp::vhost_addr' data-ref="Slirp::vhost_addr">vhost_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>) {</td></tr>
+<tr><th id="954">954</th><td>        <i>/* Check if it's pty_exec */</i></td></tr>
+<tr><th id="955">955</th><td>        <b>for</b> (<a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a> = <a class="local col3 ref" href="#73slirp" title='slirp' data-ref="73slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::exec_list" title='Slirp::exec_list' data-ref="Slirp::exec_list">exec_list</a>; <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>; <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a> = <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_next" title='ex_list::ex_next' data-ref="ex_list::ex_next">ex_next</a>) {</td></tr>
+<tr><th id="956">956</th><td>            <b>if</b> (<a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_fport" title='ex_list::ex_fport' data-ref="ex_list::ex_fport">ex_fport</a> == <a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a> &amp;&amp;</td></tr>
+<tr><th id="957">957</th><td>                <a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_addr" title='ex_list::ex_addr' data-ref="ex_list::ex_addr">ex_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>) {</td></tr>
+<tr><th id="958">958</th><td>                <b>if</b> (<a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_pty" title='ex_list::ex_pty' data-ref="ex_list::ex_pty">ex_pty</a> == <var>3</var>) {</td></tr>
+<tr><th id="959">959</th><td>                    <a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a> = -<var>1</var>;</td></tr>
+<tr><th id="960">960</th><td>                    <a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::extra" title='socket::extra' data-ref="socket::extra">extra</a> = (<em>void</em> *)<a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_exec" title='ex_list::ex_exec' data-ref="ex_list::ex_exec">ex_exec</a>;</td></tr>
+<tr><th id="961">961</th><td>                    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="962">962</th><td>                }</td></tr>
+<tr><th id="963">963</th><td>                <a class="local col6 ref" href="#76do_pty" title='do_pty' data-ref="76do_pty">do_pty</a> = <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_pty" title='ex_list::ex_pty' data-ref="ex_list::ex_pty">ex_pty</a>;</td></tr>
+<tr><th id="964">964</th><td>                <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>" executing %s\n"</q>, ex_ptr-&gt;ex_exec));</td></tr>
+<tr><th id="965">965</th><td>                <b>return</b> <a class="ref" href="misc.h.html#fork_exec" title='fork_exec' data-ref="fork_exec">fork_exec</a>(<a class="local col2 ref" href="#72so" title='so' data-ref="72so">so</a>, <a class="local col5 ref" href="#75ex_ptr" title='ex_ptr' data-ref="75ex_ptr">ex_ptr</a>-&gt;<a class="ref" href="misc.h.html#ex_list::ex_exec" title='ex_list::ex_exec' data-ref="ex_list::ex_exec">ex_exec</a>, <a class="local col6 ref" href="#76do_pty" title='do_pty' data-ref="76do_pty">do_pty</a>);</td></tr>
+<tr><th id="966">966</th><td>            }</td></tr>
+<tr><th id="967">967</th><td>        }</td></tr>
+<tr><th id="968">968</th><td>    }</td></tr>
+<tr><th id="969">969</th><td>    <a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> =</td></tr>
+<tr><th id="970">970</th><td>        <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>, <a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> - (<a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> - <a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>),</td></tr>
+<tr><th id="971">971</th><td>                 <q>"Error: No application configured.\r\n"</q>);</td></tr>
+<tr><th id="972">972</th><td>    <a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> += <a class="local col4 ref" href="#74sb" title='sb' data-ref="74sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>;</td></tr>
+<tr><th id="973">973</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="974">974</th><td>}</td></tr>
+<tr><th id="975">975</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

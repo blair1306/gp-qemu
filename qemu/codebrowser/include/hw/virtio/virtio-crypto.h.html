@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>virtio-crypto.h source code [codebrowser/include/hw/virtio/virtio-crypto.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="VirtIOCrypto,VirtIOCryptoConf,VirtIOCryptoQueue,VirtIOCryptoReq "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/virtio/virtio-crypto.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>virtio</a>/<a href='virtio-crypto.h.html'>virtio-crypto.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Virtio crypto Support</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *    Gonglei &lt;arei.gonglei@huawei.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="10">10</th><td><i> * (at your option) any later version.  See the COPYING file in the</i></td></tr>
+<tr><th id="11">11</th><td><i> * top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/_QEMU_VIRTIO_CRYPTO_H">_QEMU_VIRTIO_CRYPTO_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/_QEMU_VIRTIO_CRYPTO_H" data-ref="_M/_QEMU_VIRTIO_CRYPTO_H">_QEMU_VIRTIO_CRYPTO_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../../standard-headers/linux/virtio_crypto.h.html">"standard-headers/linux/virtio_crypto.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="virtio.h.html">"hw/virtio/virtio.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../../sysemu/iothread.h.html">"sysemu/iothread.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../../sysemu/cryptodev.h.html">"sysemu/cryptodev.h"</a></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/DEBUG_VIRTIO_CRYPTO" data-ref="_M/DEBUG_VIRTIO_CRYPTO">DEBUG_VIRTIO_CRYPTO</dfn> 0</u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/DPRINTF" data-ref="_M/DPRINTF">DPRINTF</dfn>(fmt, ...) \</u></td></tr>
+<tr><th id="26">26</th><td><u>do { \</u></td></tr>
+<tr><th id="27">27</th><td><u>    if (DEBUG_VIRTIO_CRYPTO) { \</u></td></tr>
+<tr><th id="28">28</th><td><u>        fprintf(stderr, "virtio_crypto: " fmt, ##__VA_ARGS__); \</u></td></tr>
+<tr><th id="29">29</th><td><u>    } \</u></td></tr>
+<tr><th id="30">30</th><td><u>} while (0)</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/TYPE_VIRTIO_CRYPTO" data-ref="_M/TYPE_VIRTIO_CRYPTO">TYPE_VIRTIO_CRYPTO</dfn> "virtio-crypto-device"</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/VIRTIO_CRYPTO" data-ref="_M/VIRTIO_CRYPTO">VIRTIO_CRYPTO</dfn>(obj) \</u></td></tr>
+<tr><th id="35">35</th><td><u>        OBJECT_CHECK(VirtIOCrypto, (obj), TYPE_VIRTIO_CRYPTO)</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/VIRTIO_CRYPTO_GET_PARENT_CLASS" data-ref="_M/VIRTIO_CRYPTO_GET_PARENT_CLASS">VIRTIO_CRYPTO_GET_PARENT_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="37">37</th><td><u>        OBJECT_GET_PARENT_CLASS(obj, TYPE_VIRTIO_CRYPTO)</u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIOCryptoConf" title='VirtIOCryptoConf' data-ref="VirtIOCryptoConf"><a class="type" href="#VirtIOCryptoConf" title='VirtIOCryptoConf' data-ref="VirtIOCryptoConf">VirtIOCryptoConf</a></dfn> {</td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../../sysemu/cryptodev.h.html#CryptoDevBackend" title='CryptoDevBackend' data-type='struct CryptoDevBackend' data-ref="CryptoDevBackend">CryptoDevBackend</a> *<dfn class="decl" id="VirtIOCryptoConf::cryptodev" title='VirtIOCryptoConf::cryptodev' data-ref="VirtIOCryptoConf::cryptodev">cryptodev</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td>    <i>/* Supported service mask */</i></td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::crypto_services" title='VirtIOCryptoConf::crypto_services' data-ref="VirtIOCryptoConf::crypto_services">crypto_services</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>    <i>/* Detailed algorithms mask */</i></td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::cipher_algo_l" title='VirtIOCryptoConf::cipher_algo_l' data-ref="VirtIOCryptoConf::cipher_algo_l">cipher_algo_l</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::cipher_algo_h" title='VirtIOCryptoConf::cipher_algo_h' data-ref="VirtIOCryptoConf::cipher_algo_h">cipher_algo_h</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::hash_algo" title='VirtIOCryptoConf::hash_algo' data-ref="VirtIOCryptoConf::hash_algo">hash_algo</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::mac_algo_l" title='VirtIOCryptoConf::mac_algo_l' data-ref="VirtIOCryptoConf::mac_algo_l">mac_algo_l</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::mac_algo_h" title='VirtIOCryptoConf::mac_algo_h' data-ref="VirtIOCryptoConf::mac_algo_h">mac_algo_h</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::aead_algo" title='VirtIOCryptoConf::aead_algo' data-ref="VirtIOCryptoConf::aead_algo">aead_algo</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>    <i>/* Maximum length of cipher key */</i></td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::max_cipher_key_len" title='VirtIOCryptoConf::max_cipher_key_len' data-ref="VirtIOCryptoConf::max_cipher_key_len">max_cipher_key_len</dfn>;</td></tr>
+<tr><th id="56">56</th><td>    <i>/* Maximum length of authenticated key */</i></td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoConf::max_auth_key_len" title='VirtIOCryptoConf::max_auth_key_len' data-ref="VirtIOCryptoConf::max_auth_key_len">max_auth_key_len</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <i>/* Maximum size of each crypto request's content */</i></td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VirtIOCryptoConf::max_size" title='VirtIOCryptoConf::max_size' data-ref="VirtIOCryptoConf::max_size">max_size</dfn>;</td></tr>
+<tr><th id="60">60</th><td>} <dfn class="typedef" id="VirtIOCryptoConf" title='VirtIOCryptoConf' data-type='struct VirtIOCryptoConf' data-ref="VirtIOCryptoConf">VirtIOCryptoConf</dfn>;</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><b>struct</b> <a class="type" href="#VirtIOCrypto" title='VirtIOCrypto' data-ref="VirtIOCrypto">VirtIOCrypto</a>;</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIOCryptoReq" title='VirtIOCryptoReq' data-ref="VirtIOCryptoReq"><a class="type" href="#VirtIOCryptoReq" title='VirtIOCryptoReq' data-ref="VirtIOCryptoReq">VirtIOCryptoReq</a></dfn> {</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="virtio.h.html#VirtQueueElement" title='VirtQueueElement' data-type='struct VirtQueueElement' data-ref="VirtQueueElement">VirtQueueElement</a> <dfn class="decl" id="VirtIOCryptoReq::elem" title='VirtIOCryptoReq::elem' data-ref="VirtIOCryptoReq::elem">elem</dfn>;</td></tr>
+<tr><th id="66">66</th><td>    <i>/* flags of operation, such as type of algorithm */</i></td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCryptoReq::flags" title='VirtIOCryptoReq::flags' data-ref="VirtIOCryptoReq::flags">flags</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <b>struct</b> <a class="type" href="../../standard-headers/linux/virtio_crypto.h.html#virtio_crypto_inhdr" title='virtio_crypto_inhdr' data-ref="virtio_crypto_inhdr">virtio_crypto_inhdr</a> *<dfn class="decl" id="VirtIOCryptoReq::in" title='VirtIOCryptoReq::in' data-ref="VirtIOCryptoReq::in">in</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="decl" id="VirtIOCryptoReq::in_iov" title='VirtIOCryptoReq::in_iov' data-ref="VirtIOCryptoReq::in_iov">in_iov</dfn>; <i>/* Head address of dest iovec */</i></td></tr>
+<tr><th id="70">70</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="VirtIOCryptoReq::in_num" title='VirtIOCryptoReq::in_num' data-ref="VirtIOCryptoReq::in_num">in_num</dfn>; <i>/* Number of dest iovec */</i></td></tr>
+<tr><th id="71">71</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VirtIOCryptoReq::in_len" title='VirtIOCryptoReq::in_len' data-ref="VirtIOCryptoReq::in_len">in_len</dfn>;</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIOCryptoReq::vq" title='VirtIOCryptoReq::vq' data-ref="VirtIOCryptoReq::vq">vq</dfn>;</td></tr>
+<tr><th id="73">73</th><td>    <b>struct</b> <a class="type" href="#VirtIOCrypto" title='VirtIOCrypto' data-ref="VirtIOCrypto">VirtIOCrypto</a> *<dfn class="decl" id="VirtIOCryptoReq::vcrypto" title='VirtIOCryptoReq::vcrypto' data-ref="VirtIOCryptoReq::vcrypto">vcrypto</dfn>;</td></tr>
+<tr><th id="74">74</th><td>    <b>union</b> {</td></tr>
+<tr><th id="75">75</th><td>        <a class="typedef" href="../../sysemu/cryptodev.h.html#CryptoDevBackendSymOpInfo" title='CryptoDevBackendSymOpInfo' data-type='struct CryptoDevBackendSymOpInfo' data-ref="CryptoDevBackendSymOpInfo">CryptoDevBackendSymOpInfo</a> *<dfn class="decl" id="VirtIOCryptoReq::(anonymous)::sym_op_info" title='VirtIOCryptoReq::(anonymous union)::sym_op_info' data-ref="VirtIOCryptoReq::(anonymous)::sym_op_info">sym_op_info</dfn>;</td></tr>
+<tr><th id="76">76</th><td>    } <dfn class="decl" id="VirtIOCryptoReq::u" title='VirtIOCryptoReq::u' data-ref="VirtIOCryptoReq::u">u</dfn>;</td></tr>
+<tr><th id="77">77</th><td>} <dfn class="typedef" id="VirtIOCryptoReq" title='VirtIOCryptoReq' data-type='struct VirtIOCryptoReq' data-ref="VirtIOCryptoReq">VirtIOCryptoReq</dfn>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIOCryptoQueue" title='VirtIOCryptoQueue' data-ref="VirtIOCryptoQueue"><a class="type" href="#VirtIOCryptoQueue" title='VirtIOCryptoQueue' data-ref="VirtIOCryptoQueue">VirtIOCryptoQueue</a></dfn> {</td></tr>
+<tr><th id="80">80</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIOCryptoQueue::dataq" title='VirtIOCryptoQueue::dataq' data-ref="VirtIOCryptoQueue::dataq">dataq</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="VirtIOCryptoQueue::dataq_bh" title='VirtIOCryptoQueue::dataq_bh' data-ref="VirtIOCryptoQueue::dataq_bh">dataq_bh</dfn>;</td></tr>
+<tr><th id="82">82</th><td>    <b>struct</b> <a class="type" href="#VirtIOCrypto" title='VirtIOCrypto' data-ref="VirtIOCrypto">VirtIOCrypto</a> *<dfn class="decl" id="VirtIOCryptoQueue::vcrypto" title='VirtIOCryptoQueue::vcrypto' data-ref="VirtIOCryptoQueue::vcrypto">vcrypto</dfn>;</td></tr>
+<tr><th id="83">83</th><td>} <dfn class="typedef" id="VirtIOCryptoQueue" title='VirtIOCryptoQueue' data-type='struct VirtIOCryptoQueue' data-ref="VirtIOCryptoQueue">VirtIOCryptoQueue</dfn>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIOCrypto" title='VirtIOCrypto' data-ref="VirtIOCrypto"><a class="type" href="#VirtIOCrypto" title='VirtIOCrypto' data-ref="VirtIOCrypto">VirtIOCrypto</a></dfn> {</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#VirtIODevice" title='VirtIODevice' data-type='struct VirtIODevice' data-ref="VirtIODevice">VirtIODevice</a> <dfn class="decl" id="VirtIOCrypto::parent_obj" title='VirtIOCrypto::parent_obj' data-ref="VirtIOCrypto::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIOCrypto::ctrl_vq" title='VirtIOCrypto::ctrl_vq' data-ref="VirtIOCrypto::ctrl_vq">ctrl_vq</dfn>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="#VirtIOCryptoQueue" title='VirtIOCryptoQueue' data-type='struct VirtIOCryptoQueue' data-ref="VirtIOCryptoQueue">VirtIOCryptoQueue</a> *<dfn class="decl" id="VirtIOCrypto::vqs" title='VirtIOCrypto::vqs' data-ref="VirtIOCrypto::vqs">vqs</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="#VirtIOCryptoConf" title='VirtIOCryptoConf' data-type='struct VirtIOCryptoConf' data-ref="VirtIOCryptoConf">VirtIOCryptoConf</a> <dfn class="decl" id="VirtIOCrypto::conf" title='VirtIOCrypto::conf' data-ref="VirtIOCrypto::conf">conf</dfn>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="typedef" href="../../sysemu/cryptodev.h.html#CryptoDevBackend" title='CryptoDevBackend' data-type='struct CryptoDevBackend' data-ref="CryptoDevBackend">CryptoDevBackend</a> *<dfn class="decl" id="VirtIOCrypto::cryptodev" title='VirtIOCrypto::cryptodev' data-ref="VirtIOCrypto::cryptodev">cryptodev</dfn>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCrypto::max_queues" title='VirtIOCrypto::max_queues' data-ref="VirtIOCrypto::max_queues">max_queues</dfn>;</td></tr>
+<tr><th id="94">94</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCrypto::status" title='VirtIOCrypto::status' data-ref="VirtIOCrypto::status">status</dfn>;</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td>    <em>int</em> <dfn class="decl" id="VirtIOCrypto::multiqueue" title='VirtIOCrypto::multiqueue' data-ref="VirtIOCrypto::multiqueue">multiqueue</dfn>;</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIOCrypto::curr_queues" title='VirtIOCrypto::curr_queues' data-ref="VirtIOCrypto::curr_queues">curr_queues</dfn>;</td></tr>
+<tr><th id="98">98</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VirtIOCrypto::config_size" title='VirtIOCrypto::config_size' data-ref="VirtIOCrypto::config_size">config_size</dfn>;</td></tr>
+<tr><th id="99">99</th><td>} <dfn class="typedef" id="VirtIOCrypto" title='VirtIOCrypto' data-type='struct VirtIOCrypto' data-ref="VirtIOCrypto">VirtIOCrypto</dfn>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><u>#<span data-ppcond="14">endif</span> /* _QEMU_VIRTIO_CRYPTO_H */</u></td></tr>
+<tr><th id="102">102</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../backends/cryptodev.c.html'>codebrowser/backends/cryptodev.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

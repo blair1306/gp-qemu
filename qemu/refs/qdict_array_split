@@ -1,0 +1,19 @@
+<dec f='codebrowser/include/qapi/qmp/qdict.h' l='83' type='void qdict_array_split(QDict * src, QList ** dst)'/>
+<use f='codebrowser/blockdev.c' l='505' u='c' c='blockdev_init'/>
+<def f='codebrowser/qobject/qdict.c' l='614' ll='654' type='void qdict_array_split(QDict * src, QList ** dst)'/>
+<doc f='codebrowser/qobject/qdict.c' l='599'>/**
+ * qdict_array_split(): This function moves array-like elements of a QDict into
+ * a new QList. Every entry in the original QDict with a key &quot;%u&quot; or one
+ * prefixed &quot;%u.&quot;, where %u designates an unsigned integer starting at 0 and
+ * incrementally counting up, will be moved to a new QDict at index %u in the
+ * output QList with the key prefix removed, if that prefix is &quot;%u.&quot;. If the
+ * whole key is just &quot;%u&quot;, the whole QObject will be moved unchanged without
+ * creating a new QDict. The function terminates when there is no entry in the
+ * QDict with a prefix directly (incrementally) following the last one; it also
+ * returns if there are both entries with &quot;%u&quot; and &quot;%u.&quot; for the same index %u.
+ * Example: {&quot;0.a&quot;: 42, &quot;0.b&quot;: 23, &quot;1.x&quot;: 0, &quot;4.y&quot;: 1, &quot;o.o&quot;: 7, &quot;2&quot;: 66}
+ *      (or {&quot;1.x&quot;: 0, &quot;4.y&quot;: 1, &quot;0.a&quot;: 42, &quot;o.o&quot;: 7, &quot;0.b&quot;: 23, &quot;2&quot;: 66})
+ *       =&gt; [{&quot;a&quot;: 42, &quot;b&quot;: 23}, {&quot;x&quot;: 0}, 66]
+ *      and {&quot;4.y&quot;: 1, &quot;o.o&quot;: 7} (remainder of the old QDict)
+ */</doc>
+<use f='codebrowser/util/qemu-config.c' l='520' u='c' c='config_parse_qdict_section'/>

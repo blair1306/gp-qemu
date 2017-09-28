@@ -1,0 +1,32 @@
+<dec f='codebrowser/include/block/block.h' l='317' type='int bdrv_drop_intermediate(BlockDriverState * active, BlockDriverState * top, BlockDriverState * base, const char * backing_file_str)'/>
+<def f='codebrowser/block.c' l='3361' ll='3409' type='int bdrv_drop_intermediate(BlockDriverState * active, BlockDriverState * top, BlockDriverState * base, const char * backing_file_str)'/>
+<doc f='codebrowser/block.c' l='3332'>/*
+ * Drops images above &apos;base&apos; up to and including &apos;top&apos;, and sets the image
+ * above &apos;top&apos; to have base as its backing file.
+ *
+ * Requires that the overlay to &apos;top&apos; is opened r/w, so that the backing file
+ * information in &apos;bs&apos; can be properly updated.
+ *
+ * E.g., this will convert the following chain:
+ * bottom &lt;- base &lt;- intermediate &lt;- top &lt;- active
+ *
+ * to
+ *
+ * bottom &lt;- base &lt;- active
+ *
+ * It is allowed for bottom==base, in which case it converts:
+ *
+ * base &lt;- intermediate &lt;- top &lt;- active
+ *
+ * to
+ *
+ * base &lt;- active
+ *
+ * If backing_file_str is non-NULL, it will be used when modifying top&apos;s
+ * overlay image metadata.
+ *
+ * Error conditions:
+ *  if active == top, that is considered an error
+ *
+ */</doc>
+<use f='codebrowser/block/commit.c' l='103' u='c' c='commit_complete'/>

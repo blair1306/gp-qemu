@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>or-irq.c source code [codebrowser/hw/core/or-irq.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/core/or-irq.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>core</a>/<a href='or-irq.c.html'>or-irq.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU IRQ/GPIO common code.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 Alistair Francis &lt;alistair@alistair23.me&gt;.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/hw/or-irq.h.html">"hw/or-irq.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_handler" title='or_irq_handler' data-type='void or_irq_handler(void * opaque, int n, int level)' data-ref="or_irq_handler">or_irq_handler</dfn>(<em>void</em> *<dfn class="local col1 decl" id="1opaque" title='opaque' data-type='void *' data-ref="1opaque">opaque</dfn>, <em>int</em> <dfn class="local col2 decl" id="2n" title='n' data-type='int' data-ref="2n">n</dfn>, <em>int</em> <dfn class="local col3 decl" id="3level" title='level' data-type='int' data-ref="3level">level</dfn>)</td></tr>
+<tr><th id="29">29</th><td>{</td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a> *<dfn class="local col4 decl" id="4s" title='s' data-type='qemu_or_irq *' data-ref="4s">s</dfn> = <a class="macro" href="../../include/hw/or-irq.h.html#35" title="((qemu_or_irq *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;or-irq&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 30, __func__))" data-ref="_M/OR_IRQ">OR_IRQ</a>(<a class="local col1 ref" href="#1opaque" title='opaque' data-ref="1opaque">opaque</a>);</td></tr>
+<tr><th id="31">31</th><td>    <em>int</em> <dfn class="local col5 decl" id="5or_level" title='or_level' data-type='int' data-ref="5or_level">or_level</dfn> = <var>0</var>;</td></tr>
+<tr><th id="32">32</th><td>    <em>int</em> <dfn class="local col6 decl" id="6i" title='i' data-type='int' data-ref="6i">i</dfn>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>    <a class="local col4 ref" href="#4s" title='s' data-ref="4s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::levels" title='OrIRQState::levels' data-ref="OrIRQState::levels">levels</a>[<a class="local col2 ref" href="#2n" title='n' data-ref="2n">n</a>] = <a class="local col3 ref" href="#3level" title='level' data-ref="3level">level</a>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>    <b>for</b> (<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> = <var>0</var>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> &lt; <a class="local col4 ref" href="#4s" title='s' data-ref="4s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::num_lines" title='OrIRQState::num_lines' data-ref="OrIRQState::num_lines">num_lines</a>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>++) {</td></tr>
+<tr><th id="37">37</th><td>        <a class="local col5 ref" href="#5or_level" title='or_level' data-ref="5or_level">or_level</a> |= <a class="local col4 ref" href="#4s" title='s' data-ref="4s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::levels" title='OrIRQState::levels' data-ref="OrIRQState::levels">levels</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>];</td></tr>
+<tr><th id="38">38</th><td>    }</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>    <a class="ref" href="../../include/hw/irq.h.html#qemu_set_irq" title='qemu_set_irq' data-ref="qemu_set_irq">qemu_set_irq</a>(<a class="local col4 ref" href="#4s" title='s' data-ref="4s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::out_irq" title='OrIRQState::out_irq' data-ref="OrIRQState::out_irq">out_irq</a>, <a class="local col5 ref" href="#5or_level" title='or_level' data-ref="5or_level">or_level</a>);</td></tr>
+<tr><th id="41">41</th><td>}</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_reset" title='or_irq_reset' data-type='void or_irq_reset(DeviceState * dev)' data-ref="or_irq_reset">or_irq_reset</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="7dev" title='dev' data-type='DeviceState *' data-ref="7dev">dev</dfn>)</td></tr>
+<tr><th id="44">44</th><td>{</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a> *<dfn class="local col8 decl" id="8s" title='s' data-type='qemu_or_irq *' data-ref="8s">s</dfn> = <a class="macro" href="../../include/hw/or-irq.h.html#35" title="((qemu_or_irq *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;or-irq&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 45, __func__))" data-ref="_M/OR_IRQ">OR_IRQ</a>(<a class="local col7 ref" href="#7dev" title='dev' data-ref="7dev">dev</a>);</td></tr>
+<tr><th id="46">46</th><td>    <em>int</em> <dfn class="local col9 decl" id="9i" title='i' data-type='int' data-ref="9i">i</dfn>;</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td>    <b>for</b> (<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> = <var>0</var>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> &lt; <a class="macro" href="../../include/hw/or-irq.h.html#31" title="16" data-ref="_M/MAX_OR_LINES">MAX_OR_LINES</a>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>++) {</td></tr>
+<tr><th id="49">49</th><td>        <a class="local col8 ref" href="#8s" title='s' data-ref="8s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::levels" title='OrIRQState::levels' data-ref="OrIRQState::levels">levels</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>] = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="50">50</th><td>    }</td></tr>
+<tr><th id="51">51</th><td>}</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_realize" title='or_irq_realize' data-type='void or_irq_realize(DeviceState * dev, Error ** errp)' data-ref="or_irq_realize">or_irq_realize</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col0 decl" id="10dev" title='dev' data-type='DeviceState *' data-ref="10dev">dev</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="11errp" title='errp' data-type='Error **' data-ref="11errp">errp</dfn>)</td></tr>
+<tr><th id="54">54</th><td>{</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a> *<dfn class="local col2 decl" id="12s" title='s' data-type='qemu_or_irq *' data-ref="12s">s</dfn> = <a class="macro" href="../../include/hw/or-irq.h.html#35" title="((qemu_or_irq *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;or-irq&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 55, __func__))" data-ref="_M/OR_IRQ">OR_IRQ</a>(<a class="local col0 ref" href="#10dev" title='dev' data-ref="10dev">dev</a>);</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((s-&gt;num_lines &lt; 16) ? (void) (0) : __assert_fail (&quot;s-&gt;num_lines &lt; MAX_OR_LINES&quot;, &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 57, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col2 ref" href="#12s" title='s' data-ref="12s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::num_lines" title='OrIRQState::num_lines' data-ref="OrIRQState::num_lines">num_lines</a> &lt; <a class="macro" href="../../include/hw/or-irq.h.html#31" title="16" data-ref="_M/MAX_OR_LINES">MAX_OR_LINES</a>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>    <a class="ref" href="../../include/hw/qdev-core.h.html#qdev_init_gpio_in" title='qdev_init_gpio_in' data-ref="qdev_init_gpio_in">qdev_init_gpio_in</a>(<a class="local col0 ref" href="#10dev" title='dev' data-ref="10dev">dev</a>, <a class="tu ref" href="#or_irq_handler" title='or_irq_handler' data-use='r' data-ref="or_irq_handler">or_irq_handler</a>, <a class="local col2 ref" href="#12s" title='s' data-ref="12s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::num_lines" title='OrIRQState::num_lines' data-ref="OrIRQState::num_lines">num_lines</a>);</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_init" title='or_irq_init' data-type='void or_irq_init(Object * obj)' data-ref="or_irq_init">or_irq_init</dfn>(<a class="typedef" href="../../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col3 decl" id="13obj" title='obj' data-type='Object *' data-ref="13obj">obj</dfn>)</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a> *<dfn class="local col4 decl" id="14s" title='s' data-type='qemu_or_irq *' data-ref="14s">s</dfn> = <a class="macro" href="../../include/hw/or-irq.h.html#35" title="((qemu_or_irq *)object_dynamic_cast_assert(((Object *)((obj))), (&quot;or-irq&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 64, __func__))" data-ref="_M/OR_IRQ">OR_IRQ</a>(<a class="local col3 ref" href="#13obj" title='obj' data-ref="13obj">obj</a>);</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <a class="ref" href="../../include/hw/qdev-core.h.html#qdev_init_gpio_out" title='qdev_init_gpio_out' data-ref="qdev_init_gpio_out">qdev_init_gpio_out</a>(<a class="macro" href="../../include/hw/qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((obj))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 66, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col3 ref" href="#13obj" title='obj' data-ref="13obj">obj</a>), &amp;<a class="local col4 ref" href="#14s" title='s' data-ref="14s">s</a>-&gt;<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::out_irq" title='OrIRQState::out_irq' data-ref="OrIRQState::out_irq">out_irq</a>, <var>1</var>);</td></tr>
+<tr><th id="67">67</th><td>}</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="vmstate_or_irq" title='vmstate_or_irq' data-type='const VMStateDescription' data-ref="vmstate_or_irq">vmstate_or_irq</dfn> = {</td></tr>
+<tr><th id="70">70</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <a class="macro" href="../../include/hw/or-irq.h.html#29" title="&quot;or-irq&quot;" data-ref="_M/TYPE_OR_IRQ">TYPE_OR_IRQ</a>,</td></tr>
+<tr><th id="71">71</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="72">72</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::minimum_version_id" title='VMStateDescription::minimum_version_id' data-ref="VMStateDescription::minimum_version_id">minimum_version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="73">73</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="74">74</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#869" title="{ .name = (&quot;levels&quot;), .version_id = (0), .num = (16), .info = &amp;(vmstate_info_bool), .size = sizeof(_Bool), .flags = VMS_ARRAY, .offset = (__builtin_offsetof(qemu_or_irq, levels) + ((_Bool(*)[16])0 - (typeof(((qemu_or_irq *)0)-&gt;levels)*)0)), }" data-ref="_M/VMSTATE_BOOL_ARRAY">VMSTATE_BOOL_ARRAY</a>(<a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::levels" title='OrIRQState::levels' data-ref="OrIRQState::levels">levels</a>, <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a>, <a class="macro" href="../../include/hw/or-irq.h.html#31" title="16" data-ref="_M/MAX_OR_LINES">MAX_OR_LINES</a>),</td></tr>
+<tr><th id="75">75</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>(),</td></tr>
+<tr><th id="76">76</th><td>    }</td></tr>
+<tr><th id="77">77</th><td>};</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><em>static</em> <a class="typedef" href="../../include/qemu/typedefs.h.html#Property" title='Property' data-type='struct Property' data-ref="Property">Property</a> <dfn class="tu decl def" id="or_irq_properties" title='or_irq_properties' data-type='Property [2]' data-ref="or_irq_properties">or_irq_properties</dfn>[] = {</td></tr>
+<tr><th id="80">80</th><td>    <a class="macro" href="../../include/hw/qdev-properties.h.html#153" title="{ .name = (&quot;num-lines&quot;), .info = &amp;(qdev_prop_uint16), .offset = __builtin_offsetof(qemu_or_irq, num_lines) + ((uint16_t*)0 - (typeof(((qemu_or_irq *)0)-&gt;num_lines)*)0), .set_default = 1, .defval.u = (uint16_t)1, }" data-ref="_M/DEFINE_PROP_UINT16">DEFINE_PROP_UINT16</a>(<q>"num-lines"</q>, <a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a>, <a class="ref" href="../../include/hw/or-irq.h.html#OrIRQState::num_lines" title='OrIRQState::num_lines' data-ref="OrIRQState::num_lines">num_lines</a>, <var>1</var>),</td></tr>
+<tr><th id="81">81</th><td>    <a class="macro" href="../../include/hw/qdev-properties.h.html#216" title="{}" data-ref="_M/DEFINE_PROP_END_OF_LIST">DEFINE_PROP_END_OF_LIST</a>(),</td></tr>
+<tr><th id="82">82</th><td>};</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_class_init" title='or_irq_class_init' data-type='void or_irq_class_init(ObjectClass * klass, void * data)' data-ref="or_irq_class_init">or_irq_class_init</dfn>(<a class="typedef" href="../../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col5 decl" id="15klass" title='klass' data-type='ObjectClass *' data-ref="15klass">klass</dfn>, <em>void</em> *<dfn class="local col6 decl" id="16data" title='data' data-type='void *' data-ref="16data">data</dfn>)</td></tr>
+<tr><th id="85">85</th><td>{</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../include/hw/qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> *<dfn class="local col7 decl" id="17dc" title='dc' data-type='DeviceClass *' data-ref="17dc">dc</dfn> = <a class="macro" href="../../include/hw/qdev-core.h.html#17" title="((DeviceClass *)object_class_dynamic_cast_assert(((ObjectClass *)((klass))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/core/or-irq.c&quot;, 86, __func__))" data-ref="_M/DEVICE_CLASS">DEVICE_CLASS</a>(<a class="local col5 ref" href="#15klass" title='klass' data-ref="15klass">klass</a>);</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>    <a class="local col7 ref" href="#17dc" title='dc' data-ref="17dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::reset" title='DeviceClass::reset' data-ref="DeviceClass::reset">reset</a> = <a class="tu ref" href="#or_irq_reset" title='or_irq_reset' data-use='r' data-ref="or_irq_reset">or_irq_reset</a>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="local col7 ref" href="#17dc" title='dc' data-ref="17dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::props" title='DeviceClass::props' data-ref="DeviceClass::props">props</a> = <a class="tu ref" href="#or_irq_properties" title='or_irq_properties' data-use='r' data-ref="or_irq_properties">or_irq_properties</a>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="local col7 ref" href="#17dc" title='dc' data-ref="17dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::realize" title='DeviceClass::realize' data-ref="DeviceClass::realize">realize</a> = <a class="tu ref" href="#or_irq_realize" title='or_irq_realize' data-use='r' data-ref="or_irq_realize">or_irq_realize</a>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="local col7 ref" href="#17dc" title='dc' data-ref="17dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::vmsd" title='DeviceClass::vmsd' data-ref="DeviceClass::vmsd">vmsd</a> = &amp;<a class="tu ref" href="#vmstate_or_irq" title='vmstate_or_irq' data-use='a' data-ref="vmstate_or_irq">vmstate_or_irq</a>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <i>/* Reason: Needs to be wired up to work, e.g. see stm32f205_soc.c */</i></td></tr>
+<tr><th id="94">94</th><td>    <a class="local col7 ref" href="#17dc" title='dc' data-ref="17dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::user_creatable" title='DeviceClass::user_creatable' data-ref="DeviceClass::user_creatable">user_creatable</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="or_irq_type_info" title='or_irq_type_info' data-type='const TypeInfo' data-ref="or_irq_type_info">or_irq_type_info</dfn> = {</td></tr>
+<tr><th id="98">98</th><td>   .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../../include/hw/or-irq.h.html#29" title="&quot;or-irq&quot;" data-ref="_M/TYPE_OR_IRQ">TYPE_OR_IRQ</a>,</td></tr>
+<tr><th id="99">99</th><td>   .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../../include/hw/qdev-core.h.html#15" title="&quot;device&quot;" data-ref="_M/TYPE_DEVICE">TYPE_DEVICE</a>,</td></tr>
+<tr><th id="100">100</th><td>   .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::instance_size" title='TypeInfo::instance_size' data-ref="TypeInfo::instance_size">instance_size</a> = <b>sizeof</b>(<a class="typedef" href="../../include/hw/or-irq.h.html#qemu_or_irq" title='qemu_or_irq' data-type='struct OrIRQState' data-ref="qemu_or_irq">qemu_or_irq</a>),</td></tr>
+<tr><th id="101">101</th><td>   .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::instance_init" title='TypeInfo::instance_init' data-ref="TypeInfo::instance_init">instance_init</a> = <a class="tu ref" href="#or_irq_init" title='or_irq_init' data-ref="or_irq_init">or_irq_init</a>,</td></tr>
+<tr><th id="102">102</th><td>   .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a> = <a class="tu ref" href="#or_irq_class_init" title='or_irq_class_init' data-ref="or_irq_class_init">or_irq_class_init</a>,</td></tr>
+<tr><th id="103">103</th><td>};</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="or_irq_register_types" title='or_irq_register_types' data-type='void or_irq_register_types()' data-ref="or_irq_register_types">or_irq_register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td>    <a class="ref" href="../../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#or_irq_type_info" title='or_irq_type_info' data-use='a' data-ref="or_irq_type_info">or_irq_type_info</a>);</td></tr>
+<tr><th id="108">108</th><td>}</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><a class="macro" href="../../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_or_irq_register_types(void) { register_module_init(or_irq_register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#or_irq_register_types" title='or_irq_register_types' data-use='r' data-ref="or_irq_register_types">or_irq_register_types</a>)</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>atomic_template.h source code [codebrowser/atomic_template.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/atomic_template.h'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='atomic_template.h.html'>atomic_template.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Atomic helper templates</i></td></tr>
+<tr><th id="3">3</th><td><i> * Included from tcg-runtime.c and cputlb.c.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2016 Red Hat, Inc</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="8">8</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="9">9</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="10">10</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="13">13</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="14">14</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="15">15</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="18">18</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">if</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 16</u></td></tr>
+<tr><th id="22">22</th><td><u># define SUFFIX     o</u></td></tr>
+<tr><th id="23">23</th><td><u># define DATA_TYPE  Int128</u></td></tr>
+<tr><th id="24">24</th><td><u># define BSWAP      bswap128</u></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="21">elif</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 8</u></td></tr>
+<tr><th id="26">26</th><td><u># define SUFFIX     q</u></td></tr>
+<tr><th id="27">27</th><td><u># define DATA_TYPE  uint64_t</u></td></tr>
+<tr><th id="28">28</th><td><u># define BSWAP      bswap64</u></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="21">elif</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 4</u></td></tr>
+<tr><th id="30">30</th><td><u># define SUFFIX     l</u></td></tr>
+<tr><th id="31">31</th><td><u># define DATA_TYPE  uint32_t</u></td></tr>
+<tr><th id="32">32</th><td><u># define BSWAP      bswap32</u></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="21">elif</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 2</u></td></tr>
+<tr><th id="34">34</th><td><u># define SUFFIX     w</u></td></tr>
+<tr><th id="35">35</th><td><u># define DATA_TYPE  uint16_t</u></td></tr>
+<tr><th id="36">36</th><td><u># define BSWAP      bswap16</u></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="21">elif</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 1</u></td></tr>
+<tr><th id="38">38</th><td><u># define <dfn class="macro" id="_M/SUFFIX" data-ref="_M/SUFFIX">SUFFIX</dfn>     b</u></td></tr>
+<tr><th id="39">39</th><td><u># define <dfn class="macro" id="_M/DATA_TYPE" data-ref="_M/DATA_TYPE">DATA_TYPE</dfn>  <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a></u></td></tr>
+<tr><th id="40">40</th><td><u># define <dfn class="macro" id="_M/BSWAP" data-ref="_M/BSWAP">BSWAP</dfn></u></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="21">else</span></u></td></tr>
+<tr><th id="42">42</th><td><u># error unsupported data size</u></td></tr>
+<tr><th id="43">43</th><td><u>#<span data-ppcond="21">endif</span></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="45">if</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> &gt;= 4</u></td></tr>
+<tr><th id="46">46</th><td><u># define ABI_TYPE  DATA_TYPE</u></td></tr>
+<tr><th id="47">47</th><td><u>#<span data-ppcond="45">else</span></u></td></tr>
+<tr><th id="48">48</th><td><u># define <dfn class="macro" id="_M/ABI_TYPE" data-ref="_M/ABI_TYPE">ABI_TYPE</dfn>  <a class="typedef" href="../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="45">endif</span></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>/* Define host-endian atomic operations.  Note that END is used within</i></td></tr>
+<tr><th id="52">52</th><td><i>   the ATOMIC_NAME macro, and redefined below.  */</i></td></tr>
+<tr><th id="53">53</th><td><u>#<span data-ppcond="53">if</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> == 1</u></td></tr>
+<tr><th id="54">54</th><td><u># define <dfn class="macro" id="_M/END" data-ref="_M/END">END</dfn></u></td></tr>
+<tr><th id="55">55</th><td><u>#<span data-ppcond="53">elif</span> defined(HOST_WORDS_BIGENDIAN)</u></td></tr>
+<tr><th id="56">56</th><td><u># define END  _be</u></td></tr>
+<tr><th id="57">57</th><td><u>#else</u></td></tr>
+<tr><th id="58">58</th><td><u># define END  _le</u></td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="53">endif</span></u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><a class="macro" href="#48" title="uint32_t" data-ref="_M/ABI_TYPE">ABI_TYPE</a> <a class="macro" href="accel/tcg/cputlb.c.html#999" title="helper_atomic_cmpxchgb_mmu" data-ref="_M/ATOMIC_NAME">ATOMIC_NAME</a>(cmpxchg)(<a class="macro" href="target/i386/cpu.h.html#51" title="struct CPUX86State" data-ref="_M/CPUArchState">CPUArchState</a> *<dfn class="local col3 decl" id="1263env" title='env' data-type='struct CPUX86State *' data-ref="1263env">env</dfn>, <a class="typedef" href="include/exec/cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="local col4 decl" id="1264addr" title='addr' data-type='target_ulong' data-ref="1264addr">addr</dfn>,</td></tr>
+<tr><th id="62">62</th><td>                              <a class="macro" href="#48" title="uint32_t" data-ref="_M/ABI_TYPE">ABI_TYPE</a> <dfn class="local col5 decl" id="1265cmpv" title='cmpv' data-type='uint32_t' data-ref="1265cmpv">cmpv</dfn>, <a class="macro" href="#48" title="uint32_t" data-ref="_M/ABI_TYPE">ABI_TYPE</a> <dfn class="local col6 decl" id="1266newv" title='newv' data-type='uint32_t' data-ref="1266newv">newv</dfn> <a class="macro" href="accel/tcg/cputlb.c.html#998" title=", TCGMemOpIdx oi, uintptr_t retaddr" data-ref="_M/EXTRA_ARGS">EXTRA_ARGS</a>)</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <a class="macro" href="#39" title="uint8_t" data-ref="_M/DATA_TYPE">DATA_TYPE</a> *<dfn class="local col7 decl" id="1267haddr" title='haddr' data-type='uint8_t *' data-ref="1267haddr">haddr</dfn> = <a class="macro" href="accel/tcg/cputlb.c.html#1001" title="atomic_mmu_lookup(env, addr, oi, retaddr)" data-ref="_M/ATOMIC_MMU_LOOKUP">ATOMIC_MMU_LOOKUP</a>;</td></tr>
+<tr><th id="65">65</th><td>    <b>return</b> <a class="macro" href="include/qemu/atomic.h.html#188" title="({ typeof( __builtin_choose_expr( __builtin_types_compatible_p(typeof(*haddr), _Bool) || __builtin_types_compatible_p(typeof(*haddr), const _Bool) || __builtin_types_compatible_p(typeof(*haddr), volatile _Bool) || __builtin_types_compatible_p(typeof(*haddr), const volatile _Bool), (_Bool)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*haddr), signed char) || __builtin_types_compatible_p(typeof(*haddr), const signed char) || __builtin_types_compatible_p(typeof(*haddr), volatile signed char) || __builtin_types_compatible_p(typeof(*haddr), const volatile signed char), (signed char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*haddr), unsigned char) || __builtin_types_compatible_p(typeof(*haddr), const unsigned char) || __builtin_types_compatible_p(typeof(*haddr), volatile unsigned char) || __builtin_types_compatible_p(typeof(*haddr), const volatile unsigned char), (unsigned char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*haddr), signed short) || __builtin_types_compatible_p(typeof(*haddr), const signed short) || __builtin_types_compatible_p(typeof(*haddr), volatile signed short) || __builtin_types_compatible_p(typeof(*haddr), const volatile signed short), (signed short)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*haddr), unsigned short) || __builtin_types_compatible_p(typeof(*haddr), const unsigned short) || __builtin_types_compatible_p(typeof(*haddr), volatile unsigned short) || __builtin_types_compatible_p(typeof(*haddr), const volatile unsigned short), (unsigned short)1, (*haddr)+0)))))) _old = (cmpv); __atomic_compare_exchange_n(haddr, &amp;_old, newv, 0, 5, 5); _old; })" data-ref="_M/atomic_cmpxchg__nocheck">atomic_cmpxchg__nocheck</a>(<a class="local col7 ref" href="#1267haddr" title='haddr' data-ref="1267haddr">haddr</a>, <a class="local col5 ref" href="#1265cmpv" title='cmpv' data-ref="1265cmpv">cmpv</a>, <a class="local col6 ref" href="#1266newv" title='newv' data-ref="1266newv">newv</a>);</td></tr>
+<tr><th id="66">66</th><td>}</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#<span data-ppcond="68">if</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> &gt;= 16</u></td></tr>
+<tr><th id="69">69</th><td>ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)</td></tr>
+<tr><th id="70">70</th><td>{</td></tr>
+<tr><th id="71">71</th><td>    DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="72">72</th><td>    __atomic_load(haddr, &amp;val, __ATOMIC_RELAXED);</td></tr>
+<tr><th id="73">73</th><td>    <b>return</b> val;</td></tr>
+<tr><th id="74">74</th><td>}</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>void</em> ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="77">77</th><td>                     ABI_TYPE val EXTRA_ARGS)</td></tr>
+<tr><th id="78">78</th><td>{</td></tr>
+<tr><th id="79">79</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="80">80</th><td>    __atomic_store(haddr, &amp;val, __ATOMIC_RELAXED);</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td><u>#<span data-ppcond="68">else</span></u></td></tr>
+<tr><th id="83">83</th><td><a class="macro" href="#48" title="uint32_t" data-ref="_M/ABI_TYPE">ABI_TYPE</a> <a class="macro" href="accel/tcg/cputlb.c.html#999" title="helper_atomic_xchgb_mmu" data-ref="_M/ATOMIC_NAME">ATOMIC_NAME</a>(xchg)(<a class="macro" href="target/i386/cpu.h.html#51" title="struct CPUX86State" data-ref="_M/CPUArchState">CPUArchState</a> *<dfn class="local col8 decl" id="1268env" title='env' data-type='struct CPUX86State *' data-ref="1268env">env</dfn>, <a class="typedef" href="include/exec/cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="local col9 decl" id="1269addr" title='addr' data-type='target_ulong' data-ref="1269addr">addr</dfn>,</td></tr>
+<tr><th id="84">84</th><td>                           <a class="macro" href="#48" title="uint32_t" data-ref="_M/ABI_TYPE">ABI_TYPE</a> <dfn class="local col0 decl" id="1270val" title='val' data-type='uint32_t' data-ref="1270val">val</dfn> <a class="macro" href="accel/tcg/cputlb.c.html#998" title=", TCGMemOpIdx oi, uintptr_t retaddr" data-ref="_M/EXTRA_ARGS">EXTRA_ARGS</a>)</td></tr>
+<tr><th id="85">85</th><td>{</td></tr>
+<tr><th id="86">86</th><td>    <a class="macro" href="#39" title="uint8_t" data-ref="_M/DATA_TYPE">DATA_TYPE</a> *<dfn class="local col1 decl" id="1271haddr" title='haddr' data-type='uint8_t *' data-ref="1271haddr">haddr</dfn> = <a class="macro" href="accel/tcg/cputlb.c.html#1001" title="atomic_mmu_lookup(env, addr, oi, retaddr)" data-ref="_M/ATOMIC_MMU_LOOKUP">ATOMIC_MMU_LOOKUP</a>;</td></tr>
+<tr><th id="87">87</th><td>    <b>return</b> <a class="macro" href="include/qemu/atomic.h.html#178" title="({ __atomic_exchange_n(haddr, (val), 5); })" data-ref="_M/atomic_xchg__nocheck">atomic_xchg__nocheck</a>(<a class="local col1 ref" href="#1271haddr" title='haddr' data-ref="1271haddr">haddr</a>, <a class="local col0 ref" href="#1270val" title='val' data-ref="1270val">val</a>);</td></tr>
+<tr><th id="88">88</th><td>}</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/GEN_ATOMIC_HELPER" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</dfn>(X)                                        \</u></td></tr>
+<tr><th id="91">91</th><td><u>ABI_TYPE ATOMIC_NAME(X)(CPUArchState *<dfn class="local col2 decl" id="1272env" title='env' data-type='struct CPUX86State *' data-ref="1272env"><dfn class="local col6 decl" id="1276env" title='env' data-type='struct CPUX86State *' data-ref="1276env"><dfn class="local col0 decl" id="1280env" title='env' data-type='struct CPUX86State *' data-ref="1280env"><dfn class="local col4 decl" id="1284env" title='env' data-type='struct CPUX86State *' data-ref="1284env"><dfn class="local col8 decl" id="1288env" title='env' data-type='struct CPUX86State *' data-ref="1288env"><dfn class="local col2 decl" id="1292env" title='env' data-type='struct CPUX86State *' data-ref="1292env"><dfn class="local col6 decl" id="1296env" title='env' data-type='struct CPUX86State *' data-ref="1296env"><dfn class="local col0 decl" id="1300env" title='env' data-type='struct CPUX86State *' data-ref="1300env">env</dfn></dfn></dfn></dfn></dfn></dfn></dfn></dfn>, <a class="typedef" href="include/exec/cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="local col3 decl" id="1273addr" title='addr' data-type='target_ulong' data-ref="1273addr"><dfn class="local col7 decl" id="1277addr" title='addr' data-type='target_ulong' data-ref="1277addr"><dfn class="local col1 decl" id="1281addr" title='addr' data-type='target_ulong' data-ref="1281addr"><dfn class="local col5 decl" id="1285addr" title='addr' data-type='target_ulong' data-ref="1285addr"><dfn class="local col9 decl" id="1289addr" title='addr' data-type='target_ulong' data-ref="1289addr"><dfn class="local col3 decl" id="1293addr" title='addr' data-type='target_ulong' data-ref="1293addr"><dfn class="local col7 decl" id="1297addr" title='addr' data-type='target_ulong' data-ref="1297addr"><dfn class="local col1 decl" id="1301addr" title='addr' data-type='target_ulong' data-ref="1301addr">addr</dfn></dfn></dfn></dfn></dfn></dfn></dfn></dfn>,       \</u></td></tr>
+<tr><th id="92">92</th><td><u>                 ABI_TYPE <dfn class="local col4 decl" id="1274val" title='val' data-type='uint32_t' data-ref="1274val"><dfn class="local col8 decl" id="1278val" title='val' data-type='uint32_t' data-ref="1278val"><dfn class="local col2 decl" id="1282val" title='val' data-type='uint32_t' data-ref="1282val"><dfn class="local col6 decl" id="1286val" title='val' data-type='uint32_t' data-ref="1286val"><dfn class="local col0 decl" id="1290val" title='val' data-type='uint32_t' data-ref="1290val"><dfn class="local col4 decl" id="1294val" title='val' data-type='uint32_t' data-ref="1294val"><dfn class="local col8 decl" id="1298val" title='val' data-type='uint32_t' data-ref="1298val"><dfn class="local col2 decl" id="1302val" title='val' data-type='uint32_t' data-ref="1302val">val</dfn></dfn></dfn></dfn></dfn></dfn></dfn></dfn> EXTRA_ARGS)                           \</u></td></tr>
+<tr><th id="93">93</th><td><u>{                                                                   \</u></td></tr>
+<tr><th id="94">94</th><td><u>    DATA_TYPE *<dfn class="local col5 decl" id="1275haddr" title='haddr' data-type='uint8_t *' data-ref="1275haddr"><dfn class="local col9 decl" id="1279haddr" title='haddr' data-type='uint8_t *' data-ref="1279haddr"><dfn class="local col3 decl" id="1283haddr" title='haddr' data-type='uint8_t *' data-ref="1283haddr"><dfn class="local col7 decl" id="1287haddr" title='haddr' data-type='uint8_t *' data-ref="1287haddr"><dfn class="local col1 decl" id="1291haddr" title='haddr' data-type='uint8_t *' data-ref="1291haddr"><dfn class="local col5 decl" id="1295haddr" title='haddr' data-type='uint8_t *' data-ref="1295haddr"><dfn class="local col9 decl" id="1299haddr" title='haddr' data-type='uint8_t *' data-ref="1299haddr"><dfn class="local col3 decl" id="1303haddr" title='haddr' data-type='uint8_t *' data-ref="1303haddr">haddr</dfn></dfn></dfn></dfn></dfn></dfn></dfn></dfn> = ATOMIC_MMU_LOOKUP;                           \</u></td></tr>
+<tr><th id="95">95</th><td><u>    return atomic_##X(<a class="local col5 ref" href="#98" title='haddr' data-ref="1275haddr"><a class="local col9 ref" href="#99" title='haddr' data-ref="1279haddr"><a class="local col3 ref" href="#100" title='haddr' data-ref="1283haddr"><a class="local col7 ref" href="#101" title='haddr' data-ref="1287haddr"><a class="local col1 ref" href="#102" title='haddr' data-ref="1291haddr"><a class="local col5 ref" href="#103" title='haddr' data-ref="1295haddr"><a class="local col9 ref" href="#104" title='haddr' data-ref="1299haddr"><a class="local col3 ref" href="#105" title='haddr' data-ref="1303haddr">haddr</a></a></a></a></a></a></a></a>, <a class="local col4 ref" href="#98" title='val' data-ref="1274val"><a class="local col8 ref" href="#99" title='val' data-ref="1278val"><a class="local col2 ref" href="#100" title='val' data-ref="1282val"><a class="local col6 ref" href="#101" title='val' data-ref="1286val"><a class="local col0 ref" href="#102" title='val' data-ref="1290val"><a class="local col4 ref" href="#103" title='val' data-ref="1294val"><a class="local col8 ref" href="#104" title='val' data-ref="1298val"><a class="local col2 ref" href="#105" title='val' data-ref="1302val">val</a></a></a></a></a></a></a></a>);                                  \</u></td></tr>
+<tr><th id="96">96</th><td><u>}</u>                                                                   \</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_fetch_addb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_fetch_add(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(fetch_add)</td></tr>
+<tr><th id="99">99</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_fetch_andb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_fetch_and(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(fetch_and)</td></tr>
+<tr><th id="100">100</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_fetch_orb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_fetch_or(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(fetch_or)</td></tr>
+<tr><th id="101">101</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_fetch_xorb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_fetch_xor(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(fetch_xor)</td></tr>
+<tr><th id="102">102</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_add_fetchb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_add_fetch(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(add_fetch)</td></tr>
+<tr><th id="103">103</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_and_fetchb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_and_fetch(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(and_fetch)</td></tr>
+<tr><th id="104">104</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_or_fetchb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_or_fetch(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(or_fetch)</td></tr>
+<tr><th id="105">105</th><td><a class="macro" href="#90" title="uint32_t helper_atomic_xor_fetchb_mmu(struct CPUX86State *env, target_ulong addr, uint32_t val , TCGMemOpIdx oi, uintptr_t retaddr) { uint8_t *haddr = atomic_mmu_lookup(env, addr, oi, retaddr); return __atomic_xor_fetch(haddr, val, 5); }" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a>(xor_fetch)</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><u>#undef <a class="macro" href="#90" data-ref="_M/GEN_ATOMIC_HELPER">GEN_ATOMIC_HELPER</a></u></td></tr>
+<tr><th id="108">108</th><td><u>#<span data-ppcond="68">endif</span> /* DATA SIZE &gt;= 16 */</u></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><u>#undef <a class="macro" href="#54" data-ref="_M/END">END</a></u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><u>#<span data-ppcond="112">if</span> <a class="macro" href="accel/tcg/cputlb.c.html#1003" title="1" data-ref="_M/DATA_SIZE">DATA_SIZE</a> &gt; 1</u></td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><i>/* Define reverse-host-endian atomic operations.  Note that END is used</i></td></tr>
+<tr><th id="115">115</th><td><i>   within the ATOMIC_NAME macro.  */</i></td></tr>
+<tr><th id="116">116</th><td><u>#ifdef HOST_WORDS_BIGENDIAN</u></td></tr>
+<tr><th id="117">117</th><td><u># define END  _le</u></td></tr>
+<tr><th id="118">118</th><td><u>#else</u></td></tr>
+<tr><th id="119">119</th><td><u># define END  _be</u></td></tr>
+<tr><th id="120">120</th><td><u>#endif</u></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>ABI_TYPE ATOMIC_NAME(cmpxchg)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="123">123</th><td>                              ABI_TYPE cmpv, ABI_TYPE newv EXTRA_ARGS)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="126">126</th><td>    <b>return</b> BSWAP(atomic_cmpxchg__nocheck(haddr, BSWAP(cmpv), BSWAP(newv)));</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><u>#if DATA_SIZE &gt;= 16</u></td></tr>
+<tr><th id="130">130</th><td>ABI_TYPE ATOMIC_NAME(ld)(CPUArchState *env, target_ulong addr EXTRA_ARGS)</td></tr>
+<tr><th id="131">131</th><td>{</td></tr>
+<tr><th id="132">132</th><td>    DATA_TYPE val, *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="133">133</th><td>    __atomic_load(haddr, &amp;val, __ATOMIC_RELAXED);</td></tr>
+<tr><th id="134">134</th><td>    <b>return</b> BSWAP(val);</td></tr>
+<tr><th id="135">135</th><td>}</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><em>void</em> ATOMIC_NAME(st)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="138">138</th><td>                     ABI_TYPE val EXTRA_ARGS)</td></tr>
+<tr><th id="139">139</th><td>{</td></tr>
+<tr><th id="140">140</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="141">141</th><td>    val = BSWAP(val);</td></tr>
+<tr><th id="142">142</th><td>    __atomic_store(haddr, &amp;val, __ATOMIC_RELAXED);</td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td><u>#else</u></td></tr>
+<tr><th id="145">145</th><td>ABI_TYPE ATOMIC_NAME(xchg)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="146">146</th><td>                           ABI_TYPE val EXTRA_ARGS)</td></tr>
+<tr><th id="147">147</th><td>{</td></tr>
+<tr><th id="148">148</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="149">149</th><td>    <b>return</b> BSWAP(atomic_xchg__nocheck(haddr, BSWAP(val)));</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><u>#define GEN_ATOMIC_HELPER(X)                                        \</u></td></tr>
+<tr><th id="153">153</th><td><u>ABI_TYPE ATOMIC_NAME(X)(CPUArchState *env, target_ulong addr,       \</u></td></tr>
+<tr><th id="154">154</th><td><u>                 ABI_TYPE val EXTRA_ARGS)                           \</u></td></tr>
+<tr><th id="155">155</th><td><u>{                                                                   \</u></td></tr>
+<tr><th id="156">156</th><td><u>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;                           \</u></td></tr>
+<tr><th id="157">157</th><td><u>    return BSWAP(atomic_##X(haddr, BSWAP(val)));                    \</u></td></tr>
+<tr><th id="158">158</th><td><u>}</u></td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>GEN_ATOMIC_HELPER(fetch_and)</td></tr>
+<tr><th id="161">161</th><td>GEN_ATOMIC_HELPER(fetch_or)</td></tr>
+<tr><th id="162">162</th><td>GEN_ATOMIC_HELPER(fetch_xor)</td></tr>
+<tr><th id="163">163</th><td>GEN_ATOMIC_HELPER(and_fetch)</td></tr>
+<tr><th id="164">164</th><td>GEN_ATOMIC_HELPER(or_fetch)</td></tr>
+<tr><th id="165">165</th><td>GEN_ATOMIC_HELPER(xor_fetch)</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><u>#undef GEN_ATOMIC_HELPER</u></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><i>/* Note that for addition, we need to use a separate cmpxchg loop instead</i></td></tr>
+<tr><th id="170">170</th><td><i>   of bswaps for the reverse-host-endian helpers.  */</i></td></tr>
+<tr><th id="171">171</th><td>ABI_TYPE ATOMIC_NAME(fetch_add)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="172">172</th><td>                         ABI_TYPE val EXTRA_ARGS)</td></tr>
+<tr><th id="173">173</th><td>{</td></tr>
+<tr><th id="174">174</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="175">175</th><td>    DATA_TYPE ldo, ldn, ret, sto;</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>    ldo = atomic_read__nocheck(haddr);</td></tr>
+<tr><th id="178">178</th><td>    <b>while</b> (<var>1</var>) {</td></tr>
+<tr><th id="179">179</th><td>        ret = BSWAP(ldo);</td></tr>
+<tr><th id="180">180</th><td>        sto = BSWAP(ret + val);</td></tr>
+<tr><th id="181">181</th><td>        ldn = atomic_cmpxchg__nocheck(haddr, ldo, sto);</td></tr>
+<tr><th id="182">182</th><td>        <b>if</b> (ldn == ldo) {</td></tr>
+<tr><th id="183">183</th><td>            <b>return</b> ret;</td></tr>
+<tr><th id="184">184</th><td>        }</td></tr>
+<tr><th id="185">185</th><td>        ldo = ldn;</td></tr>
+<tr><th id="186">186</th><td>    }</td></tr>
+<tr><th id="187">187</th><td>}</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>ABI_TYPE ATOMIC_NAME(add_fetch)(CPUArchState *env, target_ulong addr,</td></tr>
+<tr><th id="190">190</th><td>                         ABI_TYPE val EXTRA_ARGS)</td></tr>
+<tr><th id="191">191</th><td>{</td></tr>
+<tr><th id="192">192</th><td>    DATA_TYPE *haddr = ATOMIC_MMU_LOOKUP;</td></tr>
+<tr><th id="193">193</th><td>    DATA_TYPE ldo, ldn, ret, sto;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>    ldo = atomic_read__nocheck(haddr);</td></tr>
+<tr><th id="196">196</th><td>    <b>while</b> (<var>1</var>) {</td></tr>
+<tr><th id="197">197</th><td>        ret = BSWAP(ldo) + val;</td></tr>
+<tr><th id="198">198</th><td>        sto = BSWAP(ret);</td></tr>
+<tr><th id="199">199</th><td>        ldn = atomic_cmpxchg__nocheck(haddr, ldo, sto);</td></tr>
+<tr><th id="200">200</th><td>        <b>if</b> (ldn == ldo) {</td></tr>
+<tr><th id="201">201</th><td>            <b>return</b> ret;</td></tr>
+<tr><th id="202">202</th><td>        }</td></tr>
+<tr><th id="203">203</th><td>        ldo = ldn;</td></tr>
+<tr><th id="204">204</th><td>    }</td></tr>
+<tr><th id="205">205</th><td>}</td></tr>
+<tr><th id="206">206</th><td><u>#endif /* DATA_SIZE &gt;= 16 */</u></td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><u>#undef END</u></td></tr>
+<tr><th id="209">209</th><td><u>#<span data-ppcond="112">endif</span> /* DATA_SIZE &gt; 1 */</u></td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><u>#undef <a class="macro" href="#40" data-ref="_M/BSWAP">BSWAP</a></u></td></tr>
+<tr><th id="212">212</th><td><u>#undef <a class="macro" href="#48" data-ref="_M/ABI_TYPE">ABI_TYPE</a></u></td></tr>
+<tr><th id="213">213</th><td><u>#undef <a class="macro" href="#39" data-ref="_M/DATA_TYPE">DATA_TYPE</a></u></td></tr>
+<tr><th id="214">214</th><td><u>#undef <a class="macro" href="#38" data-ref="_M/SUFFIX">SUFFIX</a></u></td></tr>
+<tr><th id="215">215</th><td><u>#undef <a class="macro" href="accel/tcg/cputlb.c.html#1003" data-ref="_M/DATA_SIZE">DATA_SIZE</a></u></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='accel/tcg/cputlb.c.html'>codebrowser/accel/tcg/cputlb.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

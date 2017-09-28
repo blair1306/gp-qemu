@@ -1,0 +1,599 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>vnc.h source code [codebrowser/ui/vnc.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="VncDisplay,VncHextile,VncJob,VncRect,VncRectEntry,VncRectStat,VncShareMode,VncSharePolicy,VncState,VncSurface,VncTight,VncZlib,VncZrle,VncZywrle "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/ui/vnc.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>ui</a>/<a href='vnc.h.html'>vnc.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU VNC display driver</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2006 Anthony Liguori &lt;anthony@codemonkey.ws&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2006 Fabrice Bellard</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2009 Red Hat, Inc</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="9">9</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="10">10</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="11">11</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="12">12</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="13">13</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="14">14</th><td><i> *</i></td></tr>
+<tr><th id="15">15</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="16">16</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="19">19</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="20">20</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="21">21</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="22">22</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="23">23</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="24">24</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="25">25</th><td><i> */</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#<span data-ppcond="27">ifndef</span> <span class="macro" data-ref="_M/QEMU_VNC_H">QEMU_VNC_H</span></u></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/QEMU_VNC_H" data-ref="_M/QEMU_VNC_H">QEMU_VNC_H</dfn></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../include/qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/ui/console.h.html">"ui/console.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../audio/audio.h.html">"audio/audio.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/qemu/bitmap.h.html">"qemu/bitmap.h"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/crypto/tlssession.h.html">"crypto/tlssession.h"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/qemu/buffer.h.html">"qemu/buffer.h"</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../include/io/channel-socket.h.html">"io/channel-socket.h"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../include/io/channel-tls.h.html">"io/channel-tls.h"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../include/zlib.h.html">&lt;zlib.h&gt;</a></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><u>#include <a href="keymaps.h.html">"keymaps.h"</a></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="vnc-palette.h.html">"vnc-palette.h"</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="vnc-enc-zrle.h.html">"vnc-enc-zrle.h"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../qapi-types.h.html">"qapi-types.h"</a></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i>// #define _VNC_DEBUG 1</i></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="49">ifdef</span> <span class="macro" data-ref="_M/_VNC_DEBUG">_VNC_DEBUG</span></u></td></tr>
+<tr><th id="50">50</th><td><u>#define VNC_DEBUG(fmt, ...) do { fprintf(stderr, fmt, ## __VA_ARGS__); } while (0)</u></td></tr>
+<tr><th id="51">51</th><td><u>#<span data-ppcond="49">else</span></u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/VNC_DEBUG" data-ref="_M/VNC_DEBUG">VNC_DEBUG</dfn>(fmt, ...) do { } while (0)</u></td></tr>
+<tr><th id="53">53</th><td><u>#<span data-ppcond="49">endif</span></u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="56">56</th><td><i> *</i></td></tr>
+<tr><th id="57">57</th><td><i> * Core data structures</i></td></tr>
+<tr><th id="58">58</th><td><i> *</i></td></tr>
+<tr><th id="59">59</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncState" title='VncState' data-ref="VncState">VncState</a> <dfn class="typedef" id="VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</dfn>;</td></tr>
+<tr><th id="62">62</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncJob" title='VncJob' data-ref="VncJob">VncJob</a> <dfn class="typedef" id="VncJob" title='VncJob' data-type='struct VncJob' data-ref="VncJob">VncJob</dfn>;</td></tr>
+<tr><th id="63">63</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncRect" title='VncRect' data-ref="VncRect">VncRect</a> <dfn class="typedef" id="VncRect" title='VncRect' data-type='struct VncRect' data-ref="VncRect">VncRect</dfn>;</td></tr>
+<tr><th id="64">64</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncRectEntry" title='VncRectEntry' data-ref="VncRectEntry">VncRectEntry</a> <dfn class="typedef" id="VncRectEntry" title='VncRectEntry' data-type='struct VncRectEntry' data-ref="VncRectEntry">VncRectEntry</dfn>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><b>typedef</b> <em>int</em> <dfn class="typedef" id="VncReadEvent" title='VncReadEvent' data-type='int (VncState *, uint8_t *, size_t)' data-ref="VncReadEvent">VncReadEvent</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col9 decl" id="49vs" title='vs' data-type='VncState *' data-ref="49vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="50data" title='data' data-type='uint8_t *' data-ref="50data">data</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="51len" title='len' data-type='size_t' data-ref="51len">len</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="VncWritePixels" title='VncWritePixels' data-type='void (VncState *, void *, int)' data-ref="VncWritePixels">VncWritePixels</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col2 decl" id="52vs" title='vs' data-type='VncState *' data-ref="52vs">vs</dfn>, <em>void</em> *<dfn class="local col3 decl" id="53data" title='data' data-type='void *' data-ref="53data">data</dfn>, <em>int</em> <dfn class="local col4 decl" id="54size" title='size' data-type='int' data-ref="54size">size</dfn>);</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="VncSendHextileTile" title='VncSendHextileTile' data-type='void (VncState *, int, int, int, int, void *, void *, int *, int *)' data-ref="VncSendHextileTile">VncSendHextileTile</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="55vs" title='vs' data-type='VncState *' data-ref="55vs">vs</dfn>,</td></tr>
+<tr><th id="71">71</th><td>                                <em>int</em> <dfn class="local col6 decl" id="56x" title='x' data-type='int' data-ref="56x">x</dfn>, <em>int</em> <dfn class="local col7 decl" id="57y" title='y' data-type='int' data-ref="57y">y</dfn>, <em>int</em> <dfn class="local col8 decl" id="58w" title='w' data-type='int' data-ref="58w">w</dfn>, <em>int</em> <dfn class="local col9 decl" id="59h" title='h' data-type='int' data-ref="59h">h</dfn>,</td></tr>
+<tr><th id="72">72</th><td>                                <em>void</em> *<dfn class="local col0 decl" id="60last_bg" title='last_bg' data-type='void *' data-ref="60last_bg">last_bg</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                                <em>void</em> *<dfn class="local col1 decl" id="61last_fg" title='last_fg' data-type='void *' data-ref="61last_fg">last_fg</dfn>,</td></tr>
+<tr><th id="74">74</th><td>                                <em>int</em> *<dfn class="local col2 decl" id="62has_bg" title='has_bg' data-type='int *' data-ref="62has_bg">has_bg</dfn>, <em>int</em> *<dfn class="local col3 decl" id="63has_fg" title='has_fg' data-type='int *' data-ref="63has_fg">has_fg</dfn>);</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><i>/* VNC_DIRTY_PIXELS_PER_BIT is the number of dirty pixels represented</i></td></tr>
+<tr><th id="77">77</th><td><i> * by one bit in the dirty bitmap, should be a power of 2 */</i></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/VNC_DIRTY_PIXELS_PER_BIT" data-ref="_M/VNC_DIRTY_PIXELS_PER_BIT">VNC_DIRTY_PIXELS_PER_BIT</dfn> 16</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>/* VNC_MAX_WIDTH must be a multiple of VNC_DIRTY_PIXELS_PER_BIT. */</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/VNC_MAX_WIDTH" data-ref="_M/VNC_MAX_WIDTH">VNC_MAX_WIDTH</dfn> ROUND_UP(2560, VNC_DIRTY_PIXELS_PER_BIT)</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/VNC_MAX_HEIGHT" data-ref="_M/VNC_MAX_HEIGHT">VNC_MAX_HEIGHT</dfn> 2048</u></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><i>/* VNC_DIRTY_BITS is the number of bits in the dirty bitmap. */</i></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/VNC_DIRTY_BITS" data-ref="_M/VNC_DIRTY_BITS">VNC_DIRTY_BITS</dfn> (VNC_MAX_WIDTH / VNC_DIRTY_PIXELS_PER_BIT)</u></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>/* VNC_DIRTY_BPL (BPL = bits per line) might be greater than</i></td></tr>
+<tr><th id="89">89</th><td><i> * VNC_DIRTY_BITS due to alignment */</i></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/VNC_DIRTY_BPL" data-ref="_M/VNC_DIRTY_BPL">VNC_DIRTY_BPL</dfn>(x) (sizeof((x)-&gt;dirty) / VNC_MAX_HEIGHT * BITS_PER_BYTE)</u></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/VNC_STAT_RECT" data-ref="_M/VNC_STAT_RECT">VNC_STAT_RECT</dfn>  64</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/VNC_STAT_COLS" data-ref="_M/VNC_STAT_COLS">VNC_STAT_COLS</dfn> (VNC_MAX_WIDTH / VNC_STAT_RECT)</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/VNC_STAT_ROWS" data-ref="_M/VNC_STAT_ROWS">VNC_STAT_ROWS</dfn> (VNC_MAX_HEIGHT / VNC_STAT_RECT)</u></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/VNC_AUTH_CHALLENGE_SIZE" data-ref="_M/VNC_AUTH_CHALLENGE_SIZE">VNC_AUTH_CHALLENGE_SIZE</dfn> 16</u></td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncDisplay" title='VncDisplay' data-ref="VncDisplay">VncDisplay</a> <dfn class="typedef" id="VncDisplay" title='VncDisplay' data-type='struct VncDisplay' data-ref="VncDisplay">VncDisplay</dfn>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><u>#include <a href="vnc-auth-vencrypt.h.html">"vnc-auth-vencrypt.h"</a></u></td></tr>
+<tr><th id="101">101</th><td><u>#<span data-ppcond="101">ifdef</span> <span class="macro" data-ref="_M/CONFIG_VNC_SASL">CONFIG_VNC_SASL</span></u></td></tr>
+<tr><th id="102">102</th><td><u>#include "vnc-auth-sasl.h"</u></td></tr>
+<tr><th id="103">103</th><td><u>#<span data-ppcond="101">endif</span></u></td></tr>
+<tr><th id="104">104</th><td><u>#include <a href="vnc-ws.h.html">"vnc-ws.h"</a></u></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><b>struct</b> <dfn class="type def" id="VncRectStat" title='VncRectStat' data-ref="VncRectStat">VncRectStat</dfn></td></tr>
+<tr><th id="107">107</th><td>{</td></tr>
+<tr><th id="108">108</th><td>    <i>/* time of last 10 updates, to find update frequency */</i></td></tr>
+<tr><th id="109">109</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/time.h.html#timeval" title='timeval' data-ref="timeval">timeval</a> <dfn class="decl" id="VncRectStat::times" title='VncRectStat::times' data-ref="VncRectStat::times">times</dfn>[<var>10</var>];</td></tr>
+<tr><th id="110">110</th><td>    <em>int</em> <dfn class="decl" id="VncRectStat::idx" title='VncRectStat::idx' data-ref="VncRectStat::idx">idx</dfn>;</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <em>double</em> <dfn class="decl" id="VncRectStat::freq" title='VncRectStat::freq' data-ref="VncRectStat::freq">freq</dfn>;        <i>/* Update frequency (in Hz) */</i></td></tr>
+<tr><th id="113">113</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncRectStat::updated" title='VncRectStat::updated' data-ref="VncRectStat::updated">updated</dfn>;       <i>/* Already updated during this refresh */</i></td></tr>
+<tr><th id="114">114</th><td>};</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VncRectStat" title='VncRectStat' data-ref="VncRectStat">VncRectStat</a> <dfn class="typedef" id="VncRectStat" title='VncRectStat' data-type='struct VncRectStat' data-ref="VncRectStat">VncRectStat</dfn>;</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><b>struct</b> <dfn class="type def" id="VncSurface" title='VncSurface' data-ref="VncSurface">VncSurface</dfn></td></tr>
+<tr><th id="119">119</th><td>{</td></tr>
+<tr><th id="120">120</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/time.h.html#timeval" title='timeval' data-ref="timeval">timeval</a> <dfn class="decl" id="VncSurface::last_freq_check" title='VncSurface::last_freq_check' data-ref="VncSurface::last_freq_check">last_freq_check</dfn>;</td></tr>
+<tr><th id="121">121</th><td>    <a class="macro" href="../include/qemu/bitmap.h.html#63" title="unsigned long dirty[2048][((((((2560) + (16) - 1) &amp; -(16)) / 16) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))]" data-ref="_M/DECLARE_BITMAP">DECLARE_BITMAP</a>(<dfn class="decl" id="VncSurface::dirty" title='VncSurface::dirty' data-ref="VncSurface::dirty">dirty</dfn>[<a class="macro" href="#83" title="2048" data-ref="_M/VNC_MAX_HEIGHT">VNC_MAX_HEIGHT</a>],</td></tr>
+<tr><th id="122">122</th><td>                   <a class="macro" href="#82" title="(((2560) + (16) - 1) &amp; -(16))" data-ref="_M/VNC_MAX_WIDTH">VNC_MAX_WIDTH</a> / <a class="macro" href="#78" title="16" data-ref="_M/VNC_DIRTY_PIXELS_PER_BIT">VNC_DIRTY_PIXELS_PER_BIT</a>);</td></tr>
+<tr><th id="123">123</th><td>    <a class="typedef" href="#VncRectStat" title='VncRectStat' data-type='struct VncRectStat' data-ref="VncRectStat">VncRectStat</a> <dfn class="decl" id="VncSurface::stats" title='VncSurface::stats' data-ref="VncSurface::stats">stats</dfn>[<a class="macro" href="#94" title="(2048 / 64)" data-ref="_M/VNC_STAT_ROWS">VNC_STAT_ROWS</a>][<a class="macro" href="#93" title="((((2560) + (16) - 1) &amp; -(16)) / 64)" data-ref="_M/VNC_STAT_COLS">VNC_STAT_COLS</a>];</td></tr>
+<tr><th id="124">124</th><td>    <a class="typedef" href="../../include/pixman-1/pixman.h.html#pixman_image_t" title='pixman_image_t' data-type='union pixman_image' data-ref="pixman_image_t">pixman_image_t</a> *<dfn class="decl" id="VncSurface::fb" title='VncSurface::fb' data-ref="VncSurface::fb">fb</dfn>;</td></tr>
+<tr><th id="125">125</th><td>    <a class="typedef" href="../../include/pixman-1/pixman.h.html#pixman_format_code_t" title='pixman_format_code_t' data-type='enum pixman_format_code_t' data-ref="pixman_format_code_t">pixman_format_code_t</a> <dfn class="decl" id="VncSurface::format" title='VncSurface::format' data-ref="VncSurface::format">format</dfn>;</td></tr>
+<tr><th id="126">126</th><td>};</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="VncShareMode" title='VncShareMode' data-ref="VncShareMode"><a class="type" href="#VncShareMode" title='VncShareMode' data-ref="VncShareMode">VncShareMode</a></dfn> {</td></tr>
+<tr><th id="129">129</th><td>    <dfn class="enum" id="VncShareMode::VNC_SHARE_MODE_CONNECTING" title='VncShareMode::VNC_SHARE_MODE_CONNECTING' data-ref="VncShareMode::VNC_SHARE_MODE_CONNECTING">VNC_SHARE_MODE_CONNECTING</dfn> = <var>1</var>,</td></tr>
+<tr><th id="130">130</th><td>    <dfn class="enum" id="VncShareMode::VNC_SHARE_MODE_SHARED" title='VncShareMode::VNC_SHARE_MODE_SHARED' data-ref="VncShareMode::VNC_SHARE_MODE_SHARED">VNC_SHARE_MODE_SHARED</dfn>,</td></tr>
+<tr><th id="131">131</th><td>    <dfn class="enum" id="VncShareMode::VNC_SHARE_MODE_EXCLUSIVE" title='VncShareMode::VNC_SHARE_MODE_EXCLUSIVE' data-ref="VncShareMode::VNC_SHARE_MODE_EXCLUSIVE">VNC_SHARE_MODE_EXCLUSIVE</dfn>,</td></tr>
+<tr><th id="132">132</th><td>    <dfn class="enum" id="VncShareMode::VNC_SHARE_MODE_DISCONNECTED" title='VncShareMode::VNC_SHARE_MODE_DISCONNECTED' data-ref="VncShareMode::VNC_SHARE_MODE_DISCONNECTED">VNC_SHARE_MODE_DISCONNECTED</dfn>,</td></tr>
+<tr><th id="133">133</th><td>} <dfn class="typedef" id="VncShareMode" title='VncShareMode' data-type='enum VncShareMode' data-ref="VncShareMode">VncShareMode</dfn>;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="VncSharePolicy" title='VncSharePolicy' data-ref="VncSharePolicy"><a class="type" href="#VncSharePolicy" title='VncSharePolicy' data-ref="VncSharePolicy">VncSharePolicy</a></dfn> {</td></tr>
+<tr><th id="136">136</th><td>    <dfn class="enum" id="VncSharePolicy::VNC_SHARE_POLICY_IGNORE" title='VncSharePolicy::VNC_SHARE_POLICY_IGNORE' data-ref="VncSharePolicy::VNC_SHARE_POLICY_IGNORE">VNC_SHARE_POLICY_IGNORE</dfn> = <var>1</var>,</td></tr>
+<tr><th id="137">137</th><td>    <dfn class="enum" id="VncSharePolicy::VNC_SHARE_POLICY_ALLOW_EXCLUSIVE" title='VncSharePolicy::VNC_SHARE_POLICY_ALLOW_EXCLUSIVE' data-ref="VncSharePolicy::VNC_SHARE_POLICY_ALLOW_EXCLUSIVE">VNC_SHARE_POLICY_ALLOW_EXCLUSIVE</dfn>,</td></tr>
+<tr><th id="138">138</th><td>    <dfn class="enum" id="VncSharePolicy::VNC_SHARE_POLICY_FORCE_SHARED" title='VncSharePolicy::VNC_SHARE_POLICY_FORCE_SHARED' data-ref="VncSharePolicy::VNC_SHARE_POLICY_FORCE_SHARED">VNC_SHARE_POLICY_FORCE_SHARED</dfn>,</td></tr>
+<tr><th id="139">139</th><td>} <dfn class="typedef" id="VncSharePolicy" title='VncSharePolicy' data-type='enum VncSharePolicy' data-ref="VncSharePolicy">VncSharePolicy</dfn>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><b>struct</b> <dfn class="type def" id="VncDisplay" title='VncDisplay' data-ref="VncDisplay">VncDisplay</dfn></td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td>    <a class="macro" href="../include/qemu/queue.h.html#349" title="struct { struct VncState *tqh_first; struct VncState * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(, <a class="type" href="#VncState" title='VncState' data-ref="VncState">VncState</a>) <dfn class="decl" id="VncDisplay::clients" title='VncDisplay::clients' data-ref="VncDisplay::clients">clients</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::num_connecting" title='VncDisplay::num_connecting' data-ref="VncDisplay::num_connecting">num_connecting</dfn>;</td></tr>
+<tr><th id="145">145</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::num_shared" title='VncDisplay::num_shared' data-ref="VncDisplay::num_shared">num_shared</dfn>;</td></tr>
+<tr><th id="146">146</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::num_exclusive" title='VncDisplay::num_exclusive' data-ref="VncDisplay::num_exclusive">num_exclusive</dfn>;</td></tr>
+<tr><th id="147">147</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::connections_limit" title='VncDisplay::connections_limit' data-ref="VncDisplay::connections_limit">connections_limit</dfn>;</td></tr>
+<tr><th id="148">148</th><td>    <a class="typedef" href="#VncSharePolicy" title='VncSharePolicy' data-type='enum VncSharePolicy' data-ref="VncSharePolicy">VncSharePolicy</a> <dfn class="decl" id="VncDisplay::share_policy" title='VncDisplay::share_policy' data-ref="VncDisplay::share_policy">share_policy</dfn>;</td></tr>
+<tr><th id="149">149</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VncDisplay::nlsock" title='VncDisplay::nlsock' data-ref="VncDisplay::nlsock">nlsock</dfn>;</td></tr>
+<tr><th id="150">150</th><td>    <a class="typedef" href="../include/io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> **<dfn class="decl" id="VncDisplay::lsock" title='VncDisplay::lsock' data-ref="VncDisplay::lsock">lsock</dfn>;</td></tr>
+<tr><th id="151">151</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#guint" title='guint' data-type='unsigned int' data-ref="guint">guint</a> *<dfn class="decl" id="VncDisplay::lsock_tag" title='VncDisplay::lsock_tag' data-ref="VncDisplay::lsock_tag">lsock_tag</dfn>;</td></tr>
+<tr><th id="152">152</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VncDisplay::nlwebsock" title='VncDisplay::nlwebsock' data-ref="VncDisplay::nlwebsock">nlwebsock</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <a class="typedef" href="../include/io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> **<dfn class="decl" id="VncDisplay::lwebsock" title='VncDisplay::lwebsock' data-ref="VncDisplay::lwebsock">lwebsock</dfn>;</td></tr>
+<tr><th id="154">154</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#guint" title='guint' data-type='unsigned int' data-ref="guint">guint</a> *<dfn class="decl" id="VncDisplay::lwebsock_tag" title='VncDisplay::lwebsock_tag' data-ref="VncDisplay::lwebsock_tag">lwebsock_tag</dfn>;</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#DisplaySurface" title='DisplaySurface' data-type='struct DisplaySurface' data-ref="DisplaySurface">DisplaySurface</a> *<dfn class="decl" id="VncDisplay::ds" title='VncDisplay::ds' data-ref="VncDisplay::ds">ds</dfn>;</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#DisplayChangeListener" title='DisplayChangeListener' data-type='struct DisplayChangeListener' data-ref="DisplayChangeListener">DisplayChangeListener</a> <dfn class="decl" id="VncDisplay::dcl" title='VncDisplay::dcl' data-ref="VncDisplay::dcl">dcl</dfn>;</td></tr>
+<tr><th id="157">157</th><td>    <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="decl" id="VncDisplay::kbd_layout" title='VncDisplay::kbd_layout' data-ref="VncDisplay::kbd_layout">kbd_layout</dfn>;</td></tr>
+<tr><th id="158">158</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::lock_key_sync" title='VncDisplay::lock_key_sync' data-ref="VncDisplay::lock_key_sync">lock_key_sync</dfn>;</td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../include/ui/console.h.html#QEMUPutLEDEntry" title='QEMUPutLEDEntry' data-type='struct QEMUPutLEDEntry' data-ref="QEMUPutLEDEntry">QEMUPutLEDEntry</a> *<dfn class="decl" id="VncDisplay::led" title='VncDisplay::led' data-ref="VncDisplay::led">led</dfn>;</td></tr>
+<tr><th id="160">160</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::ledstate" title='VncDisplay::ledstate' data-ref="VncDisplay::ledstate">ledstate</dfn>;</td></tr>
+<tr><th id="161">161</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::key_delay_ms" title='VncDisplay::key_delay_ms' data-ref="VncDisplay::key_delay_ms">key_delay_ms</dfn>;</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="VncDisplay::mutex" title='VncDisplay::mutex' data-ref="VncDisplay::mutex">mutex</dfn>;</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <a class="typedef" href="../include/ui/console.h.html#QEMUCursor" title='QEMUCursor' data-type='struct QEMUCursor' data-ref="QEMUCursor">QEMUCursor</a> *<dfn class="decl" id="VncDisplay::cursor" title='VncDisplay::cursor' data-ref="VncDisplay::cursor">cursor</dfn>;</td></tr>
+<tr><th id="165">165</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::cursor_msize" title='VncDisplay::cursor_msize' data-ref="VncDisplay::cursor_msize">cursor_msize</dfn>;</td></tr>
+<tr><th id="166">166</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="VncDisplay::cursor_mask" title='VncDisplay::cursor_mask' data-ref="VncDisplay::cursor_mask">cursor_mask</dfn>;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <b>struct</b> <a class="type" href="#VncSurface" title='VncSurface' data-ref="VncSurface">VncSurface</a> <dfn class="decl" id="VncDisplay::guest" title='VncDisplay::guest' data-ref="VncDisplay::guest">guest</dfn>;   <i>/* guest visible surface (aka ds-&gt;surface) */</i></td></tr>
+<tr><th id="169">169</th><td>    <a class="typedef" href="../../include/pixman-1/pixman.h.html#pixman_image_t" title='pixman_image_t' data-type='union pixman_image' data-ref="pixman_image_t">pixman_image_t</a> *<dfn class="decl" id="VncDisplay::server" title='VncDisplay::server' data-ref="VncDisplay::server">server</dfn>;    <i>/* vnc server surface */</i></td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="VncDisplay::id" title='VncDisplay::id' data-ref="VncDisplay::id">id</dfn>;</td></tr>
+<tr><th id="172">172</th><td>    <a class="macro" href="../include/qemu/queue.h.html#359" title="struct { struct VncDisplay *tqe_next; struct VncDisplay * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#VncDisplay" title='VncDisplay' data-ref="VncDisplay">VncDisplay</a>) <dfn class="decl" id="VncDisplay::next" title='VncDisplay::next' data-ref="VncDisplay::next">next</dfn>;</td></tr>
+<tr><th id="173">173</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncDisplay::is_unix" title='VncDisplay::is_unix' data-ref="VncDisplay::is_unix">is_unix</dfn>;</td></tr>
+<tr><th id="174">174</th><td>    <em>char</em> *<dfn class="decl" id="VncDisplay::password" title='VncDisplay::password' data-ref="VncDisplay::password">password</dfn>;</td></tr>
+<tr><th id="175">175</th><td>    <a class="typedef" href="../../include/time.h.html#time_t" title='time_t' data-type='__time_t' data-ref="time_t">time_t</a> <dfn class="decl" id="VncDisplay::expires" title='VncDisplay::expires' data-ref="VncDisplay::expires">expires</dfn>;</td></tr>
+<tr><th id="176">176</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::auth" title='VncDisplay::auth' data-ref="VncDisplay::auth">auth</dfn>;</td></tr>
+<tr><th id="177">177</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::subauth" title='VncDisplay::subauth' data-ref="VncDisplay::subauth">subauth</dfn>; <i>/* Used by VeNCrypt */</i></td></tr>
+<tr><th id="178">178</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::ws_auth" title='VncDisplay::ws_auth' data-ref="VncDisplay::ws_auth">ws_auth</dfn>; <i>/* Used by websockets */</i></td></tr>
+<tr><th id="179">179</th><td>    <em>int</em> <dfn class="decl" id="VncDisplay::ws_subauth" title='VncDisplay::ws_subauth' data-ref="VncDisplay::ws_subauth">ws_subauth</dfn>; <i>/* Used by websockets */</i></td></tr>
+<tr><th id="180">180</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncDisplay::lossy" title='VncDisplay::lossy' data-ref="VncDisplay::lossy">lossy</dfn>;</td></tr>
+<tr><th id="181">181</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncDisplay::non_adaptive" title='VncDisplay::non_adaptive' data-ref="VncDisplay::non_adaptive">non_adaptive</dfn>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="typedef" href="../include/crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="decl" id="VncDisplay::tlscreds" title='VncDisplay::tlscreds' data-ref="VncDisplay::tlscreds">tlscreds</dfn>;</td></tr>
+<tr><th id="183">183</th><td>    <em>char</em> *<dfn class="decl" id="VncDisplay::tlsaclname" title='VncDisplay::tlsaclname' data-ref="VncDisplay::tlsaclname">tlsaclname</dfn>;</td></tr>
+<tr><th id="184">184</th><td><u>#<span data-ppcond="184">ifdef</span> <span class="macro" data-ref="_M/CONFIG_VNC_SASL">CONFIG_VNC_SASL</span></u></td></tr>
+<tr><th id="185">185</th><td>    VncDisplaySASL sasl;</td></tr>
+<tr><th id="186">186</th><td><u>#<span data-ppcond="184">endif</span></u></td></tr>
+<tr><th id="187">187</th><td>};</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncTight" title='VncTight' data-ref="VncTight"><a class="type" href="#VncTight" title='VncTight' data-ref="VncTight">VncTight</a></dfn> {</td></tr>
+<tr><th id="190">190</th><td>    <em>int</em> <dfn class="decl" id="VncTight::type" title='VncTight::type' data-ref="VncTight::type">type</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VncTight::quality" title='VncTight::quality' data-ref="VncTight::quality">quality</dfn>;</td></tr>
+<tr><th id="192">192</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VncTight::compression" title='VncTight::compression' data-ref="VncTight::compression">compression</dfn>;</td></tr>
+<tr><th id="193">193</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VncTight::pixel24" title='VncTight::pixel24' data-ref="VncTight::pixel24">pixel24</dfn>;</td></tr>
+<tr><th id="194">194</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncTight::tight" title='VncTight::tight' data-ref="VncTight::tight">tight</dfn>;</td></tr>
+<tr><th id="195">195</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncTight::tmp" title='VncTight::tmp' data-ref="VncTight::tmp">tmp</dfn>;</td></tr>
+<tr><th id="196">196</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncTight::zlib" title='VncTight::zlib' data-ref="VncTight::zlib">zlib</dfn>;</td></tr>
+<tr><th id="197">197</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncTight::gradient" title='VncTight::gradient' data-ref="VncTight::gradient">gradient</dfn>;</td></tr>
+<tr><th id="198">198</th><td><u>#<span data-ppcond="198">ifdef</span> <span class="macro" data-ref="_M/CONFIG_VNC_JPEG">CONFIG_VNC_JPEG</span></u></td></tr>
+<tr><th id="199">199</th><td>    Buffer jpeg;</td></tr>
+<tr><th id="200">200</th><td><u>#<span data-ppcond="198">endif</span></u></td></tr>
+<tr><th id="201">201</th><td><u>#<span data-ppcond="201">ifdef</span> <a class="macro" href="../config-host.h.html#25" data-ref="_M/CONFIG_VNC_PNG">CONFIG_VNC_PNG</a></u></td></tr>
+<tr><th id="202">202</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncTight::png" title='VncTight::png' data-ref="VncTight::png">png</dfn>;</td></tr>
+<tr><th id="203">203</th><td><u>#<span data-ppcond="201">endif</span></u></td></tr>
+<tr><th id="204">204</th><td>    <em>int</em> <dfn class="decl" id="VncTight::levels" title='VncTight::levels' data-ref="VncTight::levels">levels</dfn>[<var>4</var>];</td></tr>
+<tr><th id="205">205</th><td>    <a class="typedef" href="../../include/zlib.h.html#z_stream" title='z_stream' data-type='struct z_stream_s' data-ref="z_stream">z_stream</a> <dfn class="decl" id="VncTight::stream" title='VncTight::stream' data-ref="VncTight::stream">stream</dfn>[<var>4</var>];</td></tr>
+<tr><th id="206">206</th><td>} <dfn class="typedef" id="VncTight" title='VncTight' data-type='struct VncTight' data-ref="VncTight">VncTight</dfn>;</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncHextile" title='VncHextile' data-ref="VncHextile"><a class="type" href="#VncHextile" title='VncHextile' data-ref="VncHextile">VncHextile</a></dfn> {</td></tr>
+<tr><th id="209">209</th><td>    <a class="typedef" href="#VncSendHextileTile" title='VncSendHextileTile' data-type='void (VncState *, int, int, int, int, void *, void *, int *, int *)' data-ref="VncSendHextileTile">VncSendHextileTile</a> *<dfn class="decl" id="VncHextile::send_tile" title='VncHextile::send_tile' data-ref="VncHextile::send_tile">send_tile</dfn>;</td></tr>
+<tr><th id="210">210</th><td>} <dfn class="typedef" id="VncHextile" title='VncHextile' data-type='struct VncHextile' data-ref="VncHextile">VncHextile</dfn>;</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncZlib" title='VncZlib' data-ref="VncZlib"><a class="type" href="#VncZlib" title='VncZlib' data-ref="VncZlib">VncZlib</a></dfn> {</td></tr>
+<tr><th id="213">213</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZlib::zlib" title='VncZlib::zlib' data-ref="VncZlib::zlib">zlib</dfn>;</td></tr>
+<tr><th id="214">214</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZlib::tmp" title='VncZlib::tmp' data-ref="VncZlib::tmp">tmp</dfn>;</td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="../../include/zlib.h.html#z_stream" title='z_stream' data-type='struct z_stream_s' data-ref="z_stream">z_stream</a> <dfn class="decl" id="VncZlib::stream" title='VncZlib::stream' data-ref="VncZlib::stream">stream</dfn>;</td></tr>
+<tr><th id="216">216</th><td>    <em>int</em> <dfn class="decl" id="VncZlib::level" title='VncZlib::level' data-ref="VncZlib::level">level</dfn>;</td></tr>
+<tr><th id="217">217</th><td>} <dfn class="typedef" id="VncZlib" title='VncZlib' data-type='struct VncZlib' data-ref="VncZlib">VncZlib</dfn>;</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncZrle" title='VncZrle' data-ref="VncZrle"><a class="type" href="#VncZrle" title='VncZrle' data-ref="VncZrle">VncZrle</a></dfn> {</td></tr>
+<tr><th id="220">220</th><td>    <em>int</em> <dfn class="decl" id="VncZrle::type" title='VncZrle::type' data-ref="VncZrle::type">type</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZrle::fb" title='VncZrle::fb' data-ref="VncZrle::fb">fb</dfn>;</td></tr>
+<tr><th id="222">222</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZrle::zrle" title='VncZrle::zrle' data-ref="VncZrle::zrle">zrle</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZrle::tmp" title='VncZrle::tmp' data-ref="VncZrle::tmp">tmp</dfn>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncZrle::zlib" title='VncZrle::zlib' data-ref="VncZrle::zlib">zlib</dfn>;</td></tr>
+<tr><th id="225">225</th><td>    <a class="typedef" href="../../include/zlib.h.html#z_stream" title='z_stream' data-type='struct z_stream_s' data-ref="z_stream">z_stream</a> <dfn class="decl" id="VncZrle::stream" title='VncZrle::stream' data-ref="VncZrle::stream">stream</dfn>;</td></tr>
+<tr><th id="226">226</th><td>    <a class="typedef" href="vnc-palette.h.html#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> <dfn class="decl" id="VncZrle::palette" title='VncZrle::palette' data-ref="VncZrle::palette">palette</dfn>;</td></tr>
+<tr><th id="227">227</th><td>} <dfn class="typedef" id="VncZrle" title='VncZrle' data-type='struct VncZrle' data-ref="VncZrle">VncZrle</dfn>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncZywrle" title='VncZywrle' data-ref="VncZywrle"><a class="type" href="#VncZywrle" title='VncZywrle' data-ref="VncZywrle">VncZywrle</a></dfn> {</td></tr>
+<tr><th id="230">230</th><td>    <em>int</em> <dfn class="decl" id="VncZywrle::buf" title='VncZywrle::buf' data-ref="VncZywrle::buf">buf</dfn>[<a class="macro" href="vnc-enc-zrle.h.html#37" title="64" data-ref="_M/VNC_ZRLE_TILE_WIDTH">VNC_ZRLE_TILE_WIDTH</a> * <a class="macro" href="vnc-enc-zrle.h.html#38" title="64" data-ref="_M/VNC_ZRLE_TILE_HEIGHT">VNC_ZRLE_TILE_HEIGHT</a>];</td></tr>
+<tr><th id="231">231</th><td>} <dfn class="typedef" id="VncZywrle" title='VncZywrle' data-type='struct VncZywrle' data-ref="VncZywrle">VncZywrle</dfn>;</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td><b>struct</b> <dfn class="type def" id="VncRect" title='VncRect' data-ref="VncRect">VncRect</dfn></td></tr>
+<tr><th id="234">234</th><td>{</td></tr>
+<tr><th id="235">235</th><td>    <em>int</em> <dfn class="decl" id="VncRect::x" title='VncRect::x' data-ref="VncRect::x">x</dfn>;</td></tr>
+<tr><th id="236">236</th><td>    <em>int</em> <dfn class="decl" id="VncRect::y" title='VncRect::y' data-ref="VncRect::y">y</dfn>;</td></tr>
+<tr><th id="237">237</th><td>    <em>int</em> <dfn class="decl" id="VncRect::w" title='VncRect::w' data-ref="VncRect::w">w</dfn>;</td></tr>
+<tr><th id="238">238</th><td>    <em>int</em> <dfn class="decl" id="VncRect::h" title='VncRect::h' data-ref="VncRect::h">h</dfn>;</td></tr>
+<tr><th id="239">239</th><td>};</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><b>struct</b> <dfn class="type def" id="VncRectEntry" title='VncRectEntry' data-ref="VncRectEntry">VncRectEntry</dfn></td></tr>
+<tr><th id="242">242</th><td>{</td></tr>
+<tr><th id="243">243</th><td>    <b>struct</b> <a class="type" href="#VncRect" title='VncRect' data-ref="VncRect">VncRect</a> <dfn class="decl" id="VncRectEntry::rect" title='VncRectEntry::rect' data-ref="VncRectEntry::rect">rect</dfn>;</td></tr>
+<tr><th id="244">244</th><td>    <a class="macro" href="../include/qemu/queue.h.html#94" title="struct { struct VncRectEntry *le_next; struct VncRectEntry **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#VncRectEntry" title='VncRectEntry' data-ref="VncRectEntry">VncRectEntry</a>) <dfn class="decl" id="VncRectEntry::next" title='VncRectEntry::next' data-ref="VncRectEntry::next">next</dfn>;</td></tr>
+<tr><th id="245">245</th><td>};</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><b>struct</b> <dfn class="type def" id="VncJob" title='VncJob' data-ref="VncJob">VncJob</dfn></td></tr>
+<tr><th id="248">248</th><td>{</td></tr>
+<tr><th id="249">249</th><td>    <a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="decl" id="VncJob::vs" title='VncJob::vs' data-ref="VncJob::vs">vs</dfn>;</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td>    <a class="macro" href="../include/qemu/queue.h.html#86" title="struct { struct VncRectEntry *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#VncRectEntry" title='VncRectEntry' data-ref="VncRectEntry">VncRectEntry</a>) <dfn class="decl" id="VncJob::rectangles" title='VncJob::rectangles' data-ref="VncJob::rectangles">rectangles</dfn>;</td></tr>
+<tr><th id="252">252</th><td>    <a class="macro" href="../include/qemu/queue.h.html#359" title="struct { struct VncJob *tqe_next; struct VncJob * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#VncJob" title='VncJob' data-ref="VncJob">VncJob</a>) <dfn class="decl" id="VncJob::next" title='VncJob::next' data-ref="VncJob::next">next</dfn>;</td></tr>
+<tr><th id="253">253</th><td>};</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><b>struct</b> <dfn class="type def" id="VncState" title='VncState' data-ref="VncState">VncState</dfn></td></tr>
+<tr><th id="256">256</th><td>{</td></tr>
+<tr><th id="257">257</th><td>    <a class="typedef" href="../include/io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> *<dfn class="decl" id="VncState::sioc" title='VncState::sioc' data-ref="VncState::sioc">sioc</dfn>; <i>/* The underlying socket */</i></td></tr>
+<tr><th id="258">258</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="decl" id="VncState::ioc" title='VncState::ioc' data-ref="VncState::ioc">ioc</dfn>; <i>/* The channel currently used for I/O */</i></td></tr>
+<tr><th id="259">259</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#guint" title='guint' data-type='unsigned int' data-ref="guint">guint</a> <dfn class="decl" id="VncState::ioc_tag" title='VncState::ioc_tag' data-ref="VncState::ioc_tag">ioc_tag</dfn>;</td></tr>
+<tr><th id="260">260</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a> <dfn class="decl" id="VncState::disconnecting" title='VncState::disconnecting' data-ref="VncState::disconnecting">disconnecting</dfn>;</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td>    <a class="macro" href="../include/qemu/bitmap.h.html#63" title="unsigned long dirty[2048][(((((((2560) + (16) - 1) &amp; -(16)) / 16)) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))]" data-ref="_M/DECLARE_BITMAP">DECLARE_BITMAP</a>(<dfn class="decl" id="VncState::dirty" title='VncState::dirty' data-ref="VncState::dirty">dirty</dfn>[<a class="macro" href="#83" title="2048" data-ref="_M/VNC_MAX_HEIGHT">VNC_MAX_HEIGHT</a>], <a class="macro" href="#86" title="((((2560) + (16) - 1) &amp; -(16)) / 16)" data-ref="_M/VNC_DIRTY_BITS">VNC_DIRTY_BITS</a>);</td></tr>
+<tr><th id="263">263</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> **<dfn class="decl" id="VncState::lossy_rect" title='VncState::lossy_rect' data-ref="VncState::lossy_rect">lossy_rect</dfn>; <i>/* Not an Array to avoid costly memcpy in</i></td></tr>
+<tr><th id="264">264</th><td><i>                           * vnc-jobs-async.c */</i></td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>    <a class="typedef" href="#VncDisplay" title='VncDisplay' data-type='struct VncDisplay' data-ref="VncDisplay">VncDisplay</a> *<dfn class="decl" id="VncState::vd" title='VncState::vd' data-ref="VncState::vd">vd</dfn>;</td></tr>
+<tr><th id="267">267</th><td>    <em>int</em> <dfn class="decl" id="VncState::need_update" title='VncState::need_update' data-ref="VncState::need_update">need_update</dfn>;</td></tr>
+<tr><th id="268">268</th><td>    <em>int</em> <dfn class="decl" id="VncState::force_update" title='VncState::force_update' data-ref="VncState::force_update">force_update</dfn>;</td></tr>
+<tr><th id="269">269</th><td>    <em>int</em> <dfn class="decl" id="VncState::has_dirty" title='VncState::has_dirty' data-ref="VncState::has_dirty">has_dirty</dfn>;</td></tr>
+<tr><th id="270">270</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VncState::features" title='VncState::features' data-ref="VncState::features">features</dfn>;</td></tr>
+<tr><th id="271">271</th><td>    <em>int</em> <dfn class="decl" id="VncState::absolute" title='VncState::absolute' data-ref="VncState::absolute">absolute</dfn>;</td></tr>
+<tr><th id="272">272</th><td>    <em>int</em> <dfn class="decl" id="VncState::last_x" title='VncState::last_x' data-ref="VncState::last_x">last_x</dfn>;</td></tr>
+<tr><th id="273">273</th><td>    <em>int</em> <dfn class="decl" id="VncState::last_y" title='VncState::last_y' data-ref="VncState::last_y">last_y</dfn>;</td></tr>
+<tr><th id="274">274</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VncState::last_bmask" title='VncState::last_bmask' data-ref="VncState::last_bmask">last_bmask</dfn>;</td></tr>
+<tr><th id="275">275</th><td>    <em>int</em> <dfn class="decl" id="VncState::client_width" title='VncState::client_width' data-ref="VncState::client_width">client_width</dfn>;</td></tr>
+<tr><th id="276">276</th><td>    <em>int</em> <dfn class="decl" id="VncState::client_height" title='VncState::client_height' data-ref="VncState::client_height">client_height</dfn>;</td></tr>
+<tr><th id="277">277</th><td>    <a class="typedef" href="#VncShareMode" title='VncShareMode' data-type='enum VncShareMode' data-ref="VncShareMode">VncShareMode</a> <dfn class="decl" id="VncState::share_mode" title='VncState::share_mode' data-ref="VncState::share_mode">share_mode</dfn>;</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VncState::vnc_encoding" title='VncState::vnc_encoding' data-ref="VncState::vnc_encoding">vnc_encoding</dfn>;</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>    <em>int</em> <dfn class="decl" id="VncState::major" title='VncState::major' data-ref="VncState::major">major</dfn>;</td></tr>
+<tr><th id="282">282</th><td>    <em>int</em> <dfn class="decl" id="VncState::minor" title='VncState::minor' data-ref="VncState::minor">minor</dfn>;</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>    <em>int</em> <dfn class="decl" id="VncState::auth" title='VncState::auth' data-ref="VncState::auth">auth</dfn>;</td></tr>
+<tr><th id="285">285</th><td>    <em>int</em> <dfn class="decl" id="VncState::subauth" title='VncState::subauth' data-ref="VncState::subauth">subauth</dfn>; <i>/* Used by VeNCrypt */</i></td></tr>
+<tr><th id="286">286</th><td>    <em>char</em> <dfn class="decl" id="VncState::challenge" title='VncState::challenge' data-ref="VncState::challenge">challenge</dfn>[<a class="macro" href="#96" title="16" data-ref="_M/VNC_AUTH_CHALLENGE_SIZE">VNC_AUTH_CHALLENGE_SIZE</a>];</td></tr>
+<tr><th id="287">287</th><td>    <a class="typedef" href="../include/crypto/tlssession.h.html#QCryptoTLSSession" title='QCryptoTLSSession' data-type='struct QCryptoTLSSession' data-ref="QCryptoTLSSession">QCryptoTLSSession</a> *<dfn class="decl" id="VncState::tls" title='VncState::tls' data-ref="VncState::tls">tls</dfn>; <i>/* Borrowed pointer from channel, don't free */</i></td></tr>
+<tr><th id="288">288</th><td><u>#<span data-ppcond="288">ifdef</span> <span class="macro" data-ref="_M/CONFIG_VNC_SASL">CONFIG_VNC_SASL</span></u></td></tr>
+<tr><th id="289">289</th><td>    VncStateSASL sasl;</td></tr>
+<tr><th id="290">290</th><td><u>#<span data-ppcond="288">endif</span></u></td></tr>
+<tr><th id="291">291</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncState::encode_ws" title='VncState::encode_ws' data-ref="VncState::encode_ws">encode_ws</dfn>;</td></tr>
+<tr><th id="292">292</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncState::websocket" title='VncState::websocket' data-ref="VncState::websocket">websocket</dfn>;</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    <a class="typedef" href="../qapi-types.h.html#VncClientInfo" title='VncClientInfo' data-type='struct VncClientInfo' data-ref="VncClientInfo">VncClientInfo</a> *<dfn class="decl" id="VncState::info" title='VncState::info' data-ref="VncState::info">info</dfn>;</td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncState::output" title='VncState::output' data-ref="VncState::output">output</dfn>;</td></tr>
+<tr><th id="297">297</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncState::input" title='VncState::input' data-ref="VncState::input">input</dfn>;</td></tr>
+<tr><th id="298">298</th><td>    <i>/* current output mode information */</i></td></tr>
+<tr><th id="299">299</th><td>    <a class="typedef" href="#VncWritePixels" title='VncWritePixels' data-type='void (VncState *, void *, int)' data-ref="VncWritePixels">VncWritePixels</a> *<dfn class="decl" id="VncState::write_pixels" title='VncState::write_pixels' data-ref="VncState::write_pixels">write_pixels</dfn>;</td></tr>
+<tr><th id="300">300</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#PixelFormat" title='PixelFormat' data-type='struct PixelFormat' data-ref="PixelFormat">PixelFormat</a> <dfn class="decl" id="VncState::client_pf" title='VncState::client_pf' data-ref="VncState::client_pf">client_pf</dfn>;</td></tr>
+<tr><th id="301">301</th><td>    <a class="typedef" href="../../include/pixman-1/pixman.h.html#pixman_format_code_t" title='pixman_format_code_t' data-type='enum pixman_format_code_t' data-ref="pixman_format_code_t">pixman_format_code_t</a> <dfn class="decl" id="VncState::client_format" title='VncState::client_format' data-ref="VncState::client_format">client_format</dfn>;</td></tr>
+<tr><th id="302">302</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncState::client_be" title='VncState::client_be' data-ref="VncState::client_be">client_be</dfn>;</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>    <a class="typedef" href="../audio/audio.h.html#CaptureVoiceOut" title='CaptureVoiceOut' data-type='struct CaptureVoiceOut' data-ref="CaptureVoiceOut">CaptureVoiceOut</a> *<dfn class="decl" id="VncState::audio_cap" title='VncState::audio_cap' data-ref="VncState::audio_cap">audio_cap</dfn>;</td></tr>
+<tr><th id="305">305</th><td>    <b>struct</b> <a class="type" href="../audio/audio.h.html#audsettings" title='audsettings' data-ref="audsettings">audsettings</a> <dfn class="decl" id="VncState::as" title='VncState::as' data-ref="VncState::as">as</dfn>;</td></tr>
+<tr><th id="306">306</th><td></td></tr>
+<tr><th id="307">307</th><td>    <a class="typedef" href="#VncReadEvent" title='VncReadEvent' data-type='int (VncState *, uint8_t *, size_t)' data-ref="VncReadEvent">VncReadEvent</a> *<dfn class="decl" id="VncState::read_handler" title='VncState::read_handler' data-ref="VncState::read_handler">read_handler</dfn>;</td></tr>
+<tr><th id="308">308</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VncState::read_handler_expect" title='VncState::read_handler_expect' data-ref="VncState::read_handler_expect">read_handler_expect</dfn>;</td></tr>
+<tr><th id="309">309</th><td>    <i>/* input */</i></td></tr>
+<tr><th id="310">310</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VncState::modifiers_state" title='VncState::modifiers_state' data-ref="VncState::modifiers_state">modifiers_state</dfn>[<var>256</var>];</td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VncState::abort" title='VncState::abort' data-ref="VncState::abort">abort</dfn>;</td></tr>
+<tr><th id="313">313</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="VncState::output_mutex" title='VncState::output_mutex' data-ref="VncState::output_mutex">output_mutex</dfn>;</td></tr>
+<tr><th id="314">314</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="VncState::bh" title='VncState::bh' data-ref="VncState::bh">bh</dfn>;</td></tr>
+<tr><th id="315">315</th><td>    <a class="typedef" href="../include/qemu/buffer.h.html#Buffer" title='Buffer' data-type='struct Buffer' data-ref="Buffer">Buffer</a> <dfn class="decl" id="VncState::jobs_buffer" title='VncState::jobs_buffer' data-ref="VncState::jobs_buffer">jobs_buffer</dfn>;</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>    <i>/* Encoding specific, if you add something here, don't forget to</i></td></tr>
+<tr><th id="318">318</th><td><i>     *  update vnc_async_encoding_start()</i></td></tr>
+<tr><th id="319">319</th><td><i>     */</i></td></tr>
+<tr><th id="320">320</th><td>    <a class="typedef" href="#VncTight" title='VncTight' data-type='struct VncTight' data-ref="VncTight">VncTight</a> <dfn class="decl" id="VncState::tight" title='VncState::tight' data-ref="VncState::tight">tight</dfn>;</td></tr>
+<tr><th id="321">321</th><td>    <a class="typedef" href="#VncZlib" title='VncZlib' data-type='struct VncZlib' data-ref="VncZlib">VncZlib</a> <dfn class="decl" id="VncState::zlib" title='VncState::zlib' data-ref="VncState::zlib">zlib</dfn>;</td></tr>
+<tr><th id="322">322</th><td>    <a class="typedef" href="#VncHextile" title='VncHextile' data-type='struct VncHextile' data-ref="VncHextile">VncHextile</a> <dfn class="decl" id="VncState::hextile" title='VncState::hextile' data-ref="VncState::hextile">hextile</dfn>;</td></tr>
+<tr><th id="323">323</th><td>    <a class="typedef" href="#VncZrle" title='VncZrle' data-type='struct VncZrle' data-ref="VncZrle">VncZrle</a> <dfn class="decl" id="VncState::zrle" title='VncState::zrle' data-ref="VncState::zrle">zrle</dfn>;</td></tr>
+<tr><th id="324">324</th><td>    <a class="typedef" href="#VncZywrle" title='VncZywrle' data-type='struct VncZywrle' data-ref="VncZywrle">VncZywrle</a> <dfn class="decl" id="VncState::zywrle" title='VncState::zywrle' data-ref="VncState::zywrle">zywrle</dfn>;</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>    <a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> <dfn class="decl" id="VncState::mouse_mode_notifier" title='VncState::mouse_mode_notifier' data-ref="VncState::mouse_mode_notifier">mouse_mode_notifier</dfn>;</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>    <a class="macro" href="../include/qemu/queue.h.html#359" title="struct { struct VncState *tqe_next; struct VncState * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#VncState" title='VncState' data-ref="VncState">VncState</a>) <dfn class="decl" id="VncState::next" title='VncState::next' data-ref="VncState::next">next</dfn>;</td></tr>
+<tr><th id="329">329</th><td>};</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="333">333</th><td><i> *</i></td></tr>
+<tr><th id="334">334</th><td><i> * Authentication modes</i></td></tr>
+<tr><th id="335">335</th><td><i> *</i></td></tr>
+<tr><th id="336">336</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td><b>enum</b> {</td></tr>
+<tr><th id="339">339</th><td>    <dfn class="enum" id="VNC_AUTH_INVALID" title='VNC_AUTH_INVALID' data-ref="VNC_AUTH_INVALID">VNC_AUTH_INVALID</dfn> = <var>0</var>,</td></tr>
+<tr><th id="340">340</th><td>    <dfn class="enum" id="VNC_AUTH_NONE" title='VNC_AUTH_NONE' data-ref="VNC_AUTH_NONE">VNC_AUTH_NONE</dfn> = <var>1</var>,</td></tr>
+<tr><th id="341">341</th><td>    <dfn class="enum" id="VNC_AUTH_VNC" title='VNC_AUTH_VNC' data-ref="VNC_AUTH_VNC">VNC_AUTH_VNC</dfn> = <var>2</var>,</td></tr>
+<tr><th id="342">342</th><td>    <dfn class="enum" id="VNC_AUTH_RA2" title='VNC_AUTH_RA2' data-ref="VNC_AUTH_RA2">VNC_AUTH_RA2</dfn> = <var>5</var>,</td></tr>
+<tr><th id="343">343</th><td>    <dfn class="enum" id="VNC_AUTH_RA2NE" title='VNC_AUTH_RA2NE' data-ref="VNC_AUTH_RA2NE">VNC_AUTH_RA2NE</dfn> = <var>6</var>,</td></tr>
+<tr><th id="344">344</th><td>    <dfn class="enum" id="VNC_AUTH_TIGHT" title='VNC_AUTH_TIGHT' data-ref="VNC_AUTH_TIGHT">VNC_AUTH_TIGHT</dfn> = <var>16</var>,</td></tr>
+<tr><th id="345">345</th><td>    <dfn class="enum" id="VNC_AUTH_ULTRA" title='VNC_AUTH_ULTRA' data-ref="VNC_AUTH_ULTRA">VNC_AUTH_ULTRA</dfn> = <var>17</var>,</td></tr>
+<tr><th id="346">346</th><td>    <dfn class="enum" id="VNC_AUTH_TLS" title='VNC_AUTH_TLS' data-ref="VNC_AUTH_TLS">VNC_AUTH_TLS</dfn> = <var>18</var>,      <i>/* Supported in GTK-VNC &amp; VINO */</i></td></tr>
+<tr><th id="347">347</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT" title='VNC_AUTH_VENCRYPT' data-ref="VNC_AUTH_VENCRYPT">VNC_AUTH_VENCRYPT</dfn> = <var>19</var>, <i>/* Supported in GTK-VNC &amp; VeNCrypt */</i></td></tr>
+<tr><th id="348">348</th><td>    <dfn class="enum" id="VNC_AUTH_SASL" title='VNC_AUTH_SASL' data-ref="VNC_AUTH_SASL">VNC_AUTH_SASL</dfn> = <var>20</var>,     <i>/* Supported in GTK-VNC &amp; VINO */</i></td></tr>
+<tr><th id="349">349</th><td>};</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><b>enum</b> {</td></tr>
+<tr><th id="352">352</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_PLAIN" title='VNC_AUTH_VENCRYPT_PLAIN' data-ref="VNC_AUTH_VENCRYPT_PLAIN">VNC_AUTH_VENCRYPT_PLAIN</dfn> = <var>256</var>,</td></tr>
+<tr><th id="353">353</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_TLSNONE" title='VNC_AUTH_VENCRYPT_TLSNONE' data-ref="VNC_AUTH_VENCRYPT_TLSNONE">VNC_AUTH_VENCRYPT_TLSNONE</dfn> = <var>257</var>,</td></tr>
+<tr><th id="354">354</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_TLSVNC" title='VNC_AUTH_VENCRYPT_TLSVNC' data-ref="VNC_AUTH_VENCRYPT_TLSVNC">VNC_AUTH_VENCRYPT_TLSVNC</dfn> = <var>258</var>,</td></tr>
+<tr><th id="355">355</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_TLSPLAIN" title='VNC_AUTH_VENCRYPT_TLSPLAIN' data-ref="VNC_AUTH_VENCRYPT_TLSPLAIN">VNC_AUTH_VENCRYPT_TLSPLAIN</dfn> = <var>259</var>,</td></tr>
+<tr><th id="356">356</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_X509NONE" title='VNC_AUTH_VENCRYPT_X509NONE' data-ref="VNC_AUTH_VENCRYPT_X509NONE">VNC_AUTH_VENCRYPT_X509NONE</dfn> = <var>260</var>,</td></tr>
+<tr><th id="357">357</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_X509VNC" title='VNC_AUTH_VENCRYPT_X509VNC' data-ref="VNC_AUTH_VENCRYPT_X509VNC">VNC_AUTH_VENCRYPT_X509VNC</dfn> = <var>261</var>,</td></tr>
+<tr><th id="358">358</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_X509PLAIN" title='VNC_AUTH_VENCRYPT_X509PLAIN' data-ref="VNC_AUTH_VENCRYPT_X509PLAIN">VNC_AUTH_VENCRYPT_X509PLAIN</dfn> = <var>262</var>,</td></tr>
+<tr><th id="359">359</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_X509SASL" title='VNC_AUTH_VENCRYPT_X509SASL' data-ref="VNC_AUTH_VENCRYPT_X509SASL">VNC_AUTH_VENCRYPT_X509SASL</dfn> = <var>263</var>,</td></tr>
+<tr><th id="360">360</th><td>    <dfn class="enum" id="VNC_AUTH_VENCRYPT_TLSSASL" title='VNC_AUTH_VENCRYPT_TLSSASL' data-ref="VNC_AUTH_VENCRYPT_TLSSASL">VNC_AUTH_VENCRYPT_TLSSASL</dfn> = <var>264</var>,</td></tr>
+<tr><th id="361">361</th><td>};</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="365">365</th><td><i> *</i></td></tr>
+<tr><th id="366">366</th><td><i> * Encoding types</i></td></tr>
+<tr><th id="367">367</th><td><i> *</i></td></tr>
+<tr><th id="368">368</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="369">369</th><td></td></tr>
+<tr><th id="370">370</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_RAW" data-ref="_M/VNC_ENCODING_RAW">VNC_ENCODING_RAW</dfn>                  0x00000000</u></td></tr>
+<tr><th id="371">371</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_COPYRECT" data-ref="_M/VNC_ENCODING_COPYRECT">VNC_ENCODING_COPYRECT</dfn>             0x00000001</u></td></tr>
+<tr><th id="372">372</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_RRE" data-ref="_M/VNC_ENCODING_RRE">VNC_ENCODING_RRE</dfn>                  0x00000002</u></td></tr>
+<tr><th id="373">373</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_CORRE" data-ref="_M/VNC_ENCODING_CORRE">VNC_ENCODING_CORRE</dfn>                0x00000004</u></td></tr>
+<tr><th id="374">374</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_HEXTILE" data-ref="_M/VNC_ENCODING_HEXTILE">VNC_ENCODING_HEXTILE</dfn>              0x00000005</u></td></tr>
+<tr><th id="375">375</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_ZLIB" data-ref="_M/VNC_ENCODING_ZLIB">VNC_ENCODING_ZLIB</dfn>                 0x00000006</u></td></tr>
+<tr><th id="376">376</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_TIGHT" data-ref="_M/VNC_ENCODING_TIGHT">VNC_ENCODING_TIGHT</dfn>                0x00000007</u></td></tr>
+<tr><th id="377">377</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_ZLIBHEX" data-ref="_M/VNC_ENCODING_ZLIBHEX">VNC_ENCODING_ZLIBHEX</dfn>              0x00000008</u></td></tr>
+<tr><th id="378">378</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_TRLE" data-ref="_M/VNC_ENCODING_TRLE">VNC_ENCODING_TRLE</dfn>                 0x0000000f</u></td></tr>
+<tr><th id="379">379</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_ZRLE" data-ref="_M/VNC_ENCODING_ZRLE">VNC_ENCODING_ZRLE</dfn>                 0x00000010</u></td></tr>
+<tr><th id="380">380</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_ZYWRLE" data-ref="_M/VNC_ENCODING_ZYWRLE">VNC_ENCODING_ZYWRLE</dfn>               0x00000011</u></td></tr>
+<tr><th id="381">381</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_COMPRESSLEVEL0" data-ref="_M/VNC_ENCODING_COMPRESSLEVEL0">VNC_ENCODING_COMPRESSLEVEL0</dfn>       0xFFFFFF00 /* -256 */</u></td></tr>
+<tr><th id="382">382</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_QUALITYLEVEL0" data-ref="_M/VNC_ENCODING_QUALITYLEVEL0">VNC_ENCODING_QUALITYLEVEL0</dfn>        0xFFFFFFE0 /* -32  */</u></td></tr>
+<tr><th id="383">383</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_XCURSOR" data-ref="_M/VNC_ENCODING_XCURSOR">VNC_ENCODING_XCURSOR</dfn>              0xFFFFFF10 /* -240 */</u></td></tr>
+<tr><th id="384">384</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_RICH_CURSOR" data-ref="_M/VNC_ENCODING_RICH_CURSOR">VNC_ENCODING_RICH_CURSOR</dfn>          0xFFFFFF11 /* -239 */</u></td></tr>
+<tr><th id="385">385</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_POINTER_POS" data-ref="_M/VNC_ENCODING_POINTER_POS">VNC_ENCODING_POINTER_POS</dfn>          0xFFFFFF18 /* -232 */</u></td></tr>
+<tr><th id="386">386</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_LASTRECT" data-ref="_M/VNC_ENCODING_LASTRECT">VNC_ENCODING_LASTRECT</dfn>             0xFFFFFF20 /* -224 */</u></td></tr>
+<tr><th id="387">387</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_DESKTOPRESIZE" data-ref="_M/VNC_ENCODING_DESKTOPRESIZE">VNC_ENCODING_DESKTOPRESIZE</dfn>        0xFFFFFF21 /* -223 */</u></td></tr>
+<tr><th id="388">388</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_POINTER_TYPE_CHANGE" data-ref="_M/VNC_ENCODING_POINTER_TYPE_CHANGE">VNC_ENCODING_POINTER_TYPE_CHANGE</dfn>  0XFFFFFEFF /* -257 */</u></td></tr>
+<tr><th id="389">389</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_EXT_KEY_EVENT" data-ref="_M/VNC_ENCODING_EXT_KEY_EVENT">VNC_ENCODING_EXT_KEY_EVENT</dfn>        0XFFFFFEFE /* -258 */</u></td></tr>
+<tr><th id="390">390</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_AUDIO" data-ref="_M/VNC_ENCODING_AUDIO">VNC_ENCODING_AUDIO</dfn>                0XFFFFFEFD /* -259 */</u></td></tr>
+<tr><th id="391">391</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_TIGHT_PNG" data-ref="_M/VNC_ENCODING_TIGHT_PNG">VNC_ENCODING_TIGHT_PNG</dfn>            0xFFFFFEFC /* -260 */</u></td></tr>
+<tr><th id="392">392</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_LED_STATE" data-ref="_M/VNC_ENCODING_LED_STATE">VNC_ENCODING_LED_STATE</dfn>            0XFFFFFEFB /* -261 */</u></td></tr>
+<tr><th id="393">393</th><td><u>#define <dfn class="macro" id="_M/VNC_ENCODING_WMVi" data-ref="_M/VNC_ENCODING_WMVi">VNC_ENCODING_WMVi</dfn>                 0x574D5669</u></td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="396">396</th><td><i> *</i></td></tr>
+<tr><th id="397">397</th><td><i> * Other tight constants</i></td></tr>
+<tr><th id="398">398</th><td><i> *</i></td></tr>
+<tr><th id="399">399</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td><i>/*</i></td></tr>
+<tr><th id="402">402</th><td><i> * Vendors known by TightVNC: standard VNC/RealVNC, TridiaVNC, and TightVNC.</i></td></tr>
+<tr><th id="403">403</th><td><i> */</i></td></tr>
+<tr><th id="404">404</th><td></td></tr>
+<tr><th id="405">405</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_RESET_MASK" data-ref="_M/VNC_TIGHT_CCB_RESET_MASK">VNC_TIGHT_CCB_RESET_MASK</dfn>   (0x0f)</u></td></tr>
+<tr><th id="406">406</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_TYPE_MASK" data-ref="_M/VNC_TIGHT_CCB_TYPE_MASK">VNC_TIGHT_CCB_TYPE_MASK</dfn>    (0x0f &lt;&lt; 4)</u></td></tr>
+<tr><th id="407">407</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_TYPE_FILL" data-ref="_M/VNC_TIGHT_CCB_TYPE_FILL">VNC_TIGHT_CCB_TYPE_FILL</dfn>    (0x08 &lt;&lt; 4)</u></td></tr>
+<tr><th id="408">408</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_TYPE_JPEG" data-ref="_M/VNC_TIGHT_CCB_TYPE_JPEG">VNC_TIGHT_CCB_TYPE_JPEG</dfn>    (0x09 &lt;&lt; 4)</u></td></tr>
+<tr><th id="409">409</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_TYPE_PNG" data-ref="_M/VNC_TIGHT_CCB_TYPE_PNG">VNC_TIGHT_CCB_TYPE_PNG</dfn>     (0x0A &lt;&lt; 4)</u></td></tr>
+<tr><th id="410">410</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_BASIC_MAX" data-ref="_M/VNC_TIGHT_CCB_BASIC_MAX">VNC_TIGHT_CCB_BASIC_MAX</dfn>    (0x07 &lt;&lt; 4)</u></td></tr>
+<tr><th id="411">411</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_BASIC_ZLIB" data-ref="_M/VNC_TIGHT_CCB_BASIC_ZLIB">VNC_TIGHT_CCB_BASIC_ZLIB</dfn>   (0x03 &lt;&lt; 4)</u></td></tr>
+<tr><th id="412">412</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_CCB_BASIC_FILTER" data-ref="_M/VNC_TIGHT_CCB_BASIC_FILTER">VNC_TIGHT_CCB_BASIC_FILTER</dfn> (0x04 &lt;&lt; 4)</u></td></tr>
+<tr><th id="413">413</th><td></td></tr>
+<tr><th id="414">414</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="415">415</th><td><i> *</i></td></tr>
+<tr><th id="416">416</th><td><i> * Features</i></td></tr>
+<tr><th id="417">417</th><td><i> *</i></td></tr>
+<tr><th id="418">418</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="419">419</th><td></td></tr>
+<tr><th id="420">420</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_RESIZE" data-ref="_M/VNC_FEATURE_RESIZE">VNC_FEATURE_RESIZE</dfn>                   0</u></td></tr>
+<tr><th id="421">421</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_HEXTILE" data-ref="_M/VNC_FEATURE_HEXTILE">VNC_FEATURE_HEXTILE</dfn>                  1</u></td></tr>
+<tr><th id="422">422</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_POINTER_TYPE_CHANGE" data-ref="_M/VNC_FEATURE_POINTER_TYPE_CHANGE">VNC_FEATURE_POINTER_TYPE_CHANGE</dfn>      2</u></td></tr>
+<tr><th id="423">423</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_WMVI" data-ref="_M/VNC_FEATURE_WMVI">VNC_FEATURE_WMVI</dfn>                     3</u></td></tr>
+<tr><th id="424">424</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_TIGHT" data-ref="_M/VNC_FEATURE_TIGHT">VNC_FEATURE_TIGHT</dfn>                    4</u></td></tr>
+<tr><th id="425">425</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZLIB" data-ref="_M/VNC_FEATURE_ZLIB">VNC_FEATURE_ZLIB</dfn>                     5</u></td></tr>
+<tr><th id="426">426</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_COPYRECT" data-ref="_M/VNC_FEATURE_COPYRECT">VNC_FEATURE_COPYRECT</dfn>                 6</u></td></tr>
+<tr><th id="427">427</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_RICH_CURSOR" data-ref="_M/VNC_FEATURE_RICH_CURSOR">VNC_FEATURE_RICH_CURSOR</dfn>              7</u></td></tr>
+<tr><th id="428">428</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_TIGHT_PNG" data-ref="_M/VNC_FEATURE_TIGHT_PNG">VNC_FEATURE_TIGHT_PNG</dfn>                8</u></td></tr>
+<tr><th id="429">429</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZRLE" data-ref="_M/VNC_FEATURE_ZRLE">VNC_FEATURE_ZRLE</dfn>                     9</u></td></tr>
+<tr><th id="430">430</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZYWRLE" data-ref="_M/VNC_FEATURE_ZYWRLE">VNC_FEATURE_ZYWRLE</dfn>                  10</u></td></tr>
+<tr><th id="431">431</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_LED_STATE" data-ref="_M/VNC_FEATURE_LED_STATE">VNC_FEATURE_LED_STATE</dfn>               11</u></td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_RESIZE_MASK" data-ref="_M/VNC_FEATURE_RESIZE_MASK">VNC_FEATURE_RESIZE_MASK</dfn>              (1 &lt;&lt; VNC_FEATURE_RESIZE)</u></td></tr>
+<tr><th id="434">434</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_HEXTILE_MASK" data-ref="_M/VNC_FEATURE_HEXTILE_MASK">VNC_FEATURE_HEXTILE_MASK</dfn>             (1 &lt;&lt; VNC_FEATURE_HEXTILE)</u></td></tr>
+<tr><th id="435">435</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_POINTER_TYPE_CHANGE_MASK" data-ref="_M/VNC_FEATURE_POINTER_TYPE_CHANGE_MASK">VNC_FEATURE_POINTER_TYPE_CHANGE_MASK</dfn> (1 &lt;&lt; VNC_FEATURE_POINTER_TYPE_CHANGE)</u></td></tr>
+<tr><th id="436">436</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_WMVI_MASK" data-ref="_M/VNC_FEATURE_WMVI_MASK">VNC_FEATURE_WMVI_MASK</dfn>                (1 &lt;&lt; VNC_FEATURE_WMVI)</u></td></tr>
+<tr><th id="437">437</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_TIGHT_MASK" data-ref="_M/VNC_FEATURE_TIGHT_MASK">VNC_FEATURE_TIGHT_MASK</dfn>               (1 &lt;&lt; VNC_FEATURE_TIGHT)</u></td></tr>
+<tr><th id="438">438</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZLIB_MASK" data-ref="_M/VNC_FEATURE_ZLIB_MASK">VNC_FEATURE_ZLIB_MASK</dfn>                (1 &lt;&lt; VNC_FEATURE_ZLIB)</u></td></tr>
+<tr><th id="439">439</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_COPYRECT_MASK" data-ref="_M/VNC_FEATURE_COPYRECT_MASK">VNC_FEATURE_COPYRECT_MASK</dfn>            (1 &lt;&lt; VNC_FEATURE_COPYRECT)</u></td></tr>
+<tr><th id="440">440</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_RICH_CURSOR_MASK" data-ref="_M/VNC_FEATURE_RICH_CURSOR_MASK">VNC_FEATURE_RICH_CURSOR_MASK</dfn>         (1 &lt;&lt; VNC_FEATURE_RICH_CURSOR)</u></td></tr>
+<tr><th id="441">441</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_TIGHT_PNG_MASK" data-ref="_M/VNC_FEATURE_TIGHT_PNG_MASK">VNC_FEATURE_TIGHT_PNG_MASK</dfn>           (1 &lt;&lt; VNC_FEATURE_TIGHT_PNG)</u></td></tr>
+<tr><th id="442">442</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZRLE_MASK" data-ref="_M/VNC_FEATURE_ZRLE_MASK">VNC_FEATURE_ZRLE_MASK</dfn>                (1 &lt;&lt; VNC_FEATURE_ZRLE)</u></td></tr>
+<tr><th id="443">443</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_ZYWRLE_MASK" data-ref="_M/VNC_FEATURE_ZYWRLE_MASK">VNC_FEATURE_ZYWRLE_MASK</dfn>              (1 &lt;&lt; VNC_FEATURE_ZYWRLE)</u></td></tr>
+<tr><th id="444">444</th><td><u>#define <dfn class="macro" id="_M/VNC_FEATURE_LED_STATE_MASK" data-ref="_M/VNC_FEATURE_LED_STATE_MASK">VNC_FEATURE_LED_STATE_MASK</dfn>           (1 &lt;&lt; VNC_FEATURE_LED_STATE)</u></td></tr>
+<tr><th id="445">445</th><td></td></tr>
+<tr><th id="446">446</th><td></td></tr>
+<tr><th id="447">447</th><td><i>/* Client -&gt; Server message IDs */</i></td></tr>
+<tr><th id="448">448</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_SET_PIXEL_FORMAT" data-ref="_M/VNC_MSG_CLIENT_SET_PIXEL_FORMAT">VNC_MSG_CLIENT_SET_PIXEL_FORMAT</dfn>           0</u></td></tr>
+<tr><th id="449">449</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_SET_ENCODINGS" data-ref="_M/VNC_MSG_CLIENT_SET_ENCODINGS">VNC_MSG_CLIENT_SET_ENCODINGS</dfn>              2</u></td></tr>
+<tr><th id="450">450</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_FRAMEBUFFER_UPDATE_REQUEST" data-ref="_M/VNC_MSG_CLIENT_FRAMEBUFFER_UPDATE_REQUEST">VNC_MSG_CLIENT_FRAMEBUFFER_UPDATE_REQUEST</dfn> 3</u></td></tr>
+<tr><th id="451">451</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_KEY_EVENT" data-ref="_M/VNC_MSG_CLIENT_KEY_EVENT">VNC_MSG_CLIENT_KEY_EVENT</dfn>                  4</u></td></tr>
+<tr><th id="452">452</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_POINTER_EVENT" data-ref="_M/VNC_MSG_CLIENT_POINTER_EVENT">VNC_MSG_CLIENT_POINTER_EVENT</dfn>              5</u></td></tr>
+<tr><th id="453">453</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_CUT_TEXT" data-ref="_M/VNC_MSG_CLIENT_CUT_TEXT">VNC_MSG_CLIENT_CUT_TEXT</dfn>                   6</u></td></tr>
+<tr><th id="454">454</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_VMWARE_0" data-ref="_M/VNC_MSG_CLIENT_VMWARE_0">VNC_MSG_CLIENT_VMWARE_0</dfn>                   127</u></td></tr>
+<tr><th id="455">455</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_CALL_CONTROL" data-ref="_M/VNC_MSG_CLIENT_CALL_CONTROL">VNC_MSG_CLIENT_CALL_CONTROL</dfn>               249</u></td></tr>
+<tr><th id="456">456</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_XVP" data-ref="_M/VNC_MSG_CLIENT_XVP">VNC_MSG_CLIENT_XVP</dfn>                        250</u></td></tr>
+<tr><th id="457">457</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_SET_DESKTOP_SIZE" data-ref="_M/VNC_MSG_CLIENT_SET_DESKTOP_SIZE">VNC_MSG_CLIENT_SET_DESKTOP_SIZE</dfn>           251</u></td></tr>
+<tr><th id="458">458</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_TIGHT" data-ref="_M/VNC_MSG_CLIENT_TIGHT">VNC_MSG_CLIENT_TIGHT</dfn>                      252</u></td></tr>
+<tr><th id="459">459</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_GII" data-ref="_M/VNC_MSG_CLIENT_GII">VNC_MSG_CLIENT_GII</dfn>                        253</u></td></tr>
+<tr><th id="460">460</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_VMWARE_1" data-ref="_M/VNC_MSG_CLIENT_VMWARE_1">VNC_MSG_CLIENT_VMWARE_1</dfn>                   254</u></td></tr>
+<tr><th id="461">461</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU" data-ref="_M/VNC_MSG_CLIENT_QEMU">VNC_MSG_CLIENT_QEMU</dfn>                       255</u></td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td><i>/* Server -&gt; Client message IDs */</i></td></tr>
+<tr><th id="464">464</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_FRAMEBUFFER_UPDATE" data-ref="_M/VNC_MSG_SERVER_FRAMEBUFFER_UPDATE">VNC_MSG_SERVER_FRAMEBUFFER_UPDATE</dfn>         0</u></td></tr>
+<tr><th id="465">465</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_SET_COLOUR_MAP_ENTRIES" data-ref="_M/VNC_MSG_SERVER_SET_COLOUR_MAP_ENTRIES">VNC_MSG_SERVER_SET_COLOUR_MAP_ENTRIES</dfn>     1</u></td></tr>
+<tr><th id="466">466</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_BELL" data-ref="_M/VNC_MSG_SERVER_BELL">VNC_MSG_SERVER_BELL</dfn>                       2</u></td></tr>
+<tr><th id="467">467</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_CUT_TEXT" data-ref="_M/VNC_MSG_SERVER_CUT_TEXT">VNC_MSG_SERVER_CUT_TEXT</dfn>                   3</u></td></tr>
+<tr><th id="468">468</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_VMWARE_0" data-ref="_M/VNC_MSG_SERVER_VMWARE_0">VNC_MSG_SERVER_VMWARE_0</dfn>                   127</u></td></tr>
+<tr><th id="469">469</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_CALL_CONTROL" data-ref="_M/VNC_MSG_SERVER_CALL_CONTROL">VNC_MSG_SERVER_CALL_CONTROL</dfn>               249</u></td></tr>
+<tr><th id="470">470</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_XVP" data-ref="_M/VNC_MSG_SERVER_XVP">VNC_MSG_SERVER_XVP</dfn>                        250</u></td></tr>
+<tr><th id="471">471</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_TIGHT" data-ref="_M/VNC_MSG_SERVER_TIGHT">VNC_MSG_SERVER_TIGHT</dfn>                      252</u></td></tr>
+<tr><th id="472">472</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_GII" data-ref="_M/VNC_MSG_SERVER_GII">VNC_MSG_SERVER_GII</dfn>                        253</u></td></tr>
+<tr><th id="473">473</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_VMWARE_1" data-ref="_M/VNC_MSG_SERVER_VMWARE_1">VNC_MSG_SERVER_VMWARE_1</dfn>                   254</u></td></tr>
+<tr><th id="474">474</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_QEMU" data-ref="_M/VNC_MSG_SERVER_QEMU">VNC_MSG_SERVER_QEMU</dfn>                       255</u></td></tr>
+<tr><th id="475">475</th><td></td></tr>
+<tr><th id="476">476</th><td></td></tr>
+<tr><th id="477">477</th><td></td></tr>
+<tr><th id="478">478</th><td><i>/* QEMU client -&gt; server message IDs */</i></td></tr>
+<tr><th id="479">479</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU_EXT_KEY_EVENT" data-ref="_M/VNC_MSG_CLIENT_QEMU_EXT_KEY_EVENT">VNC_MSG_CLIENT_QEMU_EXT_KEY_EVENT</dfn>         0</u></td></tr>
+<tr><th id="480">480</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU_AUDIO" data-ref="_M/VNC_MSG_CLIENT_QEMU_AUDIO">VNC_MSG_CLIENT_QEMU_AUDIO</dfn>                 1</u></td></tr>
+<tr><th id="481">481</th><td></td></tr>
+<tr><th id="482">482</th><td><i>/* QEMU server -&gt; client message IDs */</i></td></tr>
+<tr><th id="483">483</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_QEMU_AUDIO" data-ref="_M/VNC_MSG_SERVER_QEMU_AUDIO">VNC_MSG_SERVER_QEMU_AUDIO</dfn>                 1</u></td></tr>
+<tr><th id="484">484</th><td></td></tr>
+<tr><th id="485">485</th><td></td></tr>
+<tr><th id="486">486</th><td></td></tr>
+<tr><th id="487">487</th><td><i>/* QEMU client -&gt; server audio message IDs */</i></td></tr>
+<tr><th id="488">488</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU_AUDIO_ENABLE" data-ref="_M/VNC_MSG_CLIENT_QEMU_AUDIO_ENABLE">VNC_MSG_CLIENT_QEMU_AUDIO_ENABLE</dfn>          0</u></td></tr>
+<tr><th id="489">489</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU_AUDIO_DISABLE" data-ref="_M/VNC_MSG_CLIENT_QEMU_AUDIO_DISABLE">VNC_MSG_CLIENT_QEMU_AUDIO_DISABLE</dfn>         1</u></td></tr>
+<tr><th id="490">490</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_CLIENT_QEMU_AUDIO_SET_FORMAT" data-ref="_M/VNC_MSG_CLIENT_QEMU_AUDIO_SET_FORMAT">VNC_MSG_CLIENT_QEMU_AUDIO_SET_FORMAT</dfn>      2</u></td></tr>
+<tr><th id="491">491</th><td></td></tr>
+<tr><th id="492">492</th><td><i>/* QEMU server -&gt; client audio message IDs */</i></td></tr>
+<tr><th id="493">493</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_QEMU_AUDIO_END" data-ref="_M/VNC_MSG_SERVER_QEMU_AUDIO_END">VNC_MSG_SERVER_QEMU_AUDIO_END</dfn>             0</u></td></tr>
+<tr><th id="494">494</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_QEMU_AUDIO_BEGIN" data-ref="_M/VNC_MSG_SERVER_QEMU_AUDIO_BEGIN">VNC_MSG_SERVER_QEMU_AUDIO_BEGIN</dfn>           1</u></td></tr>
+<tr><th id="495">495</th><td><u>#define <dfn class="macro" id="_M/VNC_MSG_SERVER_QEMU_AUDIO_DATA" data-ref="_M/VNC_MSG_SERVER_QEMU_AUDIO_DATA">VNC_MSG_SERVER_QEMU_AUDIO_DATA</dfn>            2</u></td></tr>
+<tr><th id="496">496</th><td></td></tr>
+<tr><th id="497">497</th><td></td></tr>
+<tr><th id="498">498</th><td><i>/*****************************************************************************</i></td></tr>
+<tr><th id="499">499</th><td><i> *</i></td></tr>
+<tr><th id="500">500</th><td><i> * Internal APIs</i></td></tr>
+<tr><th id="501">501</th><td><i> *</i></td></tr>
+<tr><th id="502">502</th><td><i> *****************************************************************************/</i></td></tr>
+<tr><th id="503">503</th><td></td></tr>
+<tr><th id="504">504</th><td><i>/* Event loop functions */</i></td></tr>
+<tr><th id="505">505</th><td><a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a> <dfn class="decl" id="vnc_client_io" title='vnc_client_io' data-ref="vnc_client_io">vnc_client_io</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col1 decl" id="71ioc" title='ioc' data-type='QIOChannel *' data-ref="71ioc">ioc</dfn>,</td></tr>
+<tr><th id="506">506</th><td>                       <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col2 decl" id="72condition" title='condition' data-type='GIOCondition' data-ref="72condition">condition</dfn>,</td></tr>
+<tr><th id="507">507</th><td>                       <em>void</em> *<dfn class="local col3 decl" id="73opaque" title='opaque' data-type='void *' data-ref="73opaque">opaque</dfn>);</td></tr>
+<tr><th id="508">508</th><td></td></tr>
+<tr><th id="509">509</th><td><a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="vnc_client_read_buf" title='vnc_client_read_buf' data-ref="vnc_client_read_buf">vnc_client_read_buf</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col4 decl" id="74vs" title='vs' data-type='VncState *' data-ref="74vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="75data" title='data' data-type='uint8_t *' data-ref="75data">data</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="76datalen" title='datalen' data-type='size_t' data-ref="76datalen">datalen</dfn>);</td></tr>
+<tr><th id="510">510</th><td><a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="vnc_client_write_buf" title='vnc_client_write_buf' data-ref="vnc_client_write_buf">vnc_client_write_buf</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col7 decl" id="77vs" title='vs' data-type='VncState *' data-ref="77vs">vs</dfn>, <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="78data" title='data' data-type='const uint8_t *' data-ref="78data">data</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col9 decl" id="79datalen" title='datalen' data-type='size_t' data-ref="79datalen">datalen</dfn>);</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td><i>/* Protocol I/O functions */</i></td></tr>
+<tr><th id="513">513</th><td><em>void</em> <dfn class="decl" id="vnc_write" title='vnc_write' data-ref="vnc_write">vnc_write</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col0 decl" id="80vs" title='vs' data-type='VncState *' data-ref="80vs">vs</dfn>, <em>const</em> <em>void</em> *<dfn class="local col1 decl" id="81data" title='data' data-type='const void *' data-ref="81data">data</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col2 decl" id="82len" title='len' data-type='size_t' data-ref="82len">len</dfn>);</td></tr>
+<tr><th id="514">514</th><td><em>void</em> <dfn class="decl" id="vnc_write_u32" title='vnc_write_u32' data-ref="vnc_write_u32">vnc_write_u32</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col3 decl" id="83vs" title='vs' data-type='VncState *' data-ref="83vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="84value" title='value' data-type='uint32_t' data-ref="84value">value</dfn>);</td></tr>
+<tr><th id="515">515</th><td><em>void</em> <dfn class="decl" id="vnc_write_s32" title='vnc_write_s32' data-ref="vnc_write_s32">vnc_write_s32</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="85vs" title='vs' data-type='VncState *' data-ref="85vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="local col6 decl" id="86value" title='value' data-type='int32_t' data-ref="86value">value</dfn>);</td></tr>
+<tr><th id="516">516</th><td><em>void</em> <dfn class="decl" id="vnc_write_u16" title='vnc_write_u16' data-ref="vnc_write_u16">vnc_write_u16</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col7 decl" id="87vs" title='vs' data-type='VncState *' data-ref="87vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col8 decl" id="88value" title='value' data-type='uint16_t' data-ref="88value">value</dfn>);</td></tr>
+<tr><th id="517">517</th><td><em>void</em> <dfn class="decl" id="vnc_write_u8" title='vnc_write_u8' data-ref="vnc_write_u8">vnc_write_u8</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col9 decl" id="89vs" title='vs' data-type='VncState *' data-ref="89vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col0 decl" id="90value" title='value' data-type='uint8_t' data-ref="90value">value</dfn>);</td></tr>
+<tr><th id="518">518</th><td><em>void</em> <dfn class="decl" id="vnc_flush" title='vnc_flush' data-ref="vnc_flush">vnc_flush</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col1 decl" id="91vs" title='vs' data-type='VncState *' data-ref="91vs">vs</dfn>);</td></tr>
+<tr><th id="519">519</th><td><em>void</em> <dfn class="decl" id="vnc_read_when" title='vnc_read_when' data-ref="vnc_read_when">vnc_read_when</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col2 decl" id="92vs" title='vs' data-type='VncState *' data-ref="92vs">vs</dfn>, <a class="typedef" href="#VncReadEvent" title='VncReadEvent' data-type='int (VncState *, uint8_t *, size_t)' data-ref="VncReadEvent">VncReadEvent</a> *<dfn class="local col3 decl" id="93func" title='func' data-type='VncReadEvent *' data-ref="93func">func</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col4 decl" id="94expecting" title='expecting' data-type='size_t' data-ref="94expecting">expecting</dfn>);</td></tr>
+<tr><th id="520">520</th><td><em>void</em> <dfn class="decl" id="vnc_disconnect_finish" title='vnc_disconnect_finish' data-ref="vnc_disconnect_finish">vnc_disconnect_finish</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="95vs" title='vs' data-type='VncState *' data-ref="95vs">vs</dfn>);</td></tr>
+<tr><th id="521">521</th><td><em>void</em> <dfn class="decl" id="vnc_start_protocol" title='vnc_start_protocol' data-ref="vnc_start_protocol">vnc_start_protocol</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col6 decl" id="96vs" title='vs' data-type='VncState *' data-ref="96vs">vs</dfn>);</td></tr>
+<tr><th id="522">522</th><td></td></tr>
+<tr><th id="523">523</th><td></td></tr>
+<tr><th id="524">524</th><td><i>/* Buffer I/O functions */</i></td></tr>
+<tr><th id="525">525</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="read_u32" title='read_u32' data-ref="read_u32">read_u32</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="97data" title='data' data-type='uint8_t *' data-ref="97data">data</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col8 decl" id="98offset" title='offset' data-type='size_t' data-ref="98offset">offset</dfn>);</td></tr>
+<tr><th id="526">526</th><td></td></tr>
+<tr><th id="527">527</th><td><i>/* Protocol stage functions */</i></td></tr>
+<tr><th id="528">528</th><td><em>void</em> <dfn class="decl" id="vnc_client_error" title='vnc_client_error' data-ref="vnc_client_error">vnc_client_error</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col9 decl" id="99vs" title='vs' data-type='VncState *' data-ref="99vs">vs</dfn>);</td></tr>
+<tr><th id="529">529</th><td><a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="vnc_client_io_error" title='vnc_client_io_error' data-ref="vnc_client_io_error">vnc_client_io_error</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col0 decl" id="100vs" title='vs' data-type='VncState *' data-ref="100vs">vs</dfn>, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col1 decl" id="101ret" title='ret' data-type='ssize_t' data-ref="101ret">ret</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="102errp" title='errp' data-type='Error **' data-ref="102errp">errp</dfn>);</td></tr>
+<tr><th id="530">530</th><td></td></tr>
+<tr><th id="531">531</th><td><em>void</em> <dfn class="decl" id="start_client_init" title='start_client_init' data-ref="start_client_init">start_client_init</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col3 decl" id="103vs" title='vs' data-type='VncState *' data-ref="103vs">vs</dfn>);</td></tr>
+<tr><th id="532">532</th><td><em>void</em> <dfn class="decl" id="start_auth_vnc" title='start_auth_vnc' data-ref="start_auth_vnc">start_auth_vnc</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col4 decl" id="104vs" title='vs' data-type='VncState *' data-ref="104vs">vs</dfn>);</td></tr>
+<tr><th id="533">533</th><td></td></tr>
+<tr><th id="534">534</th><td></td></tr>
+<tr><th id="535">535</th><td><i>/* Misc helpers */</i></td></tr>
+<tr><th id="536">536</th><td></td></tr>
+<tr><th id="537">537</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="vnc_has_feature" title='vnc_has_feature' data-ref="vnc_has_feature">vnc_has_feature</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="105vs" title='vs' data-type='VncState *' data-ref="105vs">vs</dfn>, <em>int</em> <dfn class="local col6 decl" id="106feature" title='feature' data-type='int' data-ref="106feature">feature</dfn>) {</td></tr>
+<tr><th id="538">538</th><td>    <b>return</b> (<a class="local col5 ref" href="#105vs" title='vs' data-ref="105vs">vs</a>-&gt;<a class="ref" href="#VncState::features" title='VncState::features' data-ref="VncState::features">features</a> &amp; (<var>1</var> &lt;&lt; <a class="local col6 ref" href="#106feature" title='feature' data-ref="106feature">feature</a>));</td></tr>
+<tr><th id="539">539</th><td>}</td></tr>
+<tr><th id="540">540</th><td></td></tr>
+<tr><th id="541">541</th><td><i>/* Framebuffer */</i></td></tr>
+<tr><th id="542">542</th><td><em>void</em> <dfn class="decl" id="vnc_framebuffer_update" title='vnc_framebuffer_update' data-ref="vnc_framebuffer_update">vnc_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col7 decl" id="107vs" title='vs' data-type='VncState *' data-ref="107vs">vs</dfn>, <em>int</em> <dfn class="local col8 decl" id="108x" title='x' data-type='int' data-ref="108x">x</dfn>, <em>int</em> <dfn class="local col9 decl" id="109y" title='y' data-type='int' data-ref="109y">y</dfn>, <em>int</em> <dfn class="local col0 decl" id="110w" title='w' data-type='int' data-ref="110w">w</dfn>, <em>int</em> <dfn class="local col1 decl" id="111h" title='h' data-type='int' data-ref="111h">h</dfn>,</td></tr>
+<tr><th id="543">543</th><td>                            <a class="typedef" href="../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="local col2 decl" id="112encoding" title='encoding' data-type='int32_t' data-ref="112encoding">encoding</dfn>);</td></tr>
+<tr><th id="544">544</th><td></td></tr>
+<tr><th id="545">545</th><td><i>/* server fb is in PIXMAN_x8r8g8b8 */</i></td></tr>
+<tr><th id="546">546</th><td><u>#define <dfn class="macro" id="_M/VNC_SERVER_FB_FORMAT" data-ref="_M/VNC_SERVER_FB_FORMAT">VNC_SERVER_FB_FORMAT</dfn> PIXMAN_FORMAT(32, PIXMAN_TYPE_ARGB, 0, 8, 8, 8)</u></td></tr>
+<tr><th id="547">547</th><td><u>#define <dfn class="macro" id="_M/VNC_SERVER_FB_BITS" data-ref="_M/VNC_SERVER_FB_BITS">VNC_SERVER_FB_BITS</dfn>   (PIXMAN_FORMAT_BPP(VNC_SERVER_FB_FORMAT))</u></td></tr>
+<tr><th id="548">548</th><td><u>#define <dfn class="macro" id="_M/VNC_SERVER_FB_BYTES" data-ref="_M/VNC_SERVER_FB_BYTES">VNC_SERVER_FB_BYTES</dfn>  ((VNC_SERVER_FB_BITS+7)/8)</u></td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td><em>void</em> *<dfn class="decl" id="vnc_server_fb_ptr" title='vnc_server_fb_ptr' data-ref="vnc_server_fb_ptr">vnc_server_fb_ptr</dfn>(<a class="typedef" href="#VncDisplay" title='VncDisplay' data-type='struct VncDisplay' data-ref="VncDisplay">VncDisplay</a> *<dfn class="local col3 decl" id="113vd" title='vd' data-type='VncDisplay *' data-ref="113vd">vd</dfn>, <em>int</em> <dfn class="local col4 decl" id="114x" title='x' data-type='int' data-ref="114x">x</dfn>, <em>int</em> <dfn class="local col5 decl" id="115y" title='y' data-type='int' data-ref="115y">y</dfn>);</td></tr>
+<tr><th id="551">551</th><td><em>int</em> <dfn class="decl" id="vnc_server_fb_stride" title='vnc_server_fb_stride' data-ref="vnc_server_fb_stride">vnc_server_fb_stride</dfn>(<a class="typedef" href="#VncDisplay" title='VncDisplay' data-type='struct VncDisplay' data-ref="VncDisplay">VncDisplay</a> *<dfn class="local col6 decl" id="116vd" title='vd' data-type='VncDisplay *' data-ref="116vd">vd</dfn>);</td></tr>
+<tr><th id="552">552</th><td></td></tr>
+<tr><th id="553">553</th><td><em>void</em> <dfn class="decl" id="vnc_convert_pixel" title='vnc_convert_pixel' data-ref="vnc_convert_pixel">vnc_convert_pixel</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col7 decl" id="117vs" title='vs' data-type='VncState *' data-ref="117vs">vs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="118buf" title='buf' data-type='uint8_t *' data-ref="118buf">buf</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="119v" title='v' data-type='uint32_t' data-ref="119v">v</dfn>);</td></tr>
+<tr><th id="554">554</th><td><em>double</em> <dfn class="decl" id="vnc_update_freq" title='vnc_update_freq' data-ref="vnc_update_freq">vnc_update_freq</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col0 decl" id="120vs" title='vs' data-type='VncState *' data-ref="120vs">vs</dfn>, <em>int</em> <dfn class="local col1 decl" id="121x" title='x' data-type='int' data-ref="121x">x</dfn>, <em>int</em> <dfn class="local col2 decl" id="122y" title='y' data-type='int' data-ref="122y">y</dfn>, <em>int</em> <dfn class="local col3 decl" id="123w" title='w' data-type='int' data-ref="123w">w</dfn>, <em>int</em> <dfn class="local col4 decl" id="124h" title='h' data-type='int' data-ref="124h">h</dfn>);</td></tr>
+<tr><th id="555">555</th><td><em>void</em> <dfn class="decl" id="vnc_sent_lossy_rect" title='vnc_sent_lossy_rect' data-ref="vnc_sent_lossy_rect">vnc_sent_lossy_rect</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="125vs" title='vs' data-type='VncState *' data-ref="125vs">vs</dfn>, <em>int</em> <dfn class="local col6 decl" id="126x" title='x' data-type='int' data-ref="126x">x</dfn>, <em>int</em> <dfn class="local col7 decl" id="127y" title='y' data-type='int' data-ref="127y">y</dfn>, <em>int</em> <dfn class="local col8 decl" id="128w" title='w' data-type='int' data-ref="128w">w</dfn>, <em>int</em> <dfn class="local col9 decl" id="129h" title='h' data-type='int' data-ref="129h">h</dfn>);</td></tr>
+<tr><th id="556">556</th><td></td></tr>
+<tr><th id="557">557</th><td><i>/* Encodings */</i></td></tr>
+<tr><th id="558">558</th><td><em>int</em> <dfn class="decl" id="vnc_send_framebuffer_update" title='vnc_send_framebuffer_update' data-ref="vnc_send_framebuffer_update">vnc_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col0 decl" id="130vs" title='vs' data-type='VncState *' data-ref="130vs">vs</dfn>, <em>int</em> <dfn class="local col1 decl" id="131x" title='x' data-type='int' data-ref="131x">x</dfn>, <em>int</em> <dfn class="local col2 decl" id="132y" title='y' data-type='int' data-ref="132y">y</dfn>, <em>int</em> <dfn class="local col3 decl" id="133w" title='w' data-type='int' data-ref="133w">w</dfn>, <em>int</em> <dfn class="local col4 decl" id="134h" title='h' data-type='int' data-ref="134h">h</dfn>);</td></tr>
+<tr><th id="559">559</th><td></td></tr>
+<tr><th id="560">560</th><td><em>int</em> <dfn class="decl" id="vnc_raw_send_framebuffer_update" title='vnc_raw_send_framebuffer_update' data-ref="vnc_raw_send_framebuffer_update">vnc_raw_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="135vs" title='vs' data-type='VncState *' data-ref="135vs">vs</dfn>, <em>int</em> <dfn class="local col6 decl" id="136x" title='x' data-type='int' data-ref="136x">x</dfn>, <em>int</em> <dfn class="local col7 decl" id="137y" title='y' data-type='int' data-ref="137y">y</dfn>, <em>int</em> <dfn class="local col8 decl" id="138w" title='w' data-type='int' data-ref="138w">w</dfn>, <em>int</em> <dfn class="local col9 decl" id="139h" title='h' data-type='int' data-ref="139h">h</dfn>);</td></tr>
+<tr><th id="561">561</th><td></td></tr>
+<tr><th id="562">562</th><td><em>int</em> <dfn class="decl" id="vnc_hextile_send_framebuffer_update" title='vnc_hextile_send_framebuffer_update' data-ref="vnc_hextile_send_framebuffer_update">vnc_hextile_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col0 decl" id="140vs" title='vs' data-type='VncState *' data-ref="140vs">vs</dfn>, <em>int</em> <dfn class="local col1 decl" id="141x" title='x' data-type='int' data-ref="141x">x</dfn>,</td></tr>
+<tr><th id="563">563</th><td>                                         <em>int</em> <dfn class="local col2 decl" id="142y" title='y' data-type='int' data-ref="142y">y</dfn>, <em>int</em> <dfn class="local col3 decl" id="143w" title='w' data-type='int' data-ref="143w">w</dfn>, <em>int</em> <dfn class="local col4 decl" id="144h" title='h' data-type='int' data-ref="144h">h</dfn>);</td></tr>
+<tr><th id="564">564</th><td><em>void</em> <dfn class="decl" id="vnc_hextile_set_pixel_conversion" title='vnc_hextile_set_pixel_conversion' data-ref="vnc_hextile_set_pixel_conversion">vnc_hextile_set_pixel_conversion</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col5 decl" id="145vs" title='vs' data-type='VncState *' data-ref="145vs">vs</dfn>, <em>int</em> <dfn class="local col6 decl" id="146generic" title='generic' data-type='int' data-ref="146generic">generic</dfn>);</td></tr>
+<tr><th id="565">565</th><td></td></tr>
+<tr><th id="566">566</th><td><em>void</em> *<dfn class="decl" id="vnc_zlib_zalloc" title='vnc_zlib_zalloc' data-ref="vnc_zlib_zalloc">vnc_zlib_zalloc</dfn>(<em>void</em> *<dfn class="local col7 decl" id="147x" title='x' data-type='void *' data-ref="147x">x</dfn>, <em>unsigned</em> <dfn class="local col8 decl" id="148items" title='items' data-type='unsigned int' data-ref="148items">items</dfn>, <em>unsigned</em> <dfn class="local col9 decl" id="149size" title='size' data-type='unsigned int' data-ref="149size">size</dfn>);</td></tr>
+<tr><th id="567">567</th><td><em>void</em> <dfn class="decl" id="vnc_zlib_zfree" title='vnc_zlib_zfree' data-ref="vnc_zlib_zfree">vnc_zlib_zfree</dfn>(<em>void</em> *<dfn class="local col0 decl" id="150x" title='x' data-type='void *' data-ref="150x">x</dfn>, <em>void</em> *<dfn class="local col1 decl" id="151addr" title='addr' data-type='void *' data-ref="151addr">addr</dfn>);</td></tr>
+<tr><th id="568">568</th><td><em>int</em> <dfn class="decl" id="vnc_zlib_send_framebuffer_update" title='vnc_zlib_send_framebuffer_update' data-ref="vnc_zlib_send_framebuffer_update">vnc_zlib_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col2 decl" id="152vs" title='vs' data-type='VncState *' data-ref="152vs">vs</dfn>, <em>int</em> <dfn class="local col3 decl" id="153x" title='x' data-type='int' data-ref="153x">x</dfn>, <em>int</em> <dfn class="local col4 decl" id="154y" title='y' data-type='int' data-ref="154y">y</dfn>, <em>int</em> <dfn class="local col5 decl" id="155w" title='w' data-type='int' data-ref="155w">w</dfn>, <em>int</em> <dfn class="local col6 decl" id="156h" title='h' data-type='int' data-ref="156h">h</dfn>);</td></tr>
+<tr><th id="569">569</th><td><em>void</em> <dfn class="decl" id="vnc_zlib_clear" title='vnc_zlib_clear' data-ref="vnc_zlib_clear">vnc_zlib_clear</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col7 decl" id="157vs" title='vs' data-type='VncState *' data-ref="157vs">vs</dfn>);</td></tr>
+<tr><th id="570">570</th><td></td></tr>
+<tr><th id="571">571</th><td><em>int</em> <dfn class="decl" id="vnc_tight_send_framebuffer_update" title='vnc_tight_send_framebuffer_update' data-ref="vnc_tight_send_framebuffer_update">vnc_tight_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col8 decl" id="158vs" title='vs' data-type='VncState *' data-ref="158vs">vs</dfn>, <em>int</em> <dfn class="local col9 decl" id="159x" title='x' data-type='int' data-ref="159x">x</dfn>, <em>int</em> <dfn class="local col0 decl" id="160y" title='y' data-type='int' data-ref="160y">y</dfn>, <em>int</em> <dfn class="local col1 decl" id="161w" title='w' data-type='int' data-ref="161w">w</dfn>, <em>int</em> <dfn class="local col2 decl" id="162h" title='h' data-type='int' data-ref="162h">h</dfn>);</td></tr>
+<tr><th id="572">572</th><td><em>int</em> <dfn class="decl" id="vnc_tight_png_send_framebuffer_update" title='vnc_tight_png_send_framebuffer_update' data-ref="vnc_tight_png_send_framebuffer_update">vnc_tight_png_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col3 decl" id="163vs" title='vs' data-type='VncState *' data-ref="163vs">vs</dfn>, <em>int</em> <dfn class="local col4 decl" id="164x" title='x' data-type='int' data-ref="164x">x</dfn>, <em>int</em> <dfn class="local col5 decl" id="165y" title='y' data-type='int' data-ref="165y">y</dfn>,</td></tr>
+<tr><th id="573">573</th><td>                                          <em>int</em> <dfn class="local col6 decl" id="166w" title='w' data-type='int' data-ref="166w">w</dfn>, <em>int</em> <dfn class="local col7 decl" id="167h" title='h' data-type='int' data-ref="167h">h</dfn>);</td></tr>
+<tr><th id="574">574</th><td><em>void</em> <dfn class="decl" id="vnc_tight_clear" title='vnc_tight_clear' data-ref="vnc_tight_clear">vnc_tight_clear</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col8 decl" id="168vs" title='vs' data-type='VncState *' data-ref="168vs">vs</dfn>);</td></tr>
+<tr><th id="575">575</th><td></td></tr>
+<tr><th id="576">576</th><td><em>int</em> <dfn class="decl" id="vnc_zrle_send_framebuffer_update" title='vnc_zrle_send_framebuffer_update' data-ref="vnc_zrle_send_framebuffer_update">vnc_zrle_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col9 decl" id="169vs" title='vs' data-type='VncState *' data-ref="169vs">vs</dfn>, <em>int</em> <dfn class="local col0 decl" id="170x" title='x' data-type='int' data-ref="170x">x</dfn>, <em>int</em> <dfn class="local col1 decl" id="171y" title='y' data-type='int' data-ref="171y">y</dfn>, <em>int</em> <dfn class="local col2 decl" id="172w" title='w' data-type='int' data-ref="172w">w</dfn>, <em>int</em> <dfn class="local col3 decl" id="173h" title='h' data-type='int' data-ref="173h">h</dfn>);</td></tr>
+<tr><th id="577">577</th><td><em>int</em> <dfn class="decl" id="vnc_zywrle_send_framebuffer_update" title='vnc_zywrle_send_framebuffer_update' data-ref="vnc_zywrle_send_framebuffer_update">vnc_zywrle_send_framebuffer_update</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col4 decl" id="174vs" title='vs' data-type='VncState *' data-ref="174vs">vs</dfn>, <em>int</em> <dfn class="local col5 decl" id="175x" title='x' data-type='int' data-ref="175x">x</dfn>, <em>int</em> <dfn class="local col6 decl" id="176y" title='y' data-type='int' data-ref="176y">y</dfn>, <em>int</em> <dfn class="local col7 decl" id="177w" title='w' data-type='int' data-ref="177w">w</dfn>, <em>int</em> <dfn class="local col8 decl" id="178h" title='h' data-type='int' data-ref="178h">h</dfn>);</td></tr>
+<tr><th id="578">578</th><td><em>void</em> <dfn class="decl" id="vnc_zrle_clear" title='vnc_zrle_clear' data-ref="vnc_zrle_clear">vnc_zrle_clear</dfn>(<a class="typedef" href="#VncState" title='VncState' data-type='struct VncState' data-ref="VncState">VncState</a> *<dfn class="local col9 decl" id="179vs" title='vs' data-type='VncState *' data-ref="179vs">vs</dfn>);</td></tr>
+<tr><th id="579">579</th><td></td></tr>
+<tr><th id="580">580</th><td><u>#<span data-ppcond="27">endif</span> /* QEMU_VNC_H */</u></td></tr>
+<tr><th id="581">581</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../hw/display/vmware_vga.c.html'>codebrowser/hw/display/vmware_vga.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>if.c source code [codebrowser/slirp/if.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/if.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='if.c.html'>if.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1995 Danny Gasparovski.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Please read the file COPYRIGHT for the</i></td></tr>
+<tr><th id="5">5</th><td><i> * terms and conditions of the copyright.</i></td></tr>
+<tr><th id="6">6</th><td><i> */</i></td></tr>
+<tr><th id="7">7</th><td></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../include/qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="13">13</th><td><dfn class="tu decl def" id="ifs_insque" title='ifs_insque' data-type='void ifs_insque(struct mbuf * ifm, struct mbuf * ifmhead)' data-ref="ifs_insque">ifs_insque</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col1 decl" id="1ifm" title='ifm' data-type='struct mbuf *' data-ref="1ifm">ifm</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col2 decl" id="2ifmhead" title='ifmhead' data-type='struct mbuf *' data-ref="2ifmhead">ifmhead</dfn>)</td></tr>
+<tr><th id="14">14</th><td>{</td></tr>
+<tr><th id="15">15</th><td>	<a class="local col1 ref" href="#1ifm" title='ifm' data-ref="1ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a> = <a class="local col2 ref" href="#2ifmhead" title='ifmhead' data-ref="2ifmhead">ifmhead</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>;</td></tr>
+<tr><th id="16">16</th><td>	<a class="local col2 ref" href="#2ifmhead" title='ifmhead' data-ref="2ifmhead">ifmhead</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a> = <a class="local col1 ref" href="#1ifm" title='ifm' data-ref="1ifm">ifm</a>;</td></tr>
+<tr><th id="17">17</th><td>	<a class="local col1 ref" href="#1ifm" title='ifm' data-ref="1ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a> = <a class="local col2 ref" href="#2ifmhead" title='ifmhead' data-ref="2ifmhead">ifmhead</a>;</td></tr>
+<tr><th id="18">18</th><td>	<a class="local col1 ref" href="#1ifm" title='ifm' data-ref="1ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a> = <a class="local col1 ref" href="#1ifm" title='ifm' data-ref="1ifm">ifm</a>;</td></tr>
+<tr><th id="19">19</th><td>}</td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="22">22</th><td><dfn class="tu decl def" id="ifs_remque" title='ifs_remque' data-type='void ifs_remque(struct mbuf * ifm)' data-ref="ifs_remque">ifs_remque</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col3 decl" id="3ifm" title='ifm' data-type='struct mbuf *' data-ref="3ifm">ifm</dfn>)</td></tr>
+<tr><th id="23">23</th><td>{</td></tr>
+<tr><th id="24">24</th><td>	<a class="local col3 ref" href="#3ifm" title='ifm' data-ref="3ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a> = <a class="local col3 ref" href="#3ifm" title='ifm' data-ref="3ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>;</td></tr>
+<tr><th id="25">25</th><td>	<a class="local col3 ref" href="#3ifm" title='ifm' data-ref="3ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a> = <a class="local col3 ref" href="#3ifm" title='ifm' data-ref="3ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a>;</td></tr>
+<tr><th id="26">26</th><td>}</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><em>void</em></td></tr>
+<tr><th id="29">29</th><td><dfn class="decl def" id="if_init" title='if_init' data-ref="if_init">if_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col4 decl" id="4slirp" title='slirp' data-type='Slirp *' data-ref="4slirp">slirp</dfn>)</td></tr>
+<tr><th id="30">30</th><td>{</td></tr>
+<tr><th id="31">31</th><td>    <a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_link" title='slirp_quehead::qh_link' data-ref="slirp_quehead::qh_link">qh_link</a> = <a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_rlink" title='slirp_quehead::qh_rlink' data-ref="slirp_quehead::qh_rlink">qh_rlink</a> = &amp;<a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>;</td></tr>
+<tr><th id="32">32</th><td>    <a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_link" title='slirp_quehead::qh_link' data-ref="slirp_quehead::qh_link">qh_link</a> = <a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_rlink" title='slirp_quehead::qh_rlink' data-ref="slirp_quehead::qh_rlink">qh_rlink</a> = &amp;<a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>;</td></tr>
+<tr><th id="33">33</th><td>    <a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> = (<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *) &amp;<a class="local col4 ref" href="#4slirp" title='slirp' data-ref="4slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>;</td></tr>
+<tr><th id="34">34</th><td>}</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/*</i></td></tr>
+<tr><th id="37">37</th><td><i> * if_output: Queue packet into an output queue.</i></td></tr>
+<tr><th id="38">38</th><td><i> * There are 2 output queue's, if_fastq and if_batchq.</i></td></tr>
+<tr><th id="39">39</th><td><i> * Each output queue is a doubly linked list of double linked lists</i></td></tr>
+<tr><th id="40">40</th><td><i> * of mbufs, each list belonging to one "session" (socket).  This</i></td></tr>
+<tr><th id="41">41</th><td><i> * way, we can output packets fairly by sending one packet from each</i></td></tr>
+<tr><th id="42">42</th><td><i> * session, instead of all the packets from one session, then all packets</i></td></tr>
+<tr><th id="43">43</th><td><i> * from the next session, etc.  Packets on the if_fastq get absolute</i></td></tr>
+<tr><th id="44">44</th><td><i> * priority, but if one session hogs the link, it gets "downgraded"</i></td></tr>
+<tr><th id="45">45</th><td><i> * to the batchq until it runs out of packets, then it'll return</i></td></tr>
+<tr><th id="46">46</th><td><i> * to the fastq (eg. if the user does an ls -alR in a telnet session,</i></td></tr>
+<tr><th id="47">47</th><td><i> * it'll temporarily get downgraded to the batchq)</i></td></tr>
+<tr><th id="48">48</th><td><i> */</i></td></tr>
+<tr><th id="49">49</th><td><em>void</em></td></tr>
+<tr><th id="50">50</th><td><dfn class="decl def" id="if_output" title='if_output' data-ref="if_output">if_output</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col5 decl" id="5so" title='so' data-type='struct socket *' data-ref="5so">so</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col6 decl" id="6ifm" title='ifm' data-type='struct mbuf *' data-ref="6ifm">ifm</dfn>)</td></tr>
+<tr><th id="51">51</th><td>{</td></tr>
+<tr><th id="52">52</th><td>	<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col7 decl" id="7slirp" title='slirp' data-type='Slirp *' data-ref="7slirp">slirp</dfn> = <a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>;</td></tr>
+<tr><th id="53">53</th><td>	<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col8 decl" id="8ifq" title='ifq' data-type='struct mbuf *' data-ref="8ifq">ifq</dfn>;</td></tr>
+<tr><th id="54">54</th><td>	<em>int</em> <dfn class="local col9 decl" id="9on_fastq" title='on_fastq' data-type='int' data-ref="9on_fastq">on_fastq</dfn> = <var>1</var>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"if_output"</q>);</td></tr>
+<tr><th id="57">57</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %p"</q>, so);</td></tr>
+<tr><th id="58">58</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"ifm = %p"</q>, ifm);</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>	<i>/*</i></td></tr>
+<tr><th id="61">61</th><td><i>	 * First remove the mbuf from m_usedlist,</i></td></tr>
+<tr><th id="62">62</th><td><i>	 * since we're gonna use m_next and m_prev ourselves</i></td></tr>
+<tr><th id="63">63</th><td><i>	 * XXX Shouldn't need this, gotta change dtom() etc.</i></td></tr>
+<tr><th id="64">64</th><td><i>	 */</i></td></tr>
+<tr><th id="65">65</th><td>	<b>if</b> (<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_flags" title='mbuf::m_flags' data-ref="mbuf::m_flags">m_flags</a> &amp; <a class="macro" href="mbuf.h.html#97" title="0x04" data-ref="_M/M_USEDLIST">M_USEDLIST</a>) {</td></tr>
+<tr><th id="66">66</th><td>		<a class="macro" href="slirp.h.html#65" title="slirp_remque" data-ref="_M/remque">remque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>);</td></tr>
+<tr><th id="67">67</th><td>		<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_flags" title='mbuf::m_flags' data-ref="mbuf::m_flags">m_flags</a> &amp;= ~<a class="macro" href="mbuf.h.html#97" title="0x04" data-ref="_M/M_USEDLIST">M_USEDLIST</a>;</td></tr>
+<tr><th id="68">68</th><td>	}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>	<i>/*</i></td></tr>
+<tr><th id="71">71</th><td><i>	 * See if there's already a batchq list for this session.</i></td></tr>
+<tr><th id="72">72</th><td><i>	 * This can include an interactive session, which should go on fastq,</i></td></tr>
+<tr><th id="73">73</th><td><i>	 * but gets too greedy... hence it'll be downgraded from fastq to batchq.</i></td></tr>
+<tr><th id="74">74</th><td><i>	 * We mustn't put this packet back on the fastq (or we'll send it out of order)</i></td></tr>
+<tr><th id="75">75</th><td><i>	 * XXX add cache here?</i></td></tr>
+<tr><th id="76">76</th><td><i>	 */</i></td></tr>
+<tr><th id="77">77</th><td>	<b>for</b> (<a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a> = (<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *) <a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_rlink" title='slirp_quehead::qh_rlink' data-ref="slirp_quehead::qh_rlink">qh_rlink</a>;</td></tr>
+<tr><th id="78">78</th><td>	     (<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a> != &amp;<a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>;</td></tr>
+<tr><th id="79">79</th><td>	     <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a> = <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>-&gt;<a class="macro" href="mbuf.h.html#89" title="m_prev" data-ref="_M/ifq_prev">ifq_prev</a>) {</td></tr>
+<tr><th id="80">80</th><td>		<b>if</b> (<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a> == <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a>) {</td></tr>
+<tr><th id="81">81</th><td>			<i>/* A match! */</i></td></tr>
+<tr><th id="82">82</th><td>			<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a> = <a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>;</td></tr>
+<tr><th id="83">83</th><td>			<a class="tu ref" href="#ifs_insque" title='ifs_insque' data-use='c' data-ref="ifs_insque">ifs_insque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>, <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a>);</td></tr>
+<tr><th id="84">84</th><td>			<b>goto</b> <a class="lbl" href="#10diddit" data-ref="10diddit">diddit</a>;</td></tr>
+<tr><th id="85">85</th><td>		}</td></tr>
+<tr><th id="86">86</th><td>	}</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td>	<i>/* No match, check which queue to put it on */</i></td></tr>
+<tr><th id="89">89</th><td>	<b>if</b> (<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a> &amp;&amp; (<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_iptos" title='socket::so_iptos' data-ref="socket::so_iptos">so_iptos</a> &amp; <a class="macro" href="ip.h.html#97" title="0x10" data-ref="_M/IPTOS_LOWDELAY">IPTOS_LOWDELAY</a>)) {</td></tr>
+<tr><th id="90">90</th><td>		<a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a> = (<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *) <a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_rlink" title='slirp_quehead::qh_rlink' data-ref="slirp_quehead::qh_rlink">qh_rlink</a>;</td></tr>
+<tr><th id="91">91</th><td>		<a class="local col9 ref" href="#9on_fastq" title='on_fastq' data-ref="9on_fastq">on_fastq</a> = <var>1</var>;</td></tr>
+<tr><th id="92">92</th><td>		<i>/*</i></td></tr>
+<tr><th id="93">93</th><td><i>		 * Check if this packet is a part of the last</i></td></tr>
+<tr><th id="94">94</th><td><i>		 * packet's session</i></td></tr>
+<tr><th id="95">95</th><td><i>		 */</i></td></tr>
+<tr><th id="96">96</th><td>		<b>if</b> (<a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a> == <a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>) {</td></tr>
+<tr><th id="97">97</th><td>			<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a> = <a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>;</td></tr>
+<tr><th id="98">98</th><td>			<a class="tu ref" href="#ifs_insque" title='ifs_insque' data-use='c' data-ref="ifs_insque">ifs_insque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>, <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>-&gt;<a class="macro" href="mbuf.h.html#91" title="m_prevpkt" data-ref="_M/ifs_prev">ifs_prev</a>);</td></tr>
+<tr><th id="99">99</th><td>			<b>goto</b> <a class="lbl" href="#10diddit" data-ref="10diddit">diddit</a>;</td></tr>
+<tr><th id="100">100</th><td>		}</td></tr>
+<tr><th id="101">101</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="102">102</th><td>		<a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a> = (<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *) <a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_rlink" title='slirp_quehead::qh_rlink' data-ref="slirp_quehead::qh_rlink">qh_rlink</a>;</td></tr>
+<tr><th id="103">103</th><td>                <i>/* Set next_m if the queue was empty so far */</i></td></tr>
+<tr><th id="104">104</th><td>                <b>if</b> ((<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> == &amp;<a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>) {</td></tr>
+<tr><th id="105">105</th><td>                    <a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> = <a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>;</td></tr>
+<tr><th id="106">106</th><td>                }</td></tr>
+<tr><th id="107">107</th><td>        }</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>	<i>/* Create a new doubly linked list for this session */</i></td></tr>
+<tr><th id="110">110</th><td>	<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a> = <a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>;</td></tr>
+<tr><th id="111">111</th><td>	<a class="ref" href="mbuf.h.html#ifs_init" title='ifs_init' data-ref="ifs_init">ifs_init</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>);</td></tr>
+<tr><th id="112">112</th><td>	<a class="macro" href="slirp.h.html#64" title="slirp_insque" data-ref="_M/insque">insque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>, <a class="local col8 ref" href="#8ifq" title='ifq' data-ref="8ifq">ifq</a>);</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><dfn class="lbl" id="10diddit" data-ref="10diddit">diddit</dfn>:</td></tr>
+<tr><th id="115">115</th><td>	<b>if</b> (<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>) {</td></tr>
+<tr><th id="116">116</th><td>		<i>/* Update *_queued */</i></td></tr>
+<tr><th id="117">117</th><td>		<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_queued" title='socket::so_queued' data-ref="socket::so_queued">so_queued</a>++;</td></tr>
+<tr><th id="118">118</th><td>		<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_nqueued" title='socket::so_nqueued' data-ref="socket::so_nqueued">so_nqueued</a>++;</td></tr>
+<tr><th id="119">119</th><td>		<i>/*</i></td></tr>
+<tr><th id="120">120</th><td><i>		 * Check if the interactive session should be downgraded to</i></td></tr>
+<tr><th id="121">121</th><td><i>		 * the batchq.  A session is downgraded if it has queued 6</i></td></tr>
+<tr><th id="122">122</th><td><i>		 * packets without pausing, and at least 3 of those packets</i></td></tr>
+<tr><th id="123">123</th><td><i>		 * have been sent over the link</i></td></tr>
+<tr><th id="124">124</th><td><i>		 * (XXX These are arbitrary numbers, probably not optimal..)</i></td></tr>
+<tr><th id="125">125</th><td><i>		 */</i></td></tr>
+<tr><th id="126">126</th><td>		<b>if</b> (<a class="local col9 ref" href="#9on_fastq" title='on_fastq' data-ref="9on_fastq">on_fastq</a> &amp;&amp; ((<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_nqueued" title='socket::so_nqueued' data-ref="socket::so_nqueued">so_nqueued</a> &gt;= <var>6</var>) &amp;&amp;</td></tr>
+<tr><th id="127">127</th><td>				 (<a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_nqueued" title='socket::so_nqueued' data-ref="socket::so_nqueued">so_nqueued</a> - <a class="local col5 ref" href="#5so" title='so' data-ref="5so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_queued" title='socket::so_queued' data-ref="socket::so_queued">so_queued</a>) &gt;= <var>3</var>)) {</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>			<i>/* Remove from current queue... */</i></td></tr>
+<tr><th id="130">130</th><td>			<a class="macro" href="slirp.h.html#65" title="slirp_remque" data-ref="_M/remque">remque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>);</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>			<i>/* ...And insert in the new.  That'll teach ya! */</i></td></tr>
+<tr><th id="133">133</th><td>			<a class="macro" href="slirp.h.html#64" title="slirp_insque" data-ref="_M/insque">insque</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>, &amp;<a class="local col7 ref" href="#7slirp" title='slirp' data-ref="7slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>);</td></tr>
+<tr><th id="134">134</th><td>		}</td></tr>
+<tr><th id="135">135</th><td>	}</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><u>#<span data-ppcond="137">ifndef</span> <span class="macro" data-ref="_M/FULL_BOLT">FULL_BOLT</span></u></td></tr>
+<tr><th id="138">138</th><td>	<i>/*</i></td></tr>
+<tr><th id="139">139</th><td><i>	 * This prevents us from malloc()ing too many mbufs</i></td></tr>
+<tr><th id="140">140</th><td><i>	 */</i></td></tr>
+<tr><th id="141">141</th><td>	<a class="ref" href="#if_start" title='if_start' data-ref="if_start">if_start</a>(<a class="local col6 ref" href="#6ifm" title='ifm' data-ref="6ifm">ifm</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>);</td></tr>
+<tr><th id="142">142</th><td><u>#<span data-ppcond="137">endif</span></u></td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/*</i></td></tr>
+<tr><th id="146">146</th><td><i> * Send a packet</i></td></tr>
+<tr><th id="147">147</th><td><i> * We choose a packet based on its position in the output queues;</i></td></tr>
+<tr><th id="148">148</th><td><i> * If there are packets on the fastq, they are sent FIFO, before</i></td></tr>
+<tr><th id="149">149</th><td><i> * everything else.  Otherwise we choose the first packet from the</i></td></tr>
+<tr><th id="150">150</th><td><i> * batchq and send it.  the next packet chosen will be from the session</i></td></tr>
+<tr><th id="151">151</th><td><i> * after this one, then the session after that one, and so on..  So,</i></td></tr>
+<tr><th id="152">152</th><td><i> * for example, if there are 3 ftp session's fighting for bandwidth,</i></td></tr>
+<tr><th id="153">153</th><td><i> * one packet will be sent from the first session, then one packet</i></td></tr>
+<tr><th id="154">154</th><td><i> * from the second session, then one packet from the third, then back</i></td></tr>
+<tr><th id="155">155</th><td><i> * to the first, etc. etc.</i></td></tr>
+<tr><th id="156">156</th><td><i> */</i></td></tr>
+<tr><th id="157">157</th><td><em>void</em> <dfn class="decl def" id="if_start" title='if_start' data-ref="if_start">if_start</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col1 decl" id="11slirp" title='slirp' data-type='Slirp *' data-ref="11slirp">slirp</dfn>)</td></tr>
+<tr><th id="158">158</th><td>{</td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="12now" title='now' data-type='uint64_t' data-ref="12now">now</dfn> = <a class="ref" href="../include/qemu/timer.h.html#qemu_clock_get_ns" title='qemu_clock_get_ns' data-ref="qemu_clock_get_ns">qemu_clock_get_ns</a>(<a class="enum" href="../include/qemu/timer.h.html#QEMU_CLOCK_REALTIME" title='QEMU_CLOCK_REALTIME' data-ref="QEMU_CLOCK_REALTIME">QEMU_CLOCK_REALTIME</a>);</td></tr>
+<tr><th id="160">160</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="13from_batchq" title='from_batchq' data-type='_Bool' data-ref="13from_batchq">from_batchq</dfn>, <dfn class="local col4 decl" id="14next_from_batchq" title='next_from_batchq' data-type='_Bool' data-ref="14next_from_batchq">next_from_batchq</dfn>;</td></tr>
+<tr><th id="161">161</th><td>    <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col5 decl" id="15ifm" title='ifm' data-type='struct mbuf *' data-ref="15ifm">ifm</dfn>, *<dfn class="local col6 decl" id="16ifm_next" title='ifm_next' data-type='struct mbuf *' data-ref="16ifm_next">ifm_next</dfn>, *<dfn class="local col7 decl" id="17ifqt" title='ifqt' data-type='struct mbuf *' data-ref="17ifqt">ifqt</dfn>;</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>    <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"if_start"</q>);</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td>    <b>if</b> (<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_start_busy" title='Slirp::if_start_busy' data-ref="Slirp::if_start_busy">if_start_busy</a>) {</td></tr>
+<tr><th id="166">166</th><td>        <b>return</b>;</td></tr>
+<tr><th id="167">167</th><td>    }</td></tr>
+<tr><th id="168">168</th><td>    <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_start_busy" title='Slirp::if_start_busy' data-ref="Slirp::if_start_busy">if_start_busy</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>    <b>if</b> (<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_link" title='slirp_quehead::qh_link' data-ref="slirp_quehead::qh_link">qh_link</a> != &amp;<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>) {</td></tr>
+<tr><th id="171">171</th><td>        <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = (<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *) <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>.<a class="ref" href="misc.h.html#slirp_quehead::qh_link" title='slirp_quehead::qh_link' data-ref="slirp_quehead::qh_link">qh_link</a>;</td></tr>
+<tr><th id="172">172</th><td>        <a class="local col4 ref" href="#14next_from_batchq" title='next_from_batchq' data-ref="14next_from_batchq">next_from_batchq</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="173">173</th><td>    } <b>else</b> <b>if</b> ((<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> != &amp;<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>) {</td></tr>
+<tr><th id="174">174</th><td>        <i>/* Nothing on fastq, pick up from batchq via next_m */</i></td></tr>
+<tr><th id="175">175</th><td>        <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a>;</td></tr>
+<tr><th id="176">176</th><td>        <a class="local col4 ref" href="#14next_from_batchq" title='next_from_batchq' data-ref="14next_from_batchq">next_from_batchq</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="177">177</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="178">178</th><td>        <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="179">179</th><td>    }</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>    <b>while</b> (<a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a>) {</td></tr>
+<tr><th id="182">182</th><td>        <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a> = <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a>;</td></tr>
+<tr><th id="183">183</th><td>        <a class="local col3 ref" href="#13from_batchq" title='from_batchq' data-ref="13from_batchq">from_batchq</a> = <a class="local col4 ref" href="#14next_from_batchq" title='next_from_batchq' data-ref="14next_from_batchq">next_from_batchq</a>;</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>        <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#90" title="m_next" data-ref="_M/ifq_next">ifq_next</a>;</td></tr>
+<tr><th id="186">186</th><td>        <b>if</b> ((<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> == &amp;<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</a>) {</td></tr>
+<tr><th id="187">187</th><td>            <i>/* No more packets in fastq, switch to batchq */</i></td></tr>
+<tr><th id="188">188</th><td>            <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a>;</td></tr>
+<tr><th id="189">189</th><td>            <a class="local col4 ref" href="#14next_from_batchq" title='next_from_batchq' data-ref="14next_from_batchq">next_from_batchq</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="190">190</th><td>        }</td></tr>
+<tr><th id="191">191</th><td>        <b>if</b> ((<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> == &amp;<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>) {</td></tr>
+<tr><th id="192">192</th><td>            <i>/* end of batchq */</i></td></tr>
+<tr><th id="193">193</th><td>            <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="194">194</th><td>        }</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>        <i>/* Try to send packet unless it already expired */</i></td></tr>
+<tr><th id="197">197</th><td>        <b>if</b> (<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::expiration_date" title='mbuf::expiration_date' data-ref="mbuf::expiration_date">expiration_date</a> &gt;= <a class="local col2 ref" href="#12now" title='now' data-ref="12now">now</a> &amp;&amp; !<a class="ref" href="main.h.html#if_encap" title='if_encap' data-ref="if_encap">if_encap</a>(<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>, <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>)) {</td></tr>
+<tr><th id="198">198</th><td>            <i>/* Packet is delayed due to pending ARP or NDP resolution */</i></td></tr>
+<tr><th id="199">199</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="200">200</th><td>        }</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td>        <b>if</b> (<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a> == <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a>) {</td></tr>
+<tr><th id="203">203</th><td>            <i>/* Set which packet to send on next iteration */</i></td></tr>
+<tr><th id="204">204</th><td>            <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> = <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#90" title="m_next" data-ref="_M/ifq_next">ifq_next</a>;</td></tr>
+<tr><th id="205">205</th><td>        }</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>        <i>/* Remove it from the queue */</i></td></tr>
+<tr><th id="208">208</th><td>        <a class="local col7 ref" href="#17ifqt" title='ifqt' data-ref="17ifqt">ifqt</a> = <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#89" title="m_prev" data-ref="_M/ifq_prev">ifq_prev</a>;</td></tr>
+<tr><th id="209">209</th><td>        <a class="macro" href="slirp.h.html#65" title="slirp_remque" data-ref="_M/remque">remque</a>(<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>);</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>        <i>/* If there are more packets for this session, re-queue them */</i></td></tr>
+<tr><th id="212">212</th><td>        <b>if</b> (<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a> != <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>) {</td></tr>
+<tr><th id="213">213</th><td>            <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col8 decl" id="18next" title='next' data-type='struct mbuf *' data-ref="18next">next</dfn> = <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#92" title="m_nextpkt" data-ref="_M/ifs_next">ifs_next</a>;</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>            <a class="macro" href="slirp.h.html#64" title="slirp_insque" data-ref="_M/insque">insque</a>(<a class="local col8 ref" href="#18next" title='next' data-ref="18next">next</a>, <a class="local col7 ref" href="#17ifqt" title='ifqt' data-ref="17ifqt">ifqt</a>);</td></tr>
+<tr><th id="216">216</th><td>            <a class="tu ref" href="#ifs_remque" title='ifs_remque' data-use='c' data-ref="ifs_remque">ifs_remque</a>(<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>);</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>            <b>if</b> (!<a class="local col3 ref" href="#13from_batchq" title='from_batchq' data-ref="13from_batchq">from_batchq</a>) {</td></tr>
+<tr><th id="219">219</th><td>                <i>/* Next packet in fastq is from the same session */</i></td></tr>
+<tr><th id="220">220</th><td>                <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <a class="local col8 ref" href="#18next" title='next' data-ref="18next">next</a>;</td></tr>
+<tr><th id="221">221</th><td>                <a class="local col4 ref" href="#14next_from_batchq" title='next_from_batchq' data-ref="14next_from_batchq">next_from_batchq</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="222">222</th><td>            } <b>else</b> <b>if</b> ((<b>struct</b> <a class="macro" href="slirp.h.html#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> *) <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> == &amp;<a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</a>) {</td></tr>
+<tr><th id="223">223</th><td>                <i>/* Set next_m and ifm_next if the session packet is now the</i></td></tr>
+<tr><th id="224">224</th><td><i>                 * only one on batchq */</i></td></tr>
+<tr><th id="225">225</th><td>                <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</a> = <a class="local col6 ref" href="#16ifm_next" title='ifm_next' data-ref="16ifm_next">ifm_next</a> = <a class="local col8 ref" href="#18next" title='next' data-ref="18next">next</a>;</td></tr>
+<tr><th id="226">226</th><td>            }</td></tr>
+<tr><th id="227">227</th><td>        }</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>        <i>/* Update so_queued */</i></td></tr>
+<tr><th id="230">230</th><td>        <b>if</b> (<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a> &amp;&amp; --<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_queued" title='socket::so_queued' data-ref="socket::so_queued">so_queued</a> == <var>0</var>) {</td></tr>
+<tr><th id="231">231</th><td>            <i>/* If there's no more queued, reset nqueued */</i></td></tr>
+<tr><th id="232">232</th><td>            <a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>-&gt;<a class="macro" href="mbuf.h.html#93" title="m_so" data-ref="_M/ifq_so">ifq_so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_nqueued" title='socket::so_nqueued' data-ref="socket::so_nqueued">so_nqueued</a> = <var>0</var>;</td></tr>
+<tr><th id="233">233</th><td>        }</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>        <a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col5 ref" href="#15ifm" title='ifm' data-ref="15ifm">ifm</a>);</td></tr>
+<tr><th id="236">236</th><td>    }</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>    <a class="local col1 ref" href="#11slirp" title='slirp' data-ref="11slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::if_start_busy" title='Slirp::if_start_busy' data-ref="Slirp::if_start_busy">if_start_busy</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="239">239</th><td>}</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

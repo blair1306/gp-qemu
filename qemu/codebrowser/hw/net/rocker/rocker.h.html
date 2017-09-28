@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>rocker.h source code [codebrowser/hw/net/rocker/rocker.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ipv6_addr "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/net/rocker/rocker.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>hw</a>/<a href='..'>net</a>/<a href='./'>rocker</a>/<a href='rocker.h.html'>rocker.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU rocker switch emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2014 Scott Feldman &lt;sfeldma@gmail.com&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2014 Jiri Pirko &lt;jiri@resnulli.us&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (c) 2014 Neil Horman &lt;nhorman@tuxdriver.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="9">9</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="10">10</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="11">11</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</i></td></tr>
+<tr><th id="16">16</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> */</i></td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><u>#<span data-ppcond="19">ifndef</span> <span class="macro" data-ref="_M/ROCKER_H">ROCKER_H</span></u></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/ROCKER_H" data-ref="_M/ROCKER_H">ROCKER_H</dfn></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../../include/qemu/sockets.h.html">"qemu/sockets.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="24">if</span> defined(<span class="macro" data-ref="_M/DEBUG_ROCKER">DEBUG_ROCKER</span>)</u></td></tr>
+<tr><th id="25">25</th><td><u>#  define DPRINTF(fmt, ...) \</u></td></tr>
+<tr><th id="26">26</th><td><u>    do {                                                           \</u></td></tr>
+<tr><th id="27">27</th><td><u>        struct timeval tv;                                         \</u></td></tr>
+<tr><th id="28">28</th><td><u>        char timestr[64];                                          \</u></td></tr>
+<tr><th id="29">29</th><td><u>        time_t now;                                                \</u></td></tr>
+<tr><th id="30">30</th><td><u>        gettimeofday(&amp;tv, NULL);                                   \</u></td></tr>
+<tr><th id="31">31</th><td><u>        now = tv.tv_sec;                                           \</u></td></tr>
+<tr><th id="32">32</th><td><u>        strftime(timestr, sizeof(timestr), "%T", localtime(&amp;now)); \</u></td></tr>
+<tr><th id="33">33</th><td><u>        fprintf(stderr, "%s.%06ld ", timestr, tv.tv_usec);         \</u></td></tr>
+<tr><th id="34">34</th><td><u>        fprintf(stderr, "ROCKER: " fmt, ## __VA_ARGS__);           \</u></td></tr>
+<tr><th id="35">35</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="24">else</span></u></td></tr>
+<tr><th id="37">37</th><td><em>static</em> <b>inline</b> <a class="macro" href="../../../include/qemu/compiler.h.html#100" title="__attribute__((format(printf, 1, 2)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>1</var>, <var>2</var>) <em>int</em> <dfn class="decl def" id="DPRINTF" title='DPRINTF' data-ref="DPRINTF">DPRINTF</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1fmt" title='fmt' data-type='const char *' data-ref="1fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="38">38</th><td>{</td></tr>
+<tr><th id="39">39</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="40">40</th><td>}</td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="24">endif</span></u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/__le16" data-ref="_M/__le16">__le16</dfn> uint16_t</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/__le32" data-ref="_M/__le32">__le32</dfn> uint32_t</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/__le64" data-ref="_M/__le64">__le64</dfn> uint64_t</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/__be16" data-ref="_M/__be16">__be16</dfn> <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/__be32" data-ref="_M/__be32">__be32</dfn> <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a></u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/__be64" data-ref="_M/__be64">__be64</dfn> uint64_t</u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="ipv4_addr_is_multicast" title='ipv4_addr_is_multicast' data-ref="ipv4_addr_is_multicast">ipv4_addr_is_multicast</dfn>(<a class="macro" href="#48" title="uint32_t" data-ref="_M/__be32">__be32</a> <dfn class="local col2 decl" id="2addr" title='addr' data-type='uint32_t' data-ref="2addr">addr</dfn>)</td></tr>
+<tr><th id="52">52</th><td>{</td></tr>
+<tr><th id="53">53</th><td>    <b>return</b> (<a class="local col2 ref" href="#2addr" title='addr' data-ref="2addr">addr</a> &amp; <a class="ref" href="../../../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<var>0xf0000000</var>)) == <a class="ref" href="../../../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<var>0xe0000000</var>);</td></tr>
+<tr><th id="54">54</th><td>}</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ipv6_addr" title='ipv6_addr' data-ref="ipv6_addr"><a class="type" href="#ipv6_addr" title='ipv6_addr' data-ref="ipv6_addr">ipv6_addr</a></dfn> {</td></tr>
+<tr><th id="57">57</th><td>    <b>union</b> {</td></tr>
+<tr><th id="58">58</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="ipv6_addr::(anonymous)::addr8" title='ipv6_addr::(anonymous union)::addr8' data-ref="ipv6_addr::(anonymous)::addr8">addr8</dfn>[<var>16</var>];</td></tr>
+<tr><th id="59">59</th><td>        <a class="macro" href="#47" title="uint16_t" data-ref="_M/__be16">__be16</a> <dfn class="decl" id="ipv6_addr::(anonymous)::addr16" title='ipv6_addr::(anonymous union)::addr16' data-ref="ipv6_addr::(anonymous)::addr16">addr16</dfn>[<var>8</var>];</td></tr>
+<tr><th id="60">60</th><td>        <a class="macro" href="#48" title="uint32_t" data-ref="_M/__be32">__be32</a> <dfn class="decl" id="ipv6_addr::(anonymous)::addr32" title='ipv6_addr::(anonymous union)::addr32' data-ref="ipv6_addr::(anonymous)::addr32">addr32</dfn>[<var>4</var>];</td></tr>
+<tr><th id="61">61</th><td>    };</td></tr>
+<tr><th id="62">62</th><td>} <dfn class="typedef" id="Ipv6Addr" title='Ipv6Addr' data-type='struct ipv6_addr' data-ref="Ipv6Addr">Ipv6Addr</dfn>;</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="ipv6_addr_is_multicast" title='ipv6_addr_is_multicast' data-ref="ipv6_addr_is_multicast">ipv6_addr_is_multicast</dfn>(<em>const</em> <a class="typedef" href="#Ipv6Addr" title='Ipv6Addr' data-type='struct ipv6_addr' data-ref="Ipv6Addr">Ipv6Addr</a> *<dfn class="local col3 decl" id="3addr" title='addr' data-type='const Ipv6Addr *' data-ref="3addr">addr</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>    <b>return</b> (<a class="local col3 ref" href="#3addr" title='addr' data-ref="3addr">addr</a>-&gt;<a class="ref" href="#ipv6_addr::(anonymous)::addr32" title='ipv6_addr::(anonymous union)::addr32' data-ref="ipv6_addr::(anonymous)::addr32">addr32</a>[<var>0</var>] &amp; <a class="ref" href="../../../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<var>0xFF000000</var>)) == <a class="ref" href="../../../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(<var>0xFF000000</var>);</td></tr>
+<tr><th id="67">67</th><td>}</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><b>typedef</b> <b>struct</b> <a class="type" href="rocker.c.html#rocker" title='rocker' data-ref="rocker" id="rocker"><a class="type" href="rocker.c.html#rocker" title='rocker' data-ref="rocker">rocker</a></a> <dfn class="typedef" id="Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</dfn>;</td></tr>
+<tr><th id="70">70</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="world" title='world' data-ref="world"><a class="type" href="#world" title='world' data-ref="world">world</a></dfn> <dfn class="typedef" id="World" title='World' data-type='struct world' data-ref="World">World</dfn>;</td></tr>
+<tr><th id="71">71</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="desc_info" title='desc_info' data-ref="desc_info"><a class="type" href="#desc_info" title='desc_info' data-ref="desc_info">desc_info</a></dfn> <dfn class="typedef" id="DescInfo" title='DescInfo' data-type='struct desc_info' data-ref="DescInfo">DescInfo</dfn>;</td></tr>
+<tr><th id="72">72</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="desc_ring" title='desc_ring' data-ref="desc_ring"><a class="type" href="#desc_ring" title='desc_ring' data-ref="desc_ring">desc_ring</a></dfn> <dfn class="typedef" id="DescRing" title='DescRing' data-type='struct desc_ring' data-ref="DescRing">DescRing</dfn>;</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><a class="typedef" href="#Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</a> *<a class="decl" href="rocker.c.html#rocker_find" title='rocker_find' data-ref="rocker_find" id="rocker_find">rocker_find</a>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="4name" title='name' data-type='const char *' data-ref="4name">name</dfn>);</td></tr>
+<tr><th id="75">75</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <a class="decl" href="rocker.c.html#rocker_fp_ports" title='rocker_fp_ports' data-ref="rocker_fp_ports" id="rocker_fp_ports">rocker_fp_ports</a>(<a class="typedef" href="#Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</a> *<dfn class="local col5 decl" id="5r" title='r' data-type='Rocker *' data-ref="5r">r</dfn>);</td></tr>
+<tr><th id="76">76</th><td><em>int</em> <a class="decl" href="rocker.c.html#rocker_event_link_changed" title='rocker_event_link_changed' data-ref="rocker_event_link_changed" id="rocker_event_link_changed">rocker_event_link_changed</a>(<a class="typedef" href="#Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</a> *<dfn class="local col6 decl" id="6r" title='r' data-type='Rocker *' data-ref="6r">r</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="7pport" title='pport' data-type='uint32_t' data-ref="7pport">pport</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="8link_up" title='link_up' data-type='_Bool' data-ref="8link_up">link_up</dfn>);</td></tr>
+<tr><th id="77">77</th><td><em>int</em> <a class="decl" href="rocker.c.html#rocker_event_mac_vlan_seen" title='rocker_event_mac_vlan_seen' data-ref="rocker_event_mac_vlan_seen" id="rocker_event_mac_vlan_seen">rocker_event_mac_vlan_seen</a>(<a class="typedef" href="#Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</a> *<dfn class="local col9 decl" id="9r" title='r' data-type='Rocker *' data-ref="9r">r</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10pport" title='pport' data-type='uint32_t' data-ref="10pport">pport</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="11addr" title='addr' data-type='uint8_t *' data-ref="11addr">addr</dfn>,</td></tr>
+<tr><th id="78">78</th><td>                               <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col2 decl" id="12vlan_id" title='vlan_id' data-type='uint16_t' data-ref="12vlan_id">vlan_id</dfn>);</td></tr>
+<tr><th id="79">79</th><td><em>int</em> <a class="decl" href="rocker.c.html#rx_produce" title='rx_produce' data-ref="rx_produce" id="rx_produce">rx_produce</a>(<a class="typedef" href="#World" title='World' data-type='struct world' data-ref="World">World</a> *<dfn class="local col3 decl" id="13world" title='world' data-type='World *' data-ref="13world">world</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="14pport" title='pport' data-type='uint32_t' data-ref="14pport">pport</dfn>,</td></tr>
+<tr><th id="80">80</th><td>               <em>const</em> <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col5 decl" id="15iov" title='iov' data-type='const struct iovec *' data-ref="15iov">iov</dfn>, <em>int</em> <dfn class="local col6 decl" id="16iovcnt" title='iovcnt' data-type='int' data-ref="16iovcnt">iovcnt</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col7 decl" id="17copy_to_cpu" title='copy_to_cpu' data-type='uint8_t' data-ref="17copy_to_cpu">copy_to_cpu</dfn>);</td></tr>
+<tr><th id="81">81</th><td><em>int</em> <a class="decl" href="rocker.c.html#rocker_port_eg" title='rocker_port_eg' data-ref="rocker_port_eg" id="rocker_port_eg">rocker_port_eg</a>(<a class="typedef" href="#Rocker" title='Rocker' data-type='struct rocker' data-ref="Rocker">Rocker</a> *<dfn class="local col8 decl" id="18r" title='r' data-type='Rocker *' data-ref="18r">r</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="19pport" title='pport' data-type='uint32_t' data-ref="19pport">pport</dfn>,</td></tr>
+<tr><th id="82">82</th><td>                   <em>const</em> <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col0 decl" id="20iov" title='iov' data-type='const struct iovec *' data-ref="20iov">iov</dfn>, <em>int</em> <dfn class="local col1 decl" id="21iovcnt" title='iovcnt' data-type='int' data-ref="21iovcnt">iovcnt</dfn>);</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><u>#<span data-ppcond="19">endif</span> /* ROCKER_H */</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='rocker.c.html'>codebrowser/hw/net/rocker/rocker.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

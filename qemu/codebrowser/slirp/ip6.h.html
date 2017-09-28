@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ip6.h source code [codebrowser/slirp/ip6.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ip6,ip6_pseudohdr "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/ip6.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='ip6.h.html'>ip6.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 2013</i></td></tr>
+<tr><th id="3">3</th><td><i> * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.</i></td></tr>
+<tr><th id="4">4</th><td><i> */</i></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><u>#<span data-ppcond="6">ifndef</span> <span class="macro" data-ref="_M/SLIRP_IP6_H">SLIRP_IP6_H</span></u></td></tr>
+<tr><th id="7">7</th><td><u>#define <dfn class="macro" id="_M/SLIRP_IP6_H" data-ref="_M/SLIRP_IP6_H">SLIRP_IP6_H</dfn></u></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../include/net/eth.h.html">"net/eth.h"</a></u></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#define <dfn class="macro" id="_M/ALLNODES_MULTICAST" data-ref="_M/ALLNODES_MULTICAST">ALLNODES_MULTICAST</dfn>  { .s6_addr = \</u></td></tr>
+<tr><th id="12">12</th><td><u>                            { 0xff, 0x02, 0x00, 0x00,\</u></td></tr>
+<tr><th id="13">13</th><td><u>                            0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="14">14</th><td><u>                            0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="15">15</th><td><u>                            0x00, 0x00, 0x00, 0x01 } }</u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#define <dfn class="macro" id="_M/SOLICITED_NODE_PREFIX" data-ref="_M/SOLICITED_NODE_PREFIX">SOLICITED_NODE_PREFIX</dfn> { .s6_addr = \</u></td></tr>
+<tr><th id="18">18</th><td><u>                            { 0xff, 0x02, 0x00, 0x00,\</u></td></tr>
+<tr><th id="19">19</th><td><u>                            0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="20">20</th><td><u>                            0x00, 0x00, 0x00, 0x01,\</u></td></tr>
+<tr><th id="21">21</th><td><u>                            0xff, 0x00, 0x00, 0x00 } }</u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/LINKLOCAL_ADDR" data-ref="_M/LINKLOCAL_ADDR">LINKLOCAL_ADDR</dfn>  { .s6_addr = \</u></td></tr>
+<tr><th id="24">24</th><td><u>                        { 0xfe, 0x80, 0x00, 0x00,\</u></td></tr>
+<tr><th id="25">25</th><td><u>                        0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="26">26</th><td><u>                        0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="27">27</th><td><u>                        0x00, 0x00, 0x00, 0x02 } }</u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/ZERO_ADDR" data-ref="_M/ZERO_ADDR">ZERO_ADDR</dfn>  { .s6_addr = \</u></td></tr>
+<tr><th id="30">30</th><td><u>                        { 0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="31">31</th><td><u>                        0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="32">32</th><td><u>                        0x00, 0x00, 0x00, 0x00,\</u></td></tr>
+<tr><th id="33">33</th><td><u>                        0x00, 0x00, 0x00, 0x00 } }</u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="in6_equal" title='in6_equal' data-ref="in6_equal">in6_equal</dfn>(<em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col5 decl" id="125a" title='a' data-type='const struct in6_addr *' data-ref="125a">a</dfn>, <em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col6 decl" id="126b" title='b' data-type='const struct in6_addr *' data-ref="126b">b</dfn>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <b>return</b> <a class="ref" href="../../include/string.h.html#memcmp" title='memcmp' data-ref="memcmp">memcmp</a>(<a class="local col5 ref" href="#125a" title='a' data-ref="125a">a</a>, <a class="local col6 ref" href="#126b" title='b' data-ref="126b">b</a>, <b>sizeof</b>(*<a class="local col5 ref" href="#125a" title='a' data-ref="125a">a</a>)) == <var>0</var>;</td></tr>
+<tr><th id="38">38</th><td>}</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="in6_equal_net" title='in6_equal_net' data-ref="in6_equal_net">in6_equal_net</dfn>(<em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col7 decl" id="127a" title='a' data-type='const struct in6_addr *' data-ref="127a">a</dfn>,</td></tr>
+<tr><th id="41">41</th><td>                                 <em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col8 decl" id="128b" title='b' data-type='const struct in6_addr *' data-ref="128b">b</dfn>,</td></tr>
+<tr><th id="42">42</th><td>                                 <em>int</em> <dfn class="local col9 decl" id="129prefix_len" title='prefix_len' data-type='int' data-ref="129prefix_len">prefix_len</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <b>if</b> (<a class="ref" href="../../include/string.h.html#memcmp" title='memcmp' data-ref="memcmp">memcmp</a>(<a class="local col7 ref" href="#127a" title='a' data-ref="127a">a</a>, <a class="local col8 ref" href="#128b" title='b' data-ref="128b">b</a>, <a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> / <var>8</var>) != <var>0</var>) {</td></tr>
+<tr><th id="45">45</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="46">46</th><td>    }</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td>    <b>if</b> (<a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> % <var>8</var> == <var>0</var>) {</td></tr>
+<tr><th id="49">49</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="50">50</th><td>    }</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <b>return</b> <a class="local col7 ref" href="#127a" title='a' data-ref="127a">a</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> / <var>8</var>] &gt;&gt; (<var>8</var> - (<a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> % <var>8</var>))</td></tr>
+<tr><th id="53">53</th><td>        == <a class="local col8 ref" href="#128b" title='b' data-ref="128b">b</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> / <var>8</var>] &gt;&gt; (<var>8</var> - (<a class="local col9 ref" href="#129prefix_len" title='prefix_len' data-ref="129prefix_len">prefix_len</a> % <var>8</var>));</td></tr>
+<tr><th id="54">54</th><td>}</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="in6_equal_mach" title='in6_equal_mach' data-ref="in6_equal_mach">in6_equal_mach</dfn>(<em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col0 decl" id="130a" title='a' data-type='const struct in6_addr *' data-ref="130a">a</dfn>,</td></tr>
+<tr><th id="57">57</th><td>                                  <em>const</em> <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> *<dfn class="local col1 decl" id="131b" title='b' data-type='const struct in6_addr *' data-ref="131b">b</dfn>,</td></tr>
+<tr><th id="58">58</th><td>                                  <em>int</em> <dfn class="local col2 decl" id="132prefix_len" title='prefix_len' data-type='int' data-ref="132prefix_len">prefix_len</dfn>)</td></tr>
+<tr><th id="59">59</th><td>{</td></tr>
+<tr><th id="60">60</th><td>    <b>if</b> (<a class="ref" href="../../include/string.h.html#memcmp" title='memcmp' data-ref="memcmp">memcmp</a>(&amp;(<a class="local col0 ref" href="#130a" title='a' data-ref="130a">a</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="macro" href="../include/qemu/osdep.h.html#198" title="(((prefix_len) + (8) - 1) / (8))" data-ref="_M/DIV_ROUND_UP">DIV_ROUND_UP</a>(<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a>, <var>8</var>)]),</td></tr>
+<tr><th id="61">61</th><td>               &amp;(<a class="local col1 ref" href="#131b" title='b' data-ref="131b">b</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="macro" href="../include/qemu/osdep.h.html#198" title="(((prefix_len) + (8) - 1) / (8))" data-ref="_M/DIV_ROUND_UP">DIV_ROUND_UP</a>(<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a>, <var>8</var>)]),</td></tr>
+<tr><th id="62">62</th><td>               <var>16</var> - <a class="macro" href="../include/qemu/osdep.h.html#198" title="(((prefix_len) + (8) - 1) / (8))" data-ref="_M/DIV_ROUND_UP">DIV_ROUND_UP</a>(<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a>, <var>8</var>)) != <var>0</var>) {</td></tr>
+<tr><th id="63">63</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <b>if</b> (<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a> % <var>8</var> == <var>0</var>) {</td></tr>
+<tr><th id="67">67</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="68">68</th><td>    }</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>    <b>return</b> (<a class="local col0 ref" href="#130a" title='a' data-ref="130a">a</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a> / <var>8</var>] &amp; ((<var>1U</var> &lt;&lt; (<var>8</var> - (<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a> % <var>8</var>))) - <var>1</var>))</td></tr>
+<tr><th id="71">71</th><td>        == (<a class="local col1 ref" href="#131b" title='b' data-ref="131b">b</a>-&gt;<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a> / <var>8</var>] &amp; ((<var>1U</var> &lt;&lt; (<var>8</var> - (<a class="local col2 ref" href="#132prefix_len" title='prefix_len' data-ref="132prefix_len">prefix_len</a> % <var>8</var>))) - <var>1</var>));</td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/in6_equal_router" data-ref="_M/in6_equal_router">in6_equal_router</dfn>(a)\</u></td></tr>
+<tr><th id="76">76</th><td><u>    ((in6_equal_net(a, &amp;slirp-&gt;vprefix_addr6, slirp-&gt;vprefix_len)\</u></td></tr>
+<tr><th id="77">77</th><td><u>      &amp;&amp; in6_equal_mach(a, &amp;slirp-&gt;vhost_addr6, slirp-&gt;vprefix_len))\</u></td></tr>
+<tr><th id="78">78</th><td><u>  || (in6_equal_net(a, &amp;(struct in6_addr)LINKLOCAL_ADDR, 64)\</u></td></tr>
+<tr><th id="79">79</th><td><u>      &amp;&amp; in6_equal_mach(a, &amp;slirp-&gt;vhost_addr6, 64)))</u></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/in6_equal_dns" data-ref="_M/in6_equal_dns">in6_equal_dns</dfn>(a)\</u></td></tr>
+<tr><th id="82">82</th><td><u>    ((in6_equal_net(a, &amp;slirp-&gt;vprefix_addr6, slirp-&gt;vprefix_len)\</u></td></tr>
+<tr><th id="83">83</th><td><u>      &amp;&amp; in6_equal_mach(a, &amp;slirp-&gt;vnameserver_addr6, slirp-&gt;vprefix_len))\</u></td></tr>
+<tr><th id="84">84</th><td><u>  || (in6_equal_net(a, &amp;(struct in6_addr)LINKLOCAL_ADDR, 64)\</u></td></tr>
+<tr><th id="85">85</th><td><u>      &amp;&amp; in6_equal_mach(a, &amp;slirp-&gt;vnameserver_addr6, 64)))</u></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/in6_equal_host" data-ref="_M/in6_equal_host">in6_equal_host</dfn>(a)\</u></td></tr>
+<tr><th id="88">88</th><td><u>    (in6_equal_router(a) || in6_equal_dns(a))</u></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/in6_solicitednode_multicast" data-ref="_M/in6_solicitednode_multicast">in6_solicitednode_multicast</dfn>(a)\</u></td></tr>
+<tr><th id="91">91</th><td><u>    (in6_equal_net(a, &amp;(struct in6_addr)SOLICITED_NODE_PREFIX, 104))</u></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/in6_zero" data-ref="_M/in6_zero">in6_zero</dfn>(a)\</u></td></tr>
+<tr><th id="94">94</th><td><u>    (in6_equal(a, &amp;(struct in6_addr)ZERO_ADDR))</u></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><i>/* Compute emulated host MAC address from its ipv6 address */</i></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="in6_compute_ethaddr" title='in6_compute_ethaddr' data-ref="in6_compute_ethaddr">in6_compute_ethaddr</dfn>(<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="local col3 decl" id="133ip" title='ip' data-type='struct in6_addr' data-ref="133ip">ip</dfn>,</td></tr>
+<tr><th id="98">98</th><td>                                       <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="134eth" title='eth' data-type='uint8_t *' data-ref="134eth">eth</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>])</td></tr>
+<tr><th id="99">99</th><td>{</td></tr>
+<tr><th id="100">100</th><td>    <a class="local col4 ref" href="#134eth" title='eth' data-ref="134eth">eth</a>[<var>0</var>] = <var>0x52</var>;</td></tr>
+<tr><th id="101">101</th><td>    <a class="local col4 ref" href="#134eth" title='eth' data-ref="134eth">eth</a>[<var>1</var>] = <var>0x56</var>;</td></tr>
+<tr><th id="102">102</th><td>    <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(&amp;<a class="local col4 ref" href="#134eth" title='eth' data-ref="134eth">eth</a>[<var>2</var>], &amp;<a class="local col3 ref" href="#133ip" title='ip' data-ref="133ip">ip</a>.<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>[<var>16</var> - (<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a> - <var>2</var>)], <a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a> - <var>2</var>);</td></tr>
+<tr><th id="103">103</th><td>}</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><i>/*</i></td></tr>
+<tr><th id="106">106</th><td><i> * Definitions for internet protocol version 6.</i></td></tr>
+<tr><th id="107">107</th><td><i> * Per RFC 2460, December 1998.</i></td></tr>
+<tr><th id="108">108</th><td><i> */</i></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/IP6VERSION" data-ref="_M/IP6VERSION">IP6VERSION</dfn>      6</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/IP6_HOP_LIMIT" data-ref="_M/IP6_HOP_LIMIT">IP6_HOP_LIMIT</dfn> 255</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>/*</i></td></tr>
+<tr><th id="113">113</th><td><i> * Structure of an internet header, naked of options.</i></td></tr>
+<tr><th id="114">114</th><td><i> */</i></td></tr>
+<tr><th id="115">115</th><td><b>struct</b> <dfn class="type def" id="ip6" title='ip6' data-ref="ip6">ip6</dfn> {</td></tr>
+<tr><th id="116">116</th><td><u>#<span data-ppcond="116">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="117">117</th><td>    uint32_t</td></tr>
+<tr><th id="118">118</th><td>        ip_v:<var>4</var>,         <i>/* version */</i></td></tr>
+<tr><th id="119">119</th><td>        ip_tc_hi:<var>4</var>,     <i>/* traffic class */</i></td></tr>
+<tr><th id="120">120</th><td>        ip_tc_lo:<var>4</var>,</td></tr>
+<tr><th id="121">121</th><td>        ip_fl_hi:<var>4</var>,     <i>/* flow label */</i></td></tr>
+<tr><th id="122">122</th><td>        ip_fl_lo:<var>16</var>;</td></tr>
+<tr><th id="123">123</th><td><u>#<span data-ppcond="116">else</span></u></td></tr>
+<tr><th id="124">124</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a></td></tr>
+<tr><th id="125">125</th><td>        <dfn class="decl" id="ip6::ip_tc_hi" title='ip6::ip_tc_hi' data-ref="ip6::ip_tc_hi">ip_tc_hi</dfn>:<var>4</var>,</td></tr>
+<tr><th id="126">126</th><td>        <dfn class="decl" id="ip6::ip_v" title='ip6::ip_v' data-ref="ip6::ip_v">ip_v</dfn>:<var>4</var>,</td></tr>
+<tr><th id="127">127</th><td>        <dfn class="decl" id="ip6::ip_fl_hi" title='ip6::ip_fl_hi' data-ref="ip6::ip_fl_hi">ip_fl_hi</dfn>:<var>4</var>,</td></tr>
+<tr><th id="128">128</th><td>        <dfn class="decl" id="ip6::ip_tc_lo" title='ip6::ip_tc_lo' data-ref="ip6::ip_tc_lo">ip_tc_lo</dfn>:<var>4</var>,</td></tr>
+<tr><th id="129">129</th><td>        <dfn class="decl" id="ip6::ip_fl_lo" title='ip6::ip_fl_lo' data-ref="ip6::ip_fl_lo">ip_fl_lo</dfn>:<var>16</var>;</td></tr>
+<tr><th id="130">130</th><td><u>#<span data-ppcond="116">endif</span></u></td></tr>
+<tr><th id="131">131</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>    <dfn class="decl" id="ip6::ip_pl" title='ip6::ip_pl' data-ref="ip6::ip_pl">ip_pl</dfn>;               <i>/* payload length */</i></td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>     <dfn class="decl" id="ip6::ip_nh" title='ip6::ip_nh' data-ref="ip6::ip_nh">ip_nh</dfn>;               <i>/* next header */</i></td></tr>
+<tr><th id="133">133</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>     <dfn class="decl" id="ip6::ip_hl" title='ip6::ip_hl' data-ref="ip6::ip_hl">ip_hl</dfn>;               <i>/* hop limit */</i></td></tr>
+<tr><th id="134">134</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="ip6::ip_src" title='ip6::ip_src' data-ref="ip6::ip_src">ip_src</dfn>, <dfn class="decl" id="ip6::ip_dst" title='ip6::ip_dst' data-ref="ip6::ip_dst">ip_dst</dfn>;  <i>/* source and dest address */</i></td></tr>
+<tr><th id="135">135</th><td>} <a class="macro" href="../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i>/*</i></td></tr>
+<tr><th id="138">138</th><td><i> * IPv6 pseudo-header used by upper-layer protocols</i></td></tr>
+<tr><th id="139">139</th><td><i> */</i></td></tr>
+<tr><th id="140">140</th><td><b>struct</b> <dfn class="type def" id="ip6_pseudohdr" title='ip6_pseudohdr' data-ref="ip6_pseudohdr">ip6_pseudohdr</dfn> {</td></tr>
+<tr><th id="141">141</th><td>    <b>struct</b>      <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="ip6_pseudohdr::ih_src" title='ip6_pseudohdr::ih_src' data-ref="ip6_pseudohdr::ih_src">ih_src</dfn>;  <i>/* source internet address */</i></td></tr>
+<tr><th id="142">142</th><td>    <b>struct</b>      <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="ip6_pseudohdr::ih_dst" title='ip6_pseudohdr::ih_dst' data-ref="ip6_pseudohdr::ih_dst">ih_dst</dfn>;  <i>/* destination internet address */</i></td></tr>
+<tr><th id="143">143</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="ip6_pseudohdr::ih_pl" title='ip6_pseudohdr::ih_pl' data-ref="ip6_pseudohdr::ih_pl">ih_pl</dfn>;            <i>/* upper-layer packet length */</i></td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>    <dfn class="decl" id="ip6_pseudohdr::ih_zero_hi" title='ip6_pseudohdr::ih_zero_hi' data-ref="ip6_pseudohdr::ih_zero_hi">ih_zero_hi</dfn>;       <i>/* zero */</i></td></tr>
+<tr><th id="145">145</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>     <dfn class="decl" id="ip6_pseudohdr::ih_zero_lo" title='ip6_pseudohdr::ih_zero_lo' data-ref="ip6_pseudohdr::ih_zero_lo">ih_zero_lo</dfn>;       <i>/* zero */</i></td></tr>
+<tr><th id="146">146</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>     <dfn class="decl" id="ip6_pseudohdr::ih_nh" title='ip6_pseudohdr::ih_nh' data-ref="ip6_pseudohdr::ih_nh">ih_nh</dfn>;            <i>/* next header */</i></td></tr>
+<tr><th id="147">147</th><td>} <a class="macro" href="../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><u>#<span data-ppcond="6">endif</span></u></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../net/colo-compare.c.html'>codebrowser/net/colo-compare.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,55 @@
+<dec f='codebrowser/include/exec/ramlist.h' l='41'/>
+<doc f='codebrowser/include/exec/ramlist.h' l='16'>/* The dirty memory bitmap is split into fixed-size blocks to allow growth
+ * under RCU.  The bitmap for a block can be accessed as follows:
+ *
+ *   rcu_read_lock();
+ *
+ *   DirtyMemoryBlocks *blocks =
+ *       atomic_rcu_read(&amp;ram_list.dirty_memory[DIRTY_MEMORY_MIGRATION]);
+ *
+ *   ram_addr_t idx = (addr &gt;&gt; TARGET_PAGE_BITS) / DIRTY_MEMORY_BLOCK_SIZE;
+ *   unsigned long *block = blocks.blocks[idx];
+ *   ...access block bitmap...
+ *
+ *   rcu_read_unlock();
+ *
+ * Remember to check for the end of the block when accessing a range of
+ * addresses.  Move on to the next block if you reach the end.
+ *
+ * Organization into blocks allows dirty memory to grow (but not shrink) under
+ * RCU.  When adding new RAMBlocks requires the dirty memory to grow, a new
+ * DirtyMemoryBlocks array is allocated with pointers to existing blocks kept
+ * the same.  Other threads can safely access existing blocks while dirty
+ * memory is being grown.  When no threads are using the old DirtyMemoryBlocks
+ * anymore it is freed by RCU (but the underlying blocks stay because they are
+ * pointed to from the new DirtyMemoryBlocks).
+ */</doc>
+<use f='codebrowser/include/exec/ram_addr.h' l='104' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='105' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='108' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='119' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='145' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='146' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='149' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='160' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='213' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='214' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='247' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='248' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='251' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='269' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='299' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='301' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='320' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='390' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='392' u='c'/>
+<use f='codebrowser/include/exec/ram_addr.h' l='410' u='c'/>
+<use f='codebrowser/exec.c' l='1114' u='c'/>
+<use f='codebrowser/exec.c' l='1115' u='c'/>
+<use f='codebrowser/exec.c' l='1116' u='c'/>
+<use f='codebrowser/exec.c' l='1156' u='c'/>
+<use f='codebrowser/exec.c' l='1157' u='c'/>
+<use f='codebrowser/exec.c' l='1158' u='c'/>
+<use f='codebrowser/exec.c' l='1826' u='c'/>
+<use f='codebrowser/exec.c' l='1828' u='c'/>
+<use f='codebrowser/exec.c' l='1851' u='c'/>

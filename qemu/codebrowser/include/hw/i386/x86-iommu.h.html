@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>x86-iommu.h source code [codebrowser/include/hw/i386/x86-iommu.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="IEC_Notifier,IommuType,X86IOMMUClass,X86IOMMUState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/i386/x86-iommu.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='x86-iommu.h.html'>x86-iommu.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Common IOMMU interface for X86 platform</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2016 Peter Xu, Red Hat &lt;peterx@redhat.com&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="7">7</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="8">8</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="9">9</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i></i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="14">14</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i></i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="17">17</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#<span data-ppcond="20">ifndef</span> <span class="macro" data-ref="_M/IOMMU_COMMON_H">IOMMU_COMMON_H</span></u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/IOMMU_COMMON_H" data-ref="_M/IOMMU_COMMON_H">IOMMU_COMMON_H</dfn></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#define  <dfn class="macro" id="_M/TYPE_X86_IOMMU_DEVICE" data-ref="_M/TYPE_X86_IOMMU_DEVICE">TYPE_X86_IOMMU_DEVICE</dfn>  ("x86-iommu")</u></td></tr>
+<tr><th id="27">27</th><td><u>#define  <dfn class="macro" id="_M/X86_IOMMU_DEVICE" data-ref="_M/X86_IOMMU_DEVICE">X86_IOMMU_DEVICE</dfn>(obj) \</u></td></tr>
+<tr><th id="28">28</th><td><u>    OBJECT_CHECK(X86IOMMUState, (obj), TYPE_X86_IOMMU_DEVICE)</u></td></tr>
+<tr><th id="29">29</th><td><u>#define  <dfn class="macro" id="_M/X86_IOMMU_CLASS" data-ref="_M/X86_IOMMU_CLASS">X86_IOMMU_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="30">30</th><td><u>    OBJECT_CLASS_CHECK(X86IOMMUClass, (klass), TYPE_X86_IOMMU_DEVICE)</u></td></tr>
+<tr><th id="31">31</th><td><u>#define  <dfn class="macro" id="_M/X86_IOMMU_GET_CLASS" data-ref="_M/X86_IOMMU_GET_CLASS">X86_IOMMU_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="32">32</th><td><u>    OBJECT_GET_CLASS(X86IOMMUClass, obj, TYPE_X86_IOMMU_DEVICE)</u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/X86_IOMMU_PCI_DEVFN_MAX" data-ref="_M/X86_IOMMU_PCI_DEVFN_MAX">X86_IOMMU_PCI_DEVFN_MAX</dfn>           256</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/X86_IOMMU_SID_INVALID" data-ref="_M/X86_IOMMU_SID_INVALID">X86_IOMMU_SID_INVALID</dfn>             (0xffff)</u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#X86IOMMUState" title='X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> <dfn class="typedef" id="X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</dfn>;</td></tr>
+<tr><th id="38">38</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#X86IOMMUClass" title='X86IOMMUClass' data-ref="X86IOMMUClass">X86IOMMUClass</a> <dfn class="typedef" id="X86IOMMUClass" title='X86IOMMUClass' data-type='struct X86IOMMUClass' data-ref="X86IOMMUClass">X86IOMMUClass</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="IommuType" title='IommuType' data-ref="IommuType"><a class="type" href="#IommuType" title='IommuType' data-ref="IommuType">IommuType</a></dfn> {</td></tr>
+<tr><th id="41">41</th><td>    <dfn class="enum" id="IommuType::TYPE_INTEL" title='IommuType::TYPE_INTEL' data-ref="IommuType::TYPE_INTEL">TYPE_INTEL</dfn>,</td></tr>
+<tr><th id="42">42</th><td>    <dfn class="enum" id="IommuType::TYPE_AMD" title='IommuType::TYPE_AMD' data-ref="IommuType::TYPE_AMD">TYPE_AMD</dfn>,</td></tr>
+<tr><th id="43">43</th><td>    <dfn class="enum" id="IommuType::TYPE_NONE" title='IommuType::TYPE_NONE' data-ref="IommuType::TYPE_NONE">TYPE_NONE</dfn></td></tr>
+<tr><th id="44">44</th><td>} <dfn class="typedef" id="IommuType" title='IommuType' data-type='enum IommuType' data-ref="IommuType">IommuType</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><b>struct</b> <dfn class="type def" id="X86IOMMUClass" title='X86IOMMUClass' data-ref="X86IOMMUClass">X86IOMMUClass</dfn> {</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../sysbus.h.html#SysBusDeviceClass" title='SysBusDeviceClass' data-type='struct SysBusDeviceClass' data-ref="SysBusDeviceClass">SysBusDeviceClass</a> <dfn class="decl" id="X86IOMMUClass::parent" title='X86IOMMUClass::parent' data-ref="X86IOMMUClass::parent">parent</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <i>/* Intel/AMD specific realize() hook */</i></td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceRealize" title='DeviceRealize' data-type='void (*)(DeviceState *, Error **)' data-ref="DeviceRealize">DeviceRealize</a> <dfn class="decl" id="X86IOMMUClass::realize" title='X86IOMMUClass::realize' data-ref="X86IOMMUClass::realize">realize</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <i>/* MSI-based interrupt remapping */</i></td></tr>
+<tr><th id="51">51</th><td>    <em>int</em> (*<dfn class="decl" id="X86IOMMUClass::int_remap" title='X86IOMMUClass::int_remap' data-ref="X86IOMMUClass::int_remap">int_remap</dfn>)(<a class="typedef" href="#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> *<dfn class="local col3 decl" id="13iommu" title='iommu' data-type='X86IOMMUState *' data-ref="13iommu">iommu</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#MSIMessage" title='MSIMessage' data-type='struct MSIMessage' data-ref="MSIMessage">MSIMessage</a> *<dfn class="local col4 decl" id="14src" title='src' data-type='MSIMessage *' data-ref="14src">src</dfn>,</td></tr>
+<tr><th id="52">52</th><td>                     <a class="typedef" href="../../qemu/typedefs.h.html#MSIMessage" title='MSIMessage' data-type='struct MSIMessage' data-ref="MSIMessage">MSIMessage</a> *<dfn class="local col5 decl" id="15dst" title='dst' data-type='MSIMessage *' data-ref="15dst">dst</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col6 decl" id="16sid" title='sid' data-type='uint16_t' data-ref="16sid">sid</dfn>);</td></tr>
+<tr><th id="53">53</th><td>};</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * iec_notify_fn - IEC (Interrupt Entry Cache) notifier hook,</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *                 triggered when IR invalidation happens.</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> *<span class="command"> @private</span>: private data</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> *<span class="command"> @global</span>: whether this is a global IEC invalidation</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> *<span class="command"> @index</span>: IRTE index to invalidate (start from)</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> *<span class="command"> @mask</span>: invalidation mask</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="63">63</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="iec_notify_fn" title='iec_notify_fn' data-type='void (*)(void *, _Bool, uint32_t, uint32_t)' data-ref="iec_notify_fn">iec_notify_fn</dfn>)(<em>void</em> *<dfn class="local col7 decl" id="17private" title='private' data-type='void *' data-ref="17private">private</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="18global" title='global' data-type='_Bool' data-ref="18global">global</dfn>,</td></tr>
+<tr><th id="64">64</th><td>                              <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="19index" title='index' data-type='uint32_t' data-ref="19index">index</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="20mask" title='mask' data-type='uint32_t' data-ref="20mask">mask</dfn>);</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><b>struct</b> <dfn class="type def" id="IEC_Notifier" title='IEC_Notifier' data-ref="IEC_Notifier">IEC_Notifier</dfn> {</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="#iec_notify_fn" title='iec_notify_fn' data-type='void (*)(void *, _Bool, uint32_t, uint32_t)' data-ref="iec_notify_fn">iec_notify_fn</a> <dfn class="decl" id="IEC_Notifier::iec_notify" title='IEC_Notifier::iec_notify' data-ref="IEC_Notifier::iec_notify">iec_notify</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <em>void</em> *<dfn class="decl" id="IEC_Notifier::private" title='IEC_Notifier::private' data-ref="IEC_Notifier::private">private</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="macro" href="../../qemu/queue.h.html#94" title="struct { struct IEC_Notifier *le_next; struct IEC_Notifier **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#IEC_Notifier" title='IEC_Notifier' data-ref="IEC_Notifier">IEC_Notifier</a>) <dfn class="decl" id="IEC_Notifier::list" title='IEC_Notifier::list' data-ref="IEC_Notifier::list">list</dfn>;</td></tr>
+<tr><th id="70">70</th><td>};</td></tr>
+<tr><th id="71">71</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IEC_Notifier" title='IEC_Notifier' data-ref="IEC_Notifier">IEC_Notifier</a> <dfn class="typedef" id="IEC_Notifier" title='IEC_Notifier' data-type='struct IEC_Notifier' data-ref="IEC_Notifier">IEC_Notifier</dfn>;</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>struct</b> <dfn class="type def" id="X86IOMMUState" title='X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</dfn> {</td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="decl" id="X86IOMMUState::busdev" title='X86IOMMUState::busdev' data-ref="X86IOMMUState::busdev">busdev</dfn>;</td></tr>
+<tr><th id="75">75</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="X86IOMMUState::intr_supported" title='X86IOMMUState::intr_supported' data-ref="X86IOMMUState::intr_supported">intr_supported</dfn>;        <i>/* Whether vIOMMU supports IR */</i></td></tr>
+<tr><th id="76">76</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="X86IOMMUState::dt_supported" title='X86IOMMUState::dt_supported' data-ref="X86IOMMUState::dt_supported">dt_supported</dfn>;          <i>/* Whether vIOMMU supports DT */</i></td></tr>
+<tr><th id="77">77</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="X86IOMMUState::pt_supported" title='X86IOMMUState::pt_supported' data-ref="X86IOMMUState::pt_supported">pt_supported</dfn>;          <i>/* Whether vIOMMU supports pass-through */</i></td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="#IommuType" title='IommuType' data-type='enum IommuType' data-ref="IommuType">IommuType</a> <dfn class="decl" id="X86IOMMUState::type" title='X86IOMMUState::type' data-ref="X86IOMMUState::type">type</dfn>;             <i>/* IOMMU type - AMD/Intel     */</i></td></tr>
+<tr><th id="79">79</th><td>    <a class="macro" href="../../qemu/queue.h.html#86" title="struct { struct IEC_Notifier *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#IEC_Notifier" title='IEC_Notifier' data-ref="IEC_Notifier">IEC_Notifier</a>) <dfn class="decl" id="X86IOMMUState::iec_notifiers" title='X86IOMMUState::iec_notifiers' data-ref="X86IOMMUState::iec_notifiers">iec_notifiers</dfn>; <i>/* IEC notify list */</i></td></tr>
+<tr><th id="80">80</th><td>};</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> * x86_iommu_get_default - get default IOMMU device</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> * <span class="command">@return</span>: pointer to default IOMMU device</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="86">86</th><td><a class="typedef" href="#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> *<dfn class="decl" id="x86_iommu_get_default" title='x86_iommu_get_default' data-ref="x86_iommu_get_default">x86_iommu_get_default</dfn>(<em>void</em>);</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>/*</i></td></tr>
+<tr><th id="89">89</th><td><i> * x86_iommu_get_type - get IOMMU type</i></td></tr>
+<tr><th id="90">90</th><td><i> */</i></td></tr>
+<tr><th id="91">91</th><td><a class="typedef" href="#IommuType" title='IommuType' data-type='enum IommuType' data-ref="IommuType">IommuType</a> <dfn class="decl" id="x86_iommu_get_type" title='x86_iommu_get_type' data-ref="x86_iommu_get_type">x86_iommu_get_type</dfn>(<em>void</em>);</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> * x86_iommu_iec_register_notifier - register IEC (Interrupt Entry</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *                                   Cache) notifiers</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @iommu</span>: IOMMU device to register</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> * <span class="command">@fn</span>:<span class="verb"> IEC notifier hook function</span></i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> * <span class="command">@data</span>: notifier private data</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="100">100</th><td><em>void</em> <dfn class="decl" id="x86_iommu_iec_register_notifier" title='x86_iommu_iec_register_notifier' data-ref="x86_iommu_iec_register_notifier">x86_iommu_iec_register_notifier</dfn>(<a class="typedef" href="#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> *<dfn class="local col1 decl" id="21iommu" title='iommu' data-type='X86IOMMUState *' data-ref="21iommu">iommu</dfn>,</td></tr>
+<tr><th id="101">101</th><td>                                     <a class="typedef" href="#iec_notify_fn" title='iec_notify_fn' data-type='void (*)(void *, _Bool, uint32_t, uint32_t)' data-ref="iec_notify_fn">iec_notify_fn</a> <dfn class="local col2 decl" id="22fn" title='fn' data-type='iec_notify_fn' data-ref="22fn">fn</dfn>, <em>void</em> *<dfn class="local col3 decl" id="23data" title='data' data-type='void *' data-ref="23data">data</dfn>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * x86_iommu_iec_notify_all - Notify IEC invalidations</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *<span class="command"> @iommu</span>: IOMMU device that sends the notification</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *<span class="command"> @global</span>: whether this is a global invalidation. If true,<span class="command"> @index</span></i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *          and<span class="command"> @mask</span> are undefined.</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *<span class="command"> @index</span>: starting index of interrupt entry to invalidate</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> *<span class="command"> @mask</span>: index mask for the invalidation</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="111">111</th><td><em>void</em> <dfn class="decl" id="x86_iommu_iec_notify_all" title='x86_iommu_iec_notify_all' data-ref="x86_iommu_iec_notify_all">x86_iommu_iec_notify_all</dfn>(<a class="typedef" href="#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> *<dfn class="local col4 decl" id="24iommu" title='iommu' data-type='X86IOMMUState *' data-ref="24iommu">iommu</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="25global" title='global' data-type='_Bool' data-ref="25global">global</dfn>,</td></tr>
+<tr><th id="112">112</th><td>                              <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="26index" title='index' data-type='uint32_t' data-ref="26index">index</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="27mask" title='mask' data-type='uint32_t' data-ref="27mask">mask</dfn>);</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><u>#<span data-ppcond="20">endif</span></u></td></tr>
+<tr><th id="115">115</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/acpi-build.c.html'>codebrowser/hw/i386/acpi-build.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

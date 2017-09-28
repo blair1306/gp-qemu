@@ -1,0 +1,231 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>blockdev-nbd.c source code [codebrowser/blockdev-nbd.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="NBDServerData "/>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/blockdev-nbd.c'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='blockdev-nbd.c.html'>blockdev-nbd.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Serving QEMU block devices via NBD</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2012 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Author: Paolo Bonzini &lt;pbonzini@redhat.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="9">9</th><td><i> * later.  See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="include/sysemu/blockdev.h.html">"sysemu/blockdev.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="include/hw/block/block.h.html">"hw/block/block.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="include/qapi/qmp/qerror.h.html">"qapi/qmp/qerror.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="qmp-commands.h.html">"qmp-commands.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="include/block/nbd.h.html">"block/nbd.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="include/io/channel-socket.h.html">"io/channel-socket.h"</a></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="NBDServerData" title='NBDServerData' data-ref="NBDServerData"><a class="type" href="#NBDServerData" title='NBDServerData' data-ref="NBDServerData">NBDServerData</a></dfn> {</td></tr>
+<tr><th id="23">23</th><td>    <a class="typedef" href="include/io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> *<dfn class="tu decl" id="NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-type='QIOChannelSocket *' data-ref="NBDServerData::listen_ioc">listen_ioc</dfn>;</td></tr>
+<tr><th id="24">24</th><td>    <em>int</em> <dfn class="tu decl" id="NBDServerData::watch" title='NBDServerData::watch' data-type='int' data-ref="NBDServerData::watch">watch</dfn>;</td></tr>
+<tr><th id="25">25</th><td>    <a class="typedef" href="include/crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="tu decl" id="NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-type='QCryptoTLSCreds *' data-ref="NBDServerData::tlscreds">tlscreds</dfn>;</td></tr>
+<tr><th id="26">26</th><td>} <dfn class="typedef" id="NBDServerData" title='NBDServerData' data-type='struct NBDServerData' data-ref="NBDServerData">NBDServerData</dfn>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><em>static</em> <a class="typedef" href="#NBDServerData" title='NBDServerData' data-type='struct NBDServerData' data-ref="NBDServerData">NBDServerData</a> *<dfn class="tu decl def" id="nbd_server" title='nbd_server' data-type='NBDServerData *' data-ref="nbd_server">nbd_server</dfn>;</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="nbd_blockdev_client_closed" title='nbd_blockdev_client_closed' data-type='void nbd_blockdev_client_closed(NBDClient * client, _Bool ignored)' data-ref="nbd_blockdev_client_closed">nbd_blockdev_client_closed</dfn>(<a class="typedef" href="include/block/nbd.h.html#NBDClient" title='NBDClient' data-type='struct NBDClient' data-ref="NBDClient">NBDClient</a> *<dfn class="local col5 decl" id="25client" title='client' data-type='NBDClient *' data-ref="25client">client</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="26ignored" title='ignored' data-type='_Bool' data-ref="26ignored">ignored</dfn>)</td></tr>
+<tr><th id="31">31</th><td>{</td></tr>
+<tr><th id="32">32</th><td>    <a class="ref" href="include/block/nbd.h.html#nbd_client_put" title='nbd_client_put' data-ref="nbd_client_put">nbd_client_put</a>(<a class="local col5 ref" href="#25client" title='client' data-ref="25client">client</a>);</td></tr>
+<tr><th id="33">33</th><td>}</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <a class="typedef" href="../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a> <dfn class="tu decl def" id="nbd_accept" title='nbd_accept' data-type='gboolean nbd_accept(QIOChannel * ioc, GIOCondition condition, gpointer opaque)' data-ref="nbd_accept">nbd_accept</dfn>(<a class="typedef" href="include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col7 decl" id="27ioc" title='ioc' data-type='QIOChannel *' data-ref="27ioc">ioc</dfn>, <a class="typedef" href="../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col8 decl" id="28condition" title='condition' data-type='GIOCondition' data-ref="28condition">condition</dfn>,</td></tr>
+<tr><th id="36">36</th><td>                           <a class="typedef" href="../include/glib-2.0/glib/gtypes.h.html#gpointer" title='gpointer' data-type='void *' data-ref="gpointer">gpointer</a> <dfn class="local col9 decl" id="29opaque" title='opaque' data-type='gpointer' data-ref="29opaque">opaque</dfn>)</td></tr>
+<tr><th id="37">37</th><td>{</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="include/io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> *<dfn class="local col0 decl" id="30cioc" title='cioc' data-type='QIOChannelSocket *' data-ref="30cioc">cioc</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>    <b>if</b> (!<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>) {</td></tr>
+<tr><th id="41">41</th><td>        <b>return</b> <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="42">42</th><td>    }</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="local col0 ref" href="#30cioc" title='cioc' data-ref="30cioc">cioc</a> = <a class="ref" href="include/io/channel-socket.h.html#qio_channel_socket_accept" title='qio_channel_socket_accept' data-ref="qio_channel_socket_accept">qio_channel_socket_accept</a>(<a class="macro" href="include/io/channel-socket.h.html#29" title="((QIOChannelSocket *)object_dynamic_cast_assert(((Object *)((ioc))), (&quot;qio-channel-socket&quot;), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 44, __func__))" data-ref="_M/QIO_CHANNEL_SOCKET">QIO_CHANNEL_SOCKET</a>(<a class="local col7 ref" href="#27ioc" title='ioc' data-ref="27ioc">ioc</a>),</td></tr>
+<tr><th id="45">45</th><td>                                     <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="46">46</th><td>    <b>if</b> (!<a class="local col0 ref" href="#30cioc" title='cioc' data-ref="30cioc">cioc</a>) {</td></tr>
+<tr><th id="47">47</th><td>        <b>return</b> <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#284" title="(!(0))" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="48">48</th><td>    }</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <a class="ref" href="include/io/channel.h.html#qio_channel_set_name" title='qio_channel_set_name' data-ref="qio_channel_set_name">qio_channel_set_name</a>(<a class="macro" href="include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((cioc))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 50, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col0 ref" href="#30cioc" title='cioc' data-ref="30cioc">cioc</a>), <q>"nbd-server"</q>);</td></tr>
+<tr><th id="51">51</th><td>    <a class="ref" href="include/block/nbd.h.html#nbd_client_new" title='nbd_client_new' data-ref="nbd_client_new">nbd_client_new</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col0 ref" href="#30cioc" title='cioc' data-ref="30cioc">cioc</a>,</td></tr>
+<tr><th id="52">52</th><td>                   <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-use='r' data-ref="NBDServerData::tlscreds">tlscreds</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="53">53</th><td>                   <a class="tu ref" href="#nbd_blockdev_client_closed" title='nbd_blockdev_client_closed' data-use='r' data-ref="nbd_blockdev_client_closed">nbd_blockdev_client_closed</a>);</td></tr>
+<tr><th id="54">54</th><td>    <a class="ref" href="include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="include/qom/object.h.html#473" title="((Object *)(cioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col0 ref" href="#30cioc" title='cioc' data-ref="30cioc">cioc</a>));</td></tr>
+<tr><th id="55">55</th><td>    <b>return</b> <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#284" title="(!(0))" data-ref="_M/TRUE">TRUE</a>;</td></tr>
+<tr><th id="56">56</th><td>}</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="nbd_server_free" title='nbd_server_free' data-type='void nbd_server_free(NBDServerData * server)' data-ref="nbd_server_free">nbd_server_free</dfn>(<a class="typedef" href="#NBDServerData" title='NBDServerData' data-type='struct NBDServerData' data-ref="NBDServerData">NBDServerData</a> *<dfn class="local col1 decl" id="31server" title='server' data-type='NBDServerData *' data-ref="31server">server</dfn>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>    <b>if</b> (!<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>) {</td></tr>
+<tr><th id="62">62</th><td>        <b>return</b>;</td></tr>
+<tr><th id="63">63</th><td>    }</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <b>if</b> (<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>-&gt;<a class="tu ref" href="#NBDServerData::watch" title='NBDServerData::watch' data-use='r' data-ref="NBDServerData::watch">watch</a> != -<var>1</var>) {</td></tr>
+<tr><th id="66">66</th><td>        <a class="ref" href="../include/glib-2.0/glib/gmain.h.html#g_source_remove" title='g_source_remove' data-ref="g_source_remove">g_source_remove</a>(<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>-&gt;<a class="tu ref" href="#NBDServerData::watch" title='NBDServerData::watch' data-use='r' data-ref="NBDServerData::watch">watch</a>);</td></tr>
+<tr><th id="67">67</th><td>    }</td></tr>
+<tr><th id="68">68</th><td>    <a class="ref" href="include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="include/qom/object.h.html#473" title="((Object *)(server-&gt;listen_ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>-&gt;<a class="tu ref" href="#NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-use='r' data-ref="NBDServerData::listen_ioc">listen_ioc</a>));</td></tr>
+<tr><th id="69">69</th><td>    <b>if</b> (<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>-&gt;<a class="tu ref" href="#NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-use='r' data-ref="NBDServerData::tlscreds">tlscreds</a>) {</td></tr>
+<tr><th id="70">70</th><td>        <a class="ref" href="include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="include/qom/object.h.html#473" title="((Object *)(server-&gt;tlscreds))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>-&gt;<a class="tu ref" href="#NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-use='r' data-ref="NBDServerData::tlscreds">tlscreds</a>));</td></tr>
+<tr><th id="71">71</th><td>    }</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>    <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col1 ref" href="#31server" title='server' data-ref="31server">server</a>);</td></tr>
+<tr><th id="74">74</th><td>}</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>static</em> <a class="typedef" href="include/crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="tu decl def" id="nbd_get_tls_creds" title='nbd_get_tls_creds' data-type='QCryptoTLSCreds * nbd_get_tls_creds(const char * id, Error ** errp)' data-ref="nbd_get_tls_creds">nbd_get_tls_creds</dfn>(<em>const</em> <em>char</em> *<dfn class="local col2 decl" id="32id" title='id' data-type='const char *' data-ref="32id">id</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="33errp" title='errp' data-type='Error **' data-ref="33errp">errp</dfn>)</td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col4 decl" id="34obj" title='obj' data-type='Object *' data-ref="34obj">obj</dfn>;</td></tr>
+<tr><th id="79">79</th><td>    <a class="typedef" href="include/crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="local col5 decl" id="35creds" title='creds' data-type='QCryptoTLSCreds *' data-ref="35creds">creds</dfn>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>    <a class="local col4 ref" href="#34obj" title='obj' data-ref="34obj">obj</a> = <a class="ref" href="include/qom/object.h.html#object_resolve_path_component" title='object_resolve_path_component' data-ref="object_resolve_path_component">object_resolve_path_component</a>(</td></tr>
+<tr><th id="82">82</th><td>        <a class="ref" href="include/qom/object.h.html#object_get_objects_root" title='object_get_objects_root' data-ref="object_get_objects_root">object_get_objects_root</a>(), <a class="local col2 ref" href="#32id" title='id' data-ref="32id">id</a>);</td></tr>
+<tr><th id="83">83</th><td>    <b>if</b> (!<a class="local col4 ref" href="#34obj" title='obj' data-ref="34obj">obj</a>) {</td></tr>
+<tr><th id="84">84</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 85, __func__, (&quot;No TLS credentials with id &apos;%s&apos;&quot;), id)" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#33errp" title='errp' data-ref="33errp">errp</a>, <q>"No TLS credentials with id '%s'"</q>,</td></tr>
+<tr><th id="85">85</th><td>                   <a class="local col2 ref" href="#32id" title='id' data-ref="32id">id</a>);</td></tr>
+<tr><th id="86">86</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="87">87</th><td>    }</td></tr>
+<tr><th id="88">88</th><td>    <a class="local col5 ref" href="#35creds" title='creds' data-ref="35creds">creds</a> = (<a class="typedef" href="include/crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *)</td></tr>
+<tr><th id="89">89</th><td>        <a class="ref" href="include/qom/object.h.html#object_dynamic_cast" title='object_dynamic_cast' data-ref="object_dynamic_cast">object_dynamic_cast</a>(<a class="local col4 ref" href="#34obj" title='obj' data-ref="34obj">obj</a>, <a class="macro" href="include/crypto/tlscreds.h.html#30" title="&quot;tls-creds&quot;" data-ref="_M/TYPE_QCRYPTO_TLS_CREDS">TYPE_QCRYPTO_TLS_CREDS</a>);</td></tr>
+<tr><th id="90">90</th><td>    <b>if</b> (!<a class="local col5 ref" href="#35creds" title='creds' data-ref="35creds">creds</a>) {</td></tr>
+<tr><th id="91">91</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 92, __func__, (&quot;Object with id &apos;%s&apos; is not TLS credentials&quot;), id)" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#33errp" title='errp' data-ref="33errp">errp</a>, <q>"Object with id '%s' is not TLS credentials"</q>,</td></tr>
+<tr><th id="92">92</th><td>                   <a class="local col2 ref" href="#32id" title='id' data-ref="32id">id</a>);</td></tr>
+<tr><th id="93">93</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="94">94</th><td>    }</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td>    <b>if</b> (<a class="local col5 ref" href="#35creds" title='creds' data-ref="35creds">creds</a>-&gt;<a class="ref" href="include/crypto/tlscreds.h.html#QCryptoTLSCreds::endpoint" title='QCryptoTLSCreds::endpoint' data-ref="QCryptoTLSCreds::endpoint">endpoint</a> != <a class="enum" href="qapi-types.h.html#QCryptoTLSCredsEndpoint::QCRYPTO_TLS_CREDS_ENDPOINT_SERVER" title='QCryptoTLSCredsEndpoint::QCRYPTO_TLS_CREDS_ENDPOINT_SERVER' data-ref="QCryptoTLSCredsEndpoint::QCRYPTO_TLS_CREDS_ENDPOINT_SERVER">QCRYPTO_TLS_CREDS_ENDPOINT_SERVER</a>) {</td></tr>
+<tr><th id="97">97</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 98, __func__, (&quot;Expecting TLS credentials with a server endpoint&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#33errp" title='errp' data-ref="33errp">errp</a>,</td></tr>
+<tr><th id="98">98</th><td>                   <q>"Expecting TLS credentials with a server endpoint"</q>);</td></tr>
+<tr><th id="99">99</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="100">100</th><td>    }</td></tr>
+<tr><th id="101">101</th><td>    <a class="ref" href="include/qom/object.h.html#object_ref" title='object_ref' data-ref="object_ref">object_ref</a>(<a class="local col4 ref" href="#34obj" title='obj' data-ref="34obj">obj</a>);</td></tr>
+<tr><th id="102">102</th><td>    <b>return</b> <a class="local col5 ref" href="#35creds" title='creds' data-ref="35creds">creds</a>;</td></tr>
+<tr><th id="103">103</th><td>}</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><em>void</em> <dfn class="decl def" id="nbd_server_start" title='nbd_server_start' data-ref="nbd_server_start">nbd_server_start</dfn>(<a class="typedef" href="qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> *<dfn class="local col6 decl" id="36addr" title='addr' data-type='SocketAddress *' data-ref="36addr">addr</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="37tls_creds" title='tls_creds' data-type='const char *' data-ref="37tls_creds">tls_creds</dfn>,</td></tr>
+<tr><th id="107">107</th><td>                      <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="38errp" title='errp' data-type='Error **' data-ref="38errp">errp</dfn>)</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>    <b>if</b> (<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>) {</td></tr>
+<tr><th id="110">110</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 110, __func__, (&quot;NBD server already running&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <q>"NBD server already running"</q>);</td></tr>
+<tr><th id="111">111</th><td>        <b>return</b>;</td></tr>
+<tr><th id="112">112</th><td>    }</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='w' data-ref="nbd_server">nbd_server</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((NBDServerData *) g_malloc0_n ((1), sizeof (NBDServerData)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="#NBDServerData" title='NBDServerData' data-type='struct NBDServerData' data-ref="NBDServerData">NBDServerData</a>, <var>1</var>);</td></tr>
+<tr><th id="115">115</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::watch" title='NBDServerData::watch' data-use='w' data-ref="NBDServerData::watch">watch</a> = -<var>1</var>;</td></tr>
+<tr><th id="116">116</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-use='w' data-ref="NBDServerData::listen_ioc">listen_ioc</a> = <a class="ref" href="include/io/channel-socket.h.html#qio_channel_socket_new" title='qio_channel_socket_new' data-ref="qio_channel_socket_new">qio_channel_socket_new</a>();</td></tr>
+<tr><th id="117">117</th><td>    <a class="ref" href="include/io/channel.h.html#qio_channel_set_name" title='qio_channel_set_name' data-ref="qio_channel_set_name">qio_channel_set_name</a>(<a class="macro" href="include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((nbd_server-&gt;listen_ioc))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 117, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-use='r' data-ref="NBDServerData::listen_ioc">listen_ioc</a>),</td></tr>
+<tr><th id="118">118</th><td>                         <q>"nbd-listener"</q>);</td></tr>
+<tr><th id="119">119</th><td>    <b>if</b> (<a class="ref" href="include/io/channel-socket.h.html#qio_channel_socket_listen_sync" title='qio_channel_socket_listen_sync' data-ref="qio_channel_socket_listen_sync">qio_channel_socket_listen_sync</a>(</td></tr>
+<tr><th id="120">120</th><td>            <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-use='r' data-ref="NBDServerData::listen_ioc">listen_ioc</a>, <a class="local col6 ref" href="#36addr" title='addr' data-ref="36addr">addr</a>, <a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="121">121</th><td>        <b>goto</b> <a class="lbl" href="#39error" data-ref="39error">error</a>;</td></tr>
+<tr><th id="122">122</th><td>    }</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <b>if</b> (<a class="local col7 ref" href="#37tls_creds" title='tls_creds' data-ref="37tls_creds">tls_creds</a>) {</td></tr>
+<tr><th id="125">125</th><td>        <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-use='w' data-ref="NBDServerData::tlscreds">tlscreds</a> = <a class="tu ref" href="#nbd_get_tls_creds" title='nbd_get_tls_creds' data-use='c' data-ref="nbd_get_tls_creds">nbd_get_tls_creds</a>(<a class="local col7 ref" href="#37tls_creds" title='tls_creds' data-ref="37tls_creds">tls_creds</a>, <a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>);</td></tr>
+<tr><th id="126">126</th><td>        <b>if</b> (!<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::tlscreds" title='NBDServerData::tlscreds' data-use='r' data-ref="NBDServerData::tlscreds">tlscreds</a>) {</td></tr>
+<tr><th id="127">127</th><td>            <b>goto</b> <a class="lbl" href="#39error" data-ref="39error">error</a>;</td></tr>
+<tr><th id="128">128</th><td>        }</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>        <i>/* TODO SOCKET_ADDRESS_TYPE_FD where fd has AF_INET or AF_INET6 */</i></td></tr>
+<tr><th id="131">131</th><td>        <b>if</b> (<a class="local col6 ref" href="#36addr" title='addr' data-ref="36addr">addr</a>-&gt;<a class="ref" href="qapi-types.h.html#SocketAddress::type" title='SocketAddress::type' data-ref="SocketAddress::type">type</a> != <a class="enum" href="qapi-types.h.html#SocketAddressType::SOCKET_ADDRESS_TYPE_INET" title='SocketAddressType::SOCKET_ADDRESS_TYPE_INET' data-ref="SocketAddressType::SOCKET_ADDRESS_TYPE_INET">SOCKET_ADDRESS_TYPE_INET</a>) {</td></tr>
+<tr><th id="132">132</th><td>            <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 132, __func__, (&quot;TLS is only supported with IPv4/IPv6&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <q>"TLS is only supported with IPv4/IPv6"</q>);</td></tr>
+<tr><th id="133">133</th><td>            <b>goto</b> <a class="lbl" href="#39error" data-ref="39error">error</a>;</td></tr>
+<tr><th id="134">134</th><td>        }</td></tr>
+<tr><th id="135">135</th><td>    }</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::watch" title='NBDServerData::watch' data-use='w' data-ref="NBDServerData::watch">watch</a> = <a class="ref" href="include/io/channel.h.html#qio_channel_add_watch" title='qio_channel_add_watch' data-ref="qio_channel_add_watch">qio_channel_add_watch</a>(</td></tr>
+<tr><th id="138">138</th><td>        <a class="macro" href="include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((nbd_server-&gt;listen_ioc))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 138, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>-&gt;<a class="tu ref" href="#NBDServerData::listen_ioc" title='NBDServerData::listen_ioc' data-use='r' data-ref="NBDServerData::listen_ioc">listen_ioc</a>),</td></tr>
+<tr><th id="139">139</th><td>        <a class="enum" href="../include/glib-2.0/glib/gmain.h.html#G_IO_IN" title='G_IO_IN' data-ref="G_IO_IN">G_IO_IN</a>,</td></tr>
+<tr><th id="140">140</th><td>        <a class="tu ref" href="#nbd_accept" title='nbd_accept' data-use='r' data-ref="nbd_accept">nbd_accept</a>,</td></tr>
+<tr><th id="141">141</th><td>        <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="142">142</th><td>        <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>    <b>return</b>;</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td> <dfn class="lbl" id="39error" data-ref="39error">error</dfn>:</td></tr>
+<tr><th id="147">147</th><td>    <a class="tu ref" href="#nbd_server_free" title='nbd_server_free' data-use='c' data-ref="nbd_server_free">nbd_server_free</a>(<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>);</td></tr>
+<tr><th id="148">148</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='w' data-ref="nbd_server">nbd_server</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="149">149</th><td>}</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><em>void</em> <dfn class="decl def" id="qmp_nbd_server_start" title='qmp_nbd_server_start' data-ref="qmp_nbd_server_start">qmp_nbd_server_start</dfn>(<a class="typedef" href="qapi-types.h.html#SocketAddressLegacy" title='SocketAddressLegacy' data-type='struct SocketAddressLegacy' data-ref="SocketAddressLegacy">SocketAddressLegacy</a> *<dfn class="local col0 decl" id="40addr" title='addr' data-type='SocketAddressLegacy *' data-ref="40addr">addr</dfn>,</td></tr>
+<tr><th id="152">152</th><td>                          <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="41has_tls_creds" title='has_tls_creds' data-type='_Bool' data-ref="41has_tls_creds">has_tls_creds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="42tls_creds" title='tls_creds' data-type='const char *' data-ref="42tls_creds">tls_creds</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                          <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="43errp" title='errp' data-type='Error **' data-ref="43errp">errp</dfn>)</td></tr>
+<tr><th id="154">154</th><td>{</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> *<dfn class="local col4 decl" id="44addr_flat" title='addr_flat' data-type='SocketAddress *' data-ref="44addr_flat">addr_flat</dfn> = <a class="ref" href="include/qemu/sockets.h.html#socket_address_flatten" title='socket_address_flatten' data-ref="socket_address_flatten">socket_address_flatten</a>(<a class="local col0 ref" href="#40addr" title='addr' data-ref="40addr">addr</a>);</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>    <a class="ref" href="#nbd_server_start" title='nbd_server_start' data-ref="nbd_server_start">nbd_server_start</a>(<a class="local col4 ref" href="#44addr_flat" title='addr_flat' data-ref="44addr_flat">addr_flat</a>, <a class="local col2 ref" href="#42tls_creds" title='tls_creds' data-ref="42tls_creds">tls_creds</a>, <a class="local col3 ref" href="#43errp" title='errp' data-ref="43errp">errp</a>);</td></tr>
+<tr><th id="158">158</th><td>    <a class="ref" href="qapi-types.h.html#qapi_free_SocketAddress" title='qapi_free_SocketAddress' data-ref="qapi_free_SocketAddress">qapi_free_SocketAddress</a>(<a class="local col4 ref" href="#44addr_flat" title='addr_flat' data-ref="44addr_flat">addr_flat</a>);</td></tr>
+<tr><th id="159">159</th><td>}</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><em>void</em> <dfn class="decl def" id="qmp_nbd_server_add" title='qmp_nbd_server_add' data-ref="qmp_nbd_server_add">qmp_nbd_server_add</dfn>(<em>const</em> <em>char</em> *<dfn class="local col5 decl" id="45device" title='device' data-type='const char *' data-ref="45device">device</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="46has_writable" title='has_writable' data-type='_Bool' data-ref="46has_writable">has_writable</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="47writable" title='writable' data-type='_Bool' data-ref="47writable">writable</dfn>,</td></tr>
+<tr><th id="162">162</th><td>                        <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="48errp" title='errp' data-type='Error **' data-ref="48errp">errp</dfn>)</td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#BlockDriverState" title='BlockDriverState' data-type='struct BlockDriverState' data-ref="BlockDriverState">BlockDriverState</a> *<dfn class="local col9 decl" id="49bs" title='bs' data-type='BlockDriverState *' data-ref="49bs">bs</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="165">165</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col0 decl" id="50on_eject_blk" title='on_eject_blk' data-type='BlockBackend *' data-ref="50on_eject_blk">on_eject_blk</dfn>;</td></tr>
+<tr><th id="166">166</th><td>    <a class="typedef" href="include/block/nbd.h.html#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col1 decl" id="51exp" title='exp' data-type='NBDExport *' data-ref="51exp">exp</dfn>;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <b>if</b> (!<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>) {</td></tr>
+<tr><th id="169">169</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 169, __func__, (&quot;NBD server not running&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>, <q>"NBD server not running"</q>);</td></tr>
+<tr><th id="170">170</th><td>        <b>return</b>;</td></tr>
+<tr><th id="171">171</th><td>    }</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td>    <b>if</b> (<a class="ref" href="include/block/nbd.h.html#nbd_export_find" title='nbd_export_find' data-ref="nbd_export_find">nbd_export_find</a>(<a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>)) {</td></tr>
+<tr><th id="174">174</th><td>        <a class="macro" href="include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/blockdev-nbd.c&quot;, 174, __func__, (&quot;NBD server already exporting device &apos;%s&apos;&quot;), device)" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>, <q>"NBD server already exporting device '%s'"</q>, <a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>);</td></tr>
+<tr><th id="175">175</th><td>        <b>return</b>;</td></tr>
+<tr><th id="176">176</th><td>    }</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <a class="local col0 ref" href="#50on_eject_blk" title='on_eject_blk' data-ref="50on_eject_blk">on_eject_blk</a> = <a class="ref" href="include/sysemu/block-backend.h.html#blk_by_name" title='blk_by_name' data-ref="blk_by_name">blk_by_name</a>(<a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>);</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>    <a class="local col9 ref" href="#49bs" title='bs' data-ref="49bs">bs</a> = <a class="ref" href="include/block/block.h.html#bdrv_lookup_bs" title='bdrv_lookup_bs' data-ref="bdrv_lookup_bs">bdrv_lookup_bs</a>(<a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>, <a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>, <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>);</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (!<a class="local col9 ref" href="#49bs" title='bs' data-ref="49bs">bs</a>) {</td></tr>
+<tr><th id="182">182</th><td>        <b>return</b>;</td></tr>
+<tr><th id="183">183</th><td>    }</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>    <b>if</b> (!<a class="local col6 ref" href="#46has_writable" title='has_writable' data-ref="46has_writable">has_writable</a>) {</td></tr>
+<tr><th id="186">186</th><td>        <a class="local col7 ref" href="#47writable" title='writable' data-ref="47writable">writable</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="187">187</th><td>    }</td></tr>
+<tr><th id="188">188</th><td>    <b>if</b> (<a class="ref" href="include/block/block.h.html#bdrv_is_read_only" title='bdrv_is_read_only' data-ref="bdrv_is_read_only">bdrv_is_read_only</a>(<a class="local col9 ref" href="#49bs" title='bs' data-ref="49bs">bs</a>)) {</td></tr>
+<tr><th id="189">189</th><td>        <a class="local col7 ref" href="#47writable" title='writable' data-ref="47writable">writable</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="190">190</th><td>    }</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td>    <a class="local col1 ref" href="#51exp" title='exp' data-ref="51exp">exp</a> = <a class="ref" href="include/block/nbd.h.html#nbd_export_new" title='nbd_export_new' data-ref="nbd_export_new">nbd_export_new</a>(<a class="local col9 ref" href="#49bs" title='bs' data-ref="49bs">bs</a>, <var>0</var>, -<var>1</var>, <a class="local col7 ref" href="#47writable" title='writable' data-ref="47writable">writable</a> ? <var>0</var> : <a class="macro" href="include/block/nbd.h.html#69" title="(1 &lt;&lt; 1)" data-ref="_M/NBD_FLAG_READ_ONLY">NBD_FLAG_READ_ONLY</a>,</td></tr>
+<tr><th id="193">193</th><td>                         <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="0" data-ref="_M/false">false</span>, <a class="local col0 ref" href="#50on_eject_blk" title='on_eject_blk' data-ref="50on_eject_blk">on_eject_blk</a>, <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>);</td></tr>
+<tr><th id="194">194</th><td>    <b>if</b> (!<a class="local col1 ref" href="#51exp" title='exp' data-ref="51exp">exp</a>) {</td></tr>
+<tr><th id="195">195</th><td>        <b>return</b>;</td></tr>
+<tr><th id="196">196</th><td>    }</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <a class="ref" href="include/block/nbd.h.html#nbd_export_set_name" title='nbd_export_set_name' data-ref="nbd_export_set_name">nbd_export_set_name</a>(<a class="local col1 ref" href="#51exp" title='exp' data-ref="51exp">exp</a>, <a class="local col5 ref" href="#45device" title='device' data-ref="45device">device</a>);</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <i>/* The list of named exports has a strong reference to this export now and</i></td></tr>
+<tr><th id="201">201</th><td><i>     * our only way of accessing it is through nbd_export_find(), so we can drop</i></td></tr>
+<tr><th id="202">202</th><td><i>     * the strong reference that is @exp. */</i></td></tr>
+<tr><th id="203">203</th><td>    <a class="ref" href="include/block/nbd.h.html#nbd_export_put" title='nbd_export_put' data-ref="nbd_export_put">nbd_export_put</a>(<a class="local col1 ref" href="#51exp" title='exp' data-ref="51exp">exp</a>);</td></tr>
+<tr><th id="204">204</th><td>}</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td><em>void</em> <dfn class="decl def" id="qmp_nbd_server_stop" title='qmp_nbd_server_stop' data-ref="qmp_nbd_server_stop">qmp_nbd_server_stop</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="52errp" title='errp' data-type='Error **' data-ref="52errp">errp</dfn>)</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td>    <a class="ref" href="include/block/nbd.h.html#nbd_export_close_all" title='nbd_export_close_all' data-ref="nbd_export_close_all">nbd_export_close_all</a>();</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td>    <a class="tu ref" href="#nbd_server_free" title='nbd_server_free' data-use='c' data-ref="nbd_server_free">nbd_server_free</a>(<a class="tu ref" href="#nbd_server" title='nbd_server' data-use='r' data-ref="nbd_server">nbd_server</a>);</td></tr>
+<tr><th id="211">211</th><td>    <a class="tu ref" href="#nbd_server" title='nbd_server' data-use='w' data-ref="nbd_server">nbd_server</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="212">212</th><td>}</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>stats64.h source code [codebrowser/include/qemu/stats64.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="Stat64 "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/stats64.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='stats64.h.html'>stats64.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Atomic operations on 64-bit quantities.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2017 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Author: Paolo Bonzini &lt;pbonzini@redhat.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="9">9</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#<span data-ppcond="12">ifndef</span> <span class="macro" data-ref="_M/QEMU_STATS64_H">QEMU_STATS64_H</span></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/QEMU_STATS64_H" data-ref="_M/QEMU_STATS64_H">QEMU_STATS64_H</dfn> 1</u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><i>/* This provides atomic operations on 64-bit type, using a reader-writer</i></td></tr>
+<tr><th id="18">18</th><td><i> * spinlock on architectures that do not have 64-bit accesses.  Even on</i></td></tr>
+<tr><th id="19">19</th><td><i> * those architectures, it tries hard not to take the lock.</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="Stat64" title='Stat64' data-ref="Stat64"><a class="type" href="#Stat64" title='Stat64' data-ref="Stat64">Stat64</a></dfn> {</td></tr>
+<tr><th id="23">23</th><td><u>#<span data-ppcond="23">ifdef</span> <a class="macro" href="../../config-host.h.html#83" data-ref="_M/CONFIG_ATOMIC64">CONFIG_ATOMIC64</a></u></td></tr>
+<tr><th id="24">24</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</dfn>;</td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="23">else</span></u></td></tr>
+<tr><th id="26">26</th><td>    uint32_t low, high;</td></tr>
+<tr><th id="27">27</th><td>    uint32_t lock;</td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="23">endif</span></u></td></tr>
+<tr><th id="29">29</th><td>} <dfn class="typedef" id="Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</dfn>;</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="31">ifdef</span> <a class="macro" href="../../config-host.h.html#83" data-ref="_M/CONFIG_ATOMIC64">CONFIG_ATOMIC64</a></u></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="stat64_init" title='stat64_init' data-ref="stat64_init">stat64_init</dfn>(<a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a> *<dfn class="local col6 decl" id="616s" title='s' data-type='Stat64 *' data-ref="616s">s</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="617value" title='value' data-type='uint64_t' data-ref="617value">value</dfn>)</td></tr>
+<tr><th id="33">33</th><td>{</td></tr>
+<tr><th id="34">34</th><td>    <i>/* This is not guaranteed to be atomic! */</i></td></tr>
+<tr><th id="35">35</th><td>    *<a class="local col6 ref" href="#616s" title='s' data-ref="616s">s</a> = (<a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a>) { <a class="local col7 ref" href="#617value" title='value' data-ref="617value">value</a> };</td></tr>
+<tr><th id="36">36</th><td>}</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="stat64_get" title='stat64_get' data-ref="stat64_get">stat64_get</dfn>(<em>const</em> <a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a> *<dfn class="local col8 decl" id="618s" title='s' data-type='const Stat64 *' data-ref="618s">s</dfn>)</td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>    <b>return</b> <a class="macro" href="atomic.h.html#120" title="__atomic_load_n(&amp;s-&gt;value, 0)" data-ref="_M/atomic_read__nocheck">atomic_read__nocheck</a>(&amp;<a class="local col8 ref" href="#618s" title='s' data-ref="618s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>);</td></tr>
+<tr><th id="41">41</th><td>}</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="stat64_add" title='stat64_add' data-ref="stat64_add">stat64_add</dfn>(<a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a> *<dfn class="local col9 decl" id="619s" title='s' data-type='Stat64 *' data-ref="619s">s</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="620value" title='value' data-type='uint64_t' data-ref="620value">value</dfn>)</td></tr>
+<tr><th id="44">44</th><td>{</td></tr>
+<tr><th id="45">45</th><td>    <a class="macro" href="atomic.h.html#220" title="((void) __atomic_fetch_add(&amp;s-&gt;value, value, 5))" data-ref="_M/atomic_add">atomic_add</a>(&amp;<a class="local col9 ref" href="#619s" title='s' data-ref="619s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>, <a class="local col0 ref" href="#620value" title='value' data-ref="620value">value</a>);</td></tr>
+<tr><th id="46">46</th><td>}</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="stat64_min" title='stat64_min' data-ref="stat64_min">stat64_min</dfn>(<a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a> *<dfn class="local col1 decl" id="621s" title='s' data-type='Stat64 *' data-ref="621s">s</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="622value" title='value' data-type='uint64_t' data-ref="622value">value</dfn>)</td></tr>
+<tr><th id="49">49</th><td>{</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="623orig" title='orig' data-type='uint64_t' data-ref="623orig">orig</dfn> = <a class="macro" href="atomic.h.html#120" title="__atomic_load_n(&amp;s-&gt;value, 0)" data-ref="_M/atomic_read__nocheck">atomic_read__nocheck</a>(&amp;<a class="local col1 ref" href="#621s" title='s' data-ref="621s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>);</td></tr>
+<tr><th id="51">51</th><td>    <b>while</b> (<a class="local col3 ref" href="#623orig" title='orig' data-ref="623orig">orig</a> &gt; <a class="local col2 ref" href="#622value" title='value' data-ref="622value">value</a>) {</td></tr>
+<tr><th id="52">52</th><td>        <a class="local col3 ref" href="#623orig" title='orig' data-ref="623orig">orig</a> = <a class="macro" href="atomic.h.html#188" title="({ typeof( __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile _Bool), (_Bool)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile signed char), (signed char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile unsigned char), (unsigned char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile signed short), (signed short)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile unsigned short), (unsigned short)1, (*&amp;s-&gt;value)+0)))))) _old = (orig); __atomic_compare_exchange_n(&amp;s-&gt;value, &amp;_old, value, 0, 5, 5); _old; })" data-ref="_M/atomic_cmpxchg__nocheck">atomic_cmpxchg__nocheck</a>(&amp;<a class="local col1 ref" href="#621s" title='s' data-ref="621s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>, <a class="local col3 ref" href="#623orig" title='orig' data-ref="623orig">orig</a>, <a class="local col2 ref" href="#622value" title='value' data-ref="622value">value</a>);</td></tr>
+<tr><th id="53">53</th><td>    }</td></tr>
+<tr><th id="54">54</th><td>}</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="stat64_max" title='stat64_max' data-ref="stat64_max">stat64_max</dfn>(<a class="typedef" href="#Stat64" title='Stat64' data-type='struct Stat64' data-ref="Stat64">Stat64</a> *<dfn class="local col4 decl" id="624s" title='s' data-type='Stat64 *' data-ref="624s">s</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="625value" title='value' data-type='uint64_t' data-ref="625value">value</dfn>)</td></tr>
+<tr><th id="57">57</th><td>{</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="626orig" title='orig' data-type='uint64_t' data-ref="626orig">orig</dfn> = <a class="macro" href="atomic.h.html#120" title="__atomic_load_n(&amp;s-&gt;value, 0)" data-ref="_M/atomic_read__nocheck">atomic_read__nocheck</a>(&amp;<a class="local col4 ref" href="#624s" title='s' data-ref="624s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>);</td></tr>
+<tr><th id="59">59</th><td>    <b>while</b> (<a class="local col6 ref" href="#626orig" title='orig' data-ref="626orig">orig</a> &lt; <a class="local col5 ref" href="#625value" title='value' data-ref="625value">value</a>) {</td></tr>
+<tr><th id="60">60</th><td>        <a class="local col6 ref" href="#626orig" title='orig' data-ref="626orig">orig</a> = <a class="macro" href="atomic.h.html#188" title="({ typeof( __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile _Bool) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile _Bool), (_Bool)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile signed char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile signed char), (signed char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile unsigned char) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile unsigned char), (unsigned char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile signed short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile signed short), (signed short)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), volatile unsigned short) || __builtin_types_compatible_p(typeof(*&amp;s-&gt;value), const volatile unsigned short), (unsigned short)1, (*&amp;s-&gt;value)+0)))))) _old = (orig); __atomic_compare_exchange_n(&amp;s-&gt;value, &amp;_old, value, 0, 5, 5); _old; })" data-ref="_M/atomic_cmpxchg__nocheck">atomic_cmpxchg__nocheck</a>(&amp;<a class="local col4 ref" href="#624s" title='s' data-ref="624s">s</a>-&gt;<a class="ref" href="#Stat64::value" title='Stat64::value' data-ref="Stat64::value">value</a>, <a class="local col6 ref" href="#626orig" title='orig' data-ref="626orig">orig</a>, <a class="local col5 ref" href="#625value" title='value' data-ref="625value">value</a>);</td></tr>
+<tr><th id="61">61</th><td>    }</td></tr>
+<tr><th id="62">62</th><td>}</td></tr>
+<tr><th id="63">63</th><td><u>#<span data-ppcond="31">else</span></u></td></tr>
+<tr><th id="64">64</th><td>uint64_t stat64_get(<em>const</em> Stat64 *s);</td></tr>
+<tr><th id="65">65</th><td>bool stat64_min_slow(Stat64 *s, uint64_t value);</td></tr>
+<tr><th id="66">66</th><td>bool stat64_max_slow(Stat64 *s, uint64_t value);</td></tr>
+<tr><th id="67">67</th><td>bool stat64_add32_carry(Stat64 *s, uint32_t low, uint32_t high);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><em>static</em> <b>inline</b> <em>void</em> stat64_init(Stat64 *s, uint64_t value)</td></tr>
+<tr><th id="70">70</th><td>{</td></tr>
+<tr><th id="71">71</th><td>    <i>/* This is not guaranteed to be atomic! */</i></td></tr>
+<tr><th id="72">72</th><td>    *s = (Stat64) { .low = value, .high = value &gt;&gt; <var>32</var>, .lock = <var>0</var> };</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><em>static</em> <b>inline</b> <em>void</em> stat64_add(Stat64 *s, uint64_t value)</td></tr>
+<tr><th id="76">76</th><td>{</td></tr>
+<tr><th id="77">77</th><td>    uint32_t low, high;</td></tr>
+<tr><th id="78">78</th><td>    high = value &gt;&gt; <var>32</var>;</td></tr>
+<tr><th id="79">79</th><td>    low = (uint32_t) value;</td></tr>
+<tr><th id="80">80</th><td>    <b>if</b> (!low) {</td></tr>
+<tr><th id="81">81</th><td>        <b>if</b> (high) {</td></tr>
+<tr><th id="82">82</th><td>            atomic_add(&amp;s-&gt;high, high);</td></tr>
+<tr><th id="83">83</th><td>        }</td></tr>
+<tr><th id="84">84</th><td>        <b>return</b>;</td></tr>
+<tr><th id="85">85</th><td>    }</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <b>for</b> (;;) {</td></tr>
+<tr><th id="88">88</th><td>        uint32_t orig = s-&gt;low;</td></tr>
+<tr><th id="89">89</th><td>        uint32_t result = orig + low;</td></tr>
+<tr><th id="90">90</th><td>        uint32_t old;</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>        <b>if</b> (result &lt; low || high) {</td></tr>
+<tr><th id="93">93</th><td>            <i>/* If the high part is affected, take the lock.  */</i></td></tr>
+<tr><th id="94">94</th><td>            <b>if</b> (stat64_add32_carry(s, low, high)) {</td></tr>
+<tr><th id="95">95</th><td>                <b>return</b>;</td></tr>
+<tr><th id="96">96</th><td>            }</td></tr>
+<tr><th id="97">97</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="98">98</th><td>        }</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>        <i>/* No carry, try with a 32-bit cmpxchg.  The result is independent of</i></td></tr>
+<tr><th id="101">101</th><td><i>         * the high 32 bits, so it can race just fine with stat64_add32_carry</i></td></tr>
+<tr><th id="102">102</th><td><i>         * and even stat64_get!</i></td></tr>
+<tr><th id="103">103</th><td><i>         */</i></td></tr>
+<tr><th id="104">104</th><td>        old = atomic_cmpxchg(&amp;s-&gt;low, orig, result);</td></tr>
+<tr><th id="105">105</th><td>        <b>if</b> (orig == old) {</td></tr>
+<tr><th id="106">106</th><td>            <b>return</b>;</td></tr>
+<tr><th id="107">107</th><td>        }</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td>}</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><em>static</em> <b>inline</b> <em>void</em> stat64_min(Stat64 *s, uint64_t value)</td></tr>
+<tr><th id="112">112</th><td>{</td></tr>
+<tr><th id="113">113</th><td>    uint32_t low, high;</td></tr>
+<tr><th id="114">114</th><td>    uint32_t orig_low, orig_high;</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>    high = value &gt;&gt; <var>32</var>;</td></tr>
+<tr><th id="117">117</th><td>    low = (uint32_t) value;</td></tr>
+<tr><th id="118">118</th><td>    <b>do</b> {</td></tr>
+<tr><th id="119">119</th><td>        orig_high = atomic_read(&amp;s-&gt;high);</td></tr>
+<tr><th id="120">120</th><td>        <b>if</b> (orig_high &lt; high) {</td></tr>
+<tr><th id="121">121</th><td>            <b>return</b>;</td></tr>
+<tr><th id="122">122</th><td>        }</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>        <b>if</b> (orig_high == high) {</td></tr>
+<tr><th id="125">125</th><td>            <i>/* High 32 bits are equal.  Read low after high, otherwise we</i></td></tr>
+<tr><th id="126">126</th><td><i>             * can get a false positive (e.g. 0x1235,0x0000 changes to</i></td></tr>
+<tr><th id="127">127</th><td><i>             * 0x1234,0x8000 and we read it as 0x1234,0x0000). Pairs with</i></td></tr>
+<tr><th id="128">128</th><td><i>             * the write barrier in stat64_min_slow.</i></td></tr>
+<tr><th id="129">129</th><td><i>             */</i></td></tr>
+<tr><th id="130">130</th><td>            smp_rmb();</td></tr>
+<tr><th id="131">131</th><td>            orig_low = atomic_read(&amp;s-&gt;low);</td></tr>
+<tr><th id="132">132</th><td>            <b>if</b> (orig_low &lt;= low) {</td></tr>
+<tr><th id="133">133</th><td>                <b>return</b>;</td></tr>
+<tr><th id="134">134</th><td>            }</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>            <i>/* See if we were lucky and a writer raced against us.  The</i></td></tr>
+<tr><th id="137">137</th><td><i>             * barrier is theoretically unnecessary, but if we remove it</i></td></tr>
+<tr><th id="138">138</th><td><i>             * we may miss being lucky.</i></td></tr>
+<tr><th id="139">139</th><td><i>             */</i></td></tr>
+<tr><th id="140">140</th><td>            smp_rmb();</td></tr>
+<tr><th id="141">141</th><td>            orig_high = atomic_read(&amp;s-&gt;high);</td></tr>
+<tr><th id="142">142</th><td>            <b>if</b> (orig_high &lt; high) {</td></tr>
+<tr><th id="143">143</th><td>                <b>return</b>;</td></tr>
+<tr><th id="144">144</th><td>            }</td></tr>
+<tr><th id="145">145</th><td>        }</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>        <i>/* If the value changes in any way, we have to take the lock.  */</i></td></tr>
+<tr><th id="148">148</th><td>    } <b>while</b> (!stat64_min_slow(s, value));</td></tr>
+<tr><th id="149">149</th><td>}</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><em>static</em> <b>inline</b> <em>void</em> stat64_max(Stat64 *s, uint64_t value)</td></tr>
+<tr><th id="152">152</th><td>{</td></tr>
+<tr><th id="153">153</th><td>    uint32_t low, high;</td></tr>
+<tr><th id="154">154</th><td>    uint32_t orig_low, orig_high;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    high = value &gt;&gt; <var>32</var>;</td></tr>
+<tr><th id="157">157</th><td>    low = (uint32_t) value;</td></tr>
+<tr><th id="158">158</th><td>    <b>do</b> {</td></tr>
+<tr><th id="159">159</th><td>        orig_high = atomic_read(&amp;s-&gt;high);</td></tr>
+<tr><th id="160">160</th><td>        <b>if</b> (orig_high &gt; high) {</td></tr>
+<tr><th id="161">161</th><td>            <b>return</b>;</td></tr>
+<tr><th id="162">162</th><td>        }</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>        <b>if</b> (orig_high == high) {</td></tr>
+<tr><th id="165">165</th><td>            <i>/* High 32 bits are equal.  Read low after high, otherwise we</i></td></tr>
+<tr><th id="166">166</th><td><i>             * can get a false positive (e.g. 0x1234,0x8000 changes to</i></td></tr>
+<tr><th id="167">167</th><td><i>             * 0x1235,0x0000 and we read it as 0x1235,0x8000). Pairs with</i></td></tr>
+<tr><th id="168">168</th><td><i>             * the write barrier in stat64_max_slow.</i></td></tr>
+<tr><th id="169">169</th><td><i>             */</i></td></tr>
+<tr><th id="170">170</th><td>            smp_rmb();</td></tr>
+<tr><th id="171">171</th><td>            orig_low = atomic_read(&amp;s-&gt;low);</td></tr>
+<tr><th id="172">172</th><td>            <b>if</b> (orig_low &gt;= low) {</td></tr>
+<tr><th id="173">173</th><td>                <b>return</b>;</td></tr>
+<tr><th id="174">174</th><td>            }</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>            <i>/* See if we were lucky and a writer raced against us.  The</i></td></tr>
+<tr><th id="177">177</th><td><i>             * barrier is theoretically unnecessary, but if we remove it</i></td></tr>
+<tr><th id="178">178</th><td><i>             * we may miss being lucky.</i></td></tr>
+<tr><th id="179">179</th><td><i>             */</i></td></tr>
+<tr><th id="180">180</th><td>            smp_rmb();</td></tr>
+<tr><th id="181">181</th><td>            orig_high = atomic_read(&amp;s-&gt;high);</td></tr>
+<tr><th id="182">182</th><td>            <b>if</b> (orig_high &gt; high) {</td></tr>
+<tr><th id="183">183</th><td>                <b>return</b>;</td></tr>
+<tr><th id="184">184</th><td>            }</td></tr>
+<tr><th id="185">185</th><td>        }</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>        <i>/* If the value changes in any way, we have to take the lock.  */</i></td></tr>
+<tr><th id="188">188</th><td>    } <b>while</b> (!stat64_max_slow(s, value));</td></tr>
+<tr><th id="189">189</th><td>}</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><u>#<span data-ppcond="31">endif</span></u></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><u>#<span data-ppcond="12">endif</span></u></td></tr>
+<tr><th id="194">194</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../block.c.html'>codebrowser/block.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

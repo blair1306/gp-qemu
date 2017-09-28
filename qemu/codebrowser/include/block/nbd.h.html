@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>nbd.h source code [codebrowser/include/block/nbd.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="NBDExportInfo,NBDReply,NBDRequest,nbd_opt_reply,nbd_option "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/block/nbd.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>block</a>/<a href='nbd.h.html'>nbd.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  Copyright (C) 2016-2017 Red Hat, Inc.</i></td></tr>
+<tr><th id="3">3</th><td><i> *  Copyright (C) 2005  Anthony Liguori &lt;anthony@codemonkey.ws&gt;</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> *  Network Block Device</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> *  This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="8">8</th><td><i> *  it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="9">9</th><td><i> *  the Free Software Foundation; under version 2 of the License.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> *  This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="14">14</th><td><i> *  GNU General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> *  You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="17">17</th><td><i> *  along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#<span data-ppcond="20">ifndef</span> <span class="macro" data-ref="_M/NBD_H">NBD_H</span></u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/NBD_H" data-ref="_M/NBD_H">NBD_H</dfn></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../qemu/option.h.html">"qemu/option.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../io/channel-socket.h.html">"io/channel-socket.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../crypto/tlscreds.h.html">"crypto/tlscreds.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i>/* Handshake phase structs - this struct is passed on the wire */</i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><b>struct</b> <dfn class="type def" id="nbd_option" title='nbd_option' data-ref="nbd_option">nbd_option</dfn> {</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="nbd_option::magic" title='nbd_option::magic' data-ref="nbd_option::magic">magic</dfn>; <i>/* NBD_OPTS_MAGIC */</i></td></tr>
+<tr><th id="33">33</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="nbd_option::option" title='nbd_option::option' data-ref="nbd_option::option">option</dfn>; <i>/* NBD_OPT_* */</i></td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="nbd_option::length" title='nbd_option::length' data-ref="nbd_option::length">length</dfn>;</td></tr>
+<tr><th id="35">35</th><td>} <a class="macro" href="../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="36">36</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#nbd_option" title='nbd_option' data-ref="nbd_option">nbd_option</a> <dfn class="typedef" id="nbd_option" title='nbd_option' data-type='struct nbd_option' data-ref="nbd_option">nbd_option</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><b>struct</b> <dfn class="type def" id="nbd_opt_reply" title='nbd_opt_reply' data-ref="nbd_opt_reply">nbd_opt_reply</dfn> {</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="nbd_opt_reply::magic" title='nbd_opt_reply::magic' data-ref="nbd_opt_reply::magic">magic</dfn>; <i>/* NBD_REP_MAGIC */</i></td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="nbd_opt_reply::option" title='nbd_opt_reply::option' data-ref="nbd_opt_reply::option">option</dfn>; <i>/* NBD_OPT_* */</i></td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="nbd_opt_reply::type" title='nbd_opt_reply::type' data-ref="nbd_opt_reply::type">type</dfn>; <i>/* NBD_REP_* */</i></td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="nbd_opt_reply::length" title='nbd_opt_reply::length' data-ref="nbd_opt_reply::length">length</dfn>;</td></tr>
+<tr><th id="43">43</th><td>} <a class="macro" href="../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="44">44</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#nbd_opt_reply" title='nbd_opt_reply' data-ref="nbd_opt_reply">nbd_opt_reply</a> <dfn class="typedef" id="nbd_opt_reply" title='nbd_opt_reply' data-type='struct nbd_opt_reply' data-ref="nbd_opt_reply">nbd_opt_reply</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i>/* Transmission phase structs</i></td></tr>
+<tr><th id="47">47</th><td><i> *</i></td></tr>
+<tr><th id="48">48</th><td><i> * Note: these are _NOT_ the same as the network representation of an NBD</i></td></tr>
+<tr><th id="49">49</th><td><i> * request and reply!</i></td></tr>
+<tr><th id="50">50</th><td><i> */</i></td></tr>
+<tr><th id="51">51</th><td><b>struct</b> <dfn class="type def" id="NBDRequest" title='NBDRequest' data-ref="NBDRequest">NBDRequest</dfn> {</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="NBDRequest::handle" title='NBDRequest::handle' data-ref="NBDRequest::handle">handle</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="NBDRequest::from" title='NBDRequest::from' data-ref="NBDRequest::from">from</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NBDRequest::len" title='NBDRequest::len' data-ref="NBDRequest::len">len</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="NBDRequest::flags" title='NBDRequest::flags' data-ref="NBDRequest::flags">flags</dfn>; <i>/* NBD_CMD_FLAG_* */</i></td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="NBDRequest::type" title='NBDRequest::type' data-ref="NBDRequest::type">type</dfn>; <i>/* NBD_CMD_* */</i></td></tr>
+<tr><th id="57">57</th><td>};</td></tr>
+<tr><th id="58">58</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#NBDRequest" title='NBDRequest' data-ref="NBDRequest">NBDRequest</a> <dfn class="typedef" id="NBDRequest" title='NBDRequest' data-type='struct NBDRequest' data-ref="NBDRequest">NBDRequest</dfn>;</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><b>struct</b> <dfn class="type def" id="NBDReply" title='NBDReply' data-ref="NBDReply">NBDReply</dfn> {</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="NBDReply::handle" title='NBDReply::handle' data-ref="NBDReply::handle">handle</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NBDReply::error" title='NBDReply::error' data-ref="NBDReply::error">error</dfn>;</td></tr>
+<tr><th id="63">63</th><td>};</td></tr>
+<tr><th id="64">64</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#NBDReply" title='NBDReply' data-ref="NBDReply">NBDReply</a> <dfn class="typedef" id="NBDReply" title='NBDReply' data-type='struct NBDReply' data-ref="NBDReply">NBDReply</dfn>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><i>/* Transmission (export) flags: sent from server to client during handshake,</i></td></tr>
+<tr><th id="67">67</th><td><i>   but describe what will happen during transmission */</i></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_HAS_FLAGS" data-ref="_M/NBD_FLAG_HAS_FLAGS">NBD_FLAG_HAS_FLAGS</dfn>      (1 &lt;&lt; 0)        /* Flags are there */</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_READ_ONLY" data-ref="_M/NBD_FLAG_READ_ONLY">NBD_FLAG_READ_ONLY</dfn>      (1 &lt;&lt; 1)        /* Device is read-only */</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_SEND_FLUSH" data-ref="_M/NBD_FLAG_SEND_FLUSH">NBD_FLAG_SEND_FLUSH</dfn>     (1 &lt;&lt; 2)        /* Send FLUSH */</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_SEND_FUA" data-ref="_M/NBD_FLAG_SEND_FUA">NBD_FLAG_SEND_FUA</dfn>       (1 &lt;&lt; 3)        /* Send FUA (Force Unit Access) */</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_ROTATIONAL" data-ref="_M/NBD_FLAG_ROTATIONAL">NBD_FLAG_ROTATIONAL</dfn>     (1 &lt;&lt; 4)        /* Use elevator algorithm - rotational media */</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_SEND_TRIM" data-ref="_M/NBD_FLAG_SEND_TRIM">NBD_FLAG_SEND_TRIM</dfn>      (1 &lt;&lt; 5)        /* Send TRIM (discard) */</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_SEND_WRITE_ZEROES" data-ref="_M/NBD_FLAG_SEND_WRITE_ZEROES">NBD_FLAG_SEND_WRITE_ZEROES</dfn> (1 &lt;&lt; 6)     /* Send WRITE_ZEROES */</u></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><i>/* New-style handshake (global) flags, sent from server to client, and</i></td></tr>
+<tr><th id="77">77</th><td><i>   control what will happen during handshake phase. */</i></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_FIXED_NEWSTYLE" data-ref="_M/NBD_FLAG_FIXED_NEWSTYLE">NBD_FLAG_FIXED_NEWSTYLE</dfn>   (1 &lt;&lt; 0) /* Fixed newstyle protocol. */</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_NO_ZEROES" data-ref="_M/NBD_FLAG_NO_ZEROES">NBD_FLAG_NO_ZEROES</dfn>        (1 &lt;&lt; 1) /* End handshake without zeroes. */</u></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><i>/* New-style client flags, sent from client to server to control what happens</i></td></tr>
+<tr><th id="82">82</th><td><i>   during handshake phase. */</i></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_C_FIXED_NEWSTYLE" data-ref="_M/NBD_FLAG_C_FIXED_NEWSTYLE">NBD_FLAG_C_FIXED_NEWSTYLE</dfn> (1 &lt;&lt; 0) /* Fixed newstyle protocol. */</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/NBD_FLAG_C_NO_ZEROES" data-ref="_M/NBD_FLAG_C_NO_ZEROES">NBD_FLAG_C_NO_ZEROES</dfn>      (1 &lt;&lt; 1) /* End handshake without zeroes. */</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><i>/* Option requests. */</i></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_EXPORT_NAME" data-ref="_M/NBD_OPT_EXPORT_NAME">NBD_OPT_EXPORT_NAME</dfn>      (1)</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_ABORT" data-ref="_M/NBD_OPT_ABORT">NBD_OPT_ABORT</dfn>            (2)</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_LIST" data-ref="_M/NBD_OPT_LIST">NBD_OPT_LIST</dfn>             (3)</u></td></tr>
+<tr><th id="90">90</th><td><i>/* #define NBD_OPT_PEEK_EXPORT   (4) not in use */</i></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_STARTTLS" data-ref="_M/NBD_OPT_STARTTLS">NBD_OPT_STARTTLS</dfn>         (5)</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_INFO" data-ref="_M/NBD_OPT_INFO">NBD_OPT_INFO</dfn>             (6)</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_GO" data-ref="_M/NBD_OPT_GO">NBD_OPT_GO</dfn>               (7)</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/NBD_OPT_STRUCTURED_REPLY" data-ref="_M/NBD_OPT_STRUCTURED_REPLY">NBD_OPT_STRUCTURED_REPLY</dfn> (8)</u></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><i>/* Option reply types. */</i></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR" data-ref="_M/NBD_REP_ERR">NBD_REP_ERR</dfn>(value) ((UINT32_C(1) &lt;&lt; 31) | (value))</u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ACK" data-ref="_M/NBD_REP_ACK">NBD_REP_ACK</dfn>             (1)             /* Data sending finished. */</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_SERVER" data-ref="_M/NBD_REP_SERVER">NBD_REP_SERVER</dfn>          (2)             /* Export description. */</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_INFO" data-ref="_M/NBD_REP_INFO">NBD_REP_INFO</dfn>            (3)             /* NBD_OPT_INFO/GO. */</u></td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_UNSUP" data-ref="_M/NBD_REP_ERR_UNSUP">NBD_REP_ERR_UNSUP</dfn>           NBD_REP_ERR(1)  /* Unknown option */</u></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_POLICY" data-ref="_M/NBD_REP_ERR_POLICY">NBD_REP_ERR_POLICY</dfn>          NBD_REP_ERR(2)  /* Server denied */</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_INVALID" data-ref="_M/NBD_REP_ERR_INVALID">NBD_REP_ERR_INVALID</dfn>         NBD_REP_ERR(3)  /* Invalid length */</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_PLATFORM" data-ref="_M/NBD_REP_ERR_PLATFORM">NBD_REP_ERR_PLATFORM</dfn>        NBD_REP_ERR(4)  /* Not compiled in */</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_TLS_REQD" data-ref="_M/NBD_REP_ERR_TLS_REQD">NBD_REP_ERR_TLS_REQD</dfn>        NBD_REP_ERR(5)  /* TLS required */</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_UNKNOWN" data-ref="_M/NBD_REP_ERR_UNKNOWN">NBD_REP_ERR_UNKNOWN</dfn>         NBD_REP_ERR(6)  /* Export unknown */</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_SHUTDOWN" data-ref="_M/NBD_REP_ERR_SHUTDOWN">NBD_REP_ERR_SHUTDOWN</dfn>        NBD_REP_ERR(7)  /* Server shutting down */</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_ERR_BLOCK_SIZE_REQD" data-ref="_M/NBD_REP_ERR_BLOCK_SIZE_REQD">NBD_REP_ERR_BLOCK_SIZE_REQD</dfn> NBD_REP_ERR(8)  /* Need INFO_BLOCK_SIZE */</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>/* Info types, used during NBD_REP_INFO */</i></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/NBD_INFO_EXPORT" data-ref="_M/NBD_INFO_EXPORT">NBD_INFO_EXPORT</dfn>         0</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/NBD_INFO_NAME" data-ref="_M/NBD_INFO_NAME">NBD_INFO_NAME</dfn>           1</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/NBD_INFO_DESCRIPTION" data-ref="_M/NBD_INFO_DESCRIPTION">NBD_INFO_DESCRIPTION</dfn>    2</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/NBD_INFO_BLOCK_SIZE" data-ref="_M/NBD_INFO_BLOCK_SIZE">NBD_INFO_BLOCK_SIZE</dfn>     3</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><i>/* Request flags, sent from client to server during transmission phase */</i></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/NBD_CMD_FLAG_FUA" data-ref="_M/NBD_CMD_FLAG_FUA">NBD_CMD_FLAG_FUA</dfn>        (1 &lt;&lt; 0) /* 'force unit access' during write */</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/NBD_CMD_FLAG_NO_HOLE" data-ref="_M/NBD_CMD_FLAG_NO_HOLE">NBD_CMD_FLAG_NO_HOLE</dfn>    (1 &lt;&lt; 1) /* don't punch hole on zero run */</u></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><i>/* Supported request types */</i></td></tr>
+<tr><th id="123">123</th><td><b>enum</b> {</td></tr>
+<tr><th id="124">124</th><td>    <dfn class="enum" id="NBD_CMD_READ" title='NBD_CMD_READ' data-ref="NBD_CMD_READ">NBD_CMD_READ</dfn> = <var>0</var>,</td></tr>
+<tr><th id="125">125</th><td>    <dfn class="enum" id="NBD_CMD_WRITE" title='NBD_CMD_WRITE' data-ref="NBD_CMD_WRITE">NBD_CMD_WRITE</dfn> = <var>1</var>,</td></tr>
+<tr><th id="126">126</th><td>    <dfn class="enum" id="NBD_CMD_DISC" title='NBD_CMD_DISC' data-ref="NBD_CMD_DISC">NBD_CMD_DISC</dfn> = <var>2</var>,</td></tr>
+<tr><th id="127">127</th><td>    <dfn class="enum" id="NBD_CMD_FLUSH" title='NBD_CMD_FLUSH' data-ref="NBD_CMD_FLUSH">NBD_CMD_FLUSH</dfn> = <var>3</var>,</td></tr>
+<tr><th id="128">128</th><td>    <dfn class="enum" id="NBD_CMD_TRIM" title='NBD_CMD_TRIM' data-ref="NBD_CMD_TRIM">NBD_CMD_TRIM</dfn> = <var>4</var>,</td></tr>
+<tr><th id="129">129</th><td>    <i>/* 5 reserved for failed experiment NBD_CMD_CACHE */</i></td></tr>
+<tr><th id="130">130</th><td>    <dfn class="enum" id="NBD_CMD_WRITE_ZEROES" title='NBD_CMD_WRITE_ZEROES' data-ref="NBD_CMD_WRITE_ZEROES">NBD_CMD_WRITE_ZEROES</dfn> = <var>6</var>,</td></tr>
+<tr><th id="131">131</th><td>};</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/NBD_DEFAULT_PORT" data-ref="_M/NBD_DEFAULT_PORT">NBD_DEFAULT_PORT</dfn>	10809</u></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><i>/* Maximum size of a single READ/WRITE data buffer */</i></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/NBD_MAX_BUFFER_SIZE" data-ref="_M/NBD_MAX_BUFFER_SIZE">NBD_MAX_BUFFER_SIZE</dfn> (32 * 1024 * 1024)</u></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><i>/* Maximum size of an export name. The NBD spec requires 256 and</i></td></tr>
+<tr><th id="139">139</th><td><i> * suggests that servers support up to 4096, but we stick to only the</i></td></tr>
+<tr><th id="140">140</th><td><i> * required size so that we can stack-allocate the names, and because</i></td></tr>
+<tr><th id="141">141</th><td><i> * going larger would require an audit of more code to make sure we</i></td></tr>
+<tr><th id="142">142</th><td><i> * aren't overflowing some other buffer. */</i></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/NBD_MAX_NAME_SIZE" data-ref="_M/NBD_MAX_NAME_SIZE">NBD_MAX_NAME_SIZE</dfn> 256</u></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/* Details collected by NBD_OPT_EXPORT_NAME and NBD_OPT_GO */</i></td></tr>
+<tr><th id="146">146</th><td><b>struct</b> <dfn class="type def" id="NBDExportInfo" title='NBDExportInfo' data-ref="NBDExportInfo">NBDExportInfo</dfn> {</td></tr>
+<tr><th id="147">147</th><td>    <i>/* Set by client before nbd_receive_negotiate() */</i></td></tr>
+<tr><th id="148">148</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="NBDExportInfo::request_sizes" title='NBDExportInfo::request_sizes' data-ref="NBDExportInfo::request_sizes">request_sizes</dfn>;</td></tr>
+<tr><th id="149">149</th><td>    <i>/* Set by server results during nbd_receive_negotiate() */</i></td></tr>
+<tr><th id="150">150</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="NBDExportInfo::size" title='NBDExportInfo::size' data-ref="NBDExportInfo::size">size</dfn>;</td></tr>
+<tr><th id="151">151</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="NBDExportInfo::flags" title='NBDExportInfo::flags' data-ref="NBDExportInfo::flags">flags</dfn>;</td></tr>
+<tr><th id="152">152</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NBDExportInfo::min_block" title='NBDExportInfo::min_block' data-ref="NBDExportInfo::min_block">min_block</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NBDExportInfo::opt_block" title='NBDExportInfo::opt_block' data-ref="NBDExportInfo::opt_block">opt_block</dfn>;</td></tr>
+<tr><th id="154">154</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NBDExportInfo::max_block" title='NBDExportInfo::max_block' data-ref="NBDExportInfo::max_block">max_block</dfn>;</td></tr>
+<tr><th id="155">155</th><td>};</td></tr>
+<tr><th id="156">156</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#NBDExportInfo" title='NBDExportInfo' data-ref="NBDExportInfo">NBDExportInfo</a> <dfn class="typedef" id="NBDExportInfo" title='NBDExportInfo' data-type='struct NBDExportInfo' data-ref="NBDExportInfo">NBDExportInfo</dfn>;</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="nbd_rwv" title='nbd_rwv' data-ref="nbd_rwv">nbd_rwv</dfn>(<a class="typedef" href="../io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col3 decl" id="1283ioc" title='ioc' data-type='QIOChannel *' data-ref="1283ioc">ioc</dfn>, <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col4 decl" id="1284iov" title='iov' data-type='struct iovec *' data-ref="1284iov">iov</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="1285niov" title='niov' data-type='size_t' data-ref="1285niov">niov</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="1286length" title='length' data-type='size_t' data-ref="1286length">length</dfn>,</td></tr>
+<tr><th id="159">159</th><td>                <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="1287do_read" title='do_read' data-type='_Bool' data-ref="1287do_read">do_read</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="1288errp" title='errp' data-type='Error **' data-ref="1288errp">errp</dfn>);</td></tr>
+<tr><th id="160">160</th><td><em>int</em> <dfn class="decl" id="nbd_receive_negotiate" title='nbd_receive_negotiate' data-ref="nbd_receive_negotiate">nbd_receive_negotiate</dfn>(<a class="typedef" href="../io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col9 decl" id="1289ioc" title='ioc' data-type='QIOChannel *' data-ref="1289ioc">ioc</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="1290name" title='name' data-type='const char *' data-ref="1290name">name</dfn>,</td></tr>
+<tr><th id="161">161</th><td>                          <a class="typedef" href="../crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="local col1 decl" id="1291tlscreds" title='tlscreds' data-type='QCryptoTLSCreds *' data-ref="1291tlscreds">tlscreds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="1292hostname" title='hostname' data-type='const char *' data-ref="1292hostname">hostname</dfn>,</td></tr>
+<tr><th id="162">162</th><td>                          <a class="typedef" href="../io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> **<dfn class="local col3 decl" id="1293outioc" title='outioc' data-type='QIOChannel **' data-ref="1293outioc">outioc</dfn>, <a class="typedef" href="#NBDExportInfo" title='NBDExportInfo' data-type='struct NBDExportInfo' data-ref="NBDExportInfo">NBDExportInfo</a> *<dfn class="local col4 decl" id="1294info" title='info' data-type='NBDExportInfo *' data-ref="1294info">info</dfn>,</td></tr>
+<tr><th id="163">163</th><td>                          <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="1295errp" title='errp' data-type='Error **' data-ref="1295errp">errp</dfn>);</td></tr>
+<tr><th id="164">164</th><td><em>int</em> <dfn class="decl" id="nbd_init" title='nbd_init' data-ref="nbd_init">nbd_init</dfn>(<em>int</em> <dfn class="local col6 decl" id="1296fd" title='fd' data-type='int' data-ref="1296fd">fd</dfn>, <a class="typedef" href="../io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> *<dfn class="local col7 decl" id="1297sioc" title='sioc' data-type='QIOChannelSocket *' data-ref="1297sioc">sioc</dfn>, <a class="typedef" href="#NBDExportInfo" title='NBDExportInfo' data-type='struct NBDExportInfo' data-ref="NBDExportInfo">NBDExportInfo</a> *<dfn class="local col8 decl" id="1298info" title='info' data-type='NBDExportInfo *' data-ref="1298info">info</dfn>,</td></tr>
+<tr><th id="165">165</th><td>             <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="1299errp" title='errp' data-type='Error **' data-ref="1299errp">errp</dfn>);</td></tr>
+<tr><th id="166">166</th><td><a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="nbd_send_request" title='nbd_send_request' data-ref="nbd_send_request">nbd_send_request</dfn>(<a class="typedef" href="../io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col0 decl" id="1300ioc" title='ioc' data-type='QIOChannel *' data-ref="1300ioc">ioc</dfn>, <a class="typedef" href="#NBDRequest" title='NBDRequest' data-type='struct NBDRequest' data-ref="NBDRequest">NBDRequest</a> *<dfn class="local col1 decl" id="1301request" title='request' data-type='NBDRequest *' data-ref="1301request">request</dfn>);</td></tr>
+<tr><th id="167">167</th><td><a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl" id="nbd_receive_reply" title='nbd_receive_reply' data-ref="nbd_receive_reply">nbd_receive_reply</dfn>(<a class="typedef" href="../io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col2 decl" id="1302ioc" title='ioc' data-type='QIOChannel *' data-ref="1302ioc">ioc</dfn>, <a class="typedef" href="#NBDReply" title='NBDReply' data-type='struct NBDReply' data-ref="NBDReply">NBDReply</a> *<dfn class="local col3 decl" id="1303reply" title='reply' data-type='NBDReply *' data-ref="1303reply">reply</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="1304errp" title='errp' data-type='Error **' data-ref="1304errp">errp</dfn>);</td></tr>
+<tr><th id="168">168</th><td><em>int</em> <dfn class="decl" id="nbd_client" title='nbd_client' data-ref="nbd_client">nbd_client</dfn>(<em>int</em> <dfn class="local col5 decl" id="1305fd" title='fd' data-type='int' data-ref="1305fd">fd</dfn>);</td></tr>
+<tr><th id="169">169</th><td><em>int</em> <dfn class="decl" id="nbd_disconnect" title='nbd_disconnect' data-ref="nbd_disconnect">nbd_disconnect</dfn>(<em>int</em> <dfn class="local col6 decl" id="1306fd" title='fd' data-type='int' data-ref="1306fd">fd</dfn>);</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="NBDExport" title='NBDExport' data-ref="NBDExport"><a class="type" href="#NBDExport" title='NBDExport' data-ref="NBDExport">NBDExport</a></dfn> <dfn class="typedef" id="NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</dfn>;</td></tr>
+<tr><th id="172">172</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="NBDClient" title='NBDClient' data-ref="NBDClient"><a class="type" href="#NBDClient" title='NBDClient' data-ref="NBDClient">NBDClient</a></dfn> <dfn class="typedef" id="NBDClient" title='NBDClient' data-type='struct NBDClient' data-ref="NBDClient">NBDClient</dfn>;</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="decl" id="nbd_export_new" title='nbd_export_new' data-ref="nbd_export_new">nbd_export_new</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#BlockDriverState" title='BlockDriverState' data-type='struct BlockDriverState' data-ref="BlockDriverState">BlockDriverState</a> *<dfn class="local col7 decl" id="1307bs" title='bs' data-type='BlockDriverState *' data-ref="1307bs">bs</dfn>, <a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#off_t" title='off_t' data-type='__off64_t' data-ref="off_t">off_t</a> <dfn class="local col8 decl" id="1308dev_offset" title='dev_offset' data-type='off_t' data-ref="1308dev_offset">dev_offset</dfn>, <a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#off_t" title='off_t' data-type='__off64_t' data-ref="off_t">off_t</a> <dfn class="local col9 decl" id="1309size" title='size' data-type='off_t' data-ref="1309size">size</dfn>,</td></tr>
+<tr><th id="175">175</th><td>                          <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="1310nbdflags" title='nbdflags' data-type='uint16_t' data-ref="1310nbdflags">nbdflags</dfn>, <em>void</em> (*<dfn class="local col1 decl" id="1311close" title='close' data-type='void (*)(NBDExport *)' data-ref="1311close">close</dfn>)(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *),</td></tr>
+<tr><th id="176">176</th><td>                          <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="1312writethrough" title='writethrough' data-type='_Bool' data-ref="1312writethrough">writethrough</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col3 decl" id="1313on_eject_blk" title='on_eject_blk' data-type='BlockBackend *' data-ref="1313on_eject_blk">on_eject_blk</dfn>,</td></tr>
+<tr><th id="177">177</th><td>                          <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="1314errp" title='errp' data-type='Error **' data-ref="1314errp">errp</dfn>);</td></tr>
+<tr><th id="178">178</th><td><em>void</em> <dfn class="decl" id="nbd_export_close" title='nbd_export_close' data-ref="nbd_export_close">nbd_export_close</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col5 decl" id="1315exp" title='exp' data-type='NBDExport *' data-ref="1315exp">exp</dfn>);</td></tr>
+<tr><th id="179">179</th><td><em>void</em> <dfn class="decl" id="nbd_export_get" title='nbd_export_get' data-ref="nbd_export_get">nbd_export_get</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col6 decl" id="1316exp" title='exp' data-type='NBDExport *' data-ref="1316exp">exp</dfn>);</td></tr>
+<tr><th id="180">180</th><td><em>void</em> <dfn class="decl" id="nbd_export_put" title='nbd_export_put' data-ref="nbd_export_put">nbd_export_put</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col7 decl" id="1317exp" title='exp' data-type='NBDExport *' data-ref="1317exp">exp</dfn>);</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><a class="typedef" href="../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="decl" id="nbd_export_get_blockdev" title='nbd_export_get_blockdev' data-ref="nbd_export_get_blockdev">nbd_export_get_blockdev</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col8 decl" id="1318exp" title='exp' data-type='NBDExport *' data-ref="1318exp">exp</dfn>);</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="decl" id="nbd_export_find" title='nbd_export_find' data-ref="nbd_export_find">nbd_export_find</dfn>(<em>const</em> <em>char</em> *<dfn class="local col9 decl" id="1319name" title='name' data-type='const char *' data-ref="1319name">name</dfn>);</td></tr>
+<tr><th id="185">185</th><td><em>void</em> <dfn class="decl" id="nbd_export_set_name" title='nbd_export_set_name' data-ref="nbd_export_set_name">nbd_export_set_name</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col0 decl" id="1320exp" title='exp' data-type='NBDExport *' data-ref="1320exp">exp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1321name" title='name' data-type='const char *' data-ref="1321name">name</dfn>);</td></tr>
+<tr><th id="186">186</th><td><em>void</em> <dfn class="decl" id="nbd_export_set_description" title='nbd_export_set_description' data-ref="nbd_export_set_description">nbd_export_set_description</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col2 decl" id="1322exp" title='exp' data-type='NBDExport *' data-ref="1322exp">exp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="1323description" title='description' data-type='const char *' data-ref="1323description">description</dfn>);</td></tr>
+<tr><th id="187">187</th><td><em>void</em> <dfn class="decl" id="nbd_export_close_all" title='nbd_export_close_all' data-ref="nbd_export_close_all">nbd_export_close_all</dfn>(<em>void</em>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><em>void</em> <dfn class="decl" id="nbd_client_new" title='nbd_client_new' data-ref="nbd_client_new">nbd_client_new</dfn>(<a class="typedef" href="#NBDExport" title='NBDExport' data-type='struct NBDExport' data-ref="NBDExport">NBDExport</a> *<dfn class="local col4 decl" id="1324exp" title='exp' data-type='NBDExport *' data-ref="1324exp">exp</dfn>,</td></tr>
+<tr><th id="190">190</th><td>                    <a class="typedef" href="../io/channel-socket.h.html#QIOChannelSocket" title='QIOChannelSocket' data-type='struct QIOChannelSocket' data-ref="QIOChannelSocket">QIOChannelSocket</a> *<dfn class="local col5 decl" id="1325sioc" title='sioc' data-type='QIOChannelSocket *' data-ref="1325sioc">sioc</dfn>,</td></tr>
+<tr><th id="191">191</th><td>                    <a class="typedef" href="../crypto/tlscreds.h.html#QCryptoTLSCreds" title='QCryptoTLSCreds' data-type='struct QCryptoTLSCreds' data-ref="QCryptoTLSCreds">QCryptoTLSCreds</a> *<dfn class="local col6 decl" id="1326tlscreds" title='tlscreds' data-type='QCryptoTLSCreds *' data-ref="1326tlscreds">tlscreds</dfn>,</td></tr>
+<tr><th id="192">192</th><td>                    <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="1327tlsaclname" title='tlsaclname' data-type='const char *' data-ref="1327tlsaclname">tlsaclname</dfn>,</td></tr>
+<tr><th id="193">193</th><td>                    <em>void</em> (*<dfn class="local col8 decl" id="1328close_fn" title='close_fn' data-type='void (*)(NBDClient *, _Bool)' data-ref="1328close_fn">close_fn</dfn>)(<a class="typedef" href="#NBDClient" title='NBDClient' data-type='struct NBDClient' data-ref="NBDClient">NBDClient</a> *, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>));</td></tr>
+<tr><th id="194">194</th><td><em>void</em> <dfn class="decl" id="nbd_client_get" title='nbd_client_get' data-ref="nbd_client_get">nbd_client_get</dfn>(<a class="typedef" href="#NBDClient" title='NBDClient' data-type='struct NBDClient' data-ref="NBDClient">NBDClient</a> *<dfn class="local col9 decl" id="1329client" title='client' data-type='NBDClient *' data-ref="1329client">client</dfn>);</td></tr>
+<tr><th id="195">195</th><td><em>void</em> <dfn class="decl" id="nbd_client_put" title='nbd_client_put' data-ref="nbd_client_put">nbd_client_put</dfn>(<a class="typedef" href="#NBDClient" title='NBDClient' data-type='struct NBDClient' data-ref="NBDClient">NBDClient</a> *<dfn class="local col0 decl" id="1330client" title='client' data-type='NBDClient *' data-ref="1330client">client</dfn>);</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td><em>void</em> <dfn class="decl" id="nbd_server_start" title='nbd_server_start' data-ref="nbd_server_start">nbd_server_start</dfn>(<a class="typedef" href="../../qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> *<dfn class="local col1 decl" id="1331addr" title='addr' data-type='SocketAddress *' data-ref="1331addr">addr</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="1332tls_creds" title='tls_creds' data-type='const char *' data-ref="1332tls_creds">tls_creds</dfn>,</td></tr>
+<tr><th id="198">198</th><td>                      <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="1333errp" title='errp' data-type='Error **' data-ref="1333errp">errp</dfn>);</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><u>#<span data-ppcond="20">endif</span></u></td></tr>
+<tr><th id="201">201</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../block.c.html'>codebrowser/block.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

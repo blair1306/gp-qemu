@@ -1,0 +1,77 @@
+<def f='codebrowser/include/block/block_int.h' l='542' ll='676'/>
+<size>12952</size>
+<doc f='codebrowser/include/block/block_int.h' l='536'>/*
+ * Note: the function bdrv_append() copies and swaps contents of
+ * BlockDriverStates, so if you add new fields to this struct, please
+ * inspect bdrv_append() to determine if the new fields need to be
+ * copied as well.
+ */</doc>
+<mbr r='BlockDriverState::open_flags' o='0' t='int'/>
+<mbr r='BlockDriverState::read_only' o='32' t='_Bool'/>
+<mbr r='BlockDriverState::encrypted' o='40' t='_Bool'/>
+<mbr r='BlockDriverState::sg' o='48' t='_Bool'/>
+<mbr r='BlockDriverState::probed' o='56' t='_Bool'/>
+<mbr r='BlockDriverState::force_share' o='64' t='_Bool'/>
+<mbr r='BlockDriverState::implicit' o='72' t='_Bool'/>
+<mbr r='BlockDriverState::drv' o='128' t='BlockDriver *'/>
+<mbr r='BlockDriverState::opaque' o='192' t='void *'/>
+<mbr r='BlockDriverState::aio_context' o='256' t='AioContext *'/>
+<mbr r='BlockDriverState::aio_notifiers' o='320' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:561:5)'/>
+<mbr r='BlockDriverState::walking_aio_notifiers' o='384' t='_Bool'/>
+<mbr r='BlockDriverState::filename' o='392' t='char [4096]'/>
+<mbr r='BlockDriverState::backing_file' o='33160' t='char [4096]'/>
+<mbr r='BlockDriverState::backing_format' o='65928' t='char [16]'/>
+<mbr r='BlockDriverState::full_open_options' o='66112' t='QDict *'/>
+<mbr r='BlockDriverState::exact_filename' o='66176' t='char [4096]'/>
+<mbr r='BlockDriverState::backing' o='98944' t='BdrvChild *'/>
+<mbr r='BlockDriverState::file' o='99008' t='BdrvChild *'/>
+<mbr r='BlockDriverState::bl' o='99072' t='BlockLimits'/>
+<mbr r='BlockDriverState::supported_write_flags' o='99520' t='unsigned int'/>
+<mbr r='BlockDriverState::supported_zero_flags' o='99552' t='unsigned int'/>
+<mbr r='BlockDriverState::node_name' o='99584' t='char [32]'/>
+<mbr r='BlockDriverState::node_list' o='99840' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:587:5)'/>
+<mbr r='BlockDriverState::bs_list' o='99968' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:589:5)'/>
+<mbr r='BlockDriverState::monitor_list' o='100096' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:591:5)'/>
+<mbr r='BlockDriverState::refcnt' o='100224' t='int'/>
+<mbr r='BlockDriverState::op_blockers' o='100288' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:595:5) [16]'/>
+<mbr r='BlockDriverState::job' o='101312' t='BlockJob *'/>
+<mbr r='BlockDriverState::inherits_from' o='101376' t='BlockDriverState *'/>
+<mbr r='BlockDriverState::children' o='101440' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:604:5)'/>
+<mbr r='BlockDriverState::parents' o='101504' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:605:5)'/>
+<mbr r='BlockDriverState::options' o='101568' t='QDict *'/>
+<mbr r='BlockDriverState::explicit_options' o='101632' t='QDict *'/>
+<mbr r='BlockDriverState::detect_zeroes' o='101696' t='BlockdevDetectZeroesOptions'/>
+<mbr r='BlockDriverState::backing_blocker' o='101760' t='Error *'/>
+<mbr r='BlockDriverState::total_sectors' o='101824' t='int64_t'/>
+<mbr r='BlockDriverState::before_write_notifiers' o='101888' t='NotifierWithReturnList'/>
+<mbr r='BlockDriverState::write_threshold_offset' o='101952' t='uint64_t'/>
+<mbr r='BlockDriverState::write_threshold_notifier' o='102016' t='NotifierWithReturn'/>
+<mbr r='BlockDriverState::dirty_bitmap_mutex' o='102208' t='QemuMutex'/>
+<mbr r='BlockDriverState::dirty_bitmaps' o='102592' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:634:5)'/>
+<mbr r='BlockDriverState::wr_highest_offset' o='102656' t='Stat64'/>
+<mbr r='BlockDriverState::copy_on_read' o='102720' t='int'/>
+<mbr r='BlockDriverState::in_flight' o='102752' t='unsigned int'/>
+<mbr r='BlockDriverState::serialising_in_flight' o='102784' t='unsigned int'/>
+<mbr r='BlockDriverState::wakeup' o='102816' t='_Bool'/>
+<mbr r='BlockDriverState::io_plugged' o='102848' t='unsigned int'/>
+<mbr r='BlockDriverState::enable_write_cache' o='102880' t='int'/>
+<mbr r='BlockDriverState::quiesce_counter' o='102912' t='int'/>
+<mbr r='BlockDriverState::write_gen' o='102944' t='unsigned int'/>
+<mbr r='BlockDriverState::reqs_lock' o='102976' t='CoMutex'/>
+<mbr r='BlockDriverState::tracked_requests' o='103360' t='struct (anonymous struct at /home/jon/workspace/qemu/include/block/block_int.h:670:5)'/>
+<mbr r='BlockDriverState::flush_queue' o='103424' t='CoQueue'/>
+<mbr r='BlockDriverState::active_flush_req' o='103552' t='_Bool'/>
+<mbr r='BlockDriverState::flushed_gen' o='103584' t='unsigned int'/>
+<doc f='codebrowser/include/block/blockjob_int.h' l='238'>/**
+ * block_job_defer_to_main_loop:
+ * @job: The job
+ * @fn: The function to run in the main loop
+ * @opaque: The opaque value that is passed to @fn
+ *
+ * This function must be called by the main job coroutine just before it
+ * returns.  @fn is executed in the main loop with the BlockDriverState
+ * AioContext acquired.  Block jobs must call bdrv_unref(), bdrv_close(), and
+ * anything that uses bdrv_drain_all() in the main loop.
+ *
+ * The @job AioContext is held while @fn executes.
+ */</doc>

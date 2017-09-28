@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pc_sysfw.c source code [codebrowser/hw/i386/pc_sysfw.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="PcSysFwDevice "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/i386/pc_sysfw.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='pc_sysfw.c.html'>pc_sysfw.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU PC System Firmware</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2004 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2011-2012 Intel Corporation</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="8">8</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="9">9</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="10">10</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="11">11</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="12">12</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="15">15</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="18">18</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="19">19</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="21">21</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="22">22</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="23">23</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i> */</i></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../include/hw/sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../include/hw/i386/pc.h.html">"hw/i386/pc.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../include/hw/boards.h.html">"hw/boards.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../include/hw/loader.h.html">"hw/loader.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../include/hw/block/flash.h.html">"hw/block/flash.h"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../include/sysemu/kvm.h.html">"sysemu/kvm.h"</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/BIOS_FILENAME" data-ref="_M/BIOS_FILENAME">BIOS_FILENAME</dfn> "bios.bin"</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="PcSysFwDevice" title='PcSysFwDevice' data-ref="PcSysFwDevice"><a class="type" href="#PcSysFwDevice" title='PcSysFwDevice' data-ref="PcSysFwDevice">PcSysFwDevice</a></dfn> {</td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="../../include/hw/sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="tu decl" id="PcSysFwDevice::busdev" title='PcSysFwDevice::busdev' data-type='SysBusDevice' data-ref="PcSysFwDevice::busdev">busdev</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="PcSysFwDevice::isapc_ram_fw" title='PcSysFwDevice::isapc_ram_fw' data-type='uint8_t' data-ref="PcSysFwDevice::isapc_ram_fw">isapc_ram_fw</dfn>;</td></tr>
+<tr><th id="44">44</th><td>} <dfn class="typedef" id="PcSysFwDevice" title='PcSysFwDevice' data-type='struct PcSysFwDevice' data-ref="PcSysFwDevice">PcSysFwDevice</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pc_isa_bios_init" title='pc_isa_bios_init' data-type='void pc_isa_bios_init(MemoryRegion * rom_memory, MemoryRegion * flash_mem, int ram_size)' data-ref="pc_isa_bios_init">pc_isa_bios_init</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col1 decl" id="1rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="1rom_memory">rom_memory</dfn>,</td></tr>
+<tr><th id="47">47</th><td>                             <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col2 decl" id="2flash_mem" title='flash_mem' data-type='MemoryRegion *' data-ref="2flash_mem">flash_mem</dfn>,</td></tr>
+<tr><th id="48">48</th><td>                             <em>int</em> <dfn class="local col3 decl" id="3ram_size" title='ram_size' data-type='int' data-ref="3ram_size">ram_size</dfn>)</td></tr>
+<tr><th id="49">49</th><td>{</td></tr>
+<tr><th id="50">50</th><td>    <em>int</em> <dfn class="local col4 decl" id="4isa_bios_size" title='isa_bios_size' data-type='int' data-ref="4isa_bios_size">isa_bios_size</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col5 decl" id="5isa_bios" title='isa_bios' data-type='MemoryRegion *' data-ref="5isa_bios">isa_bios</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="6flash_size" title='flash_size' data-type='uint64_t' data-ref="6flash_size">flash_size</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <em>void</em> *<dfn class="local col7 decl" id="7flash_ptr" title='flash_ptr' data-type='void *' data-ref="7flash_ptr">flash_ptr</dfn>, *<dfn class="local col8 decl" id="8isa_bios_ptr" title='isa_bios_ptr' data-type='void *' data-ref="8isa_bios_ptr">isa_bios_ptr</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <a class="local col6 ref" href="#6flash_size" title='flash_size' data-ref="6flash_size">flash_size</a> = <a class="ref" href="../../include/exec/memory.h.html#memory_region_size" title='memory_region_size' data-ref="memory_region_size">memory_region_size</a>(<a class="local col2 ref" href="#2flash_mem" title='flash_mem' data-ref="2flash_mem">flash_mem</a>);</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <i>/* map the last 128KB of the BIOS in ISA space */</i></td></tr>
+<tr><th id="58">58</th><td>    <a class="local col4 ref" href="#4isa_bios_size" title='isa_bios_size' data-ref="4isa_bios_size">isa_bios_size</a> = <a class="macro" href="../../../include/glib-2.0/glib/gmacros.h.html#291" title="(((flash_size) &lt; (128 * 1024)) ? (flash_size) : (128 * 1024))" data-ref="_M/MIN">MIN</a>(<a class="local col6 ref" href="#6flash_size" title='flash_size' data-ref="6flash_size">flash_size</a>, <var>128</var> * <var>1024</var>);</td></tr>
+<tr><th id="59">59</th><td>    <a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a> = <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_malloc" title='g_malloc' data-ref="g_malloc">g_malloc</a>(<b>sizeof</b>(*<a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a>));</td></tr>
+<tr><th id="60">60</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_init_ram" title='memory_region_init_ram' data-ref="memory_region_init_ram">memory_region_init_ram</a>(<a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <q>"isa-bios"</q>, <a class="local col4 ref" href="#4isa_bios_size" title='isa_bios_size' data-ref="4isa_bios_size">isa_bios_size</a>,</td></tr>
+<tr><th id="61">61</th><td>                           &amp;<a class="ref" href="../../include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>);</td></tr>
+<tr><th id="62">62</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_add_subregion_overlap" title='memory_region_add_subregion_overlap' data-ref="memory_region_add_subregion_overlap">memory_region_add_subregion_overlap</a>(<a class="local col1 ref" href="#1rom_memory" title='rom_memory' data-ref="1rom_memory">rom_memory</a>,</td></tr>
+<tr><th id="63">63</th><td>                                        <var>0x100000</var> - <a class="local col4 ref" href="#4isa_bios_size" title='isa_bios_size' data-ref="4isa_bios_size">isa_bios_size</a>,</td></tr>
+<tr><th id="64">64</th><td>                                        <a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a>,</td></tr>
+<tr><th id="65">65</th><td>                                        <var>1</var>);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>    <i>/* copy ISA rom image from top of flash memory */</i></td></tr>
+<tr><th id="68">68</th><td>    <a class="local col7 ref" href="#7flash_ptr" title='flash_ptr' data-ref="7flash_ptr">flash_ptr</a> = <a class="ref" href="../../include/exec/memory.h.html#memory_region_get_ram_ptr" title='memory_region_get_ram_ptr' data-ref="memory_region_get_ram_ptr">memory_region_get_ram_ptr</a>(<a class="local col2 ref" href="#2flash_mem" title='flash_mem' data-ref="2flash_mem">flash_mem</a>);</td></tr>
+<tr><th id="69">69</th><td>    <a class="local col8 ref" href="#8isa_bios_ptr" title='isa_bios_ptr' data-ref="8isa_bios_ptr">isa_bios_ptr</a> = <a class="ref" href="../../include/exec/memory.h.html#memory_region_get_ram_ptr" title='memory_region_get_ram_ptr' data-ref="memory_region_get_ram_ptr">memory_region_get_ram_ptr</a>(<a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a>);</td></tr>
+<tr><th id="70">70</th><td>    <a class="ref" href="../../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col8 ref" href="#8isa_bios_ptr" title='isa_bios_ptr' data-ref="8isa_bios_ptr">isa_bios_ptr</a>,</td></tr>
+<tr><th id="71">71</th><td>           ((<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>*)<a class="local col7 ref" href="#7flash_ptr" title='flash_ptr' data-ref="7flash_ptr">flash_ptr</a>) + (<a class="local col6 ref" href="#6flash_size" title='flash_size' data-ref="6flash_size">flash_size</a> - <a class="local col4 ref" href="#4isa_bios_size" title='isa_bios_size' data-ref="4isa_bios_size">isa_bios_size</a>),</td></tr>
+<tr><th id="72">72</th><td>           <a class="local col4 ref" href="#4isa_bios_size" title='isa_bios_size' data-ref="4isa_bios_size">isa_bios_size</a>);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_set_readonly" title='memory_region_set_readonly' data-ref="memory_region_set_readonly">memory_region_set_readonly</a>(<a class="local col5 ref" href="#5isa_bios" title='isa_bios' data-ref="5isa_bios">isa_bios</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/FLASH_MAP_UNIT_MAX" data-ref="_M/FLASH_MAP_UNIT_MAX">FLASH_MAP_UNIT_MAX</dfn> 2</u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>/* We don't have a theoretically justifiable exact lower bound on the base</i></td></tr>
+<tr><th id="80">80</th><td><i> * address of any flash mapping. In practice, the IO-APIC MMIO range is</i></td></tr>
+<tr><th id="81">81</th><td><i> * [0xFEE00000..0xFEE01000[ -- see IO_APIC_DEFAULT_ADDRESS --, leaving free</i></td></tr>
+<tr><th id="82">82</th><td><i> * only 18MB-4KB below 4G. For now, restrict the cumulative mapping to 8MB in</i></td></tr>
+<tr><th id="83">83</th><td><i> * size.</i></td></tr>
+<tr><th id="84">84</th><td><i> */</i></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/FLASH_MAP_BASE_MIN" data-ref="_M/FLASH_MAP_BASE_MIN">FLASH_MAP_BASE_MIN</dfn> ((<a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a>)(0x100000000ULL - 8*1024*1024))</u></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><i  data-doc="pc_system_flash_init">/* This function maps flash drives from 4G downward, in order of their unit</i></td></tr>
+<tr><th id="88">88</th><td><i  data-doc="pc_system_flash_init"> * numbers. The mapping starts at unit#0, with unit number increments of 1, and</i></td></tr>
+<tr><th id="89">89</th><td><i  data-doc="pc_system_flash_init"> * stops before the first missing flash drive, or before</i></td></tr>
+<tr><th id="90">90</th><td><i  data-doc="pc_system_flash_init"> * unit#FLASH_MAP_UNIT_MAX, whichever is reached first.</i></td></tr>
+<tr><th id="91">91</th><td><i  data-doc="pc_system_flash_init"> *</i></td></tr>
+<tr><th id="92">92</th><td><i  data-doc="pc_system_flash_init"> * Addressing within one flash drive is of course not reversed.</i></td></tr>
+<tr><th id="93">93</th><td><i  data-doc="pc_system_flash_init"> *</i></td></tr>
+<tr><th id="94">94</th><td><i  data-doc="pc_system_flash_init"> * An error message is printed and the process exits if:</i></td></tr>
+<tr><th id="95">95</th><td><i  data-doc="pc_system_flash_init"> * - the size of the backing file for a flash drive is non-positive, or not a</i></td></tr>
+<tr><th id="96">96</th><td><i  data-doc="pc_system_flash_init"> *   multiple of the required sector size, or</i></td></tr>
+<tr><th id="97">97</th><td><i  data-doc="pc_system_flash_init"> * - the current mapping's base address would fall below FLASH_MAP_BASE_MIN.</i></td></tr>
+<tr><th id="98">98</th><td><i  data-doc="pc_system_flash_init"> *</i></td></tr>
+<tr><th id="99">99</th><td><i  data-doc="pc_system_flash_init"> * The drive with unit#0 (if available) is mapped at the highest address, and</i></td></tr>
+<tr><th id="100">100</th><td><i  data-doc="pc_system_flash_init"> * it is passed to pc_isa_bios_init(). Merging several drives for isa-bios is</i></td></tr>
+<tr><th id="101">101</th><td><i  data-doc="pc_system_flash_init"> * not supported.</i></td></tr>
+<tr><th id="102">102</th><td><i  data-doc="pc_system_flash_init"> */</i></td></tr>
+<tr><th id="103">103</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pc_system_flash_init" title='pc_system_flash_init' data-type='void pc_system_flash_init(MemoryRegion * rom_memory)' data-ref="pc_system_flash_init">pc_system_flash_init</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col9 decl" id="9rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="9rom_memory">rom_memory</dfn>)</td></tr>
+<tr><th id="104">104</th><td>{</td></tr>
+<tr><th id="105">105</th><td>    <em>int</em> <dfn class="local col0 decl" id="10unit" title='unit' data-type='int' data-ref="10unit">unit</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="local col1 decl" id="11pflash_drv" title='pflash_drv' data-type='DriveInfo *' data-ref="11pflash_drv">pflash_drv</dfn>;</td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col2 decl" id="12blk" title='blk' data-type='BlockBackend *' data-ref="12blk">blk</dfn>;</td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col3 decl" id="13size" title='size' data-type='int64_t' data-ref="13size">size</dfn>;</td></tr>
+<tr><th id="109">109</th><td>    <em>char</em> *<dfn class="local col4 decl" id="14fatal_errmsg" title='fatal_errmsg' data-type='char *' data-ref="14fatal_errmsg">fatal_errmsg</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="110">110</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="15phys_addr" title='phys_addr' data-type='hwaddr' data-ref="15phys_addr">phys_addr</dfn> = <var>0x100000000ULL</var>;</td></tr>
+<tr><th id="111">111</th><td>    <em>int</em> <dfn class="local col6 decl" id="16sector_bits" title='sector_bits' data-type='int' data-ref="16sector_bits">sector_bits</dfn>, <dfn class="local col7 decl" id="17sector_size" title='sector_size' data-type='int' data-ref="17sector_size">sector_size</dfn>;</td></tr>
+<tr><th id="112">112</th><td>    <a class="typedef" href="../../include/hw/block/flash.h.html#pflash_t" title='pflash_t' data-type='struct pflash_t' data-ref="pflash_t">pflash_t</a> *<dfn class="local col8 decl" id="18system_flash" title='system_flash' data-type='pflash_t *' data-ref="18system_flash">system_flash</dfn>;</td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col9 decl" id="19flash_mem" title='flash_mem' data-type='MemoryRegion *' data-ref="19flash_mem">flash_mem</dfn>;</td></tr>
+<tr><th id="114">114</th><td>    <em>char</em> <dfn class="local col0 decl" id="20name" title='name' data-type='char [64]' data-ref="20name">name</dfn>[<var>64</var>];</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>    <a class="local col6 ref" href="#16sector_bits" title='sector_bits' data-ref="16sector_bits">sector_bits</a> = <var>12</var>;</td></tr>
+<tr><th id="117">117</th><td>    <a class="local col7 ref" href="#17sector_size" title='sector_size' data-ref="17sector_size">sector_size</a> = <var>1</var> &lt;&lt; <a class="local col6 ref" href="#16sector_bits" title='sector_bits' data-ref="16sector_bits">sector_bits</a>;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <b>for</b> (<a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a> = <var>0</var>;</td></tr>
+<tr><th id="120">120</th><td>         (<a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a> &lt; <a class="macro" href="#77" title="2" data-ref="_M/FLASH_MAP_UNIT_MAX">FLASH_MAP_UNIT_MAX</a> &amp;&amp;</td></tr>
+<tr><th id="121">121</th><td>          (<a class="local col1 ref" href="#11pflash_drv" title='pflash_drv' data-ref="11pflash_drv">pflash_drv</a> = <a class="ref" href="../../include/sysemu/blockdev.h.html#drive_get" title='drive_get' data-ref="drive_get">drive_get</a>(<a class="enum" href="../../include/sysemu/blockdev.h.html#IF_PFLASH" title='IF_PFLASH' data-ref="IF_PFLASH">IF_PFLASH</a>, <var>0</var>, <a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="122">122</th><td>         ++<a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a>) {</td></tr>
+<tr><th id="123">123</th><td>        <a class="local col2 ref" href="#12blk" title='blk' data-ref="12blk">blk</a> = <a class="ref" href="../../include/sysemu/blockdev.h.html#blk_by_legacy_dinfo" title='blk_by_legacy_dinfo' data-ref="blk_by_legacy_dinfo">blk_by_legacy_dinfo</a>(<a class="local col1 ref" href="#11pflash_drv" title='pflash_drv' data-ref="11pflash_drv">pflash_drv</a>);</td></tr>
+<tr><th id="124">124</th><td>        <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> = <a class="ref" href="../../include/sysemu/block-backend.h.html#blk_getlength" title='blk_getlength' data-ref="blk_getlength">blk_getlength</a>(<a class="local col2 ref" href="#12blk" title='blk' data-ref="12blk">blk</a>);</td></tr>
+<tr><th id="125">125</th><td>        <b>if</b> (<a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="126">126</th><td>            <a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a> = <a class="ref" href="../../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<q>"failed to get backing file size"</q>);</td></tr>
+<tr><th id="127">127</th><td>        } <b>else</b> <b>if</b> (<a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> == <var>0</var>) {</td></tr>
+<tr><th id="128">128</th><td>            <a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a> = <a class="ref" href="../../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<q>"PC system firmware (pflash) "</q></td></tr>
+<tr><th id="129">129</th><td>                               <q>"cannot have zero size"</q>);</td></tr>
+<tr><th id="130">130</th><td>        } <b>else</b> <b>if</b> ((<a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> % <a class="local col7 ref" href="#17sector_size" title='sector_size' data-ref="17sector_size">sector_size</a>) != <var>0</var>) {</td></tr>
+<tr><th id="131">131</th><td>            <a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a> = <a class="ref" href="../../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<q>"PC system firmware (pflash) "</q></td></tr>
+<tr><th id="132">132</th><td>                               <q>"must be a multiple of 0x%x"</q>, <a class="local col7 ref" href="#17sector_size" title='sector_size' data-ref="17sector_size">sector_size</a>);</td></tr>
+<tr><th id="133">133</th><td>        } <b>else</b> <b>if</b> (<a class="local col5 ref" href="#15phys_addr" title='phys_addr' data-ref="15phys_addr">phys_addr</a> &lt; <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> || <a class="local col5 ref" href="#15phys_addr" title='phys_addr' data-ref="15phys_addr">phys_addr</a> - <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> &lt; <a class="macro" href="#85" title="((hwaddr)(0x100000000ULL - 8*1024*1024))" data-ref="_M/FLASH_MAP_BASE_MIN">FLASH_MAP_BASE_MIN</a>) {</td></tr>
+<tr><th id="134">134</th><td>            <a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a> = <a class="ref" href="../../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<q>"oversized backing file, pflash "</q></td></tr>
+<tr><th id="135">135</th><td>                               <q>"segments cannot be mapped under "</q></td></tr>
+<tr><th id="136">136</th><td>                               <a class="macro" href="../../include/exec/hwaddr.h.html#13" title="&quot;%016&quot; &quot;l&quot; &quot;x&quot;" data-ref="_M/TARGET_FMT_plx">TARGET_FMT_plx</a>, <a class="macro" href="#85" title="((hwaddr)(0x100000000ULL - 8*1024*1024))" data-ref="_M/FLASH_MAP_BASE_MIN">FLASH_MAP_BASE_MIN</a>);</td></tr>
+<tr><th id="137">137</th><td>        }</td></tr>
+<tr><th id="138">138</th><td>        <b>if</b> (<a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="139">139</th><td>            <a class="typedef" href="../../include/qemu/error-report.h.html#Location" title='Location' data-type='struct Location' data-ref="Location">Location</a> <dfn class="local col1 decl" id="21loc" title='loc' data-type='Location' data-ref="21loc">loc</dfn>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>            <i>/* push a new, "none" location on the location stack; overwrite its</i></td></tr>
+<tr><th id="142">142</th><td><i>             * contents with the location saved in the option; print the error</i></td></tr>
+<tr><th id="143">143</th><td><i>             * (includes location); pop the top</i></td></tr>
+<tr><th id="144">144</th><td><i>             */</i></td></tr>
+<tr><th id="145">145</th><td>            <a class="ref" href="../../include/qemu/error-report.h.html#loc_push_none" title='loc_push_none' data-ref="loc_push_none">loc_push_none</a>(&amp;<a class="local col1 ref" href="#21loc" title='loc' data-ref="21loc">loc</a>);</td></tr>
+<tr><th id="146">146</th><td>            <b>if</b> (<a class="local col1 ref" href="#11pflash_drv" title='pflash_drv' data-ref="11pflash_drv">pflash_drv</a>-&gt;<a class="ref" href="../../include/sysemu/blockdev.h.html#DriveInfo::opts" title='DriveInfo::opts' data-ref="DriveInfo::opts">opts</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="147">147</th><td>                <a class="ref" href="../../include/qemu/option.h.html#qemu_opts_loc_restore" title='qemu_opts_loc_restore' data-ref="qemu_opts_loc_restore">qemu_opts_loc_restore</a>(<a class="local col1 ref" href="#11pflash_drv" title='pflash_drv' data-ref="11pflash_drv">pflash_drv</a>-&gt;<a class="ref" href="../../include/sysemu/blockdev.h.html#DriveInfo::opts" title='DriveInfo::opts' data-ref="DriveInfo::opts">opts</a>);</td></tr>
+<tr><th id="148">148</th><td>            }</td></tr>
+<tr><th id="149">149</th><td>            <a class="ref" href="../../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"%s"</q>, <a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a>);</td></tr>
+<tr><th id="150">150</th><td>            <a class="ref" href="../../include/qemu/error-report.h.html#loc_pop" title='loc_pop' data-ref="loc_pop">loc_pop</a>(&amp;<a class="local col1 ref" href="#21loc" title='loc' data-ref="21loc">loc</a>);</td></tr>
+<tr><th id="151">151</th><td>            <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col4 ref" href="#14fatal_errmsg" title='fatal_errmsg' data-ref="14fatal_errmsg">fatal_errmsg</a>);</td></tr>
+<tr><th id="152">152</th><td>            <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="153">153</th><td>        }</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td>        <a class="local col5 ref" href="#15phys_addr" title='phys_addr' data-ref="15phys_addr">phys_addr</a> -= <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a>;</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>        <i>/* pflash_cfi01_register() creates a deep copy of the name */</i></td></tr>
+<tr><th id="158">158</th><td>        <a class="ref" href="../../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col0 ref" href="#20name" title='name' data-ref="20name">name</a>, <b>sizeof</b> <a class="local col0 ref" href="#20name" title='name' data-ref="20name">name</a>, <q>"system.flash%d"</q>, <a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a>);</td></tr>
+<tr><th id="159">159</th><td>        <a class="local col8 ref" href="#18system_flash" title='system_flash' data-ref="18system_flash">system_flash</a> = <a class="ref" href="../../include/hw/block/flash.h.html#pflash_cfi01_register" title='pflash_cfi01_register' data-ref="pflash_cfi01_register">pflash_cfi01_register</a>(<a class="local col5 ref" href="#15phys_addr" title='phys_addr' data-ref="15phys_addr">phys_addr</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span> <i>/* qdev */</i>, <a class="local col0 ref" href="#20name" title='name' data-ref="20name">name</a>,</td></tr>
+<tr><th id="160">160</th><td>                                             <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a>, <a class="local col2 ref" href="#12blk" title='blk' data-ref="12blk">blk</a>, <a class="local col7 ref" href="#17sector_size" title='sector_size' data-ref="17sector_size">sector_size</a>,</td></tr>
+<tr><th id="161">161</th><td>                                             <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a> &gt;&gt; <a class="local col6 ref" href="#16sector_bits" title='sector_bits' data-ref="16sector_bits">sector_bits</a>,</td></tr>
+<tr><th id="162">162</th><td>                                             <var>1</var>      <i>/* width */</i>,</td></tr>
+<tr><th id="163">163</th><td>                                             <var>0x0000</var> <i>/* id0 */</i>,</td></tr>
+<tr><th id="164">164</th><td>                                             <var>0x0000</var> <i>/* id1 */</i>,</td></tr>
+<tr><th id="165">165</th><td>                                             <var>0x0000</var> <i>/* id2 */</i>,</td></tr>
+<tr><th id="166">166</th><td>                                             <var>0x0000</var> <i>/* id3 */</i>,</td></tr>
+<tr><th id="167">167</th><td>                                             <var>0</var>      <i>/* be */</i>);</td></tr>
+<tr><th id="168">168</th><td>        <b>if</b> (<a class="local col0 ref" href="#10unit" title='unit' data-ref="10unit">unit</a> == <var>0</var>) {</td></tr>
+<tr><th id="169">169</th><td>            <a class="local col9 ref" href="#19flash_mem" title='flash_mem' data-ref="19flash_mem">flash_mem</a> = <a class="ref" href="../../include/hw/block/flash.h.html#pflash_cfi01_get_memory" title='pflash_cfi01_get_memory' data-ref="pflash_cfi01_get_memory">pflash_cfi01_get_memory</a>(<a class="local col8 ref" href="#18system_flash" title='system_flash' data-ref="18system_flash">system_flash</a>);</td></tr>
+<tr><th id="170">170</th><td>            <a class="tu ref" href="#pc_isa_bios_init" title='pc_isa_bios_init' data-use='c' data-ref="pc_isa_bios_init">pc_isa_bios_init</a>(<a class="local col9 ref" href="#9rom_memory" title='rom_memory' data-ref="9rom_memory">rom_memory</a>, <a class="local col9 ref" href="#19flash_mem" title='flash_mem' data-ref="19flash_mem">flash_mem</a>, <a class="local col3 ref" href="#13size" title='size' data-ref="13size">size</a>);</td></tr>
+<tr><th id="171">171</th><td>        }</td></tr>
+<tr><th id="172">172</th><td>    }</td></tr>
+<tr><th id="173">173</th><td>}</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="old_pc_system_rom_init" title='old_pc_system_rom_init' data-type='void old_pc_system_rom_init(MemoryRegion * rom_memory, _Bool isapc_ram_fw)' data-ref="old_pc_system_rom_init">old_pc_system_rom_init</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col2 decl" id="22rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="22rom_memory">rom_memory</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="23isapc_ram_fw" title='isapc_ram_fw' data-type='_Bool' data-ref="23isapc_ram_fw">isapc_ram_fw</dfn>)</td></tr>
+<tr><th id="176">176</th><td>{</td></tr>
+<tr><th id="177">177</th><td>    <em>char</em> *<dfn class="local col4 decl" id="24filename" title='filename' data-type='char *' data-ref="24filename">filename</dfn>;</td></tr>
+<tr><th id="178">178</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col5 decl" id="25bios" title='bios' data-type='MemoryRegion *' data-ref="25bios">bios</dfn>, *<dfn class="local col6 decl" id="26isa_bios" title='isa_bios' data-type='MemoryRegion *' data-ref="26isa_bios">isa_bios</dfn>;</td></tr>
+<tr><th id="179">179</th><td>    <em>int</em> <dfn class="local col7 decl" id="27bios_size" title='bios_size' data-type='int' data-ref="27bios_size">bios_size</dfn>, <dfn class="local col8 decl" id="28isa_bios_size" title='isa_bios_size' data-type='int' data-ref="28isa_bios_size">isa_bios_size</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    <em>int</em> <dfn class="local col9 decl" id="29ret" title='ret' data-type='int' data-ref="29ret">ret</dfn>;</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td>    <i>/* BIOS load */</i></td></tr>
+<tr><th id="183">183</th><td>    <b>if</b> (<a class="ref" href="../../include/sysemu/sysemu.h.html#bios_name" title='bios_name' data-ref="bios_name">bios_name</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="184">184</th><td>        <a class="ref" href="../../include/sysemu/sysemu.h.html#bios_name" title='bios_name' data-ref="bios_name">bios_name</a> = <a class="macro" href="#39" title="&quot;bios.bin&quot;" data-ref="_M/BIOS_FILENAME">BIOS_FILENAME</a>;</td></tr>
+<tr><th id="185">185</th><td>    }</td></tr>
+<tr><th id="186">186</th><td>    <a class="local col4 ref" href="#24filename" title='filename' data-ref="24filename">filename</a> = <a class="ref" href="../../include/qemu-common.h.html#qemu_find_file" title='qemu_find_file' data-ref="qemu_find_file">qemu_find_file</a>(<a class="macro" href="../../include/qemu-common.h.html#130" title="0" data-ref="_M/QEMU_FILE_TYPE_BIOS">QEMU_FILE_TYPE_BIOS</a>, <a class="ref" href="../../include/sysemu/sysemu.h.html#bios_name" title='bios_name' data-ref="bios_name">bios_name</a>);</td></tr>
+<tr><th id="187">187</th><td>    <b>if</b> (<a class="local col4 ref" href="#24filename" title='filename' data-ref="24filename">filename</a>) {</td></tr>
+<tr><th id="188">188</th><td>        <a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a> = <a class="ref" href="../../include/hw/loader.h.html#get_image_size" title='get_image_size' data-ref="get_image_size">get_image_size</a>(<a class="local col4 ref" href="#24filename" title='filename' data-ref="24filename">filename</a>);</td></tr>
+<tr><th id="189">189</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="190">190</th><td>        <a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a> = -<var>1</var>;</td></tr>
+<tr><th id="191">191</th><td>    }</td></tr>
+<tr><th id="192">192</th><td>    <b>if</b> (<a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a> &lt;= <var>0</var> ||</td></tr>
+<tr><th id="193">193</th><td>        (<a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a> % <var>65536</var>) != <var>0</var>) {</td></tr>
+<tr><th id="194">194</th><td>        <b>goto</b> <a class="lbl" href="#30bios_error" data-ref="30bios_error">bios_error</a>;</td></tr>
+<tr><th id="195">195</th><td>    }</td></tr>
+<tr><th id="196">196</th><td>    <a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a> = <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_malloc" title='g_malloc' data-ref="g_malloc">g_malloc</a>(<b>sizeof</b>(*<a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a>));</td></tr>
+<tr><th id="197">197</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_init_ram" title='memory_region_init_ram' data-ref="memory_region_init_ram">memory_region_init_ram</a>(<a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <q>"pc.bios"</q>, <a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a>, &amp;<a class="ref" href="../../include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>);</td></tr>
+<tr><th id="198">198</th><td>    <b>if</b> (!<a class="local col3 ref" href="#23isapc_ram_fw" title='isapc_ram_fw' data-ref="23isapc_ram_fw">isapc_ram_fw</a>) {</td></tr>
+<tr><th id="199">199</th><td>        <a class="ref" href="../../include/exec/memory.h.html#memory_region_set_readonly" title='memory_region_set_readonly' data-ref="memory_region_set_readonly">memory_region_set_readonly</a>(<a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="200">200</th><td>    }</td></tr>
+<tr><th id="201">201</th><td>    <a class="local col9 ref" href="#29ret" title='ret' data-ref="29ret">ret</a> = <a class="macro" href="../../include/hw/loader.h.html#208" title="rom_add_file(bios_name, ((void*)0), (uint32_t)(-bios_size), -1, 0, ((void*)0), ((void*)0))" data-ref="_M/rom_add_file_fixed">rom_add_file_fixed</a>(<a class="ref" href="../../include/sysemu/sysemu.h.html#bios_name" title='bios_name' data-ref="bios_name">bios_name</a>, (<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)(-<a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a>), -<var>1</var>);</td></tr>
+<tr><th id="202">202</th><td>    <b>if</b> (<a class="local col9 ref" href="#29ret" title='ret' data-ref="29ret">ret</a> != <var>0</var>) {</td></tr>
+<tr><th id="203">203</th><td>    <dfn class="lbl" id="30bios_error" data-ref="30bios_error">bios_error</dfn>:</td></tr>
+<tr><th id="204">204</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: could not load PC BIOS '%s'\n"</q>, <a class="ref" href="../../include/sysemu/sysemu.h.html#bios_name" title='bios_name' data-ref="bios_name">bios_name</a>);</td></tr>
+<tr><th id="205">205</th><td>        <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="206">206</th><td>    }</td></tr>
+<tr><th id="207">207</th><td>    <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col4 ref" href="#24filename" title='filename' data-ref="24filename">filename</a>);</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>    <i>/* map the last 128KB of the BIOS in ISA space */</i></td></tr>
+<tr><th id="210">210</th><td>    <a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a> = <a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a>;</td></tr>
+<tr><th id="211">211</th><td>    <b>if</b> (<a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a> &gt; (<var>128</var> * <var>1024</var>)) {</td></tr>
+<tr><th id="212">212</th><td>        <a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a> = <var>128</var> * <var>1024</var>;</td></tr>
+<tr><th id="213">213</th><td>    }</td></tr>
+<tr><th id="214">214</th><td>    <a class="local col6 ref" href="#26isa_bios" title='isa_bios' data-ref="26isa_bios">isa_bios</a> = <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_malloc" title='g_malloc' data-ref="g_malloc">g_malloc</a>(<b>sizeof</b>(*<a class="local col6 ref" href="#26isa_bios" title='isa_bios' data-ref="26isa_bios">isa_bios</a>));</td></tr>
+<tr><th id="215">215</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_init_alias" title='memory_region_init_alias' data-ref="memory_region_init_alias">memory_region_init_alias</a>(<a class="local col6 ref" href="#26isa_bios" title='isa_bios' data-ref="26isa_bios">isa_bios</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <q>"isa-bios"</q>, <a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a>,</td></tr>
+<tr><th id="216">216</th><td>                             <a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a> - <a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a>, <a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a>);</td></tr>
+<tr><th id="217">217</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_add_subregion_overlap" title='memory_region_add_subregion_overlap' data-ref="memory_region_add_subregion_overlap">memory_region_add_subregion_overlap</a>(<a class="local col2 ref" href="#22rom_memory" title='rom_memory' data-ref="22rom_memory">rom_memory</a>,</td></tr>
+<tr><th id="218">218</th><td>                                        <var>0x100000</var> - <a class="local col8 ref" href="#28isa_bios_size" title='isa_bios_size' data-ref="28isa_bios_size">isa_bios_size</a>,</td></tr>
+<tr><th id="219">219</th><td>                                        <a class="local col6 ref" href="#26isa_bios" title='isa_bios' data-ref="26isa_bios">isa_bios</a>,</td></tr>
+<tr><th id="220">220</th><td>                                        <var>1</var>);</td></tr>
+<tr><th id="221">221</th><td>    <b>if</b> (!<a class="local col3 ref" href="#23isapc_ram_fw" title='isapc_ram_fw' data-ref="23isapc_ram_fw">isapc_ram_fw</a>) {</td></tr>
+<tr><th id="222">222</th><td>        <a class="ref" href="../../include/exec/memory.h.html#memory_region_set_readonly" title='memory_region_set_readonly' data-ref="memory_region_set_readonly">memory_region_set_readonly</a>(<a class="local col6 ref" href="#26isa_bios" title='isa_bios' data-ref="26isa_bios">isa_bios</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="223">223</th><td>    }</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>    <i>/* map all the bios at the top of memory */</i></td></tr>
+<tr><th id="226">226</th><td>    <a class="ref" href="../../include/exec/memory.h.html#memory_region_add_subregion" title='memory_region_add_subregion' data-ref="memory_region_add_subregion">memory_region_add_subregion</a>(<a class="local col2 ref" href="#22rom_memory" title='rom_memory' data-ref="22rom_memory">rom_memory</a>,</td></tr>
+<tr><th id="227">227</th><td>                                (<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)(-<a class="local col7 ref" href="#27bios_size" title='bios_size' data-ref="27bios_size">bios_size</a>),</td></tr>
+<tr><th id="228">228</th><td>                                <a class="local col5 ref" href="#25bios" title='bios' data-ref="25bios">bios</a>);</td></tr>
+<tr><th id="229">229</th><td>}</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><em>void</em> <dfn class="decl def" id="pc_system_firmware_init" title='pc_system_firmware_init' data-ref="pc_system_firmware_init">pc_system_firmware_init</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col1 decl" id="31rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="31rom_memory">rom_memory</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="32isapc_ram_fw" title='isapc_ram_fw' data-type='_Bool' data-ref="32isapc_ram_fw">isapc_ram_fw</dfn>)</td></tr>
+<tr><th id="232">232</th><td>{</td></tr>
+<tr><th id="233">233</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="local col3 decl" id="33pflash_drv" title='pflash_drv' data-type='DriveInfo *' data-ref="33pflash_drv">pflash_drv</dfn>;</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td>    <a class="local col3 ref" href="#33pflash_drv" title='pflash_drv' data-ref="33pflash_drv">pflash_drv</a> = <a class="ref" href="../../include/sysemu/blockdev.h.html#drive_get" title='drive_get' data-ref="drive_get">drive_get</a>(<a class="enum" href="../../include/sysemu/blockdev.h.html#IF_PFLASH" title='IF_PFLASH' data-ref="IF_PFLASH">IF_PFLASH</a>, <var>0</var>, <var>0</var>);</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>    <b>if</b> (<a class="local col2 ref" href="#32isapc_ram_fw" title='isapc_ram_fw' data-ref="32isapc_ram_fw">isapc_ram_fw</a> || <a class="local col3 ref" href="#33pflash_drv" title='pflash_drv' data-ref="33pflash_drv">pflash_drv</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="238">238</th><td>        <i>/* When a pflash drive is not found, use rom-mode */</i></td></tr>
+<tr><th id="239">239</th><td>        <a class="tu ref" href="#old_pc_system_rom_init" title='old_pc_system_rom_init' data-use='c' data-ref="old_pc_system_rom_init">old_pc_system_rom_init</a>(<a class="local col1 ref" href="#31rom_memory" title='rom_memory' data-ref="31rom_memory">rom_memory</a>, <a class="local col2 ref" href="#32isapc_ram_fw" title='isapc_ram_fw' data-ref="32isapc_ram_fw">isapc_ram_fw</a>);</td></tr>
+<tr><th id="240">240</th><td>        <b>return</b>;</td></tr>
+<tr><th id="241">241</th><td>    }</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td>    <b>if</b> (<a class="macro" href="../../include/sysemu/kvm.h.html#50" title="(kvm_allowed)" data-ref="_M/kvm_enabled">kvm_enabled</a>() &amp;&amp; !<a class="macro" href="../../include/sysemu/kvm.h.html#149" title="(kvm_readonly_mem_allowed)" data-ref="_M/kvm_readonly_mem_enabled">kvm_readonly_mem_enabled</a>()) {</td></tr>
+<tr><th id="244">244</th><td>        <i>/* Older KVM cannot execute from device memory. So, flash memory</i></td></tr>
+<tr><th id="245">245</th><td><i>         * cannot be used unless the readonly memory kvm capability is present. */</i></td></tr>
+<tr><th id="246">246</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: pflash with kvm requires KVM readonly memory support\n"</q>);</td></tr>
+<tr><th id="247">247</th><td>        <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="248">248</th><td>    }</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td>    <a class="tu ref" href="#pc_system_flash_init" title='pc_system_flash_init' data-use='c' data-ref="pc_system_flash_init">pc_system_flash_init</a>(<a class="local col1 ref" href="#31rom_memory" title='rom_memory' data-ref="31rom_memory">rom_memory</a>);</td></tr>
+<tr><th id="251">251</th><td>}</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

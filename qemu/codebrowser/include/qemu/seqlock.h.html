@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>seqlock.h source code [codebrowser/include/qemu/seqlock.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QemuSeqLock "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/seqlock.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='seqlock.h.html'>seqlock.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Seqlock implementation for QEMU</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Red Hat, Inc. 2013</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Author:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Paolo Bonzini &lt;pbonzini@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/QEMU_SEQLOCK_H">QEMU_SEQLOCK_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/QEMU_SEQLOCK_H" data-ref="_M/QEMU_SEQLOCK_H">QEMU_SEQLOCK_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QemuSeqLock" title='QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> <dfn class="typedef" id="QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</dfn>;</td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>struct</b> <dfn class="type def" id="QemuSeqLock" title='QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</dfn> {</td></tr>
+<tr><th id="23">23</th><td>    <em>unsigned</em> <dfn class="decl" id="QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</dfn>;</td></tr>
+<tr><th id="24">24</th><td>};</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="seqlock_init" title='seqlock_init' data-ref="seqlock_init">seqlock_init</dfn>(<a class="typedef" href="#QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> *<dfn class="local col1 decl" id="1sl" title='sl' data-type='QemuSeqLock *' data-ref="1sl">sl</dfn>)</td></tr>
+<tr><th id="27">27</th><td>{</td></tr>
+<tr><th id="28">28</th><td>    <a class="local col1 ref" href="#1sl" title='sl' data-ref="1sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a> = <var>0</var>;</td></tr>
+<tr><th id="29">29</th><td>}</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><i>/* Lock out other writers and update the count.  */</i></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="seqlock_write_begin" title='seqlock_write_begin' data-ref="seqlock_write_begin">seqlock_write_begin</dfn>(<a class="typedef" href="#QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> *<dfn class="local col2 decl" id="2sl" title='sl' data-type='QemuSeqLock *' data-ref="2sl">sl</dfn>)</td></tr>
+<tr><th id="33">33</th><td>{</td></tr>
+<tr><th id="34">34</th><td>    <a class="macro" href="atomic.h.html#132" title="do { _Static_assert(!(sizeof(*&amp;sl-&gt;sequence) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;sl-&gt;sequence) &gt; ATOMIC_REG_SIZE&quot;); __atomic_store_n(&amp;sl-&gt;sequence, sl-&gt;sequence + 1, 0); } while(0)" data-ref="_M/atomic_set">atomic_set</a>(&amp;<a class="local col2 ref" href="#2sl" title='sl' data-ref="2sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a>, <a class="local col2 ref" href="#2sl" title='sl' data-ref="2sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a> + <var>1</var>);</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>    <i>/* Write sequence before updating other fields.  */</i></td></tr>
+<tr><th id="37">37</th><td>    <a class="macro" href="atomic.h.html#412" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(3); })" data-ref="_M/smp_wmb">smp_wmb</a>();</td></tr>
+<tr><th id="38">38</th><td>}</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="seqlock_write_end" title='seqlock_write_end' data-ref="seqlock_write_end">seqlock_write_end</dfn>(<a class="typedef" href="#QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> *<dfn class="local col3 decl" id="3sl" title='sl' data-type='QemuSeqLock *' data-ref="3sl">sl</dfn>)</td></tr>
+<tr><th id="41">41</th><td>{</td></tr>
+<tr><th id="42">42</th><td>    <i>/* Write other fields before finalizing sequence.  */</i></td></tr>
+<tr><th id="43">43</th><td>    <a class="macro" href="atomic.h.html#412" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(3); })" data-ref="_M/smp_wmb">smp_wmb</a>();</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <a class="macro" href="atomic.h.html#132" title="do { _Static_assert(!(sizeof(*&amp;sl-&gt;sequence) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;sl-&gt;sequence) &gt; ATOMIC_REG_SIZE&quot;); __atomic_store_n(&amp;sl-&gt;sequence, sl-&gt;sequence + 1, 0); } while(0)" data-ref="_M/atomic_set">atomic_set</a>(&amp;<a class="local col3 ref" href="#3sl" title='sl' data-ref="3sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a>, <a class="local col3 ref" href="#3sl" title='sl' data-ref="3sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a> + <var>1</var>);</td></tr>
+<tr><th id="46">46</th><td>}</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><em>static</em> <b>inline</b> <em>unsigned</em> <dfn class="decl def" id="seqlock_read_begin" title='seqlock_read_begin' data-ref="seqlock_read_begin">seqlock_read_begin</dfn>(<a class="typedef" href="#QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> *<dfn class="local col4 decl" id="4sl" title='sl' data-type='QemuSeqLock *' data-ref="4sl">sl</dfn>)</td></tr>
+<tr><th id="49">49</th><td>{</td></tr>
+<tr><th id="50">50</th><td>    <i>/* Always fail if a write is in progress.  */</i></td></tr>
+<tr><th id="51">51</th><td>    <em>unsigned</em> <dfn class="local col5 decl" id="5ret" title='ret' data-type='unsigned int' data-ref="5ret">ret</dfn> = <a class="macro" href="atomic.h.html#123" title="({ _Static_assert(!(sizeof(*&amp;sl-&gt;sequence) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;sl-&gt;sequence) &gt; ATOMIC_REG_SIZE&quot;); __atomic_load_n(&amp;sl-&gt;sequence, 0); })" data-ref="_M/atomic_read">atomic_read</a>(&amp;<a class="local col4 ref" href="#4sl" title='sl' data-ref="4sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a>);</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>    <i>/* Read sequence before reading other fields.  */</i></td></tr>
+<tr><th id="54">54</th><td>    <a class="macro" href="atomic.h.html#415" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(2); })" data-ref="_M/smp_rmb">smp_rmb</a>();</td></tr>
+<tr><th id="55">55</th><td>    <b>return</b> <a class="local col5 ref" href="#5ret" title='ret' data-ref="5ret">ret</a> &amp; ~<var>1</var>;</td></tr>
+<tr><th id="56">56</th><td>}</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="seqlock_read_retry" title='seqlock_read_retry' data-ref="seqlock_read_retry">seqlock_read_retry</dfn>(<em>const</em> <a class="typedef" href="#QemuSeqLock" title='QemuSeqLock' data-type='struct QemuSeqLock' data-ref="QemuSeqLock">QemuSeqLock</a> *<dfn class="local col6 decl" id="6sl" title='sl' data-type='const QemuSeqLock *' data-ref="6sl">sl</dfn>, <em>unsigned</em> <dfn class="local col7 decl" id="7start" title='start' data-type='unsigned int' data-ref="7start">start</dfn>)</td></tr>
+<tr><th id="59">59</th><td>{</td></tr>
+<tr><th id="60">60</th><td>    <i>/* Read other fields before reading final sequence.  */</i></td></tr>
+<tr><th id="61">61</th><td>    <a class="macro" href="atomic.h.html#415" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(2); })" data-ref="_M/smp_rmb">smp_rmb</a>();</td></tr>
+<tr><th id="62">62</th><td>    <b>return</b> <a class="macro" href="compiler.h.html#58" title="__builtin_expect(!!(({ _Static_assert(!(sizeof(*&amp;sl-&gt;sequence) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;sl-&gt;sequence) &gt; ATOMIC_REG_SIZE&quot;); __atomic_load_n(&amp;sl-&gt;sequence, 0); }) != start), 0)" data-ref="_M/unlikely">unlikely</a>(<a class="macro" href="atomic.h.html#123" title="({ _Static_assert(!(sizeof(*&amp;sl-&gt;sequence) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;sl-&gt;sequence) &gt; ATOMIC_REG_SIZE&quot;); __atomic_load_n(&amp;sl-&gt;sequence, 0); })" data-ref="_M/atomic_read">atomic_read</a>(&amp;<a class="local col6 ref" href="#6sl" title='sl' data-ref="6sl">sl</a>-&gt;<a class="ref" href="#QemuSeqLock::sequence" title='QemuSeqLock::sequence' data-ref="QemuSeqLock::sequence">sequence</a>) != <a class="local col7 ref" href="#7start" title='start' data-ref="7start">start</a>);</td></tr>
+<tr><th id="63">63</th><td>}</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/tcg/cpu-exec-common.c.html'>codebrowser/accel/tcg/cpu-exec-common.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

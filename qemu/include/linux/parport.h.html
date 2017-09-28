@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>parport.h source code [include/linux/parport.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'include/linux/parport.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>include</a>/<a href='./'>linux</a>/<a href='parport.h.html'>parport.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Any part of this program may be used in documents licensed under</i></td></tr>
+<tr><th id="3">3</th><td><i> * the GNU Free Documentation License, Version 1.1 or any later version</i></td></tr>
+<tr><th id="4">4</th><td><i> * published by the Free Software Foundation.</i></td></tr>
+<tr><th id="5">5</th><td><i> */</i></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><u>#<span data-ppcond="7">ifndef</span> <span class="macro" data-ref="_M/_PARPORT_H_">_PARPORT_H_</span></u></td></tr>
+<tr><th id="8">8</th><td><u>#define <dfn class="macro" id="_M/_PARPORT_H_" data-ref="_M/_PARPORT_H_">_PARPORT_H_</dfn></u></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><i>/* Start off with user-visible constants */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><i>/* Maximum of 16 ports per machine */</i></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MAX" data-ref="_M/PARPORT_MAX">PARPORT_MAX</dfn>  16</u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><i>/* Magic numbers */</i></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/PARPORT_IRQ_NONE" data-ref="_M/PARPORT_IRQ_NONE">PARPORT_IRQ_NONE</dfn>  -1</u></td></tr>
+<tr><th id="17">17</th><td><u>#define <dfn class="macro" id="_M/PARPORT_DMA_NONE" data-ref="_M/PARPORT_DMA_NONE">PARPORT_DMA_NONE</dfn>  -1</u></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/PARPORT_IRQ_AUTO" data-ref="_M/PARPORT_IRQ_AUTO">PARPORT_IRQ_AUTO</dfn>  -2</u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/PARPORT_DMA_AUTO" data-ref="_M/PARPORT_DMA_AUTO">PARPORT_DMA_AUTO</dfn>  -2</u></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/PARPORT_DMA_NOFIFO" data-ref="_M/PARPORT_DMA_NOFIFO">PARPORT_DMA_NOFIFO</dfn> -3</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/PARPORT_DISABLE" data-ref="_M/PARPORT_DISABLE">PARPORT_DISABLE</dfn>   -2</u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/PARPORT_IRQ_PROBEONLY" data-ref="_M/PARPORT_IRQ_PROBEONLY">PARPORT_IRQ_PROBEONLY</dfn> -3</u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/PARPORT_IOHI_AUTO" data-ref="_M/PARPORT_IOHI_AUTO">PARPORT_IOHI_AUTO</dfn> -1</u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/PARPORT_CONTROL_STROBE" data-ref="_M/PARPORT_CONTROL_STROBE">PARPORT_CONTROL_STROBE</dfn>    0x1</u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/PARPORT_CONTROL_AUTOFD" data-ref="_M/PARPORT_CONTROL_AUTOFD">PARPORT_CONTROL_AUTOFD</dfn>    0x2</u></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/PARPORT_CONTROL_INIT" data-ref="_M/PARPORT_CONTROL_INIT">PARPORT_CONTROL_INIT</dfn>      0x4</u></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/PARPORT_CONTROL_SELECT" data-ref="_M/PARPORT_CONTROL_SELECT">PARPORT_CONTROL_SELECT</dfn>    0x8</u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/PARPORT_STATUS_ERROR" data-ref="_M/PARPORT_STATUS_ERROR">PARPORT_STATUS_ERROR</dfn>      0x8</u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/PARPORT_STATUS_SELECT" data-ref="_M/PARPORT_STATUS_SELECT">PARPORT_STATUS_SELECT</dfn>     0x10</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/PARPORT_STATUS_PAPEROUT" data-ref="_M/PARPORT_STATUS_PAPEROUT">PARPORT_STATUS_PAPEROUT</dfn>   0x20</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/PARPORT_STATUS_ACK" data-ref="_M/PARPORT_STATUS_ACK">PARPORT_STATUS_ACK</dfn>        0x40</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/PARPORT_STATUS_BUSY" data-ref="_M/PARPORT_STATUS_BUSY">PARPORT_STATUS_BUSY</dfn>       0x80</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/* Type classes for Plug-and-Play probe.  */</i></td></tr>
+<tr><th id="37">37</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="38">38</th><td>	<dfn class="enum" id="PARPORT_CLASS_LEGACY" title='PARPORT_CLASS_LEGACY' data-ref="PARPORT_CLASS_LEGACY">PARPORT_CLASS_LEGACY</dfn> = <var>0</var>,       <i>/* Non-IEEE1284 device */</i></td></tr>
+<tr><th id="39">39</th><td>	<dfn class="enum" id="PARPORT_CLASS_PRINTER" title='PARPORT_CLASS_PRINTER' data-ref="PARPORT_CLASS_PRINTER">PARPORT_CLASS_PRINTER</dfn>,</td></tr>
+<tr><th id="40">40</th><td>	<dfn class="enum" id="PARPORT_CLASS_MODEM" title='PARPORT_CLASS_MODEM' data-ref="PARPORT_CLASS_MODEM">PARPORT_CLASS_MODEM</dfn>,</td></tr>
+<tr><th id="41">41</th><td>	<dfn class="enum" id="PARPORT_CLASS_NET" title='PARPORT_CLASS_NET' data-ref="PARPORT_CLASS_NET">PARPORT_CLASS_NET</dfn>,</td></tr>
+<tr><th id="42">42</th><td>	<dfn class="enum" id="PARPORT_CLASS_HDC" title='PARPORT_CLASS_HDC' data-ref="PARPORT_CLASS_HDC">PARPORT_CLASS_HDC</dfn>,              <i>/* Hard disk controller */</i></td></tr>
+<tr><th id="43">43</th><td>	<dfn class="enum" id="PARPORT_CLASS_PCMCIA" title='PARPORT_CLASS_PCMCIA' data-ref="PARPORT_CLASS_PCMCIA">PARPORT_CLASS_PCMCIA</dfn>,</td></tr>
+<tr><th id="44">44</th><td>	<dfn class="enum" id="PARPORT_CLASS_MEDIA" title='PARPORT_CLASS_MEDIA' data-ref="PARPORT_CLASS_MEDIA">PARPORT_CLASS_MEDIA</dfn>,            <i>/* Multimedia device */</i></td></tr>
+<tr><th id="45">45</th><td>	<dfn class="enum" id="PARPORT_CLASS_FDC" title='PARPORT_CLASS_FDC' data-ref="PARPORT_CLASS_FDC">PARPORT_CLASS_FDC</dfn>,              <i>/* Floppy disk controller */</i></td></tr>
+<tr><th id="46">46</th><td>	<dfn class="enum" id="PARPORT_CLASS_PORTS" title='PARPORT_CLASS_PORTS' data-ref="PARPORT_CLASS_PORTS">PARPORT_CLASS_PORTS</dfn>,</td></tr>
+<tr><th id="47">47</th><td>	<dfn class="enum" id="PARPORT_CLASS_SCANNER" title='PARPORT_CLASS_SCANNER' data-ref="PARPORT_CLASS_SCANNER">PARPORT_CLASS_SCANNER</dfn>,</td></tr>
+<tr><th id="48">48</th><td>	<dfn class="enum" id="PARPORT_CLASS_DIGCAM" title='PARPORT_CLASS_DIGCAM' data-ref="PARPORT_CLASS_DIGCAM">PARPORT_CLASS_DIGCAM</dfn>,</td></tr>
+<tr><th id="49">49</th><td>	<dfn class="enum" id="PARPORT_CLASS_OTHER" title='PARPORT_CLASS_OTHER' data-ref="PARPORT_CLASS_OTHER">PARPORT_CLASS_OTHER</dfn>,            <i>/* Anything else */</i></td></tr>
+<tr><th id="50">50</th><td>	<dfn class="enum" id="PARPORT_CLASS_UNSPEC" title='PARPORT_CLASS_UNSPEC' data-ref="PARPORT_CLASS_UNSPEC">PARPORT_CLASS_UNSPEC</dfn>,           <i>/* No CLS field in ID */</i></td></tr>
+<tr><th id="51">51</th><td>	<dfn class="enum" id="PARPORT_CLASS_SCSIADAPTER" title='PARPORT_CLASS_SCSIADAPTER' data-ref="PARPORT_CLASS_SCSIADAPTER">PARPORT_CLASS_SCSIADAPTER</dfn></td></tr>
+<tr><th id="52">52</th><td>} <dfn class="typedef" id="parport_device_class" title='parport_device_class' data-type='enum parport_device_class' data-ref="parport_device_class">parport_device_class</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><i>/* The "modes" entry in parport is a bit field representing the</i></td></tr>
+<tr><th id="55">55</th><td><i>   capabilities of the hardware. */</i></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_PCSPP" data-ref="_M/PARPORT_MODE_PCSPP">PARPORT_MODE_PCSPP</dfn>	(1&lt;&lt;0) /* IBM PC registers available. */</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_TRISTATE" data-ref="_M/PARPORT_MODE_TRISTATE">PARPORT_MODE_TRISTATE</dfn>	(1&lt;&lt;1) /* Can tristate. */</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_EPP" data-ref="_M/PARPORT_MODE_EPP">PARPORT_MODE_EPP</dfn>	(1&lt;&lt;2) /* Hardware EPP. */</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_ECP" data-ref="_M/PARPORT_MODE_ECP">PARPORT_MODE_ECP</dfn>	(1&lt;&lt;3) /* Hardware ECP. */</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_COMPAT" data-ref="_M/PARPORT_MODE_COMPAT">PARPORT_MODE_COMPAT</dfn>	(1&lt;&lt;4) /* Hardware 'printer protocol'. */</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_DMA" data-ref="_M/PARPORT_MODE_DMA">PARPORT_MODE_DMA</dfn>	(1&lt;&lt;5) /* Hardware can DMA. */</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/PARPORT_MODE_SAFEININT" data-ref="_M/PARPORT_MODE_SAFEININT">PARPORT_MODE_SAFEININT</dfn>	(1&lt;&lt;6) /* SPP registers accessible in IRQ. */</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i>/* IEEE1284 modes: </i></td></tr>
+<tr><th id="65">65</th><td><i>   Nibble mode, byte mode, ECP, ECPRLE and EPP are their own</i></td></tr>
+<tr><th id="66">66</th><td><i>   'extensibility request' values.  Others are special.</i></td></tr>
+<tr><th id="67">67</th><td><i>   'Real' ECP modes must have the IEEE1284_MODE_ECP bit set.  */</i></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_NIBBLE" data-ref="_M/IEEE1284_MODE_NIBBLE">IEEE1284_MODE_NIBBLE</dfn>             0</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_BYTE" data-ref="_M/IEEE1284_MODE_BYTE">IEEE1284_MODE_BYTE</dfn>              (1&lt;&lt;0)</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_COMPAT" data-ref="_M/IEEE1284_MODE_COMPAT">IEEE1284_MODE_COMPAT</dfn>            (1&lt;&lt;8)</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_BECP" data-ref="_M/IEEE1284_MODE_BECP">IEEE1284_MODE_BECP</dfn>              (1&lt;&lt;9) /* Bounded ECP mode */</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_ECP" data-ref="_M/IEEE1284_MODE_ECP">IEEE1284_MODE_ECP</dfn>               (1&lt;&lt;4)</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_ECPRLE" data-ref="_M/IEEE1284_MODE_ECPRLE">IEEE1284_MODE_ECPRLE</dfn>            (IEEE1284_MODE_ECP | (1&lt;&lt;5))</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_ECPSWE" data-ref="_M/IEEE1284_MODE_ECPSWE">IEEE1284_MODE_ECPSWE</dfn>            (1&lt;&lt;10) /* Software-emulated */</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_EPP" data-ref="_M/IEEE1284_MODE_EPP">IEEE1284_MODE_EPP</dfn>               (1&lt;&lt;6)</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_EPPSL" data-ref="_M/IEEE1284_MODE_EPPSL">IEEE1284_MODE_EPPSL</dfn>             (1&lt;&lt;11) /* EPP 1.7 */</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_MODE_EPPSWE" data-ref="_M/IEEE1284_MODE_EPPSWE">IEEE1284_MODE_EPPSWE</dfn>            (1&lt;&lt;12) /* Software-emulated */</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_DEVICEID" data-ref="_M/IEEE1284_DEVICEID">IEEE1284_DEVICEID</dfn>               (1&lt;&lt;2)  /* This is a flag */</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_EXT_LINK" data-ref="_M/IEEE1284_EXT_LINK">IEEE1284_EXT_LINK</dfn>               (1&lt;&lt;14) /* This flag causes the</u></td></tr>
+<tr><th id="80">80</th><td><u>						 * extensibility link to</u></td></tr>
+<tr><th id="81">81</th><td><u>						 * be requested, using</u></td></tr>
+<tr><th id="82">82</th><td><u>						 * bits 0-6. */</u></td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i>/* For the benefit of parport_read/write, you can use these with</i></td></tr>
+<tr><th id="85">85</th><td><i> * parport_negotiate to use address operations.  They have no effect</i></td></tr>
+<tr><th id="86">86</th><td><i> * other than to make parport_read/write use address transfers. */</i></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_ADDR" data-ref="_M/IEEE1284_ADDR">IEEE1284_ADDR</dfn>			(1&lt;&lt;13)	/* This is a flag */</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/IEEE1284_DATA" data-ref="_M/IEEE1284_DATA">IEEE1284_DATA</dfn>			 0	/* So is this */</u></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><i>/* Flags for block transfer operations. */</i></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/PARPORT_EPP_FAST" data-ref="_M/PARPORT_EPP_FAST">PARPORT_EPP_FAST</dfn>		(1&lt;&lt;0) /* Unreliable counts. */</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/PARPORT_W91284PIC" data-ref="_M/PARPORT_W91284PIC">PARPORT_W91284PIC</dfn>		(1&lt;&lt;1) /* have a Warp9 w91284pic in the device */</u></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><i>/* The rest is for the kernel only */</i></td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="7">endif</span> /* _PARPORT_H_ */</u></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../codebrowser/chardev/char-parallel.c.html'>codebrowser/chardev/char-parallel.c</a><br/>Generated on <em>2017-Aug-28</em> from project include<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

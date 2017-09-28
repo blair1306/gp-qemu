@@ -1,0 +1,35 @@
+<dec f='codebrowser/include/exec/memory.h' l='1477' type='MemoryRegionSection memory_region_find(MemoryRegion * mr, hwaddr addr, uint64_t size)'/>
+<doc f='codebrowser/include/exec/memory.h' l='1449'>/**
+ * memory_region_find: translate an address/size relative to a
+ * MemoryRegion into a #MemoryRegionSection.
+ *
+ * Locates the first #MemoryRegion within @mr that overlaps the range
+ * given by @addr and @size.
+ *
+ * Returns a #MemoryRegionSection that describes a contiguous overlap.
+ * It will have the following characteristics:
+ *    .@size = 0 iff no overlap was found
+ *    .@mr is non-%NULL iff an overlap was found
+ *
+ * Remember that in the return value the @offset_within_region is
+ * relative to the returned region (in the .@mr field), not to the
+ * @mr argument.
+ *
+ * Similarly, the .@offset_within_address_space is relative to the
+ * address space that contains both regions, the passed and the
+ * returned one.  However, in the special case where the @mr argument
+ * has no container (and thus is the root of the address space), the
+ * following will hold:
+ *    .@offset_within_address_space &gt;= @addr
+ *    .@offset_within_address_space + .@size &lt;= @addr + @size
+ *
+ * @mr: a MemoryRegion within which @addr is a relative address
+ * @addr: start of the area within @as to be searched
+ * @size: size of the area to be searched
+ */</doc>
+<use f='codebrowser/hw/core/loader.c' l='1117' u='c' c='rom_check_and_register_reset'/>
+<use f='codebrowser/hw/i386/kvmvapic.c' l='592' u='c' c='vapic_map_rom_writable'/>
+<use f='codebrowser/hw/virtio/virtio-balloon.c' l='230' u='c' c='virtio_balloon_handle_output'/>
+<def f='codebrowser/memory.c' l='2314' ll='2325' type='MemoryRegionSection memory_region_find(MemoryRegion * mr, hwaddr addr, uint64_t size)'/>
+<use f='codebrowser/memory.c' l='2522' u='c' c='memory_region_do_invalidate_mmio_ptr'/>
+<use f='codebrowser/monitor.c' l='1448' u='c' c='gpa2hva'/>

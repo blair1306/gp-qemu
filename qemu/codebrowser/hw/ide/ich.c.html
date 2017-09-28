@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ich.c source code [codebrowser/hw/ide/ich.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/ide/ich.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>ide</a>/<a href='ich.c.html'>ich.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU ICH Emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010 Sebastian Herbszt &lt;herbszt@gmx.de&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2010 Alexander Graf &lt;agraf@suse.de&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="8">8</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="9">9</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="10">10</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="13">13</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="14">14</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="15">15</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="18">18</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="19">19</th><td><i> *</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * lspci dump of a ICH-9 real device</i></td></tr>
+<tr><th id="22">22</th><td><i> *</i></td></tr>
+<tr><th id="23">23</th><td><i> * 00:1f.2 SATA controller [0106]: Intel Corporation 82801IR/IO/IH (ICH9R/DO/DH) 6 port SATA AHCI Controller [8086:2922] (rev 02) (prog-if 01 [AHCI 1.0])</i></td></tr>
+<tr><th id="24">24</th><td><i> *         Subsystem: Intel Corporation 82801IR/IO/IH (ICH9R/DO/DH) 6 port SATA AHCI Controller [8086:2922]</i></td></tr>
+<tr><th id="25">25</th><td><i> *         Control: I/O+ Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Stepping- SERR- FastB2B- DisINTx+</i></td></tr>
+<tr><th id="26">26</th><td><i> *         Status: Cap+ 66MHz+ UDF- FastB2B+ ParErr- DEVSEL=medium &gt;TAbort- &lt;TAbort- &lt;MAbort- &gt;SERR- &lt;PERR- INTx-</i></td></tr>
+<tr><th id="27">27</th><td><i> *         Latency: 0</i></td></tr>
+<tr><th id="28">28</th><td><i> *         Interrupt: pin B routed to IRQ 222</i></td></tr>
+<tr><th id="29">29</th><td><i> *         Region 0: I/O ports at d000 [size=8]</i></td></tr>
+<tr><th id="30">30</th><td><i> *         Region 1: I/O ports at cc00 [size=4]</i></td></tr>
+<tr><th id="31">31</th><td><i> *         Region 2: I/O ports at c880 [size=8]</i></td></tr>
+<tr><th id="32">32</th><td><i> *         Region 3: I/O ports at c800 [size=4]</i></td></tr>
+<tr><th id="33">33</th><td><i> *         Region 4: I/O ports at c480 [size=32]</i></td></tr>
+<tr><th id="34">34</th><td><i> *         Region 5: Memory at febf9000 (32-bit, non-prefetchable) [size=2K]</i></td></tr>
+<tr><th id="35">35</th><td><i> *         Capabilities: [80] Message Signalled Interrupts: Mask- 64bit- Count=1/16 Enable+</i></td></tr>
+<tr><th id="36">36</th><td><i> *                 Address: fee0f00c  Data: 41d9</i></td></tr>
+<tr><th id="37">37</th><td><i> *         Capabilities: [70] Power Management version 3</i></td></tr>
+<tr><th id="38">38</th><td><i> *                 Flags: PMEClk- DSI- D1- D2- AuxCurrent=0mA PME(D0-,D1-,D2-,D3hot+,D3cold-)</i></td></tr>
+<tr><th id="39">39</th><td><i> *                 Status: D0 PME-Enable- DSel=0 DScale=0 PME-</i></td></tr>
+<tr><th id="40">40</th><td><i> *         Capabilities: [a8] SATA HBA &lt;?&gt;</i></td></tr>
+<tr><th id="41">41</th><td><i> *         Capabilities: [b0] Vendor Specific Information &lt;?&gt;</i></td></tr>
+<tr><th id="42">42</th><td><i> *         Kernel driver in use: ahci</i></td></tr>
+<tr><th id="43">43</th><td><i> *         Kernel modules: ahci</i></td></tr>
+<tr><th id="44">44</th><td><i> * 00: 86 80 22 29 07 04 b0 02 02 01 06 01 00 00 00 00</i></td></tr>
+<tr><th id="45">45</th><td><i> * 10: 01 d0 00 00 01 cc 00 00 81 c8 00 00 01 c8 00 00</i></td></tr>
+<tr><th id="46">46</th><td><i> * 20: 81 c4 00 00 00 90 bf fe 00 00 00 00 86 80 22 29</i></td></tr>
+<tr><th id="47">47</th><td><i> * 30: 00 00 00 00 80 00 00 00 00 00 00 00 0f 02 00 00</i></td></tr>
+<tr><th id="48">48</th><td><i> * 40: 00 80 00 80 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="49">49</th><td><i> * 50: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="50">50</th><td><i> * 60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="51">51</th><td><i> * 70: 01 a8 03 40 08 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="52">52</th><td><i> * 80: 05 70 09 00 0c f0 e0 fe d9 41 00 00 00 00 00 00</i></td></tr>
+<tr><th id="53">53</th><td><i> * 90: 40 00 0f 82 93 01 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="54">54</th><td><i> * a0: ac 00 00 00 0a 00 12 00 12 b0 10 00 48 00 00 00</i></td></tr>
+<tr><th id="55">55</th><td><i> * b0: 09 00 06 20 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="56">56</th><td><i> * c0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="57">57</th><td><i> * d0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="58">58</th><td><i> * e0: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</i></td></tr>
+<tr><th id="59">59</th><td><i> * f0: 00 00 00 00 00 00 00 00 86 0f 02 00 00 00 00 00</i></td></tr>
+<tr><th id="60">60</th><td><i> *</i></td></tr>
+<tr><th id="61">61</th><td><i> */</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="64">64</th><td><u>#include <a href="../../include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="65">65</th><td><u>#include <a href="../../include/hw/pci/msi.h.html">"hw/pci/msi.h"</a></u></td></tr>
+<tr><th id="66">66</th><td><u>#include <a href="../../include/hw/i386/pc.h.html">"hw/i386/pc.h"</a></u></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="../../include/hw/pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="68">68</th><td><u>#include <a href="../../include/hw/isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="69">69</th><td><u>#include <a href="../../include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#include <a href="../../include/sysemu/dma.h.html">"sysemu/dma.h"</a></u></td></tr>
+<tr><th id="71">71</th><td><u>#include <a href="../../include/hw/ide/pci.h.html">"hw/ide/pci.h"</a></u></td></tr>
+<tr><th id="72">72</th><td><u>#include <a href="ahci_internal.h.html">"hw/ide/ahci_internal.h"</a></u></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/ICH9_MSI_CAP_OFFSET" data-ref="_M/ICH9_MSI_CAP_OFFSET">ICH9_MSI_CAP_OFFSET</dfn>     0x80</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/ICH9_SATA_CAP_OFFSET" data-ref="_M/ICH9_SATA_CAP_OFFSET">ICH9_SATA_CAP_OFFSET</dfn>    0xA8</u></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/ICH9_IDP_BAR" data-ref="_M/ICH9_IDP_BAR">ICH9_IDP_BAR</dfn>            4</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/ICH9_MEM_BAR" data-ref="_M/ICH9_MEM_BAR">ICH9_MEM_BAR</dfn>            5</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/ICH9_IDP_INDEX" data-ref="_M/ICH9_IDP_INDEX">ICH9_IDP_INDEX</dfn>          0x10</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/ICH9_IDP_INDEX_LOG2" data-ref="_M/ICH9_IDP_INDEX_LOG2">ICH9_IDP_INDEX_LOG2</dfn>     0x04</u></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="vmstate_ich9_ahci" title='vmstate_ich9_ahci' data-type='const VMStateDescription' data-ref="vmstate_ich9_ahci">vmstate_ich9_ahci</dfn> = {</td></tr>
+<tr><th id="84">84</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <q>"ich9_ahci"</q>,</td></tr>
+<tr><th id="85">85</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="86">86</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="87">87</th><td>        <a class="macro" href="../../include/hw/pci/pci.h.html#808" title="{ .name = (&quot;parent_obj&quot;), .size = sizeof(PCIDevice), .vmsd = &amp;vmstate_pci_device, .flags = VMS_STRUCT, .offset = (__builtin_offsetof(AHCIPCIState, parent_obj) + ((PCIDevice*)0 - (typeof(((AHCIPCIState *)0)-&gt;parent_obj)*)0)), }" data-ref="_M/VMSTATE_PCI_DEVICE">VMSTATE_PCI_DEVICE</a>(<a class="ref" href="ahci_internal.h.html#AHCIPCIState::parent_obj" title='AHCIPCIState::parent_obj' data-ref="AHCIPCIState::parent_obj">parent_obj</a>, <a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIPCIState" title='AHCIPCIState' data-type='struct AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a>),</td></tr>
+<tr><th id="88">88</th><td>        <a class="macro" href="ahci_internal.h.html#295" title="{ .name = (&quot;ahci&quot;), .size = sizeof(AHCIState), .vmsd = &amp;vmstate_ahci, .flags = VMS_STRUCT, .offset = (__builtin_offsetof(AHCIPCIState, ahci) + ((AHCIState*)0 - (typeof(((AHCIPCIState *)0)-&gt;ahci)*)0)), }" data-ref="_M/VMSTATE_AHCI">VMSTATE_AHCI</a>(<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>, <a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIPCIState" title='AHCIPCIState' data-type='struct AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a>),</td></tr>
+<tr><th id="89">89</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>()</td></tr>
+<tr><th id="90">90</th><td>    },</td></tr>
+<tr><th id="91">91</th><td>};</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pci_ich9_reset" title='pci_ich9_reset' data-type='void pci_ich9_reset(DeviceState * dev)' data-ref="pci_ich9_reset">pci_ich9_reset</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col1 decl" id="1dev" title='dev' data-type='DeviceState *' data-ref="1dev">dev</dfn>)</td></tr>
+<tr><th id="94">94</th><td>{</td></tr>
+<tr><th id="95">95</th><td>    <a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIPCIState" title='AHCIPCIState' data-type='struct AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a> *<dfn class="local col2 decl" id="2d" title='d' data-type='AHCIPCIState *' data-ref="2d">d</dfn> = <a class="macro" href="ahci_internal.h.html#290" title="((AHCIPCIState *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;ich9-ahci&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 95, __func__))" data-ref="_M/ICH_AHCI">ICH_AHCI</a>(<a class="local col1 ref" href="#1dev" title='dev' data-ref="1dev">dev</a>);</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <a class="ref" href="ahci_internal.h.html#ahci_reset" title='ahci_reset' data-ref="ahci_reset">ahci_reset</a>(&amp;<a class="local col2 ref" href="#2d" title='d' data-ref="2d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>);</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pci_ich9_ahci_init" title='pci_ich9_ahci_init' data-type='void pci_ich9_ahci_init(Object * obj)' data-ref="pci_ich9_ahci_init">pci_ich9_ahci_init</dfn>(<a class="typedef" href="../../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col3 decl" id="3obj" title='obj' data-type='Object *' data-ref="3obj">obj</dfn>)</td></tr>
+<tr><th id="101">101</th><td>{</td></tr>
+<tr><th id="102">102</th><td>    <b>struct</b> <a class="type" href="ahci_internal.h.html#AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a> *<dfn class="local col4 decl" id="4d" title='d' data-type='struct AHCIPCIState *' data-ref="4d">d</dfn> = <a class="macro" href="ahci_internal.h.html#290" title="((AHCIPCIState *)object_dynamic_cast_assert(((Object *)((obj))), (&quot;ich9-ahci&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 102, __func__))" data-ref="_M/ICH_AHCI">ICH_AHCI</a>(<a class="local col3 ref" href="#3obj" title='obj' data-ref="3obj">obj</a>);</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <a class="ref" href="ahci_internal.h.html#ahci_init" title='ahci_init' data-ref="ahci_init">ahci_init</a>(&amp;<a class="local col4 ref" href="#4d" title='d' data-ref="4d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>, <a class="macro" href="../../include/hw/qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((obj))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 104, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col3 ref" href="#3obj" title='obj' data-ref="3obj">obj</a>));</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pci_ich9_ahci_realize" title='pci_ich9_ahci_realize' data-type='void pci_ich9_ahci_realize(PCIDevice * dev, Error ** errp)' data-ref="pci_ich9_ahci_realize">pci_ich9_ahci_realize</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col5 decl" id="5dev" title='dev' data-type='PCIDevice *' data-ref="5dev">dev</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="6errp" title='errp' data-type='Error **' data-ref="6errp">errp</dfn>)</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>    <b>struct</b> <a class="type" href="ahci_internal.h.html#AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a> *<dfn class="local col7 decl" id="7d" title='d' data-type='struct AHCIPCIState *' data-ref="7d">d</dfn>;</td></tr>
+<tr><th id="110">110</th><td>    <em>int</em> <dfn class="local col8 decl" id="8sata_cap_offset" title='sata_cap_offset' data-type='int' data-ref="8sata_cap_offset">sata_cap_offset</dfn>;</td></tr>
+<tr><th id="111">111</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="9sata_cap" title='sata_cap' data-type='uint8_t *' data-ref="9sata_cap">sata_cap</dfn>;</td></tr>
+<tr><th id="112">112</th><td>    <a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a> = <a class="macro" href="ahci_internal.h.html#290" title="((AHCIPCIState *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;ich9-ahci&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 112, __func__))" data-ref="_M/ICH_AHCI">ICH_AHCI</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>);</td></tr>
+<tr><th id="113">113</th><td>    <em>int</em> <dfn class="local col0 decl" id="10ret" title='ret' data-type='int' data-ref="10ret">ret</dfn>;</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <a class="ref" href="ahci_internal.h.html#ahci_realize" title='ahci_realize' data-ref="ahci_realize">ahci_realize</a>(&amp;<a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>, <a class="macro" href="../../include/hw/qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 115, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>), <a class="ref" href="../../include/hw/pci/pci.h.html#pci_get_address_space" title='pci_get_address_space' data-ref="pci_get_address_space">pci_get_address_space</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>), <var>6</var>);</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_config_set_prog_interface" title='pci_config_set_prog_interface' data-ref="pci_config_set_prog_interface">pci_config_set_prog_interface</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a>, <a class="macro" href="ahci_internal.h.html#187" title="1" data-ref="_M/AHCI_PROGMODE_MAJOR_REV_1">AHCI_PROGMODE_MAJOR_REV_1</a>);</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a>[<a class="macro" href="../../include/standard-headers/linux/pci_regs.h.html#75" title="0x0c" data-ref="_M/PCI_CACHE_LINE_SIZE">PCI_CACHE_LINE_SIZE</a>] = <var>0x08</var>;  <i>/* Cache line size */</i></td></tr>
+<tr><th id="120">120</th><td>    <a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a>[<a class="macro" href="../../include/standard-headers/linux/pci_regs.h.html#76" title="0x0d" data-ref="_M/PCI_LATENCY_TIMER">PCI_LATENCY_TIMER</a>]   = <var>0x00</var>;  <i>/* Latency timer */</i></td></tr>
+<tr><th id="121">121</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_config_set_interrupt_pin" title='pci_config_set_interrupt_pin' data-ref="pci_config_set_interrupt_pin">pci_config_set_interrupt_pin</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a>, <var>1</var>);</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>    <i>/* XXX Software should program this register */</i></td></tr>
+<tr><th id="124">124</th><td>    <a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a>[<var>0x90</var>]   = <var>1</var> &lt;&lt; <var>6</var>; <i>/* Address Map Register - AHCI mode */</i></td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>.<a class="ref" href="../../include/hw/ide/ahci.h.html#AHCIState::irq" title='AHCIState::irq' data-ref="AHCIState::irq">irq</a> = <a class="ref" href="../../include/hw/pci/pci.h.html#pci_allocate_irq" title='pci_allocate_irq' data-ref="pci_allocate_irq">pci_allocate_irq</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>);</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_register_bar" title='pci_register_bar' data-ref="pci_register_bar">pci_register_bar</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <a class="macro" href="#77" title="4" data-ref="_M/ICH9_IDP_BAR">ICH9_IDP_BAR</a>, <a class="macro" href="../../include/standard-headers/linux/pci_regs.h.html#100" title="0x01" data-ref="_M/PCI_BASE_ADDRESS_SPACE_IO">PCI_BASE_ADDRESS_SPACE_IO</a>,</td></tr>
+<tr><th id="129">129</th><td>                     &amp;<a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>.<a class="ref" href="../../include/hw/ide/ahci.h.html#AHCIState::idp" title='AHCIState::idp' data-ref="AHCIState::idp">idp</a>);</td></tr>
+<tr><th id="130">130</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_register_bar" title='pci_register_bar' data-ref="pci_register_bar">pci_register_bar</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <a class="macro" href="#78" title="5" data-ref="_M/ICH9_MEM_BAR">ICH9_MEM_BAR</a>, <a class="macro" href="../../include/standard-headers/linux/pci_regs.h.html#101" title="0x00" data-ref="_M/PCI_BASE_ADDRESS_SPACE_MEMORY">PCI_BASE_ADDRESS_SPACE_MEMORY</a>,</td></tr>
+<tr><th id="131">131</th><td>                     &amp;<a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>.<a class="ref" href="../../include/hw/ide/ahci.h.html#AHCIState::mem" title='AHCIState::mem' data-ref="AHCIState::mem">mem</a>);</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>    <a class="local col8 ref" href="#8sata_cap_offset" title='sata_cap_offset' data-ref="8sata_cap_offset">sata_cap_offset</a> = <a class="ref" href="../../include/hw/pci/pci.h.html#pci_add_capability" title='pci_add_capability' data-ref="pci_add_capability">pci_add_capability</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <a class="macro" href="../../include/standard-headers/linux/pci_regs.h.html#225" title="0x12" data-ref="_M/PCI_CAP_ID_SATA">PCI_CAP_ID_SATA</a>,</td></tr>
+<tr><th id="134">134</th><td>                                          <a class="macro" href="#75" title="0xA8" data-ref="_M/ICH9_SATA_CAP_OFFSET">ICH9_SATA_CAP_OFFSET</a>, <a class="macro" href="ahci_internal.h.html#210" title="0x8" data-ref="_M/SATA_CAP_SIZE">SATA_CAP_SIZE</a>,</td></tr>
+<tr><th id="135">135</th><td>                                          <a class="local col6 ref" href="#6errp" title='errp' data-ref="6errp">errp</a>);</td></tr>
+<tr><th id="136">136</th><td>    <b>if</b> (<a class="local col8 ref" href="#8sata_cap_offset" title='sata_cap_offset' data-ref="8sata_cap_offset">sata_cap_offset</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="137">137</th><td>        <b>return</b>;</td></tr>
+<tr><th id="138">138</th><td>    }</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>    <a class="local col9 ref" href="#9sata_cap" title='sata_cap' data-ref="9sata_cap">sata_cap</a> = <a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDevice::config" title='PCIDevice::config' data-ref="PCIDevice::config">config</a> + <a class="local col8 ref" href="#8sata_cap_offset" title='sata_cap_offset' data-ref="8sata_cap_offset">sata_cap_offset</a>;</td></tr>
+<tr><th id="141">141</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_set_word" title='pci_set_word' data-ref="pci_set_word">pci_set_word</a>(<a class="local col9 ref" href="#9sata_cap" title='sata_cap' data-ref="9sata_cap">sata_cap</a> + <a class="macro" href="ahci_internal.h.html#211" title="0x2" data-ref="_M/SATA_CAP_REV">SATA_CAP_REV</a>, <var>0x10</var>);</td></tr>
+<tr><th id="142">142</th><td>    <a class="ref" href="../../include/hw/pci/pci.h.html#pci_set_long" title='pci_set_long' data-ref="pci_set_long">pci_set_long</a>(<a class="local col9 ref" href="#9sata_cap" title='sata_cap' data-ref="9sata_cap">sata_cap</a> + <a class="macro" href="ahci_internal.h.html#212" title="0x4" data-ref="_M/SATA_CAP_BAR">SATA_CAP_BAR</a>,</td></tr>
+<tr><th id="143">143</th><td>                 (<a class="macro" href="#77" title="4" data-ref="_M/ICH9_IDP_BAR">ICH9_IDP_BAR</a> + <var>0x4</var>) | (<a class="macro" href="#81" title="0x04" data-ref="_M/ICH9_IDP_INDEX_LOG2">ICH9_IDP_INDEX_LOG2</a> &lt;&lt; <var>4</var>));</td></tr>
+<tr><th id="144">144</th><td>    <a class="local col7 ref" href="#7d" title='d' data-ref="7d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>.<a class="ref" href="../../include/hw/ide/ahci.h.html#AHCIState::idp_offset" title='AHCIState::idp_offset' data-ref="AHCIState::idp_offset">idp_offset</a> = <a class="macro" href="#80" title="0x10" data-ref="_M/ICH9_IDP_INDEX">ICH9_IDP_INDEX</a>;</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>    <i>/* Although the AHCI 1.3 specification states that the first capability</i></td></tr>
+<tr><th id="147">147</th><td><i>     * should be PMCAP, the Intel ICH9 data sheet specifies that the ICH9</i></td></tr>
+<tr><th id="148">148</th><td><i>     * AHCI device puts the MSI capability first, pointing to 0x80. */</i></td></tr>
+<tr><th id="149">149</th><td>    <a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a> = <a class="ref" href="../../include/hw/pci/msi.h.html#msi_init" title='msi_init' data-ref="msi_init">msi_init</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <a class="macro" href="#74" title="0x80" data-ref="_M/ICH9_MSI_CAP_OFFSET">ICH9_MSI_CAP_OFFSET</a>, <var>1</var>, <span class="macro" title="1" data-ref="_M/true">true</span>, <span class="macro" title="0" data-ref="_M/false">false</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="150">150</th><td>    <i>/* Any error other than -ENOTSUP(board's MSI support is broken)</i></td></tr>
+<tr><th id="151">151</th><td><i>     * is a programming error.  Fall back to INTx silently on -ENOTSUP */</i></td></tr>
+<tr><th id="152">152</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((!ret || ret == -95) ? (void) (0) : __assert_fail (&quot;!ret || ret == -ENOTSUP&quot;, &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 152, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a> || <a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a> == -<a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>);</td></tr>
+<tr><th id="153">153</th><td>}</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="pci_ich9_uninit" title='pci_ich9_uninit' data-type='void pci_ich9_uninit(PCIDevice * dev)' data-ref="pci_ich9_uninit">pci_ich9_uninit</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col1 decl" id="11dev" title='dev' data-type='PCIDevice *' data-ref="11dev">dev</dfn>)</td></tr>
+<tr><th id="156">156</th><td>{</td></tr>
+<tr><th id="157">157</th><td>    <b>struct</b> <a class="type" href="ahci_internal.h.html#AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a> *<dfn class="local col2 decl" id="12d" title='d' data-type='struct AHCIPCIState *' data-ref="12d">d</dfn>;</td></tr>
+<tr><th id="158">158</th><td>    <a class="local col2 ref" href="#12d" title='d' data-ref="12d">d</a> = <a class="macro" href="ahci_internal.h.html#290" title="((AHCIPCIState *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;ich9-ahci&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 158, __func__))" data-ref="_M/ICH_AHCI">ICH_AHCI</a>(<a class="local col1 ref" href="#11dev" title='dev' data-ref="11dev">dev</a>);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <a class="ref" href="../../include/hw/pci/msi.h.html#msi_uninit" title='msi_uninit' data-ref="msi_uninit">msi_uninit</a>(<a class="local col1 ref" href="#11dev" title='dev' data-ref="11dev">dev</a>);</td></tr>
+<tr><th id="161">161</th><td>    <a class="ref" href="ahci_internal.h.html#ahci_uninit" title='ahci_uninit' data-ref="ahci_uninit">ahci_uninit</a>(&amp;<a class="local col2 ref" href="#12d" title='d' data-ref="12d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>);</td></tr>
+<tr><th id="162">162</th><td>    <a class="ref" href="../../include/hw/irq.h.html#qemu_free_irq" title='qemu_free_irq' data-ref="qemu_free_irq">qemu_free_irq</a>(<a class="local col2 ref" href="#12d" title='d' data-ref="12d">d</a>-&gt;<a class="ref" href="ahci_internal.h.html#AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</a>.<a class="ref" href="../../include/hw/ide/ahci.h.html#AHCIState::irq" title='AHCIState::irq' data-ref="AHCIState::irq">irq</a>);</td></tr>
+<tr><th id="163">163</th><td>}</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="ich_ahci_class_init" title='ich_ahci_class_init' data-type='void ich_ahci_class_init(ObjectClass * klass, void * data)' data-ref="ich_ahci_class_init">ich_ahci_class_init</dfn>(<a class="typedef" href="../../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col3 decl" id="13klass" title='klass' data-type='ObjectClass *' data-ref="13klass">klass</dfn>, <em>void</em> *<dfn class="local col4 decl" id="14data" title='data' data-type='void *' data-ref="14data">data</dfn>)</td></tr>
+<tr><th id="166">166</th><td>{</td></tr>
+<tr><th id="167">167</th><td>    <a class="typedef" href="../../include/hw/qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> *<dfn class="local col5 decl" id="15dc" title='dc' data-type='DeviceClass *' data-ref="15dc">dc</dfn> = <a class="macro" href="../../include/hw/qdev-core.h.html#17" title="((DeviceClass *)object_class_dynamic_cast_assert(((ObjectClass *)((klass))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 167, __func__))" data-ref="_M/DEVICE_CLASS">DEVICE_CLASS</a>(<a class="local col3 ref" href="#13klass" title='klass' data-ref="13klass">klass</a>);</td></tr>
+<tr><th id="168">168</th><td>    <a class="typedef" href="../../include/hw/pci/pci.h.html#PCIDeviceClass" title='PCIDeviceClass' data-type='struct PCIDeviceClass' data-ref="PCIDeviceClass">PCIDeviceClass</a> *<dfn class="local col6 decl" id="16k" title='k' data-type='PCIDeviceClass *' data-ref="16k">k</dfn> = <a class="macro" href="../../include/hw/pci/pci.h.html#193" title="((PCIDeviceClass *)object_class_dynamic_cast_assert(((ObjectClass *)((klass))), (&quot;pci-device&quot;), &quot;/home/jon/workspace/qemu/hw/ide/ich.c&quot;, 168, __func__))" data-ref="_M/PCI_DEVICE_CLASS">PCI_DEVICE_CLASS</a>(<a class="local col3 ref" href="#13klass" title='klass' data-ref="13klass">klass</a>);</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::realize" title='PCIDeviceClass::realize' data-ref="PCIDeviceClass::realize">realize</a> = <a class="tu ref" href="#pci_ich9_ahci_realize" title='pci_ich9_ahci_realize' data-use='r' data-ref="pci_ich9_ahci_realize">pci_ich9_ahci_realize</a>;</td></tr>
+<tr><th id="171">171</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::exit" title='PCIDeviceClass::exit' data-ref="PCIDeviceClass::exit">exit</a> = <a class="tu ref" href="#pci_ich9_uninit" title='pci_ich9_uninit' data-use='r' data-ref="pci_ich9_uninit">pci_ich9_uninit</a>;</td></tr>
+<tr><th id="172">172</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::vendor_id" title='PCIDeviceClass::vendor_id' data-ref="PCIDeviceClass::vendor_id">vendor_id</a> = <a class="macro" href="../../include/hw/pci/pci_ids.h.html#221" title="0x8086" data-ref="_M/PCI_VENDOR_ID_INTEL">PCI_VENDOR_ID_INTEL</a>;</td></tr>
+<tr><th id="173">173</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::device_id" title='PCIDeviceClass::device_id' data-ref="PCIDeviceClass::device_id">device_id</a> = <a class="macro" href="../../include/hw/pci/pci.h.html#71" title="0x2922" data-ref="_M/PCI_DEVICE_ID_INTEL_82801IR">PCI_DEVICE_ID_INTEL_82801IR</a>;</td></tr>
+<tr><th id="174">174</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::revision" title='PCIDeviceClass::revision' data-ref="PCIDeviceClass::revision">revision</a> = <var>0x02</var>;</td></tr>
+<tr><th id="175">175</th><td>    <a class="local col6 ref" href="#16k" title='k' data-ref="16k">k</a>-&gt;<a class="ref" href="../../include/hw/pci/pci.h.html#PCIDeviceClass::class_id" title='PCIDeviceClass::class_id' data-ref="PCIDeviceClass::class_id">class_id</a> = <a class="macro" href="../../include/hw/pci/pci_ids.h.html#26" title="0x0106" data-ref="_M/PCI_CLASS_STORAGE_SATA">PCI_CLASS_STORAGE_SATA</a>;</td></tr>
+<tr><th id="176">176</th><td>    <a class="local col5 ref" href="#15dc" title='dc' data-ref="15dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::vmsd" title='DeviceClass::vmsd' data-ref="DeviceClass::vmsd">vmsd</a> = &amp;<a class="tu ref" href="#vmstate_ich9_ahci" title='vmstate_ich9_ahci' data-use='a' data-ref="vmstate_ich9_ahci">vmstate_ich9_ahci</a>;</td></tr>
+<tr><th id="177">177</th><td>    <a class="local col5 ref" href="#15dc" title='dc' data-ref="15dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#DeviceClass::reset" title='DeviceClass::reset' data-ref="DeviceClass::reset">reset</a> = <a class="tu ref" href="#pci_ich9_reset" title='pci_ich9_reset' data-use='r' data-ref="pci_ich9_reset">pci_ich9_reset</a>;</td></tr>
+<tr><th id="178">178</th><td>    <a class="ref" href="../../include/qemu/bitops.h.html#set_bit" title='set_bit' data-ref="set_bit">set_bit</a>(<a class="enum" href="../../include/hw/qdev-core.h.html#DeviceCategory::DEVICE_CATEGORY_STORAGE" title='DeviceCategory::DEVICE_CATEGORY_STORAGE' data-ref="DeviceCategory::DEVICE_CATEGORY_STORAGE">DEVICE_CATEGORY_STORAGE</a>, <a class="local col5 ref" href="#15dc" title='dc' data-ref="15dc">dc</a>-&gt;<a class="ref" href="../../include/hw/qdev-core.h.html#100" title='DeviceClass::categories' data-ref="DeviceClass::categories">categories</a>);</td></tr>
+<tr><th id="179">179</th><td>}</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="ich_ahci_info" title='ich_ahci_info' data-type='const TypeInfo' data-ref="ich_ahci_info">ich_ahci_info</dfn> = {</td></tr>
+<tr><th id="182">182</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a>          = <a class="macro" href="ahci_internal.h.html#288" title="&quot;ich9-ahci&quot;" data-ref="_M/TYPE_ICH9_AHCI">TYPE_ICH9_AHCI</a>,</td></tr>
+<tr><th id="183">183</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a>        = <a class="macro" href="../../include/hw/pci/pci.h.html#190" title="&quot;pci-device&quot;" data-ref="_M/TYPE_PCI_DEVICE">TYPE_PCI_DEVICE</a>,</td></tr>
+<tr><th id="184">184</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::instance_size" title='TypeInfo::instance_size' data-ref="TypeInfo::instance_size">instance_size</a> = <b>sizeof</b>(<a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIPCIState" title='AHCIPCIState' data-type='struct AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a>),</td></tr>
+<tr><th id="185">185</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::instance_init" title='TypeInfo::instance_init' data-ref="TypeInfo::instance_init">instance_init</a> = <a class="tu ref" href="#pci_ich9_ahci_init" title='pci_ich9_ahci_init' data-ref="pci_ich9_ahci_init">pci_ich9_ahci_init</a>,</td></tr>
+<tr><th id="186">186</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a>    = <a class="tu ref" href="#ich_ahci_class_init" title='ich_ahci_class_init' data-ref="ich_ahci_class_init">ich_ahci_class_init</a>,</td></tr>
+<tr><th id="187">187</th><td>};</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="ich_ahci_register_types" title='ich_ahci_register_types' data-type='void ich_ahci_register_types()' data-ref="ich_ahci_register_types">ich_ahci_register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="190">190</th><td>{</td></tr>
+<tr><th id="191">191</th><td>    <a class="ref" href="../../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#ich_ahci_info" title='ich_ahci_info' data-use='a' data-ref="ich_ahci_info">ich_ahci_info</a>);</td></tr>
+<tr><th id="192">192</th><td>}</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><a class="macro" href="../../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_ich_ahci_register_types(void) { register_module_init(ich_ahci_register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#ich_ahci_register_types" title='ich_ahci_register_types' data-use='r' data-ref="ich_ahci_register_types">ich_ahci_register_types</a>)</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,461 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ip_icmp.c source code [codebrowser/slirp/ip_icmp.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/ip_icmp.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='ip_icmp.c.html'>ip_icmp.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1982, 1986, 1988, 1993</i></td></tr>
+<tr><th id="3">3</th><td><i> *	The Regents of the University of California.  All rights reserved.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="6">6</th><td><i> * modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="7">7</th><td><i> * are met:</i></td></tr>
+<tr><th id="8">8</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="9">9</th><td><i> *    notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="10">10</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="11">11</th><td><i> *    notice, this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="12">12</th><td><i> *    documentation and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="13">13</th><td><i> * 3. Neither the name of the University nor the names of its contributors</i></td></tr>
+<tr><th id="14">14</th><td><i> *    may be used to endorse or promote products derived from this software</i></td></tr>
+<tr><th id="15">15</th><td><i> *    without specific prior written permission.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND</i></td></tr>
+<tr><th id="18">18</th><td><i> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</i></td></tr>
+<tr><th id="19">19</th><td><i> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</i></td></tr>
+<tr><th id="20">20</th><td><i> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE</i></td></tr>
+<tr><th id="21">21</th><td><i> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</i></td></tr>
+<tr><th id="22">22</th><td><i> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</i></td></tr>
+<tr><th id="23">23</th><td><i> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</i></td></tr>
+<tr><th id="24">24</th><td><i> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</i></td></tr>
+<tr><th id="25">25</th><td><i> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</i></td></tr>
+<tr><th id="26">26</th><td><i> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</i></td></tr>
+<tr><th id="27">27</th><td><i> * SUCH DAMAGE.</i></td></tr>
+<tr><th id="28">28</th><td><i> *</i></td></tr>
+<tr><th id="29">29</th><td><i> *	@(#)ip_icmp.c	8.2 (Berkeley) 1/4/94</i></td></tr>
+<tr><th id="30">30</th><td><i> * ip_icmp.c,v 1.7 1995/05/30 08:09:42 rgrimes Exp</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="ip_icmp.h.html">"ip_icmp.h"</a></u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><i>/* The message sent when emulating PING */</i></td></tr>
+<tr><th id="38">38</th><td><i  data-doc="icmp_ping_msg">/* Be nice and tell them it's just a pseudo-ping packet */</i></td></tr>
+<tr><th id="39">39</th><td><em>static</em> <em>const</em> <em>char</em> <dfn class="tu decl def" id="icmp_ping_msg" title='icmp_ping_msg' data-type='const char [82]' data-ref="icmp_ping_msg">icmp_ping_msg</dfn>[] = <q>"This is a pseudo-PING packet used by Slirp to emulate ICMP ECHO-REQUEST packets.\n"</q>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><i  data-doc="icmp_flush">/* list of actions for icmp_send_error() on RX of an icmp message */</i></td></tr>
+<tr><th id="42">42</th><td><em>static</em> <em>const</em> <em>int</em> <dfn class="tu decl def" id="icmp_flush" title='icmp_flush' data-type='const int [19]' data-ref="icmp_flush">icmp_flush</dfn>[<var>19</var>] = {</td></tr>
+<tr><th id="43">43</th><td><i>/*  ECHO REPLY (0)  */</i>   <var>0</var>,</td></tr>
+<tr><th id="44">44</th><td>		         <var>1</var>,</td></tr>
+<tr><th id="45">45</th><td>		         <var>1</var>,</td></tr>
+<tr><th id="46">46</th><td><i>/* DEST UNREACH (3) */</i>   <var>1</var>,</td></tr>
+<tr><th id="47">47</th><td><i>/* SOURCE QUENCH (4)*/</i>   <var>1</var>,</td></tr>
+<tr><th id="48">48</th><td><i>/* REDIRECT (5) */</i>       <var>1</var>,</td></tr>
+<tr><th id="49">49</th><td>		         <var>1</var>,</td></tr>
+<tr><th id="50">50</th><td>		         <var>1</var>,</td></tr>
+<tr><th id="51">51</th><td><i>/* ECHO (8) */</i>           <var>0</var>,</td></tr>
+<tr><th id="52">52</th><td><i>/* ROUTERADVERT (9) */</i>   <var>1</var>,</td></tr>
+<tr><th id="53">53</th><td><i>/* ROUTERSOLICIT (10) */</i> <var>1</var>,</td></tr>
+<tr><th id="54">54</th><td><i>/* TIME EXCEEDED (11) */</i> <var>1</var>,</td></tr>
+<tr><th id="55">55</th><td><i>/* PARAMETER PROBLEM (12) */</i> <var>1</var>,</td></tr>
+<tr><th id="56">56</th><td><i>/* TIMESTAMP (13) */</i>     <var>0</var>,</td></tr>
+<tr><th id="57">57</th><td><i>/* TIMESTAMP REPLY (14) */</i> <var>0</var>,</td></tr>
+<tr><th id="58">58</th><td><i>/* INFO (15) */</i>          <var>0</var>,</td></tr>
+<tr><th id="59">59</th><td><i>/* INFO REPLY (16) */</i>    <var>0</var>,</td></tr>
+<tr><th id="60">60</th><td><i>/* ADDR MASK (17) */</i>     <var>0</var>,</td></tr>
+<tr><th id="61">61</th><td><i>/* ADDR MASK REPLY (18) */</i> <var>0</var></td></tr>
+<tr><th id="62">62</th><td>};</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>void</em> <dfn class="decl def" id="icmp_init" title='icmp_init' data-ref="icmp_init">icmp_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col1 decl" id="1slirp" title='slirp' data-type='Slirp *' data-ref="1slirp">slirp</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>    <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a> = <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>.<a class="ref" href="socket.h.html#socket::so_prev" title='socket::so_prev' data-ref="socket::so_prev">so_prev</a> = &amp;<a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp_last_so" title='Slirp::icmp_last_so' data-ref="Slirp::icmp_last_so">icmp_last_so</a> = &amp;<a class="local col1 ref" href="#1slirp" title='slirp' data-ref="1slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>;</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>void</em> <dfn class="decl def" id="icmp_cleanup" title='icmp_cleanup' data-ref="icmp_cleanup">icmp_cleanup</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col2 decl" id="2slirp" title='slirp' data-type='Slirp *' data-ref="2slirp">slirp</dfn>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    <b>while</b> (<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a> != &amp;<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>) {</td></tr>
+<tr><th id="73">73</th><td>        <a class="ref" href="#icmp_detach" title='icmp_detach' data-ref="icmp_detach">icmp_detach</a>(<a class="local col2 ref" href="#2slirp" title='slirp' data-ref="2slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>.<a class="ref" href="socket.h.html#socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</a>);</td></tr>
+<tr><th id="74">74</th><td>    }</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="icmp_send" title='icmp_send' data-type='int icmp_send(struct socket * so, struct mbuf * m, int hlen)' data-ref="icmp_send">icmp_send</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col3 decl" id="3so" title='so' data-type='struct socket *' data-ref="3so">so</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col4 decl" id="4m" title='m' data-type='struct mbuf *' data-ref="4m">m</dfn>, <em>int</em> <dfn class="local col5 decl" id="5hlen" title='hlen' data-type='int' data-ref="5hlen">hlen</dfn>)</td></tr>
+<tr><th id="78">78</th><td>{</td></tr>
+<tr><th id="79">79</th><td>    <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col6 decl" id="6ip" title='ip' data-type='struct ip *' data-ref="6ip">ip</dfn> = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col4 ref" href="#4m" title='m' data-ref="4m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="80">80</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> <dfn class="local col7 decl" id="7addr" title='addr' data-type='struct sockaddr_in' data-ref="7addr">addr</dfn>;</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a> = <a class="ref" href="../include/qemu/sockets.h.html#qemu_socket" title='qemu_socket' data-ref="qemu_socket">qemu_socket</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket_type.h.html#31" title="SOCK_DGRAM" data-ref="_M/SOCK_DGRAM">SOCK_DGRAM</a>, <a class="macro" href="../../include/netinet/in.h.html#45" title="IPPROTO_ICMP" data-ref="_M/IPPROTO_ICMP">IPPROTO_ICMP</a>);</td></tr>
+<tr><th id="83">83</th><td>    <b>if</b> (<a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a> == -<var>1</var>) {</td></tr>
+<tr><th id="84">84</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="85">85</th><td>    }</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a> = <a class="local col4 ref" href="#4m" title='m' data-ref="4m">m</a>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a> = <a class="local col6 ref" href="#6ip" title='ip' data-ref="6ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a> = <a class="local col6 ref" href="#6ip" title='ip' data-ref="6ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_iptos" title='socket::so_iptos' data-ref="socket::so_iptos">so_iptos</a> = <a class="local col6 ref" href="#6ip" title='ip' data-ref="6ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_tos" title='ip::ip_tos' data-ref="ip::ip_tos">ip_tos</a>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_type" title='socket::so_type' data-ref="socket::so_type">so_type</a> = <a class="macro" href="../../include/netinet/in.h.html#45" title="IPPROTO_ICMP" data-ref="_M/IPPROTO_ICMP">IPPROTO_ICMP</a>;</td></tr>
+<tr><th id="92">92</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> = <a class="macro" href="socket.h.html#81" title="0x004" data-ref="_M/SS_ISFCONNECTED">SS_ISFCONNECTED</a>;</td></tr>
+<tr><th id="93">93</th><td>    <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_expire" title='socket::so_expire' data-ref="socket::so_expire">so_expire</a> = <a class="ref" href="main.h.html#curtime" title='curtime' data-ref="curtime">curtime</a> + <a class="macro" href="socket.h.html#11" title="240000" data-ref="_M/SO_EXPIRE">SO_EXPIRE</a>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <a class="local col7 ref" href="#7addr" title='addr' data-ref="7addr">addr</a>.<a class="ref" href="../../include/netinet/in.h.html#241" title='sockaddr_in::sin_family' data-ref="sockaddr_in::sin_family">sin_family</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>;</td></tr>
+<tr><th id="96">96</th><td>    <a class="local col7 ref" href="#7addr" title='addr' data-ref="7addr">addr</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_addr" title='sockaddr_in::sin_addr' data-ref="sockaddr_in::sin_addr">sin_addr</a> = <a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a>;</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <a class="macro" href="slirp.h.html#64" title="slirp_insque" data-ref="_M/insque">insque</a>(<a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>, &amp;<a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</a>);</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#sendto" title='sendto' data-ref="sendto">sendto</a>(<a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>, <a class="local col4 ref" href="#4m" title='m' data-ref="4m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> + <a class="local col5 ref" href="#5hlen" title='hlen' data-ref="5hlen">hlen</a>, <a class="local col4 ref" href="#4m" title='m' data-ref="4m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> - <a class="local col5 ref" href="#5hlen" title='hlen' data-ref="5hlen">hlen</a>, <var>0</var>,</td></tr>
+<tr><th id="101">101</th><td>               (<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col7 ref" href="#7addr" title='addr' data-ref="7addr">addr</a>, <b>sizeof</b>(<a class="local col7 ref" href="#7addr" title='addr' data-ref="7addr">addr</a>)) == -<var>1</var>) {</td></tr>
+<tr><th id="102">102</th><td>        <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>"icmp_input icmp sendto tx errno = %d-%s\n"</q>,</td></tr>
+<tr><th id="103">103</th><td>                    errno, strerror(errno)));</td></tr>
+<tr><th id="104">104</th><td>        <a class="ref" href="#icmp_send_error" title='icmp_send_error' data-ref="icmp_send_error">icmp_send_error</a>(<a class="local col4 ref" href="#4m" title='m' data-ref="4m">m</a>, <a class="macro" href="ip_icmp.h.html#112" title="3" data-ref="_M/ICMP_UNREACH">ICMP_UNREACH</a>, <a class="macro" href="ip_icmp.h.html#113" title="0" data-ref="_M/ICMP_UNREACH_NET">ICMP_UNREACH_NET</a>, <var>0</var>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="105">105</th><td>        <a class="ref" href="#icmp_detach" title='icmp_detach' data-ref="icmp_detach">icmp_detach</a>(<a class="local col3 ref" href="#3so" title='so' data-ref="3so">so</a>);</td></tr>
+<tr><th id="106">106</th><td>    }</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="109">109</th><td>}</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><em>void</em> <dfn class="decl def" id="icmp_detach" title='icmp_detach' data-ref="icmp_detach">icmp_detach</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col8 decl" id="8so" title='so' data-type='struct socket *' data-ref="8so">so</dfn>)</td></tr>
+<tr><th id="112">112</th><td>{</td></tr>
+<tr><th id="113">113</th><td>    <a class="macro" href="../include/sysemu/os-posix.h.html#48" title="close(so-&gt;s)" data-ref="_M/closesocket">closesocket</a>(<a class="local col8 ref" href="#8so" title='so' data-ref="8so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>);</td></tr>
+<tr><th id="114">114</th><td>    <a class="ref" href="socket.h.html#sofree" title='sofree' data-ref="sofree">sofree</a>(<a class="local col8 ref" href="#8so" title='so' data-ref="8so">so</a>);</td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><i>/*</i></td></tr>
+<tr><th id="118">118</th><td><i> * Process a received ICMP message.</i></td></tr>
+<tr><th id="119">119</th><td><i> */</i></td></tr>
+<tr><th id="120">120</th><td><em>void</em></td></tr>
+<tr><th id="121">121</th><td><dfn class="decl def" id="icmp_input" title='icmp_input' data-ref="icmp_input">icmp_input</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col9 decl" id="9m" title='m' data-type='struct mbuf *' data-ref="9m">m</dfn>, <em>int</em> <dfn class="local col0 decl" id="10hlen" title='hlen' data-type='int' data-ref="10hlen">hlen</dfn>)</td></tr>
+<tr><th id="122">122</th><td>{</td></tr>
+<tr><th id="123">123</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *<dfn class="local col1 decl" id="11icp" title='icp' data-type='struct icmp *' data-ref="11icp">icp</dfn>;</td></tr>
+<tr><th id="124">124</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col2 decl" id="12ip" title='ip' data-type='struct ip *' data-ref="12ip">ip</dfn>=<a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="125">125</th><td>  <em>int</em> <dfn class="local col3 decl" id="13icmplen" title='icmplen' data-type='int' data-ref="13icmplen">icmplen</dfn>=<a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a>;</td></tr>
+<tr><th id="126">126</th><td>  <a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col4 decl" id="14slirp" title='slirp' data-type='Slirp *' data-ref="14slirp">slirp</dfn> = <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>;</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>  <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"icmp_input"</q>);</td></tr>
+<tr><th id="129">129</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m = %p"</q>, m);</td></tr>
+<tr><th id="130">130</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m_len = %d"</q>, m-&gt;m_len);</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>  <i>/*</i></td></tr>
+<tr><th id="133">133</th><td><i>   * Locate icmp structure in mbuf, and check</i></td></tr>
+<tr><th id="134">134</th><td><i>   * that its not corrupted and of at least minimum length.</i></td></tr>
+<tr><th id="135">135</th><td><i>   */</i></td></tr>
+<tr><th id="136">136</th><td>  <b>if</b> (<a class="local col3 ref" href="#13icmplen" title='icmplen' data-ref="13icmplen">icmplen</a> &lt; <a class="macro" href="ip_icmp.h.html#101" title="8" data-ref="_M/ICMP_MINLEN">ICMP_MINLEN</a>) {          <i>/* min 8 bytes payload */</i></td></tr>
+<tr><th id="137">137</th><td>  <dfn class="lbl" id="15freeit" data-ref="15freeit">freeit</dfn>:</td></tr>
+<tr><th id="138">138</th><td>    <a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>);</td></tr>
+<tr><th id="139">139</th><td>    <b>goto</b> <a class="lbl" href="#16end_error" data-ref="16end_error">end_error</a>;</td></tr>
+<tr><th id="140">140</th><td>  }</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>  <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>;</td></tr>
+<tr><th id="143">143</th><td>  <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>;</td></tr>
+<tr><th id="144">144</th><td>  <a class="local col1 ref" href="#11icp" title='icp' data-ref="11icp">icp</a> = <a class="macro" href="mbuf.h.html#42" title="((struct icmp *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>, <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *);</td></tr>
+<tr><th id="145">145</th><td>  <b>if</b> (<a class="ref" href="slirp.h.html#cksum" title='cksum' data-ref="cksum">cksum</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>, <a class="local col3 ref" href="#13icmplen" title='icmplen' data-ref="13icmplen">icmplen</a>)) {</td></tr>
+<tr><th id="146">146</th><td>    <b>goto</b> <a class="lbl" href="#15freeit" data-ref="15freeit">freeit</a>;</td></tr>
+<tr><th id="147">147</th><td>  }</td></tr>
+<tr><th id="148">148</th><td>  <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>;</td></tr>
+<tr><th id="149">149</th><td>  <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> -= <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>;</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"icmp_type = %d"</q>, icp-&gt;icmp_type);</td></tr>
+<tr><th id="152">152</th><td>  <b>switch</b> (<a class="local col1 ref" href="#11icp" title='icp' data-ref="11icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_type" title='icmp::icmp_type' data-ref="icmp::icmp_type">icmp_type</a>) {</td></tr>
+<tr><th id="153">153</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#132" title="8" data-ref="_M/ICMP_ECHO">ICMP_ECHO</a>:</td></tr>
+<tr><th id="154">154</th><td>    <a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a> += <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>;	             <i>/* since ip_input subtracts this */</i></td></tr>
+<tr><th id="155">155</th><td>    <b>if</b> (<a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col4 ref" href="#14slirp" title='slirp' data-ref="14slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vhost_addr" title='Slirp::vhost_addr' data-ref="Slirp::vhost_addr">vhost_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> ||</td></tr>
+<tr><th id="156">156</th><td>        <a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col4 ref" href="#14slirp" title='slirp' data-ref="14slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vnameserver_addr" title='Slirp::vnameserver_addr' data-ref="Slirp::vnameserver_addr">vnameserver_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a>) {</td></tr>
+<tr><th id="157">157</th><td>        <a class="ref" href="#icmp_reflect" title='icmp_reflect' data-ref="icmp_reflect">icmp_reflect</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>);</td></tr>
+<tr><th id="158">158</th><td>    } <b>else</b> <b>if</b> (<a class="local col4 ref" href="#14slirp" title='slirp' data-ref="14slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::restricted" title='Slirp::restricted' data-ref="Slirp::restricted">restricted</a>) {</td></tr>
+<tr><th id="159">159</th><td>        <b>goto</b> <a class="lbl" href="#15freeit" data-ref="15freeit">freeit</a>;</td></tr>
+<tr><th id="160">160</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="161">161</th><td>      <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col7 decl" id="17so" title='so' data-type='struct socket *' data-ref="17so">so</dfn>;</td></tr>
+<tr><th id="162">162</th><td>      <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> <dfn class="local col8 decl" id="18addr" title='addr' data-type='struct sockaddr_storage' data-ref="18addr">addr</dfn>;</td></tr>
+<tr><th id="163">163</th><td>      <b>if</b> ((<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a> = <a class="ref" href="socket.h.html#socreate" title='socreate' data-ref="socreate">socreate</a>(<a class="local col4 ref" href="#14slirp" title='slirp' data-ref="14slirp">slirp</a>)) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) <b>goto</b> <a class="lbl" href="#15freeit" data-ref="15freeit">freeit</a>;</td></tr>
+<tr><th id="164">164</th><td>      <b>if</b> (<a class="tu ref" href="#icmp_send" title='icmp_send' data-use='c' data-ref="icmp_send">icmp_send</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>, <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>, <a class="local col0 ref" href="#10hlen" title='hlen' data-ref="10hlen">hlen</a>) == <var>0</var>) {</td></tr>
+<tr><th id="165">165</th><td>        <b>return</b>;</td></tr>
+<tr><th id="166">166</th><td>      }</td></tr>
+<tr><th id="167">167</th><td>      <b>if</b> (<a class="ref" href="udp.h.html#udp_attach" title='udp_attach' data-ref="udp_attach">udp_attach</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="168">168</th><td>	<a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd,<q>"icmp_input udp_attach errno = %d-%s\n"</q>,</td></tr>
+<tr><th id="169">169</th><td>		    errno,strerror(errno)));</td></tr>
+<tr><th id="170">170</th><td>	<a class="ref" href="socket.h.html#sofree" title='sofree' data-ref="sofree">sofree</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>);</td></tr>
+<tr><th id="171">171</th><td>	<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>);</td></tr>
+<tr><th id="172">172</th><td>	<b>goto</b> <a class="lbl" href="#16end_error" data-ref="16end_error">end_error</a>;</td></tr>
+<tr><th id="173">173</th><td>      }</td></tr>
+<tr><th id="174">174</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a> = <a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>;</td></tr>
+<tr><th id="175">175</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#45" title="fhost.ss.ss_family" data-ref="_M/so_ffamily">so_ffamily</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>;</td></tr>
+<tr><th id="176">176</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#41" title="fhost.sin.sin_addr" data-ref="_M/so_faddr">so_faddr</a> = <a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a>;</td></tr>
+<tr><th id="177">177</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#42" title="fhost.sin.sin_port" data-ref="_M/so_fport">so_fport</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<var>7</var>);</td></tr>
+<tr><th id="178">178</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#52" title="lhost.ss.ss_family" data-ref="_M/so_lfamily">so_lfamily</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>;</td></tr>
+<tr><th id="179">179</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#48" title="lhost.sin.sin_addr" data-ref="_M/so_laddr">so_laddr</a> = <a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a>;</td></tr>
+<tr><th id="180">180</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="macro" href="socket.h.html#49" title="lhost.sin.sin_port" data-ref="_M/so_lport">so_lport</a> = <a class="ref" href="../../include/netinet/in.h.html#htons" title='htons' data-ref="htons">htons</a>(<var>9</var>);</td></tr>
+<tr><th id="181">181</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_iptos" title='socket::so_iptos' data-ref="socket::so_iptos">so_iptos</a> = <a class="local col2 ref" href="#12ip" title='ip' data-ref="12ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_tos" title='ip::ip_tos' data-ref="ip::ip_tos">ip_tos</a>;</td></tr>
+<tr><th id="182">182</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_type" title='socket::so_type' data-ref="socket::so_type">so_type</a> = <a class="macro" href="../../include/netinet/in.h.html#45" title="IPPROTO_ICMP" data-ref="_M/IPPROTO_ICMP">IPPROTO_ICMP</a>;</td></tr>
+<tr><th id="183">183</th><td>      <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</a> = <a class="macro" href="socket.h.html#81" title="0x004" data-ref="_M/SS_ISFCONNECTED">SS_ISFCONNECTED</a>;</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>      <i>/* Send the packet */</i></td></tr>
+<tr><th id="186">186</th><td>      <a class="local col8 ref" href="#18addr" title='addr' data-ref="18addr">addr</a> = <a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::fhost" title='socket::fhost' data-ref="socket::fhost">fhost</a>.<a class="ref" href="socket.h.html#slirp_sockaddr::ss" title='slirp_sockaddr::ss' data-ref="slirp_sockaddr::ss">ss</a>;</td></tr>
+<tr><th id="187">187</th><td>      <a class="ref" href="socket.h.html#sotranslate_out" title='sotranslate_out' data-ref="sotranslate_out">sotranslate_out</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>, &amp;<a class="local col8 ref" href="#18addr" title='addr' data-ref="18addr">addr</a>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>      <b>if</b>(<a class="ref" href="../../include/x86_64-linux-gnu/sys/socket.h.html#sendto" title='sendto' data-ref="sendto">sendto</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>, <a class="tu ref" href="#icmp_ping_msg" title='icmp_ping_msg' data-use='r' data-ref="icmp_ping_msg">icmp_ping_msg</a>, <a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="tu ref" href="#icmp_ping_msg" title='icmp_ping_msg' data-use='r' data-ref="icmp_ping_msg">icmp_ping_msg</a>), <var>0</var>,</td></tr>
+<tr><th id="190">190</th><td>		(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr" title='sockaddr' data-ref="sockaddr">sockaddr</a> *)&amp;<a class="local col8 ref" href="#18addr" title='addr' data-ref="18addr">addr</a>, <a class="ref" href="socket.h.html#sockaddr_size" title='sockaddr_size' data-ref="sockaddr_size">sockaddr_size</a>(&amp;<a class="local col8 ref" href="#18addr" title='addr' data-ref="18addr">addr</a>)) == -<var>1</var>) {</td></tr>
+<tr><th id="191">191</th><td>	<a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd,<q>"icmp_input udp sendto tx errno = %d-%s\n"</q>,</td></tr>
+<tr><th id="192">192</th><td>		    errno,strerror(errno)));</td></tr>
+<tr><th id="193">193</th><td>	<a class="ref" href="#icmp_send_error" title='icmp_send_error' data-ref="icmp_send_error">icmp_send_error</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>, <a class="macro" href="ip_icmp.h.html#112" title="3" data-ref="_M/ICMP_UNREACH">ICMP_UNREACH</a>, <a class="macro" href="ip_icmp.h.html#113" title="0" data-ref="_M/ICMP_UNREACH_NET">ICMP_UNREACH_NET</a>, <var>0</var>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="194">194</th><td>	<a class="ref" href="udp.h.html#udp_detach" title='udp_detach' data-ref="udp_detach">udp_detach</a>(<a class="local col7 ref" href="#17so" title='so' data-ref="17so">so</a>);</td></tr>
+<tr><th id="195">195</th><td>      }</td></tr>
+<tr><th id="196">196</th><td>    } <i>/* if ip-&gt;ip_dst.s_addr == alias_addr.s_addr */</i></td></tr>
+<tr><th id="197">197</th><td>    <b>break</b>;</td></tr>
+<tr><th id="198">198</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#112" title="3" data-ref="_M/ICMP_UNREACH">ICMP_UNREACH</a>:</td></tr>
+<tr><th id="199">199</th><td>    <i>/* XXX? report error? close socket? */</i></td></tr>
+<tr><th id="200">200</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#135" title="11" data-ref="_M/ICMP_TIMXCEED">ICMP_TIMXCEED</a>:</td></tr>
+<tr><th id="201">201</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#138" title="12" data-ref="_M/ICMP_PARAMPROB">ICMP_PARAMPROB</a>:</td></tr>
+<tr><th id="202">202</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#126" title="4" data-ref="_M/ICMP_SOURCEQUENCH">ICMP_SOURCEQUENCH</a>:</td></tr>
+<tr><th id="203">203</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#140" title="13" data-ref="_M/ICMP_TSTAMP">ICMP_TSTAMP</a>:</td></tr>
+<tr><th id="204">204</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#144" title="17" data-ref="_M/ICMP_MASKREQ">ICMP_MASKREQ</a>:</td></tr>
+<tr><th id="205">205</th><td>  <b>case</b> <a class="macro" href="ip_icmp.h.html#127" title="5" data-ref="_M/ICMP_REDIRECT">ICMP_REDIRECT</a>:</td></tr>
+<tr><th id="206">206</th><td>    <a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>);</td></tr>
+<tr><th id="207">207</th><td>    <b>break</b>;</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>  <b>default</b>:</td></tr>
+<tr><th id="210">210</th><td>    <a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col9 ref" href="#9m" title='m' data-ref="9m">m</a>);</td></tr>
+<tr><th id="211">211</th><td>  } <i>/* swith */</i></td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><dfn class="lbl" id="16end_error" data-ref="16end_error">end_error</dfn>:</td></tr>
+<tr><th id="214">214</th><td>  <i>/* m is m_free()'d xor put in a socket xor or given to ip_send */</i></td></tr>
+<tr><th id="215">215</th><td>  <b>return</b>;</td></tr>
+<tr><th id="216">216</th><td>}</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td><i>/*</i></td></tr>
+<tr><th id="220">220</th><td><i> *	Send an ICMP message in response to a situation</i></td></tr>
+<tr><th id="221">221</th><td><i> *</i></td></tr>
+<tr><th id="222">222</th><td><i> *	RFC 1122: 3.2.2	MUST send at least the IP header and 8 bytes of header. MAY send more (we do).</i></td></tr>
+<tr><th id="223">223</th><td><i> *			MUST NOT change this header information.</i></td></tr>
+<tr><th id="224">224</th><td><i> *			MUST NOT reply to a multicast/broadcast IP address.</i></td></tr>
+<tr><th id="225">225</th><td><i> *			MUST NOT reply to a multicast/broadcast MAC address.</i></td></tr>
+<tr><th id="226">226</th><td><i> *			MUST reply to only the first fragment.</i></td></tr>
+<tr><th id="227">227</th><td><i> */</i></td></tr>
+<tr><th id="228">228</th><td><i>/*</i></td></tr>
+<tr><th id="229">229</th><td><i> * Send ICMP_UNREACH back to the source regarding msrc.</i></td></tr>
+<tr><th id="230">230</th><td><i> * mbuf *msrc is used as a template, but is NOT m_free()'d.</i></td></tr>
+<tr><th id="231">231</th><td><i> * It is reported as the bad ip packet.  The header should</i></td></tr>
+<tr><th id="232">232</th><td><i> * be fully correct and in host byte order.</i></td></tr>
+<tr><th id="233">233</th><td><i> * ICMP fragmentation is illegal.  All machines must accept 576 bytes in one</i></td></tr>
+<tr><th id="234">234</th><td><i> * packet.  The maximum payload is 576-20(ip hdr)-8(icmp hdr)=548</i></td></tr>
+<tr><th id="235">235</th><td><i> */</i></td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/ICMP_MAXDATALEN" data-ref="_M/ICMP_MAXDATALEN">ICMP_MAXDATALEN</dfn> (IP_MSS-28)</u></td></tr>
+<tr><th id="238">238</th><td><em>void</em></td></tr>
+<tr><th id="239">239</th><td><dfn class="decl def" id="icmp_send_error" title='icmp_send_error' data-ref="icmp_send_error">icmp_send_error</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col9 decl" id="19msrc" title='msrc' data-type='struct mbuf *' data-ref="19msrc">msrc</dfn>, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> <dfn class="local col0 decl" id="20type" title='type' data-type='u_char' data-ref="20type">type</dfn>, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> <dfn class="local col1 decl" id="21code" title='code' data-type='u_char' data-ref="21code">code</dfn>, <em>int</em> <dfn class="local col2 decl" id="22minsize" title='minsize' data-type='int' data-ref="22minsize">minsize</dfn>,</td></tr>
+<tr><th id="240">240</th><td>           <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="23message" title='message' data-type='const char *' data-ref="23message">message</dfn>)</td></tr>
+<tr><th id="241">241</th><td>{</td></tr>
+<tr><th id="242">242</th><td>  <em>unsigned</em> <dfn class="local col4 decl" id="24hlen" title='hlen' data-type='unsigned int' data-ref="24hlen">hlen</dfn>, <dfn class="local col5 decl" id="25shlen" title='shlen' data-type='unsigned int' data-ref="25shlen">shlen</dfn>, <dfn class="local col6 decl" id="26s_ip_len" title='s_ip_len' data-type='unsigned int' data-ref="26s_ip_len">s_ip_len</dfn>;</td></tr>
+<tr><th id="243">243</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col7 decl" id="27ip" title='ip' data-type='struct ip *' data-ref="27ip">ip</dfn>;</td></tr>
+<tr><th id="244">244</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *<dfn class="local col8 decl" id="28icp" title='icp' data-type='struct icmp *' data-ref="28icp">icp</dfn>;</td></tr>
+<tr><th id="245">245</th><td>  <em>register</em> <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col9 decl" id="29m" title='m' data-type='struct mbuf *' data-ref="29m">m</dfn>;</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td>  <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"icmp_send_error"</q>);</td></tr>
+<tr><th id="248">248</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"msrc = %p"</q>, msrc);</td></tr>
+<tr><th id="249">249</th><td>  <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"msrc_len = %d"</q>, msrc-&gt;m_len);</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td>  <b>if</b>(<a class="local col0 ref" href="#20type" title='type' data-ref="20type">type</a>!=<a class="macro" href="ip_icmp.h.html#112" title="3" data-ref="_M/ICMP_UNREACH">ICMP_UNREACH</a> &amp;&amp; <a class="local col0 ref" href="#20type" title='type' data-ref="20type">type</a>!=<a class="macro" href="ip_icmp.h.html#135" title="11" data-ref="_M/ICMP_TIMXCEED">ICMP_TIMXCEED</a>) <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td>  <i>/* check msrc */</i></td></tr>
+<tr><th id="254">254</th><td>  <b>if</b>(!<a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>) <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;</td></tr>
+<tr><th id="255">255</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a> = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(msrc)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="256">256</th><td><u>#<span data-ppcond="256">ifdef</span> <span class="macro" data-ref="_M/DEBUG">DEBUG</span></u></td></tr>
+<tr><th id="257">257</th><td>  { <em>char</em> bufa[<var>20</var>], bufb[<var>20</var>];</td></tr>
+<tr><th id="258">258</th><td>    strcpy(bufa, inet_ntoa(ip-&gt;ip_src));</td></tr>
+<tr><th id="259">259</th><td>    strcpy(bufb, inet_ntoa(ip-&gt;ip_dst));</td></tr>
+<tr><th id="260">260</th><td>    DEBUG_MISC((dfd, <q>" %.16s to %.16s\n"</q>, bufa, bufb));</td></tr>
+<tr><th id="261">261</th><td>  }</td></tr>
+<tr><th id="262">262</th><td><u>#<span data-ppcond="256">endif</span></u></td></tr>
+<tr><th id="263">263</th><td>  <b>if</b>(<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_off" title='ip::ip_off' data-ref="ip::ip_off">ip_off</a> &amp; <a class="macro" href="ip.h.html#85" title="0x1fff" data-ref="_M/IP_OFFMASK">IP_OFFMASK</a>) <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;    <i>/* Only reply to fragment 0 */</i></td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td>  <i>/* Do not reply to source-only IPs */</i></td></tr>
+<tr><th id="266">266</th><td>  <b>if</b> ((<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> &amp; <a class="ref" href="../../include/netinet/in.h.html#htonl" title='htonl' data-ref="htonl">htonl</a>(~(<var>0xf</var> &lt;&lt; <var>28</var>))) == <var>0</var>) {</td></tr>
+<tr><th id="267">267</th><td>      <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;</td></tr>
+<tr><th id="268">268</th><td>  }</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>  <a class="local col5 ref" href="#25shlen" title='shlen' data-ref="25shlen">shlen</a>=<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_hl" title='ip::ip_hl' data-ref="ip::ip_hl">ip_hl</a> &lt;&lt; <var>2</var>;</td></tr>
+<tr><th id="271">271</th><td>  <a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>=<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a>;</td></tr>
+<tr><th id="272">272</th><td>  <b>if</b>(<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_p" title='ip::ip_p' data-ref="ip::ip_p">ip_p</a> == <a class="macro" href="../../include/netinet/in.h.html#45" title="IPPROTO_ICMP" data-ref="_M/IPPROTO_ICMP">IPPROTO_ICMP</a>) {</td></tr>
+<tr><th id="273">273</th><td>    <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a> = (<b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *)((<em>char</em> *)<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a> + <a class="local col5 ref" href="#25shlen" title='shlen' data-ref="25shlen">shlen</a>);</td></tr>
+<tr><th id="274">274</th><td>    <i>/*</i></td></tr>
+<tr><th id="275">275</th><td><i>     *	Assume any unknown ICMP type is an error. This isn't</i></td></tr>
+<tr><th id="276">276</th><td><i>     *	specified by the RFC, but think about it..</i></td></tr>
+<tr><th id="277">277</th><td><i>     */</i></td></tr>
+<tr><th id="278">278</th><td>    <b>if</b>(<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_type" title='icmp::icmp_type' data-ref="icmp::icmp_type">icmp_type</a>&gt;<var>18</var> || <a class="tu ref" href="#icmp_flush" title='icmp_flush' data-use='r' data-ref="icmp_flush">icmp_flush</a>[<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_type" title='icmp::icmp_type' data-ref="icmp::icmp_type">icmp_type</a>]) <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;</td></tr>
+<tr><th id="279">279</th><td>  }</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>  <i>/* make a copy */</i></td></tr>
+<tr><th id="282">282</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a> = <a class="ref" href="mbuf.h.html#m_get" title='m_get' data-ref="m_get">m_get</a>(<a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>);</td></tr>
+<tr><th id="283">283</th><td>  <b>if</b> (!<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>) {</td></tr>
+<tr><th id="284">284</th><td>      <b>goto</b> <a class="lbl" href="#30end_error" data-ref="30end_error">end_error</a>;</td></tr>
+<tr><th id="285">285</th><td>  }</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>  { <em>int</em> <dfn class="local col1 decl" id="31new_m_size" title='new_m_size' data-type='int' data-ref="31new_m_size">new_m_size</dfn>;</td></tr>
+<tr><th id="288">288</th><td>    <a class="local col1 ref" href="#31new_m_size" title='new_m_size' data-ref="31new_m_size">new_m_size</a>=<b>sizeof</b>(<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> )+<a class="macro" href="ip_icmp.h.html#101" title="8" data-ref="_M/ICMP_MINLEN">ICMP_MINLEN</a>+<a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>+<a class="macro" href="#237" title="(576-28)" data-ref="_M/ICMP_MAXDATALEN">ICMP_MAXDATALEN</a>;</td></tr>
+<tr><th id="289">289</th><td>    <b>if</b>(<a class="local col1 ref" href="#31new_m_size" title='new_m_size' data-ref="31new_m_size">new_m_size</a>&gt;<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>) <a class="ref" href="mbuf.h.html#m_inc" title='m_inc' data-ref="m_inc">m_inc</a>(<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>, <a class="local col1 ref" href="#31new_m_size" title='new_m_size' data-ref="31new_m_size">new_m_size</a>);</td></tr>
+<tr><th id="290">290</th><td>  }</td></tr>
+<tr><th id="291">291</th><td>  <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>);</td></tr>
+<tr><th id="292">292</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;                        <i>/* copy msrc to m */</i></td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>  <i>/* make the header of the reply packet */</i></td></tr>
+<tr><th id="295">295</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>  = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="296">296</th><td>  <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a>= <b>sizeof</b>(<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> );     <i>/* no options in reply */</i></td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>  <i>/* fill in icmp */</i></td></tr>
+<tr><th id="299">299</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a>;</td></tr>
+<tr><th id="300">300</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a>;</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a> = <a class="macro" href="mbuf.h.html#42" title="((struct icmp *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>, <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *);</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>  <b>if</b>(<a class="local col2 ref" href="#22minsize" title='minsize' data-ref="22minsize">minsize</a>) <a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>=<a class="local col5 ref" href="#25shlen" title='shlen' data-ref="25shlen">shlen</a>+<a class="macro" href="ip_icmp.h.html#101" title="8" data-ref="_M/ICMP_MINLEN">ICMP_MINLEN</a>;   <i>/* return header+8b only */</i></td></tr>
+<tr><th id="305">305</th><td>  <b>else</b> <b>if</b>(<a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>&gt;<a class="macro" href="#237" title="(576-28)" data-ref="_M/ICMP_MAXDATALEN">ICMP_MAXDATALEN</a>)         <i>/* maximum size */</i></td></tr>
+<tr><th id="306">306</th><td>    <a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>=<a class="macro" href="#237" title="(576-28)" data-ref="_M/ICMP_MAXDATALEN">ICMP_MAXDATALEN</a>;</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>=<a class="macro" href="ip_icmp.h.html#101" title="8" data-ref="_M/ICMP_MINLEN">ICMP_MINLEN</a>+<a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>;        <i>/* 8 bytes ICMP header */</i></td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>  <i>/* min. size = 8+sizeof(struct ip)+8 */</i></td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_type" title='icmp::icmp_type' data-ref="icmp::icmp_type">icmp_type</a> = <a class="local col0 ref" href="#20type" title='type' data-ref="20type">type</a>;</td></tr>
+<tr><th id="313">313</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_code" title='icmp::icmp_code' data-ref="icmp::icmp_code">icmp_code</a> = <a class="local col1 ref" href="#21code" title='code' data-ref="21code">code</a>;</td></tr>
+<tr><th id="314">314</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#67" title="icmp_hun.ih_idseq.icd_id" data-ref="_M/icmp_id">icmp_id</a> = <var>0</var>;</td></tr>
+<tr><th id="315">315</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#68" title="icmp_hun.ih_idseq.icd_seq" data-ref="_M/icmp_seq">icmp_seq</a> = <var>0</var>;</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>  <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(&amp;<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#88" title="icmp_dun.id_ip.idi_ip" data-ref="_M/icmp_ip">icmp_ip</a>, <a class="local col9 ref" href="#19msrc" title='msrc' data-ref="19msrc">msrc</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col6 ref" href="#26s_ip_len" title='s_ip_len' data-ref="26s_ip_len">s_ip_len</a>);   <i>/* report the ip packet */</i></td></tr>
+<tr><th id="318">318</th><td>  <a class="macro" href="ip.h.html#56" title="((icp-&gt;icmp_dun.id_ip.idi_ip.ip_len) = htons((uint16_t)(icp-&gt;icmp_dun.id_ip.idi_ip.ip_len)))" data-ref="_M/HTONS">HTONS</a>(<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#88" title="icmp_dun.id_ip.idi_ip" data-ref="_M/icmp_ip">icmp_ip</a>.<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a>);</td></tr>
+<tr><th id="319">319</th><td>  <a class="macro" href="ip.h.html#56" title="((icp-&gt;icmp_dun.id_ip.idi_ip.ip_id) = htons((uint16_t)(icp-&gt;icmp_dun.id_ip.idi_ip.ip_id)))" data-ref="_M/HTONS">HTONS</a>(<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#88" title="icmp_dun.id_ip.idi_ip" data-ref="_M/icmp_ip">icmp_ip</a>.<a class="ref" href="ip.h.html#ip::ip_id" title='ip::ip_id' data-ref="ip::ip_id">ip_id</a>);</td></tr>
+<tr><th id="320">320</th><td>  <a class="macro" href="ip.h.html#56" title="((icp-&gt;icmp_dun.id_ip.idi_ip.ip_off) = htons((uint16_t)(icp-&gt;icmp_dun.id_ip.idi_ip.ip_off)))" data-ref="_M/HTONS">HTONS</a>(<a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#88" title="icmp_dun.id_ip.idi_ip" data-ref="_M/icmp_ip">icmp_ip</a>.<a class="ref" href="ip.h.html#ip::ip_off" title='ip::ip_off' data-ref="ip::ip_off">ip_off</a>);</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td><u>#<span data-ppcond="322">ifdef</span> <span class="macro" data-ref="_M/DEBUG">DEBUG</span></u></td></tr>
+<tr><th id="323">323</th><td>  <b>if</b>(message) {           <i>/* DEBUG : append message to ICMP packet */</i></td></tr>
+<tr><th id="324">324</th><td>    <em>int</em> message_len;</td></tr>
+<tr><th id="325">325</th><td>    <em>char</em> *cpnt;</td></tr>
+<tr><th id="326">326</th><td>    message_len=strlen(message);</td></tr>
+<tr><th id="327">327</th><td>    <b>if</b>(message_len&gt;ICMP_MAXDATALEN) message_len=ICMP_MAXDATALEN;</td></tr>
+<tr><th id="328">328</th><td>    cpnt=(<em>char</em> *)m-&gt;m_data+m-&gt;m_len;</td></tr>
+<tr><th id="329">329</th><td>    memcpy(cpnt, message, message_len);</td></tr>
+<tr><th id="330">330</th><td>    m-&gt;m_len+=message_len;</td></tr>
+<tr><th id="331">331</th><td>  }</td></tr>
+<tr><th id="332">332</th><td><u>#<span data-ppcond="322">endif</span></u></td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_cksum" title='icmp::icmp_cksum' data-ref="icmp::icmp_cksum">icmp_cksum</a> = <var>0</var>;</td></tr>
+<tr><th id="335">335</th><td>  <a class="local col8 ref" href="#28icp" title='icp' data-ref="28icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_cksum" title='icmp::icmp_cksum' data-ref="icmp::icmp_cksum">icmp_cksum</a> = <a class="ref" href="slirp.h.html#cksum" title='cksum' data-ref="cksum">cksum</a>(<a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>, <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>);</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> -= <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a>;</td></tr>
+<tr><th id="338">338</th><td>  <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a>;</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>  <i>/* fill in ip */</i></td></tr>
+<tr><th id="341">341</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_hl" title='ip::ip_hl' data-ref="ip::ip_hl">ip_hl</a> = <a class="local col4 ref" href="#24hlen" title='hlen' data-ref="24hlen">hlen</a> &gt;&gt; <var>2</var>;</td></tr>
+<tr><th id="342">342</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a> = <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;</td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_tos" title='ip::ip_tos' data-ref="ip::ip_tos">ip_tos</a>=((<a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_tos" title='ip::ip_tos' data-ref="ip::ip_tos">ip_tos</a> &amp; <var>0x1E</var>) | <var>0xC0</var>);  <i>/* high priority for errors */</i></td></tr>
+<tr><th id="345">345</th><td></td></tr>
+<tr><th id="346">346</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_ttl" title='ip::ip_ttl' data-ref="ip::ip_ttl">ip_ttl</a> = <a class="macro" href="ip.h.html#171" title="255" data-ref="_M/MAXTTL">MAXTTL</a>;</td></tr>
+<tr><th id="347">347</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_p" title='ip::ip_p' data-ref="ip::ip_p">ip_p</a> = <a class="macro" href="../../include/netinet/in.h.html#45" title="IPPROTO_ICMP" data-ref="_M/IPPROTO_ICMP">IPPROTO_ICMP</a>;</td></tr>
+<tr><th id="348">348</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a> = <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a>;    <i>/* ip addresses */</i></td></tr>
+<tr><th id="349">349</th><td>  <a class="local col7 ref" href="#27ip" title='ip' data-ref="27ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a> = <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vhost_addr" title='Slirp::vhost_addr' data-ref="Slirp::vhost_addr">vhost_addr</a>;</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>  (<em>void</em> ) <a class="ref" href="slirp.h.html#ip_output" title='ip_output' data-ref="ip_output">ip_output</a>((<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *)<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col9 ref" href="#29m" title='m' data-ref="29m">m</a>);</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td><dfn class="lbl" id="30end_error" data-ref="30end_error">end_error</dfn>:</td></tr>
+<tr><th id="354">354</th><td>  <b>return</b>;</td></tr>
+<tr><th id="355">355</th><td>}</td></tr>
+<tr><th id="356">356</th><td><u>#undef <a class="macro" href="#237" data-ref="_M/ICMP_MAXDATALEN">ICMP_MAXDATALEN</a></u></td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td><i>/*</i></td></tr>
+<tr><th id="359">359</th><td><i> * Reflect the ip packet back to the source</i></td></tr>
+<tr><th id="360">360</th><td><i> */</i></td></tr>
+<tr><th id="361">361</th><td><em>void</em></td></tr>
+<tr><th id="362">362</th><td><dfn class="decl def" id="icmp_reflect" title='icmp_reflect' data-ref="icmp_reflect">icmp_reflect</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col2 decl" id="32m" title='m' data-type='struct mbuf *' data-ref="32m">m</dfn>)</td></tr>
+<tr><th id="363">363</th><td>{</td></tr>
+<tr><th id="364">364</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col3 decl" id="33ip" title='ip' data-type='struct ip *' data-ref="33ip">ip</dfn> = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="365">365</th><td>  <em>int</em> <dfn class="local col4 decl" id="34hlen" title='hlen' data-type='int' data-ref="34hlen">hlen</dfn> = <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_hl" title='ip::ip_hl' data-ref="ip::ip_hl">ip_hl</a> &lt;&lt; <var>2</var>;</td></tr>
+<tr><th id="366">366</th><td>  <em>int</em> <dfn class="local col5 decl" id="35optlen" title='optlen' data-type='int' data-ref="35optlen">optlen</dfn> = <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a> - <b>sizeof</b>(<b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> );</td></tr>
+<tr><th id="367">367</th><td>  <em>register</em> <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *<dfn class="local col6 decl" id="36icp" title='icp' data-type='struct icmp *' data-ref="36icp">icp</dfn>;</td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td>  <i>/*</i></td></tr>
+<tr><th id="370">370</th><td><i>   * Send an icmp packet back to the ip level,</i></td></tr>
+<tr><th id="371">371</th><td><i>   * after supplying a checksum.</i></td></tr>
+<tr><th id="372">372</th><td><i>   */</i></td></tr>
+<tr><th id="373">373</th><td>  <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>;</td></tr>
+<tr><th id="374">374</th><td>  <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>;</td></tr>
+<tr><th id="375">375</th><td>  <a class="local col6 ref" href="#36icp" title='icp' data-ref="36icp">icp</a> = <a class="macro" href="mbuf.h.html#42" title="((struct icmp *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>, <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *);</td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td>  <a class="local col6 ref" href="#36icp" title='icp' data-ref="36icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_type" title='icmp::icmp_type' data-ref="icmp::icmp_type">icmp_type</a> = <a class="macro" href="ip_icmp.h.html#111" title="0" data-ref="_M/ICMP_ECHOREPLY">ICMP_ECHOREPLY</a>;</td></tr>
+<tr><th id="378">378</th><td>  <a class="local col6 ref" href="#36icp" title='icp' data-ref="36icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_cksum" title='icmp::icmp_cksum' data-ref="icmp::icmp_cksum">icmp_cksum</a> = <var>0</var>;</td></tr>
+<tr><th id="379">379</th><td>  <a class="local col6 ref" href="#36icp" title='icp' data-ref="36icp">icp</a>-&gt;<a class="ref" href="ip_icmp.h.html#icmp::icmp_cksum" title='icmp::icmp_cksum' data-ref="icmp::icmp_cksum">icmp_cksum</a> = <a class="ref" href="slirp.h.html#cksum" title='cksum' data-ref="cksum">cksum</a>(<a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>, <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a> - <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>);</td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td>  <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> -= <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>;</td></tr>
+<tr><th id="382">382</th><td>  <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>;</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td>  <i>/* fill in ip */</i></td></tr>
+<tr><th id="385">385</th><td>  <b>if</b> (<a class="local col5 ref" href="#35optlen" title='optlen' data-ref="35optlen">optlen</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="386">386</th><td>    <i>/*</i></td></tr>
+<tr><th id="387">387</th><td><i>     * Strip out original options by copying rest of first</i></td></tr>
+<tr><th id="388">388</th><td><i>     * mbuf's data back, and adjust the IP length.</i></td></tr>
+<tr><th id="389">389</th><td><i>     */</i></td></tr>
+<tr><th id="390">390</th><td>    <a class="ref" href="../../include/string.h.html#memmove" title='memmove' data-ref="memmove">memmove</a>((<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#caddr_t" title='caddr_t' data-type='__caddr_t' data-ref="caddr_t">caddr_t</a>)(<a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a> + <var>1</var>), (<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#caddr_t" title='caddr_t' data-type='__caddr_t' data-ref="caddr_t">caddr_t</a>)<a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a> + <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>,</td></tr>
+<tr><th id="391">391</th><td>	    (<em>unsigned</em> )(<a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> - <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a>));</td></tr>
+<tr><th id="392">392</th><td>    <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a> -= <a class="local col5 ref" href="#35optlen" title='optlen' data-ref="35optlen">optlen</a>;</td></tr>
+<tr><th id="393">393</th><td>    <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_hl" title='ip::ip_hl' data-ref="ip::ip_hl">ip_hl</a> = <a class="local col4 ref" href="#34hlen" title='hlen' data-ref="34hlen">hlen</a> &gt;&gt; <var>2</var>;</td></tr>
+<tr><th id="394">394</th><td>    <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_len" title='ip::ip_len' data-ref="ip::ip_len">ip_len</a> -= <a class="local col5 ref" href="#35optlen" title='optlen' data-ref="35optlen">optlen</a>;</td></tr>
+<tr><th id="395">395</th><td>    <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col5 ref" href="#35optlen" title='optlen' data-ref="35optlen">optlen</a>;</td></tr>
+<tr><th id="396">396</th><td>  }</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td>  <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_ttl" title='ip::ip_ttl' data-ref="ip::ip_ttl">ip_ttl</a> = <a class="macro" href="ip.h.html#171" title="255" data-ref="_M/MAXTTL">MAXTTL</a>;</td></tr>
+<tr><th id="399">399</th><td>  { <i>/* swap */</i></td></tr>
+<tr><th id="400">400</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="local col7 decl" id="37icmp_dst" title='icmp_dst' data-type='struct in_addr' data-ref="37icmp_dst">icmp_dst</dfn>;</td></tr>
+<tr><th id="401">401</th><td>    <a class="local col7 ref" href="#37icmp_dst" title='icmp_dst' data-ref="37icmp_dst">icmp_dst</a> = <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a>;</td></tr>
+<tr><th id="402">402</th><td>    <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_dst" title='ip::ip_dst' data-ref="ip::ip_dst">ip_dst</a> = <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a>;</td></tr>
+<tr><th id="403">403</th><td>    <a class="local col3 ref" href="#33ip" title='ip' data-ref="33ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_src" title='ip::ip_src' data-ref="ip::ip_src">ip_src</a> = <a class="local col7 ref" href="#37icmp_dst" title='icmp_dst' data-ref="37icmp_dst">icmp_dst</a>;</td></tr>
+<tr><th id="404">404</th><td>  }</td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td>  (<em>void</em> ) <a class="ref" href="slirp.h.html#ip_output" title='ip_output' data-ref="ip_output">ip_output</a>((<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *)<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col2 ref" href="#32m" title='m' data-ref="32m">m</a>);</td></tr>
+<tr><th id="407">407</th><td>}</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><em>void</em> <dfn class="decl def" id="icmp_receive" title='icmp_receive' data-ref="icmp_receive">icmp_receive</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col8 decl" id="38so" title='so' data-type='struct socket *' data-ref="38so">so</dfn>)</td></tr>
+<tr><th id="410">410</th><td>{</td></tr>
+<tr><th id="411">411</th><td>    <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col9 decl" id="39m" title='m' data-type='struct mbuf *' data-ref="39m">m</dfn> = <a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a>;</td></tr>
+<tr><th id="412">412</th><td>    <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *<dfn class="local col0 decl" id="40ip" title='ip' data-type='struct ip *' data-ref="40ip">ip</dfn> = <a class="macro" href="mbuf.h.html#42" title="((struct ip *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>, <b>struct</b> <a class="type" href="ip.h.html#ip" title='ip' data-ref="ip">ip</a> *);</td></tr>
+<tr><th id="413">413</th><td>    <em>int</em> <dfn class="local col1 decl" id="41hlen" title='hlen' data-type='int' data-ref="41hlen">hlen</dfn> = <a class="local col0 ref" href="#40ip" title='ip' data-ref="40ip">ip</a>-&gt;<a class="ref" href="ip.h.html#ip::ip_hl" title='ip::ip_hl' data-ref="ip::ip_hl">ip_hl</a> &lt;&lt; <var>2</var>;</td></tr>
+<tr><th id="414">414</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a> <dfn class="local col2 decl" id="42error_code" title='error_code' data-type='u_char' data-ref="42error_code">error_code</dfn>;</td></tr>
+<tr><th id="415">415</th><td>    <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *<dfn class="local col3 decl" id="43icp" title='icp' data-type='struct icmp *' data-ref="43icp">icp</dfn>;</td></tr>
+<tr><th id="416">416</th><td>    <em>int</em> <dfn class="local col4 decl" id="44id" title='id' data-type='int' data-ref="44id">id</dfn>, <dfn class="local col5 decl" id="45len" title='len' data-type='int' data-ref="45len">len</dfn>;</td></tr>
+<tr><th id="417">417</th><td></td></tr>
+<tr><th id="418">418</th><td>    <a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="local col1 ref" href="#41hlen" title='hlen' data-ref="41hlen">hlen</a>;</td></tr>
+<tr><th id="419">419</th><td>    <a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col1 ref" href="#41hlen" title='hlen' data-ref="41hlen">hlen</a>;</td></tr>
+<tr><th id="420">420</th><td>    <a class="local col3 ref" href="#43icp" title='icp' data-ref="43icp">icp</a> = <a class="macro" href="mbuf.h.html#42" title="((struct icmp *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>, <b>struct</b> <a class="type" href="ip_icmp.h.html#icmp" title='icmp' data-ref="icmp">icmp</a> *);</td></tr>
+<tr><th id="421">421</th><td></td></tr>
+<tr><th id="422">422</th><td>    <a class="local col4 ref" href="#44id" title='id' data-ref="44id">id</a> = <a class="local col3 ref" href="#43icp" title='icp' data-ref="43icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#67" title="icmp_hun.ih_idseq.icd_id" data-ref="_M/icmp_id">icmp_id</a>;</td></tr>
+<tr><th id="423">423</th><td>    <a class="local col5 ref" href="#45len" title='len' data-ref="45len">len</a> = <a class="macro" href="../include/qemu-common.h.html#74" title="recv(so-&gt;s, icp, m-&gt;m_len, 0)" data-ref="_M/qemu_recv">qemu_recv</a>(<a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::s" title='socket::s' data-ref="socket::s">s</a>, <a class="local col3 ref" href="#43icp" title='icp' data-ref="43icp">icp</a>, <a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>, <var>0</var>);</td></tr>
+<tr><th id="424">424</th><td>    <a class="local col3 ref" href="#43icp" title='icp' data-ref="43icp">icp</a>-&gt;<a class="macro" href="ip_icmp.h.html#67" title="icmp_hun.ih_idseq.icd_id" data-ref="_M/icmp_id">icmp_id</a> = <a class="local col4 ref" href="#44id" title='id' data-ref="44id">id</a>;</td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td>    <a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> -= <a class="local col1 ref" href="#41hlen" title='hlen' data-ref="41hlen">hlen</a>;</td></tr>
+<tr><th id="427">427</th><td>    <a class="local col9 ref" href="#39m" title='m' data-ref="39m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> += <a class="local col1 ref" href="#41hlen" title='hlen' data-ref="41hlen">hlen</a>;</td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td>    <b>if</b> (<a class="local col5 ref" href="#45len" title='len' data-ref="45len">len</a> == -<var>1</var> || <a class="local col5 ref" href="#45len" title='len' data-ref="45len">len</a> == <var>0</var>) {</td></tr>
+<tr><th id="430">430</th><td>        <b>if</b> (<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno.h.html#83" title="101" data-ref="_M/ENETUNREACH">ENETUNREACH</a>) {</td></tr>
+<tr><th id="431">431</th><td>            <a class="local col2 ref" href="#42error_code" title='error_code' data-ref="42error_code">error_code</a> = <a class="macro" href="ip_icmp.h.html#113" title="0" data-ref="_M/ICMP_UNREACH_NET">ICMP_UNREACH_NET</a>;</td></tr>
+<tr><th id="432">432</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="433">433</th><td>            <a class="local col2 ref" href="#42error_code" title='error_code' data-ref="42error_code">error_code</a> = <a class="macro" href="ip_icmp.h.html#114" title="1" data-ref="_M/ICMP_UNREACH_HOST">ICMP_UNREACH_HOST</a>;</td></tr>
+<tr><th id="434">434</th><td>        }</td></tr>
+<tr><th id="435">435</th><td>        <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>" udp icmp rx errno = %d-%s\n"</q>, errno,</td></tr>
+<tr><th id="436">436</th><td>                    strerror(errno)));</td></tr>
+<tr><th id="437">437</th><td>        <a class="ref" href="#icmp_send_error" title='icmp_send_error' data-ref="icmp_send_error">icmp_send_error</a>(<a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a>, <a class="macro" href="ip_icmp.h.html#112" title="3" data-ref="_M/ICMP_UNREACH">ICMP_UNREACH</a>, <a class="local col2 ref" href="#42error_code" title='error_code' data-ref="42error_code">error_code</a>, <var>0</var>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="438">438</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="439">439</th><td>        <a class="ref" href="#icmp_reflect" title='icmp_reflect' data-ref="icmp_reflect">icmp_reflect</a>(<a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a>);</td></tr>
+<tr><th id="440">440</th><td>        <a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <i>/* Don't m_free() it again! */</i></td></tr>
+<tr><th id="441">441</th><td>    }</td></tr>
+<tr><th id="442">442</th><td>    <a class="ref" href="#icmp_detach" title='icmp_detach' data-ref="icmp_detach">icmp_detach</a>(<a class="local col8 ref" href="#38so" title='so' data-ref="38so">so</a>);</td></tr>
+<tr><th id="443">443</th><td>}</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

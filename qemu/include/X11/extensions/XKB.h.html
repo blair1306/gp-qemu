@@ -1,0 +1,804 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>XKB.h source code [include/X11/extensions/XKB.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'include/X11/extensions/XKB.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>include</a>/<a href='..'>X11</a>/<a href='./'>extensions</a>/<a href='XKB.h.html'>XKB.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/************************************************************</i></td></tr>
+<tr><th id="2">2</th><td><i>Copyright (c) 1993 by Silicon Graphics Computer Systems, Inc.</i></td></tr>
+<tr><th id="3">3</th><td><i></i></td></tr>
+<tr><th id="4">4</th><td><i>Permission to use, copy, modify, and distribute this</i></td></tr>
+<tr><th id="5">5</th><td><i>software and its documentation for any purpose and without</i></td></tr>
+<tr><th id="6">6</th><td><i>fee is hereby granted, provided that the above copyright</i></td></tr>
+<tr><th id="7">7</th><td><i>notice appear in all copies and that both that copyright</i></td></tr>
+<tr><th id="8">8</th><td><i>notice and this permission notice appear in supporting</i></td></tr>
+<tr><th id="9">9</th><td><i>documentation, and that the name of Silicon Graphics not be </i></td></tr>
+<tr><th id="10">10</th><td><i>used in advertising or publicity pertaining to distribution </i></td></tr>
+<tr><th id="11">11</th><td><i>of the software without specific prior written permission.</i></td></tr>
+<tr><th id="12">12</th><td><i>Silicon Graphics makes no representation about the suitability </i></td></tr>
+<tr><th id="13">13</th><td><i>of this software for any purpose. It is provided "as is"</i></td></tr>
+<tr><th id="14">14</th><td><i>without any express or implied warranty.</i></td></tr>
+<tr><th id="15">15</th><td><i></i></td></tr>
+<tr><th id="16">16</th><td><i>SILICON GRAPHICS DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS </i></td></tr>
+<tr><th id="17">17</th><td><i>SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY </i></td></tr>
+<tr><th id="18">18</th><td><i>AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL SILICON</i></td></tr>
+<tr><th id="19">19</th><td><i>GRAPHICS BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL </i></td></tr>
+<tr><th id="20">20</th><td><i>DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, </i></td></tr>
+<tr><th id="21">21</th><td><i>DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE </i></td></tr>
+<tr><th id="22">22</th><td><i>OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION  WITH</i></td></tr>
+<tr><th id="23">23</th><td><i>THE USE OR PERFORMANCE OF THIS SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i></i></td></tr>
+<tr><th id="25">25</th><td><i>********************************************************/</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#<span data-ppcond="27">ifndef</span> <span class="macro" data-ref="_M/_XKB_H_">_XKB_H_</span></u></td></tr>
+<tr><th id="28">28</th><td><u>#define	<dfn class="macro" id="_M/_XKB_H_" data-ref="_M/_XKB_H_">_XKB_H_</dfn></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td>    <i>/*</i></td></tr>
+<tr><th id="31">31</th><td><i>     * XKB request codes, used in:</i></td></tr>
+<tr><th id="32">32</th><td><i>     *  -  xkbReqType field of all requests</i></td></tr>
+<tr><th id="33">33</th><td><i>     *  -  requestMinor field of some events</i></td></tr>
+<tr><th id="34">34</th><td><i>     */</i></td></tr>
+<tr><th id="35">35</th><td><u>#define	<dfn class="macro" id="_M/X_kbUseExtension" data-ref="_M/X_kbUseExtension">X_kbUseExtension</dfn>		 0</u></td></tr>
+<tr><th id="36">36</th><td><u>#define	<dfn class="macro" id="_M/X_kbSelectEvents" data-ref="_M/X_kbSelectEvents">X_kbSelectEvents</dfn>	 	 1</u></td></tr>
+<tr><th id="37">37</th><td><u>#define	<dfn class="macro" id="_M/X_kbBell" data-ref="_M/X_kbBell">X_kbBell</dfn>			 3</u></td></tr>
+<tr><th id="38">38</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetState" data-ref="_M/X_kbGetState">X_kbGetState</dfn>			 4</u></td></tr>
+<tr><th id="39">39</th><td><u>#define	<dfn class="macro" id="_M/X_kbLatchLockState" data-ref="_M/X_kbLatchLockState">X_kbLatchLockState</dfn>		 5</u></td></tr>
+<tr><th id="40">40</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetControls" data-ref="_M/X_kbGetControls">X_kbGetControls</dfn>			 6</u></td></tr>
+<tr><th id="41">41</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetControls" data-ref="_M/X_kbSetControls">X_kbSetControls</dfn>			 7</u></td></tr>
+<tr><th id="42">42</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetMap" data-ref="_M/X_kbGetMap">X_kbGetMap</dfn>			 8</u></td></tr>
+<tr><th id="43">43</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetMap" data-ref="_M/X_kbSetMap">X_kbSetMap</dfn>			 9</u></td></tr>
+<tr><th id="44">44</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetCompatMap" data-ref="_M/X_kbGetCompatMap">X_kbGetCompatMap</dfn>		10</u></td></tr>
+<tr><th id="45">45</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetCompatMap" data-ref="_M/X_kbSetCompatMap">X_kbSetCompatMap</dfn>		11</u></td></tr>
+<tr><th id="46">46</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetIndicatorState" data-ref="_M/X_kbGetIndicatorState">X_kbGetIndicatorState</dfn>		12</u></td></tr>
+<tr><th id="47">47</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetIndicatorMap" data-ref="_M/X_kbGetIndicatorMap">X_kbGetIndicatorMap</dfn>		13</u></td></tr>
+<tr><th id="48">48</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetIndicatorMap" data-ref="_M/X_kbSetIndicatorMap">X_kbSetIndicatorMap</dfn>		14</u></td></tr>
+<tr><th id="49">49</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetNamedIndicator" data-ref="_M/X_kbGetNamedIndicator">X_kbGetNamedIndicator</dfn>		15</u></td></tr>
+<tr><th id="50">50</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetNamedIndicator" data-ref="_M/X_kbSetNamedIndicator">X_kbSetNamedIndicator</dfn>		16</u></td></tr>
+<tr><th id="51">51</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetNames" data-ref="_M/X_kbGetNames">X_kbGetNames</dfn>			17</u></td></tr>
+<tr><th id="52">52</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetNames" data-ref="_M/X_kbSetNames">X_kbSetNames</dfn>			18</u></td></tr>
+<tr><th id="53">53</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetGeometry" data-ref="_M/X_kbGetGeometry">X_kbGetGeometry</dfn>			19</u></td></tr>
+<tr><th id="54">54</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetGeometry" data-ref="_M/X_kbSetGeometry">X_kbSetGeometry</dfn>			20</u></td></tr>
+<tr><th id="55">55</th><td><u>#define	<dfn class="macro" id="_M/X_kbPerClientFlags" data-ref="_M/X_kbPerClientFlags">X_kbPerClientFlags</dfn>		21</u></td></tr>
+<tr><th id="56">56</th><td><u>#define	<dfn class="macro" id="_M/X_kbListComponents" data-ref="_M/X_kbListComponents">X_kbListComponents</dfn>		22</u></td></tr>
+<tr><th id="57">57</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetKbdByName" data-ref="_M/X_kbGetKbdByName">X_kbGetKbdByName</dfn>		23</u></td></tr>
+<tr><th id="58">58</th><td><u>#define	<dfn class="macro" id="_M/X_kbGetDeviceInfo" data-ref="_M/X_kbGetDeviceInfo">X_kbGetDeviceInfo</dfn>		24</u></td></tr>
+<tr><th id="59">59</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetDeviceInfo" data-ref="_M/X_kbSetDeviceInfo">X_kbSetDeviceInfo</dfn>		25</u></td></tr>
+<tr><th id="60">60</th><td><u>#define	<dfn class="macro" id="_M/X_kbSetDebuggingFlags" data-ref="_M/X_kbSetDebuggingFlags">X_kbSetDebuggingFlags</dfn>		101</u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <i>/*</i></td></tr>
+<tr><th id="63">63</th><td><i>     * In the X sense, XKB reports only one event.</i></td></tr>
+<tr><th id="64">64</th><td><i>     * The type field of all XKB events is XkbEventCode</i></td></tr>
+<tr><th id="65">65</th><td><i>     */</i></td></tr>
+<tr><th id="66">66</th><td><u>#define	<dfn class="macro" id="_M/XkbEventCode" data-ref="_M/XkbEventCode">XkbEventCode</dfn>			0</u></td></tr>
+<tr><th id="67">67</th><td><u>#define	<dfn class="macro" id="_M/XkbNumberEvents" data-ref="_M/XkbNumberEvents">XkbNumberEvents</dfn>			(XkbEventCode+1)</u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <i>/*</i></td></tr>
+<tr><th id="70">70</th><td><i>     * XKB has a minor event code so it can use one X event code for </i></td></tr>
+<tr><th id="71">71</th><td><i>     * multiple purposes.  </i></td></tr>
+<tr><th id="72">72</th><td><i>     *  - reported in the xkbType field of all XKB events.</i></td></tr>
+<tr><th id="73">73</th><td><i>     *  - XkbSelectEventDetails: Indicates the event for which event details </i></td></tr>
+<tr><th id="74">74</th><td><i>     *    are being changed</i></td></tr>
+<tr><th id="75">75</th><td><i>     */</i></td></tr>
+<tr><th id="76">76</th><td><u>#define	<dfn class="macro" id="_M/XkbNewKeyboardNotify" data-ref="_M/XkbNewKeyboardNotify">XkbNewKeyboardNotify</dfn>		0</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/XkbMapNotify" data-ref="_M/XkbMapNotify">XkbMapNotify</dfn>			1</u></td></tr>
+<tr><th id="78">78</th><td><u>#define	<dfn class="macro" id="_M/XkbStateNotify" data-ref="_M/XkbStateNotify">XkbStateNotify</dfn>			2</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/XkbControlsNotify" data-ref="_M/XkbControlsNotify">XkbControlsNotify</dfn>		3</u></td></tr>
+<tr><th id="80">80</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorStateNotify" data-ref="_M/XkbIndicatorStateNotify">XkbIndicatorStateNotify</dfn>		4</u></td></tr>
+<tr><th id="81">81</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorMapNotify" data-ref="_M/XkbIndicatorMapNotify">XkbIndicatorMapNotify</dfn>		5</u></td></tr>
+<tr><th id="82">82</th><td><u>#define	<dfn class="macro" id="_M/XkbNamesNotify" data-ref="_M/XkbNamesNotify">XkbNamesNotify</dfn>			6</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/XkbCompatMapNotify" data-ref="_M/XkbCompatMapNotify">XkbCompatMapNotify</dfn>		7</u></td></tr>
+<tr><th id="84">84</th><td><u>#define	<dfn class="macro" id="_M/XkbBellNotify" data-ref="_M/XkbBellNotify">XkbBellNotify</dfn>			8</u></td></tr>
+<tr><th id="85">85</th><td><u>#define	<dfn class="macro" id="_M/XkbActionMessage" data-ref="_M/XkbActionMessage">XkbActionMessage</dfn>		9</u></td></tr>
+<tr><th id="86">86</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXNotify" data-ref="_M/XkbAccessXNotify">XkbAccessXNotify</dfn>		10</u></td></tr>
+<tr><th id="87">87</th><td><u>#define	<dfn class="macro" id="_M/XkbExtensionDeviceNotify" data-ref="_M/XkbExtensionDeviceNotify">XkbExtensionDeviceNotify</dfn>	11</u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <i>/*</i></td></tr>
+<tr><th id="90">90</th><td><i>     * Event Mask:</i></td></tr>
+<tr><th id="91">91</th><td><i>     *  - XkbSelectEvents:  Specifies event interest.</i></td></tr>
+<tr><th id="92">92</th><td><i>     */</i></td></tr>
+<tr><th id="93">93</th><td><u>#define	<dfn class="macro" id="_M/XkbNewKeyboardNotifyMask" data-ref="_M/XkbNewKeyboardNotifyMask">XkbNewKeyboardNotifyMask</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/XkbMapNotifyMask" data-ref="_M/XkbMapNotifyMask">XkbMapNotifyMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="95">95</th><td><u>#define	<dfn class="macro" id="_M/XkbStateNotifyMask" data-ref="_M/XkbStateNotifyMask">XkbStateNotifyMask</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/XkbControlsNotifyMask" data-ref="_M/XkbControlsNotifyMask">XkbControlsNotifyMask</dfn>		(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="97">97</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorStateNotifyMask" data-ref="_M/XkbIndicatorStateNotifyMask">XkbIndicatorStateNotifyMask</dfn>	(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="98">98</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorMapNotifyMask" data-ref="_M/XkbIndicatorMapNotifyMask">XkbIndicatorMapNotifyMask</dfn>	(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="99">99</th><td><u>#define	<dfn class="macro" id="_M/XkbNamesNotifyMask" data-ref="_M/XkbNamesNotifyMask">XkbNamesNotifyMask</dfn>		(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/XkbCompatMapNotifyMask" data-ref="_M/XkbCompatMapNotifyMask">XkbCompatMapNotifyMask</dfn>		(1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="101">101</th><td><u>#define	<dfn class="macro" id="_M/XkbBellNotifyMask" data-ref="_M/XkbBellNotifyMask">XkbBellNotifyMask</dfn>		(1L &lt;&lt; 8)</u></td></tr>
+<tr><th id="102">102</th><td><u>#define	<dfn class="macro" id="_M/XkbActionMessageMask" data-ref="_M/XkbActionMessageMask">XkbActionMessageMask</dfn>		(1L &lt;&lt; 9)</u></td></tr>
+<tr><th id="103">103</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXNotifyMask" data-ref="_M/XkbAccessXNotifyMask">XkbAccessXNotifyMask</dfn>		(1L &lt;&lt; 10)</u></td></tr>
+<tr><th id="104">104</th><td><u>#define	<dfn class="macro" id="_M/XkbExtensionDeviceNotifyMask" data-ref="_M/XkbExtensionDeviceNotifyMask">XkbExtensionDeviceNotifyMask</dfn>	(1L &lt;&lt; 11)</u></td></tr>
+<tr><th id="105">105</th><td><u>#define	<dfn class="macro" id="_M/XkbAllEventsMask" data-ref="_M/XkbAllEventsMask">XkbAllEventsMask</dfn>		(0xFFF)</u></td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <i>/*</i></td></tr>
+<tr><th id="108">108</th><td><i>     * NewKeyboardNotify event details:</i></td></tr>
+<tr><th id="109">109</th><td><i>     */</i></td></tr>
+<tr><th id="110">110</th><td><u>#define	<dfn class="macro" id="_M/XkbNKN_KeycodesMask" data-ref="_M/XkbNKN_KeycodesMask">XkbNKN_KeycodesMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="111">111</th><td><u>#define	<dfn class="macro" id="_M/XkbNKN_GeometryMask" data-ref="_M/XkbNKN_GeometryMask">XkbNKN_GeometryMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="112">112</th><td><u>#define	<dfn class="macro" id="_M/XkbNKN_DeviceIDMask" data-ref="_M/XkbNKN_DeviceIDMask">XkbNKN_DeviceIDMask</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="113">113</th><td><u>#define	<dfn class="macro" id="_M/XkbAllNewKeyboardEventsMask" data-ref="_M/XkbAllNewKeyboardEventsMask">XkbAllNewKeyboardEventsMask</dfn>	(0x7)</u></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <i>/*</i></td></tr>
+<tr><th id="116">116</th><td><i>     * AccessXNotify event types:</i></td></tr>
+<tr><th id="117">117</th><td><i>     *  - The 'what' field of AccessXNotify events reports the</i></td></tr>
+<tr><th id="118">118</th><td><i>     *    reason that the event was generated.</i></td></tr>
+<tr><th id="119">119</th><td><i>     */</i></td></tr>
+<tr><th id="120">120</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKPress" data-ref="_M/XkbAXN_SKPress">XkbAXN_SKPress</dfn>			0</u></td></tr>
+<tr><th id="121">121</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKAccept" data-ref="_M/XkbAXN_SKAccept">XkbAXN_SKAccept</dfn>			1</u></td></tr>
+<tr><th id="122">122</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKReject" data-ref="_M/XkbAXN_SKReject">XkbAXN_SKReject</dfn>			2</u></td></tr>
+<tr><th id="123">123</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKRelease" data-ref="_M/XkbAXN_SKRelease">XkbAXN_SKRelease</dfn>		3</u></td></tr>
+<tr><th id="124">124</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_BKAccept" data-ref="_M/XkbAXN_BKAccept">XkbAXN_BKAccept</dfn>			4</u></td></tr>
+<tr><th id="125">125</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_BKReject" data-ref="_M/XkbAXN_BKReject">XkbAXN_BKReject</dfn>			5</u></td></tr>
+<tr><th id="126">126</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_AXKWarning" data-ref="_M/XkbAXN_AXKWarning">XkbAXN_AXKWarning</dfn>		6</u></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <i>/*</i></td></tr>
+<tr><th id="129">129</th><td><i>     * AccessXNotify details:</i></td></tr>
+<tr><th id="130">130</th><td><i>     * - Used as an event detail mask to limit the conditions under which</i></td></tr>
+<tr><th id="131">131</th><td><i>     *   AccessXNotify events are reported</i></td></tr>
+<tr><th id="132">132</th><td><i>     */</i></td></tr>
+<tr><th id="133">133</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKPressMask" data-ref="_M/XkbAXN_SKPressMask">XkbAXN_SKPressMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="134">134</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKAcceptMask" data-ref="_M/XkbAXN_SKAcceptMask">XkbAXN_SKAcceptMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="135">135</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKRejectMask" data-ref="_M/XkbAXN_SKRejectMask">XkbAXN_SKRejectMask</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="136">136</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_SKReleaseMask" data-ref="_M/XkbAXN_SKReleaseMask">XkbAXN_SKReleaseMask</dfn>		(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="137">137</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_BKAcceptMask" data-ref="_M/XkbAXN_BKAcceptMask">XkbAXN_BKAcceptMask</dfn>		(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="138">138</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_BKRejectMask" data-ref="_M/XkbAXN_BKRejectMask">XkbAXN_BKRejectMask</dfn>		(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="139">139</th><td><u>#define	<dfn class="macro" id="_M/XkbAXN_AXKWarningMask" data-ref="_M/XkbAXN_AXKWarningMask">XkbAXN_AXKWarningMask</dfn>		(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="140">140</th><td><u>#define	<dfn class="macro" id="_M/XkbAllAccessXEventsMask" data-ref="_M/XkbAllAccessXEventsMask">XkbAllAccessXEventsMask</dfn>		(0x7f)</u></td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    <i>/*</i></td></tr>
+<tr><th id="143">143</th><td><i>     * Miscellaneous event details:</i></td></tr>
+<tr><th id="144">144</th><td><i>     * - event detail masks for assorted events that don't reall</i></td></tr>
+<tr><th id="145">145</th><td><i>     *   have any details.</i></td></tr>
+<tr><th id="146">146</th><td><i>     */</i></td></tr>
+<tr><th id="147">147</th><td><u>#define	<dfn class="macro" id="_M/XkbAllStateEventsMask" data-ref="_M/XkbAllStateEventsMask">XkbAllStateEventsMask</dfn>		XkbAllStateComponentsMask</u></td></tr>
+<tr><th id="148">148</th><td><u>#define	<dfn class="macro" id="_M/XkbAllMapEventsMask" data-ref="_M/XkbAllMapEventsMask">XkbAllMapEventsMask</dfn>		XkbAllMapComponentsMask</u></td></tr>
+<tr><th id="149">149</th><td><u>#define	<dfn class="macro" id="_M/XkbAllControlEventsMask" data-ref="_M/XkbAllControlEventsMask">XkbAllControlEventsMask</dfn>		XkbAllControlsMask</u></td></tr>
+<tr><th id="150">150</th><td><u>#define	<dfn class="macro" id="_M/XkbAllIndicatorEventsMask" data-ref="_M/XkbAllIndicatorEventsMask">XkbAllIndicatorEventsMask</dfn>	XkbAllIndicatorsMask</u></td></tr>
+<tr><th id="151">151</th><td><u>#define	<dfn class="macro" id="_M/XkbAllNameEventsMask" data-ref="_M/XkbAllNameEventsMask">XkbAllNameEventsMask</dfn>		XkbAllNamesMask</u></td></tr>
+<tr><th id="152">152</th><td><u>#define	<dfn class="macro" id="_M/XkbAllCompatMapEventsMask" data-ref="_M/XkbAllCompatMapEventsMask">XkbAllCompatMapEventsMask</dfn>	XkbAllCompatMask</u></td></tr>
+<tr><th id="153">153</th><td><u>#define	<dfn class="macro" id="_M/XkbAllBellEventsMask" data-ref="_M/XkbAllBellEventsMask">XkbAllBellEventsMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="154">154</th><td><u>#define	<dfn class="macro" id="_M/XkbAllActionMessagesMask" data-ref="_M/XkbAllActionMessagesMask">XkbAllActionMessagesMask</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <i>/*</i></td></tr>
+<tr><th id="157">157</th><td><i>     * XKB reports one error:  BadKeyboard</i></td></tr>
+<tr><th id="158">158</th><td><i>     * A further reason for the error is encoded into to most significant</i></td></tr>
+<tr><th id="159">159</th><td><i>     * byte of the resourceID for the error:</i></td></tr>
+<tr><th id="160">160</th><td><i>     *    XkbErr_BadDevice - the device in question was not found</i></td></tr>
+<tr><th id="161">161</th><td><i>     *    XkbErr_BadClass  - the device was found but it doesn't belong to </i></td></tr>
+<tr><th id="162">162</th><td><i>     *                       the appropriate class.</i></td></tr>
+<tr><th id="163">163</th><td><i>     *    XkbErr_BadId     - the device was found and belongs to the right</i></td></tr>
+<tr><th id="164">164</th><td><i>     *                       class, but not feedback with a matching id was</i></td></tr>
+<tr><th id="165">165</th><td><i>     *                       found.</i></td></tr>
+<tr><th id="166">166</th><td><i>     * The low byte of the resourceID for this error contains the device</i></td></tr>
+<tr><th id="167">167</th><td><i>     * id, class specifier or feedback id that failed.</i></td></tr>
+<tr><th id="168">168</th><td><i>     */</i></td></tr>
+<tr><th id="169">169</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyboard" data-ref="_M/XkbKeyboard">XkbKeyboard</dfn>			0</u></td></tr>
+<tr><th id="170">170</th><td><u>#define	<dfn class="macro" id="_M/XkbNumberErrors" data-ref="_M/XkbNumberErrors">XkbNumberErrors</dfn>			1</u></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><u>#define	<dfn class="macro" id="_M/XkbErr_BadDevice" data-ref="_M/XkbErr_BadDevice">XkbErr_BadDevice</dfn>	0xff</u></td></tr>
+<tr><th id="173">173</th><td><u>#define	<dfn class="macro" id="_M/XkbErr_BadClass" data-ref="_M/XkbErr_BadClass">XkbErr_BadClass</dfn>		0xfe</u></td></tr>
+<tr><th id="174">174</th><td><u>#define	<dfn class="macro" id="_M/XkbErr_BadId" data-ref="_M/XkbErr_BadId">XkbErr_BadId</dfn>		0xfd</u></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>    <i>/*</i></td></tr>
+<tr><th id="177">177</th><td><i>     * Keyboard Components Mask:</i></td></tr>
+<tr><th id="178">178</th><td><i>     * - Specifies the components that follow a GetKeyboardByNameReply</i></td></tr>
+<tr><th id="179">179</th><td><i>     */</i></td></tr>
+<tr><th id="180">180</th><td><u>#define	<dfn class="macro" id="_M/XkbClientMapMask" data-ref="_M/XkbClientMapMask">XkbClientMapMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="181">181</th><td><u>#define	<dfn class="macro" id="_M/XkbServerMapMask" data-ref="_M/XkbServerMapMask">XkbServerMapMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="182">182</th><td><u>#define	<dfn class="macro" id="_M/XkbCompatMapMask" data-ref="_M/XkbCompatMapMask">XkbCompatMapMask</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="183">183</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorMapMask" data-ref="_M/XkbIndicatorMapMask">XkbIndicatorMapMask</dfn>		(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="184">184</th><td><u>#define	<dfn class="macro" id="_M/XkbNamesMask" data-ref="_M/XkbNamesMask">XkbNamesMask</dfn>			(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="185">185</th><td><u>#define	<dfn class="macro" id="_M/XkbGeometryMask" data-ref="_M/XkbGeometryMask">XkbGeometryMask</dfn>			(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="186">186</th><td><u>#define	<dfn class="macro" id="_M/XkbControlsMask" data-ref="_M/XkbControlsMask">XkbControlsMask</dfn>			(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="187">187</th><td><u>#define	<dfn class="macro" id="_M/XkbAllComponentsMask" data-ref="_M/XkbAllComponentsMask">XkbAllComponentsMask</dfn>		(0x7f)</u></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <i>/*</i></td></tr>
+<tr><th id="190">190</th><td><i>     * State detail mask:</i></td></tr>
+<tr><th id="191">191</th><td><i>     *  - The 'changed' field of StateNotify events reports which of</i></td></tr>
+<tr><th id="192">192</th><td><i>     *    the keyboard state components have changed.</i></td></tr>
+<tr><th id="193">193</th><td><i>     *  - Used as an event detail mask to limit the conditions under</i></td></tr>
+<tr><th id="194">194</th><td><i>     *    which StateNotify events are reported.</i></td></tr>
+<tr><th id="195">195</th><td><i>     */</i></td></tr>
+<tr><th id="196">196</th><td><u>#define	<dfn class="macro" id="_M/XkbModifierStateMask" data-ref="_M/XkbModifierStateMask">XkbModifierStateMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="197">197</th><td><u>#define	<dfn class="macro" id="_M/XkbModifierBaseMask" data-ref="_M/XkbModifierBaseMask">XkbModifierBaseMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="198">198</th><td><u>#define	<dfn class="macro" id="_M/XkbModifierLatchMask" data-ref="_M/XkbModifierLatchMask">XkbModifierLatchMask</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="199">199</th><td><u>#define	<dfn class="macro" id="_M/XkbModifierLockMask" data-ref="_M/XkbModifierLockMask">XkbModifierLockMask</dfn>		(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="200">200</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupStateMask" data-ref="_M/XkbGroupStateMask">XkbGroupStateMask</dfn>		(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="201">201</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupBaseMask" data-ref="_M/XkbGroupBaseMask">XkbGroupBaseMask</dfn>		(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="202">202</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupLatchMask" data-ref="_M/XkbGroupLatchMask">XkbGroupLatchMask</dfn>		(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="203">203</th><td><u>#define <dfn class="macro" id="_M/XkbGroupLockMask" data-ref="_M/XkbGroupLockMask">XkbGroupLockMask</dfn>		(1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="204">204</th><td><u>#define	<dfn class="macro" id="_M/XkbCompatStateMask" data-ref="_M/XkbCompatStateMask">XkbCompatStateMask</dfn>		(1L &lt;&lt; 8)</u></td></tr>
+<tr><th id="205">205</th><td><u>#define	<dfn class="macro" id="_M/XkbGrabModsMask" data-ref="_M/XkbGrabModsMask">XkbGrabModsMask</dfn>			(1L &lt;&lt; 9)</u></td></tr>
+<tr><th id="206">206</th><td><u>#define	<dfn class="macro" id="_M/XkbCompatGrabModsMask" data-ref="_M/XkbCompatGrabModsMask">XkbCompatGrabModsMask</dfn>		(1L &lt;&lt; 10)</u></td></tr>
+<tr><th id="207">207</th><td><u>#define	<dfn class="macro" id="_M/XkbLookupModsMask" data-ref="_M/XkbLookupModsMask">XkbLookupModsMask</dfn>		(1L &lt;&lt; 11)</u></td></tr>
+<tr><th id="208">208</th><td><u>#define	<dfn class="macro" id="_M/XkbCompatLookupModsMask" data-ref="_M/XkbCompatLookupModsMask">XkbCompatLookupModsMask</dfn>		(1L &lt;&lt; 12)</u></td></tr>
+<tr><th id="209">209</th><td><u>#define	<dfn class="macro" id="_M/XkbPointerButtonMask" data-ref="_M/XkbPointerButtonMask">XkbPointerButtonMask</dfn>		(1L &lt;&lt; 13)</u></td></tr>
+<tr><th id="210">210</th><td><u>#define	<dfn class="macro" id="_M/XkbAllStateComponentsMask" data-ref="_M/XkbAllStateComponentsMask">XkbAllStateComponentsMask</dfn>	(0x3fff)</u></td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>    <i>/*</i></td></tr>
+<tr><th id="213">213</th><td><i>     * Controls detail masks:</i></td></tr>
+<tr><th id="214">214</th><td><i>     *  The controls specified in XkbAllControlsMask:</i></td></tr>
+<tr><th id="215">215</th><td><i>     *  - The 'changed' field of ControlsNotify events reports which of </i></td></tr>
+<tr><th id="216">216</th><td><i>     *    the keyboard controls have changed.</i></td></tr>
+<tr><th id="217">217</th><td><i>     *  - The 'changeControls' field of the SetControls request specifies</i></td></tr>
+<tr><th id="218">218</th><td><i>     *    the controls for which values are to be changed.</i></td></tr>
+<tr><th id="219">219</th><td><i>     *  - Used as an event detail mask to limit the conditions under </i></td></tr>
+<tr><th id="220">220</th><td><i>     *    which ControlsNotify events are reported.</i></td></tr>
+<tr><th id="221">221</th><td><i>     *</i></td></tr>
+<tr><th id="222">222</th><td><i>     *  The controls specified in the XkbAllBooleanCtrlsMask:</i></td></tr>
+<tr><th id="223">223</th><td><i>     *  - The 'enabledControls' field of ControlsNotify events reports the</i></td></tr>
+<tr><th id="224">224</th><td><i>     *    current status of the boolean controls.</i></td></tr>
+<tr><th id="225">225</th><td><i>     *  - The 'enabledControlsChanges' field of ControlsNotify events reports</i></td></tr>
+<tr><th id="226">226</th><td><i>     *    any boolean controls that have been turned on or off.</i></td></tr>
+<tr><th id="227">227</th><td><i>     *  - The 'affectEnabledControls' and 'enabledControls' fields of the</i></td></tr>
+<tr><th id="228">228</th><td><i>     *    kbSetControls request change the set of enabled controls.</i></td></tr>
+<tr><th id="229">229</th><td><i>     *  - The 'accessXTimeoutMask' and 'accessXTimeoutValues' fields of</i></td></tr>
+<tr><th id="230">230</th><td><i>     *    an XkbControlsRec specify the controls to be changed if the keyboard</i></td></tr>
+<tr><th id="231">231</th><td><i>     *    times out and the values to which they should be changed.</i></td></tr>
+<tr><th id="232">232</th><td><i>     *  - The 'autoCtrls' and 'autoCtrlsValues' fields of the PerClientFlags </i></td></tr>
+<tr><th id="233">233</th><td><i>     *    request specifies the specify the controls to be reset when the</i></td></tr>
+<tr><th id="234">234</th><td><i>     *    client exits and the values to which they should be reset.</i></td></tr>
+<tr><th id="235">235</th><td><i>     *  - The 'ctrls' field of an indicator map specifies the controls</i></td></tr>
+<tr><th id="236">236</th><td><i>     *    that drive the indicator.</i></td></tr>
+<tr><th id="237">237</th><td><i>     *  - Specifies the boolean controls affected by the SetControls and</i></td></tr>
+<tr><th id="238">238</th><td><i>     *    LockControls key actions.</i></td></tr>
+<tr><th id="239">239</th><td><i>     */</i></td></tr>
+<tr><th id="240">240</th><td><u>#define	<dfn class="macro" id="_M/XkbRepeatKeysMask" data-ref="_M/XkbRepeatKeysMask">XkbRepeatKeysMask</dfn>	 (1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="241">241</th><td><u>#define	<dfn class="macro" id="_M/XkbSlowKeysMask" data-ref="_M/XkbSlowKeysMask">XkbSlowKeysMask</dfn>		 (1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="242">242</th><td><u>#define	<dfn class="macro" id="_M/XkbBounceKeysMask" data-ref="_M/XkbBounceKeysMask">XkbBounceKeysMask</dfn>	 (1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="243">243</th><td><u>#define	<dfn class="macro" id="_M/XkbStickyKeysMask" data-ref="_M/XkbStickyKeysMask">XkbStickyKeysMask</dfn>	 (1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="244">244</th><td><u>#define	<dfn class="macro" id="_M/XkbMouseKeysMask" data-ref="_M/XkbMouseKeysMask">XkbMouseKeysMask</dfn>	 (1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="245">245</th><td><u>#define	<dfn class="macro" id="_M/XkbMouseKeysAccelMask" data-ref="_M/XkbMouseKeysAccelMask">XkbMouseKeysAccelMask</dfn>	 (1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="246">246</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXKeysMask" data-ref="_M/XkbAccessXKeysMask">XkbAccessXKeysMask</dfn>	 (1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="247">247</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXTimeoutMask" data-ref="_M/XkbAccessXTimeoutMask">XkbAccessXTimeoutMask</dfn>	 (1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="248">248</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXFeedbackMask" data-ref="_M/XkbAccessXFeedbackMask">XkbAccessXFeedbackMask</dfn>	 (1L &lt;&lt; 8)</u></td></tr>
+<tr><th id="249">249</th><td><u>#define	<dfn class="macro" id="_M/XkbAudibleBellMask" data-ref="_M/XkbAudibleBellMask">XkbAudibleBellMask</dfn>	 (1L &lt;&lt; 9)</u></td></tr>
+<tr><th id="250">250</th><td><u>#define	<dfn class="macro" id="_M/XkbOverlay1Mask" data-ref="_M/XkbOverlay1Mask">XkbOverlay1Mask</dfn>		 (1L &lt;&lt; 10)</u></td></tr>
+<tr><th id="251">251</th><td><u>#define	<dfn class="macro" id="_M/XkbOverlay2Mask" data-ref="_M/XkbOverlay2Mask">XkbOverlay2Mask</dfn>		 (1L &lt;&lt; 11)</u></td></tr>
+<tr><th id="252">252</th><td><u>#define	<dfn class="macro" id="_M/XkbIgnoreGroupLockMask" data-ref="_M/XkbIgnoreGroupLockMask">XkbIgnoreGroupLockMask</dfn>	 (1L &lt;&lt; 12)</u></td></tr>
+<tr><th id="253">253</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupsWrapMask" data-ref="_M/XkbGroupsWrapMask">XkbGroupsWrapMask</dfn>	 (1L &lt;&lt; 27)</u></td></tr>
+<tr><th id="254">254</th><td><u>#define	<dfn class="macro" id="_M/XkbInternalModsMask" data-ref="_M/XkbInternalModsMask">XkbInternalModsMask</dfn>	 (1L &lt;&lt; 28)</u></td></tr>
+<tr><th id="255">255</th><td><u>#define	<dfn class="macro" id="_M/XkbIgnoreLockModsMask" data-ref="_M/XkbIgnoreLockModsMask">XkbIgnoreLockModsMask</dfn>	 (1L &lt;&lt; 29)</u></td></tr>
+<tr><th id="256">256</th><td><u>#define	<dfn class="macro" id="_M/XkbPerKeyRepeatMask" data-ref="_M/XkbPerKeyRepeatMask">XkbPerKeyRepeatMask</dfn>	 (1L &lt;&lt; 30)</u></td></tr>
+<tr><th id="257">257</th><td><u>#define	<dfn class="macro" id="_M/XkbControlsEnabledMask" data-ref="_M/XkbControlsEnabledMask">XkbControlsEnabledMask</dfn>	 (1L &lt;&lt; 31)</u></td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td><u>#define	<dfn class="macro" id="_M/XkbAccessXOptionsMask" data-ref="_M/XkbAccessXOptionsMask">XkbAccessXOptionsMask</dfn>    (XkbStickyKeysMask|XkbAccessXFeedbackMask)</u></td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td><u>#define	<dfn class="macro" id="_M/XkbAllBooleanCtrlsMask" data-ref="_M/XkbAllBooleanCtrlsMask">XkbAllBooleanCtrlsMask</dfn>	 (0x00001FFF)</u></td></tr>
+<tr><th id="262">262</th><td><u>#define	<dfn class="macro" id="_M/XkbAllControlsMask" data-ref="_M/XkbAllControlsMask">XkbAllControlsMask</dfn>	 (0xF8001FFF)</u></td></tr>
+<tr><th id="263">263</th><td><u>#define	<dfn class="macro" id="_M/XkbAllControlEventsMask" data-ref="_M/XkbAllControlEventsMask">XkbAllControlEventsMask</dfn>	 XkbAllControlsMask</u></td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td>    <i>/*</i></td></tr>
+<tr><th id="266">266</th><td><i>     * AccessX Options Mask</i></td></tr>
+<tr><th id="267">267</th><td><i>     *  - The 'accessXOptions' field of an XkbControlsRec specifies the</i></td></tr>
+<tr><th id="268">268</th><td><i>     *    AccessX options that are currently in effect.</i></td></tr>
+<tr><th id="269">269</th><td><i>     *  - The 'accessXTimeoutOptionsMask' and 'accessXTimeoutOptionsValues'</i></td></tr>
+<tr><th id="270">270</th><td><i>     *    fields of an XkbControlsRec specify the Access X options to be </i></td></tr>
+<tr><th id="271">271</th><td><i>     *    changed if the keyboard times out and the values to which they </i></td></tr>
+<tr><th id="272">272</th><td><i>     *    should be changed.</i></td></tr>
+<tr><th id="273">273</th><td><i>     */</i></td></tr>
+<tr><th id="274">274</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SKPressFBMask" data-ref="_M/XkbAX_SKPressFBMask">XkbAX_SKPressFBMask</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="275">275</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SKAcceptFBMask" data-ref="_M/XkbAX_SKAcceptFBMask">XkbAX_SKAcceptFBMask</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="276">276</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_FeatureFBMask" data-ref="_M/XkbAX_FeatureFBMask">XkbAX_FeatureFBMask</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="277">277</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SlowWarnFBMask" data-ref="_M/XkbAX_SlowWarnFBMask">XkbAX_SlowWarnFBMask</dfn>	(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="278">278</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_IndicatorFBMask" data-ref="_M/XkbAX_IndicatorFBMask">XkbAX_IndicatorFBMask</dfn>	(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="279">279</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_StickyKeysFBMask" data-ref="_M/XkbAX_StickyKeysFBMask">XkbAX_StickyKeysFBMask</dfn>	(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="280">280</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_TwoKeysMask" data-ref="_M/XkbAX_TwoKeysMask">XkbAX_TwoKeysMask</dfn>	(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="281">281</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_LatchToLockMask" data-ref="_M/XkbAX_LatchToLockMask">XkbAX_LatchToLockMask</dfn>	(1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="282">282</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SKReleaseFBMask" data-ref="_M/XkbAX_SKReleaseFBMask">XkbAX_SKReleaseFBMask</dfn>	(1L &lt;&lt; 8)</u></td></tr>
+<tr><th id="283">283</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SKRejectFBMask" data-ref="_M/XkbAX_SKRejectFBMask">XkbAX_SKRejectFBMask</dfn>	(1L &lt;&lt; 9)</u></td></tr>
+<tr><th id="284">284</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_BKRejectFBMask" data-ref="_M/XkbAX_BKRejectFBMask">XkbAX_BKRejectFBMask</dfn>	(1L &lt;&lt; 10)</u></td></tr>
+<tr><th id="285">285</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_DumbBellFBMask" data-ref="_M/XkbAX_DumbBellFBMask">XkbAX_DumbBellFBMask</dfn>	(1L &lt;&lt; 11)</u></td></tr>
+<tr><th id="286">286</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_FBOptionsMask" data-ref="_M/XkbAX_FBOptionsMask">XkbAX_FBOptionsMask</dfn>	(0xF3F)</u></td></tr>
+<tr><th id="287">287</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_SKOptionsMask" data-ref="_M/XkbAX_SKOptionsMask">XkbAX_SKOptionsMask</dfn>	(0x0C0)</u></td></tr>
+<tr><th id="288">288</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_AllOptionsMask" data-ref="_M/XkbAX_AllOptionsMask">XkbAX_AllOptionsMask</dfn>	(0xFFF)</u></td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td>    <i>/*</i></td></tr>
+<tr><th id="291">291</th><td><i>     * XkbUseCoreKbd is used to specify the core keyboard without having</i></td></tr>
+<tr><th id="292">292</th><td><i>     * 			to look up its X input extension identifier.</i></td></tr>
+<tr><th id="293">293</th><td><i>     * XkbUseCorePtr is used to specify the core pointer without having</i></td></tr>
+<tr><th id="294">294</th><td><i>     *			to look up its X input extension identifier.</i></td></tr>
+<tr><th id="295">295</th><td><i>     * XkbDfltXIClass is used to specify "don't care" any place that the</i></td></tr>
+<tr><th id="296">296</th><td><i>     *			XKB protocol is looking for an X Input Extension </i></td></tr>
+<tr><th id="297">297</th><td><i>     *			device class.</i></td></tr>
+<tr><th id="298">298</th><td><i>     * XkbDfltXIId is used to specify "don't care" any place that the</i></td></tr>
+<tr><th id="299">299</th><td><i>     *			XKB protocol is looking for an X Input Extension</i></td></tr>
+<tr><th id="300">300</th><td><i>     *			feedback identifier.</i></td></tr>
+<tr><th id="301">301</th><td><i>     * XkbAllXIClasses is used to get information about all device indicators,</i></td></tr>
+<tr><th id="302">302</th><td><i>     *			whether they're part of the indicator feedback class</i></td></tr>
+<tr><th id="303">303</th><td><i>     *			or the keyboard feedback class.</i></td></tr>
+<tr><th id="304">304</th><td><i>     * XkbAllXIIds is used to get information about all device indicator</i></td></tr>
+<tr><th id="305">305</th><td><i>     *			feedbacks without having to list them.</i></td></tr>
+<tr><th id="306">306</th><td><i>     * XkbXINone is used to indicate that no class or id has been specified.</i></td></tr>
+<tr><th id="307">307</th><td><i>     * XkbLegalXILedClass(c)  True if 'c' specifies a legal class with LEDs</i></td></tr>
+<tr><th id="308">308</th><td><i>     * XkbLegalXIBellClass(c) True if 'c' specifies a legal class with bells</i></td></tr>
+<tr><th id="309">309</th><td><i>     * XkbExplicitXIDevice(d) True if 'd' explicitly specifies a device</i></td></tr>
+<tr><th id="310">310</th><td><i>     * XkbExplicitXIClass(c)  True if 'c' explicitly specifies a device class</i></td></tr>
+<tr><th id="311">311</th><td><i>     * XkbExplicitXIId(c)     True if 'i' explicitly specifies a device id</i></td></tr>
+<tr><th id="312">312</th><td><i>     * XkbSingleXIClass(c)    True if 'c' specifies exactly one device class, </i></td></tr>
+<tr><th id="313">313</th><td><i>     *                        including the default.</i></td></tr>
+<tr><th id="314">314</th><td><i>     * XkbSingleXIId(i)       True if 'i' specifies exactly one device </i></td></tr>
+<tr><th id="315">315</th><td><i>     *	                      identifier, including the default.</i></td></tr>
+<tr><th id="316">316</th><td><i>     */</i></td></tr>
+<tr><th id="317">317</th><td><u>#define	<dfn class="macro" id="_M/XkbUseCoreKbd" data-ref="_M/XkbUseCoreKbd">XkbUseCoreKbd</dfn>		0x0100</u></td></tr>
+<tr><th id="318">318</th><td><u>#define	<dfn class="macro" id="_M/XkbUseCorePtr" data-ref="_M/XkbUseCorePtr">XkbUseCorePtr</dfn>		0x0200</u></td></tr>
+<tr><th id="319">319</th><td><u>#define	<dfn class="macro" id="_M/XkbDfltXIClass" data-ref="_M/XkbDfltXIClass">XkbDfltXIClass</dfn>		0x0300</u></td></tr>
+<tr><th id="320">320</th><td><u>#define	<dfn class="macro" id="_M/XkbDfltXIId" data-ref="_M/XkbDfltXIId">XkbDfltXIId</dfn>		0x0400</u></td></tr>
+<tr><th id="321">321</th><td><u>#define	<dfn class="macro" id="_M/XkbAllXIClasses" data-ref="_M/XkbAllXIClasses">XkbAllXIClasses</dfn>		0x0500</u></td></tr>
+<tr><th id="322">322</th><td><u>#define	<dfn class="macro" id="_M/XkbAllXIIds" data-ref="_M/XkbAllXIIds">XkbAllXIIds</dfn>		0x0600</u></td></tr>
+<tr><th id="323">323</th><td><u>#define	<dfn class="macro" id="_M/XkbXINone" data-ref="_M/XkbXINone">XkbXINone</dfn>		0xff00</u></td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td><u>#define	<dfn class="macro" id="_M/XkbLegalXILedClass" data-ref="_M/XkbLegalXILedClass">XkbLegalXILedClass</dfn>(c)	(((c)==KbdFeedbackClass)||\</u></td></tr>
+<tr><th id="326">326</th><td><u>					((c)==LedFeedbackClass)||\</u></td></tr>
+<tr><th id="327">327</th><td><u>					((c)==XkbDfltXIClass)||\</u></td></tr>
+<tr><th id="328">328</th><td><u>					((c)==XkbAllXIClasses))</u></td></tr>
+<tr><th id="329">329</th><td><u>#define	<dfn class="macro" id="_M/XkbLegalXIBellClass" data-ref="_M/XkbLegalXIBellClass">XkbLegalXIBellClass</dfn>(c)	(((c)==KbdFeedbackClass)||\</u></td></tr>
+<tr><th id="330">330</th><td><u>					((c)==BellFeedbackClass)||\</u></td></tr>
+<tr><th id="331">331</th><td><u>					((c)==XkbDfltXIClass)||\</u></td></tr>
+<tr><th id="332">332</th><td><u>					((c)==XkbAllXIClasses))</u></td></tr>
+<tr><th id="333">333</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitXIDevice" data-ref="_M/XkbExplicitXIDevice">XkbExplicitXIDevice</dfn>(c)	(((c)&amp;(~0xff))==0)</u></td></tr>
+<tr><th id="334">334</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitXIClass" data-ref="_M/XkbExplicitXIClass">XkbExplicitXIClass</dfn>(c)	(((c)&amp;(~0xff))==0)</u></td></tr>
+<tr><th id="335">335</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitXIId" data-ref="_M/XkbExplicitXIId">XkbExplicitXIId</dfn>(c)	(((c)&amp;(~0xff))==0)</u></td></tr>
+<tr><th id="336">336</th><td><u>#define	<dfn class="macro" id="_M/XkbSingleXIClass" data-ref="_M/XkbSingleXIClass">XkbSingleXIClass</dfn>(c)	((((c)&amp;(~0xff))==0)||((c)==XkbDfltXIClass))</u></td></tr>
+<tr><th id="337">337</th><td><u>#define	<dfn class="macro" id="_M/XkbSingleXIId" data-ref="_M/XkbSingleXIId">XkbSingleXIId</dfn>(c)	((((c)&amp;(~0xff))==0)||((c)==XkbDfltXIId))</u></td></tr>
+<tr><th id="338">338</th><td></td></tr>
+<tr><th id="339">339</th><td><u>#define	<dfn class="macro" id="_M/XkbNoModifier" data-ref="_M/XkbNoModifier">XkbNoModifier</dfn>		0xff</u></td></tr>
+<tr><th id="340">340</th><td><u>#define	<dfn class="macro" id="_M/XkbNoShiftLevel" data-ref="_M/XkbNoShiftLevel">XkbNoShiftLevel</dfn>		0xff</u></td></tr>
+<tr><th id="341">341</th><td><u>#define	<dfn class="macro" id="_M/XkbNoShape" data-ref="_M/XkbNoShape">XkbNoShape</dfn>		0xff</u></td></tr>
+<tr><th id="342">342</th><td><u>#define	<dfn class="macro" id="_M/XkbNoIndicator" data-ref="_M/XkbNoIndicator">XkbNoIndicator</dfn>		0xff</u></td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td><u>#define	<dfn class="macro" id="_M/XkbNoModifierMask" data-ref="_M/XkbNoModifierMask">XkbNoModifierMask</dfn>	0</u></td></tr>
+<tr><th id="345">345</th><td><u>#define	<dfn class="macro" id="_M/XkbAllModifiersMask" data-ref="_M/XkbAllModifiersMask">XkbAllModifiersMask</dfn>	0xff</u></td></tr>
+<tr><th id="346">346</th><td><u>#define	<dfn class="macro" id="_M/XkbAllVirtualModsMask" data-ref="_M/XkbAllVirtualModsMask">XkbAllVirtualModsMask</dfn>	0xffff</u></td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td><u>#define	<dfn class="macro" id="_M/XkbNumKbdGroups" data-ref="_M/XkbNumKbdGroups">XkbNumKbdGroups</dfn>		4</u></td></tr>
+<tr><th id="349">349</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxKbdGroup" data-ref="_M/XkbMaxKbdGroup">XkbMaxKbdGroup</dfn>		(XkbNumKbdGroups-1)</u></td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxMouseKeysBtn" data-ref="_M/XkbMaxMouseKeysBtn">XkbMaxMouseKeysBtn</dfn>	4</u></td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td>    <i>/*</i></td></tr>
+<tr><th id="354">354</th><td><i>     * Group Index and Mask:</i></td></tr>
+<tr><th id="355">355</th><td><i>     *  - Indices into the kt_index array of a key type.</i></td></tr>
+<tr><th id="356">356</th><td><i>     *  - Mask specifies types to be changed for XkbChangeTypesOfKey</i></td></tr>
+<tr><th id="357">357</th><td><i>     */</i></td></tr>
+<tr><th id="358">358</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup1Index" data-ref="_M/XkbGroup1Index">XkbGroup1Index</dfn>		0</u></td></tr>
+<tr><th id="359">359</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup2Index" data-ref="_M/XkbGroup2Index">XkbGroup2Index</dfn>		1</u></td></tr>
+<tr><th id="360">360</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup3Index" data-ref="_M/XkbGroup3Index">XkbGroup3Index</dfn>		2</u></td></tr>
+<tr><th id="361">361</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup4Index" data-ref="_M/XkbGroup4Index">XkbGroup4Index</dfn>		3</u></td></tr>
+<tr><th id="362">362</th><td><u>#define	<dfn class="macro" id="_M/XkbAnyGroup" data-ref="_M/XkbAnyGroup">XkbAnyGroup</dfn>		254</u></td></tr>
+<tr><th id="363">363</th><td><u>#define	<dfn class="macro" id="_M/XkbAllGroups" data-ref="_M/XkbAllGroups">XkbAllGroups</dfn>		255</u></td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup1Mask" data-ref="_M/XkbGroup1Mask">XkbGroup1Mask</dfn>		(1&lt;&lt;0)</u></td></tr>
+<tr><th id="366">366</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup2Mask" data-ref="_M/XkbGroup2Mask">XkbGroup2Mask</dfn>		(1&lt;&lt;1)</u></td></tr>
+<tr><th id="367">367</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup3Mask" data-ref="_M/XkbGroup3Mask">XkbGroup3Mask</dfn>		(1&lt;&lt;2)</u></td></tr>
+<tr><th id="368">368</th><td><u>#define	<dfn class="macro" id="_M/XkbGroup4Mask" data-ref="_M/XkbGroup4Mask">XkbGroup4Mask</dfn>		(1&lt;&lt;3)</u></td></tr>
+<tr><th id="369">369</th><td><u>#define	<dfn class="macro" id="_M/XkbAnyGroupMask" data-ref="_M/XkbAnyGroupMask">XkbAnyGroupMask</dfn>		(1&lt;&lt;7)</u></td></tr>
+<tr><th id="370">370</th><td><u>#define	<dfn class="macro" id="_M/XkbAllGroupsMask" data-ref="_M/XkbAllGroupsMask">XkbAllGroupsMask</dfn>	(0xf)</u></td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td>    <i>/*</i></td></tr>
+<tr><th id="373">373</th><td><i>     * BuildCoreState: Given a keyboard group and a modifier state,</i></td></tr>
+<tr><th id="374">374</th><td><i>     *                 construct the value to be reported an event.</i></td></tr>
+<tr><th id="375">375</th><td><i>     * GroupForCoreState:  Given the state reported in an event,</i></td></tr>
+<tr><th id="376">376</th><td><i>     *                 determine the keyboard group.</i></td></tr>
+<tr><th id="377">377</th><td><i>     * IsLegalGroup:   Returns TRUE if 'g' is a valid group index.</i></td></tr>
+<tr><th id="378">378</th><td><i>     */</i></td></tr>
+<tr><th id="379">379</th><td><u>#define	<dfn class="macro" id="_M/XkbBuildCoreState" data-ref="_M/XkbBuildCoreState">XkbBuildCoreState</dfn>(m,g)	((((g)&amp;0x3)&lt;&lt;13)|((m)&amp;0xff))</u></td></tr>
+<tr><th id="380">380</th><td><u>#define <dfn class="macro" id="_M/XkbGroupForCoreState" data-ref="_M/XkbGroupForCoreState">XkbGroupForCoreState</dfn>(s)	(((s)&gt;&gt;13)&amp;0x3)</u></td></tr>
+<tr><th id="381">381</th><td><u>#define	<dfn class="macro" id="_M/XkbIsLegalGroup" data-ref="_M/XkbIsLegalGroup">XkbIsLegalGroup</dfn>(g)	(((g)&gt;=0)&amp;&amp;((g)&lt;XkbNumKbdGroups))</u></td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td>    <i>/*</i></td></tr>
+<tr><th id="384">384</th><td><i>     * GroupsWrap values:</i></td></tr>
+<tr><th id="385">385</th><td><i>     *  - The 'groupsWrap' field of an XkbControlsRec specifies the</i></td></tr>
+<tr><th id="386">386</th><td><i>     *    treatment of out of range groups.</i></td></tr>
+<tr><th id="387">387</th><td><i>     *  - Bits 6 and 7 of the group info field of a key symbol map</i></td></tr>
+<tr><th id="388">388</th><td><i>     *    specify the interpretation of out of range groups for the</i></td></tr>
+<tr><th id="389">389</th><td><i>     *    corresponding key.</i></td></tr>
+<tr><th id="390">390</th><td><i>     */</i></td></tr>
+<tr><th id="391">391</th><td><u>#define	<dfn class="macro" id="_M/XkbWrapIntoRange" data-ref="_M/XkbWrapIntoRange">XkbWrapIntoRange</dfn>	(0x00)</u></td></tr>
+<tr><th id="392">392</th><td><u>#define	<dfn class="macro" id="_M/XkbClampIntoRange" data-ref="_M/XkbClampIntoRange">XkbClampIntoRange</dfn>	(0x40)</u></td></tr>
+<tr><th id="393">393</th><td><u>#define	<dfn class="macro" id="_M/XkbRedirectIntoRange" data-ref="_M/XkbRedirectIntoRange">XkbRedirectIntoRange</dfn>	(0x80)</u></td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td>    <i>/*</i></td></tr>
+<tr><th id="396">396</th><td><i>     * Action flags:  Reported in the 'flags' field of most key actions.</i></td></tr>
+<tr><th id="397">397</th><td><i>     * Interpretation depends on the type of the action; not all actions</i></td></tr>
+<tr><th id="398">398</th><td><i>     * accept all flags.</i></td></tr>
+<tr><th id="399">399</th><td><i>     *</i></td></tr>
+<tr><th id="400">400</th><td><i>     * Option			Used for Actions</i></td></tr>
+<tr><th id="401">401</th><td><i>     * ------			----------------</i></td></tr>
+<tr><th id="402">402</th><td><i>     * ClearLocks		SetMods, LatchMods, SetGroup, LatchGroup</i></td></tr>
+<tr><th id="403">403</th><td><i>     * LatchToLock		SetMods, LatchMods, SetGroup, LatchGroup</i></td></tr>
+<tr><th id="404">404</th><td><i>     * LockNoLock		LockMods, ISOLock, LockPtrBtn, LockDeviceBtn</i></td></tr>
+<tr><th id="405">405</th><td><i>     * LockNoUnlock		LockMods, ISOLock, LockPtrBtn, LockDeviceBtn</i></td></tr>
+<tr><th id="406">406</th><td><i>     * UseModMapMods		SetMods, LatchMods, LockMods, ISOLock</i></td></tr>
+<tr><th id="407">407</th><td><i>     * GroupAbsolute		SetGroup, LatchGroup, LockGroup, ISOLock</i></td></tr>
+<tr><th id="408">408</th><td><i>     * UseDfltButton		PtrBtn, LockPtrBtn</i></td></tr>
+<tr><th id="409">409</th><td><i>     * NoAcceleration		MovePtr</i></td></tr>
+<tr><th id="410">410</th><td><i>     * MoveAbsoluteX		MovePtr</i></td></tr>
+<tr><th id="411">411</th><td><i>     * MoveAbsoluteY		MovePtr</i></td></tr>
+<tr><th id="412">412</th><td><i>     * ISODfltIsGroup		ISOLock</i></td></tr>
+<tr><th id="413">413</th><td><i>     * ISONoAffectMods		ISOLock</i></td></tr>
+<tr><th id="414">414</th><td><i>     * ISONoAffectGroup		ISOLock</i></td></tr>
+<tr><th id="415">415</th><td><i>     * ISONoAffectPtr		ISOLock</i></td></tr>
+<tr><th id="416">416</th><td><i>     * ISONoAffectCtrls		ISOLock</i></td></tr>
+<tr><th id="417">417</th><td><i>     * MessageOnPress		ActionMessage</i></td></tr>
+<tr><th id="418">418</th><td><i>     * MessageOnRelease		ActionMessage</i></td></tr>
+<tr><th id="419">419</th><td><i>     * MessageGenKeyEvent	ActionMessage</i></td></tr>
+<tr><th id="420">420</th><td><i>     * AffectDfltBtn		SetPtrDflt</i></td></tr>
+<tr><th id="421">421</th><td><i>     * DfltBtnAbsolute		SetPtrDflt</i></td></tr>
+<tr><th id="422">422</th><td><i>     * SwitchApplication	SwitchScreen</i></td></tr>
+<tr><th id="423">423</th><td><i>     * SwitchAbsolute		SwitchScreen</i></td></tr>
+<tr><th id="424">424</th><td><i>     */</i></td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ClearLocks" data-ref="_M/XkbSA_ClearLocks">XkbSA_ClearLocks</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="427">427</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LatchToLock" data-ref="_M/XkbSA_LatchToLock">XkbSA_LatchToLock</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="428">428</th><td></td></tr>
+<tr><th id="429">429</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockNoLock" data-ref="_M/XkbSA_LockNoLock">XkbSA_LockNoLock</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="430">430</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockNoUnlock" data-ref="_M/XkbSA_LockNoUnlock">XkbSA_LockNoUnlock</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_UseModMapMods" data-ref="_M/XkbSA_UseModMapMods">XkbSA_UseModMapMods</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="433">433</th><td></td></tr>
+<tr><th id="434">434</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_GroupAbsolute" data-ref="_M/XkbSA_GroupAbsolute">XkbSA_GroupAbsolute</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="435">435</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_UseDfltButton" data-ref="_M/XkbSA_UseDfltButton">XkbSA_UseDfltButton</dfn>	0</u></td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_NoAcceleration" data-ref="_M/XkbSA_NoAcceleration">XkbSA_NoAcceleration</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="438">438</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MoveAbsoluteX" data-ref="_M/XkbSA_MoveAbsoluteX">XkbSA_MoveAbsoluteX</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="439">439</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MoveAbsoluteY" data-ref="_M/XkbSA_MoveAbsoluteY">XkbSA_MoveAbsoluteY</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISODfltIsGroup" data-ref="_M/XkbSA_ISODfltIsGroup">XkbSA_ISODfltIsGroup</dfn> 	 (1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="442">442</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISONoAffectMods" data-ref="_M/XkbSA_ISONoAffectMods">XkbSA_ISONoAffectMods</dfn>	 (1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="443">443</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISONoAffectGroup" data-ref="_M/XkbSA_ISONoAffectGroup">XkbSA_ISONoAffectGroup</dfn>	 (1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="444">444</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISONoAffectPtr" data-ref="_M/XkbSA_ISONoAffectPtr">XkbSA_ISONoAffectPtr</dfn>	 (1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="445">445</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISONoAffectCtrls" data-ref="_M/XkbSA_ISONoAffectCtrls">XkbSA_ISONoAffectCtrls</dfn>	 (1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="446">446</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISOAffectMask" data-ref="_M/XkbSA_ISOAffectMask">XkbSA_ISOAffectMask</dfn>	 (0x78)</u></td></tr>
+<tr><th id="447">447</th><td></td></tr>
+<tr><th id="448">448</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MessageOnPress" data-ref="_M/XkbSA_MessageOnPress">XkbSA_MessageOnPress</dfn>	 (1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="449">449</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MessageOnRelease" data-ref="_M/XkbSA_MessageOnRelease">XkbSA_MessageOnRelease</dfn>	 (1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="450">450</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MessageGenKeyEvent" data-ref="_M/XkbSA_MessageGenKeyEvent">XkbSA_MessageGenKeyEvent</dfn> (1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_AffectDfltBtn" data-ref="_M/XkbSA_AffectDfltBtn">XkbSA_AffectDfltBtn</dfn>	1</u></td></tr>
+<tr><th id="453">453</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_DfltBtnAbsolute" data-ref="_M/XkbSA_DfltBtnAbsolute">XkbSA_DfltBtnAbsolute</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SwitchApplication" data-ref="_M/XkbSA_SwitchApplication">XkbSA_SwitchApplication</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="456">456</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SwitchAbsolute" data-ref="_M/XkbSA_SwitchAbsolute">XkbSA_SwitchAbsolute</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td>    <i>/*</i></td></tr>
+<tr><th id="459">459</th><td><i>     * The following values apply to the SA_DeviceValuator </i></td></tr>
+<tr><th id="460">460</th><td><i>     * action only.  Valuator operations specify the action </i></td></tr>
+<tr><th id="461">461</th><td><i>     * to be taken.   Values specified in the action are </i></td></tr>
+<tr><th id="462">462</th><td><i>     * multiplied by 2^scale before they are applied.</i></td></tr>
+<tr><th id="463">463</th><td><i>     */</i></td></tr>
+<tr><th id="464">464</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_IgnoreVal" data-ref="_M/XkbSA_IgnoreVal">XkbSA_IgnoreVal</dfn>		(0x00)</u></td></tr>
+<tr><th id="465">465</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetValMin" data-ref="_M/XkbSA_SetValMin">XkbSA_SetValMin</dfn>		(0x10)</u></td></tr>
+<tr><th id="466">466</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetValCenter" data-ref="_M/XkbSA_SetValCenter">XkbSA_SetValCenter</dfn>	(0x20)</u></td></tr>
+<tr><th id="467">467</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetValMax" data-ref="_M/XkbSA_SetValMax">XkbSA_SetValMax</dfn>		(0x30)</u></td></tr>
+<tr><th id="468">468</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetValRelative" data-ref="_M/XkbSA_SetValRelative">XkbSA_SetValRelative</dfn>	(0x40)</u></td></tr>
+<tr><th id="469">469</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetValAbsolute" data-ref="_M/XkbSA_SetValAbsolute">XkbSA_SetValAbsolute</dfn>	(0x50)</u></td></tr>
+<tr><th id="470">470</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ValOpMask" data-ref="_M/XkbSA_ValOpMask">XkbSA_ValOpMask</dfn>		(0x70)</u></td></tr>
+<tr><th id="471">471</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ValScaleMask" data-ref="_M/XkbSA_ValScaleMask">XkbSA_ValScaleMask</dfn>	(0x07)</u></td></tr>
+<tr><th id="472">472</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ValOp" data-ref="_M/XkbSA_ValOp">XkbSA_ValOp</dfn>(a)		((a)&amp;XkbSA_ValOpMask)</u></td></tr>
+<tr><th id="473">473</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ValScale" data-ref="_M/XkbSA_ValScale">XkbSA_ValScale</dfn>(a)	((a)&amp;XkbSA_ValScaleMask)</u></td></tr>
+<tr><th id="474">474</th><td></td></tr>
+<tr><th id="475">475</th><td>    <i>/*</i></td></tr>
+<tr><th id="476">476</th><td><i>     * Action types: specifies the type of a key action.  Reported in the</i></td></tr>
+<tr><th id="477">477</th><td><i>     * type field of all key actions.</i></td></tr>
+<tr><th id="478">478</th><td><i>     */</i></td></tr>
+<tr><th id="479">479</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_NoAction" data-ref="_M/XkbSA_NoAction">XkbSA_NoAction</dfn>		0x00</u></td></tr>
+<tr><th id="480">480</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetMods" data-ref="_M/XkbSA_SetMods">XkbSA_SetMods</dfn>		0x01</u></td></tr>
+<tr><th id="481">481</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LatchMods" data-ref="_M/XkbSA_LatchMods">XkbSA_LatchMods</dfn>		0x02</u></td></tr>
+<tr><th id="482">482</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockMods" data-ref="_M/XkbSA_LockMods">XkbSA_LockMods</dfn>		0x03</u></td></tr>
+<tr><th id="483">483</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetGroup" data-ref="_M/XkbSA_SetGroup">XkbSA_SetGroup</dfn>		0x04</u></td></tr>
+<tr><th id="484">484</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LatchGroup" data-ref="_M/XkbSA_LatchGroup">XkbSA_LatchGroup</dfn>	0x05</u></td></tr>
+<tr><th id="485">485</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockGroup" data-ref="_M/XkbSA_LockGroup">XkbSA_LockGroup</dfn>		0x06</u></td></tr>
+<tr><th id="486">486</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_MovePtr" data-ref="_M/XkbSA_MovePtr">XkbSA_MovePtr</dfn>		0x07</u></td></tr>
+<tr><th id="487">487</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_PtrBtn" data-ref="_M/XkbSA_PtrBtn">XkbSA_PtrBtn</dfn>		0x08</u></td></tr>
+<tr><th id="488">488</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockPtrBtn" data-ref="_M/XkbSA_LockPtrBtn">XkbSA_LockPtrBtn</dfn>	0x09</u></td></tr>
+<tr><th id="489">489</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetPtrDflt" data-ref="_M/XkbSA_SetPtrDflt">XkbSA_SetPtrDflt</dfn>	0x0a</u></td></tr>
+<tr><th id="490">490</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ISOLock" data-ref="_M/XkbSA_ISOLock">XkbSA_ISOLock</dfn>		0x0b</u></td></tr>
+<tr><th id="491">491</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_Terminate" data-ref="_M/XkbSA_Terminate">XkbSA_Terminate</dfn>		0x0c</u></td></tr>
+<tr><th id="492">492</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SwitchScreen" data-ref="_M/XkbSA_SwitchScreen">XkbSA_SwitchScreen</dfn>	0x0d</u></td></tr>
+<tr><th id="493">493</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_SetControls" data-ref="_M/XkbSA_SetControls">XkbSA_SetControls</dfn>	0x0e</u></td></tr>
+<tr><th id="494">494</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockControls" data-ref="_M/XkbSA_LockControls">XkbSA_LockControls</dfn>	0x0f</u></td></tr>
+<tr><th id="495">495</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_ActionMessage" data-ref="_M/XkbSA_ActionMessage">XkbSA_ActionMessage</dfn>	0x10</u></td></tr>
+<tr><th id="496">496</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_RedirectKey" data-ref="_M/XkbSA_RedirectKey">XkbSA_RedirectKey</dfn>	0x11</u></td></tr>
+<tr><th id="497">497</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_DeviceBtn" data-ref="_M/XkbSA_DeviceBtn">XkbSA_DeviceBtn</dfn>		0x12</u></td></tr>
+<tr><th id="498">498</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LockDeviceBtn" data-ref="_M/XkbSA_LockDeviceBtn">XkbSA_LockDeviceBtn</dfn>	0x13</u></td></tr>
+<tr><th id="499">499</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_DeviceValuator" data-ref="_M/XkbSA_DeviceValuator">XkbSA_DeviceValuator</dfn>	0x14</u></td></tr>
+<tr><th id="500">500</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_LastAction" data-ref="_M/XkbSA_LastAction">XkbSA_LastAction</dfn>	XkbSA_DeviceValuator</u></td></tr>
+<tr><th id="501">501</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_NumActions" data-ref="_M/XkbSA_NumActions">XkbSA_NumActions</dfn>	(XkbSA_LastAction+1)</u></td></tr>
+<tr><th id="502">502</th><td></td></tr>
+<tr><th id="503">503</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_XFree86Private" data-ref="_M/XkbSA_XFree86Private">XkbSA_XFree86Private</dfn>	0x86</u></td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>    <i>/*</i></td></tr>
+<tr><th id="506">506</th><td><i>     * Specifies the key actions that clear latched groups or modifiers.</i></td></tr>
+<tr><th id="507">507</th><td><i>     */</i></td></tr>
+<tr><th id="508">508</th><td><u>#define	<dfn class="macro" id="_M/XkbSA_BreakLatch" data-ref="_M/XkbSA_BreakLatch">XkbSA_BreakLatch</dfn> \</u></td></tr>
+<tr><th id="509">509</th><td><u>	((1&lt;&lt;XkbSA_NoAction)|(1&lt;&lt;XkbSA_PtrBtn)|(1&lt;&lt;XkbSA_LockPtrBtn)|\</u></td></tr>
+<tr><th id="510">510</th><td><u>	(1&lt;&lt;XkbSA_Terminate)|(1&lt;&lt;XkbSA_SwitchScreen)|(1&lt;&lt;XkbSA_SetControls)|\</u></td></tr>
+<tr><th id="511">511</th><td><u>	(1&lt;&lt;XkbSA_LockControls)|(1&lt;&lt;XkbSA_ActionMessage)|\</u></td></tr>
+<tr><th id="512">512</th><td><u>	(1&lt;&lt;XkbSA_RedirectKey)|(1&lt;&lt;XkbSA_DeviceBtn)|(1&lt;&lt;XkbSA_LockDeviceBtn))</u></td></tr>
+<tr><th id="513">513</th><td>	 </td></tr>
+<tr><th id="514">514</th><td>    <i>/*</i></td></tr>
+<tr><th id="515">515</th><td><i>     * Macros to classify key actions</i></td></tr>
+<tr><th id="516">516</th><td><i>     */</i></td></tr>
+<tr><th id="517">517</th><td><u>#define	<dfn class="macro" id="_M/XkbIsModAction" data-ref="_M/XkbIsModAction">XkbIsModAction</dfn>(a)	(((a)-&gt;type&gt;=Xkb_SASetMods)&amp;&amp;((a)-&gt;type&lt;=XkbSA_LockMods))</u></td></tr>
+<tr><th id="518">518</th><td><u>#define	<dfn class="macro" id="_M/XkbIsGroupAction" data-ref="_M/XkbIsGroupAction">XkbIsGroupAction</dfn>(a)	(((a)-&gt;type&gt;=XkbSA_SetGroup)&amp;&amp;((a)-&gt;type&lt;=XkbSA_LockGroup))</u></td></tr>
+<tr><th id="519">519</th><td><u>#define	<dfn class="macro" id="_M/XkbIsPtrAction" data-ref="_M/XkbIsPtrAction">XkbIsPtrAction</dfn>(a)	(((a)-&gt;type&gt;=XkbSA_MovePtr)&amp;&amp;((a)-&gt;type&lt;=XkbSA_SetPtrDflt))</u></td></tr>
+<tr><th id="520">520</th><td></td></tr>
+<tr><th id="521">521</th><td></td></tr>
+<tr><th id="522">522</th><td>    <i>/*</i></td></tr>
+<tr><th id="523">523</th><td><i>     * Key Behavior Qualifier:</i></td></tr>
+<tr><th id="524">524</th><td><i>     *    KB_Permanent indicates that the behavior describes an unalterable</i></td></tr>
+<tr><th id="525">525</th><td><i>     *    characteristic of the keyboard, not an XKB software-simulation of</i></td></tr>
+<tr><th id="526">526</th><td><i>     *    the listed behavior.</i></td></tr>
+<tr><th id="527">527</th><td><i>     * Key Behavior Types:  </i></td></tr>
+<tr><th id="528">528</th><td><i>     *    Specifies the behavior of the underlying key.</i></td></tr>
+<tr><th id="529">529</th><td><i>     */</i></td></tr>
+<tr><th id="530">530</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_Permanent" data-ref="_M/XkbKB_Permanent">XkbKB_Permanent</dfn>		0x80</u></td></tr>
+<tr><th id="531">531</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_OpMask" data-ref="_M/XkbKB_OpMask">XkbKB_OpMask</dfn>		0x7f</u></td></tr>
+<tr><th id="532">532</th><td></td></tr>
+<tr><th id="533">533</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_Default" data-ref="_M/XkbKB_Default">XkbKB_Default</dfn>		0x00</u></td></tr>
+<tr><th id="534">534</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_Lock" data-ref="_M/XkbKB_Lock">XkbKB_Lock</dfn>		0x01</u></td></tr>
+<tr><th id="535">535</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_RadioGroup" data-ref="_M/XkbKB_RadioGroup">XkbKB_RadioGroup</dfn>	0x02</u></td></tr>
+<tr><th id="536">536</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_Overlay1" data-ref="_M/XkbKB_Overlay1">XkbKB_Overlay1</dfn>		0x03</u></td></tr>
+<tr><th id="537">537</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_Overlay2" data-ref="_M/XkbKB_Overlay2">XkbKB_Overlay2</dfn>		0x04</u></td></tr>
+<tr><th id="538">538</th><td></td></tr>
+<tr><th id="539">539</th><td><u>#define	<dfn class="macro" id="_M/XkbKB_RGAllowNone" data-ref="_M/XkbKB_RGAllowNone">XkbKB_RGAllowNone</dfn>	0x80</u></td></tr>
+<tr><th id="540">540</th><td></td></tr>
+<tr><th id="541">541</th><td>    <i>/*</i></td></tr>
+<tr><th id="542">542</th><td><i>     * Various macros which describe the range of legal keycodes.</i></td></tr>
+<tr><th id="543">543</th><td><i>     */</i></td></tr>
+<tr><th id="544">544</th><td><u>#define	<dfn class="macro" id="_M/XkbMinLegalKeyCode" data-ref="_M/XkbMinLegalKeyCode">XkbMinLegalKeyCode</dfn>	8</u></td></tr>
+<tr><th id="545">545</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxLegalKeyCode" data-ref="_M/XkbMaxLegalKeyCode">XkbMaxLegalKeyCode</dfn>	255</u></td></tr>
+<tr><th id="546">546</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxKeyCount" data-ref="_M/XkbMaxKeyCount">XkbMaxKeyCount</dfn>		(XkbMaxLegalKeyCode-XkbMinLegalKeyCode+1)</u></td></tr>
+<tr><th id="547">547</th><td><u>#define	<dfn class="macro" id="_M/XkbPerKeyBitArraySize" data-ref="_M/XkbPerKeyBitArraySize">XkbPerKeyBitArraySize</dfn>	((XkbMaxLegalKeyCode+1)/8)</u></td></tr>
+<tr><th id="548">548</th><td><i>/* Seems kinda silly to check that an unsigned char is &lt;= 255... */</i></td></tr>
+<tr><th id="549">549</th><td><u>#define	<dfn class="macro" id="_M/XkbIsLegalKeycode" data-ref="_M/XkbIsLegalKeycode">XkbIsLegalKeycode</dfn>(k)	((k)&gt;=XkbMinLegalKeyCode)</u></td></tr>
+<tr><th id="550">550</th><td></td></tr>
+<tr><th id="551">551</th><td>    <i>/*</i></td></tr>
+<tr><th id="552">552</th><td><i>     * Assorted constants and limits.</i></td></tr>
+<tr><th id="553">553</th><td><i>     */</i></td></tr>
+<tr><th id="554">554</th><td><u>#define	<dfn class="macro" id="_M/XkbNumModifiers" data-ref="_M/XkbNumModifiers">XkbNumModifiers</dfn>		8</u></td></tr>
+<tr><th id="555">555</th><td><u>#define	<dfn class="macro" id="_M/XkbNumVirtualMods" data-ref="_M/XkbNumVirtualMods">XkbNumVirtualMods</dfn>	16</u></td></tr>
+<tr><th id="556">556</th><td><u>#define	<dfn class="macro" id="_M/XkbNumIndicators" data-ref="_M/XkbNumIndicators">XkbNumIndicators</dfn>	32</u></td></tr>
+<tr><th id="557">557</th><td><u>#define	<dfn class="macro" id="_M/XkbAllIndicatorsMask" data-ref="_M/XkbAllIndicatorsMask">XkbAllIndicatorsMask</dfn>	(0xffffffff)</u></td></tr>
+<tr><th id="558">558</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxRadioGroups" data-ref="_M/XkbMaxRadioGroups">XkbMaxRadioGroups</dfn>	32</u></td></tr>
+<tr><th id="559">559</th><td><u>#define	<dfn class="macro" id="_M/XkbAllRadioGroupsMask" data-ref="_M/XkbAllRadioGroupsMask">XkbAllRadioGroupsMask</dfn>	(0xffffffff)</u></td></tr>
+<tr><th id="560">560</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxShiftLevel" data-ref="_M/XkbMaxShiftLevel">XkbMaxShiftLevel</dfn>	63</u></td></tr>
+<tr><th id="561">561</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxSymsPerKey" data-ref="_M/XkbMaxSymsPerKey">XkbMaxSymsPerKey</dfn>	(XkbMaxShiftLevel*XkbNumKbdGroups)</u></td></tr>
+<tr><th id="562">562</th><td><u>#define	<dfn class="macro" id="_M/XkbRGMaxMembers" data-ref="_M/XkbRGMaxMembers">XkbRGMaxMembers</dfn>		12</u></td></tr>
+<tr><th id="563">563</th><td><u>#define	<dfn class="macro" id="_M/XkbActionMessageLength" data-ref="_M/XkbActionMessageLength">XkbActionMessageLength</dfn>	6</u></td></tr>
+<tr><th id="564">564</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyNameLength" data-ref="_M/XkbKeyNameLength">XkbKeyNameLength</dfn>	4</u></td></tr>
+<tr><th id="565">565</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxRedirectCount" data-ref="_M/XkbMaxRedirectCount">XkbMaxRedirectCount</dfn>	8</u></td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td><u>#define	<dfn class="macro" id="_M/XkbGeomPtsPerMM" data-ref="_M/XkbGeomPtsPerMM">XkbGeomPtsPerMM</dfn>		10</u></td></tr>
+<tr><th id="568">568</th><td><u>#define	<dfn class="macro" id="_M/XkbGeomMaxColors" data-ref="_M/XkbGeomMaxColors">XkbGeomMaxColors</dfn>	32</u></td></tr>
+<tr><th id="569">569</th><td><u>#define	<dfn class="macro" id="_M/XkbGeomMaxLabelColors" data-ref="_M/XkbGeomMaxLabelColors">XkbGeomMaxLabelColors</dfn>	3</u></td></tr>
+<tr><th id="570">570</th><td><u>#define	<dfn class="macro" id="_M/XkbGeomMaxPriority" data-ref="_M/XkbGeomMaxPriority">XkbGeomMaxPriority</dfn>	255</u></td></tr>
+<tr><th id="571">571</th><td></td></tr>
+<tr><th id="572">572</th><td>    <i>/*</i></td></tr>
+<tr><th id="573">573</th><td><i>     * Key Type index and mask for the four standard key types.</i></td></tr>
+<tr><th id="574">574</th><td><i>     */</i></td></tr>
+<tr><th id="575">575</th><td><u>#define	<dfn class="macro" id="_M/XkbOneLevelIndex" data-ref="_M/XkbOneLevelIndex">XkbOneLevelIndex</dfn>	0</u></td></tr>
+<tr><th id="576">576</th><td><u>#define	<dfn class="macro" id="_M/XkbTwoLevelIndex" data-ref="_M/XkbTwoLevelIndex">XkbTwoLevelIndex</dfn>	1</u></td></tr>
+<tr><th id="577">577</th><td><u>#define	<dfn class="macro" id="_M/XkbAlphabeticIndex" data-ref="_M/XkbAlphabeticIndex">XkbAlphabeticIndex</dfn>	2</u></td></tr>
+<tr><th id="578">578</th><td><u>#define	<dfn class="macro" id="_M/XkbKeypadIndex" data-ref="_M/XkbKeypadIndex">XkbKeypadIndex</dfn>		3</u></td></tr>
+<tr><th id="579">579</th><td><u>#define	<dfn class="macro" id="_M/XkbLastRequiredType" data-ref="_M/XkbLastRequiredType">XkbLastRequiredType</dfn>	XkbKeypadIndex</u></td></tr>
+<tr><th id="580">580</th><td><u>#define	<dfn class="macro" id="_M/XkbNumRequiredTypes" data-ref="_M/XkbNumRequiredTypes">XkbNumRequiredTypes</dfn>	(XkbLastRequiredType+1)</u></td></tr>
+<tr><th id="581">581</th><td><u>#define	<dfn class="macro" id="_M/XkbMaxKeyTypes" data-ref="_M/XkbMaxKeyTypes">XkbMaxKeyTypes</dfn>		255</u></td></tr>
+<tr><th id="582">582</th><td></td></tr>
+<tr><th id="583">583</th><td><u>#define	<dfn class="macro" id="_M/XkbOneLevelMask" data-ref="_M/XkbOneLevelMask">XkbOneLevelMask</dfn>		(1&lt;&lt;0)</u></td></tr>
+<tr><th id="584">584</th><td><u>#define	<dfn class="macro" id="_M/XkbTwoLevelMask" data-ref="_M/XkbTwoLevelMask">XkbTwoLevelMask</dfn>		(1&lt;&lt;1)</u></td></tr>
+<tr><th id="585">585</th><td><u>#define	<dfn class="macro" id="_M/XkbAlphabeticMask" data-ref="_M/XkbAlphabeticMask">XkbAlphabeticMask</dfn>	(1&lt;&lt;2)</u></td></tr>
+<tr><th id="586">586</th><td><u>#define	<dfn class="macro" id="_M/XkbKeypadMask" data-ref="_M/XkbKeypadMask">XkbKeypadMask</dfn>		(1&lt;&lt;3)</u></td></tr>
+<tr><th id="587">587</th><td><u>#define	<dfn class="macro" id="_M/XkbAllRequiredTypes" data-ref="_M/XkbAllRequiredTypes">XkbAllRequiredTypes</dfn>	(0xf)</u></td></tr>
+<tr><th id="588">588</th><td></td></tr>
+<tr><th id="589">589</th><td><u>#define	<dfn class="macro" id="_M/XkbShiftLevel" data-ref="_M/XkbShiftLevel">XkbShiftLevel</dfn>(n)	((n)-1)</u></td></tr>
+<tr><th id="590">590</th><td><u>#define	<dfn class="macro" id="_M/XkbShiftLevelMask" data-ref="_M/XkbShiftLevelMask">XkbShiftLevelMask</dfn>(n)	(1&lt;&lt;((n)-1))</u></td></tr>
+<tr><th id="591">591</th><td></td></tr>
+<tr><th id="592">592</th><td>    <i>/*</i></td></tr>
+<tr><th id="593">593</th><td><i>     * Extension name and version information</i></td></tr>
+<tr><th id="594">594</th><td><i>     */</i></td></tr>
+<tr><th id="595">595</th><td><u>#define	<dfn class="macro" id="_M/XkbName" data-ref="_M/XkbName">XkbName</dfn> "XKEYBOARD"</u></td></tr>
+<tr><th id="596">596</th><td><u>#define	<dfn class="macro" id="_M/XkbMajorVersion" data-ref="_M/XkbMajorVersion">XkbMajorVersion</dfn>	1</u></td></tr>
+<tr><th id="597">597</th><td><u>#define	<dfn class="macro" id="_M/XkbMinorVersion" data-ref="_M/XkbMinorVersion">XkbMinorVersion</dfn>	0</u></td></tr>
+<tr><th id="598">598</th><td></td></tr>
+<tr><th id="599">599</th><td>    <i>/*</i></td></tr>
+<tr><th id="600">600</th><td><i>     * Explicit map components:</i></td></tr>
+<tr><th id="601">601</th><td><i>     *  - Used in the 'explicit' field of an XkbServerMap.  Specifies</i></td></tr>
+<tr><th id="602">602</th><td><i>     *    the keyboard components that should _not_ be updated automatically</i></td></tr>
+<tr><th id="603">603</th><td><i>     *    in response to core protocol keyboard mapping requests.</i></td></tr>
+<tr><th id="604">604</th><td><i>     */</i></td></tr>
+<tr><th id="605">605</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitKeyTypesMask" data-ref="_M/XkbExplicitKeyTypesMask">XkbExplicitKeyTypesMask</dfn>	  (0x0f)</u></td></tr>
+<tr><th id="606">606</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitKeyType1Mask" data-ref="_M/XkbExplicitKeyType1Mask">XkbExplicitKeyType1Mask</dfn>	  (1&lt;&lt;0)</u></td></tr>
+<tr><th id="607">607</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitKeyType2Mask" data-ref="_M/XkbExplicitKeyType2Mask">XkbExplicitKeyType2Mask</dfn>	  (1&lt;&lt;1)</u></td></tr>
+<tr><th id="608">608</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitKeyType3Mask" data-ref="_M/XkbExplicitKeyType3Mask">XkbExplicitKeyType3Mask</dfn>	  (1&lt;&lt;2)</u></td></tr>
+<tr><th id="609">609</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitKeyType4Mask" data-ref="_M/XkbExplicitKeyType4Mask">XkbExplicitKeyType4Mask</dfn>	  (1&lt;&lt;3)</u></td></tr>
+<tr><th id="610">610</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitInterpretMask" data-ref="_M/XkbExplicitInterpretMask">XkbExplicitInterpretMask</dfn>  (1&lt;&lt;4)</u></td></tr>
+<tr><th id="611">611</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitAutoRepeatMask" data-ref="_M/XkbExplicitAutoRepeatMask">XkbExplicitAutoRepeatMask</dfn> (1&lt;&lt;5)</u></td></tr>
+<tr><th id="612">612</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitBehaviorMask" data-ref="_M/XkbExplicitBehaviorMask">XkbExplicitBehaviorMask</dfn>	  (1&lt;&lt;6)</u></td></tr>
+<tr><th id="613">613</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitVModMapMask" data-ref="_M/XkbExplicitVModMapMask">XkbExplicitVModMapMask</dfn>	  (1&lt;&lt;7)</u></td></tr>
+<tr><th id="614">614</th><td><u>#define	<dfn class="macro" id="_M/XkbAllExplicitMask" data-ref="_M/XkbAllExplicitMask">XkbAllExplicitMask</dfn>	  (0xff)</u></td></tr>
+<tr><th id="615">615</th><td></td></tr>
+<tr><th id="616">616</th><td>    <i>/*</i></td></tr>
+<tr><th id="617">617</th><td><i>     * Map components masks:</i></td></tr>
+<tr><th id="618">618</th><td><i>     * Those in AllMapComponentsMask:</i></td></tr>
+<tr><th id="619">619</th><td><i>     *  - Specifies the individual fields to be loaded or changed for the</i></td></tr>
+<tr><th id="620">620</th><td><i>     *    GetMap and SetMap requests.</i></td></tr>
+<tr><th id="621">621</th><td><i>     * Those in ClientInfoMask:</i></td></tr>
+<tr><th id="622">622</th><td><i>     *  - Specifies the components to be allocated by XkbAllocClientMap.</i></td></tr>
+<tr><th id="623">623</th><td><i>     * Those in ServerInfoMask:</i></td></tr>
+<tr><th id="624">624</th><td><i>     *  - Specifies the components to be allocated by XkbAllocServerMap.</i></td></tr>
+<tr><th id="625">625</th><td><i>     */</i></td></tr>
+<tr><th id="626">626</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyTypesMask" data-ref="_M/XkbKeyTypesMask">XkbKeyTypesMask</dfn>		(1&lt;&lt;0)</u></td></tr>
+<tr><th id="627">627</th><td><u>#define	<dfn class="macro" id="_M/XkbKeySymsMask" data-ref="_M/XkbKeySymsMask">XkbKeySymsMask</dfn>		(1&lt;&lt;1)</u></td></tr>
+<tr><th id="628">628</th><td><u>#define	<dfn class="macro" id="_M/XkbModifierMapMask" data-ref="_M/XkbModifierMapMask">XkbModifierMapMask</dfn>	(1&lt;&lt;2)</u></td></tr>
+<tr><th id="629">629</th><td><u>#define	<dfn class="macro" id="_M/XkbExplicitComponentsMask" data-ref="_M/XkbExplicitComponentsMask">XkbExplicitComponentsMask</dfn> (1&lt;&lt;3)</u></td></tr>
+<tr><th id="630">630</th><td><u>#define <dfn class="macro" id="_M/XkbKeyActionsMask" data-ref="_M/XkbKeyActionsMask">XkbKeyActionsMask</dfn>	(1&lt;&lt;4)</u></td></tr>
+<tr><th id="631">631</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyBehaviorsMask" data-ref="_M/XkbKeyBehaviorsMask">XkbKeyBehaviorsMask</dfn>	(1&lt;&lt;5)</u></td></tr>
+<tr><th id="632">632</th><td><u>#define	<dfn class="macro" id="_M/XkbVirtualModsMask" data-ref="_M/XkbVirtualModsMask">XkbVirtualModsMask</dfn>	(1&lt;&lt;6)</u></td></tr>
+<tr><th id="633">633</th><td><u>#define	<dfn class="macro" id="_M/XkbVirtualModMapMask" data-ref="_M/XkbVirtualModMapMask">XkbVirtualModMapMask</dfn>	(1&lt;&lt;7)</u></td></tr>
+<tr><th id="634">634</th><td></td></tr>
+<tr><th id="635">635</th><td><u>#define	<dfn class="macro" id="_M/XkbAllClientInfoMask" data-ref="_M/XkbAllClientInfoMask">XkbAllClientInfoMask</dfn>	(XkbKeyTypesMask|XkbKeySymsMask|XkbModifierMapMask)</u></td></tr>
+<tr><th id="636">636</th><td><u>#define	<dfn class="macro" id="_M/XkbAllServerInfoMask" data-ref="_M/XkbAllServerInfoMask">XkbAllServerInfoMask</dfn>	(XkbExplicitComponentsMask|XkbKeyActionsMask|XkbKeyBehaviorsMask|XkbVirtualModsMask|XkbVirtualModMapMask)</u></td></tr>
+<tr><th id="637">637</th><td><u>#define	<dfn class="macro" id="_M/XkbAllMapComponentsMask" data-ref="_M/XkbAllMapComponentsMask">XkbAllMapComponentsMask</dfn>	(XkbAllClientInfoMask|XkbAllServerInfoMask)</u></td></tr>
+<tr><th id="638">638</th><td></td></tr>
+<tr><th id="639">639</th><td>    <i>/*</i></td></tr>
+<tr><th id="640">640</th><td><i>     * Symbol interpretations flags:</i></td></tr>
+<tr><th id="641">641</th><td><i>     *  - Used in the flags field of a symbol interpretation</i></td></tr>
+<tr><th id="642">642</th><td><i>     */</i></td></tr>
+<tr><th id="643">643</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_AutoRepeat" data-ref="_M/XkbSI_AutoRepeat">XkbSI_AutoRepeat</dfn>	(1&lt;&lt;0)</u></td></tr>
+<tr><th id="644">644</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_LockingKey" data-ref="_M/XkbSI_LockingKey">XkbSI_LockingKey</dfn>	(1&lt;&lt;1)</u></td></tr>
+<tr><th id="645">645</th><td></td></tr>
+<tr><th id="646">646</th><td>    <i>/*</i></td></tr>
+<tr><th id="647">647</th><td><i>     * Symbol interpretations match specification:</i></td></tr>
+<tr><th id="648">648</th><td><i>     *  - Used in the match field of a symbol interpretation to specify </i></td></tr>
+<tr><th id="649">649</th><td><i>     *    the conditions under which an interpretation is used.</i></td></tr>
+<tr><th id="650">650</th><td><i>     */</i></td></tr>
+<tr><th id="651">651</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_LevelOneOnly" data-ref="_M/XkbSI_LevelOneOnly">XkbSI_LevelOneOnly</dfn>	(0x80)</u></td></tr>
+<tr><th id="652">652</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_OpMask" data-ref="_M/XkbSI_OpMask">XkbSI_OpMask</dfn>		(0x7f)</u></td></tr>
+<tr><th id="653">653</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_NoneOf" data-ref="_M/XkbSI_NoneOf">XkbSI_NoneOf</dfn>		(0)</u></td></tr>
+<tr><th id="654">654</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_AnyOfOrNone" data-ref="_M/XkbSI_AnyOfOrNone">XkbSI_AnyOfOrNone</dfn>	(1)</u></td></tr>
+<tr><th id="655">655</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_AnyOf" data-ref="_M/XkbSI_AnyOf">XkbSI_AnyOf</dfn>		(2)</u></td></tr>
+<tr><th id="656">656</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_AllOf" data-ref="_M/XkbSI_AllOf">XkbSI_AllOf</dfn>		(3)</u></td></tr>
+<tr><th id="657">657</th><td><u>#define	<dfn class="macro" id="_M/XkbSI_Exactly" data-ref="_M/XkbSI_Exactly">XkbSI_Exactly</dfn>		(4)</u></td></tr>
+<tr><th id="658">658</th><td></td></tr>
+<tr><th id="659">659</th><td>    <i>/*</i></td></tr>
+<tr><th id="660">660</th><td><i>     * Indicator map flags:</i></td></tr>
+<tr><th id="661">661</th><td><i>     *  - Used in the flags field of an indicator map to indicate the</i></td></tr>
+<tr><th id="662">662</th><td><i>     *    conditions under which and indicator can be changed and the</i></td></tr>
+<tr><th id="663">663</th><td><i>     *    effects of changing the indicator.</i></td></tr>
+<tr><th id="664">664</th><td><i>     */</i></td></tr>
+<tr><th id="665">665</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_NoExplicit" data-ref="_M/XkbIM_NoExplicit">XkbIM_NoExplicit</dfn>	(1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="666">666</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_NoAutomatic" data-ref="_M/XkbIM_NoAutomatic">XkbIM_NoAutomatic</dfn>	(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="667">667</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_LEDDrivesKB" data-ref="_M/XkbIM_LEDDrivesKB">XkbIM_LEDDrivesKB</dfn>	(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="668">668</th><td></td></tr>
+<tr><th id="669">669</th><td>    <i>/*</i></td></tr>
+<tr><th id="670">670</th><td><i>     * Indicator map component specifications:</i></td></tr>
+<tr><th id="671">671</th><td><i>     *  - Used by the 'which_groups' and 'which_mods' fields of an indicator</i></td></tr>
+<tr><th id="672">672</th><td><i>     *    map to specify which keyboard components should be used to drive</i></td></tr>
+<tr><th id="673">673</th><td><i>     *    the indicator.</i></td></tr>
+<tr><th id="674">674</th><td><i>     */</i></td></tr>
+<tr><th id="675">675</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseBase" data-ref="_M/XkbIM_UseBase">XkbIM_UseBase</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="676">676</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseLatched" data-ref="_M/XkbIM_UseLatched">XkbIM_UseLatched</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="677">677</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseLocked" data-ref="_M/XkbIM_UseLocked">XkbIM_UseLocked</dfn>		(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="678">678</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseEffective" data-ref="_M/XkbIM_UseEffective">XkbIM_UseEffective</dfn>	(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="679">679</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseCompat" data-ref="_M/XkbIM_UseCompat">XkbIM_UseCompat</dfn>		(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="680">680</th><td></td></tr>
+<tr><th id="681">681</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseNone" data-ref="_M/XkbIM_UseNone">XkbIM_UseNone</dfn>	  0</u></td></tr>
+<tr><th id="682">682</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseAnyGroup" data-ref="_M/XkbIM_UseAnyGroup">XkbIM_UseAnyGroup</dfn> (XkbIM_UseBase|XkbIM_UseLatched|XkbIM_UseLocked\</u></td></tr>
+<tr><th id="683">683</th><td><u>                           |XkbIM_UseEffective)</u></td></tr>
+<tr><th id="684">684</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_UseAnyMods" data-ref="_M/XkbIM_UseAnyMods">XkbIM_UseAnyMods</dfn>  (XkbIM_UseAnyGroup|XkbIM_UseCompat)</u></td></tr>
+<tr><th id="685">685</th><td></td></tr>
+<tr><th id="686">686</th><td>    <i>/*</i></td></tr>
+<tr><th id="687">687</th><td><i>     * Compatibility Map Compontents:</i></td></tr>
+<tr><th id="688">688</th><td><i>     *  - Specifies the components to be allocated in XkbAllocCompatMap.</i></td></tr>
+<tr><th id="689">689</th><td><i>     */</i></td></tr>
+<tr><th id="690">690</th><td><u>#define	<dfn class="macro" id="_M/XkbSymInterpMask" data-ref="_M/XkbSymInterpMask">XkbSymInterpMask</dfn>	(1&lt;&lt;0)</u></td></tr>
+<tr><th id="691">691</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupCompatMask" data-ref="_M/XkbGroupCompatMask">XkbGroupCompatMask</dfn>	(1&lt;&lt;1)</u></td></tr>
+<tr><th id="692">692</th><td><u>#define	<dfn class="macro" id="_M/XkbAllCompatMask" data-ref="_M/XkbAllCompatMask">XkbAllCompatMask</dfn>	(0x3)</u></td></tr>
+<tr><th id="693">693</th><td></td></tr>
+<tr><th id="694">694</th><td>    <i>/*</i></td></tr>
+<tr><th id="695">695</th><td><i>     * Names component mask:</i></td></tr>
+<tr><th id="696">696</th><td><i>     *  - Specifies the names to be loaded or changed for the GetNames and</i></td></tr>
+<tr><th id="697">697</th><td><i>     *    SetNames requests.</i></td></tr>
+<tr><th id="698">698</th><td><i>     *  - Specifies the names that have changed in a NamesNotify event.</i></td></tr>
+<tr><th id="699">699</th><td><i>     *  - Specifies the names components to be allocated by XkbAllocNames.</i></td></tr>
+<tr><th id="700">700</th><td><i>     */</i></td></tr>
+<tr><th id="701">701</th><td><u>#define	<dfn class="macro" id="_M/XkbKeycodesNameMask" data-ref="_M/XkbKeycodesNameMask">XkbKeycodesNameMask</dfn>	(1&lt;&lt;0)</u></td></tr>
+<tr><th id="702">702</th><td><u>#define	<dfn class="macro" id="_M/XkbGeometryNameMask" data-ref="_M/XkbGeometryNameMask">XkbGeometryNameMask</dfn>	(1&lt;&lt;1)</u></td></tr>
+<tr><th id="703">703</th><td><u>#define	<dfn class="macro" id="_M/XkbSymbolsNameMask" data-ref="_M/XkbSymbolsNameMask">XkbSymbolsNameMask</dfn>	(1&lt;&lt;2)</u></td></tr>
+<tr><th id="704">704</th><td><u>#define	<dfn class="macro" id="_M/XkbPhysSymbolsNameMask" data-ref="_M/XkbPhysSymbolsNameMask">XkbPhysSymbolsNameMask</dfn>	(1&lt;&lt;3)</u></td></tr>
+<tr><th id="705">705</th><td><u>#define	<dfn class="macro" id="_M/XkbTypesNameMask" data-ref="_M/XkbTypesNameMask">XkbTypesNameMask</dfn>	(1&lt;&lt;4)</u></td></tr>
+<tr><th id="706">706</th><td><u>#define	<dfn class="macro" id="_M/XkbCompatNameMask" data-ref="_M/XkbCompatNameMask">XkbCompatNameMask</dfn> 	(1&lt;&lt;5)</u></td></tr>
+<tr><th id="707">707</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyTypeNamesMask" data-ref="_M/XkbKeyTypeNamesMask">XkbKeyTypeNamesMask</dfn>	(1&lt;&lt;6)</u></td></tr>
+<tr><th id="708">708</th><td><u>#define	<dfn class="macro" id="_M/XkbKTLevelNamesMask" data-ref="_M/XkbKTLevelNamesMask">XkbKTLevelNamesMask</dfn>	(1&lt;&lt;7)</u></td></tr>
+<tr><th id="709">709</th><td><u>#define	<dfn class="macro" id="_M/XkbIndicatorNamesMask" data-ref="_M/XkbIndicatorNamesMask">XkbIndicatorNamesMask</dfn>	(1&lt;&lt;8)</u></td></tr>
+<tr><th id="710">710</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyNamesMask" data-ref="_M/XkbKeyNamesMask">XkbKeyNamesMask</dfn>		(1&lt;&lt;9)</u></td></tr>
+<tr><th id="711">711</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyAliasesMask" data-ref="_M/XkbKeyAliasesMask">XkbKeyAliasesMask</dfn>	(1&lt;&lt;10)</u></td></tr>
+<tr><th id="712">712</th><td><u>#define	<dfn class="macro" id="_M/XkbVirtualModNamesMask" data-ref="_M/XkbVirtualModNamesMask">XkbVirtualModNamesMask</dfn>	(1&lt;&lt;11)</u></td></tr>
+<tr><th id="713">713</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupNamesMask" data-ref="_M/XkbGroupNamesMask">XkbGroupNamesMask</dfn>	(1&lt;&lt;12)</u></td></tr>
+<tr><th id="714">714</th><td><u>#define	<dfn class="macro" id="_M/XkbRGNamesMask" data-ref="_M/XkbRGNamesMask">XkbRGNamesMask</dfn>		(1&lt;&lt;13)</u></td></tr>
+<tr><th id="715">715</th><td><u>#define	<dfn class="macro" id="_M/XkbComponentNamesMask" data-ref="_M/XkbComponentNamesMask">XkbComponentNamesMask</dfn>	(0x3f)</u></td></tr>
+<tr><th id="716">716</th><td><u>#define	<dfn class="macro" id="_M/XkbAllNamesMask" data-ref="_M/XkbAllNamesMask">XkbAllNamesMask</dfn>		(0x3fff)</u></td></tr>
+<tr><th id="717">717</th><td></td></tr>
+<tr><th id="718">718</th><td>    <i>/*</i></td></tr>
+<tr><th id="719">719</th><td><i>     * GetByName components:</i></td></tr>
+<tr><th id="720">720</th><td><i>     *  - Specifies desired or necessary components to GetKbdByName request.</i></td></tr>
+<tr><th id="721">721</th><td><i>     *  - Reports the components that were found in a GetKbdByNameReply</i></td></tr>
+<tr><th id="722">722</th><td><i>     */</i></td></tr>
+<tr><th id="723">723</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_TypesMask" data-ref="_M/XkbGBN_TypesMask">XkbGBN_TypesMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="724">724</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_CompatMapMask" data-ref="_M/XkbGBN_CompatMapMask">XkbGBN_CompatMapMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="725">725</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_ClientSymbolsMask" data-ref="_M/XkbGBN_ClientSymbolsMask">XkbGBN_ClientSymbolsMask</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="726">726</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_ServerSymbolsMask" data-ref="_M/XkbGBN_ServerSymbolsMask">XkbGBN_ServerSymbolsMask</dfn>	(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="727">727</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_SymbolsMask" data-ref="_M/XkbGBN_SymbolsMask">XkbGBN_SymbolsMask</dfn> (XkbGBN_ClientSymbolsMask|XkbGBN_ServerSymbolsMask)</u></td></tr>
+<tr><th id="728">728</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_IndicatorMapMask" data-ref="_M/XkbGBN_IndicatorMapMask">XkbGBN_IndicatorMapMask</dfn>		(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="729">729</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_KeyNamesMask" data-ref="_M/XkbGBN_KeyNamesMask">XkbGBN_KeyNamesMask</dfn>		(1L &lt;&lt; 5)</u></td></tr>
+<tr><th id="730">730</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_GeometryMask" data-ref="_M/XkbGBN_GeometryMask">XkbGBN_GeometryMask</dfn>		(1L &lt;&lt; 6)</u></td></tr>
+<tr><th id="731">731</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_OtherNamesMask" data-ref="_M/XkbGBN_OtherNamesMask">XkbGBN_OtherNamesMask</dfn>		(1L &lt;&lt; 7)</u></td></tr>
+<tr><th id="732">732</th><td><u>#define	<dfn class="macro" id="_M/XkbGBN_AllComponentsMask" data-ref="_M/XkbGBN_AllComponentsMask">XkbGBN_AllComponentsMask</dfn>	(0xff)</u></td></tr>
+<tr><th id="733">733</th><td></td></tr>
+<tr><th id="734">734</th><td>     <i>/*</i></td></tr>
+<tr><th id="735">735</th><td><i>      * ListComponents flags</i></td></tr>
+<tr><th id="736">736</th><td><i>      */</i></td></tr>
+<tr><th id="737">737</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_Hidden" data-ref="_M/XkbLC_Hidden">XkbLC_Hidden</dfn>			(1L &lt;&lt;  0)</u></td></tr>
+<tr><th id="738">738</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_Default" data-ref="_M/XkbLC_Default">XkbLC_Default</dfn>			(1L &lt;&lt;  1)</u></td></tr>
+<tr><th id="739">739</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_Partial" data-ref="_M/XkbLC_Partial">XkbLC_Partial</dfn>			(1L &lt;&lt;  2)</u></td></tr>
+<tr><th id="740">740</th><td></td></tr>
+<tr><th id="741">741</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_AlphanumericKeys" data-ref="_M/XkbLC_AlphanumericKeys">XkbLC_AlphanumericKeys</dfn>		(1L &lt;&lt;  8)</u></td></tr>
+<tr><th id="742">742</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_ModifierKeys" data-ref="_M/XkbLC_ModifierKeys">XkbLC_ModifierKeys</dfn>		(1L &lt;&lt;  9)</u></td></tr>
+<tr><th id="743">743</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_KeypadKeys" data-ref="_M/XkbLC_KeypadKeys">XkbLC_KeypadKeys</dfn>		(1L &lt;&lt; 10)</u></td></tr>
+<tr><th id="744">744</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_FunctionKeys" data-ref="_M/XkbLC_FunctionKeys">XkbLC_FunctionKeys</dfn>		(1L &lt;&lt; 11)</u></td></tr>
+<tr><th id="745">745</th><td><u>#define	<dfn class="macro" id="_M/XkbLC_AlternateGroup" data-ref="_M/XkbLC_AlternateGroup">XkbLC_AlternateGroup</dfn>		(1L &lt;&lt; 12)</u></td></tr>
+<tr><th id="746">746</th><td></td></tr>
+<tr><th id="747">747</th><td>    <i>/*</i></td></tr>
+<tr><th id="748">748</th><td><i>     * X Input Extension Interactions</i></td></tr>
+<tr><th id="749">749</th><td><i>     * - Specifies the possible interactions between XKB and the X input</i></td></tr>
+<tr><th id="750">750</th><td><i>     *   extension</i></td></tr>
+<tr><th id="751">751</th><td><i>     * - Used to request (XkbGetDeviceInfo) or change (XKbSetDeviceInfo)</i></td></tr>
+<tr><th id="752">752</th><td><i>     *   XKB information about an extension device.</i></td></tr>
+<tr><th id="753">753</th><td><i>     * - Reports the list of supported optional features in the reply to</i></td></tr>
+<tr><th id="754">754</th><td><i>     *   XkbGetDeviceInfo or in an XkbExtensionDeviceNotify event.</i></td></tr>
+<tr><th id="755">755</th><td><i>     * XkbXI_UnsupportedFeature is reported in XkbExtensionDeviceNotify</i></td></tr>
+<tr><th id="756">756</th><td><i>     * events to indicate an attempt to use an unsupported feature.</i></td></tr>
+<tr><th id="757">757</th><td><i>     */</i></td></tr>
+<tr><th id="758">758</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_KeyboardsMask" data-ref="_M/XkbXI_KeyboardsMask">XkbXI_KeyboardsMask</dfn>		(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="759">759</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_ButtonActionsMask" data-ref="_M/XkbXI_ButtonActionsMask">XkbXI_ButtonActionsMask</dfn>		(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="760">760</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_IndicatorNamesMask" data-ref="_M/XkbXI_IndicatorNamesMask">XkbXI_IndicatorNamesMask</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="761">761</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_IndicatorMapsMask" data-ref="_M/XkbXI_IndicatorMapsMask">XkbXI_IndicatorMapsMask</dfn>		(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="762">762</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_IndicatorStateMask" data-ref="_M/XkbXI_IndicatorStateMask">XkbXI_IndicatorStateMask</dfn>	(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="763">763</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_UnsupportedFeatureMask" data-ref="_M/XkbXI_UnsupportedFeatureMask">XkbXI_UnsupportedFeatureMask</dfn>	(1L &lt;&lt; 15)</u></td></tr>
+<tr><th id="764">764</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_AllFeaturesMask" data-ref="_M/XkbXI_AllFeaturesMask">XkbXI_AllFeaturesMask</dfn>		(0x001f)</u></td></tr>
+<tr><th id="765">765</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_AllDeviceFeaturesMask" data-ref="_M/XkbXI_AllDeviceFeaturesMask">XkbXI_AllDeviceFeaturesMask</dfn>	(0x001e)</u></td></tr>
+<tr><th id="766">766</th><td></td></tr>
+<tr><th id="767">767</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_IndicatorsMask" data-ref="_M/XkbXI_IndicatorsMask">XkbXI_IndicatorsMask</dfn>		(0x001c)</u></td></tr>
+<tr><th id="768">768</th><td><u>#define	<dfn class="macro" id="_M/XkbAllExtensionDeviceEventsMask" data-ref="_M/XkbAllExtensionDeviceEventsMask">XkbAllExtensionDeviceEventsMask</dfn> (0x801f)</u></td></tr>
+<tr><th id="769">769</th><td></td></tr>
+<tr><th id="770">770</th><td>    <i>/*</i></td></tr>
+<tr><th id="771">771</th><td><i>     * Per-Client Flags:</i></td></tr>
+<tr><th id="772">772</th><td><i>     *  - Specifies flags to be changed by the PerClientFlags request.</i></td></tr>
+<tr><th id="773">773</th><td><i>     */</i></td></tr>
+<tr><th id="774">774</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_DetectableAutoRepeatMask" data-ref="_M/XkbPCF_DetectableAutoRepeatMask">XkbPCF_DetectableAutoRepeatMask</dfn>	(1L &lt;&lt; 0)</u></td></tr>
+<tr><th id="775">775</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_GrabsUseXKBStateMask" data-ref="_M/XkbPCF_GrabsUseXKBStateMask">XkbPCF_GrabsUseXKBStateMask</dfn>	(1L &lt;&lt; 1)</u></td></tr>
+<tr><th id="776">776</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_AutoResetControlsMask" data-ref="_M/XkbPCF_AutoResetControlsMask">XkbPCF_AutoResetControlsMask</dfn>	(1L &lt;&lt; 2)</u></td></tr>
+<tr><th id="777">777</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_LookupStateWhenGrabbed" data-ref="_M/XkbPCF_LookupStateWhenGrabbed">XkbPCF_LookupStateWhenGrabbed</dfn>	(1L &lt;&lt; 3)</u></td></tr>
+<tr><th id="778">778</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_SendEventUsesXKBState" data-ref="_M/XkbPCF_SendEventUsesXKBState">XkbPCF_SendEventUsesXKBState</dfn>	(1L &lt;&lt; 4)</u></td></tr>
+<tr><th id="779">779</th><td><u>#define	<dfn class="macro" id="_M/XkbPCF_AllFlagsMask" data-ref="_M/XkbPCF_AllFlagsMask">XkbPCF_AllFlagsMask</dfn>		(0x1F)</u></td></tr>
+<tr><th id="780">780</th><td></td></tr>
+<tr><th id="781">781</th><td>    <i>/*</i></td></tr>
+<tr><th id="782">782</th><td><i>     * Debugging flags and controls</i></td></tr>
+<tr><th id="783">783</th><td><i>     */</i></td></tr>
+<tr><th id="784">784</th><td><u>#define	<dfn class="macro" id="_M/XkbDF_DisableLocks" data-ref="_M/XkbDF_DisableLocks">XkbDF_DisableLocks</dfn>	(1&lt;&lt;0)</u></td></tr>
+<tr><th id="785">785</th><td></td></tr>
+<tr><th id="786">786</th><td><u>#<span data-ppcond="27">endif</span> /* _XKB_H_ */</u></td></tr>
+<tr><th id="787">787</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../codebrowser/ui/sdl.c.html'>codebrowser/ui/sdl.c</a><br/>Generated on <em>2017-Aug-28</em> from project include<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

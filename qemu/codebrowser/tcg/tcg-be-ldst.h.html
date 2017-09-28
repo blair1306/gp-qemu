@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tcg-be-ldst.h source code [codebrowser/tcg/tcg-be-ldst.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TCGBackendData,TCGLabelQemuLdst "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/tcg/tcg-be-ldst.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>tcg</a>/<a href='tcg-be-ldst.h.html'>tcg-be-ldst.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * TCG Backend Data: load-store optimization only.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="5">5</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="6">6</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="7">7</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="8">8</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="9">9</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="12">12</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="15">15</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="16">16</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="17">17</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="18">18</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="19">19</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="21">21</th><td><i> */</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#<span data-ppcond="23">ifdef</span> <a class="macro" href="../x86_64-softmmu/config-target.h.html#7" data-ref="_M/CONFIG_SOFTMMU">CONFIG_SOFTMMU</a></u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst"><a class="type" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a></dfn> {</td></tr>
+<tr><th id="26">26</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="TCGLabelQemuLdst::is_ld" title='TCGLabelQemuLdst::is_ld' data-ref="TCGLabelQemuLdst::is_ld">is_ld</dfn>;             <i>/* qemu_ld: true, qemu_st: false */</i></td></tr>
+<tr><th id="27">27</th><td>    <a class="typedef" href="tcg.h.html#TCGMemOpIdx" title='TCGMemOpIdx' data-type='uint32_t' data-ref="TCGMemOpIdx">TCGMemOpIdx</a> <dfn class="decl" id="TCGLabelQemuLdst::oi" title='TCGLabelQemuLdst::oi' data-ref="TCGLabelQemuLdst::oi">oi</dfn>;</td></tr>
+<tr><th id="28">28</th><td>    <a class="typedef" href="tcg.h.html#TCGType" title='TCGType' data-type='enum TCGType' data-ref="TCGType">TCGType</a> <dfn class="decl" id="TCGLabelQemuLdst::type" title='TCGLabelQemuLdst::type' data-ref="TCGLabelQemuLdst::type">type</dfn>;           <i>/* result type of a load */</i></td></tr>
+<tr><th id="29">29</th><td>    <a class="typedef" href="i386/tcg-target.h.html#TCGReg" title='TCGReg' data-type='enum TCGReg' data-ref="TCGReg">TCGReg</a> <dfn class="decl" id="TCGLabelQemuLdst::addrlo_reg" title='TCGLabelQemuLdst::addrlo_reg' data-ref="TCGLabelQemuLdst::addrlo_reg">addrlo_reg</dfn>;      <i>/* reg index for low word of guest virtual addr */</i></td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="i386/tcg-target.h.html#TCGReg" title='TCGReg' data-type='enum TCGReg' data-ref="TCGReg">TCGReg</a> <dfn class="decl" id="TCGLabelQemuLdst::addrhi_reg" title='TCGLabelQemuLdst::addrhi_reg' data-ref="TCGLabelQemuLdst::addrhi_reg">addrhi_reg</dfn>;      <i>/* reg index for high word of guest virtual addr */</i></td></tr>
+<tr><th id="31">31</th><td>    <a class="typedef" href="i386/tcg-target.h.html#TCGReg" title='TCGReg' data-type='enum TCGReg' data-ref="TCGReg">TCGReg</a> <dfn class="decl" id="TCGLabelQemuLdst::datalo_reg" title='TCGLabelQemuLdst::datalo_reg' data-ref="TCGLabelQemuLdst::datalo_reg">datalo_reg</dfn>;      <i>/* reg index for low word to be loaded or stored */</i></td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="i386/tcg-target.h.html#TCGReg" title='TCGReg' data-type='enum TCGReg' data-ref="TCGReg">TCGReg</a> <dfn class="decl" id="TCGLabelQemuLdst::datahi_reg" title='TCGLabelQemuLdst::datahi_reg' data-ref="TCGLabelQemuLdst::datahi_reg">datahi_reg</dfn>;      <i>/* reg index for high word to be loaded or stored */</i></td></tr>
+<tr><th id="33">33</th><td>    <a class="typedef" href="tcg.h.html#tcg_insn_unit" title='tcg_insn_unit' data-type='uint8_t' data-ref="tcg_insn_unit">tcg_insn_unit</a> *<dfn class="decl" id="TCGLabelQemuLdst::raddr" title='TCGLabelQemuLdst::raddr' data-ref="TCGLabelQemuLdst::raddr">raddr</dfn>;   <i>/* gen code addr of the next IR of qemu_ld/st IR */</i></td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="tcg.h.html#tcg_insn_unit" title='tcg_insn_unit' data-type='uint8_t' data-ref="tcg_insn_unit">tcg_insn_unit</a> *<dfn class="decl" id="TCGLabelQemuLdst::label_ptr" title='TCGLabelQemuLdst::label_ptr' data-ref="TCGLabelQemuLdst::label_ptr">label_ptr</dfn>[<var>2</var>]; <i>/* label pointers to be updated */</i></td></tr>
+<tr><th id="35">35</th><td>    <b>struct</b> <a class="type" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="decl" id="TCGLabelQemuLdst::next" title='TCGLabelQemuLdst::next' data-ref="TCGLabelQemuLdst::next">next</dfn>;</td></tr>
+<tr><th id="36">36</th><td>} <dfn class="typedef" id="TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TCGBackendData" title='TCGBackendData' data-ref="TCGBackendData"><a class="type" href="#TCGBackendData" title='TCGBackendData' data-ref="TCGBackendData">TCGBackendData</a></dfn> {</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="decl" id="TCGBackendData::labels" title='TCGBackendData::labels' data-ref="TCGBackendData::labels">labels</dfn>;</td></tr>
+<tr><th id="40">40</th><td>} <dfn class="typedef" id="TCGBackendData" title='TCGBackendData' data-type='struct TCGBackendData' data-ref="TCGBackendData">TCGBackendData</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i>/*</i></td></tr>
+<tr><th id="44">44</th><td><i> * Initialize TB backend data at the beginning of the TB.</i></td></tr>
+<tr><th id="45">45</th><td><i> */</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="tcg_out_tb_init" title='tcg_out_tb_init' data-ref="tcg_out_tb_init">tcg_out_tb_init</dfn>(<a class="typedef" href="tcg.h.html#TCGContext" title='TCGContext' data-type='struct TCGContext' data-ref="TCGContext">TCGContext</a> *<dfn class="local col0 decl" id="80s" title='s' data-type='TCGContext *' data-ref="80s">s</dfn>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="ref" href="tcg.h.html#TCGContext::be" title='TCGContext::be' data-ref="TCGContext::be">be</a>-&gt;<a class="ref" href="#TCGBackendData::labels" title='TCGBackendData::labels' data-ref="TCGBackendData::labels">labels</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="50">50</th><td>}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><i>/*</i></td></tr>
+<tr><th id="53">53</th><td><i> * Generate TB finalization at the end of block</i></td></tr>
+<tr><th id="54">54</th><td><i> */</i></td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><em>static</em> <em>void</em> <a class="decl" href="i386/tcg-target.inc.c.html#tcg_out_qemu_ld_slow_path" title='tcg_out_qemu_ld_slow_path' data-ref="tcg_out_qemu_ld_slow_path" id="tcg_out_qemu_ld_slow_path">tcg_out_qemu_ld_slow_path</a>(<a class="typedef" href="tcg.h.html#TCGContext" title='TCGContext' data-type='struct TCGContext' data-ref="TCGContext">TCGContext</a> *<dfn class="local col1 decl" id="81s" title='s' data-type='TCGContext *' data-ref="81s">s</dfn>, <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="local col2 decl" id="82l" title='l' data-type='TCGLabelQemuLdst *' data-ref="82l">l</dfn>);</td></tr>
+<tr><th id="57">57</th><td><em>static</em> <em>void</em> <a class="decl" href="i386/tcg-target.inc.c.html#tcg_out_qemu_st_slow_path" title='tcg_out_qemu_st_slow_path' data-ref="tcg_out_qemu_st_slow_path" id="tcg_out_qemu_st_slow_path">tcg_out_qemu_st_slow_path</a>(<a class="typedef" href="tcg.h.html#TCGContext" title='TCGContext' data-type='struct TCGContext' data-ref="TCGContext">TCGContext</a> *<dfn class="local col3 decl" id="83s" title='s' data-type='TCGContext *' data-ref="83s">s</dfn>, <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="local col4 decl" id="84l" title='l' data-type='TCGLabelQemuLdst *' data-ref="84l">l</dfn>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="tcg_out_tb_finalize" title='tcg_out_tb_finalize' data-ref="tcg_out_tb_finalize">tcg_out_tb_finalize</dfn>(<a class="typedef" href="tcg.h.html#TCGContext" title='TCGContext' data-type='struct TCGContext' data-ref="TCGContext">TCGContext</a> *<dfn class="local col5 decl" id="85s" title='s' data-type='TCGContext *' data-ref="85s">s</dfn>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="local col6 decl" id="86lb" title='lb' data-type='TCGLabelQemuLdst *' data-ref="86lb">lb</dfn>;</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>    <i>/* qemu_ld/st slow paths */</i></td></tr>
+<tr><th id="64">64</th><td>    <b>for</b> (<a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a> = <a class="local col5 ref" href="#85s" title='s' data-ref="85s">s</a>-&gt;<a class="ref" href="tcg.h.html#TCGContext::be" title='TCGContext::be' data-ref="TCGContext::be">be</a>-&gt;<a class="ref" href="#TCGBackendData::labels" title='TCGBackendData::labels' data-ref="TCGBackendData::labels">labels</a>; <a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a> = <a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a>-&gt;<a class="ref" href="#TCGLabelQemuLdst::next" title='TCGLabelQemuLdst::next' data-ref="TCGLabelQemuLdst::next">next</a>) {</td></tr>
+<tr><th id="65">65</th><td>        <b>if</b> (<a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a>-&gt;<a class="ref" href="#TCGLabelQemuLdst::is_ld" title='TCGLabelQemuLdst::is_ld' data-ref="TCGLabelQemuLdst::is_ld">is_ld</a>) {</td></tr>
+<tr><th id="66">66</th><td>            <a class="ref" href="i386/tcg-target.inc.c.html#tcg_out_qemu_ld_slow_path" title='tcg_out_qemu_ld_slow_path' data-ref="tcg_out_qemu_ld_slow_path">tcg_out_qemu_ld_slow_path</a>(<a class="local col5 ref" href="#85s" title='s' data-ref="85s">s</a>, <a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a>);</td></tr>
+<tr><th id="67">67</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="68">68</th><td>            <a class="ref" href="i386/tcg-target.inc.c.html#tcg_out_qemu_st_slow_path" title='tcg_out_qemu_st_slow_path' data-ref="tcg_out_qemu_st_slow_path">tcg_out_qemu_st_slow_path</a>(<a class="local col5 ref" href="#85s" title='s' data-ref="85s">s</a>, <a class="local col6 ref" href="#86lb" title='lb' data-ref="86lb">lb</a>);</td></tr>
+<tr><th id="69">69</th><td>        }</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>        <i>/* Test for (pending) buffer overflow.  The assumption is that any</i></td></tr>
+<tr><th id="72">72</th><td><i>           one operation beginning below the high water mark cannot overrun</i></td></tr>
+<tr><th id="73">73</th><td><i>           the buffer completely.  Thus we can test for overflow after</i></td></tr>
+<tr><th id="74">74</th><td><i>           generating code without having to check during generation.  */</i></td></tr>
+<tr><th id="75">75</th><td>        <b>if</b> (<a class="macro" href="../include/qemu/compiler.h.html#58" title="__builtin_expect(!!((void *)s-&gt;code_ptr &gt; s-&gt;code_gen_highwater), 0)" data-ref="_M/unlikely">unlikely</a>((<em>void</em> *)<a class="local col5 ref" href="#85s" title='s' data-ref="85s">s</a>-&gt;<a class="ref" href="tcg.h.html#TCGContext::code_ptr" title='TCGContext::code_ptr' data-ref="TCGContext::code_ptr">code_ptr</a> &gt; <a class="local col5 ref" href="#85s" title='s' data-ref="85s">s</a>-&gt;<a class="ref" href="tcg.h.html#TCGContext::code_gen_highwater" title='TCGContext::code_gen_highwater' data-ref="TCGContext::code_gen_highwater">code_gen_highwater</a>)) {</td></tr>
+<tr><th id="76">76</th><td>            <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="77">77</th><td>        }</td></tr>
+<tr><th id="78">78</th><td>    }</td></tr>
+<tr><th id="79">79</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="80">80</th><td>}</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i>/*</i></td></tr>
+<tr><th id="83">83</th><td><i> * Allocate a new TCGLabelQemuLdst entry.</i></td></tr>
+<tr><th id="84">84</th><td><i> */</i></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><em>static</em> <b>inline</b> <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="decl def" id="new_ldst_label" title='new_ldst_label' data-ref="new_ldst_label">new_ldst_label</dfn>(<a class="typedef" href="tcg.h.html#TCGContext" title='TCGContext' data-type='struct TCGContext' data-ref="TCGContext">TCGContext</a> *<dfn class="local col7 decl" id="87s" title='s' data-type='TCGContext *' data-ref="87s">s</dfn>)</td></tr>
+<tr><th id="87">87</th><td>{</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="#TCGBackendData" title='TCGBackendData' data-type='struct TCGBackendData' data-ref="TCGBackendData">TCGBackendData</a> *<dfn class="local col8 decl" id="88be" title='be' data-type='TCGBackendData *' data-ref="88be">be</dfn> = <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="ref" href="tcg.h.html#TCGContext::be" title='TCGContext::be' data-ref="TCGContext::be">be</a>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="#TCGLabelQemuLdst" title='TCGLabelQemuLdst' data-type='struct TCGLabelQemuLdst' data-ref="TCGLabelQemuLdst">TCGLabelQemuLdst</a> *<dfn class="local col9 decl" id="89l" title='l' data-type='TCGLabelQemuLdst *' data-ref="89l">l</dfn> = <a class="ref" href="tcg.h.html#tcg_malloc" title='tcg_malloc' data-ref="tcg_malloc">tcg_malloc</a>(<b>sizeof</b>(*<a class="local col9 ref" href="#89l" title='l' data-ref="89l">l</a>));</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>    <a class="local col9 ref" href="#89l" title='l' data-ref="89l">l</a>-&gt;<a class="ref" href="#TCGLabelQemuLdst::next" title='TCGLabelQemuLdst::next' data-ref="TCGLabelQemuLdst::next">next</a> = <a class="local col8 ref" href="#88be" title='be' data-ref="88be">be</a>-&gt;<a class="ref" href="#TCGBackendData::labels" title='TCGBackendData::labels' data-ref="TCGBackendData::labels">labels</a>;</td></tr>
+<tr><th id="92">92</th><td>    <a class="local col8 ref" href="#88be" title='be' data-ref="88be">be</a>-&gt;<a class="ref" href="#TCGBackendData::labels" title='TCGBackendData::labels' data-ref="TCGBackendData::labels">labels</a> = <a class="local col9 ref" href="#89l" title='l' data-ref="89l">l</a>;</td></tr>
+<tr><th id="93">93</th><td>    <b>return</b> <a class="local col9 ref" href="#89l" title='l' data-ref="89l">l</a>;</td></tr>
+<tr><th id="94">94</th><td>}</td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="23">else</span></u></td></tr>
+<tr><th id="96">96</th><td><u>#include "tcg-be-null.h"</u></td></tr>
+<tr><th id="97">97</th><td><u>#<span data-ppcond="23">endif</span> /* CONFIG_SOFTMMU */</u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='tcg.c.html'>codebrowser/tcg/tcg.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,1009 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pc.h source code [codebrowser/include/hw/i386/pc.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="GSIState,PCMachineClass,PCMachineState,vga_retrace_method "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/i386/pc.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='pc.h.html'>pc.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/HW_PC_H">HW_PC_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/HW_PC_H" data-ref="_M/HW_PC_H">HW_PC_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="../../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="../boards.h.html">"hw/boards.h"</a></u></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="../isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="../block/fdc.h.html">"hw/block/fdc.h"</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../../net/net.h.html">"net/net.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="ioapic.h.html">"hw/i386/ioapic.h"</a></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../../qemu/range.h.html">"qemu/range.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../../qemu/bitmap.h.html">"qemu/bitmap.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../../sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../compat.h.html">"hw/compat.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../mem/pc-dimm.h.html">"hw/mem/pc-dimm.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../mem/nvdimm.h.html">"hw/mem/nvdimm.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../acpi/acpi_dev_interface.h.html">"hw/acpi/acpi_dev_interface.h"</a></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/HPET_INTCAP" data-ref="_M/HPET_INTCAP">HPET_INTCAP</dfn> "hpet-intcap"</u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * PCMachineState:</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> *<span class="command"> @acpi</span>_dev: link to ACPI PM device that performs ACPI hotplug handling</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> *<span class="command"> @boot</span>_cpus: number of present VCPUs</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="28">28</th><td><b>struct</b> <dfn class="type def" id="PCMachineState" title='PCMachineState' data-ref="PCMachineState">PCMachineState</dfn> {</td></tr>
+<tr><th id="29">29</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> <dfn class="decl" id="PCMachineState::parent_obj" title='PCMachineState::parent_obj' data-ref="PCMachineState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td>    <i>/* &lt;public&gt; */</i></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>    <i>/* State for other subsystems/APIs: */</i></td></tr>
+<tr><th id="35">35</th><td>    <a class="typedef" href="../mem/pc-dimm.h.html#MemoryHotplugState" title='MemoryHotplugState' data-type='struct MemoryHotplugState' data-ref="MemoryHotplugState">MemoryHotplugState</a> <dfn class="decl" id="PCMachineState::hotplug_memory" title='PCMachineState::hotplug_memory' data-ref="PCMachineState::hotplug_memory">hotplug_memory</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> <dfn class="decl" id="PCMachineState::machine_done" title='PCMachineState::machine_done' data-ref="PCMachineState::machine_done">machine_done</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td>    <i>/* Pointers to devices and objects: */</i></td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../hotplug.h.html#HotplugHandler" title='HotplugHandler' data-type='struct HotplugHandler' data-ref="HotplugHandler">HotplugHandler</a> *<dfn class="decl" id="PCMachineState::acpi_dev" title='PCMachineState::acpi_dev' data-ref="PCMachineState::acpi_dev">acpi_dev</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="decl" id="PCMachineState::rtc" title='PCMachineState::rtc' data-ref="PCMachineState::rtc">rtc</dfn>;</td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="decl" id="PCMachineState::bus" title='PCMachineState::bus' data-ref="PCMachineState::bus">bus</dfn>;</td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#FWCfgState" title='FWCfgState' data-type='struct FWCfgState' data-ref="FWCfgState">FWCfgState</a> *<dfn class="decl" id="PCMachineState::fw_cfg" title='PCMachineState::fw_cfg' data-ref="PCMachineState::fw_cfg">fw_cfg</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> *<dfn class="decl" id="PCMachineState::gsi" title='PCMachineState::gsi' data-ref="PCMachineState::gsi">gsi</dfn>;</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <i>/* Configuration options: */</i></td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="PCMachineState::max_ram_below_4g" title='PCMachineState::max_ram_below_4g' data-ref="PCMachineState::max_ram_below_4g">max_ram_below_4g</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../qapi-types.h.html#OnOffAuto" title='OnOffAuto' data-type='enum OnOffAuto' data-ref="OnOffAuto">OnOffAuto</a> <dfn class="decl" id="PCMachineState::vmport" title='PCMachineState::vmport' data-ref="PCMachineState::vmport">vmport</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../../qapi-types.h.html#OnOffAuto" title='OnOffAuto' data-type='enum OnOffAuto' data-ref="OnOffAuto">OnOffAuto</a> <dfn class="decl" id="PCMachineState::smm" title='PCMachineState::smm' data-ref="PCMachineState::smm">smm</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../mem/nvdimm.h.html#AcpiNVDIMMState" title='AcpiNVDIMMState' data-type='struct AcpiNVDIMMState' data-ref="AcpiNVDIMMState">AcpiNVDIMMState</a> <dfn class="decl" id="PCMachineState::acpi_nvdimm_state" title='PCMachineState::acpi_nvdimm_state' data-ref="PCMachineState::acpi_nvdimm_state">acpi_nvdimm_state</dfn>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineState::acpi_build_enabled" title='PCMachineState::acpi_build_enabled' data-ref="PCMachineState::acpi_build_enabled">acpi_build_enabled</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineState::smbus" title='PCMachineState::smbus' data-ref="PCMachineState::smbus">smbus</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineState::sata" title='PCMachineState::sata' data-ref="PCMachineState::sata">sata</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineState::pit" title='PCMachineState::pit' data-ref="PCMachineState::pit">pit</dfn>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <i>/* RAM information (sizes, addresses, configuration): */</i></td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="decl" id="PCMachineState::below_4g_mem_size" title='PCMachineState::below_4g_mem_size' data-ref="PCMachineState::below_4g_mem_size">below_4g_mem_size</dfn>, <dfn class="decl" id="PCMachineState::above_4g_mem_size" title='PCMachineState::above_4g_mem_size' data-ref="PCMachineState::above_4g_mem_size">above_4g_mem_size</dfn>;</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>    <i>/* CPU and apic information: */</i></td></tr>
+<tr><th id="61">61</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineState::apic_xrupt_override" title='PCMachineState::apic_xrupt_override' data-ref="PCMachineState::apic_xrupt_override">apic_xrupt_override</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <em>unsigned</em> <dfn class="decl" id="PCMachineState::apic_id_limit" title='PCMachineState::apic_id_limit' data-ref="PCMachineState::apic_id_limit">apic_id_limit</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCMachineState::boot_cpus" title='PCMachineState::boot_cpus' data-ref="PCMachineState::boot_cpus">boot_cpus</dfn>;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <i>/* NUMA information: */</i></td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="PCMachineState::numa_nodes" title='PCMachineState::numa_nodes' data-ref="PCMachineState::numa_nodes">numa_nodes</dfn>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="decl" id="PCMachineState::node_mem" title='PCMachineState::node_mem' data-ref="PCMachineState::node_mem">node_mem</dfn>;</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <i>/* Address space used by IOAPIC device. All IOAPIC interrupts</i></td></tr>
+<tr><th id="70">70</th><td><i>     * will be translated to MSI messages in the address space. */</i></td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="decl" id="PCMachineState::ioapic_as" title='PCMachineState::ioapic_as' data-ref="PCMachineState::ioapic_as">ioapic_as</dfn>;</td></tr>
+<tr><th id="72">72</th><td>};</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_ACPI_DEVICE_PROP" data-ref="_M/PC_MACHINE_ACPI_DEVICE_PROP">PC_MACHINE_ACPI_DEVICE_PROP</dfn> "acpi-device"</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_MEMHP_REGION_SIZE" data-ref="_M/PC_MACHINE_MEMHP_REGION_SIZE">PC_MACHINE_MEMHP_REGION_SIZE</dfn> "hotplug-memory-region-size"</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_MAX_RAM_BELOW_4G" data-ref="_M/PC_MACHINE_MAX_RAM_BELOW_4G">PC_MACHINE_MAX_RAM_BELOW_4G</dfn> "max-ram-below-4g"</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_VMPORT" data-ref="_M/PC_MACHINE_VMPORT">PC_MACHINE_VMPORT</dfn>           "vmport"</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_SMM" data-ref="_M/PC_MACHINE_SMM">PC_MACHINE_SMM</dfn>              "smm"</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_NVDIMM" data-ref="_M/PC_MACHINE_NVDIMM">PC_MACHINE_NVDIMM</dfn>           "nvdimm"</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_SMBUS" data-ref="_M/PC_MACHINE_SMBUS">PC_MACHINE_SMBUS</dfn>            "smbus"</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_SATA" data-ref="_M/PC_MACHINE_SATA">PC_MACHINE_SATA</dfn>             "sata"</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_PIT" data-ref="_M/PC_MACHINE_PIT">PC_MACHINE_PIT</dfn>              "pit"</u></td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> * PCMachineClass:</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> * Methods:</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> *<span class="command"> @get</span>_hotplug_handler: pointer to parent class callback<span class="command"> @get</span>_hotplug_handler</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> * Compat fields:</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> *<span class="command"> @enforce</span>_aligned_dimm: check that DIMM's address/size is aligned by</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> *                        backend's alignment value if provided</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *<span class="command"> @acpi</span>_data_size: Size of the chunk of memory at the top of RAM</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *                  for the BIOS ACPI tables and other BIOS</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *                  datastructures.</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *<span class="command"> @gigabyte</span>_align: Make sure that guest addresses aligned at</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> *                  1Gbyte boundaries get mapped to host</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> *                  addresses aligned at 1Gbyte boundaries. This</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> *                  way we can use 1GByte pages in the host.</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="104">104</th><td><b>struct</b> <dfn class="type def" id="PCMachineClass" title='PCMachineClass' data-ref="PCMachineClass">PCMachineClass</dfn> {</td></tr>
+<tr><th id="105">105</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MachineClass" title='MachineClass' data-type='struct MachineClass' data-ref="MachineClass">MachineClass</a> <dfn class="decl" id="PCMachineClass::parent_class" title='PCMachineClass::parent_class' data-ref="PCMachineClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <i>/* Methods: */</i></td></tr>
+<tr><th id="111">111</th><td>    <a class="typedef" href="../hotplug.h.html#HotplugHandler" title='HotplugHandler' data-type='struct HotplugHandler' data-ref="HotplugHandler">HotplugHandler</a> *(*<dfn class="decl" id="PCMachineClass::get_hotplug_handler" title='PCMachineClass::get_hotplug_handler' data-ref="PCMachineClass::get_hotplug_handler">get_hotplug_handler</dfn>)(<a class="typedef" href="../../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col2 decl" id="62machine" title='machine' data-type='MachineState *' data-ref="62machine">machine</dfn>,</td></tr>
+<tr><th id="112">112</th><td>                                           <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col3 decl" id="63dev" title='dev' data-type='DeviceState *' data-ref="63dev">dev</dfn>);</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>    <i>/* Device configuration: */</i></td></tr>
+<tr><th id="115">115</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::pci_enabled" title='PCMachineClass::pci_enabled' data-ref="PCMachineClass::pci_enabled">pci_enabled</dfn>;</td></tr>
+<tr><th id="116">116</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::kvmclock_enabled" title='PCMachineClass::kvmclock_enabled' data-ref="PCMachineClass::kvmclock_enabled">kvmclock_enabled</dfn>;</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>    <i>/* Compat options: */</i></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <i>/* ACPI compat: */</i></td></tr>
+<tr><th id="121">121</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::has_acpi_build" title='PCMachineClass::has_acpi_build' data-ref="PCMachineClass::has_acpi_build">has_acpi_build</dfn>;</td></tr>
+<tr><th id="122">122</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::rsdp_in_ram" title='PCMachineClass::rsdp_in_ram' data-ref="PCMachineClass::rsdp_in_ram">rsdp_in_ram</dfn>;</td></tr>
+<tr><th id="123">123</th><td>    <em>int</em> <dfn class="decl" id="PCMachineClass::legacy_acpi_table_size" title='PCMachineClass::legacy_acpi_table_size' data-ref="PCMachineClass::legacy_acpi_table_size">legacy_acpi_table_size</dfn>;</td></tr>
+<tr><th id="124">124</th><td>    <em>unsigned</em> <dfn class="decl" id="PCMachineClass::acpi_data_size" title='PCMachineClass::acpi_data_size' data-ref="PCMachineClass::acpi_data_size">acpi_data_size</dfn>;</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <i>/* SMBIOS compat: */</i></td></tr>
+<tr><th id="127">127</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::smbios_defaults" title='PCMachineClass::smbios_defaults' data-ref="PCMachineClass::smbios_defaults">smbios_defaults</dfn>;</td></tr>
+<tr><th id="128">128</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::smbios_legacy_mode" title='PCMachineClass::smbios_legacy_mode' data-ref="PCMachineClass::smbios_legacy_mode">smbios_legacy_mode</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::smbios_uuid_encoded" title='PCMachineClass::smbios_uuid_encoded' data-ref="PCMachineClass::smbios_uuid_encoded">smbios_uuid_encoded</dfn>;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <i>/* RAM / address space compat: */</i></td></tr>
+<tr><th id="132">132</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::gigabyte_align" title='PCMachineClass::gigabyte_align' data-ref="PCMachineClass::gigabyte_align">gigabyte_align</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::has_reserved_memory" title='PCMachineClass::has_reserved_memory' data-ref="PCMachineClass::has_reserved_memory">has_reserved_memory</dfn>;</td></tr>
+<tr><th id="134">134</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::enforce_aligned_dimm" title='PCMachineClass::enforce_aligned_dimm' data-ref="PCMachineClass::enforce_aligned_dimm">enforce_aligned_dimm</dfn>;</td></tr>
+<tr><th id="135">135</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::broken_reserved_end" title='PCMachineClass::broken_reserved_end' data-ref="PCMachineClass::broken_reserved_end">broken_reserved_end</dfn>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <i>/* TSC rate migration: */</i></td></tr>
+<tr><th id="138">138</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::save_tsc_khz" title='PCMachineClass::save_tsc_khz' data-ref="PCMachineClass::save_tsc_khz">save_tsc_khz</dfn>;</td></tr>
+<tr><th id="139">139</th><td>    <i>/* generate legacy CPU hotplug AML */</i></td></tr>
+<tr><th id="140">140</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::legacy_cpu_hotplug" title='PCMachineClass::legacy_cpu_hotplug' data-ref="PCMachineClass::legacy_cpu_hotplug">legacy_cpu_hotplug</dfn>;</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    <i>/* use DMA capable linuxboot option rom */</i></td></tr>
+<tr><th id="143">143</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PCMachineClass::linuxboot_dma_enabled" title='PCMachineClass::linuxboot_dma_enabled' data-ref="PCMachineClass::linuxboot_dma_enabled">linuxboot_dma_enabled</dfn>;</td></tr>
+<tr><th id="144">144</th><td>};</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/TYPE_PC_MACHINE" data-ref="_M/TYPE_PC_MACHINE">TYPE_PC_MACHINE</dfn> "generic-pc-machine"</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE" data-ref="_M/PC_MACHINE">PC_MACHINE</dfn>(obj) \</u></td></tr>
+<tr><th id="148">148</th><td><u>    OBJECT_CHECK(PCMachineState, (obj), TYPE_PC_MACHINE)</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_GET_CLASS" data-ref="_M/PC_MACHINE_GET_CLASS">PC_MACHINE_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="150">150</th><td><u>    OBJECT_GET_CLASS(PCMachineClass, (obj), TYPE_PC_MACHINE)</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/PC_MACHINE_CLASS" data-ref="_M/PC_MACHINE_CLASS">PC_MACHINE_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="152">152</th><td><u>    OBJECT_CLASS_CHECK(PCMachineClass, (klass), TYPE_PC_MACHINE)</u></td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><i>/* PC-style peripherals (also used by other machines).  */</i></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_S3_DISABLED" data-ref="_M/ACPI_PM_PROP_S3_DISABLED">ACPI_PM_PROP_S3_DISABLED</dfn> "disable_s3"</u></td></tr>
+<tr><th id="157">157</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_S4_DISABLED" data-ref="_M/ACPI_PM_PROP_S4_DISABLED">ACPI_PM_PROP_S4_DISABLED</dfn> "disable_s4"</u></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_S4_VAL" data-ref="_M/ACPI_PM_PROP_S4_VAL">ACPI_PM_PROP_S4_VAL</dfn> "s4_val"</u></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_SCI_INT" data-ref="_M/ACPI_PM_PROP_SCI_INT">ACPI_PM_PROP_SCI_INT</dfn> "sci_int"</u></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_ACPI_ENABLE_CMD" data-ref="_M/ACPI_PM_PROP_ACPI_ENABLE_CMD">ACPI_PM_PROP_ACPI_ENABLE_CMD</dfn> "acpi_enable_cmd"</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_ACPI_DISABLE_CMD" data-ref="_M/ACPI_PM_PROP_ACPI_DISABLE_CMD">ACPI_PM_PROP_ACPI_DISABLE_CMD</dfn> "acpi_disable_cmd"</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_PM_IO_BASE" data-ref="_M/ACPI_PM_PROP_PM_IO_BASE">ACPI_PM_PROP_PM_IO_BASE</dfn> "pm_io_base"</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_GPE0_BLK" data-ref="_M/ACPI_PM_PROP_GPE0_BLK">ACPI_PM_PROP_GPE0_BLK</dfn> "gpe0_blk"</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_GPE0_BLK_LEN" data-ref="_M/ACPI_PM_PROP_GPE0_BLK_LEN">ACPI_PM_PROP_GPE0_BLK_LEN</dfn> "gpe0_blk_len"</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_PROP_TCO_ENABLED" data-ref="_M/ACPI_PM_PROP_TCO_ENABLED">ACPI_PM_PROP_TCO_ENABLED</dfn> "enable_tco"</u></td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><i>/* parallel.c */</i></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><em>void</em> <dfn class="decl" id="parallel_hds_isa_init" title='parallel_hds_isa_init' data-ref="parallel_hds_isa_init">parallel_hds_isa_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col4 decl" id="64bus" title='bus' data-type='ISABus *' data-ref="64bus">bus</dfn>, <em>int</em> <dfn class="local col5 decl" id="65n" title='n' data-type='int' data-ref="65n">n</dfn>);</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="parallel_mm_init" title='parallel_mm_init' data-ref="parallel_mm_init">parallel_mm_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col6 decl" id="66address_space" title='address_space' data-type='MemoryRegion *' data-ref="66address_space">address_space</dfn>,</td></tr>
+<tr><th id="172">172</th><td>                      <a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col7 decl" id="67base" title='base' data-type='hwaddr' data-ref="67base">base</dfn>, <em>int</em> <dfn class="local col8 decl" id="68it_shift" title='it_shift' data-type='int' data-ref="68it_shift">it_shift</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col9 decl" id="69irq" title='irq' data-type='qemu_irq' data-ref="69irq">irq</dfn>,</td></tr>
+<tr><th id="173">173</th><td>                      <a class="typedef" href="../../qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col0 decl" id="70chr" title='chr' data-type='Chardev *' data-ref="70chr">chr</dfn>);</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><i>/* i8259.c */</i></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><b>extern</b> <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="isa_pic" title='isa_pic' data-ref="isa_pic">isa_pic</dfn>;</td></tr>
+<tr><th id="178">178</th><td><a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> *<dfn class="decl" id="i8259_init" title='i8259_init' data-ref="i8259_init">i8259_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col1 decl" id="71bus" title='bus' data-type='ISABus *' data-ref="71bus">bus</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col2 decl" id="72parent_irq" title='parent_irq' data-type='qemu_irq' data-ref="72parent_irq">parent_irq</dfn>);</td></tr>
+<tr><th id="179">179</th><td><a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> *<dfn class="decl" id="kvm_i8259_init" title='kvm_i8259_init' data-ref="kvm_i8259_init">kvm_i8259_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col3 decl" id="73bus" title='bus' data-type='ISABus *' data-ref="73bus">bus</dfn>);</td></tr>
+<tr><th id="180">180</th><td><em>int</em> <dfn class="decl" id="pic_read_irq" title='pic_read_irq' data-ref="pic_read_irq">pic_read_irq</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col4 decl" id="74d" title='d' data-type='DeviceState *' data-ref="74d">d</dfn>);</td></tr>
+<tr><th id="181">181</th><td><em>int</em> <dfn class="decl" id="pic_get_output" title='pic_get_output' data-ref="pic_get_output">pic_get_output</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col5 decl" id="75d" title='d' data-type='DeviceState *' data-ref="75d">d</dfn>);</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td><i>/* ioapic.c */</i></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><em>void</em> <dfn class="decl" id="kvm_ioapic_dump_state" title='kvm_ioapic_dump_state' data-ref="kvm_ioapic_dump_state">kvm_ioapic_dump_state</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#Monitor" title='Monitor' data-type='struct Monitor' data-ref="Monitor">Monitor</a> *<dfn class="local col6 decl" id="76mon" title='mon' data-type='Monitor *' data-ref="76mon">mon</dfn>, <em>const</em> <a class="typedef" href="../../qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col7 decl" id="77qdict" title='qdict' data-type='const QDict *' data-ref="77qdict">qdict</dfn>);</td></tr>
+<tr><th id="186">186</th><td><em>void</em> <dfn class="decl" id="ioapic_dump_state" title='ioapic_dump_state' data-ref="ioapic_dump_state">ioapic_dump_state</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#Monitor" title='Monitor' data-type='struct Monitor' data-ref="Monitor">Monitor</a> *<dfn class="local col8 decl" id="78mon" title='mon' data-type='Monitor *' data-ref="78mon">mon</dfn>, <em>const</em> <a class="typedef" href="../../qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col9 decl" id="79qdict" title='qdict' data-type='const QDict *' data-ref="79qdict">qdict</dfn>);</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><i>/* Global System Interrupts */</i></td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><u>#define <dfn class="macro" id="_M/GSI_NUM_PINS" data-ref="_M/GSI_NUM_PINS">GSI_NUM_PINS</dfn> IOAPIC_NUM_PINS</u></td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="GSIState" title='GSIState' data-ref="GSIState"><a class="type" href="#GSIState" title='GSIState' data-ref="GSIState">GSIState</a></dfn> {</td></tr>
+<tr><th id="193">193</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="GSIState::i8259_irq" title='GSIState::i8259_irq' data-ref="GSIState::i8259_irq">i8259_irq</dfn>[<a class="macro" href="../isa/isa.h.html#10" title="16" data-ref="_M/ISA_NUM_IRQS">ISA_NUM_IRQS</a>];</td></tr>
+<tr><th id="194">194</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="GSIState::ioapic_irq" title='GSIState::ioapic_irq' data-ref="GSIState::ioapic_irq">ioapic_irq</dfn>[<a class="macro" href="ioapic.h.html#23" title="24" data-ref="_M/IOAPIC_NUM_PINS">IOAPIC_NUM_PINS</a>];</td></tr>
+<tr><th id="195">195</th><td>} <dfn class="typedef" id="GSIState" title='GSIState' data-type='struct GSIState' data-ref="GSIState">GSIState</dfn>;</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td><em>void</em> <dfn class="decl" id="gsi_handler" title='gsi_handler' data-ref="gsi_handler">gsi_handler</dfn>(<em>void</em> *<dfn class="local col0 decl" id="80opaque" title='opaque' data-type='void *' data-ref="80opaque">opaque</dfn>, <em>int</em> <dfn class="local col1 decl" id="81n" title='n' data-type='int' data-ref="81n">n</dfn>, <em>int</em> <dfn class="local col2 decl" id="82level" title='level' data-type='int' data-ref="82level">level</dfn>);</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><i>/* vmport.c */</i></td></tr>
+<tr><th id="200">200</th><td><u>#define <dfn class="macro" id="_M/TYPE_VMPORT" data-ref="_M/TYPE_VMPORT">TYPE_VMPORT</dfn> "vmport"</u></td></tr>
+<tr><th id="201">201</th><td><b>typedef</b> <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> (<dfn class="typedef" id="VMPortReadFunc" title='VMPortReadFunc' data-type='uint32_t (void *, uint32_t)' data-ref="VMPortReadFunc">VMPortReadFunc</dfn>)(<em>void</em> *<dfn class="local col3 decl" id="83opaque" title='opaque' data-type='void *' data-ref="83opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="84address" title='address' data-type='uint32_t' data-ref="84address">address</dfn>);</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="vmport_init" title='vmport_init' data-ref="vmport_init">vmport_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col5 decl" id="85bus" title='bus' data-type='ISABus *' data-ref="85bus">bus</dfn>)</td></tr>
+<tr><th id="204">204</th><td>{</td></tr>
+<tr><th id="205">205</th><td>    <a class="ref" href="../isa/isa.h.html#isa_create_simple" title='isa_create_simple' data-ref="isa_create_simple">isa_create_simple</a>(<a class="local col5 ref" href="#85bus" title='bus' data-ref="85bus">bus</a>, <a class="macro" href="#200" title="&quot;vmport&quot;" data-ref="_M/TYPE_VMPORT">TYPE_VMPORT</a>);</td></tr>
+<tr><th id="206">206</th><td>}</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><em>void</em> <dfn class="decl" id="vmport_register" title='vmport_register' data-ref="vmport_register">vmport_register</dfn>(<em>unsigned</em> <em>char</em> <dfn class="local col6 decl" id="86command" title='command' data-type='unsigned char' data-ref="86command">command</dfn>, <a class="typedef" href="#VMPortReadFunc" title='VMPortReadFunc' data-type='uint32_t (void *, uint32_t)' data-ref="VMPortReadFunc">VMPortReadFunc</a> *<dfn class="local col7 decl" id="87func" title='func' data-type='VMPortReadFunc *' data-ref="87func">func</dfn>, <em>void</em> *<dfn class="local col8 decl" id="88opaque" title='opaque' data-type='void *' data-ref="88opaque">opaque</dfn>);</td></tr>
+<tr><th id="209">209</th><td><em>void</em> <dfn class="decl" id="vmmouse_get_data" title='vmmouse_get_data' data-ref="vmmouse_get_data">vmmouse_get_data</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col9 decl" id="89data" title='data' data-type='uint32_t *' data-ref="89data">data</dfn>);</td></tr>
+<tr><th id="210">210</th><td><em>void</em> <dfn class="decl" id="vmmouse_set_data" title='vmmouse_set_data' data-ref="vmmouse_set_data">vmmouse_set_data</dfn>(<em>const</em> <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col0 decl" id="90data" title='data' data-type='const uint32_t *' data-ref="90data">data</dfn>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><i>/* pckbd.c */</i></td></tr>
+<tr><th id="213">213</th><td><u>#define <dfn class="macro" id="_M/I8042_A20_LINE" data-ref="_M/I8042_A20_LINE">I8042_A20_LINE</dfn> "a20"</u></td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td><em>void</em> <dfn class="decl" id="i8042_mm_init" title='i8042_mm_init' data-ref="i8042_mm_init">i8042_mm_init</dfn>(<a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col1 decl" id="91kbd_irq" title='kbd_irq' data-type='qemu_irq' data-ref="91kbd_irq">kbd_irq</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col2 decl" id="92mouse_irq" title='mouse_irq' data-type='qemu_irq' data-ref="92mouse_irq">mouse_irq</dfn>,</td></tr>
+<tr><th id="216">216</th><td>                   <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col3 decl" id="93region" title='region' data-type='MemoryRegion *' data-ref="93region">region</dfn>, <a class="typedef" href="../../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col4 decl" id="94size" title='size' data-type='ram_addr_t' data-ref="94size">size</dfn>,</td></tr>
+<tr><th id="217">217</th><td>                   <a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="95mask" title='mask' data-type='hwaddr' data-ref="95mask">mask</dfn>);</td></tr>
+<tr><th id="218">218</th><td><em>void</em> <dfn class="decl" id="i8042_isa_mouse_fake_event" title='i8042_isa_mouse_fake_event' data-ref="i8042_isa_mouse_fake_event">i8042_isa_mouse_fake_event</dfn>(<em>void</em> *<dfn class="local col6 decl" id="96opaque" title='opaque' data-type='void *' data-ref="96opaque">opaque</dfn>);</td></tr>
+<tr><th id="219">219</th><td><em>void</em> <dfn class="decl" id="i8042_setup_a20_line" title='i8042_setup_a20_line' data-ref="i8042_setup_a20_line">i8042_setup_a20_line</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col7 decl" id="97dev" title='dev' data-type='ISADevice *' data-ref="97dev">dev</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col8 decl" id="98a20_out" title='a20_out' data-type='qemu_irq' data-ref="98a20_out">a20_out</dfn>);</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><i>/* pc.c */</i></td></tr>
+<tr><th id="222">222</th><td><b>extern</b> <em>int</em> <dfn class="decl" id="fd_bootchk" title='fd_bootchk' data-ref="fd_bootchk">fd_bootchk</dfn>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="pc_machine_is_smm_enabled" title='pc_machine_is_smm_enabled' data-ref="pc_machine_is_smm_enabled">pc_machine_is_smm_enabled</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col9 decl" id="99pcms" title='pcms' data-type='PCMachineState *' data-ref="99pcms">pcms</dfn>);</td></tr>
+<tr><th id="225">225</th><td><em>void</em> <dfn class="decl" id="pc_register_ferr_irq" title='pc_register_ferr_irq' data-ref="pc_register_ferr_irq">pc_register_ferr_irq</dfn>(<a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col0 decl" id="100irq" title='irq' data-type='qemu_irq' data-ref="100irq">irq</dfn>);</td></tr>
+<tr><th id="226">226</th><td><em>void</em> <dfn class="decl" id="pc_acpi_smi_interrupt" title='pc_acpi_smi_interrupt' data-ref="pc_acpi_smi_interrupt">pc_acpi_smi_interrupt</dfn>(<em>void</em> *<dfn class="local col1 decl" id="101opaque" title='opaque' data-type='void *' data-ref="101opaque">opaque</dfn>, <em>int</em> <dfn class="local col2 decl" id="102irq" title='irq' data-type='int' data-ref="102irq">irq</dfn>, <em>int</em> <dfn class="local col3 decl" id="103level" title='level' data-type='int' data-ref="103level">level</dfn>);</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><em>void</em> <dfn class="decl" id="pc_cpus_init" title='pc_cpus_init' data-ref="pc_cpus_init">pc_cpus_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col4 decl" id="104pcms" title='pcms' data-type='PCMachineState *' data-ref="104pcms">pcms</dfn>);</td></tr>
+<tr><th id="229">229</th><td><em>void</em> <dfn class="decl" id="pc_hot_add_cpu" title='pc_hot_add_cpu' data-ref="pc_hot_add_cpu">pc_hot_add_cpu</dfn>(<em>const</em> <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col5 decl" id="105id" title='id' data-type='const int64_t' data-ref="105id">id</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="106errp" title='errp' data-type='Error **' data-ref="106errp">errp</dfn>);</td></tr>
+<tr><th id="230">230</th><td><em>void</em> <dfn class="decl" id="pc_acpi_init" title='pc_acpi_init' data-ref="pc_acpi_init">pc_acpi_init</dfn>(<em>const</em> <em>char</em> *<dfn class="local col7 decl" id="107default_dsdt" title='default_dsdt' data-type='const char *' data-ref="107default_dsdt">default_dsdt</dfn>);</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><em>void</em> <dfn class="decl" id="pc_guest_info_init" title='pc_guest_info_init' data-ref="pc_guest_info_init">pc_guest_info_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col8 decl" id="108pcms" title='pcms' data-type='PCMachineState *' data-ref="108pcms">pcms</dfn>);</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_PROP_PCI_HOLE_START" data-ref="_M/PCI_HOST_PROP_PCI_HOLE_START">PCI_HOST_PROP_PCI_HOLE_START</dfn>   "pci-hole-start"</u></td></tr>
+<tr><th id="235">235</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_PROP_PCI_HOLE_END" data-ref="_M/PCI_HOST_PROP_PCI_HOLE_END">PCI_HOST_PROP_PCI_HOLE_END</dfn>     "pci-hole-end"</u></td></tr>
+<tr><th id="236">236</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_PROP_PCI_HOLE64_START" data-ref="_M/PCI_HOST_PROP_PCI_HOLE64_START">PCI_HOST_PROP_PCI_HOLE64_START</dfn> "pci-hole64-start"</u></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_PROP_PCI_HOLE64_END" data-ref="_M/PCI_HOST_PROP_PCI_HOLE64_END">PCI_HOST_PROP_PCI_HOLE64_END</dfn>   "pci-hole64-end"</u></td></tr>
+<tr><th id="238">238</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_PROP_PCI_HOLE64_SIZE" data-ref="_M/PCI_HOST_PROP_PCI_HOLE64_SIZE">PCI_HOST_PROP_PCI_HOLE64_SIZE</dfn>  "pci-hole64-size"</u></td></tr>
+<tr><th id="239">239</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_BELOW_4G_MEM_SIZE" data-ref="_M/PCI_HOST_BELOW_4G_MEM_SIZE">PCI_HOST_BELOW_4G_MEM_SIZE</dfn>     "below-4g-mem-size"</u></td></tr>
+<tr><th id="240">240</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_ABOVE_4G_MEM_SIZE" data-ref="_M/PCI_HOST_ABOVE_4G_MEM_SIZE">PCI_HOST_ABOVE_4G_MEM_SIZE</dfn>     "above-4g-mem-size"</u></td></tr>
+<tr><th id="241">241</th><td><u>#define <dfn class="macro" id="_M/DEFAULT_PCI_HOLE64_SIZE" data-ref="_M/DEFAULT_PCI_HOLE64_SIZE">DEFAULT_PCI_HOLE64_SIZE</dfn> (~0x0ULL)</u></td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><em>void</em> <dfn class="decl" id="pc_pci_as_mapping_init" title='pc_pci_as_mapping_init' data-ref="pc_pci_as_mapping_init">pc_pci_as_mapping_init</dfn>(<a class="typedef" href="../../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col9 decl" id="109owner" title='owner' data-type='Object *' data-ref="109owner">owner</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col0 decl" id="110system_memory" title='system_memory' data-type='MemoryRegion *' data-ref="110system_memory">system_memory</dfn>,</td></tr>
+<tr><th id="245">245</th><td>                            <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col1 decl" id="111pci_address_space" title='pci_address_space' data-type='MemoryRegion *' data-ref="111pci_address_space">pci_address_space</dfn>);</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><em>void</em> <dfn class="decl" id="xen_load_linux" title='xen_load_linux' data-ref="xen_load_linux">xen_load_linux</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col2 decl" id="112pcms" title='pcms' data-type='PCMachineState *' data-ref="112pcms">pcms</dfn>);</td></tr>
+<tr><th id="248">248</th><td><em>void</em> <dfn class="decl" id="pc_memory_init" title='pc_memory_init' data-ref="pc_memory_init">pc_memory_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col3 decl" id="113pcms" title='pcms' data-type='PCMachineState *' data-ref="113pcms">pcms</dfn>,</td></tr>
+<tr><th id="249">249</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col4 decl" id="114system_memory" title='system_memory' data-type='MemoryRegion *' data-ref="114system_memory">system_memory</dfn>,</td></tr>
+<tr><th id="250">250</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col5 decl" id="115rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="115rom_memory">rom_memory</dfn>,</td></tr>
+<tr><th id="251">251</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> **<dfn class="local col6 decl" id="116ram_memory" title='ram_memory' data-type='MemoryRegion **' data-ref="116ram_memory">ram_memory</dfn>);</td></tr>
+<tr><th id="252">252</th><td><a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="pc_allocate_cpu_irq" title='pc_allocate_cpu_irq' data-ref="pc_allocate_cpu_irq">pc_allocate_cpu_irq</dfn>(<em>void</em>);</td></tr>
+<tr><th id="253">253</th><td><a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="pc_vga_init" title='pc_vga_init' data-ref="pc_vga_init">pc_vga_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col7 decl" id="117isa_bus" title='isa_bus' data-type='ISABus *' data-ref="117isa_bus">isa_bus</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col8 decl" id="118pci_bus" title='pci_bus' data-type='PCIBus *' data-ref="118pci_bus">pci_bus</dfn>);</td></tr>
+<tr><th id="254">254</th><td><em>void</em> <dfn class="decl" id="pc_basic_device_init" title='pc_basic_device_init' data-ref="pc_basic_device_init">pc_basic_device_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col9 decl" id="119isa_bus" title='isa_bus' data-type='ISABus *' data-ref="119isa_bus">isa_bus</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> *<dfn class="local col0 decl" id="120gsi" title='gsi' data-type='qemu_irq *' data-ref="120gsi">gsi</dfn>,</td></tr>
+<tr><th id="255">255</th><td>                          <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> **<dfn class="local col1 decl" id="121rtc_state" title='rtc_state' data-type='ISADevice **' data-ref="121rtc_state">rtc_state</dfn>,</td></tr>
+<tr><th id="256">256</th><td>                          <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="122create_fdctrl" title='create_fdctrl' data-type='_Bool' data-ref="122create_fdctrl">create_fdctrl</dfn>,</td></tr>
+<tr><th id="257">257</th><td>                          <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="123no_vmport" title='no_vmport' data-type='_Bool' data-ref="123no_vmport">no_vmport</dfn>,</td></tr>
+<tr><th id="258">258</th><td>                          <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="124has_pit" title='has_pit' data-type='_Bool' data-ref="124has_pit">has_pit</dfn>,</td></tr>
+<tr><th id="259">259</th><td>                          <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="125hpet_irqs" title='hpet_irqs' data-type='uint32_t' data-ref="125hpet_irqs">hpet_irqs</dfn>);</td></tr>
+<tr><th id="260">260</th><td><em>void</em> <dfn class="decl" id="pc_init_ne2k_isa" title='pc_init_ne2k_isa' data-ref="pc_init_ne2k_isa">pc_init_ne2k_isa</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col6 decl" id="126bus" title='bus' data-type='ISABus *' data-ref="126bus">bus</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#NICInfo" title='NICInfo' data-type='struct NICInfo' data-ref="NICInfo">NICInfo</a> *<dfn class="local col7 decl" id="127nd" title='nd' data-type='NICInfo *' data-ref="127nd">nd</dfn>);</td></tr>
+<tr><th id="261">261</th><td><em>void</em> <dfn class="decl" id="pc_cmos_init" title='pc_cmos_init' data-ref="pc_cmos_init">pc_cmos_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCMachineState" title='PCMachineState' data-type='struct PCMachineState' data-ref="PCMachineState">PCMachineState</a> *<dfn class="local col8 decl" id="128pcms" title='pcms' data-type='PCMachineState *' data-ref="128pcms">pcms</dfn>,</td></tr>
+<tr><th id="262">262</th><td>                  <a class="typedef" href="../../qemu/typedefs.h.html#BusState" title='BusState' data-type='struct BusState' data-ref="BusState">BusState</a> *<dfn class="local col9 decl" id="129ide0" title='ide0' data-type='BusState *' data-ref="129ide0">ide0</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#BusState" title='BusState' data-type='struct BusState' data-ref="BusState">BusState</a> *<dfn class="local col0 decl" id="130ide1" title='ide1' data-type='BusState *' data-ref="130ide1">ide1</dfn>,</td></tr>
+<tr><th id="263">263</th><td>                  <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col1 decl" id="131s" title='s' data-type='ISADevice *' data-ref="131s">s</dfn>);</td></tr>
+<tr><th id="264">264</th><td><em>void</em> <dfn class="decl" id="pc_nic_init" title='pc_nic_init' data-ref="pc_nic_init">pc_nic_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col2 decl" id="132isa_bus" title='isa_bus' data-type='ISABus *' data-ref="132isa_bus">isa_bus</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col3 decl" id="133pci_bus" title='pci_bus' data-type='PCIBus *' data-ref="133pci_bus">pci_bus</dfn>);</td></tr>
+<tr><th id="265">265</th><td><em>void</em> <dfn class="decl" id="pc_pci_device_init" title='pc_pci_device_init' data-ref="pc_pci_device_init">pc_pci_device_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col4 decl" id="134pci_bus" title='pci_bus' data-type='PCIBus *' data-ref="134pci_bus">pci_bus</dfn>);</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="cpu_set_smm_t" title='cpu_set_smm_t' data-type='void (*)(int, void *)' data-ref="cpu_set_smm_t">cpu_set_smm_t</dfn>)(<em>int</em> <dfn class="local col5 decl" id="135smm" title='smm' data-type='int' data-ref="135smm">smm</dfn>, <em>void</em> *<dfn class="local col6 decl" id="136arg" title='arg' data-type='void *' data-ref="136arg">arg</dfn>);</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><em>void</em> <dfn class="decl" id="ioapic_init_gsi" title='ioapic_init_gsi' data-ref="ioapic_init_gsi">ioapic_init_gsi</dfn>(<a class="typedef" href="#GSIState" title='GSIState' data-type='struct GSIState' data-ref="GSIState">GSIState</a> *<dfn class="local col7 decl" id="137gsi_state" title='gsi_state' data-type='GSIState *' data-ref="137gsi_state">gsi_state</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="138parent_name" title='parent_name' data-type='const char *' data-ref="138parent_name">parent_name</dfn>);</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="decl" id="pc_find_fdc0" title='pc_find_fdc0' data-ref="pc_find_fdc0">pc_find_fdc0</dfn>(<em>void</em>);</td></tr>
+<tr><th id="272">272</th><td><em>int</em> <dfn class="decl" id="cmos_get_fd_drive_type" title='cmos_get_fd_drive_type' data-ref="cmos_get_fd_drive_type">cmos_get_fd_drive_type</dfn>(<a class="typedef" href="../../../qapi-types.h.html#FloppyDriveType" title='FloppyDriveType' data-type='enum FloppyDriveType' data-ref="FloppyDriveType">FloppyDriveType</a> <dfn class="local col9 decl" id="139fd0" title='fd0' data-type='FloppyDriveType' data-ref="139fd0">fd0</dfn>);</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td><u>#define <dfn class="macro" id="_M/FW_CFG_IO_BASE" data-ref="_M/FW_CFG_IO_BASE">FW_CFG_IO_BASE</dfn>     0x510</u></td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><u>#define <dfn class="macro" id="_M/PORT92_A20_LINE" data-ref="_M/PORT92_A20_LINE">PORT92_A20_LINE</dfn> "a20"</u></td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><i>/* acpi_piix.c */</i></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="decl" id="piix4_pm_init" title='piix4_pm_init' data-ref="piix4_pm_init">piix4_pm_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col0 decl" id="140bus" title='bus' data-type='PCIBus *' data-ref="140bus">bus</dfn>, <em>int</em> <dfn class="local col1 decl" id="141devfn" title='devfn' data-type='int' data-ref="141devfn">devfn</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="142smb_io_base" title='smb_io_base' data-type='uint32_t' data-ref="142smb_io_base">smb_io_base</dfn>,</td></tr>
+<tr><th id="281">281</th><td>                      <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col3 decl" id="143sci_irq" title='sci_irq' data-type='qemu_irq' data-ref="143sci_irq">sci_irq</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col4 decl" id="144smi_irq" title='smi_irq' data-type='qemu_irq' data-ref="144smi_irq">smi_irq</dfn>,</td></tr>
+<tr><th id="282">282</th><td>                      <em>int</em> <dfn class="local col5 decl" id="145smm_enabled" title='smm_enabled' data-type='int' data-ref="145smm_enabled">smm_enabled</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> **<dfn class="local col6 decl" id="146piix4_pm" title='piix4_pm' data-type='DeviceState **' data-ref="146piix4_pm">piix4_pm</dfn>);</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>/* hpet.c */</i></td></tr>
+<tr><th id="285">285</th><td><b>extern</b> <em>int</em> <dfn class="decl" id="no_hpet" title='no_hpet' data-ref="no_hpet">no_hpet</dfn>;</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td><i>/* piix_pci.c */</i></td></tr>
+<tr><th id="288">288</th><td><b>struct</b> <dfn class="type" id="PCII440FXState" title='PCII440FXState' data-ref="PCII440FXState">PCII440FXState</dfn>;</td></tr>
+<tr><th id="289">289</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#PCII440FXState" title='PCII440FXState' data-ref="PCII440FXState">PCII440FXState</a> <dfn class="typedef" id="PCII440FXState" title='PCII440FXState' data-type='struct PCII440FXState' data-ref="PCII440FXState">PCII440FXState</dfn>;</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td><u>#define <dfn class="macro" id="_M/TYPE_I440FX_PCI_HOST_BRIDGE" data-ref="_M/TYPE_I440FX_PCI_HOST_BRIDGE">TYPE_I440FX_PCI_HOST_BRIDGE</dfn> "i440FX-pcihost"</u></td></tr>
+<tr><th id="292">292</th><td><u>#define <dfn class="macro" id="_M/TYPE_I440FX_PCI_DEVICE" data-ref="_M/TYPE_I440FX_PCI_DEVICE">TYPE_I440FX_PCI_DEVICE</dfn> "i440FX"</u></td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td><u>#define <dfn class="macro" id="_M/TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE" data-ref="_M/TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE">TYPE_IGD_PASSTHROUGH_I440FX_PCI_DEVICE</dfn> "igd-passthrough-i440FX"</u></td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td><i>/*</i></td></tr>
+<tr><th id="297">297</th><td><i> * Reset Control Register: PCI-accessible ISA-Compatible Register at address</i></td></tr>
+<tr><th id="298">298</th><td><i> * 0xcf9, provided by the PCI/ISA bridge (PIIX3 PCI function 0, 8086:7000).</i></td></tr>
+<tr><th id="299">299</th><td><i> */</i></td></tr>
+<tr><th id="300">300</th><td><u>#define <dfn class="macro" id="_M/RCR_IOPORT" data-ref="_M/RCR_IOPORT">RCR_IOPORT</dfn> 0xcf9</u></td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td><a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="decl" id="i440fx_init" title='i440fx_init' data-ref="i440fx_init">i440fx_init</dfn>(<em>const</em> <em>char</em> *<dfn class="local col7 decl" id="147host_type" title='host_type' data-type='const char *' data-ref="147host_type">host_type</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="148pci_type" title='pci_type' data-type='const char *' data-ref="148pci_type">pci_type</dfn>,</td></tr>
+<tr><th id="303">303</th><td>                    <a class="typedef" href="#PCII440FXState" title='PCII440FXState' data-type='struct PCII440FXState' data-ref="PCII440FXState">PCII440FXState</a> **<dfn class="local col9 decl" id="149pi440fx_state" title='pi440fx_state' data-type='PCII440FXState **' data-ref="149pi440fx_state">pi440fx_state</dfn>, <em>int</em> *<dfn class="local col0 decl" id="150piix_devfn" title='piix_devfn' data-type='int *' data-ref="150piix_devfn">piix_devfn</dfn>,</td></tr>
+<tr><th id="304">304</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> **<dfn class="local col1 decl" id="151isa_bus" title='isa_bus' data-type='ISABus **' data-ref="151isa_bus">isa_bus</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> *<dfn class="local col2 decl" id="152pic" title='pic' data-type='qemu_irq *' data-ref="152pic">pic</dfn>,</td></tr>
+<tr><th id="305">305</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col3 decl" id="153address_space_mem" title='address_space_mem' data-type='MemoryRegion *' data-ref="153address_space_mem">address_space_mem</dfn>,</td></tr>
+<tr><th id="306">306</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col4 decl" id="154address_space_io" title='address_space_io' data-type='MemoryRegion *' data-ref="154address_space_io">address_space_io</dfn>,</td></tr>
+<tr><th id="307">307</th><td>                    <a class="typedef" href="../../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col5 decl" id="155ram_size" title='ram_size' data-type='ram_addr_t' data-ref="155ram_size">ram_size</dfn>,</td></tr>
+<tr><th id="308">308</th><td>                    <a class="typedef" href="../../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col6 decl" id="156below_4g_mem_size" title='below_4g_mem_size' data-type='ram_addr_t' data-ref="156below_4g_mem_size">below_4g_mem_size</dfn>,</td></tr>
+<tr><th id="309">309</th><td>                    <a class="typedef" href="../../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col7 decl" id="157above_4g_mem_size" title='above_4g_mem_size' data-type='ram_addr_t' data-ref="157above_4g_mem_size">above_4g_mem_size</dfn>,</td></tr>
+<tr><th id="310">310</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col8 decl" id="158pci_memory" title='pci_memory' data-type='MemoryRegion *' data-ref="158pci_memory">pci_memory</dfn>,</td></tr>
+<tr><th id="311">311</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col9 decl" id="159ram_memory" title='ram_memory' data-type='MemoryRegion *' data-ref="159ram_memory">ram_memory</dfn>);</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="decl" id="find_i440fx" title='find_i440fx' data-ref="find_i440fx">find_i440fx</dfn>(<em>void</em>);</td></tr>
+<tr><th id="314">314</th><td><i>/* piix4.c */</i></td></tr>
+<tr><th id="315">315</th><td><b>extern</b> <a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="decl" id="piix4_dev" title='piix4_dev' data-ref="piix4_dev">piix4_dev</dfn>;</td></tr>
+<tr><th id="316">316</th><td><em>int</em> <dfn class="decl" id="piix4_init" title='piix4_init' data-ref="piix4_init">piix4_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col0 decl" id="160bus" title='bus' data-type='PCIBus *' data-ref="160bus">bus</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> **<dfn class="local col1 decl" id="161isa_bus" title='isa_bus' data-type='ISABus **' data-ref="161isa_bus">isa_bus</dfn>, <em>int</em> <dfn class="local col2 decl" id="162devfn" title='devfn' data-type='int' data-ref="162devfn">devfn</dfn>);</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td><i>/* vga.c */</i></td></tr>
+<tr><th id="319">319</th><td><b>enum</b> <dfn class="type def" id="vga_retrace_method" title='vga_retrace_method' data-ref="vga_retrace_method">vga_retrace_method</dfn> {</td></tr>
+<tr><th id="320">320</th><td>    <dfn class="enum" id="vga_retrace_method::VGA_RETRACE_DUMB" title='vga_retrace_method::VGA_RETRACE_DUMB' data-ref="vga_retrace_method::VGA_RETRACE_DUMB">VGA_RETRACE_DUMB</dfn>,</td></tr>
+<tr><th id="321">321</th><td>    <dfn class="enum" id="vga_retrace_method::VGA_RETRACE_PRECISE" title='vga_retrace_method::VGA_RETRACE_PRECISE' data-ref="vga_retrace_method::VGA_RETRACE_PRECISE">VGA_RETRACE_PRECISE</dfn></td></tr>
+<tr><th id="322">322</th><td>};</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><b>extern</b> <b>enum</b> <a class="type" href="#vga_retrace_method" title='vga_retrace_method' data-ref="vga_retrace_method">vga_retrace_method</a> <dfn class="decl" id="vga_retrace_method" title='vga_retrace_method' data-ref="vga_retrace_method">vga_retrace_method</dfn>;</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td><em>int</em> <dfn class="decl" id="isa_vga_mm_init" title='isa_vga_mm_init' data-ref="isa_vga_mm_init">isa_vga_mm_init</dfn>(<a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="163vram_base" title='vram_base' data-type='hwaddr' data-ref="163vram_base">vram_base</dfn>,</td></tr>
+<tr><th id="327">327</th><td>                    <a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col4 decl" id="164ctrl_base" title='ctrl_base' data-type='hwaddr' data-ref="164ctrl_base">ctrl_base</dfn>, <em>int</em> <dfn class="local col5 decl" id="165it_shift" title='it_shift' data-type='int' data-ref="165it_shift">it_shift</dfn>,</td></tr>
+<tr><th id="328">328</th><td>                    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col6 decl" id="166address_space" title='address_space' data-type='MemoryRegion *' data-ref="166address_space">address_space</dfn>);</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td><i>/* ne2000.c */</i></td></tr>
+<tr><th id="331">331</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="isa_ne2000_init" title='isa_ne2000_init' data-ref="isa_ne2000_init">isa_ne2000_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col7 decl" id="167bus" title='bus' data-type='ISABus *' data-ref="167bus">bus</dfn>, <em>int</em> <dfn class="local col8 decl" id="168base" title='base' data-type='int' data-ref="168base">base</dfn>, <em>int</em> <dfn class="local col9 decl" id="169irq" title='irq' data-type='int' data-ref="169irq">irq</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#NICInfo" title='NICInfo' data-type='struct NICInfo' data-ref="NICInfo">NICInfo</a> *<dfn class="local col0 decl" id="170nd" title='nd' data-type='NICInfo *' data-ref="170nd">nd</dfn>)</td></tr>
+<tr><th id="332">332</th><td>{</td></tr>
+<tr><th id="333">333</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col1 decl" id="171dev" title='dev' data-type='DeviceState *' data-ref="171dev">dev</dfn>;</td></tr>
+<tr><th id="334">334</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col2 decl" id="172isadev" title='isadev' data-type='ISADevice *' data-ref="172isadev">isadev</dfn>;</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>    <a class="ref" href="../../net/net.h.html#qemu_check_nic_model" title='qemu_check_nic_model' data-ref="qemu_check_nic_model">qemu_check_nic_model</a>(<a class="local col0 ref" href="#170nd" title='nd' data-ref="170nd">nd</a>, <q>"ne2k_isa"</q>);</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    <a class="local col2 ref" href="#172isadev" title='isadev' data-ref="172isadev">isadev</a> = <a class="ref" href="../isa/isa.h.html#isa_try_create" title='isa_try_create' data-ref="isa_try_create">isa_try_create</a>(<a class="local col7 ref" href="#167bus" title='bus' data-ref="167bus">bus</a>, <q>"ne2k_isa"</q>);</td></tr>
+<tr><th id="339">339</th><td>    <b>if</b> (!<a class="local col2 ref" href="#172isadev" title='isadev' data-ref="172isadev">isadev</a>) {</td></tr>
+<tr><th id="340">340</th><td>        <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="341">341</th><td>    }</td></tr>
+<tr><th id="342">342</th><td>    <a class="local col1 ref" href="#171dev" title='dev' data-ref="171dev">dev</a> = <a class="macro" href="../qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((isadev))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/include/hw/i386/pc.h&quot;, 342, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col2 ref" href="#172isadev" title='isadev' data-ref="172isadev">isadev</a>);</td></tr>
+<tr><th id="343">343</th><td>    <a class="ref" href="../qdev-properties.h.html#qdev_prop_set_uint32" title='qdev_prop_set_uint32' data-ref="qdev_prop_set_uint32">qdev_prop_set_uint32</a>(<a class="local col1 ref" href="#171dev" title='dev' data-ref="171dev">dev</a>, <q>"iobase"</q>, <a class="local col8 ref" href="#168base" title='base' data-ref="168base">base</a>);</td></tr>
+<tr><th id="344">344</th><td>    <a class="ref" href="../qdev-properties.h.html#qdev_prop_set_uint32" title='qdev_prop_set_uint32' data-ref="qdev_prop_set_uint32">qdev_prop_set_uint32</a>(<a class="local col1 ref" href="#171dev" title='dev' data-ref="171dev">dev</a>, <q>"irq"</q>,    <a class="local col9 ref" href="#169irq" title='irq' data-ref="169irq">irq</a>);</td></tr>
+<tr><th id="345">345</th><td>    <a class="ref" href="../../net/net.h.html#qdev_set_nic_properties" title='qdev_set_nic_properties' data-ref="qdev_set_nic_properties">qdev_set_nic_properties</a>(<a class="local col1 ref" href="#171dev" title='dev' data-ref="171dev">dev</a>, <a class="local col0 ref" href="#170nd" title='nd' data-ref="170nd">nd</a>);</td></tr>
+<tr><th id="346">346</th><td>    <a class="ref" href="../qdev-core.h.html#qdev_init_nofail" title='qdev_init_nofail' data-ref="qdev_init_nofail">qdev_init_nofail</a>(<a class="local col1 ref" href="#171dev" title='dev' data-ref="171dev">dev</a>);</td></tr>
+<tr><th id="347">347</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="348">348</th><td>}</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td><i>/* pc_sysfw.c */</i></td></tr>
+<tr><th id="351">351</th><td><em>void</em> <dfn class="decl" id="pc_system_firmware_init" title='pc_system_firmware_init' data-ref="pc_system_firmware_init">pc_system_firmware_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col3 decl" id="173rom_memory" title='rom_memory' data-type='MemoryRegion *' data-ref="173rom_memory">rom_memory</dfn>,</td></tr>
+<tr><th id="352">352</th><td>                             <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="174isapc_ram_fw" title='isapc_ram_fw' data-type='_Bool' data-ref="174isapc_ram_fw">isapc_ram_fw</dfn>);</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td><i>/* pvpanic.c */</i></td></tr>
+<tr><th id="355">355</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="pvpanic_port" title='pvpanic_port' data-ref="pvpanic_port">pvpanic_port</dfn>(<em>void</em>);</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td><i>/* acpi-build.c */</i></td></tr>
+<tr><th id="358">358</th><td><em>void</em> <dfn class="decl" id="pc_madt_cpu_entry" title='pc_madt_cpu_entry' data-ref="pc_madt_cpu_entry">pc_madt_cpu_entry</dfn>(<a class="typedef" href="../acpi/acpi_dev_interface.h.html#AcpiDeviceIf" title='AcpiDeviceIf' data-type='struct AcpiDeviceIf' data-ref="AcpiDeviceIf">AcpiDeviceIf</a> *<dfn class="local col5 decl" id="175adev" title='adev' data-type='AcpiDeviceIf *' data-ref="175adev">adev</dfn>, <em>int</em> <dfn class="local col6 decl" id="176uid" title='uid' data-type='int' data-ref="176uid">uid</dfn>,</td></tr>
+<tr><th id="359">359</th><td>                       <em>const</em> <a class="typedef" href="../boards.h.html#CPUArchIdList" title='CPUArchIdList' data-type='struct CPUArchIdList' data-ref="CPUArchIdList">CPUArchIdList</a> *<dfn class="local col7 decl" id="177apic_ids" title='apic_ids' data-type='const CPUArchIdList *' data-ref="177apic_ids">apic_ids</dfn>, <a class="typedef" href="../../../../include/glib-2.0/glib/garray.h.html#GArray" title='GArray' data-type='struct _GArray' data-ref="GArray">GArray</a> *<dfn class="local col8 decl" id="178entry" title='entry' data-type='GArray *' data-ref="178entry">entry</dfn>);</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td><i>/* e820 types */</i></td></tr>
+<tr><th id="362">362</th><td><u>#define <dfn class="macro" id="_M/E820_RAM" data-ref="_M/E820_RAM">E820_RAM</dfn>        1</u></td></tr>
+<tr><th id="363">363</th><td><u>#define <dfn class="macro" id="_M/E820_RESERVED" data-ref="_M/E820_RESERVED">E820_RESERVED</dfn>   2</u></td></tr>
+<tr><th id="364">364</th><td><u>#define <dfn class="macro" id="_M/E820_ACPI" data-ref="_M/E820_ACPI">E820_ACPI</dfn>       3</u></td></tr>
+<tr><th id="365">365</th><td><u>#define <dfn class="macro" id="_M/E820_NVS" data-ref="_M/E820_NVS">E820_NVS</dfn>        4</u></td></tr>
+<tr><th id="366">366</th><td><u>#define <dfn class="macro" id="_M/E820_UNUSABLE" data-ref="_M/E820_UNUSABLE">E820_UNUSABLE</dfn>   5</u></td></tr>
+<tr><th id="367">367</th><td></td></tr>
+<tr><th id="368">368</th><td><em>int</em> <dfn class="decl" id="e820_add_entry" title='e820_add_entry' data-ref="e820_add_entry">e820_add_entry</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>, <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>);</td></tr>
+<tr><th id="369">369</th><td><em>int</em> <dfn class="decl" id="e820_get_num_entries" title='e820_get_num_entries' data-ref="e820_get_num_entries">e820_get_num_entries</dfn>(<em>void</em>);</td></tr>
+<tr><th id="370">370</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="e820_get_entry" title='e820_get_entry' data-ref="e820_get_entry">e820_get_entry</dfn>(<em>int</em>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>, <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *, <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *);</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_9" data-ref="_M/PC_COMPAT_2_9">PC_COMPAT_2_9</dfn> \</u></td></tr>
+<tr><th id="373">373</th><td><u>    HW_COMPAT_2_9 \</u></td></tr>
+<tr><th id="374">374</th><td><u>    {\</u></td></tr>
+<tr><th id="375">375</th><td><u>        .driver   = "mch",\</u></td></tr>
+<tr><th id="376">376</th><td><u>        .property = "extended-tseg-mbytes",\</u></td></tr>
+<tr><th id="377">377</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="378">378</th><td><u>    },</u>\</td></tr>
+<tr><th id="379">379</th><td></td></tr>
+<tr><th id="380">380</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_8" data-ref="_M/PC_COMPAT_2_8">PC_COMPAT_2_8</dfn> \</u></td></tr>
+<tr><th id="381">381</th><td><u>    HW_COMPAT_2_8 \</u></td></tr>
+<tr><th id="382">382</th><td><u>    {\</u></td></tr>
+<tr><th id="383">383</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="384">384</th><td><u>        .property = "tcg-cpuid",\</u></td></tr>
+<tr><th id="385">385</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="386">386</th><td><u>    },\</u></td></tr>
+<tr><th id="387">387</th><td><u>    {\</u></td></tr>
+<tr><th id="388">388</th><td><u>        .driver   = "kvmclock",\</u></td></tr>
+<tr><th id="389">389</th><td><u>        .property = "x-mach-use-reliable-get-clock",\</u></td></tr>
+<tr><th id="390">390</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="391">391</th><td><u>    },\</u></td></tr>
+<tr><th id="392">392</th><td><u>    {\</u></td></tr>
+<tr><th id="393">393</th><td><u>        .driver   = "ICH9-LPC",\</u></td></tr>
+<tr><th id="394">394</th><td><u>        .property = "x-smi-broadcast",\</u></td></tr>
+<tr><th id="395">395</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="396">396</th><td><u>    },\</u></td></tr>
+<tr><th id="397">397</th><td><u>    {\</u></td></tr>
+<tr><th id="398">398</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="399">399</th><td><u>        .property = "vmware-cpuid-freq",\</u></td></tr>
+<tr><th id="400">400</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="401">401</th><td><u>    },\</u></td></tr>
+<tr><th id="402">402</th><td><u>    {\</u></td></tr>
+<tr><th id="403">403</th><td><u>        .driver   = "Haswell-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="404">404</th><td><u>        .property = "stepping",\</u></td></tr>
+<tr><th id="405">405</th><td><u>        .value    = "1",\</u></td></tr>
+<tr><th id="406">406</th><td><u>    },</u></td></tr>
+<tr><th id="407">407</th><td></td></tr>
+<tr><th id="408">408</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_7" data-ref="_M/PC_COMPAT_2_7">PC_COMPAT_2_7</dfn> \</u></td></tr>
+<tr><th id="409">409</th><td><u>    HW_COMPAT_2_7 \</u></td></tr>
+<tr><th id="410">410</th><td><u>    {\</u></td></tr>
+<tr><th id="411">411</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="412">412</th><td><u>        .property = "l3-cache",\</u></td></tr>
+<tr><th id="413">413</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="414">414</th><td><u>    },\</u></td></tr>
+<tr><th id="415">415</th><td><u>    {\</u></td></tr>
+<tr><th id="416">416</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="417">417</th><td><u>        .property = "full-cpuid-auto-level",\</u></td></tr>
+<tr><th id="418">418</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="419">419</th><td><u>    },\</u></td></tr>
+<tr><th id="420">420</th><td><u>    {\</u></td></tr>
+<tr><th id="421">421</th><td><u>        .driver   = "Opteron_G3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="422">422</th><td><u>        .property = "family",\</u></td></tr>
+<tr><th id="423">423</th><td><u>        .value    = "15",\</u></td></tr>
+<tr><th id="424">424</th><td><u>    },\</u></td></tr>
+<tr><th id="425">425</th><td><u>    {\</u></td></tr>
+<tr><th id="426">426</th><td><u>        .driver   = "Opteron_G3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="427">427</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="428">428</th><td><u>        .value    = "6",\</u></td></tr>
+<tr><th id="429">429</th><td><u>    },\</u></td></tr>
+<tr><th id="430">430</th><td><u>    {\</u></td></tr>
+<tr><th id="431">431</th><td><u>        .driver   = "Opteron_G3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="432">432</th><td><u>        .property = "stepping",\</u></td></tr>
+<tr><th id="433">433</th><td><u>        .value    = "1",\</u></td></tr>
+<tr><th id="434">434</th><td><u>    },\</u></td></tr>
+<tr><th id="435">435</th><td><u>    {\</u></td></tr>
+<tr><th id="436">436</th><td><u>        .driver   = "isa-pcspk",\</u></td></tr>
+<tr><th id="437">437</th><td><u>        .property = "migrate",\</u></td></tr>
+<tr><th id="438">438</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="439">439</th><td><u>    },</u></td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_6" data-ref="_M/PC_COMPAT_2_6">PC_COMPAT_2_6</dfn> \</u></td></tr>
+<tr><th id="442">442</th><td><u>    HW_COMPAT_2_6 \</u></td></tr>
+<tr><th id="443">443</th><td><u>    {\</u></td></tr>
+<tr><th id="444">444</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="445">445</th><td><u>        .property = "cpuid-0xb",\</u></td></tr>
+<tr><th id="446">446</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="447">447</th><td><u>    },{\</u></td></tr>
+<tr><th id="448">448</th><td><u>        .driver   = "vmxnet3",\</u></td></tr>
+<tr><th id="449">449</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="450">450</th><td><u>        .value    = "",\</u></td></tr>
+<tr><th id="451">451</th><td><u>    },\</u></td></tr>
+<tr><th id="452">452</th><td><u>    {\</u></td></tr>
+<tr><th id="453">453</th><td><u>        .driver = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="454">454</th><td><u>        .property = "fill-mtrr-mask",\</u></td></tr>
+<tr><th id="455">455</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="456">456</th><td><u>    },\</u></td></tr>
+<tr><th id="457">457</th><td><u>    {\</u></td></tr>
+<tr><th id="458">458</th><td><u>        .driver   = "apic-common",\</u></td></tr>
+<tr><th id="459">459</th><td><u>        .property = "legacy-instance-id",\</u></td></tr>
+<tr><th id="460">460</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="461">461</th><td><u>    },</u></td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_5" data-ref="_M/PC_COMPAT_2_5">PC_COMPAT_2_5</dfn> \</u></td></tr>
+<tr><th id="464">464</th><td><u>    HW_COMPAT_2_5</u></td></tr>
+<tr><th id="465">465</th><td></td></tr>
+<tr><th id="466">466</th><td><i>/* Helper for setting model-id for CPU models that changed model-id</i></td></tr>
+<tr><th id="467">467</th><td><i> * depending on QEMU versions up to QEMU 2.4.</i></td></tr>
+<tr><th id="468">468</th><td><i> */</i></td></tr>
+<tr><th id="469">469</th><td><u>#define <dfn class="macro" id="_M/PC_CPU_MODEL_IDS" data-ref="_M/PC_CPU_MODEL_IDS">PC_CPU_MODEL_IDS</dfn>(v) \</u></td></tr>
+<tr><th id="470">470</th><td><u>    {\</u></td></tr>
+<tr><th id="471">471</th><td><u>        .driver   = "qemu32-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="472">472</th><td><u>        .property = "model-id",\</u></td></tr>
+<tr><th id="473">473</th><td><u>        .value    = "QEMU Virtual CPU version " v,\</u></td></tr>
+<tr><th id="474">474</th><td><u>    },\</u></td></tr>
+<tr><th id="475">475</th><td><u>    {\</u></td></tr>
+<tr><th id="476">476</th><td><u>        .driver   = "qemu64-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="477">477</th><td><u>        .property = "model-id",\</u></td></tr>
+<tr><th id="478">478</th><td><u>        .value    = "QEMU Virtual CPU version " v,\</u></td></tr>
+<tr><th id="479">479</th><td><u>    },\</u></td></tr>
+<tr><th id="480">480</th><td><u>    {\</u></td></tr>
+<tr><th id="481">481</th><td><u>        .driver   = "athlon-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="482">482</th><td><u>        .property = "model-id",\</u></td></tr>
+<tr><th id="483">483</th><td><u>        .value    = "QEMU Virtual CPU version " v,\</u></td></tr>
+<tr><th id="484">484</th><td><u>    },</u></td></tr>
+<tr><th id="485">485</th><td></td></tr>
+<tr><th id="486">486</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_4" data-ref="_M/PC_COMPAT_2_4">PC_COMPAT_2_4</dfn> \</u></td></tr>
+<tr><th id="487">487</th><td><u>    HW_COMPAT_2_4 \</u></td></tr>
+<tr><th id="488">488</th><td><u>    PC_CPU_MODEL_IDS("2.4.0") \</u></td></tr>
+<tr><th id="489">489</th><td><u>    {\</u></td></tr>
+<tr><th id="490">490</th><td><u>        .driver   = "Haswell-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="491">491</th><td><u>        .property = "abm",\</u></td></tr>
+<tr><th id="492">492</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="493">493</th><td><u>    },\</u></td></tr>
+<tr><th id="494">494</th><td><u>    {\</u></td></tr>
+<tr><th id="495">495</th><td><u>        .driver   = "Haswell-noTSX-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="496">496</th><td><u>        .property = "abm",\</u></td></tr>
+<tr><th id="497">497</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="498">498</th><td><u>    },\</u></td></tr>
+<tr><th id="499">499</th><td><u>    {\</u></td></tr>
+<tr><th id="500">500</th><td><u>        .driver   = "Broadwell-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="501">501</th><td><u>        .property = "abm",\</u></td></tr>
+<tr><th id="502">502</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="503">503</th><td><u>    },\</u></td></tr>
+<tr><th id="504">504</th><td><u>    {\</u></td></tr>
+<tr><th id="505">505</th><td><u>        .driver   = "Broadwell-noTSX-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="506">506</th><td><u>        .property = "abm",\</u></td></tr>
+<tr><th id="507">507</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="508">508</th><td><u>    },\</u></td></tr>
+<tr><th id="509">509</th><td><u>    {\</u></td></tr>
+<tr><th id="510">510</th><td><u>        .driver   = "host" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="511">511</th><td><u>        .property = "host-cache-info",\</u></td></tr>
+<tr><th id="512">512</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="513">513</th><td><u>    },\</u></td></tr>
+<tr><th id="514">514</th><td><u>    {\</u></td></tr>
+<tr><th id="515">515</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="516">516</th><td><u>        .property = "check",\</u></td></tr>
+<tr><th id="517">517</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="518">518</th><td><u>    },\</u></td></tr>
+<tr><th id="519">519</th><td><u>    {\</u></td></tr>
+<tr><th id="520">520</th><td><u>        .driver   = "qemu64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="521">521</th><td><u>        .property = "sse4a",\</u></td></tr>
+<tr><th id="522">522</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="523">523</th><td><u>    },\</u></td></tr>
+<tr><th id="524">524</th><td><u>    {\</u></td></tr>
+<tr><th id="525">525</th><td><u>        .driver   = "qemu64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="526">526</th><td><u>        .property = "abm",\</u></td></tr>
+<tr><th id="527">527</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="528">528</th><td><u>    },\</u></td></tr>
+<tr><th id="529">529</th><td><u>    {\</u></td></tr>
+<tr><th id="530">530</th><td><u>        .driver   = "qemu64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="531">531</th><td><u>        .property = "popcnt",\</u></td></tr>
+<tr><th id="532">532</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="533">533</th><td><u>    },\</u></td></tr>
+<tr><th id="534">534</th><td><u>    {\</u></td></tr>
+<tr><th id="535">535</th><td><u>        .driver   = "qemu32" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="536">536</th><td><u>        .property = "popcnt",\</u></td></tr>
+<tr><th id="537">537</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="538">538</th><td><u>    },{\</u></td></tr>
+<tr><th id="539">539</th><td><u>        .driver   = "Opteron_G2" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="540">540</th><td><u>        .property = "rdtscp",\</u></td></tr>
+<tr><th id="541">541</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="542">542</th><td><u>    },{\</u></td></tr>
+<tr><th id="543">543</th><td><u>        .driver   = "Opteron_G3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="544">544</th><td><u>        .property = "rdtscp",\</u></td></tr>
+<tr><th id="545">545</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="546">546</th><td><u>    },{\</u></td></tr>
+<tr><th id="547">547</th><td><u>        .driver   = "Opteron_G4" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="548">548</th><td><u>        .property = "rdtscp",\</u></td></tr>
+<tr><th id="549">549</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="550">550</th><td><u>    },{\</u></td></tr>
+<tr><th id="551">551</th><td><u>        .driver   = "Opteron_G5" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="552">552</th><td><u>        .property = "rdtscp",\</u></td></tr>
+<tr><th id="553">553</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="554">554</th><td><u>    },</u></td></tr>
+<tr><th id="555">555</th><td></td></tr>
+<tr><th id="556">556</th><td></td></tr>
+<tr><th id="557">557</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_3" data-ref="_M/PC_COMPAT_2_3">PC_COMPAT_2_3</dfn> \</u></td></tr>
+<tr><th id="558">558</th><td><u>    HW_COMPAT_2_3 \</u></td></tr>
+<tr><th id="559">559</th><td><u>    PC_CPU_MODEL_IDS("2.3.0") \</u></td></tr>
+<tr><th id="560">560</th><td><u>    {\</u></td></tr>
+<tr><th id="561">561</th><td><u>        .driver   = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="562">562</th><td><u>        .property = "arat",\</u></td></tr>
+<tr><th id="563">563</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="564">564</th><td><u>    },{\</u></td></tr>
+<tr><th id="565">565</th><td><u>        .driver   = "qemu64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="566">566</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="567">567</th><td><u>        .value    = stringify(4),\</u></td></tr>
+<tr><th id="568">568</th><td><u>    },{\</u></td></tr>
+<tr><th id="569">569</th><td><u>        .driver   = "kvm64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="570">570</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="571">571</th><td><u>        .value    = stringify(5),\</u></td></tr>
+<tr><th id="572">572</th><td><u>    },{\</u></td></tr>
+<tr><th id="573">573</th><td><u>        .driver   = "pentium3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="574">574</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="575">575</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="576">576</th><td><u>    },{\</u></td></tr>
+<tr><th id="577">577</th><td><u>        .driver   = "n270" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="578">578</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="579">579</th><td><u>        .value    = stringify(5),\</u></td></tr>
+<tr><th id="580">580</th><td><u>    },{\</u></td></tr>
+<tr><th id="581">581</th><td><u>        .driver   = "Conroe" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="582">582</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="583">583</th><td><u>        .value    = stringify(4),\</u></td></tr>
+<tr><th id="584">584</th><td><u>    },{\</u></td></tr>
+<tr><th id="585">585</th><td><u>        .driver   = "Penryn" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="586">586</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="587">587</th><td><u>        .value    = stringify(4),\</u></td></tr>
+<tr><th id="588">588</th><td><u>    },{\</u></td></tr>
+<tr><th id="589">589</th><td><u>        .driver   = "Nehalem" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="590">590</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="591">591</th><td><u>        .value    = stringify(4),\</u></td></tr>
+<tr><th id="592">592</th><td><u>    },{\</u></td></tr>
+<tr><th id="593">593</th><td><u>        .driver   = "n270" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="594">594</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="595">595</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="596">596</th><td><u>    },{\</u></td></tr>
+<tr><th id="597">597</th><td><u>        .driver   = "Penryn" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="598">598</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="599">599</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="600">600</th><td><u>    },{\</u></td></tr>
+<tr><th id="601">601</th><td><u>        .driver   = "Conroe" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="602">602</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="603">603</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="604">604</th><td><u>    },{\</u></td></tr>
+<tr><th id="605">605</th><td><u>        .driver   = "Nehalem" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="606">606</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="607">607</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="608">608</th><td><u>    },{\</u></td></tr>
+<tr><th id="609">609</th><td><u>        .driver   = "Westmere" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="610">610</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="611">611</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="612">612</th><td><u>    },{\</u></td></tr>
+<tr><th id="613">613</th><td><u>        .driver   = "SandyBridge" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="614">614</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="615">615</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="616">616</th><td><u>    },{\</u></td></tr>
+<tr><th id="617">617</th><td><u>        .driver   = "IvyBridge" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="618">618</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="619">619</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="620">620</th><td><u>    },{\</u></td></tr>
+<tr><th id="621">621</th><td><u>        .driver   = "Haswell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="622">622</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="623">623</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="624">624</th><td><u>    },{\</u></td></tr>
+<tr><th id="625">625</th><td><u>        .driver   = "Haswell-noTSX" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="626">626</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="627">627</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="628">628</th><td><u>    },{\</u></td></tr>
+<tr><th id="629">629</th><td><u>        .driver   = "Broadwell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="630">630</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="631">631</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="632">632</th><td><u>    },{\</u></td></tr>
+<tr><th id="633">633</th><td><u>        .driver   = "Broadwell-noTSX" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="634">634</th><td><u>        .property = "min-xlevel",\</u></td></tr>
+<tr><th id="635">635</th><td><u>        .value    = stringify(0x8000000a),\</u></td></tr>
+<tr><th id="636">636</th><td><u>    },{\</u></td></tr>
+<tr><th id="637">637</th><td><u>        .driver = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="638">638</th><td><u>        .property = "kvm-no-smi-migration",\</u></td></tr>
+<tr><th id="639">639</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="640">640</th><td><u>    },</u></td></tr>
+<tr><th id="641">641</th><td></td></tr>
+<tr><th id="642">642</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_2" data-ref="_M/PC_COMPAT_2_2">PC_COMPAT_2_2</dfn> \</u></td></tr>
+<tr><th id="643">643</th><td><u>    HW_COMPAT_2_2 \</u></td></tr>
+<tr><th id="644">644</th><td><u>    PC_CPU_MODEL_IDS("2.3.0") \</u></td></tr>
+<tr><th id="645">645</th><td><u>    {\</u></td></tr>
+<tr><th id="646">646</th><td><u>        .driver = "kvm64" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="647">647</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="648">648</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="649">649</th><td><u>    },\</u></td></tr>
+<tr><th id="650">650</th><td><u>    {\</u></td></tr>
+<tr><th id="651">651</th><td><u>        .driver = "kvm32" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="652">652</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="653">653</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="654">654</th><td><u>    },\</u></td></tr>
+<tr><th id="655">655</th><td><u>    {\</u></td></tr>
+<tr><th id="656">656</th><td><u>        .driver = "Conroe" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="657">657</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="658">658</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="659">659</th><td><u>    },\</u></td></tr>
+<tr><th id="660">660</th><td><u>    {\</u></td></tr>
+<tr><th id="661">661</th><td><u>        .driver = "Penryn" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="662">662</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="663">663</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="664">664</th><td><u>    },\</u></td></tr>
+<tr><th id="665">665</th><td><u>    {\</u></td></tr>
+<tr><th id="666">666</th><td><u>        .driver = "Nehalem" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="667">667</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="668">668</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="669">669</th><td><u>    },\</u></td></tr>
+<tr><th id="670">670</th><td><u>    {\</u></td></tr>
+<tr><th id="671">671</th><td><u>        .driver = "Westmere" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="672">672</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="673">673</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="674">674</th><td><u>    },\</u></td></tr>
+<tr><th id="675">675</th><td><u>    {\</u></td></tr>
+<tr><th id="676">676</th><td><u>        .driver = "SandyBridge" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="677">677</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="678">678</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="679">679</th><td><u>    },\</u></td></tr>
+<tr><th id="680">680</th><td><u>    {\</u></td></tr>
+<tr><th id="681">681</th><td><u>        .driver = "Haswell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="682">682</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="683">683</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="684">684</th><td><u>    },\</u></td></tr>
+<tr><th id="685">685</th><td><u>    {\</u></td></tr>
+<tr><th id="686">686</th><td><u>        .driver = "Broadwell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="687">687</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="688">688</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="689">689</th><td><u>    },\</u></td></tr>
+<tr><th id="690">690</th><td><u>    {\</u></td></tr>
+<tr><th id="691">691</th><td><u>        .driver = "Opteron_G1" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="692">692</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="693">693</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="694">694</th><td><u>    },\</u></td></tr>
+<tr><th id="695">695</th><td><u>    {\</u></td></tr>
+<tr><th id="696">696</th><td><u>        .driver = "Opteron_G2" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="697">697</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="698">698</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="699">699</th><td><u>    },\</u></td></tr>
+<tr><th id="700">700</th><td><u>    {\</u></td></tr>
+<tr><th id="701">701</th><td><u>        .driver = "Opteron_G3" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="702">702</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="703">703</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="704">704</th><td><u>    },\</u></td></tr>
+<tr><th id="705">705</th><td><u>    {\</u></td></tr>
+<tr><th id="706">706</th><td><u>        .driver = "Opteron_G4" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="707">707</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="708">708</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="709">709</th><td><u>    },\</u></td></tr>
+<tr><th id="710">710</th><td><u>    {\</u></td></tr>
+<tr><th id="711">711</th><td><u>        .driver = "Opteron_G5" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="712">712</th><td><u>        .property = "vme",\</u></td></tr>
+<tr><th id="713">713</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="714">714</th><td><u>    },\</u></td></tr>
+<tr><th id="715">715</th><td><u>    {\</u></td></tr>
+<tr><th id="716">716</th><td><u>        .driver = "Haswell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="717">717</th><td><u>        .property = "f16c",\</u></td></tr>
+<tr><th id="718">718</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="719">719</th><td><u>    },\</u></td></tr>
+<tr><th id="720">720</th><td><u>    {\</u></td></tr>
+<tr><th id="721">721</th><td><u>        .driver = "Haswell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="722">722</th><td><u>        .property = "rdrand",\</u></td></tr>
+<tr><th id="723">723</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="724">724</th><td><u>    },\</u></td></tr>
+<tr><th id="725">725</th><td><u>    {\</u></td></tr>
+<tr><th id="726">726</th><td><u>        .driver = "Broadwell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="727">727</th><td><u>        .property = "f16c",\</u></td></tr>
+<tr><th id="728">728</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="729">729</th><td><u>    },\</u></td></tr>
+<tr><th id="730">730</th><td><u>    {\</u></td></tr>
+<tr><th id="731">731</th><td><u>        .driver = "Broadwell" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="732">732</th><td><u>        .property = "rdrand",\</u></td></tr>
+<tr><th id="733">733</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="734">734</th><td><u>    },</u></td></tr>
+<tr><th id="735">735</th><td></td></tr>
+<tr><th id="736">736</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_1" data-ref="_M/PC_COMPAT_2_1">PC_COMPAT_2_1</dfn> \</u></td></tr>
+<tr><th id="737">737</th><td><u>    HW_COMPAT_2_1 \</u></td></tr>
+<tr><th id="738">738</th><td><u>    PC_CPU_MODEL_IDS("2.1.0") \</u></td></tr>
+<tr><th id="739">739</th><td><u>    {\</u></td></tr>
+<tr><th id="740">740</th><td><u>        .driver = "coreduo" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="741">741</th><td><u>        .property = "vmx",\</u></td></tr>
+<tr><th id="742">742</th><td><u>        .value = "on",\</u></td></tr>
+<tr><th id="743">743</th><td><u>    },\</u></td></tr>
+<tr><th id="744">744</th><td><u>    {\</u></td></tr>
+<tr><th id="745">745</th><td><u>        .driver = "core2duo" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="746">746</th><td><u>        .property = "vmx",\</u></td></tr>
+<tr><th id="747">747</th><td><u>        .value = "on",\</u></td></tr>
+<tr><th id="748">748</th><td><u>    },</u></td></tr>
+<tr><th id="749">749</th><td></td></tr>
+<tr><th id="750">750</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_2_0" data-ref="_M/PC_COMPAT_2_0">PC_COMPAT_2_0</dfn> \</u></td></tr>
+<tr><th id="751">751</th><td><u>    PC_CPU_MODEL_IDS("2.0.0") \</u></td></tr>
+<tr><th id="752">752</th><td><u>    {\</u></td></tr>
+<tr><th id="753">753</th><td><u>        .driver   = "virtio-scsi-pci",\</u></td></tr>
+<tr><th id="754">754</th><td><u>        .property = "any_layout",\</u></td></tr>
+<tr><th id="755">755</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="756">756</th><td><u>    },{\</u></td></tr>
+<tr><th id="757">757</th><td><u>        .driver   = "PIIX4_PM",\</u></td></tr>
+<tr><th id="758">758</th><td><u>        .property = "memory-hotplug-support",\</u></td></tr>
+<tr><th id="759">759</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="760">760</th><td><u>    },\</u></td></tr>
+<tr><th id="761">761</th><td><u>    {\</u></td></tr>
+<tr><th id="762">762</th><td><u>        .driver   = "apic",\</u></td></tr>
+<tr><th id="763">763</th><td><u>        .property = "version",\</u></td></tr>
+<tr><th id="764">764</th><td><u>        .value    = stringify(0x11),\</u></td></tr>
+<tr><th id="765">765</th><td><u>    },\</u></td></tr>
+<tr><th id="766">766</th><td><u>    {\</u></td></tr>
+<tr><th id="767">767</th><td><u>        .driver   = "nec-usb-xhci",\</u></td></tr>
+<tr><th id="768">768</th><td><u>        .property = "superspeed-ports-first",\</u></td></tr>
+<tr><th id="769">769</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="770">770</th><td><u>    },\</u></td></tr>
+<tr><th id="771">771</th><td><u>    {\</u></td></tr>
+<tr><th id="772">772</th><td><u>        .driver   = "nec-usb-xhci",\</u></td></tr>
+<tr><th id="773">773</th><td><u>        .property = "force-pcie-endcap",\</u></td></tr>
+<tr><th id="774">774</th><td><u>        .value    = "on",\</u></td></tr>
+<tr><th id="775">775</th><td><u>    },\</u></td></tr>
+<tr><th id="776">776</th><td><u>    {\</u></td></tr>
+<tr><th id="777">777</th><td><u>        .driver   = "pci-serial",\</u></td></tr>
+<tr><th id="778">778</th><td><u>        .property = "prog_if",\</u></td></tr>
+<tr><th id="779">779</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="780">780</th><td><u>    },\</u></td></tr>
+<tr><th id="781">781</th><td><u>    {\</u></td></tr>
+<tr><th id="782">782</th><td><u>        .driver   = "pci-serial-2x",\</u></td></tr>
+<tr><th id="783">783</th><td><u>        .property = "prog_if",\</u></td></tr>
+<tr><th id="784">784</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="785">785</th><td><u>    },\</u></td></tr>
+<tr><th id="786">786</th><td><u>    {\</u></td></tr>
+<tr><th id="787">787</th><td><u>        .driver   = "pci-serial-4x",\</u></td></tr>
+<tr><th id="788">788</th><td><u>        .property = "prog_if",\</u></td></tr>
+<tr><th id="789">789</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="790">790</th><td><u>    },\</u></td></tr>
+<tr><th id="791">791</th><td><u>    {\</u></td></tr>
+<tr><th id="792">792</th><td><u>        .driver   = "virtio-net-pci",\</u></td></tr>
+<tr><th id="793">793</th><td><u>        .property = "guest_announce",\</u></td></tr>
+<tr><th id="794">794</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="795">795</th><td><u>    },\</u></td></tr>
+<tr><th id="796">796</th><td><u>    {\</u></td></tr>
+<tr><th id="797">797</th><td><u>        .driver   = "ICH9-LPC",\</u></td></tr>
+<tr><th id="798">798</th><td><u>        .property = "memory-hotplug-support",\</u></td></tr>
+<tr><th id="799">799</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="800">800</th><td><u>    },{\</u></td></tr>
+<tr><th id="801">801</th><td><u>        .driver   = "xio3130-downstream",\</u></td></tr>
+<tr><th id="802">802</th><td><u>        .property = COMPAT_PROP_PCP,\</u></td></tr>
+<tr><th id="803">803</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="804">804</th><td><u>    },{\</u></td></tr>
+<tr><th id="805">805</th><td><u>        .driver   = "ioh3420",\</u></td></tr>
+<tr><th id="806">806</th><td><u>        .property = COMPAT_PROP_PCP,\</u></td></tr>
+<tr><th id="807">807</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="808">808</th><td><u>    },</u></td></tr>
+<tr><th id="809">809</th><td></td></tr>
+<tr><th id="810">810</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_1_7" data-ref="_M/PC_COMPAT_1_7">PC_COMPAT_1_7</dfn> \</u></td></tr>
+<tr><th id="811">811</th><td><u>    PC_CPU_MODEL_IDS("1.7.0") \</u></td></tr>
+<tr><th id="812">812</th><td><u>    {\</u></td></tr>
+<tr><th id="813">813</th><td><u>        .driver   = TYPE_USB_DEVICE,\</u></td></tr>
+<tr><th id="814">814</th><td><u>        .property = "msos-desc",\</u></td></tr>
+<tr><th id="815">815</th><td><u>        .value    = "no",\</u></td></tr>
+<tr><th id="816">816</th><td><u>    },\</u></td></tr>
+<tr><th id="817">817</th><td><u>    {\</u></td></tr>
+<tr><th id="818">818</th><td><u>        .driver   = "PIIX4_PM",\</u></td></tr>
+<tr><th id="819">819</th><td><u>        .property = "acpi-pci-hotplug-with-bridge-support",\</u></td></tr>
+<tr><th id="820">820</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="821">821</th><td><u>    },\</u></td></tr>
+<tr><th id="822">822</th><td><u>    {\</u></td></tr>
+<tr><th id="823">823</th><td><u>        .driver   = "hpet",\</u></td></tr>
+<tr><th id="824">824</th><td><u>        .property = HPET_INTCAP,\</u></td></tr>
+<tr><th id="825">825</th><td><u>        .value    = stringify(4),\</u></td></tr>
+<tr><th id="826">826</th><td><u>    },</u></td></tr>
+<tr><th id="827">827</th><td></td></tr>
+<tr><th id="828">828</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_1_6" data-ref="_M/PC_COMPAT_1_6">PC_COMPAT_1_6</dfn> \</u></td></tr>
+<tr><th id="829">829</th><td><u>    PC_CPU_MODEL_IDS("1.6.0") \</u></td></tr>
+<tr><th id="830">830</th><td><u>    {\</u></td></tr>
+<tr><th id="831">831</th><td><u>        .driver   = "e1000",\</u></td></tr>
+<tr><th id="832">832</th><td><u>        .property = "mitigation",\</u></td></tr>
+<tr><th id="833">833</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="834">834</th><td><u>    },{\</u></td></tr>
+<tr><th id="835">835</th><td><u>        .driver   = "qemu64-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="836">836</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="837">837</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="838">838</th><td><u>    },{\</u></td></tr>
+<tr><th id="839">839</th><td><u>        .driver   = "qemu32-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="840">840</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="841">841</th><td><u>        .value    = stringify(3),\</u></td></tr>
+<tr><th id="842">842</th><td><u>    },{\</u></td></tr>
+<tr><th id="843">843</th><td><u>        .driver   = "i440FX-pcihost",\</u></td></tr>
+<tr><th id="844">844</th><td><u>        .property = "short_root_bus",\</u></td></tr>
+<tr><th id="845">845</th><td><u>        .value    = stringify(1),\</u></td></tr>
+<tr><th id="846">846</th><td><u>    },{\</u></td></tr>
+<tr><th id="847">847</th><td><u>        .driver   = "q35-pcihost",\</u></td></tr>
+<tr><th id="848">848</th><td><u>        .property = "short_root_bus",\</u></td></tr>
+<tr><th id="849">849</th><td><u>        .value    = stringify(1),\</u></td></tr>
+<tr><th id="850">850</th><td><u>    },</u></td></tr>
+<tr><th id="851">851</th><td></td></tr>
+<tr><th id="852">852</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_1_5" data-ref="_M/PC_COMPAT_1_5">PC_COMPAT_1_5</dfn> \</u></td></tr>
+<tr><th id="853">853</th><td><u>    PC_CPU_MODEL_IDS("1.5.0") \</u></td></tr>
+<tr><th id="854">854</th><td><u>    {\</u></td></tr>
+<tr><th id="855">855</th><td><u>        .driver   = "Conroe-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="856">856</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="857">857</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="858">858</th><td><u>    },{\</u></td></tr>
+<tr><th id="859">859</th><td><u>        .driver   = "Conroe-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="860">860</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="861">861</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="862">862</th><td><u>    },{\</u></td></tr>
+<tr><th id="863">863</th><td><u>        .driver   = "Penryn-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="864">864</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="865">865</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="866">866</th><td><u>    },{\</u></td></tr>
+<tr><th id="867">867</th><td><u>        .driver   = "Penryn-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="868">868</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="869">869</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="870">870</th><td><u>    },{\</u></td></tr>
+<tr><th id="871">871</th><td><u>        .driver   = "Nehalem-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="872">872</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="873">873</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="874">874</th><td><u>    },{\</u></td></tr>
+<tr><th id="875">875</th><td><u>        .driver   = "Nehalem-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="876">876</th><td><u>        .property = "min-level",\</u></td></tr>
+<tr><th id="877">877</th><td><u>        .value    = stringify(2),\</u></td></tr>
+<tr><th id="878">878</th><td><u>    },{\</u></td></tr>
+<tr><th id="879">879</th><td><u>        .driver   = "virtio-net-pci",\</u></td></tr>
+<tr><th id="880">880</th><td><u>        .property = "any_layout",\</u></td></tr>
+<tr><th id="881">881</th><td><u>        .value    = "off",\</u></td></tr>
+<tr><th id="882">882</th><td><u>    },{\</u></td></tr>
+<tr><th id="883">883</th><td><u>        .driver = TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="884">884</th><td><u>        .property = "pmu",\</u></td></tr>
+<tr><th id="885">885</th><td><u>        .value = "on",\</u></td></tr>
+<tr><th id="886">886</th><td><u>    },{\</u></td></tr>
+<tr><th id="887">887</th><td><u>        .driver   = "i440FX-pcihost",\</u></td></tr>
+<tr><th id="888">888</th><td><u>        .property = "short_root_bus",\</u></td></tr>
+<tr><th id="889">889</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="890">890</th><td><u>    },{\</u></td></tr>
+<tr><th id="891">891</th><td><u>        .driver   = "q35-pcihost",\</u></td></tr>
+<tr><th id="892">892</th><td><u>        .property = "short_root_bus",\</u></td></tr>
+<tr><th id="893">893</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="894">894</th><td><u>    },</u></td></tr>
+<tr><th id="895">895</th><td></td></tr>
+<tr><th id="896">896</th><td><u>#define <dfn class="macro" id="_M/PC_COMPAT_1_4" data-ref="_M/PC_COMPAT_1_4">PC_COMPAT_1_4</dfn> \</u></td></tr>
+<tr><th id="897">897</th><td><u>    PC_CPU_MODEL_IDS("1.4.0") \</u></td></tr>
+<tr><th id="898">898</th><td><u>    {\</u></td></tr>
+<tr><th id="899">899</th><td><u>        .driver   = "scsi-hd",\</u></td></tr>
+<tr><th id="900">900</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="901">901</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="902">902</th><td><u>    },{\</u></td></tr>
+<tr><th id="903">903</th><td><u>        .driver   = "scsi-cd",\</u></td></tr>
+<tr><th id="904">904</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="905">905</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="906">906</th><td><u>    },{\</u></td></tr>
+<tr><th id="907">907</th><td><u>        .driver   = "scsi-disk",\</u></td></tr>
+<tr><th id="908">908</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="909">909</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="910">910</th><td><u>    },{\</u></td></tr>
+<tr><th id="911">911</th><td><u>        .driver   = "ide-hd",\</u></td></tr>
+<tr><th id="912">912</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="913">913</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="914">914</th><td><u>    },{\</u></td></tr>
+<tr><th id="915">915</th><td><u>        .driver   = "ide-cd",\</u></td></tr>
+<tr><th id="916">916</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="917">917</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="918">918</th><td><u>    },{\</u></td></tr>
+<tr><th id="919">919</th><td><u>        .driver   = "ide-drive",\</u></td></tr>
+<tr><th id="920">920</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="921">921</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="922">922</th><td><u>    },{\</u></td></tr>
+<tr><th id="923">923</th><td><u>        .driver   = "virtio-blk-pci",\</u></td></tr>
+<tr><th id="924">924</th><td><u>        .property = "discard_granularity",\</u></td></tr>
+<tr><th id="925">925</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="926">926</th><td><u>    },{\</u></td></tr>
+<tr><th id="927">927</th><td><u>        .driver   = "virtio-serial-pci",\</u></td></tr>
+<tr><th id="928">928</th><td><u>        .property = "vectors",\</u></td></tr>
+<tr><th id="929">929</th><td><u>        /* DEV_NVECTORS_UNSPECIFIED as a uint32_t string */\</u></td></tr>
+<tr><th id="930">930</th><td><u>        .value    = stringify(0xFFFFFFFF),\</u></td></tr>
+<tr><th id="931">931</th><td><u>    },{ \</u></td></tr>
+<tr><th id="932">932</th><td><u>        .driver   = "virtio-net-pci", \</u></td></tr>
+<tr><th id="933">933</th><td><u>        .property = "ctrl_guest_offloads", \</u></td></tr>
+<tr><th id="934">934</th><td><u>        .value    = "off", \</u></td></tr>
+<tr><th id="935">935</th><td><u>    },{\</u></td></tr>
+<tr><th id="936">936</th><td><u>        .driver   = "e1000",\</u></td></tr>
+<tr><th id="937">937</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="938">938</th><td><u>        .value    = "pxe-e1000.rom",\</u></td></tr>
+<tr><th id="939">939</th><td><u>    },{\</u></td></tr>
+<tr><th id="940">940</th><td><u>        .driver   = "ne2k_pci",\</u></td></tr>
+<tr><th id="941">941</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="942">942</th><td><u>        .value    = "pxe-ne2k_pci.rom",\</u></td></tr>
+<tr><th id="943">943</th><td><u>    },{\</u></td></tr>
+<tr><th id="944">944</th><td><u>        .driver   = "pcnet",\</u></td></tr>
+<tr><th id="945">945</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="946">946</th><td><u>        .value    = "pxe-pcnet.rom",\</u></td></tr>
+<tr><th id="947">947</th><td><u>    },{\</u></td></tr>
+<tr><th id="948">948</th><td><u>        .driver   = "rtl8139",\</u></td></tr>
+<tr><th id="949">949</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="950">950</th><td><u>        .value    = "pxe-rtl8139.rom",\</u></td></tr>
+<tr><th id="951">951</th><td><u>    },{\</u></td></tr>
+<tr><th id="952">952</th><td><u>        .driver   = "virtio-net-pci",\</u></td></tr>
+<tr><th id="953">953</th><td><u>        .property = "romfile",\</u></td></tr>
+<tr><th id="954">954</th><td><u>        .value    = "pxe-virtio.rom",\</u></td></tr>
+<tr><th id="955">955</th><td><u>    },{\</u></td></tr>
+<tr><th id="956">956</th><td><u>        .driver   = "486-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="957">957</th><td><u>        .property = "model",\</u></td></tr>
+<tr><th id="958">958</th><td><u>        .value    = stringify(0),\</u></td></tr>
+<tr><th id="959">959</th><td><u>    },\</u></td></tr>
+<tr><th id="960">960</th><td><u>    {\</u></td></tr>
+<tr><th id="961">961</th><td><u>        .driver = "n270" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="962">962</th><td><u>        .property = "movbe",\</u></td></tr>
+<tr><th id="963">963</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="964">964</th><td><u>    },\</u></td></tr>
+<tr><th id="965">965</th><td><u>    {\</u></td></tr>
+<tr><th id="966">966</th><td><u>        .driver = "Westmere" "-" TYPE_X86_CPU,\</u></td></tr>
+<tr><th id="967">967</th><td><u>        .property = "pclmulqdq",\</u></td></tr>
+<tr><th id="968">968</th><td><u>        .value = "off",\</u></td></tr>
+<tr><th id="969">969</th><td><u>    },</u></td></tr>
+<tr><th id="970">970</th><td></td></tr>
+<tr><th id="971">971</th><td><u>#define <dfn class="macro" id="_M/DEFINE_PC_MACHINE" data-ref="_M/DEFINE_PC_MACHINE">DEFINE_PC_MACHINE</dfn>(suffix, namestr, initfn, optsfn) \</u></td></tr>
+<tr><th id="972">972</th><td><u>    static void pc_machine_##suffix##_class_init(ObjectClass *oc, void *data) \</u></td></tr>
+<tr><th id="973">973</th><td><u>    { \</u></td></tr>
+<tr><th id="974">974</th><td><u>        MachineClass *mc = MACHINE_CLASS(oc); \</u></td></tr>
+<tr><th id="975">975</th><td><u>        optsfn(mc); \</u></td></tr>
+<tr><th id="976">976</th><td><u>        mc-&gt;init = initfn; \</u></td></tr>
+<tr><th id="977">977</th><td><u>    } \</u></td></tr>
+<tr><th id="978">978</th><td><u>    static const TypeInfo pc_machine_type_##suffix = { \</u></td></tr>
+<tr><th id="979">979</th><td><u>        .name       = namestr TYPE_MACHINE_SUFFIX, \</u></td></tr>
+<tr><th id="980">980</th><td><u>        .parent     = TYPE_PC_MACHINE, \</u></td></tr>
+<tr><th id="981">981</th><td><u>        .class_init = pc_machine_##suffix##_class_init, \</u></td></tr>
+<tr><th id="982">982</th><td><u>    }; \</u></td></tr>
+<tr><th id="983">983</th><td><u>    static void pc_machine_init_##suffix(void) \</u></td></tr>
+<tr><th id="984">984</th><td><u>    { \</u></td></tr>
+<tr><th id="985">985</th><td><u>        type_register(&amp;pc_machine_type_##suffix); \</u></td></tr>
+<tr><th id="986">986</th><td><u>    } \</u></td></tr>
+<tr><th id="987">987</th><td><u>    type_init(pc_machine_init_##suffix)</u></td></tr>
+<tr><th id="988">988</th><td></td></tr>
+<tr><th id="989">989</th><td><b>extern</b> <em>void</em> <dfn class="decl" id="igd_passthrough_isa_bridge_create" title='igd_passthrough_isa_bridge_create' data-ref="igd_passthrough_isa_bridge_create">igd_passthrough_isa_bridge_create</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col9 decl" id="179bus" title='bus' data-type='PCIBus *' data-ref="179bus">bus</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="180gpu_dev_id" title='gpu_dev_id' data-type='uint16_t' data-ref="180gpu_dev_id">gpu_dev_id</dfn>);</td></tr>
+<tr><th id="990">990</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="991">991</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/acpi/core.c.html'>codebrowser/hw/acpi/core.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

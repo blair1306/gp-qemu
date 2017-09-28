@@ -1,0 +1,31 @@
+<dec f='codebrowser/include/crypto/block.h' l='138' type='QCryptoBlock * qcrypto_block_create(QCryptoBlockCreateOptions * options, const char * optprefix, QCryptoBlockInitFunc initfunc, QCryptoBlockWriteFunc writefunc, void * opaque, Error ** errp)'/>
+<use f='codebrowser/block/crypto.c' l='343' u='c' c='block_crypto_create_generic'/>
+<doc f='codebrowser/include/crypto/block.h' l='112'>/**
+ * qcrypto_block_create:
+ * @options: the encryption options
+ * @optprefix: name prefix for options
+ * @initfunc: callback for initializing volume header
+ * @writefunc: callback for writing data to the volume header
+ * @opaque: data to pass to @initfunc and @writefunc
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Create a new block encryption object for initializing
+ * a storage volume to be encrypted with format identified
+ * by the parameters in @options.
+ *
+ * This method will allocate space for a new volume header
+ * using @initfunc and then write header data using @writefunc,
+ * generating new master keys, etc as required. Any existing
+ * data present on the volume will be irrevocably destroyed.
+ *
+ * If any part of initializing the encryption context
+ * fails an error will be returned. This could be due
+ * to the volume being in the wrong format, a cipher
+ * or IV generator algorithm that is not supported,
+ * or incorrect passphrases.
+ *
+ * Returns: a block encryption format, or NULL on error
+ */</doc>
+<use f='codebrowser/block/qcow.c' l='870' u='c' c='qcow_create'/>
+<use f='codebrowser/block/qcow2.c' l='2456' u='c' c='qcow2_set_up_encryption'/>
+<def f='codebrowser/crypto/block.c' l='81' ll='109' type='QCryptoBlock * qcrypto_block_create(QCryptoBlockCreateOptions * options, const char * optprefix, QCryptoBlockInitFunc initfunc, QCryptoBlockWriteFunc writefunc, void * opaque, Error ** errp)'/>

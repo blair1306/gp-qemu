@@ -1,0 +1,373 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tpm.c source code [codebrowser/tpm.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/tpm.c'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='tpm.c.html'>tpm.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * TPM configuration</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2011-2013 IBM Corporation</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Berger    &lt;stefanb@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * Based on net.c</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="include/qapi/qmp/qerror.h.html">"qapi/qmp/qerror.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="include/sysemu/tpm_backend.h.html">"sysemu/tpm_backend.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="include/sysemu/tpm.h.html">"sysemu/tpm.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="include/qemu/config-file.h.html">"qemu/config-file.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="qmp-commands.h.html">"qmp-commands.h"</a></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><em>static</em> <a class="macro" href="include/qemu/queue.h.html#86" title="struct { struct TPMBackend *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-ref="TPMBackend">TPMBackend</a>) <dfn class="tu decl def" id="tpm_backends" title='tpm_backends' data-type='struct (anonymous struct at /home/jon/workspace/qemu/tpm.c:23:8)' data-ref="tpm_backends">tpm_backends</dfn> =</td></tr>
+<tr><th id="24">24</th><td>    <a class="macro" href="include/qemu/queue.h.html#91" title="{ ((void*)0) }" data-ref="_M/QLIST_HEAD_INITIALIZER">QLIST_HEAD_INITIALIZER</a>(tpm_backends);</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/TPM_MAX_MODELS" data-ref="_M/TPM_MAX_MODELS">TPM_MAX_MODELS</dfn>      1</u></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/TPM_MAX_DRIVERS" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</dfn>     1</u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><em>static</em> <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMDriverOps" title='TPMDriverOps' data-type='struct TPMDriverOps' data-ref="TPMDriverOps">TPMDriverOps</a> <em>const</em> *<dfn class="tu decl def" id="be_drivers" title='be_drivers' data-type='const TPMDriverOps *[1]' data-ref="be_drivers">be_drivers</dfn>[<a class="macro" href="#28" title="1" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</a>] = {</td></tr>
+<tr><th id="31">31</th><td>    <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="32">32</th><td>};</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><em>static</em> <b>enum</b> <a class="type" href="qapi-types.h.html#TpmModel" title='TpmModel' data-ref="TpmModel">TpmModel</a> <dfn class="tu decl def" id="tpm_models" title='tpm_models' data-type='enum TpmModel [1]' data-ref="tpm_models">tpm_models</dfn>[<a class="macro" href="#27" title="1" data-ref="_M/TPM_MAX_MODELS">TPM_MAX_MODELS</a>] = {</td></tr>
+<tr><th id="35">35</th><td>    <a class="enum" href="qapi-types.h.html#TpmModel::TPM_MODEL__MAX" title='TpmModel::TPM_MODEL__MAX' data-ref="TpmModel::TPM_MODEL__MAX">TPM_MODEL__MAX</a>,</td></tr>
+<tr><th id="36">36</th><td>};</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><em>int</em> <dfn class="decl def" id="tpm_register_model" title='tpm_register_model' data-ref="tpm_register_model">tpm_register_model</dfn>(<b>enum</b> <a class="type" href="qapi-types.h.html#TpmModel" title='TpmModel' data-ref="TpmModel">TpmModel</a> <dfn class="local col1 decl" id="1model" title='model' data-type='enum TpmModel' data-ref="1model">model</dfn>)</td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>    <em>int</em> <dfn class="local col2 decl" id="2i" title='i' data-type='int' data-ref="2i">i</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>    <b>for</b> (<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a> = <var>0</var>; <a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a> &lt; <a class="macro" href="#27" title="1" data-ref="_M/TPM_MAX_MODELS">TPM_MAX_MODELS</a>; <a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>++) {</td></tr>
+<tr><th id="43">43</th><td>        <b>if</b> (<a class="tu ref" href="#tpm_models" title='tpm_models' data-use='r' data-ref="tpm_models">tpm_models</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>] == <a class="enum" href="qapi-types.h.html#TpmModel::TPM_MODEL__MAX" title='TpmModel::TPM_MODEL__MAX' data-ref="TpmModel::TPM_MODEL__MAX">TPM_MODEL__MAX</a>) {</td></tr>
+<tr><th id="44">44</th><td>            <a class="tu ref" href="#tpm_models" title='tpm_models' data-use='w' data-ref="tpm_models">tpm_models</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>] = <a class="local col1 ref" href="#1model" title='model' data-ref="1model">model</a>;</td></tr>
+<tr><th id="45">45</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="46">46</th><td>        }</td></tr>
+<tr><th id="47">47</th><td>    }</td></tr>
+<tr><th id="48">48</th><td>    <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Could not register TPM model"</q>);</td></tr>
+<tr><th id="49">49</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="50">50</th><td>}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="tpm_model_is_registered" title='tpm_model_is_registered' data-type='_Bool tpm_model_is_registered(enum TpmModel model)' data-ref="tpm_model_is_registered">tpm_model_is_registered</dfn>(<b>enum</b> <a class="type" href="qapi-types.h.html#TpmModel" title='TpmModel' data-ref="TpmModel">TpmModel</a> <dfn class="local col3 decl" id="3model" title='model' data-type='enum TpmModel' data-ref="3model">model</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <em>int</em> <dfn class="local col4 decl" id="4i" title='i' data-type='int' data-ref="4i">i</dfn>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <b>for</b> (<a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> = <var>0</var>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a> &lt; <a class="macro" href="#27" title="1" data-ref="_M/TPM_MAX_MODELS">TPM_MAX_MODELS</a>; <a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>++) {</td></tr>
+<tr><th id="57">57</th><td>        <b>if</b> (<a class="tu ref" href="#tpm_models" title='tpm_models' data-use='r' data-ref="tpm_models">tpm_models</a>[<a class="local col4 ref" href="#4i" title='i' data-ref="4i">i</a>] == <a class="local col3 ref" href="#3model" title='model' data-ref="3model">model</a>) {</td></tr>
+<tr><th id="58">58</th><td>            <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="59">59</th><td>        }</td></tr>
+<tr><th id="60">60</th><td>    }</td></tr>
+<tr><th id="61">61</th><td>    <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="62">62</th><td>}</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>const</em> <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMDriverOps" title='TPMDriverOps' data-type='struct TPMDriverOps' data-ref="TPMDriverOps">TPMDriverOps</a> *<dfn class="decl def" id="tpm_get_backend_driver" title='tpm_get_backend_driver' data-ref="tpm_get_backend_driver">tpm_get_backend_driver</dfn>(<em>const</em> <em>char</em> *<dfn class="local col5 decl" id="5type" title='type' data-type='const char *' data-ref="5type">type</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>    <em>int</em> <dfn class="local col6 decl" id="6i" title='i' data-type='int' data-ref="6i">i</dfn>;</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    <b>for</b> (<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> = <var>0</var>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> &lt; <a class="macro" href="#28" title="1" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</a> &amp;&amp; <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>] != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>++) {</td></tr>
+<tr><th id="69">69</th><td>        <b>if</b> (!<a class="ref" href="../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="ref" href="qapi-types.h.html#TpmType_lookup" title='TpmType_lookup' data-ref="TpmType_lookup">TpmType_lookup</a>[<a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>]-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::type" title='TPMDriverOps::type' data-ref="TPMDriverOps::type">type</a>], <a class="local col5 ref" href="#5type" title='type' data-ref="5type">type</a>)) {</td></tr>
+<tr><th id="70">70</th><td>            <b>return</b> <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>];</td></tr>
+<tr><th id="71">71</th><td>        }</td></tr>
+<tr><th id="72">72</th><td>    }</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><u>#<span data-ppcond="77">ifdef</span> <a class="macro" href="config-host.h.html#86" data-ref="_M/CONFIG_TPM">CONFIG_TPM</a></u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><em>int</em> <dfn class="decl def" id="tpm_register_driver" title='tpm_register_driver' data-ref="tpm_register_driver">tpm_register_driver</dfn>(<em>const</em> <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMDriverOps" title='TPMDriverOps' data-type='struct TPMDriverOps' data-ref="TPMDriverOps">TPMDriverOps</a> *<dfn class="local col7 decl" id="7tdo" title='tdo' data-type='const TPMDriverOps *' data-ref="7tdo">tdo</dfn>)</td></tr>
+<tr><th id="80">80</th><td>{</td></tr>
+<tr><th id="81">81</th><td>    <em>int</em> <dfn class="local col8 decl" id="8i" title='i' data-type='int' data-ref="8i">i</dfn>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <b>for</b> (<a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a> = <var>0</var>; <a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a> &lt; <a class="macro" href="#28" title="1" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</a>; <a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a>++) {</td></tr>
+<tr><th id="84">84</th><td>        <b>if</b> (!<a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a>]) {</td></tr>
+<tr><th id="85">85</th><td>            <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='w' data-ref="be_drivers">be_drivers</a>[<a class="local col8 ref" href="#8i" title='i' data-ref="8i">i</a>] = <a class="local col7 ref" href="#7tdo" title='tdo' data-ref="7tdo">tdo</a>;</td></tr>
+<tr><th id="86">86</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="87">87</th><td>        }</td></tr>
+<tr><th id="88">88</th><td>    }</td></tr>
+<tr><th id="89">89</th><td>    <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Could not register TPM driver"</q>);</td></tr>
+<tr><th id="90">90</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="91">91</th><td>}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i  data-doc="tpm_display_backend_drivers">/*</i></td></tr>
+<tr><th id="94">94</th><td><i  data-doc="tpm_display_backend_drivers"> * Walk the list of available TPM backend drivers and display them on the</i></td></tr>
+<tr><th id="95">95</th><td><i  data-doc="tpm_display_backend_drivers"> * screen.</i></td></tr>
+<tr><th id="96">96</th><td><i  data-doc="tpm_display_backend_drivers"> */</i></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="tpm_display_backend_drivers" title='tpm_display_backend_drivers' data-type='void tpm_display_backend_drivers()' data-ref="tpm_display_backend_drivers">tpm_display_backend_drivers</dfn>(<em>void</em>)</td></tr>
+<tr><th id="98">98</th><td>{</td></tr>
+<tr><th id="99">99</th><td>    <em>int</em> <dfn class="local col9 decl" id="9i" title='i' data-type='int' data-ref="9i">i</dfn>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Supported TPM types (choose only one):\n"</q>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>    <b>for</b> (<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> = <var>0</var>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> &lt; <a class="macro" href="#28" title="1" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</a> &amp;&amp; <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>] != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>++) {</td></tr>
+<tr><th id="104">104</th><td>        <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"%12s   %s\n"</q>,</td></tr>
+<tr><th id="105">105</th><td>                <a class="ref" href="qapi-types.h.html#TpmType_lookup" title='TpmType_lookup' data-ref="TpmType_lookup">TpmType_lookup</a>[<a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>]-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::type" title='TPMDriverOps::type' data-ref="TPMDriverOps::type">type</a>], <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>]-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::desc" title='TPMDriverOps::desc' data-ref="TPMDriverOps::desc">desc</a>());</td></tr>
+<tr><th id="106">106</th><td>    }</td></tr>
+<tr><th id="107">107</th><td>    <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"\n"</q>);</td></tr>
+<tr><th id="108">108</th><td>}</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>/*</i></td></tr>
+<tr><th id="111">111</th><td><i> * Find the TPM with the given Id</i></td></tr>
+<tr><th id="112">112</th><td><i> */</i></td></tr>
+<tr><th id="113">113</th><td><a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="decl def" id="qemu_find_tpm" title='qemu_find_tpm' data-ref="qemu_find_tpm">qemu_find_tpm</dfn>(<em>const</em> <em>char</em> *<dfn class="local col0 decl" id="10id" title='id' data-type='const char *' data-ref="10id">id</dfn>)</td></tr>
+<tr><th id="114">114</th><td>{</td></tr>
+<tr><th id="115">115</th><td>    <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="local col1 decl" id="11drv" title='drv' data-type='TPMBackend *' data-ref="11drv">drv</dfn>;</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <b>if</b> (<a class="local col0 ref" href="#10id" title='id' data-ref="10id">id</a>) {</td></tr>
+<tr><th id="118">118</th><td>        <a class="macro" href="include/qemu/queue.h.html#149" title="for ((drv) = ((&amp;tpm_backends)-&gt;lh_first); (drv); (drv) = ((drv)-&gt;list.le_next))" data-ref="_M/QLIST_FOREACH">QLIST_FOREACH</a>(<a class="local col1 ref" href="#11drv" title='drv' data-ref="11drv">drv</a>, &amp;<a class="tu ref" href="#tpm_backends" title='tpm_backends' data-use='a' data-ref="tpm_backends">tpm_backends</a>, <a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::list" title='TPMBackend::list' data-ref="TPMBackend::list">list</a>) {</td></tr>
+<tr><th id="119">119</th><td>            <b>if</b> (!<a class="ref" href="../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col1 ref" href="#11drv" title='drv' data-ref="11drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::id" title='TPMBackend::id' data-ref="TPMBackend::id">id</a>, <a class="local col0 ref" href="#10id" title='id' data-ref="10id">id</a>)) {</td></tr>
+<tr><th id="120">120</th><td>                <b>return</b> <a class="local col1 ref" href="#11drv" title='drv' data-ref="11drv">drv</a>;</td></tr>
+<tr><th id="121">121</th><td>            }</td></tr>
+<tr><th id="122">122</th><td>        }</td></tr>
+<tr><th id="123">123</th><td>    }</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="configure_tpm" title='configure_tpm' data-type='int configure_tpm(QemuOpts * opts)' data-ref="configure_tpm">configure_tpm</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col2 decl" id="12opts" title='opts' data-type='QemuOpts *' data-ref="12opts">opts</dfn>)</td></tr>
+<tr><th id="129">129</th><td>{</td></tr>
+<tr><th id="130">130</th><td>    <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="13value" title='value' data-type='const char *' data-ref="13value">value</dfn>;</td></tr>
+<tr><th id="131">131</th><td>    <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14id" title='id' data-type='const char *' data-ref="14id">id</dfn>;</td></tr>
+<tr><th id="132">132</th><td>    <em>const</em> <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMDriverOps" title='TPMDriverOps' data-type='struct TPMDriverOps' data-ref="TPMDriverOps">TPMDriverOps</a> *<dfn class="local col5 decl" id="15be" title='be' data-type='const TPMDriverOps *' data-ref="15be">be</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="local col6 decl" id="16drv" title='drv' data-type='TPMBackend *' data-ref="16drv">drv</dfn>;</td></tr>
+<tr><th id="134">134</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col7 decl" id="17local_err" title='local_err' data-type='Error *' data-ref="17local_err">local_err</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>    <b>if</b> (!<a class="macro" href="include/qemu/queue.h.html#162" title="((&amp;tpm_backends)-&gt;lh_first == ((void*)0))" data-ref="_M/QLIST_EMPTY">QLIST_EMPTY</a>(&amp;<a class="tu ref" href="#tpm_backends" title='tpm_backends' data-use='a' data-ref="tpm_backends">tpm_backends</a>)) {</td></tr>
+<tr><th id="137">137</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Only one TPM is allowed."</q>);</td></tr>
+<tr><th id="138">138</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="139">139</th><td>    }</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>    <a class="local col4 ref" href="#14id" title='id' data-ref="14id">id</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_id" title='qemu_opts_id' data-ref="qemu_opts_id">qemu_opts_id</a>(<a class="local col2 ref" href="#12opts" title='opts' data-ref="12opts">opts</a>);</td></tr>
+<tr><th id="142">142</th><td>    <b>if</b> (<a class="local col4 ref" href="#14id" title='id' data-ref="14id">id</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="143">143</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<a class="macro" href="include/qapi/qmp/qerror.h.html#70" title="&quot;Parameter &apos;%s&apos; is missing&quot;" data-ref="_M/QERR_MISSING_PARAMETER">QERR_MISSING_PARAMETER</a>, <q>"id"</q>);</td></tr>
+<tr><th id="144">144</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="145">145</th><td>    }</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>    <a class="local col3 ref" href="#13value" title='value' data-ref="13value">value</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col2 ref" href="#12opts" title='opts' data-ref="12opts">opts</a>, <q>"type"</q>);</td></tr>
+<tr><th id="148">148</th><td>    <b>if</b> (!<a class="local col3 ref" href="#13value" title='value' data-ref="13value">value</a>) {</td></tr>
+<tr><th id="149">149</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<a class="macro" href="include/qapi/qmp/qerror.h.html#70" title="&quot;Parameter &apos;%s&apos; is missing&quot;" data-ref="_M/QERR_MISSING_PARAMETER">QERR_MISSING_PARAMETER</a>, <q>"type"</q>);</td></tr>
+<tr><th id="150">150</th><td>        <a class="tu ref" href="#tpm_display_backend_drivers" title='tpm_display_backend_drivers' data-use='c' data-ref="tpm_display_backend_drivers">tpm_display_backend_drivers</a>();</td></tr>
+<tr><th id="151">151</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="152">152</th><td>    }</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <a class="local col5 ref" href="#15be" title='be' data-ref="15be">be</a> = <a class="ref" href="#tpm_get_backend_driver" title='tpm_get_backend_driver' data-ref="tpm_get_backend_driver">tpm_get_backend_driver</a>(<a class="local col3 ref" href="#13value" title='value' data-ref="13value">value</a>);</td></tr>
+<tr><th id="155">155</th><td>    <b>if</b> (<a class="local col5 ref" href="#15be" title='be' data-ref="15be">be</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="156">156</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<a class="macro" href="include/qapi/qmp/qerror.h.html#55" title="&quot;Parameter &apos;%s&apos; expects %s&quot;" data-ref="_M/QERR_INVALID_PARAMETER_VALUE">QERR_INVALID_PARAMETER_VALUE</a>,</td></tr>
+<tr><th id="157">157</th><td>                     <q>"type"</q>, <q>"a TPM backend type"</q>);</td></tr>
+<tr><th id="158">158</th><td>        <a class="tu ref" href="#tpm_display_backend_drivers" title='tpm_display_backend_drivers' data-use='c' data-ref="tpm_display_backend_drivers">tpm_display_backend_drivers</a>();</td></tr>
+<tr><th id="159">159</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="160">160</th><td>    }</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>    <i>/* validate backend specific opts */</i></td></tr>
+<tr><th id="163">163</th><td>    <a class="ref" href="include/qemu/option.h.html#qemu_opts_validate" title='qemu_opts_validate' data-ref="qemu_opts_validate">qemu_opts_validate</a>(<a class="local col2 ref" href="#12opts" title='opts' data-ref="12opts">opts</a>, <a class="local col5 ref" href="#15be" title='be' data-ref="15be">be</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::opts" title='TPMDriverOps::opts' data-ref="TPMDriverOps::opts">opts</a>, &amp;<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>);</td></tr>
+<tr><th id="164">164</th><td>    <b>if</b> (<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>) {</td></tr>
+<tr><th id="165">165</th><td>        <a class="ref" href="include/qapi/error.h.html#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>);</td></tr>
+<tr><th id="166">166</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="167">167</th><td>    }</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <a class="local col6 ref" href="#16drv" title='drv' data-ref="16drv">drv</a> = <a class="local col5 ref" href="#15be" title='be' data-ref="15be">be</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::create" title='TPMDriverOps::create' data-ref="TPMDriverOps::create">create</a>(<a class="local col2 ref" href="#12opts" title='opts' data-ref="12opts">opts</a>, <a class="local col4 ref" href="#14id" title='id' data-ref="14id">id</a>);</td></tr>
+<tr><th id="170">170</th><td>    <b>if</b> (!<a class="local col6 ref" href="#16drv" title='drv' data-ref="16drv">drv</a>) {</td></tr>
+<tr><th id="171">171</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="172">172</th><td>    }</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td>    <a class="ref" href="include/sysemu/tpm_backend.h.html#tpm_backend_open" title='tpm_backend_open' data-ref="tpm_backend_open">tpm_backend_open</a>(<a class="local col6 ref" href="#16drv" title='drv' data-ref="16drv">drv</a>, &amp;<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>);</td></tr>
+<tr><th id="175">175</th><td>    <b>if</b> (<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>) {</td></tr>
+<tr><th id="176">176</th><td>        <a class="ref" href="include/qapi/error.h.html#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col7 ref" href="#17local_err" title='local_err' data-ref="17local_err">local_err</a>);</td></tr>
+<tr><th id="177">177</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="178">178</th><td>    }</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>    <a class="macro" href="include/qemu/queue.h.html#135" title="do { if (((drv)-&gt;list.le_next = (&amp;tpm_backends)-&gt;lh_first) != ((void*)0)) (&amp;tpm_backends)-&gt;lh_first-&gt;list.le_prev = &amp;(drv)-&gt;list.le_next; (&amp;tpm_backends)-&gt;lh_first = (drv); (drv)-&gt;list.le_prev = &amp;(&amp;tpm_backends)-&gt;lh_first; } while ( 0)" data-ref="_M/QLIST_INSERT_HEAD">QLIST_INSERT_HEAD</a>(&amp;<a class="tu ref" href="#tpm_backends" title='tpm_backends' data-use='a' data-ref="tpm_backends">tpm_backends</a>, <a class="local col6 ref" href="#16drv" title='drv' data-ref="16drv">drv</a>, <a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::list" title='TPMBackend::list' data-ref="TPMBackend::list">list</a>);</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="183">183</th><td>}</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="tpm_init_tpmdev" title='tpm_init_tpmdev' data-type='int tpm_init_tpmdev(void * dummy, QemuOpts * opts, Error ** errp)' data-ref="tpm_init_tpmdev">tpm_init_tpmdev</dfn>(<em>void</em> *<dfn class="local col8 decl" id="18dummy" title='dummy' data-type='void *' data-ref="18dummy">dummy</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col9 decl" id="19opts" title='opts' data-type='QemuOpts *' data-ref="19opts">opts</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="20errp" title='errp' data-type='Error **' data-ref="20errp">errp</dfn>)</td></tr>
+<tr><th id="186">186</th><td>{</td></tr>
+<tr><th id="187">187</th><td>    <b>return</b> <a class="tu ref" href="#configure_tpm" title='configure_tpm' data-use='c' data-ref="configure_tpm">configure_tpm</a>(<a class="local col9 ref" href="#19opts" title='opts' data-ref="19opts">opts</a>);</td></tr>
+<tr><th id="188">188</th><td>}</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><i>/*</i></td></tr>
+<tr><th id="191">191</th><td><i> * Walk the list of TPM backend drivers that are in use and call their</i></td></tr>
+<tr><th id="192">192</th><td><i> * destroy function to have them cleaned up.</i></td></tr>
+<tr><th id="193">193</th><td><i> */</i></td></tr>
+<tr><th id="194">194</th><td><em>void</em> <dfn class="decl def" id="tpm_cleanup" title='tpm_cleanup' data-ref="tpm_cleanup">tpm_cleanup</dfn>(<em>void</em>)</td></tr>
+<tr><th id="195">195</th><td>{</td></tr>
+<tr><th id="196">196</th><td>    <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="local col1 decl" id="21drv" title='drv' data-type='TPMBackend *' data-ref="21drv">drv</dfn>, *<dfn class="local col2 decl" id="22next" title='next' data-type='TPMBackend *' data-ref="22next">next</dfn>;</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <a class="macro" href="include/qemu/queue.h.html#154" title="for ((drv) = ((&amp;tpm_backends)-&gt;lh_first); (drv) &amp;&amp; ((next) = ((drv)-&gt;list.le_next), 1); (drv) = (next))" data-ref="_M/QLIST_FOREACH_SAFE">QLIST_FOREACH_SAFE</a>(<a class="local col1 ref" href="#21drv" title='drv' data-ref="21drv">drv</a>, &amp;<a class="tu ref" href="#tpm_backends" title='tpm_backends' data-use='a' data-ref="tpm_backends">tpm_backends</a>, <a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::list" title='TPMBackend::list' data-ref="TPMBackend::list">list</a>, <a class="local col2 ref" href="#22next" title='next' data-ref="22next">next</a>) {</td></tr>
+<tr><th id="199">199</th><td>        <a class="macro" href="include/qemu/queue.h.html#142" title="do { if ((drv)-&gt;list.le_next != ((void*)0)) (drv)-&gt;list.le_next-&gt;list.le_prev = (drv)-&gt;list.le_prev; *(drv)-&gt;list.le_prev = (drv)-&gt;list.le_next; } while ( 0)" data-ref="_M/QLIST_REMOVE">QLIST_REMOVE</a>(<a class="local col1 ref" href="#21drv" title='drv' data-ref="21drv">drv</a>, <a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::list" title='TPMBackend::list' data-ref="TPMBackend::list">list</a>);</td></tr>
+<tr><th id="200">200</th><td>        <a class="ref" href="include/sysemu/tpm_backend.h.html#tpm_backend_destroy" title='tpm_backend_destroy' data-ref="tpm_backend_destroy">tpm_backend_destroy</a>(<a class="local col1 ref" href="#21drv" title='drv' data-ref="21drv">drv</a>);</td></tr>
+<tr><th id="201">201</th><td>    }</td></tr>
+<tr><th id="202">202</th><td>}</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><i>/*</i></td></tr>
+<tr><th id="205">205</th><td><i> * Initialize the TPM. Process the tpmdev command line options describing the</i></td></tr>
+<tr><th id="206">206</th><td><i> * TPM backend.</i></td></tr>
+<tr><th id="207">207</th><td><i> */</i></td></tr>
+<tr><th id="208">208</th><td><em>int</em> <dfn class="decl def" id="tpm_init" title='tpm_init' data-ref="tpm_init">tpm_init</dfn>(<em>void</em>)</td></tr>
+<tr><th id="209">209</th><td>{</td></tr>
+<tr><th id="210">210</th><td>    <b>if</b> (<a class="ref" href="include/qemu/option.h.html#qemu_opts_foreach" title='qemu_opts_foreach' data-ref="qemu_opts_foreach">qemu_opts_foreach</a>(<a class="ref" href="include/qemu/config-file.h.html#qemu_find_opts" title='qemu_find_opts' data-ref="qemu_find_opts">qemu_find_opts</a>(<q>"tpmdev"</q>),</td></tr>
+<tr><th id="211">211</th><td>                          <a class="tu ref" href="#tpm_init_tpmdev" title='tpm_init_tpmdev' data-use='r' data-ref="tpm_init_tpmdev">tpm_init_tpmdev</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)) {</td></tr>
+<tr><th id="212">212</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="213">213</th><td>    }</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>    <a class="ref" href="../include/stdlib.h.html#atexit" title='atexit' data-ref="atexit">atexit</a>(<a class="ref" href="#tpm_cleanup" title='tpm_cleanup' data-ref="tpm_cleanup">tpm_cleanup</a>);</td></tr>
+<tr><th id="216">216</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="217">217</th><td>}</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td><i>/*</i></td></tr>
+<tr><th id="220">220</th><td><i> * Parse the TPM configuration options.</i></td></tr>
+<tr><th id="221">221</th><td><i> * To display all available TPM backends the user may use '-tpmdev help'</i></td></tr>
+<tr><th id="222">222</th><td><i> */</i></td></tr>
+<tr><th id="223">223</th><td><em>int</em> <dfn class="decl def" id="tpm_config_parse" title='tpm_config_parse' data-ref="tpm_config_parse">tpm_config_parse</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#QemuOptsList" title='QemuOptsList' data-type='struct QemuOptsList' data-ref="QemuOptsList">QemuOptsList</a> *<dfn class="local col3 decl" id="23opts_list" title='opts_list' data-type='QemuOptsList *' data-ref="23opts_list">opts_list</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="24optarg" title='optarg' data-type='const char *' data-ref="24optarg">optarg</dfn>)</td></tr>
+<tr><th id="224">224</th><td>{</td></tr>
+<tr><th id="225">225</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col5 decl" id="25opts" title='opts' data-type='QemuOpts *' data-ref="25opts">opts</dfn>;</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>    <b>if</b> (!<a class="ref" href="../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col4 ref" href="#24optarg" title='optarg' data-ref="24optarg">optarg</a>, <q>"help"</q>)) {</td></tr>
+<tr><th id="228">228</th><td>        <a class="tu ref" href="#tpm_display_backend_drivers" title='tpm_display_backend_drivers' data-use='c' data-ref="tpm_display_backend_drivers">tpm_display_backend_drivers</a>();</td></tr>
+<tr><th id="229">229</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="230">230</th><td>    }</td></tr>
+<tr><th id="231">231</th><td>    <a class="local col5 ref" href="#25opts" title='opts' data-ref="25opts">opts</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(<a class="local col3 ref" href="#23opts_list" title='opts_list' data-ref="23opts_list">opts_list</a>, <a class="local col4 ref" href="#24optarg" title='optarg' data-ref="24optarg">optarg</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="232">232</th><td>    <b>if</b> (!<a class="local col5 ref" href="#25opts" title='opts' data-ref="25opts">opts</a>) {</td></tr>
+<tr><th id="233">233</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="234">234</th><td>    }</td></tr>
+<tr><th id="235">235</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="236">236</th><td>}</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td><u>#<span data-ppcond="77">endif</span> /* CONFIG_TPM */</u></td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><em>static</em> <em>const</em> <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMDriverOps" title='TPMDriverOps' data-type='struct TPMDriverOps' data-ref="TPMDriverOps">TPMDriverOps</a> *<dfn class="tu decl def" id="tpm_driver_find_by_type" title='tpm_driver_find_by_type' data-type='const TPMDriverOps * tpm_driver_find_by_type(enum TpmType type)' data-ref="tpm_driver_find_by_type">tpm_driver_find_by_type</dfn>(<b>enum</b> <a class="type" href="qapi-types.h.html#TpmType" title='TpmType' data-ref="TpmType">TpmType</a> <dfn class="local col6 decl" id="26type" title='type' data-type='enum TpmType' data-ref="26type">type</dfn>)</td></tr>
+<tr><th id="241">241</th><td>{</td></tr>
+<tr><th id="242">242</th><td>    <em>int</em> <dfn class="local col7 decl" id="27i" title='i' data-type='int' data-ref="27i">i</dfn>;</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>    <b>for</b> (<a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a> = <var>0</var>; <a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a> &lt; <a class="macro" href="#28" title="1" data-ref="_M/TPM_MAX_DRIVERS">TPM_MAX_DRIVERS</a> &amp;&amp; <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a>] != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a>++) {</td></tr>
+<tr><th id="245">245</th><td>        <b>if</b> (<a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a>]-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::type" title='TPMDriverOps::type' data-ref="TPMDriverOps::type">type</a> == <a class="local col6 ref" href="#26type" title='type' data-ref="26type">type</a>) {</td></tr>
+<tr><th id="246">246</th><td>            <b>return</b> <a class="tu ref" href="#be_drivers" title='be_drivers' data-use='r' data-ref="be_drivers">be_drivers</a>[<a class="local col7 ref" href="#27i" title='i' data-ref="27i">i</a>];</td></tr>
+<tr><th id="247">247</th><td>        }</td></tr>
+<tr><th id="248">248</th><td>    }</td></tr>
+<tr><th id="249">249</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="250">250</th><td>}</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><em>static</em> <a class="typedef" href="qapi-types.h.html#TPMInfo" title='TPMInfo' data-type='struct TPMInfo' data-ref="TPMInfo">TPMInfo</a> *<dfn class="tu decl def" id="qmp_query_tpm_inst" title='qmp_query_tpm_inst' data-type='TPMInfo * qmp_query_tpm_inst(TPMBackend * drv)' data-ref="qmp_query_tpm_inst">qmp_query_tpm_inst</dfn>(<a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="local col8 decl" id="28drv" title='drv' data-type='TPMBackend *' data-ref="28drv">drv</dfn>)</td></tr>
+<tr><th id="253">253</th><td>{</td></tr>
+<tr><th id="254">254</th><td>    <a class="typedef" href="qapi-types.h.html#TPMInfo" title='TPMInfo' data-type='struct TPMInfo' data-ref="TPMInfo">TPMInfo</a> *<dfn class="local col9 decl" id="29res" title='res' data-type='TPMInfo *' data-ref="29res">res</dfn> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TPMInfo *) g_malloc0_n ((1), sizeof (TPMInfo)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TPMInfo" title='TPMInfo' data-type='struct TPMInfo' data-ref="TPMInfo">TPMInfo</a>, <var>1</var>);</td></tr>
+<tr><th id="255">255</th><td>    <a class="typedef" href="qapi-types.h.html#TPMPassthroughOptions" title='TPMPassthroughOptions' data-type='struct TPMPassthroughOptions' data-ref="TPMPassthroughOptions">TPMPassthroughOptions</a> *<dfn class="local col0 decl" id="30tpo" title='tpo' data-type='TPMPassthroughOptions *' data-ref="30tpo">tpo</dfn>;</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td>    <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfo::id" title='TPMInfo::id' data-ref="TPMInfo::id">id</a> = <a class="ref" href="../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::id" title='TPMBackend::id' data-ref="TPMBackend::id">id</a>);</td></tr>
+<tr><th id="258">258</th><td>    <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfo::model" title='TPMInfo::model' data-ref="TPMInfo::model">model</a> = <a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::fe_model" title='TPMBackend::fe_model' data-ref="TPMBackend::fe_model">fe_model</a>;</td></tr>
+<tr><th id="259">259</th><td>    <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfo::options" title='TPMInfo::options' data-ref="TPMInfo::options">options</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TpmTypeOptions *) g_malloc0_n ((1), sizeof (TpmTypeOptions)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TpmTypeOptions" title='TpmTypeOptions' data-type='struct TpmTypeOptions' data-ref="TpmTypeOptions">TpmTypeOptions</a>, <var>1</var>);</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>    <b>switch</b> (<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::ops" title='TPMBackend::ops' data-ref="TPMBackend::ops">ops</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMDriverOps::type" title='TPMDriverOps::type' data-ref="TPMDriverOps::type">type</a>) {</td></tr>
+<tr><th id="262">262</th><td>    <b>case</b> <a class="enum" href="qapi-types.h.html#TpmType::TPM_TYPE_PASSTHROUGH" title='TpmType::TPM_TYPE_PASSTHROUGH' data-ref="TpmType::TPM_TYPE_PASSTHROUGH">TPM_TYPE_PASSTHROUGH</a>:</td></tr>
+<tr><th id="263">263</th><td>        <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfo::options" title='TPMInfo::options' data-ref="TPMInfo::options">options</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmTypeOptions::type" title='TpmTypeOptions::type' data-ref="TpmTypeOptions::type">type</a> = <a class="enum" href="qapi-types.h.html#TpmTypeOptionsKind::TPM_TYPE_OPTIONS_KIND_PASSTHROUGH" title='TpmTypeOptionsKind::TPM_TYPE_OPTIONS_KIND_PASSTHROUGH' data-ref="TpmTypeOptionsKind::TPM_TYPE_OPTIONS_KIND_PASSTHROUGH">TPM_TYPE_OPTIONS_KIND_PASSTHROUGH</a>;</td></tr>
+<tr><th id="264">264</th><td>        <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TPMPassthroughOptions *) g_malloc0_n ((1), sizeof (TPMPassthroughOptions)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TPMPassthroughOptions" title='TPMPassthroughOptions' data-type='struct TPMPassthroughOptions' data-ref="TPMPassthroughOptions">TPMPassthroughOptions</a>, <var>1</var>);</td></tr>
+<tr><th id="265">265</th><td>        <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfo::options" title='TPMInfo::options' data-ref="TPMInfo::options">options</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmTypeOptions::u" title='TpmTypeOptions::u' data-ref="TpmTypeOptions::u">u</a>.<a class="ref" href="qapi-types.h.html#TpmTypeOptions::(anonymous)::passthrough" title='TpmTypeOptions::(anonymous union)::passthrough' data-ref="TpmTypeOptions::(anonymous)::passthrough">passthrough</a>.<a class="ref" href="qapi-types.h.html#q_obj_TPMPassthroughOptions_wrapper::data" title='q_obj_TPMPassthroughOptions_wrapper::data' data-ref="q_obj_TPMPassthroughOptions_wrapper::data">data</a> = <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a>;</td></tr>
+<tr><th id="266">266</th><td>        <b>if</b> (<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::path" title='TPMBackend::path' data-ref="TPMBackend::path">path</a>) {</td></tr>
+<tr><th id="267">267</th><td>            <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMPassthroughOptions::path" title='TPMPassthroughOptions::path' data-ref="TPMPassthroughOptions::path">path</a> = <a class="ref" href="../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::path" title='TPMBackend::path' data-ref="TPMBackend::path">path</a>);</td></tr>
+<tr><th id="268">268</th><td>            <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMPassthroughOptions::has_path" title='TPMPassthroughOptions::has_path' data-ref="TPMPassthroughOptions::has_path">has_path</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="269">269</th><td>        }</td></tr>
+<tr><th id="270">270</th><td>        <b>if</b> (<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::cancel_path" title='TPMBackend::cancel_path' data-ref="TPMBackend::cancel_path">cancel_path</a>) {</td></tr>
+<tr><th id="271">271</th><td>            <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMPassthroughOptions::cancel_path" title='TPMPassthroughOptions::cancel_path' data-ref="TPMPassthroughOptions::cancel_path">cancel_path</a> = <a class="ref" href="../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col8 ref" href="#28drv" title='drv' data-ref="28drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::cancel_path" title='TPMBackend::cancel_path' data-ref="TPMBackend::cancel_path">cancel_path</a>);</td></tr>
+<tr><th id="272">272</th><td>            <a class="local col0 ref" href="#30tpo" title='tpo' data-ref="30tpo">tpo</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMPassthroughOptions::has_cancel_path" title='TPMPassthroughOptions::has_cancel_path' data-ref="TPMPassthroughOptions::has_cancel_path">has_cancel_path</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="273">273</th><td>        }</td></tr>
+<tr><th id="274">274</th><td>        <b>break</b>;</td></tr>
+<tr><th id="275">275</th><td>    <b>case</b> <a class="enum" href="qapi-types.h.html#TpmType::TPM_TYPE__MAX" title='TpmType::TPM_TYPE__MAX' data-ref="TpmType::TPM_TYPE__MAX">TPM_TYPE__MAX</a>:</td></tr>
+<tr><th id="276">276</th><td>        <b>break</b>;</td></tr>
+<tr><th id="277">277</th><td>    }</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>    <b>return</b> <a class="local col9 ref" href="#29res" title='res' data-ref="29res">res</a>;</td></tr>
+<tr><th id="280">280</th><td>}</td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td><i>/*</i></td></tr>
+<tr><th id="283">283</th><td><i> * Walk the list of active TPM backends and collect information about them</i></td></tr>
+<tr><th id="284">284</th><td><i> * following the schema description in qapi-schema.json.</i></td></tr>
+<tr><th id="285">285</th><td><i> */</i></td></tr>
+<tr><th id="286">286</th><td><a class="typedef" href="qapi-types.h.html#TPMInfoList" title='TPMInfoList' data-type='struct TPMInfoList' data-ref="TPMInfoList">TPMInfoList</a> *<dfn class="decl def" id="qmp_query_tpm" title='qmp_query_tpm' data-ref="qmp_query_tpm">qmp_query_tpm</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="31errp" title='errp' data-type='Error **' data-ref="31errp">errp</dfn>)</td></tr>
+<tr><th id="287">287</th><td>{</td></tr>
+<tr><th id="288">288</th><td>    <a class="typedef" href="include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="local col2 decl" id="32drv" title='drv' data-type='TPMBackend *' data-ref="32drv">drv</dfn>;</td></tr>
+<tr><th id="289">289</th><td>    <a class="typedef" href="qapi-types.h.html#TPMInfoList" title='TPMInfoList' data-type='struct TPMInfoList' data-ref="TPMInfoList">TPMInfoList</a> *<dfn class="local col3 decl" id="33info" title='info' data-type='TPMInfoList *' data-ref="33info">info</dfn>, *<dfn class="local col4 decl" id="34head" title='head' data-type='TPMInfoList *' data-ref="34head">head</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, *<dfn class="local col5 decl" id="35cur_item" title='cur_item' data-type='TPMInfoList *' data-ref="35cur_item">cur_item</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>    <a class="macro" href="include/qemu/queue.h.html#149" title="for ((drv) = ((&amp;tpm_backends)-&gt;lh_first); (drv); (drv) = ((drv)-&gt;list.le_next))" data-ref="_M/QLIST_FOREACH">QLIST_FOREACH</a>(<a class="local col2 ref" href="#32drv" title='drv' data-ref="32drv">drv</a>, &amp;<a class="tu ref" href="#tpm_backends" title='tpm_backends' data-use='a' data-ref="tpm_backends">tpm_backends</a>, <a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::list" title='TPMBackend::list' data-ref="TPMBackend::list">list</a>) {</td></tr>
+<tr><th id="292">292</th><td>        <b>if</b> (!<a class="tu ref" href="#tpm_model_is_registered" title='tpm_model_is_registered' data-use='c' data-ref="tpm_model_is_registered">tpm_model_is_registered</a>(<a class="local col2 ref" href="#32drv" title='drv' data-ref="32drv">drv</a>-&gt;<a class="ref" href="include/sysemu/tpm_backend.h.html#TPMBackend::fe_model" title='TPMBackend::fe_model' data-ref="TPMBackend::fe_model">fe_model</a>)) {</td></tr>
+<tr><th id="293">293</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="294">294</th><td>        }</td></tr>
+<tr><th id="295">295</th><td>        <a class="local col3 ref" href="#33info" title='info' data-ref="33info">info</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TPMInfoList *) g_malloc0_n ((1), sizeof (TPMInfoList)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TPMInfoList" title='TPMInfoList' data-type='struct TPMInfoList' data-ref="TPMInfoList">TPMInfoList</a>, <var>1</var>);</td></tr>
+<tr><th id="296">296</th><td>        <a class="local col3 ref" href="#33info" title='info' data-ref="33info">info</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfoList::value" title='TPMInfoList::value' data-ref="TPMInfoList::value">value</a> = <a class="tu ref" href="#qmp_query_tpm_inst" title='qmp_query_tpm_inst' data-use='c' data-ref="qmp_query_tpm_inst">qmp_query_tpm_inst</a>(<a class="local col2 ref" href="#32drv" title='drv' data-ref="32drv">drv</a>);</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>        <b>if</b> (!<a class="local col5 ref" href="#35cur_item" title='cur_item' data-ref="35cur_item">cur_item</a>) {</td></tr>
+<tr><th id="299">299</th><td>            <a class="local col4 ref" href="#34head" title='head' data-ref="34head">head</a> = <a class="local col5 ref" href="#35cur_item" title='cur_item' data-ref="35cur_item">cur_item</a> = <a class="local col3 ref" href="#33info" title='info' data-ref="33info">info</a>;</td></tr>
+<tr><th id="300">300</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="301">301</th><td>            <a class="local col5 ref" href="#35cur_item" title='cur_item' data-ref="35cur_item">cur_item</a>-&gt;<a class="ref" href="qapi-types.h.html#TPMInfoList::next" title='TPMInfoList::next' data-ref="TPMInfoList::next">next</a> = <a class="local col3 ref" href="#33info" title='info' data-ref="33info">info</a>;</td></tr>
+<tr><th id="302">302</th><td>            <a class="local col5 ref" href="#35cur_item" title='cur_item' data-ref="35cur_item">cur_item</a> = <a class="local col3 ref" href="#33info" title='info' data-ref="33info">info</a>;</td></tr>
+<tr><th id="303">303</th><td>        }</td></tr>
+<tr><th id="304">304</th><td>    }</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td>    <b>return</b> <a class="local col4 ref" href="#34head" title='head' data-ref="34head">head</a>;</td></tr>
+<tr><th id="307">307</th><td>}</td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td><a class="typedef" href="qapi-types.h.html#TpmTypeList" title='TpmTypeList' data-type='struct TpmTypeList' data-ref="TpmTypeList">TpmTypeList</a> *<dfn class="decl def" id="qmp_query_tpm_types" title='qmp_query_tpm_types' data-ref="qmp_query_tpm_types">qmp_query_tpm_types</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="36errp" title='errp' data-type='Error **' data-ref="36errp">errp</dfn>)</td></tr>
+<tr><th id="310">310</th><td>{</td></tr>
+<tr><th id="311">311</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col7 decl" id="37i" title='i' data-type='unsigned int' data-ref="37i">i</dfn> = <var>0</var>;</td></tr>
+<tr><th id="312">312</th><td>    <a class="typedef" href="qapi-types.h.html#TpmTypeList" title='TpmTypeList' data-type='struct TpmTypeList' data-ref="TpmTypeList">TpmTypeList</a> *<dfn class="local col8 decl" id="38head" title='head' data-type='TpmTypeList *' data-ref="38head">head</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, *<dfn class="local col9 decl" id="39prev" title='prev' data-type='TpmTypeList *' data-ref="39prev">prev</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, *<dfn class="local col0 decl" id="40cur_item" title='cur_item' data-type='TpmTypeList *' data-ref="40cur_item">cur_item</dfn>;</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>    <b>for</b> (<a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a> = <var>0</var>; <a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a> &lt; <a class="enum" href="qapi-types.h.html#TpmType::TPM_TYPE__MAX" title='TpmType::TPM_TYPE__MAX' data-ref="TpmType::TPM_TYPE__MAX">TPM_TYPE__MAX</a>; <a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a>++) {</td></tr>
+<tr><th id="315">315</th><td>        <b>if</b> (!<a class="tu ref" href="#tpm_driver_find_by_type" title='tpm_driver_find_by_type' data-use='c' data-ref="tpm_driver_find_by_type">tpm_driver_find_by_type</a>(<a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a>)) {</td></tr>
+<tr><th id="316">316</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="317">317</th><td>        }</td></tr>
+<tr><th id="318">318</th><td>        <a class="local col0 ref" href="#40cur_item" title='cur_item' data-ref="40cur_item">cur_item</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TpmTypeList *) g_malloc0_n ((1), sizeof (TpmTypeList)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TpmTypeList" title='TpmTypeList' data-type='struct TpmTypeList' data-ref="TpmTypeList">TpmTypeList</a>, <var>1</var>);</td></tr>
+<tr><th id="319">319</th><td>        <a class="local col0 ref" href="#40cur_item" title='cur_item' data-ref="40cur_item">cur_item</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmTypeList::value" title='TpmTypeList::value' data-ref="TpmTypeList::value">value</a> = <a class="local col7 ref" href="#37i" title='i' data-ref="37i">i</a>;</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>        <b>if</b> (<a class="local col9 ref" href="#39prev" title='prev' data-ref="39prev">prev</a>) {</td></tr>
+<tr><th id="322">322</th><td>            <a class="local col9 ref" href="#39prev" title='prev' data-ref="39prev">prev</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmTypeList::next" title='TpmTypeList::next' data-ref="TpmTypeList::next">next</a> = <a class="local col0 ref" href="#40cur_item" title='cur_item' data-ref="40cur_item">cur_item</a>;</td></tr>
+<tr><th id="323">323</th><td>        }</td></tr>
+<tr><th id="324">324</th><td>        <b>if</b> (!<a class="local col8 ref" href="#38head" title='head' data-ref="38head">head</a>) {</td></tr>
+<tr><th id="325">325</th><td>            <a class="local col8 ref" href="#38head" title='head' data-ref="38head">head</a> = <a class="local col0 ref" href="#40cur_item" title='cur_item' data-ref="40cur_item">cur_item</a>;</td></tr>
+<tr><th id="326">326</th><td>        }</td></tr>
+<tr><th id="327">327</th><td>        <a class="local col9 ref" href="#39prev" title='prev' data-ref="39prev">prev</a> = <a class="local col0 ref" href="#40cur_item" title='cur_item' data-ref="40cur_item">cur_item</a>;</td></tr>
+<tr><th id="328">328</th><td>    }</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td>    <b>return</b> <a class="local col8 ref" href="#38head" title='head' data-ref="38head">head</a>;</td></tr>
+<tr><th id="331">331</th><td>}</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td><a class="typedef" href="qapi-types.h.html#TpmModelList" title='TpmModelList' data-type='struct TpmModelList' data-ref="TpmModelList">TpmModelList</a> *<dfn class="decl def" id="qmp_query_tpm_models" title='qmp_query_tpm_models' data-ref="qmp_query_tpm_models">qmp_query_tpm_models</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="41errp" title='errp' data-type='Error **' data-ref="41errp">errp</dfn>)</td></tr>
+<tr><th id="334">334</th><td>{</td></tr>
+<tr><th id="335">335</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col2 decl" id="42i" title='i' data-type='unsigned int' data-ref="42i">i</dfn> = <var>0</var>;</td></tr>
+<tr><th id="336">336</th><td>    <a class="typedef" href="qapi-types.h.html#TpmModelList" title='TpmModelList' data-type='struct TpmModelList' data-ref="TpmModelList">TpmModelList</a> *<dfn class="local col3 decl" id="43head" title='head' data-type='TpmModelList *' data-ref="43head">head</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, *<dfn class="local col4 decl" id="44prev" title='prev' data-type='TpmModelList *' data-ref="44prev">prev</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, *<dfn class="local col5 decl" id="45cur_item" title='cur_item' data-type='TpmModelList *' data-ref="45cur_item">cur_item</dfn>;</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    <b>for</b> (<a class="local col2 ref" href="#42i" title='i' data-ref="42i">i</a> = <var>0</var>; <a class="local col2 ref" href="#42i" title='i' data-ref="42i">i</a> &lt; <a class="enum" href="qapi-types.h.html#TpmModel::TPM_MODEL__MAX" title='TpmModel::TPM_MODEL__MAX' data-ref="TpmModel::TPM_MODEL__MAX">TPM_MODEL__MAX</a>; <a class="local col2 ref" href="#42i" title='i' data-ref="42i">i</a>++) {</td></tr>
+<tr><th id="339">339</th><td>        <b>if</b> (!<a class="tu ref" href="#tpm_model_is_registered" title='tpm_model_is_registered' data-use='c' data-ref="tpm_model_is_registered">tpm_model_is_registered</a>(<a class="local col2 ref" href="#42i" title='i' data-ref="42i">i</a>)) {</td></tr>
+<tr><th id="340">340</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="341">341</th><td>        }</td></tr>
+<tr><th id="342">342</th><td>        <a class="local col5 ref" href="#45cur_item" title='cur_item' data-ref="45cur_item">cur_item</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#278" title="((TpmModelList *) g_malloc0_n ((1), sizeof (TpmModelList)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="qapi-types.h.html#TpmModelList" title='TpmModelList' data-type='struct TpmModelList' data-ref="TpmModelList">TpmModelList</a>, <var>1</var>);</td></tr>
+<tr><th id="343">343</th><td>        <a class="local col5 ref" href="#45cur_item" title='cur_item' data-ref="45cur_item">cur_item</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmModelList::value" title='TpmModelList::value' data-ref="TpmModelList::value">value</a> = <a class="local col2 ref" href="#42i" title='i' data-ref="42i">i</a>;</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>        <b>if</b> (<a class="local col4 ref" href="#44prev" title='prev' data-ref="44prev">prev</a>) {</td></tr>
+<tr><th id="346">346</th><td>            <a class="local col4 ref" href="#44prev" title='prev' data-ref="44prev">prev</a>-&gt;<a class="ref" href="qapi-types.h.html#TpmModelList::next" title='TpmModelList::next' data-ref="TpmModelList::next">next</a> = <a class="local col5 ref" href="#45cur_item" title='cur_item' data-ref="45cur_item">cur_item</a>;</td></tr>
+<tr><th id="347">347</th><td>        }</td></tr>
+<tr><th id="348">348</th><td>        <b>if</b> (!<a class="local col3 ref" href="#43head" title='head' data-ref="43head">head</a>) {</td></tr>
+<tr><th id="349">349</th><td>            <a class="local col3 ref" href="#43head" title='head' data-ref="43head">head</a> = <a class="local col5 ref" href="#45cur_item" title='cur_item' data-ref="45cur_item">cur_item</a>;</td></tr>
+<tr><th id="350">350</th><td>        }</td></tr>
+<tr><th id="351">351</th><td>        <a class="local col4 ref" href="#44prev" title='prev' data-ref="44prev">prev</a> = <a class="local col5 ref" href="#45cur_item" title='cur_item' data-ref="45cur_item">cur_item</a>;</td></tr>
+<tr><th id="352">352</th><td>    }</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td>    <b>return</b> <a class="local col3 ref" href="#43head" title='head' data-ref="43head">head</a>;</td></tr>
+<tr><th id="355">355</th><td>}</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

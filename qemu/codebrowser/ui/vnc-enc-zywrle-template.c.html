@@ -1,0 +1,189 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>vnc-enc-zywrle-template.c source code [codebrowser/ui/vnc-enc-zywrle-template.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/ui/vnc-enc-zywrle-template.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>ui</a>/<a href='vnc-enc-zywrle-template.c.html'>vnc-enc-zywrle-template.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td></td></tr>
+<tr><th id="2">2</th><td><i>/********************************************************************</i></td></tr>
+<tr><th id="3">3</th><td><i> *                                                                  *</i></td></tr>
+<tr><th id="4">4</th><td><i> * THIS FILE IS PART OF THE 'ZYWRLE' VNC CODEC SOURCE CODE.         *</i></td></tr>
+<tr><th id="5">5</th><td><i> *                                                                  *</i></td></tr>
+<tr><th id="6">6</th><td><i> * USE, DISTRIBUTION AND REPRODUCTION OF THIS LIBRARY SOURCE IS     *</i></td></tr>
+<tr><th id="7">7</th><td><i> * GOVERNED BY A FOLLOWING BSD-STYLE SOURCE LICENSE.                *</i></td></tr>
+<tr><th id="8">8</th><td><i> * PLEASE READ THESE TERMS BEFORE DISTRIBUTING.                     *</i></td></tr>
+<tr><th id="9">9</th><td><i> *                                                                  *</i></td></tr>
+<tr><th id="10">10</th><td><i> * THE 'ZYWRLE' VNC CODEC SOURCE CODE IS (C) COPYRIGHT 2006         *</i></td></tr>
+<tr><th id="11">11</th><td><i> * BY Hitachi Systems &amp; Services, Ltd.                              *</i></td></tr>
+<tr><th id="12">12</th><td><i> * (Noriaki Yamazaki, Research &amp; Development Center)               *</i></td></tr>
+<tr><th id="13">13</th><td><i> *                                                                  *</i></td></tr>
+<tr><th id="14">14</th><td><i> *                                                                  *</i></td></tr>
+<tr><th id="15">15</th><td><i> ********************************************************************</i></td></tr>
+<tr><th id="16">16</th><td><i>Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="17">17</th><td><i>modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="18">18</th><td><i>are met:</i></td></tr>
+<tr><th id="19">19</th><td><i></i></td></tr>
+<tr><th id="20">20</th><td><i>- Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="21">21</th><td><i>notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="22">22</th><td><i></i></td></tr>
+<tr><th id="23">23</th><td><i>- Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="24">24</th><td><i>notice, this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="25">25</th><td><i>documentation and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="26">26</th><td><i></i></td></tr>
+<tr><th id="27">27</th><td><i>- Neither the name of the Hitachi Systems &amp; Services, Ltd. nor</i></td></tr>
+<tr><th id="28">28</th><td><i>the names of its contributors may be used to endorse or promote</i></td></tr>
+<tr><th id="29">29</th><td><i>products derived from this software without specific prior written</i></td></tr>
+<tr><th id="30">30</th><td><i>permission.</i></td></tr>
+<tr><th id="31">31</th><td><i></i></td></tr>
+<tr><th id="32">32</th><td><i>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS</i></td></tr>
+<tr><th id="33">33</th><td><i>``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT</i></td></tr>
+<tr><th id="34">34</th><td><i>LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR</i></td></tr>
+<tr><th id="35">35</th><td><i>A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION</i></td></tr>
+<tr><th id="36">36</th><td><i>OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,</i></td></tr>
+<tr><th id="37">37</th><td><i>SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT</i></td></tr>
+<tr><th id="38">38</th><td><i>LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,</i></td></tr>
+<tr><th id="39">39</th><td><i>DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY</i></td></tr>
+<tr><th id="40">40</th><td><i>THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</i></td></tr>
+<tr><th id="41">41</th><td><i>(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</i></td></tr>
+<tr><th id="42">42</th><td><i>OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</i></td></tr>
+<tr><th id="43">43</th><td><i> ********************************************************************/</i></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><i>/* Change Log:</i></td></tr>
+<tr><th id="46">46</th><td><i>     V0.02 : 2008/02/04 : Fix mis encode/decode when width != scanline</i></td></tr>
+<tr><th id="47">47</th><td><i>	                     (Thanks Johannes Schindelin, author of LibVNC</i></td></tr>
+<tr><th id="48">48</th><td><i>						  Server/Client)</i></td></tr>
+<tr><th id="49">49</th><td><i>     V0.01 : 2007/02/06 : Initial release</i></td></tr>
+<tr><th id="50">50</th><td><i>*/</i></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><i>/*</i></td></tr>
+<tr><th id="53">53</th><td><i>[References]</i></td></tr>
+<tr><th id="54">54</th><td><i> PLHarr:</i></td></tr>
+<tr><th id="55">55</th><td><i>   Senecal, J. G., P. Lindstrom, M. A. Duchaineau, and K. I. Joy,</i></td></tr>
+<tr><th id="56">56</th><td><i>   "An Improved N-Bit to N-Bit Reversible Haar-Like Transform,"</i></td></tr>
+<tr><th id="57">57</th><td><i>   Pacific Graphics 2004, October 2004, pp. 371-380.</i></td></tr>
+<tr><th id="58">58</th><td><i> EZW:</i></td></tr>
+<tr><th id="59">59</th><td><i>   Shapiro, JM: Embedded Image Coding Using Zerotrees of Wavelet Coefficients,</i></td></tr>
+<tr><th id="60">60</th><td><i>   IEEE Trans. Signal. Process., Vol.41, pp.3445-3462 (1993).</i></td></tr>
+<tr><th id="61">61</th><td><i>*/</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i>/* Template Macro stuffs. */</i></td></tr>
+<tr><th id="65">65</th><td><u>#undef <span class="macro" data-ref="_M/ZYWRLE_ANALYZE">ZYWRLE_ANALYZE</span></u></td></tr>
+<tr><th id="66">66</th><td><u>#undef <span class="macro" data-ref="_M/ZYWRLE_SYNTHESIZE">ZYWRLE_SYNTHESIZE</span></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_SUFFIX" data-ref="_M/ZYWRLE_SUFFIX">ZYWRLE_SUFFIX</dfn>     ZRLE_CONCAT2(ZRLE_BPP,ZRLE_ENDIAN_SUFFIX)</u></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_ANALYZE" data-ref="_M/ZYWRLE_ANALYZE">ZYWRLE_ANALYZE</dfn>    ZRLE_CONCAT2(zywrle_analyze_,   ZYWRLE_SUFFIX)</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_SYNTHESIZE" data-ref="_M/ZYWRLE_SYNTHESIZE">ZYWRLE_SYNTHESIZE</dfn> ZRLE_CONCAT2(zywrle_synthesize_,ZYWRLE_SUFFIX)</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_RGBYUV" data-ref="_M/ZYWRLE_RGBYUV">ZYWRLE_RGBYUV</dfn>     ZRLE_CONCAT2(zywrle_rgbyuv_,    ZYWRLE_SUFFIX)</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_YUVRGB" data-ref="_M/ZYWRLE_YUVRGB">ZYWRLE_YUVRGB</dfn>     ZRLE_CONCAT2(zywrle_yuvrgb_,    ZYWRLE_SUFFIX)</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_YMASK" data-ref="_M/ZYWRLE_YMASK">ZYWRLE_YMASK</dfn>      ZRLE_CONCAT2(ZYWRLE_YMASK,      ZRLE_BPP)</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_UVMASK" data-ref="_M/ZYWRLE_UVMASK">ZYWRLE_UVMASK</dfn>     ZRLE_CONCAT2(ZYWRLE_UVMASK,     ZRLE_BPP)</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_LOAD_PIXEL" data-ref="_M/ZYWRLE_LOAD_PIXEL">ZYWRLE_LOAD_PIXEL</dfn> ZRLE_CONCAT2(ZYWRLE_LOAD_PIXEL, ZRLE_BPP)</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_SAVE_PIXEL" data-ref="_M/ZYWRLE_SAVE_PIXEL">ZYWRLE_SAVE_PIXEL</dfn> ZRLE_CONCAT2(ZYWRLE_SAVE_PIXEL, ZRLE_BPP)</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>/* Packing/Unpacking pixel stuffs.</i></td></tr>
+<tr><th id="81">81</th><td><i>   Endian conversion stuffs. */</i></td></tr>
+<tr><th id="82">82</th><td><u>#undef <span class="macro" data-ref="_M/S_0">S_0</span></u></td></tr>
+<tr><th id="83">83</th><td><u>#undef <span class="macro" data-ref="_M/S_1">S_1</span></u></td></tr>
+<tr><th id="84">84</th><td><u>#undef <span class="macro" data-ref="_M/L_0">L_0</span></u></td></tr>
+<tr><th id="85">85</th><td><u>#undef <span class="macro" data-ref="_M/L_1">L_1</span></u></td></tr>
+<tr><th id="86">86</th><td><u>#undef <span class="macro" data-ref="_M/L_2">L_2</span></u></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><u>#<span data-ppcond="88">if</span> <a class="macro" href="vnc-enc-zrle.c.html#207" title="0" data-ref="_M/ZYWRLE_ENDIAN">ZYWRLE_ENDIAN</a> == <a class="macro" href="vnc-enc-zrle.c.html#197" title="1" data-ref="_M/ENDIAN_BIG">ENDIAN_BIG</a></u></td></tr>
+<tr><th id="89">89</th><td><u>#  define S_0	1</u></td></tr>
+<tr><th id="90">90</th><td><u>#  define S_1	0</u></td></tr>
+<tr><th id="91">91</th><td><u>#  define L_0	3</u></td></tr>
+<tr><th id="92">92</th><td><u>#  define L_1	2</u></td></tr>
+<tr><th id="93">93</th><td><u>#  define L_2	1</u></td></tr>
+<tr><th id="94">94</th><td><u>#<span data-ppcond="88">else</span></u></td></tr>
+<tr><th id="95">95</th><td><u>#  define <dfn class="macro" id="_M/S_0" data-ref="_M/S_0">S_0</dfn>	0</u></td></tr>
+<tr><th id="96">96</th><td><u>#  define <dfn class="macro" id="_M/S_1" data-ref="_M/S_1">S_1</dfn>	1</u></td></tr>
+<tr><th id="97">97</th><td><u>#  define <dfn class="macro" id="_M/L_0" data-ref="_M/L_0">L_0</dfn>	0</u></td></tr>
+<tr><th id="98">98</th><td><u>#  define <dfn class="macro" id="_M/L_1" data-ref="_M/L_1">L_1</dfn>	1</u></td></tr>
+<tr><th id="99">99</th><td><u>#  define <dfn class="macro" id="_M/L_2" data-ref="_M/L_2">L_2</dfn>	2</u></td></tr>
+<tr><th id="100">100</th><td><u>#<span data-ppcond="88">endif</span></u></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/ZYWRLE_QUANTIZE" data-ref="_M/ZYWRLE_QUANTIZE">ZYWRLE_QUANTIZE</dfn></u></td></tr>
+<tr><th id="103">103</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="104">104</th><td><u>#include <a href="vnc-enc-zywrle.h.html">"vnc-enc-zywrle.h"</a></u></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><u>#<span data-ppcond="106">ifndef</span> <span class="macro" data-ref="_M/ZRLE_COMPACT_PIXEL">ZRLE_COMPACT_PIXEL</span></u></td></tr>
+<tr><th id="107">107</th><td><em>static</em> <b>inline</b> <em>void</em> <a class="macro" href="#73" title="zywrle_rgbyuv_15le" data-ref="_M/ZYWRLE_RGBYUV">ZYWRLE_RGBYUV</a>(<em>int</em> *<dfn class="local col5 decl" id="125buf" title='buf' data-type='int *' data-ref="125buf">buf</dfn>, <a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a> *<dfn class="local col6 decl" id="126data" title='data' data-type='uint16_t *' data-ref="126data">data</dfn>,</td></tr>
+<tr><th id="108">108</th><td>                                 <em>int</em> <dfn class="local col7 decl" id="127width" title='width' data-type='int' data-ref="127width">width</dfn>, <em>int</em> <dfn class="local col8 decl" id="128height" title='height' data-type='int' data-ref="128height">height</dfn>, <em>int</em> <dfn class="local col9 decl" id="129scanline" title='scanline' data-type='int' data-ref="129scanline">scanline</dfn>)</td></tr>
+<tr><th id="109">109</th><td>{</td></tr>
+<tr><th id="110">110</th><td>    <em>int</em> <dfn class="local col0 decl" id="130r" title='r' data-type='int' data-ref="130r">r</dfn>, <dfn class="local col1 decl" id="131g" title='g' data-type='int' data-ref="131g">g</dfn>, <dfn class="local col2 decl" id="132b" title='b' data-type='int' data-ref="132b">b</dfn>;</td></tr>
+<tr><th id="111">111</th><td>    <em>int</em> <dfn class="local col3 decl" id="133y" title='y' data-type='int' data-ref="133y">y</dfn>, <dfn class="local col4 decl" id="134u" title='u' data-type='int' data-ref="134u">u</dfn>, <dfn class="local col5 decl" id="135v" title='v' data-type='int' data-ref="135v">v</dfn>;</td></tr>
+<tr><th id="112">112</th><td>    <em>int</em> *<dfn class="local col6 decl" id="136line" title='line' data-type='int *' data-ref="136line">line</dfn>;</td></tr>
+<tr><th id="113">113</th><td>    <em>int</em> *<dfn class="local col7 decl" id="137end" title='end' data-type='int *' data-ref="137end">end</dfn>;</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <a class="local col7 ref" href="#137end" title='end' data-ref="137end">end</a> = <a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a> + <a class="local col8 ref" href="#128height" title='height' data-ref="128height">height</a> * <a class="local col7 ref" href="#127width" title='width' data-ref="127width">width</a>;</td></tr>
+<tr><th id="116">116</th><td>    <b>while</b> (<a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a> &lt; <a class="local col7 ref" href="#137end" title='end' data-ref="137end">end</a>) {</td></tr>
+<tr><th id="117">117</th><td>        <a class="local col6 ref" href="#136line" title='line' data-ref="136line">line</a> = <a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a> + <a class="local col7 ref" href="#127width" title='width' data-ref="127width">width</a>;</td></tr>
+<tr><th id="118">118</th><td>        <b>while</b> (<a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a> &lt; <a class="local col6 ref" href="#136line" title='line' data-ref="136line">line</a>) {</td></tr>
+<tr><th id="119">119</th><td>            <a class="macro" href="#77" title="ZYWRLE_LOAD_PIXEL15" data-ref="_M/ZYWRLE_LOAD_PIXEL">ZYWRLE_LOAD_PIXEL</a>(<a class="local col6 ref" href="#126data" title='data' data-ref="126data">data</a>, <a class="local col0 ref" href="#130r" title='r' data-ref="130r">r</a>, <a class="local col1 ref" href="#131g" title='g' data-ref="131g">g</a>, <a class="local col2 ref" href="#132b" title='b' data-ref="132b">b</a>);</td></tr>
+<tr><th id="120">120</th><td>            <a class="macro" href="vnc-enc-zywrle.h.html#503" title="do { y = (r + (g &lt;&lt; 1) + b) &gt;&gt; 2; u = b - g; v = r - g; y -= 128; u &gt;&gt;= 1; v &gt;&gt;= 1; y &amp;= 0xFFFFFFF8; u &amp;= 0xFFFFFFF8; v &amp;= 0xFFFFFFF8; if (y == -128) { y += (0xFFFFFFFF - 0xFFFFFFF8 + 1); } if (u == -128) { u += (0xFFFFFFFF - 0xFFFFFFF8 + 1); } if (v == -128) { v += (0xFFFFFFFF - 0xFFFFFFF8 + 1); } } while (0)" data-ref="_M/ZYWRLE_RGBYUV_">ZYWRLE_RGBYUV_</a>(<a class="local col0 ref" href="#130r" title='r' data-ref="130r">r</a>, <a class="local col1 ref" href="#131g" title='g' data-ref="131g">g</a>, <a class="local col2 ref" href="#132b" title='b' data-ref="132b">b</a>, <a class="local col3 ref" href="#133y" title='y' data-ref="133y">y</a>, <a class="local col4 ref" href="#134u" title='u' data-ref="134u">u</a>, <a class="local col5 ref" href="#135v" title='v' data-ref="135v">v</a>, <a class="macro" href="#75" title="0xFFFFFFF8" data-ref="_M/ZYWRLE_YMASK">ZYWRLE_YMASK</a>, <a class="macro" href="#76" title="0xFFFFFFF8" data-ref="_M/ZYWRLE_UVMASK">ZYWRLE_UVMASK</a>);</td></tr>
+<tr><th id="121">121</th><td>            <a class="macro" href="vnc-enc-zywrle.h.html#479" title="do { ((int8_t*)buf)[2] = (int8_t)v; ((int8_t*)buf)[1] = (int8_t)y; ((int8_t*)buf)[0] = (int8_t)u; } while (0)" data-ref="_M/ZYWRLE_SAVE_COEFF">ZYWRLE_SAVE_COEFF</a>(<a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a>, <a class="local col5 ref" href="#135v" title='v' data-ref="135v">v</a>, <a class="local col3 ref" href="#133y" title='y' data-ref="133y">y</a>, <a class="local col4 ref" href="#134u" title='u' data-ref="134u">u</a>);</td></tr>
+<tr><th id="122">122</th><td>            <a class="local col5 ref" href="#125buf" title='buf' data-ref="125buf">buf</a>++;</td></tr>
+<tr><th id="123">123</th><td>            <a class="local col6 ref" href="#126data" title='data' data-ref="126data">data</a>++;</td></tr>
+<tr><th id="124">124</th><td>        }</td></tr>
+<tr><th id="125">125</th><td>        <a class="local col6 ref" href="#126data" title='data' data-ref="126data">data</a> += <a class="local col9 ref" href="#129scanline" title='scanline' data-ref="129scanline">scanline</a> - <a class="local col7 ref" href="#127width" title='width' data-ref="127width">width</a>;</td></tr>
+<tr><th id="126">126</th><td>    }</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><em>static</em> <a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a> *<a class="macro" href="#70" title="zywrle_analyze_15le" data-ref="_M/ZYWRLE_ANALYZE">ZYWRLE_ANALYZE</a>(<a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a> *<dfn class="local col8 decl" id="138dst" title='dst' data-type='uint16_t *' data-ref="138dst">dst</dfn>, <a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a> *<dfn class="local col9 decl" id="139src" title='src' data-type='uint16_t *' data-ref="139src">src</dfn>,</td></tr>
+<tr><th id="130">130</th><td>                                  <em>int</em> <dfn class="local col0 decl" id="140w" title='w' data-type='int' data-ref="140w">w</dfn>, <em>int</em> <dfn class="local col1 decl" id="141h" title='h' data-type='int' data-ref="141h">h</dfn>, <em>int</em> <dfn class="local col2 decl" id="142scanline" title='scanline' data-type='int' data-ref="142scanline">scanline</dfn>, <em>int</em> <dfn class="local col3 decl" id="143level" title='level' data-type='int' data-ref="143level">level</dfn>,</td></tr>
+<tr><th id="131">131</th><td>                                  <em>int</em> *<dfn class="local col4 decl" id="144buf" title='buf' data-type='int *' data-ref="144buf">buf</dfn>) {</td></tr>
+<tr><th id="132">132</th><td>    <em>int</em> <dfn class="local col5 decl" id="145l" title='l' data-type='int' data-ref="145l">l</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <em>int</em> <dfn class="local col6 decl" id="146uw" title='uw' data-type='int' data-ref="146uw">uw</dfn> = <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>;</td></tr>
+<tr><th id="134">134</th><td>    <em>int</em> <dfn class="local col7 decl" id="147uh" title='uh' data-type='int' data-ref="147uh">uh</dfn> = <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>;</td></tr>
+<tr><th id="135">135</th><td>    <em>int</em> *<dfn class="local col8 decl" id="148top" title='top' data-type='int *' data-ref="148top">top</dfn>;</td></tr>
+<tr><th id="136">136</th><td>    <em>int</em> *<dfn class="local col9 decl" id="149end" title='end' data-type='int *' data-ref="149end">end</dfn>;</td></tr>
+<tr><th id="137">137</th><td>    <em>int</em> *<dfn class="local col0 decl" id="150line" title='line' data-type='int *' data-ref="150line">line</dfn>;</td></tr>
+<tr><th id="138">138</th><td>    <a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a> *<dfn class="local col1 decl" id="151p" title='p' data-type='uint16_t *' data-ref="151p">p</dfn>;</td></tr>
+<tr><th id="139">139</th><td>    <em>int</em> <dfn class="local col2 decl" id="152r" title='r' data-type='int' data-ref="152r">r</dfn>, <dfn class="local col3 decl" id="153g" title='g' data-type='int' data-ref="153g">g</dfn>, <dfn class="local col4 decl" id="154b" title='b' data-type='int' data-ref="154b">b</dfn>;</td></tr>
+<tr><th id="140">140</th><td>    <em>int</em> <dfn class="local col5 decl" id="155s" title='s' data-type='int' data-ref="155s">s</dfn>;</td></tr>
+<tr><th id="141">141</th><td>    <em>int</em> *<dfn class="local col6 decl" id="156ph" title='ph' data-type='int *' data-ref="156ph">ph</dfn>;</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>    <a class="ref" href="vnc-enc-zywrle.h.html#zywrle_calc_size" title='zywrle_calc_size' data-ref="zywrle_calc_size">zywrle_calc_size</a>(&amp;<a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, &amp;<a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, <a class="local col3 ref" href="#143level" title='level' data-ref="143level">level</a>);</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>    <b>if</b> (<a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a> == <var>0</var> || <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a> == <var>0</var>) {</td></tr>
+<tr><th id="146">146</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="147">147</th><td>    }</td></tr>
+<tr><th id="148">148</th><td>    <a class="local col6 ref" href="#146uw" title='uw' data-ref="146uw">uw</a> -= <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>;</td></tr>
+<tr><th id="149">149</th><td>    <a class="local col7 ref" href="#147uh" title='uh' data-ref="147uh">uh</a> -= <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>;</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>    <a class="local col1 ref" href="#151p" title='p' data-ref="151p">p</a> = <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>;</td></tr>
+<tr><th id="152">152</th><td>    <a class="macro" href="vnc-enc-zywrle.h.html#609" title="do { top = buf + w * h; if (uw) { p = src + w; end = (int*)(p + h * scanline); while (p &lt; (uint16_t*)end) { line = (int*)(p + uw); while (p &lt; (uint16_t*)line) { *(uint16_t*)top = *p; p++; top++; } p += scanline - uw; } } if (uh) { p = src + h * scanline; end = (int*)(p + uh * scanline); while (p &lt; (uint16_t*)end) { line = (int*)(p + w); while (p &lt; (uint16_t*)line) { *(uint16_t*)top = *p; p++; top++; } p += scanline - w; } } if (uw &amp;&amp; uh) { p= src + w + h * scanline; end = (int*)(p + uh * scanline); while (p &lt; (uint16_t*)end) { line = (int*)(p + uw); while (p &lt; (uint16_t*)line) { *(uint16_t*)top = *p; p++; top++; } p += scanline-uw; } } } while (0)" data-ref="_M/ZYWRLE_LOAD_UNALIGN">ZYWRLE_LOAD_UNALIGN</a>(<a class="local col9 ref" href="#139src" title='src' data-ref="139src">src</a>,*(<a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a>*)<a class="local col8 ref" href="#148top" title='top' data-ref="148top">top</a> = *<a class="local col1 ref" href="#151p" title='p' data-ref="151p">p</a>;);</td></tr>
+<tr><th id="153">153</th><td>    <a class="macro" href="#73" title="zywrle_rgbyuv_15le" data-ref="_M/ZYWRLE_RGBYUV">ZYWRLE_RGBYUV</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col9 ref" href="#139src" title='src' data-ref="139src">src</a>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, <a class="local col2 ref" href="#142scanline" title='scanline' data-ref="142scanline">scanline</a>);</td></tr>
+<tr><th id="154">154</th><td>    <a class="ref" href="vnc-enc-zywrle.h.html#wavelet" title='wavelet' data-ref="wavelet">wavelet</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, <a class="local col3 ref" href="#143level" title='level' data-ref="143level">level</a>);</td></tr>
+<tr><th id="155">155</th><td>    <b>for</b> (<a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a> = <var>0</var>; <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a> &lt; <a class="local col3 ref" href="#143level" title='level' data-ref="143level">level</a>; <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a>++) {</td></tr>
+<tr><th id="156">156</th><td>        <a class="macro" href="vnc-enc-zywrle.h.html#588" title="do { ph = buf; s = 2 &lt;&lt; l; if (3 &amp; 0x01) { ph += s &gt;&gt; 1; } if (3 &amp; 0x02) { ph += (s &gt;&gt; 1) * w; } end = ph + h * w; while (ph &lt; end) { line = ph + w; while (ph &lt; line) { do { r = ((int8_t*)ph)[2]; g = ((int8_t*)ph)[1]; b = ((int8_t*)ph)[0]; } while (0); do { r &amp;= 0xF8; g &amp;= 0xF8; b &amp;= 0xF8; ((uint8_t*)dst)[1] = (uint8_t)((r &gt;&gt; 1)|(g &gt;&gt; 6)); ((uint8_t*)dst)[0] = (uint8_t)(((b &gt;&gt; 3)|(g &lt;&lt; 2))&amp; 0xFF); } while (0); do { dst++; if( dst - p &gt;= (w + uw) ) { dst += scanline-(w + uw); p = dst; } } while (0); ph += s; } ph += (s - 1) * w; } } while (0)" data-ref="_M/ZYWRLE_PACK_COEFF">ZYWRLE_PACK_COEFF</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>, <var>3</var>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, scanline, <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a>);</td></tr>
+<tr><th id="157">157</th><td>        <a class="macro" href="vnc-enc-zywrle.h.html#588" title="do { ph = buf; s = 2 &lt;&lt; l; if (2 &amp; 0x01) { ph += s &gt;&gt; 1; } if (2 &amp; 0x02) { ph += (s &gt;&gt; 1) * w; } end = ph + h * w; while (ph &lt; end) { line = ph + w; while (ph &lt; line) { do { r = ((int8_t*)ph)[2]; g = ((int8_t*)ph)[1]; b = ((int8_t*)ph)[0]; } while (0); do { r &amp;= 0xF8; g &amp;= 0xF8; b &amp;= 0xF8; ((uint8_t*)dst)[1] = (uint8_t)((r &gt;&gt; 1)|(g &gt;&gt; 6)); ((uint8_t*)dst)[0] = (uint8_t)(((b &gt;&gt; 3)|(g &lt;&lt; 2))&amp; 0xFF); } while (0); do { dst++; if( dst - p &gt;= (w + uw) ) { dst += scanline-(w + uw); p = dst; } } while (0); ph += s; } ph += (s - 1) * w; } } while (0)" data-ref="_M/ZYWRLE_PACK_COEFF">ZYWRLE_PACK_COEFF</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>, <var>2</var>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, scanline, <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a>);</td></tr>
+<tr><th id="158">158</th><td>        <a class="macro" href="vnc-enc-zywrle.h.html#588" title="do { ph = buf; s = 2 &lt;&lt; l; if (1 &amp; 0x01) { ph += s &gt;&gt; 1; } if (1 &amp; 0x02) { ph += (s &gt;&gt; 1) * w; } end = ph + h * w; while (ph &lt; end) { line = ph + w; while (ph &lt; line) { do { r = ((int8_t*)ph)[2]; g = ((int8_t*)ph)[1]; b = ((int8_t*)ph)[0]; } while (0); do { r &amp;= 0xF8; g &amp;= 0xF8; b &amp;= 0xF8; ((uint8_t*)dst)[1] = (uint8_t)((r &gt;&gt; 1)|(g &gt;&gt; 6)); ((uint8_t*)dst)[0] = (uint8_t)(((b &gt;&gt; 3)|(g &lt;&lt; 2))&amp; 0xFF); } while (0); do { dst++; if( dst - p &gt;= (w + uw) ) { dst += scanline-(w + uw); p = dst; } } while (0); ph += s; } ph += (s - 1) * w; } } while (0)" data-ref="_M/ZYWRLE_PACK_COEFF">ZYWRLE_PACK_COEFF</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>, <var>1</var>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, scanline, <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a>);</td></tr>
+<tr><th id="159">159</th><td>        <b>if</b> (<a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a> == <a class="local col3 ref" href="#143level" title='level' data-ref="143level">level</a> - <var>1</var>) {</td></tr>
+<tr><th id="160">160</th><td>            <a class="macro" href="vnc-enc-zywrle.h.html#588" title="do { ph = buf; s = 2 &lt;&lt; l; if (0 &amp; 0x01) { ph += s &gt;&gt; 1; } if (0 &amp; 0x02) { ph += (s &gt;&gt; 1) * w; } end = ph + h * w; while (ph &lt; end) { line = ph + w; while (ph &lt; line) { do { r = ((int8_t*)ph)[2]; g = ((int8_t*)ph)[1]; b = ((int8_t*)ph)[0]; } while (0); do { r &amp;= 0xF8; g &amp;= 0xF8; b &amp;= 0xF8; ((uint8_t*)dst)[1] = (uint8_t)((r &gt;&gt; 1)|(g &gt;&gt; 6)); ((uint8_t*)dst)[0] = (uint8_t)(((b &gt;&gt; 3)|(g &lt;&lt; 2))&amp; 0xFF); } while (0); do { dst++; if( dst - p &gt;= (w + uw) ) { dst += scanline-(w + uw); p = dst; } } while (0); ph += s; } ph += (s - 1) * w; } } while (0)" data-ref="_M/ZYWRLE_PACK_COEFF">ZYWRLE_PACK_COEFF</a>(<a class="local col4 ref" href="#144buf" title='buf' data-ref="144buf">buf</a>, <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>, <var>0</var>, <a class="local col0 ref" href="#140w" title='w' data-ref="140w">w</a>, <a class="local col1 ref" href="#141h" title='h' data-ref="141h">h</a>, scanline, <a class="local col5 ref" href="#145l" title='l' data-ref="145l">l</a>);</td></tr>
+<tr><th id="161">161</th><td>        }</td></tr>
+<tr><th id="162">162</th><td>    }</td></tr>
+<tr><th id="163">163</th><td>    <a class="macro" href="vnc-enc-zywrle.h.html#598" title="do { top = buf + w * h; end = buf + (w + uw) * (h + uh); while (top &lt; end) { *dst = *(uint16_t*)top; do { dst++; if( dst - p &gt;= (w + uw) ) { dst += scanline-(w + uw); p = dst; } } while (0); top++; } } while (0)" data-ref="_M/ZYWRLE_SAVE_UNALIGN">ZYWRLE_SAVE_UNALIGN</a>(<a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>,*<a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a> = *(<a class="macro" href="vnc-enc-zrle-template.c.html#51" title="uint16_t" data-ref="_M/ZRLE_PIXEL">ZRLE_PIXEL</a>*)<a class="local col8 ref" href="#148top" title='top' data-ref="148top">top</a>;);</td></tr>
+<tr><th id="164">164</th><td>    <b>return</b> <a class="local col8 ref" href="#138dst" title='dst' data-ref="138dst">dst</a>;</td></tr>
+<tr><th id="165">165</th><td>}</td></tr>
+<tr><th id="166">166</th><td><u>#<span data-ppcond="106">endif</span>  /* ZRLE_COMPACT_PIXEL */</u></td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><u>#undef <a class="macro" href="#73" data-ref="_M/ZYWRLE_RGBYUV">ZYWRLE_RGBYUV</a></u></td></tr>
+<tr><th id="169">169</th><td><u>#undef <a class="macro" href="#74" data-ref="_M/ZYWRLE_YUVRGB">ZYWRLE_YUVRGB</a></u></td></tr>
+<tr><th id="170">170</th><td><u>#undef <a class="macro" href="#77" data-ref="_M/ZYWRLE_LOAD_PIXEL">ZYWRLE_LOAD_PIXEL</a></u></td></tr>
+<tr><th id="171">171</th><td><u>#undef <a class="macro" href="#78" data-ref="_M/ZYWRLE_SAVE_PIXEL">ZYWRLE_SAVE_PIXEL</a></u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='vnc-enc-zrle.c.html'>codebrowser/ui/vnc-enc-zrle.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

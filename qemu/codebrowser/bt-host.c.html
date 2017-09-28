@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>bt-host.c source code [codebrowser/bt-host.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="bt_host_hci_s "/>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/bt-host.c'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='bt-host.c.html'>bt-host.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Wrap a host Bluetooth HCI socket in a struct HCIInfo.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2008 Andrzej Zaborowski  &lt;balrog@zabor.org&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This program is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU General Public License as</i></td></tr>
+<tr><th id="8">8</th><td><i> * published by the Free Software Foundation; either version 2 or</i></td></tr>
+<tr><th id="9">9</th><td><i> * (at your option) version 3 of the License.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="14">14</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="17">17</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="include/sysemu/bt.h.html">"sysemu/bt.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="26">26</th><td><u># include <a href="../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="27">27</th><td><u># include <a href="../include/x86_64-linux-gnu/sys/uio.h.html">&lt;sys/uio.h&gt;</a></u></td></tr>
+<tr><th id="28">28</th><td><u># <span data-ppcond="28">ifdef</span> <span class="macro" data-ref="_M/CONFIG_BLUEZ">CONFIG_BLUEZ</span></u></td></tr>
+<tr><th id="29">29</th><td><u>#  include &lt;bluetooth/bluetooth.h&gt;</u></td></tr>
+<tr><th id="30">30</th><td><u>#  include &lt;bluetooth/hci.h&gt;</u></td></tr>
+<tr><th id="31">31</th><td><u>#  include &lt;bluetooth/hci_lib.h&gt;</u></td></tr>
+<tr><th id="32">32</th><td><u># <span data-ppcond="28">else</span></u></td></tr>
+<tr><th id="33">33</th><td><u>#  include <a href="include/hw/bt.h.html">"hw/bt.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#  define <dfn class="macro" id="_M/HCI_MAX_FRAME_SIZE" data-ref="_M/HCI_MAX_FRAME_SIZE">HCI_MAX_FRAME_SIZE</dfn>	1028</u></td></tr>
+<tr><th id="35">35</th><td><u># <span data-ppcond="28">endif</span></u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><b>struct</b> <dfn class="type def" id="bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</dfn> {</td></tr>
+<tr><th id="38">38</th><td>    <b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> <dfn class="tu decl" id="bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-type='struct HCIInfo' data-ref="bt_host_hci_s::hci">hci</dfn>;</td></tr>
+<tr><th id="39">39</th><td>    <em>int</em> <dfn class="tu decl" id="bt_host_hci_s::fd" title='bt_host_hci_s::fd' data-type='int' data-ref="bt_host_hci_s::fd">fd</dfn>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="bt_host_hci_s::hdr" title='bt_host_hci_s::hdr' data-type='uint8_t [1028]' data-ref="bt_host_hci_s::hdr">hdr</dfn>[<a class="macro" href="#34" title="1028" data-ref="_M/HCI_MAX_FRAME_SIZE">HCI_MAX_FRAME_SIZE</a>];</td></tr>
+<tr><th id="42">42</th><td>    <em>int</em> <dfn class="tu decl" id="bt_host_hci_s::len" title='bt_host_hci_s::len' data-type='int' data-ref="bt_host_hci_s::len">len</dfn>;</td></tr>
+<tr><th id="43">43</th><td>};</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="bt_host_send" title='bt_host_send' data-type='void bt_host_send(struct HCIInfo * hci, int type, const uint8_t * data, int len)' data-ref="bt_host_send">bt_host_send</dfn>(<b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="local col3 decl" id="63hci" title='hci' data-type='struct HCIInfo *' data-ref="63hci">hci</dfn>,</td></tr>
+<tr><th id="46">46</th><td>                <em>int</em> <dfn class="local col4 decl" id="64type" title='type' data-type='int' data-ref="64type">type</dfn>, <em>const</em> <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="65data" title='data' data-type='const uint8_t *' data-ref="65data">data</dfn>, <em>int</em> <dfn class="local col6 decl" id="66len" title='len' data-type='int' data-ref="66len">len</dfn>)</td></tr>
+<tr><th id="47">47</th><td>{</td></tr>
+<tr><th id="48">48</th><td>    <b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a> *<dfn class="local col7 decl" id="67s" title='s' data-type='struct bt_host_hci_s *' data-ref="67s">s</dfn> = (<b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a> *) <a class="local col3 ref" href="#63hci" title='hci' data-ref="63hci">hci</a>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col8 decl" id="68pkt" title='pkt' data-type='uint8_t' data-ref="68pkt">pkt</dfn> = <a class="local col4 ref" href="#64type" title='type' data-ref="64type">type</a>;</td></tr>
+<tr><th id="50">50</th><td>    <b>struct</b> <a class="type" href="../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="local col9 decl" id="69iv" title='iv' data-type='struct iovec [2]' data-ref="69iv">iv</dfn>[<var>2</var>];</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <a class="local col9 ref" href="#69iv" title='iv' data-ref="69iv">iv</a>[<var>0</var>].<a class="ref" href="../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = (<em>void</em> *)&amp;<a class="local col8 ref" href="#68pkt" title='pkt' data-ref="68pkt">pkt</a>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="local col9 ref" href="#69iv" title='iv' data-ref="69iv">iv</a>[<var>0</var>].<a class="ref" href="../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a>  = <var>1</var>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="local col9 ref" href="#69iv" title='iv' data-ref="69iv">iv</a>[<var>1</var>].<a class="ref" href="../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = (<em>void</em> *) <a class="local col5 ref" href="#65data" title='data' data-ref="65data">data</a>;</td></tr>
+<tr><th id="55">55</th><td>    <a class="local col9 ref" href="#69iv" title='iv' data-ref="69iv">iv</a>[<var>1</var>].<a class="ref" href="../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a>  = <a class="local col6 ref" href="#66len" title='len' data-ref="66len">len</a>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <b>while</b> (<a class="ref" href="../include/x86_64-linux-gnu/sys/uio.h.html#writev" title='writev' data-ref="writev">writev</a>(<a class="local col7 ref" href="#67s" title='s' data-ref="67s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::fd" title='bt_host_hci_s::fd' data-use='r' data-ref="bt_host_hci_s::fd">fd</a>, <a class="local col9 ref" href="#69iv" title='iv' data-ref="69iv">iv</a>, <var>2</var>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="58">58</th><td>        <b>if</b> (<a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> != <a class="macro" href="../include/asm-generic/errno-base.h.html#14" title="11" data-ref="_M/EAGAIN">EAGAIN</a> &amp;&amp; <a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> != <a class="macro" href="../include/asm-generic/errno-base.h.html#7" title="4" data-ref="_M/EINTR">EINTR</a>) {</td></tr>
+<tr><th id="59">59</th><td>            <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: error %i writing bluetooth packet.\n"</q>,</td></tr>
+<tr><th id="60">60</th><td>                            <a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>);</td></tr>
+<tr><th id="61">61</th><td>            <b>return</b>;</td></tr>
+<tr><th id="62">62</th><td>        }</td></tr>
+<tr><th id="63">63</th><td>    }</td></tr>
+<tr><th id="64">64</th><td>}</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="bt_host_cmd" title='bt_host_cmd' data-type='void bt_host_cmd(struct HCIInfo * hci, const uint8_t * data, int len)' data-ref="bt_host_cmd">bt_host_cmd</dfn>(<b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="local col0 decl" id="70hci" title='hci' data-type='struct HCIInfo *' data-ref="70hci">hci</dfn>, <em>const</em> <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="71data" title='data' data-type='const uint8_t *' data-ref="71data">data</dfn>, <em>int</em> <dfn class="local col2 decl" id="72len" title='len' data-type='int' data-ref="72len">len</dfn>)</td></tr>
+<tr><th id="67">67</th><td>{</td></tr>
+<tr><th id="68">68</th><td>    <a class="tu ref" href="#bt_host_send" title='bt_host_send' data-use='c' data-ref="bt_host_send">bt_host_send</a>(<a class="local col0 ref" href="#70hci" title='hci' data-ref="70hci">hci</a>, <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_COMMAND_PKT" title='hci_packet_type::HCI_COMMAND_PKT' data-ref="hci_packet_type::HCI_COMMAND_PKT">HCI_COMMAND_PKT</a>, <a class="local col1 ref" href="#71data" title='data' data-ref="71data">data</a>, <a class="local col2 ref" href="#72len" title='len' data-ref="72len">len</a>);</td></tr>
+<tr><th id="69">69</th><td>}</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="bt_host_acl" title='bt_host_acl' data-type='void bt_host_acl(struct HCIInfo * hci, const uint8_t * data, int len)' data-ref="bt_host_acl">bt_host_acl</dfn>(<b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="local col3 decl" id="73hci" title='hci' data-type='struct HCIInfo *' data-ref="73hci">hci</dfn>, <em>const</em> <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col4 decl" id="74data" title='data' data-type='const uint8_t *' data-ref="74data">data</dfn>, <em>int</em> <dfn class="local col5 decl" id="75len" title='len' data-type='int' data-ref="75len">len</dfn>)</td></tr>
+<tr><th id="72">72</th><td>{</td></tr>
+<tr><th id="73">73</th><td>    <a class="tu ref" href="#bt_host_send" title='bt_host_send' data-use='c' data-ref="bt_host_send">bt_host_send</a>(<a class="local col3 ref" href="#73hci" title='hci' data-ref="73hci">hci</a>, <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_ACLDATA_PKT" title='hci_packet_type::HCI_ACLDATA_PKT' data-ref="hci_packet_type::HCI_ACLDATA_PKT">HCI_ACLDATA_PKT</a>, <a class="local col4 ref" href="#74data" title='data' data-ref="74data">data</a>, <a class="local col5 ref" href="#75len" title='len' data-ref="75len">len</a>);</td></tr>
+<tr><th id="74">74</th><td>}</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="bt_host_sco" title='bt_host_sco' data-type='void bt_host_sco(struct HCIInfo * hci, const uint8_t * data, int len)' data-ref="bt_host_sco">bt_host_sco</dfn>(<b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="local col6 decl" id="76hci" title='hci' data-type='struct HCIInfo *' data-ref="76hci">hci</dfn>, <em>const</em> <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="77data" title='data' data-type='const uint8_t *' data-ref="77data">data</dfn>, <em>int</em> <dfn class="local col8 decl" id="78len" title='len' data-type='int' data-ref="78len">len</dfn>)</td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>    <a class="tu ref" href="#bt_host_send" title='bt_host_send' data-use='c' data-ref="bt_host_send">bt_host_send</a>(<a class="local col6 ref" href="#76hci" title='hci' data-ref="76hci">hci</a>, <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_SCODATA_PKT" title='hci_packet_type::HCI_SCODATA_PKT' data-ref="hci_packet_type::HCI_SCODATA_PKT">HCI_SCODATA_PKT</a>, <a class="local col7 ref" href="#77data" title='data' data-ref="77data">data</a>, <a class="local col8 ref" href="#78len" title='len' data-ref="78len">len</a>);</td></tr>
+<tr><th id="79">79</th><td>}</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="bt_host_read" title='bt_host_read' data-type='void bt_host_read(void * opaque)' data-ref="bt_host_read">bt_host_read</dfn>(<em>void</em> *<dfn class="local col9 decl" id="79opaque" title='opaque' data-type='void *' data-ref="79opaque">opaque</dfn>)</td></tr>
+<tr><th id="82">82</th><td>{</td></tr>
+<tr><th id="83">83</th><td>    <b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a> *<dfn class="local col0 decl" id="80s" title='s' data-type='struct bt_host_hci_s *' data-ref="80s">s</dfn> = (<b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a> *) <a class="local col9 ref" href="#79opaque" title='opaque' data-ref="79opaque">opaque</a>;</td></tr>
+<tr><th id="84">84</th><td>    <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="81pkt" title='pkt' data-type='uint8_t *' data-ref="81pkt">pkt</dfn>;</td></tr>
+<tr><th id="85">85</th><td>    <em>int</em> <dfn class="local col2 decl" id="82pktlen" title='pktlen' data-type='int' data-ref="82pktlen">pktlen</dfn>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <i>/* Seems that we can't read only the header first and then the amount</i></td></tr>
+<tr><th id="88">88</th><td><i>     * of data indicated in the header because Linux will discard everything</i></td></tr>
+<tr><th id="89">89</th><td><i>     * that's not been read in one go.  */</i></td></tr>
+<tr><th id="90">90</th><td>    <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='w' data-ref="bt_host_hci_s::len">len</a> = <a class="ref" href="../include/unistd.h.html#read" title='read' data-ref="read">read</a>(<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::fd" title='bt_host_hci_s::fd' data-use='r' data-ref="bt_host_hci_s::fd">fd</a>, <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hdr" title='bt_host_hci_s::hdr' data-use='r' data-ref="bt_host_hci_s::hdr">hdr</a>, <b>sizeof</b>(<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hdr" title='bt_host_hci_s::hdr' data-use='r' data-ref="bt_host_hci_s::hdr">hdr</a>));</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>    <b>if</b> (<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="93">93</th><td>        <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: error %i reading HCI frame\n"</q>, <a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>);</td></tr>
+<tr><th id="94">94</th><td>        <b>return</b>;</td></tr>
+<tr><th id="95">95</th><td>    }</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a> = <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hdr" title='bt_host_hci_s::hdr' data-use='r' data-ref="bt_host_hci_s::hdr">hdr</a>;</td></tr>
+<tr><th id="98">98</th><td>    <b>while</b> (<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='w' data-ref="bt_host_hci_s::len">len</a> --)</td></tr>
+<tr><th id="99">99</th><td>        <b>switch</b> (*<a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a> ++) {</td></tr>
+<tr><th id="100">100</th><td>        <b>case</b> <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_EVENT_PKT" title='hci_packet_type::HCI_EVENT_PKT' data-ref="hci_packet_type::HCI_EVENT_PKT">HCI_EVENT_PKT</a>:</td></tr>
+<tr><th id="101">101</th><td>            <b>if</b> (<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a> &lt; <var>2</var>)</td></tr>
+<tr><th id="102">102</th><td>                <b>goto</b> <a class="lbl" href="#83bad_pkt" data-ref="83bad_pkt">bad_pkt</a>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>            <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a> = <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#291" title="(((pkt[1] + 2) &lt; (s-&gt;len)) ? (pkt[1] + 2) : (s-&gt;len))" data-ref="_M/MIN">MIN</a>(<a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>[<var>1</var>] + <var>2</var>, <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a>);</td></tr>
+<tr><th id="105">105</th><td>            <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::evt_recv" title='HCIInfo::evt_recv' data-ref="HCIInfo::evt_recv">evt_recv</a>(<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::opaque" title='HCIInfo::opaque' data-ref="HCIInfo::opaque">opaque</a>, <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>, <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>);</td></tr>
+<tr><th id="106">106</th><td>            <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='w' data-ref="bt_host_hci_s::len">len</a> -= <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="107">107</th><td>            <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a> += <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>            <i>/* TODO: if this is an Inquiry Result event, it's also</i></td></tr>
+<tr><th id="110">110</th><td><i>             * interpreted by Linux kernel before we received it, possibly</i></td></tr>
+<tr><th id="111">111</th><td><i>             * we should clean the kernel Inquiry cache through</i></td></tr>
+<tr><th id="112">112</th><td><i>             * ioctl(s-&gt;fd, HCI_INQUIRY, ...).  */</i></td></tr>
+<tr><th id="113">113</th><td>            <b>break</b>;</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>        <b>case</b> <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_ACLDATA_PKT" title='hci_packet_type::HCI_ACLDATA_PKT' data-ref="hci_packet_type::HCI_ACLDATA_PKT">HCI_ACLDATA_PKT</a>:</td></tr>
+<tr><th id="116">116</th><td>            <b>if</b> (<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a> &lt; <var>4</var>)</td></tr>
+<tr><th id="117">117</th><td>                <b>goto</b> <a class="lbl" href="#83bad_pkt" data-ref="83bad_pkt">bad_pkt</a>;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>            <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a> = <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#291" title="(((((pkt[3] &lt;&lt; 8) | pkt[2]) + 4) &lt; (s-&gt;len)) ? (((pkt[3] &lt;&lt; 8) | pkt[2]) + 4) : (s-&gt;len))" data-ref="_M/MIN">MIN</a>(((<a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>[<var>3</var>] &lt;&lt; <var>8</var>) | <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>[<var>2</var>]) + <var>4</var>, <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a>);</td></tr>
+<tr><th id="120">120</th><td>            <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::acl_recv" title='HCIInfo::acl_recv' data-ref="HCIInfo::acl_recv">acl_recv</a>(<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::opaque" title='HCIInfo::opaque' data-ref="HCIInfo::opaque">opaque</a>, <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>, <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>);</td></tr>
+<tr><th id="121">121</th><td>            <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='w' data-ref="bt_host_hci_s::len">len</a> -= <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="122">122</th><td>            <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a> += <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="123">123</th><td>            <b>break</b>;</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>        <b>case</b> <a class="enum" href="include/hw/bt.h.html#hci_packet_type::HCI_SCODATA_PKT" title='hci_packet_type::HCI_SCODATA_PKT' data-ref="hci_packet_type::HCI_SCODATA_PKT">HCI_SCODATA_PKT</a>:</td></tr>
+<tr><th id="126">126</th><td>            <b>if</b> (<a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a> &lt; <var>3</var>)</td></tr>
+<tr><th id="127">127</th><td>                <b>goto</b> <a class="lbl" href="#83bad_pkt" data-ref="83bad_pkt">bad_pkt</a>;</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>            <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a> = <a class="macro" href="../include/glib-2.0/glib/gmacros.h.html#291" title="(((pkt[2] + 3) &lt; (s-&gt;len)) ? (pkt[2] + 3) : (s-&gt;len))" data-ref="_M/MIN">MIN</a>(<a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>[<var>2</var>] + <var>3</var>, <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='r' data-ref="bt_host_hci_s::len">len</a>);</td></tr>
+<tr><th id="130">130</th><td>            <a class="local col0 ref" href="#80s" title='s' data-ref="80s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::len" title='bt_host_hci_s::len' data-use='w' data-ref="bt_host_hci_s::len">len</a> -= <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="131">131</th><td>            <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a> += <a class="local col2 ref" href="#82pktlen" title='pktlen' data-ref="82pktlen">pktlen</a>;</td></tr>
+<tr><th id="132">132</th><td>            <b>break</b>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>        <b>default</b>:</td></tr>
+<tr><th id="135">135</th><td>        <dfn class="lbl" id="83bad_pkt" data-ref="83bad_pkt">bad_pkt</dfn>:</td></tr>
+<tr><th id="136">136</th><td>            <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: bad HCI packet type %02x\n"</q>, <a class="local col1 ref" href="#81pkt" title='pkt' data-ref="81pkt">pkt</a>[-<var>1</var>]);</td></tr>
+<tr><th id="137">137</th><td>        }</td></tr>
+<tr><th id="138">138</th><td>}</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="bt_host_bdaddr_set" title='bt_host_bdaddr_set' data-type='int bt_host_bdaddr_set(struct HCIInfo * hci, const uint8_t * bd_addr)' data-ref="bt_host_bdaddr_set">bt_host_bdaddr_set</dfn>(<b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="local col4 decl" id="84hci" title='hci' data-type='struct HCIInfo *' data-ref="84hci">hci</dfn>, <em>const</em> <a class="typedef" href="../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="85bd_addr" title='bd_addr' data-type='const uint8_t *' data-ref="85bd_addr">bd_addr</dfn>)</td></tr>
+<tr><th id="141">141</th><td>{</td></tr>
+<tr><th id="142">142</th><td>    <b>return</b> -<a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><b>struct</b> <a class="type" href="include/sysemu/bt.h.html#HCIInfo" title='HCIInfo' data-ref="HCIInfo">HCIInfo</a> *<dfn class="decl def" id="bt_host_hci" title='bt_host_hci' data-ref="bt_host_hci">bt_host_hci</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="86id" title='id' data-type='const char *' data-ref="86id">id</dfn>)</td></tr>
+<tr><th id="146">146</th><td>{</td></tr>
+<tr><th id="147">147</th><td>    <b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a> *<dfn class="local col7 decl" id="87s" title='s' data-type='struct bt_host_hci_s *' data-ref="87s">s</dfn>;</td></tr>
+<tr><th id="148">148</th><td>    <em>int</em> <dfn class="local col8 decl" id="88fd" title='fd' data-type='int' data-ref="88fd">fd</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="149">149</th><td><u># <span data-ppcond="149">ifdef</span> <span class="macro" data-ref="_M/CONFIG_BLUEZ">CONFIG_BLUEZ</span></u></td></tr>
+<tr><th id="150">150</th><td>    <em>int</em> dev_id = hci_devid(id);</td></tr>
+<tr><th id="151">151</th><td>    <b>struct</b> hci_filter flt;</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>    <b>if</b> (dev_id &lt; <var>0</var>) {</td></tr>
+<tr><th id="154">154</th><td>        fprintf(stderr, <q>"qemu: `%s' not available\n"</q>, id);</td></tr>
+<tr><th id="155">155</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="156">156</th><td>    }</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>    fd = hci_open_dev(dev_id);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <i>/* XXX: can we ensure nobody else has the device opened?  */</i></td></tr>
+<tr><th id="161">161</th><td><u># <span data-ppcond="149">endif</span></u></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>    <b>if</b> (<a class="local col8 ref" href="#88fd" title='fd' data-ref="88fd">fd</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="164">164</th><td>        <a class="ref" href="../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"qemu: Can't open `%s': %s (%i)\n"</q>,</td></tr>
+<tr><th id="165">165</th><td>                        <a class="local col6 ref" href="#86id" title='id' data-ref="86id">id</a>, <a class="ref" href="../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>), <a class="macro" href="../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>);</td></tr>
+<tr><th id="166">166</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="167">167</th><td>    }</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><u># <span data-ppcond="169">ifdef</span> <span class="macro" data-ref="_M/CONFIG_BLUEZ">CONFIG_BLUEZ</span></u></td></tr>
+<tr><th id="170">170</th><td>    hci_filter_clear(&amp;flt);</td></tr>
+<tr><th id="171">171</th><td>    hci_filter_all_ptypes(&amp;flt);</td></tr>
+<tr><th id="172">172</th><td>    hci_filter_all_events(&amp;flt);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td>    <b>if</b> (qemu_setsockopt(fd, SOL_HCI, HCI_FILTER, &amp;flt, <b>sizeof</b>(flt)) &lt; <var>0</var>) {</td></tr>
+<tr><th id="175">175</th><td>        fprintf(stderr, <q>"qemu: Can't set HCI filter on socket (%i)\n"</q>, errno);</td></tr>
+<tr><th id="176">176</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="177">177</th><td>    }</td></tr>
+<tr><th id="178">178</th><td><u># <span data-ppcond="169">endif</span></u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a> = <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<b>struct</b> <a class="type" href="#bt_host_hci_s" title='bt_host_hci_s' data-ref="bt_host_hci_s">bt_host_hci_s</a>));</td></tr>
+<tr><th id="181">181</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::fd" title='bt_host_hci_s::fd' data-use='w' data-ref="bt_host_hci_s::fd">fd</a> = <a class="local col8 ref" href="#88fd" title='fd' data-ref="88fd">fd</a>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::cmd_send" title='HCIInfo::cmd_send' data-ref="HCIInfo::cmd_send">cmd_send</a> = <a class="tu ref" href="#bt_host_cmd" title='bt_host_cmd' data-use='r' data-ref="bt_host_cmd">bt_host_cmd</a>;</td></tr>
+<tr><th id="183">183</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::sco_send" title='HCIInfo::sco_send' data-ref="HCIInfo::sco_send">sco_send</a> = <a class="tu ref" href="#bt_host_sco" title='bt_host_sco' data-use='r' data-ref="bt_host_sco">bt_host_sco</a>;</td></tr>
+<tr><th id="184">184</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::acl_send" title='HCIInfo::acl_send' data-ref="HCIInfo::acl_send">acl_send</a> = <a class="tu ref" href="#bt_host_acl" title='bt_host_acl' data-use='r' data-ref="bt_host_acl">bt_host_acl</a>;</td></tr>
+<tr><th id="185">185</th><td>    <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='m' data-ref="bt_host_hci_s::hci">hci</a>.<a class="ref" href="include/sysemu/bt.h.html#HCIInfo::bdaddr_set" title='HCIInfo::bdaddr_set' data-ref="HCIInfo::bdaddr_set">bdaddr_set</a> = <a class="tu ref" href="#bt_host_bdaddr_set" title='bt_host_bdaddr_set' data-use='r' data-ref="bt_host_bdaddr_set">bt_host_bdaddr_set</a>;</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>    <a class="ref" href="include/qemu/main-loop.h.html#qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</a>(<a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::fd" title='bt_host_hci_s::fd' data-use='r' data-ref="bt_host_hci_s::fd">fd</a>, <a class="tu ref" href="#bt_host_read" title='bt_host_read' data-use='r' data-ref="bt_host_read">bt_host_read</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <b>return</b> &amp;<a class="local col7 ref" href="#87s" title='s' data-ref="87s">s</a>-&gt;<a class="tu ref" href="#bt_host_hci_s::hci" title='bt_host_hci_s::hci' data-use='a' data-ref="bt_host_hci_s::hci">hci</a>;</td></tr>
+<tr><th id="190">190</th><td>}</td></tr>
+<tr><th id="191">191</th><td><u>#<span data-ppcond="25">else</span></u></td></tr>
+<tr><th id="192">192</th><td><b>struct</b> HCIInfo *bt_host_hci(<em>const</em> <em>char</em> *id)</td></tr>
+<tr><th id="193">193</th><td>{</td></tr>
+<tr><th id="194">194</th><td>    fprintf(stderr, <q>"qemu: bluetooth passthrough not supported (yet)\n"</q>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="197">197</th><td>}</td></tr>
+<tr><th id="198">198</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

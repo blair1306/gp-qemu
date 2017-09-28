@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ipmi.h source code [codebrowser/include/hw/ipmi/ipmi.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="IPMIBmc,IPMIBmcClass,IPMIFwInfo,IPMIInterface,IPMIInterfaceClass,ipmi_op,ipmi_sdr_compact,ipmi_sdr_header "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/ipmi/ipmi.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>ipmi</a>/<a href='ipmi.h.html'>ipmi.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * IPMI base class</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015 Corey Minyard, MontaVista Software, LLC</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/HW_IPMI_H">HW_IPMI_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/HW_IPMI_H" data-ref="_M/HW_IPMI_H">HW_IPMI_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/MAX_IPMI_MSG_SIZE" data-ref="_M/MAX_IPMI_MSG_SIZE">MAX_IPMI_MSG_SIZE</dfn> 300</u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><b>enum</b> <dfn class="type def" id="ipmi_op" title='ipmi_op' data-ref="ipmi_op">ipmi_op</dfn> {</td></tr>
+<tr><th id="35">35</th><td>    <dfn class="enum" id="ipmi_op::IPMI_RESET_CHASSIS" title='ipmi_op::IPMI_RESET_CHASSIS' data-ref="ipmi_op::IPMI_RESET_CHASSIS">IPMI_RESET_CHASSIS</dfn>,</td></tr>
+<tr><th id="36">36</th><td>    <dfn class="enum" id="ipmi_op::IPMI_POWEROFF_CHASSIS" title='ipmi_op::IPMI_POWEROFF_CHASSIS' data-ref="ipmi_op::IPMI_POWEROFF_CHASSIS">IPMI_POWEROFF_CHASSIS</dfn>,</td></tr>
+<tr><th id="37">37</th><td>    <dfn class="enum" id="ipmi_op::IPMI_POWERON_CHASSIS" title='ipmi_op::IPMI_POWERON_CHASSIS' data-ref="ipmi_op::IPMI_POWERON_CHASSIS">IPMI_POWERON_CHASSIS</dfn>,</td></tr>
+<tr><th id="38">38</th><td>    <dfn class="enum" id="ipmi_op::IPMI_POWERCYCLE_CHASSIS" title='ipmi_op::IPMI_POWERCYCLE_CHASSIS' data-ref="ipmi_op::IPMI_POWERCYCLE_CHASSIS">IPMI_POWERCYCLE_CHASSIS</dfn>,</td></tr>
+<tr><th id="39">39</th><td>    <dfn class="enum" id="ipmi_op::IPMI_PULSE_DIAG_IRQ" title='ipmi_op::IPMI_PULSE_DIAG_IRQ' data-ref="ipmi_op::IPMI_PULSE_DIAG_IRQ">IPMI_PULSE_DIAG_IRQ</dfn>,</td></tr>
+<tr><th id="40">40</th><td>    <dfn class="enum" id="ipmi_op::IPMI_SHUTDOWN_VIA_ACPI_OVERTEMP" title='ipmi_op::IPMI_SHUTDOWN_VIA_ACPI_OVERTEMP' data-ref="ipmi_op::IPMI_SHUTDOWN_VIA_ACPI_OVERTEMP">IPMI_SHUTDOWN_VIA_ACPI_OVERTEMP</dfn>,</td></tr>
+<tr><th id="41">41</th><td>    <dfn class="enum" id="ipmi_op::IPMI_SEND_NMI" title='ipmi_op::IPMI_SEND_NMI' data-ref="ipmi_op::IPMI_SEND_NMI">IPMI_SEND_NMI</dfn></td></tr>
+<tr><th id="42">42</th><td>};</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_INVALID_CMD" data-ref="_M/IPMI_CC_INVALID_CMD">IPMI_CC_INVALID_CMD</dfn>                              0xc1</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_COMMAND_INVALID_FOR_LUN" data-ref="_M/IPMI_CC_COMMAND_INVALID_FOR_LUN">IPMI_CC_COMMAND_INVALID_FOR_LUN</dfn>                  0xc2</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_TIMEOUT" data-ref="_M/IPMI_CC_TIMEOUT">IPMI_CC_TIMEOUT</dfn>                                  0xc3</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_OUT_OF_SPACE" data-ref="_M/IPMI_CC_OUT_OF_SPACE">IPMI_CC_OUT_OF_SPACE</dfn>                             0xc4</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_INVALID_RESERVATION" data-ref="_M/IPMI_CC_INVALID_RESERVATION">IPMI_CC_INVALID_RESERVATION</dfn>                      0xc5</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_REQUEST_DATA_TRUNCATED" data-ref="_M/IPMI_CC_REQUEST_DATA_TRUNCATED">IPMI_CC_REQUEST_DATA_TRUNCATED</dfn>                   0xc6</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_REQUEST_DATA_LENGTH_INVALID" data-ref="_M/IPMI_CC_REQUEST_DATA_LENGTH_INVALID">IPMI_CC_REQUEST_DATA_LENGTH_INVALID</dfn>              0xc7</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_PARM_OUT_OF_RANGE" data-ref="_M/IPMI_CC_PARM_OUT_OF_RANGE">IPMI_CC_PARM_OUT_OF_RANGE</dfn>                        0xc9</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_CANNOT_RETURN_REQ_NUM_BYTES" data-ref="_M/IPMI_CC_CANNOT_RETURN_REQ_NUM_BYTES">IPMI_CC_CANNOT_RETURN_REQ_NUM_BYTES</dfn>              0xca</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_REQ_ENTRY_NOT_PRESENT" data-ref="_M/IPMI_CC_REQ_ENTRY_NOT_PRESENT">IPMI_CC_REQ_ENTRY_NOT_PRESENT</dfn>                    0xcb</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_INVALID_DATA_FIELD" data-ref="_M/IPMI_CC_INVALID_DATA_FIELD">IPMI_CC_INVALID_DATA_FIELD</dfn>                       0xcc</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_BMC_INIT_IN_PROGRESS" data-ref="_M/IPMI_CC_BMC_INIT_IN_PROGRESS">IPMI_CC_BMC_INIT_IN_PROGRESS</dfn>                     0xd2</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/IPMI_CC_COMMAND_NOT_SUPPORTED" data-ref="_M/IPMI_CC_COMMAND_NOT_SUPPORTED">IPMI_CC_COMMAND_NOT_SUPPORTED</dfn>                    0xd5</u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/IPMI_NETFN_APP" data-ref="_M/IPMI_NETFN_APP">IPMI_NETFN_APP</dfn>                0x06</u></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/IPMI_DEBUG" data-ref="_M/IPMI_DEBUG">IPMI_DEBUG</dfn> 1</u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><i>/* Specified in the SMBIOS spec. */</i></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/IPMI_SMBIOS_KCS" data-ref="_M/IPMI_SMBIOS_KCS">IPMI_SMBIOS_KCS</dfn>         0x01</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/IPMI_SMBIOS_SMIC" data-ref="_M/IPMI_SMBIOS_SMIC">IPMI_SMBIOS_SMIC</dfn>        0x02</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/IPMI_SMBIOS_BT" data-ref="_M/IPMI_SMBIOS_BT">IPMI_SMBIOS_BT</dfn>          0x03</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/IPMI_SMBIOS_SSIF" data-ref="_M/IPMI_SMBIOS_SSIF">IPMI_SMBIOS_SSIF</dfn>        0x04</u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i>/*</i></td></tr>
+<tr><th id="69">69</th><td><i> * Used for transferring information to interfaces that add</i></td></tr>
+<tr><th id="70">70</th><td><i> * entries to firmware tables.</i></td></tr>
+<tr><th id="71">71</th><td><i> */</i></td></tr>
+<tr><th id="72">72</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IPMIFwInfo" title='IPMIFwInfo' data-ref="IPMIFwInfo"><a class="type" href="#IPMIFwInfo" title='IPMIFwInfo' data-ref="IPMIFwInfo">IPMIFwInfo</a></dfn> {</td></tr>
+<tr><th id="73">73</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="IPMIFwInfo::interface_name" title='IPMIFwInfo::interface_name' data-ref="IPMIFwInfo::interface_name">interface_name</dfn>;</td></tr>
+<tr><th id="74">74</th><td>    <em>int</em> <dfn class="decl" id="IPMIFwInfo::interface_type" title='IPMIFwInfo::interface_type' data-ref="IPMIFwInfo::interface_type">interface_type</dfn>;</td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IPMIFwInfo::ipmi_spec_major_revision" title='IPMIFwInfo::ipmi_spec_major_revision' data-ref="IPMIFwInfo::ipmi_spec_major_revision">ipmi_spec_major_revision</dfn>;</td></tr>
+<tr><th id="76">76</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IPMIFwInfo::ipmi_spec_minor_revision" title='IPMIFwInfo::ipmi_spec_minor_revision' data-ref="IPMIFwInfo::ipmi_spec_minor_revision">ipmi_spec_minor_revision</dfn>;</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IPMIFwInfo::i2c_slave_address" title='IPMIFwInfo::i2c_slave_address' data-ref="IPMIFwInfo::i2c_slave_address">i2c_slave_address</dfn>;</td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IPMIFwInfo::uuid" title='IPMIFwInfo::uuid' data-ref="IPMIFwInfo::uuid">uuid</dfn>;</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IPMIFwInfo::base_address" title='IPMIFwInfo::base_address' data-ref="IPMIFwInfo::base_address">base_address</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IPMIFwInfo::register_length" title='IPMIFwInfo::register_length' data-ref="IPMIFwInfo::register_length">register_length</dfn>;</td></tr>
+<tr><th id="82">82</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IPMIFwInfo::register_spacing" title='IPMIFwInfo::register_spacing' data-ref="IPMIFwInfo::register_spacing">register_spacing</dfn>;</td></tr>
+<tr><th id="83">83</th><td>    <b>enum</b> {</td></tr>
+<tr><th id="84">84</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_MEMSPACE_IO" title='IPMIFwInfo::IPMI_MEMSPACE_IO' data-ref="IPMIFwInfo::IPMI_MEMSPACE_IO">IPMI_MEMSPACE_IO</dfn>,</td></tr>
+<tr><th id="85">85</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_MEMSPACE_MEM32" title='IPMIFwInfo::IPMI_MEMSPACE_MEM32' data-ref="IPMIFwInfo::IPMI_MEMSPACE_MEM32">IPMI_MEMSPACE_MEM32</dfn>,</td></tr>
+<tr><th id="86">86</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_MEMSPACE_MEM64" title='IPMIFwInfo::IPMI_MEMSPACE_MEM64' data-ref="IPMIFwInfo::IPMI_MEMSPACE_MEM64">IPMI_MEMSPACE_MEM64</dfn>,</td></tr>
+<tr><th id="87">87</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_MEMSPACE_SMBUS" title='IPMIFwInfo::IPMI_MEMSPACE_SMBUS' data-ref="IPMIFwInfo::IPMI_MEMSPACE_SMBUS">IPMI_MEMSPACE_SMBUS</dfn></td></tr>
+<tr><th id="88">88</th><td>    } <dfn class="decl" id="IPMIFwInfo::memspace" title='IPMIFwInfo::memspace' data-ref="IPMIFwInfo::memspace">memspace</dfn>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>    <em>int</em> <dfn class="decl" id="IPMIFwInfo::interrupt_number" title='IPMIFwInfo::interrupt_number' data-ref="IPMIFwInfo::interrupt_number">interrupt_number</dfn>;</td></tr>
+<tr><th id="91">91</th><td>    <b>enum</b> {</td></tr>
+<tr><th id="92">92</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_LEVEL_IRQ" title='IPMIFwInfo::IPMI_LEVEL_IRQ' data-ref="IPMIFwInfo::IPMI_LEVEL_IRQ">IPMI_LEVEL_IRQ</dfn>,</td></tr>
+<tr><th id="93">93</th><td>        <dfn class="enum" id="IPMIFwInfo::IPMI_EDGE_IRQ" title='IPMIFwInfo::IPMI_EDGE_IRQ' data-ref="IPMIFwInfo::IPMI_EDGE_IRQ">IPMI_EDGE_IRQ</dfn></td></tr>
+<tr><th id="94">94</th><td>    } <dfn class="decl" id="IPMIFwInfo::irq_type" title='IPMIFwInfo::irq_type' data-ref="IPMIFwInfo::irq_type">irq_type</dfn>;</td></tr>
+<tr><th id="95">95</th><td>} <dfn class="typedef" id="IPMIFwInfo" title='IPMIFwInfo' data-type='struct IPMIFwInfo' data-ref="IPMIFwInfo">IPMIFwInfo</dfn>;</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>/*</i></td></tr>
+<tr><th id="98">98</th><td><i> * Called by each instantiated IPMI interface device to get it's uuid.</i></td></tr>
+<tr><th id="99">99</th><td><i> */</i></td></tr>
+<tr><th id="100">100</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ipmi_next_uuid" title='ipmi_next_uuid' data-ref="ipmi_next_uuid">ipmi_next_uuid</dfn>(<em>void</em>);</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><i>/* IPMI Interface types (KCS, SMIC, BT) are prefixed with this */</i></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/TYPE_IPMI_INTERFACE_PREFIX" data-ref="_M/TYPE_IPMI_INTERFACE_PREFIX">TYPE_IPMI_INTERFACE_PREFIX</dfn> "ipmi-interface-"</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><i>/*</i></td></tr>
+<tr><th id="106">106</th><td><i> * An IPMI Interface, the interface for talking between the target</i></td></tr>
+<tr><th id="107">107</th><td><i> * and the BMC.</i></td></tr>
+<tr><th id="108">108</th><td><i> */</i></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/TYPE_IPMI_INTERFACE" data-ref="_M/TYPE_IPMI_INTERFACE">TYPE_IPMI_INTERFACE</dfn> "ipmi-interface"</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/IPMI_INTERFACE" data-ref="_M/IPMI_INTERFACE">IPMI_INTERFACE</dfn>(obj) \</u></td></tr>
+<tr><th id="111">111</th><td><u>     INTERFACE_CHECK(IPMIInterface, (obj), TYPE_IPMI_INTERFACE)</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/IPMI_INTERFACE_CLASS" data-ref="_M/IPMI_INTERFACE_CLASS">IPMI_INTERFACE_CLASS</dfn>(class) \</u></td></tr>
+<tr><th id="113">113</th><td><u>     OBJECT_CLASS_CHECK(IPMIInterfaceClass, (class), TYPE_IPMI_INTERFACE)</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/IPMI_INTERFACE_GET_CLASS" data-ref="_M/IPMI_INTERFACE_GET_CLASS">IPMI_INTERFACE_GET_CLASS</dfn>(class) \</u></td></tr>
+<tr><th id="115">115</th><td><u>     OBJECT_GET_CLASS(IPMIInterfaceClass, (class), TYPE_IPMI_INTERFACE)</u></td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface"><a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a></dfn> {</td></tr>
+<tr><th id="118">118</th><td>    <a class="typedef" href="../../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> <dfn class="decl" id="IPMIInterface::parent" title='IPMIInterface::parent' data-ref="IPMIInterface::parent">parent</dfn>;</td></tr>
+<tr><th id="119">119</th><td>} <dfn class="typedef" id="IPMIInterface" title='IPMIInterface' data-type='struct IPMIInterface' data-ref="IPMIInterface">IPMIInterface</dfn>;</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IPMIInterfaceClass" title='IPMIInterfaceClass' data-ref="IPMIInterfaceClass"><a class="type" href="#IPMIInterfaceClass" title='IPMIInterfaceClass' data-ref="IPMIInterfaceClass">IPMIInterfaceClass</a></dfn> {</td></tr>
+<tr><th id="122">122</th><td>    <a class="typedef" href="../../qom/object.h.html#InterfaceClass" title='InterfaceClass' data-type='struct InterfaceClass' data-ref="InterfaceClass">InterfaceClass</a> <dfn class="decl" id="IPMIInterfaceClass::parent" title='IPMIInterfaceClass::parent' data-ref="IPMIInterfaceClass::parent">parent</dfn>;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::init" title='IPMIInterfaceClass::init' data-ref="IPMIInterfaceClass::init">init</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='struct IPMIInterface *' data-ref="1s">s</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="2errp" title='errp' data-type='Error **' data-ref="2errp">errp</dfn>);</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <i>/*</i></td></tr>
+<tr><th id="127">127</th><td><i>     * Perform various operations on the hardware.  If checkonly is</i></td></tr>
+<tr><th id="128">128</th><td><i>     * true, it will return if the operation can be performed, but it</i></td></tr>
+<tr><th id="129">129</th><td><i>     * will not do the operation.</i></td></tr>
+<tr><th id="130">130</th><td><i>     */</i></td></tr>
+<tr><th id="131">131</th><td>    <em>int</em> (*<dfn class="decl" id="IPMIInterfaceClass::do_hw_op" title='IPMIInterfaceClass::do_hw_op' data-ref="IPMIInterfaceClass::do_hw_op">do_hw_op</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col3 decl" id="3s" title='s' data-type='struct IPMIInterface *' data-ref="3s">s</dfn>, <b>enum</b> <a class="type" href="#ipmi_op" title='ipmi_op' data-ref="ipmi_op">ipmi_op</a> <dfn class="local col4 decl" id="4op" title='op' data-type='enum ipmi_op' data-ref="4op">op</dfn>, <em>int</em> <dfn class="local col5 decl" id="5checkonly" title='checkonly' data-type='int' data-ref="5checkonly">checkonly</dfn>);</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>    <i>/*</i></td></tr>
+<tr><th id="134">134</th><td><i>     * Enable/disable irqs on the interface when the BMC requests this.</i></td></tr>
+<tr><th id="135">135</th><td><i>     */</i></td></tr>
+<tr><th id="136">136</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::set_irq_enable" title='IPMIInterfaceClass::set_irq_enable' data-ref="IPMIInterfaceClass::set_irq_enable">set_irq_enable</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col6 decl" id="6s" title='s' data-type='struct IPMIInterface *' data-ref="6s">s</dfn>, <em>int</em> <dfn class="local col7 decl" id="7val" title='val' data-type='int' data-ref="7val">val</dfn>);</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    <i>/*</i></td></tr>
+<tr><th id="139">139</th><td><i>     * Handle an event that occurred on the interface, generally the.</i></td></tr>
+<tr><th id="140">140</th><td><i>     * target writing to a register.</i></td></tr>
+<tr><th id="141">141</th><td><i>     */</i></td></tr>
+<tr><th id="142">142</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::handle_if_event" title='IPMIInterfaceClass::handle_if_event' data-ref="IPMIInterfaceClass::handle_if_event">handle_if_event</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col8 decl" id="8s" title='s' data-type='struct IPMIInterface *' data-ref="8s">s</dfn>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>    <i>/*</i></td></tr>
+<tr><th id="145">145</th><td><i>     * The interfaces use this to perform certain ops</i></td></tr>
+<tr><th id="146">146</th><td><i>     */</i></td></tr>
+<tr><th id="147">147</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::set_atn" title='IPMIInterfaceClass::set_atn' data-ref="IPMIInterfaceClass::set_atn">set_atn</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col9 decl" id="9s" title='s' data-type='struct IPMIInterface *' data-ref="9s">s</dfn>, <em>int</em> <dfn class="local col0 decl" id="10val" title='val' data-type='int' data-ref="10val">val</dfn>, <em>int</em> <dfn class="local col1 decl" id="11irq" title='irq' data-type='int' data-ref="11irq">irq</dfn>);</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>    <i>/*</i></td></tr>
+<tr><th id="150">150</th><td><i>     * Got an IPMI warm/cold reset.</i></td></tr>
+<tr><th id="151">151</th><td><i>     */</i></td></tr>
+<tr><th id="152">152</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::reset" title='IPMIInterfaceClass::reset' data-ref="IPMIInterfaceClass::reset">reset</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col2 decl" id="12s" title='s' data-type='struct IPMIInterface *' data-ref="12s">s</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="13is_cold" title='is_cold' data-type='_Bool' data-ref="13is_cold">is_cold</dfn>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <i>/*</i></td></tr>
+<tr><th id="155">155</th><td><i>     * Handle a response from the bmc.</i></td></tr>
+<tr><th id="156">156</th><td><i>     */</i></td></tr>
+<tr><th id="157">157</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::handle_rsp" title='IPMIInterfaceClass::handle_rsp' data-ref="IPMIInterfaceClass::handle_rsp">handle_rsp</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col4 decl" id="14s" title='s' data-type='struct IPMIInterface *' data-ref="14s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col5 decl" id="15msg_id" title='msg_id' data-type='uint8_t' data-ref="15msg_id">msg_id</dfn>,</td></tr>
+<tr><th id="158">158</th><td>                       <em>unsigned</em> <em>char</em> *<dfn class="local col6 decl" id="16rsp" title='rsp' data-type='unsigned char *' data-ref="16rsp">rsp</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col7 decl" id="17rsp_len" title='rsp_len' data-type='unsigned int' data-ref="17rsp_len">rsp_len</dfn>);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <i>/*</i></td></tr>
+<tr><th id="161">161</th><td><i>     * Set by the owner to hold the backend data for the interface.</i></td></tr>
+<tr><th id="162">162</th><td><i>     */</i></td></tr>
+<tr><th id="163">163</th><td>    <em>void</em> *(*<dfn class="decl" id="IPMIInterfaceClass::get_backend_data" title='IPMIInterfaceClass::get_backend_data' data-ref="IPMIInterfaceClass::get_backend_data">get_backend_data</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col8 decl" id="18s" title='s' data-type='struct IPMIInterface *' data-ref="18s">s</dfn>);</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td>    <i>/*</i></td></tr>
+<tr><th id="166">166</th><td><i>     * Return the firmware info for a device.</i></td></tr>
+<tr><th id="167">167</th><td><i>     */</i></td></tr>
+<tr><th id="168">168</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIInterfaceClass::get_fwinfo" title='IPMIInterfaceClass::get_fwinfo' data-ref="IPMIInterfaceClass::get_fwinfo">get_fwinfo</dfn>)(<b>struct</b> <a class="type" href="#IPMIInterface" title='IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="local col9 decl" id="19s" title='s' data-type='struct IPMIInterface *' data-ref="19s">s</dfn>, <a class="typedef" href="#IPMIFwInfo" title='IPMIFwInfo' data-type='struct IPMIFwInfo' data-ref="IPMIFwInfo">IPMIFwInfo</a> *<dfn class="local col0 decl" id="20info" title='info' data-type='IPMIFwInfo *' data-ref="20info">info</dfn>);</td></tr>
+<tr><th id="169">169</th><td>} <dfn class="typedef" id="IPMIInterfaceClass" title='IPMIInterfaceClass' data-type='struct IPMIInterfaceClass' data-ref="IPMIInterfaceClass">IPMIInterfaceClass</dfn>;</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><i>/*</i></td></tr>
+<tr><th id="172">172</th><td><i> * Define a BMC simulator (or perhaps a connection to a real BMC)</i></td></tr>
+<tr><th id="173">173</th><td><i> */</i></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/TYPE_IPMI_BMC" data-ref="_M/TYPE_IPMI_BMC">TYPE_IPMI_BMC</dfn> "ipmi-bmc"</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/IPMI_BMC" data-ref="_M/IPMI_BMC">IPMI_BMC</dfn>(obj) \</u></td></tr>
+<tr><th id="176">176</th><td><u>     OBJECT_CHECK(IPMIBmc, (obj), TYPE_IPMI_BMC)</u></td></tr>
+<tr><th id="177">177</th><td><u>#define <dfn class="macro" id="_M/IPMI_BMC_CLASS" data-ref="_M/IPMI_BMC_CLASS">IPMI_BMC_CLASS</dfn>(obj_class) \</u></td></tr>
+<tr><th id="178">178</th><td><u>     OBJECT_CLASS_CHECK(IPMIBmcClass, (obj_class), TYPE_IPMI_BMC)</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/IPMI_BMC_GET_CLASS" data-ref="_M/IPMI_BMC_GET_CLASS">IPMI_BMC_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="180">180</th><td><u>     OBJECT_GET_CLASS(IPMIBmcClass, (obj), TYPE_IPMI_BMC)</u></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IPMIBmc" title='IPMIBmc' data-ref="IPMIBmc"><a class="type" href="#IPMIBmc" title='IPMIBmc' data-ref="IPMIBmc">IPMIBmc</a></dfn> {</td></tr>
+<tr><th id="183">183</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="IPMIBmc::parent" title='IPMIBmc::parent' data-ref="IPMIBmc::parent">parent</dfn>;</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IPMIBmc::slave_addr" title='IPMIBmc::slave_addr' data-ref="IPMIBmc::slave_addr">slave_addr</dfn>;</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>    <a class="typedef" href="#IPMIInterface" title='IPMIInterface' data-type='struct IPMIInterface' data-ref="IPMIInterface">IPMIInterface</a> *<dfn class="decl" id="IPMIBmc::intf" title='IPMIBmc::intf' data-ref="IPMIBmc::intf">intf</dfn>;</td></tr>
+<tr><th id="188">188</th><td>} <dfn class="typedef" id="IPMIBmc" title='IPMIBmc' data-type='struct IPMIBmc' data-ref="IPMIBmc">IPMIBmc</dfn>;</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IPMIBmcClass" title='IPMIBmcClass' data-ref="IPMIBmcClass"><a class="type" href="#IPMIBmcClass" title='IPMIBmcClass' data-ref="IPMIBmcClass">IPMIBmcClass</a></dfn> {</td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="IPMIBmcClass::parent" title='IPMIBmcClass::parent' data-ref="IPMIBmcClass::parent">parent</dfn>;</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <i>/* Called when the system resets to report to the bmc. */</i></td></tr>
+<tr><th id="194">194</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIBmcClass::handle_reset" title='IPMIBmcClass::handle_reset' data-ref="IPMIBmcClass::handle_reset">handle_reset</dfn>)(<b>struct</b> <a class="type" href="#IPMIBmc" title='IPMIBmc' data-ref="IPMIBmc">IPMIBmc</a> *<dfn class="local col1 decl" id="21s" title='s' data-type='struct IPMIBmc *' data-ref="21s">s</dfn>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <i>/*</i></td></tr>
+<tr><th id="197">197</th><td><i>     * Handle a command to the bmc.</i></td></tr>
+<tr><th id="198">198</th><td><i>     */</i></td></tr>
+<tr><th id="199">199</th><td>    <em>void</em> (*<dfn class="decl" id="IPMIBmcClass::handle_command" title='IPMIBmcClass::handle_command' data-ref="IPMIBmcClass::handle_command">handle_command</dfn>)(<b>struct</b> <a class="type" href="#IPMIBmc" title='IPMIBmc' data-ref="IPMIBmc">IPMIBmc</a> *<dfn class="local col2 decl" id="22s" title='s' data-type='struct IPMIBmc *' data-ref="22s">s</dfn>,</td></tr>
+<tr><th id="200">200</th><td>                           <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="23cmd" title='cmd' data-type='uint8_t *' data-ref="23cmd">cmd</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col4 decl" id="24cmd_len" title='cmd_len' data-type='unsigned int' data-ref="24cmd_len">cmd_len</dfn>,</td></tr>
+<tr><th id="201">201</th><td>                           <em>unsigned</em> <em>int</em> <dfn class="local col5 decl" id="25max_cmd_len" title='max_cmd_len' data-type='unsigned int' data-ref="25max_cmd_len">max_cmd_len</dfn>,</td></tr>
+<tr><th id="202">202</th><td>                           <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col6 decl" id="26msg_id" title='msg_id' data-type='uint8_t' data-ref="26msg_id">msg_id</dfn>);</td></tr>
+<tr><th id="203">203</th><td>} <dfn class="typedef" id="IPMIBmcClass" title='IPMIBmcClass' data-type='struct IPMIBmcClass' data-ref="IPMIBmcClass">IPMIBmcClass</dfn>;</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>/*</i></td></tr>
+<tr><th id="206">206</th><td><i> * Add a link property to obj that points to a BMC.</i></td></tr>
+<tr><th id="207">207</th><td><i> */</i></td></tr>
+<tr><th id="208">208</th><td><em>void</em> <dfn class="decl" id="ipmi_bmc_find_and_link" title='ipmi_bmc_find_and_link' data-ref="ipmi_bmc_find_and_link">ipmi_bmc_find_and_link</dfn>(<a class="typedef" href="../../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col7 decl" id="27obj" title='obj' data-type='Object *' data-ref="27obj">obj</dfn>, <a class="typedef" href="../../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> **<dfn class="local col8 decl" id="28bmc" title='bmc' data-type='Object **' data-ref="28bmc">bmc</dfn>);</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><u>#<span data-ppcond="210">ifdef</span> <a class="macro" href="#60" data-ref="_M/IPMI_DEBUG">IPMI_DEBUG</a></u></td></tr>
+<tr><th id="211">211</th><td><u>#define <dfn class="macro" id="_M/ipmi_debug" data-ref="_M/ipmi_debug">ipmi_debug</dfn>(fs, ...) \</u></td></tr>
+<tr><th id="212">212</th><td><u>    fprintf(stderr, "IPMI (%s): " fs, __func__, ##__VA_ARGS__)</u></td></tr>
+<tr><th id="213">213</th><td><u>#<span data-ppcond="210">else</span></u></td></tr>
+<tr><th id="214">214</th><td><u>#define ipmi_debug(fs, ...)</u></td></tr>
+<tr><th id="215">215</th><td><u>#<span data-ppcond="210">endif</span></u></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><b>struct</b> <dfn class="type def" id="ipmi_sdr_header" title='ipmi_sdr_header' data-ref="ipmi_sdr_header">ipmi_sdr_header</dfn> {</td></tr>
+<tr><th id="218">218</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_header::rec_id" title='ipmi_sdr_header::rec_id' data-ref="ipmi_sdr_header::rec_id">rec_id</dfn>[<var>2</var>];</td></tr>
+<tr><th id="219">219</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_header::sdr_version" title='ipmi_sdr_header::sdr_version' data-ref="ipmi_sdr_header::sdr_version">sdr_version</dfn>;               <i>/* 0x51 */</i></td></tr>
+<tr><th id="220">220</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_header::rec_type" title='ipmi_sdr_header::rec_type' data-ref="ipmi_sdr_header::rec_type">rec_type</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_header::rec_length" title='ipmi_sdr_header::rec_length' data-ref="ipmi_sdr_header::rec_length">rec_length</dfn>;</td></tr>
+<tr><th id="222">222</th><td>};</td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/IPMI_SDR_HEADER_SIZE" data-ref="_M/IPMI_SDR_HEADER_SIZE">IPMI_SDR_HEADER_SIZE</dfn>     sizeof(struct ipmi_sdr_header)</u></td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><u>#define <dfn class="macro" id="_M/ipmi_sdr_recid" data-ref="_M/ipmi_sdr_recid">ipmi_sdr_recid</dfn>(sdr) ((sdr)-&gt;rec_id[0] | ((sdr)-&gt;rec_id[1] &lt;&lt; 8))</u></td></tr>
+<tr><th id="226">226</th><td><u>#define <dfn class="macro" id="_M/ipmi_sdr_length" data-ref="_M/ipmi_sdr_length">ipmi_sdr_length</dfn>(sdr) ((sdr)-&gt;rec_length + IPMI_SDR_HEADER_SIZE)</u></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><i>/*</i></td></tr>
+<tr><th id="229">229</th><td><i> * 43.2 SDR Type 02h. Compact Sensor Record</i></td></tr>
+<tr><th id="230">230</th><td><i> */</i></td></tr>
+<tr><th id="231">231</th><td><u>#define <dfn class="macro" id="_M/IPMI_SDR_COMPACT_TYPE" data-ref="_M/IPMI_SDR_COMPACT_TYPE">IPMI_SDR_COMPACT_TYPE</dfn>    2</u></td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td><b>struct</b> <dfn class="type def" id="ipmi_sdr_compact" title='ipmi_sdr_compact' data-ref="ipmi_sdr_compact">ipmi_sdr_compact</dfn> {</td></tr>
+<tr><th id="234">234</th><td>    <b>struct</b> <a class="type" href="#ipmi_sdr_header" title='ipmi_sdr_header' data-ref="ipmi_sdr_header">ipmi_sdr_header</a> <dfn class="decl" id="ipmi_sdr_compact::header" title='ipmi_sdr_compact::header' data-ref="ipmi_sdr_compact::header">header</dfn>;</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_owner_id" title='ipmi_sdr_compact::sensor_owner_id' data-ref="ipmi_sdr_compact::sensor_owner_id">sensor_owner_id</dfn>;</td></tr>
+<tr><th id="237">237</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_owner_lun" title='ipmi_sdr_compact::sensor_owner_lun' data-ref="ipmi_sdr_compact::sensor_owner_lun">sensor_owner_lun</dfn>;</td></tr>
+<tr><th id="238">238</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_owner_number" title='ipmi_sdr_compact::sensor_owner_number' data-ref="ipmi_sdr_compact::sensor_owner_number">sensor_owner_number</dfn>;       <i>/* byte 8 */</i></td></tr>
+<tr><th id="239">239</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::entity_id" title='ipmi_sdr_compact::entity_id' data-ref="ipmi_sdr_compact::entity_id">entity_id</dfn>;</td></tr>
+<tr><th id="240">240</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::entity_instance" title='ipmi_sdr_compact::entity_instance' data-ref="ipmi_sdr_compact::entity_instance">entity_instance</dfn>;</td></tr>
+<tr><th id="241">241</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_init" title='ipmi_sdr_compact::sensor_init' data-ref="ipmi_sdr_compact::sensor_init">sensor_init</dfn>;</td></tr>
+<tr><th id="242">242</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_caps" title='ipmi_sdr_compact::sensor_caps' data-ref="ipmi_sdr_compact::sensor_caps">sensor_caps</dfn>;</td></tr>
+<tr><th id="243">243</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_type" title='ipmi_sdr_compact::sensor_type' data-ref="ipmi_sdr_compact::sensor_type">sensor_type</dfn>;</td></tr>
+<tr><th id="244">244</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::reading_type" title='ipmi_sdr_compact::reading_type' data-ref="ipmi_sdr_compact::reading_type">reading_type</dfn>;</td></tr>
+<tr><th id="245">245</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::assert_mask" title='ipmi_sdr_compact::assert_mask' data-ref="ipmi_sdr_compact::assert_mask">assert_mask</dfn>[<var>2</var>];            <i>/* byte 16 */</i></td></tr>
+<tr><th id="246">246</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::deassert_mask" title='ipmi_sdr_compact::deassert_mask' data-ref="ipmi_sdr_compact::deassert_mask">deassert_mask</dfn>[<var>2</var>];</td></tr>
+<tr><th id="247">247</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::discrete_mask" title='ipmi_sdr_compact::discrete_mask' data-ref="ipmi_sdr_compact::discrete_mask">discrete_mask</dfn>[<var>2</var>];</td></tr>
+<tr><th id="248">248</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_unit1" title='ipmi_sdr_compact::sensor_unit1' data-ref="ipmi_sdr_compact::sensor_unit1">sensor_unit1</dfn>;</td></tr>
+<tr><th id="249">249</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_unit2" title='ipmi_sdr_compact::sensor_unit2' data-ref="ipmi_sdr_compact::sensor_unit2">sensor_unit2</dfn>;</td></tr>
+<tr><th id="250">250</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_unit3" title='ipmi_sdr_compact::sensor_unit3' data-ref="ipmi_sdr_compact::sensor_unit3">sensor_unit3</dfn>;</td></tr>
+<tr><th id="251">251</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::sensor_direction" title='ipmi_sdr_compact::sensor_direction' data-ref="ipmi_sdr_compact::sensor_direction">sensor_direction</dfn>[<var>2</var>];       <i>/* byte 24 */</i></td></tr>
+<tr><th id="252">252</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::positive_threshold" title='ipmi_sdr_compact::positive_threshold' data-ref="ipmi_sdr_compact::positive_threshold">positive_threshold</dfn>;</td></tr>
+<tr><th id="253">253</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::negative_threshold" title='ipmi_sdr_compact::negative_threshold' data-ref="ipmi_sdr_compact::negative_threshold">negative_threshold</dfn>;</td></tr>
+<tr><th id="254">254</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::reserved" title='ipmi_sdr_compact::reserved' data-ref="ipmi_sdr_compact::reserved">reserved</dfn>[<var>3</var>];</td></tr>
+<tr><th id="255">255</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::oem" title='ipmi_sdr_compact::oem' data-ref="ipmi_sdr_compact::oem">oem</dfn>;</td></tr>
+<tr><th id="256">256</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::id_str_len" title='ipmi_sdr_compact::id_str_len' data-ref="ipmi_sdr_compact::id_str_len">id_str_len</dfn>;                <i>/* byte 32 */</i></td></tr>
+<tr><th id="257">257</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="ipmi_sdr_compact::id_string" title='ipmi_sdr_compact::id_string' data-ref="ipmi_sdr_compact::id_string">id_string</dfn>[<var>16</var>];</td></tr>
+<tr><th id="258">258</th><td>};</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><b>typedef</b> <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="typedef" id="ipmi_sdr_compact_buffer" title='ipmi_sdr_compact_buffer' data-type='uint8_t [48]' data-ref="ipmi_sdr_compact_buffer">ipmi_sdr_compact_buffer</dfn>[<b>sizeof</b>(<b>struct</b> <a class="type" href="#ipmi_sdr_compact" title='ipmi_sdr_compact' data-ref="ipmi_sdr_compact">ipmi_sdr_compact</a>)];</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><em>int</em> <dfn class="decl" id="ipmi_bmc_sdr_find" title='ipmi_bmc_sdr_find' data-ref="ipmi_bmc_sdr_find">ipmi_bmc_sdr_find</dfn>(<a class="typedef" href="#IPMIBmc" title='IPMIBmc' data-type='struct IPMIBmc' data-ref="IPMIBmc">IPMIBmc</a> *<dfn class="local col9 decl" id="29b" title='b' data-type='IPMIBmc *' data-ref="29b">b</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="30recid" title='recid' data-type='uint16_t' data-ref="30recid">recid</dfn>,</td></tr>
+<tr><th id="263">263</th><td>                      <em>const</em> <b>struct</b> <a class="type" href="#ipmi_sdr_compact" title='ipmi_sdr_compact' data-ref="ipmi_sdr_compact">ipmi_sdr_compact</a> **<dfn class="local col1 decl" id="31sdr" title='sdr' data-type='const struct ipmi_sdr_compact **' data-ref="31sdr">sdr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> *<dfn class="local col2 decl" id="32nextrec" title='nextrec' data-type='uint16_t *' data-ref="32nextrec">nextrec</dfn>);</td></tr>
+<tr><th id="264">264</th><td><em>void</em> <dfn class="decl" id="ipmi_bmc_gen_event" title='ipmi_bmc_gen_event' data-ref="ipmi_bmc_gen_event">ipmi_bmc_gen_event</dfn>(<a class="typedef" href="#IPMIBmc" title='IPMIBmc' data-type='struct IPMIBmc' data-ref="IPMIBmc">IPMIBmc</a> *<dfn class="local col3 decl" id="33b" title='b' data-type='IPMIBmc *' data-ref="33b">b</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col4 decl" id="34evt" title='evt' data-type='uint8_t *' data-ref="34evt">evt</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="35log" title='log' data-type='_Bool' data-ref="35log">log</dfn>);</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="267">267</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/acpi/ipmi.c.html'>codebrowser/hw/acpi/ipmi.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

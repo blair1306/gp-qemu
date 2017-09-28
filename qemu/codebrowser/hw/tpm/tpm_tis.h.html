@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tpm_tis.h source code [codebrowser/hw/tpm/tpm_tis.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TPMLocality,TPMTISEmuState "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/tpm/tpm_tis.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>tpm</a>/<a href='tpm_tis.h.html'>tpm_tis.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * tpm_tis.h - QEMU's TPM TIS interface emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2006, 2010-2013 IBM Corporation</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Berger &lt;stefanb@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *  David Safford &lt;safford@us.ibm.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="11">11</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * Implementation of the TIS interface according to specs found at</i></td></tr>
+<tr><th id="14">14</th><td><i> * <a href="http://www.trustedcomputinggroup.org">http://www.trustedcomputinggroup.org</a></i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td><u>#<span data-ppcond="17">ifndef</span> <span class="macro" data-ref="_M/TPM_TPM_TIS_H">TPM_TPM_TIS_H</span></u></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/TPM_TPM_TIS_H" data-ref="_M/TPM_TPM_TIS_H">TPM_TPM_TIS_H</dfn></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../../include/hw/isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../../include/hw/acpi/tpm.h.html">"hw/acpi/tpm.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#define <dfn class="macro" id="_M/TPM_TIS_NUM_LOCALITIES" data-ref="_M/TPM_TIS_NUM_LOCALITIES">TPM_TIS_NUM_LOCALITIES</dfn>      5     /* per spec */</u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/TPM_TIS_LOCALITY_SHIFT" data-ref="_M/TPM_TIS_LOCALITY_SHIFT">TPM_TIS_LOCALITY_SHIFT</dfn>      12</u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/TPM_TIS_NO_LOCALITY" data-ref="_M/TPM_TIS_NO_LOCALITY">TPM_TIS_NO_LOCALITY</dfn>         0xff</u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/TPM_TIS_IS_VALID_LOCTY" data-ref="_M/TPM_TIS_IS_VALID_LOCTY">TPM_TIS_IS_VALID_LOCTY</dfn>(x)   ((x) &lt; TPM_TIS_NUM_LOCALITIES)</u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/TPM_TIS_BUFFER_MAX" data-ref="_M/TPM_TIS_BUFFER_MAX">TPM_TIS_BUFFER_MAX</dfn>          4096</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="33">33</th><td>    <dfn class="enum" id="TPM_TIS_STATE_IDLE" title='TPM_TIS_STATE_IDLE' data-ref="TPM_TIS_STATE_IDLE">TPM_TIS_STATE_IDLE</dfn> = <var>0</var>,</td></tr>
+<tr><th id="34">34</th><td>    <dfn class="enum" id="TPM_TIS_STATE_READY" title='TPM_TIS_STATE_READY' data-ref="TPM_TIS_STATE_READY">TPM_TIS_STATE_READY</dfn>,</td></tr>
+<tr><th id="35">35</th><td>    <dfn class="enum" id="TPM_TIS_STATE_COMPLETION" title='TPM_TIS_STATE_COMPLETION' data-ref="TPM_TIS_STATE_COMPLETION">TPM_TIS_STATE_COMPLETION</dfn>,</td></tr>
+<tr><th id="36">36</th><td>    <dfn class="enum" id="TPM_TIS_STATE_EXECUTION" title='TPM_TIS_STATE_EXECUTION' data-ref="TPM_TIS_STATE_EXECUTION">TPM_TIS_STATE_EXECUTION</dfn>,</td></tr>
+<tr><th id="37">37</th><td>    <dfn class="enum" id="TPM_TIS_STATE_RECEPTION" title='TPM_TIS_STATE_RECEPTION' data-ref="TPM_TIS_STATE_RECEPTION">TPM_TIS_STATE_RECEPTION</dfn>,</td></tr>
+<tr><th id="38">38</th><td>} <dfn class="typedef" id="TPMTISState" title='TPMTISState' data-type='enum TPMTISState' data-ref="TPMTISState">TPMTISState</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><i>/* locality data  -- all fields are persisted */</i></td></tr>
+<tr><th id="41">41</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TPMLocality" title='TPMLocality' data-ref="TPMLocality"><a class="type" href="#TPMLocality" title='TPMLocality' data-ref="TPMLocality">TPMLocality</a></dfn> {</td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="#TPMTISState" title='TPMTISState' data-type='enum TPMTISState' data-ref="TPMTISState">TPMTISState</a> <dfn class="decl" id="TPMLocality::state" title='TPMLocality::state' data-ref="TPMLocality::state">state</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TPMLocality::access" title='TPMLocality::access' data-ref="TPMLocality::access">access</dfn>;</td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMLocality::sts" title='TPMLocality::sts' data-ref="TPMLocality::sts">sts</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMLocality::iface_id" title='TPMLocality::iface_id' data-ref="TPMLocality::iface_id">iface_id</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMLocality::inte" title='TPMLocality::inte' data-ref="TPMLocality::inte">inte</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMLocality::ints" title='TPMLocality::ints' data-ref="TPMLocality::ints">ints</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TPMLocality::w_offset" title='TPMLocality::w_offset' data-ref="TPMLocality::w_offset">w_offset</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TPMLocality::r_offset" title='TPMLocality::r_offset' data-ref="TPMLocality::r_offset">r_offset</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../include/sysemu/tpm_backend.h.html#TPMSizedBuffer" title='TPMSizedBuffer' data-type='struct TPMSizedBuffer' data-ref="TPMSizedBuffer">TPMSizedBuffer</a> <dfn class="decl" id="TPMLocality::w_buffer" title='TPMLocality::w_buffer' data-ref="TPMLocality::w_buffer">w_buffer</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../include/sysemu/tpm_backend.h.html#TPMSizedBuffer" title='TPMSizedBuffer' data-type='struct TPMSizedBuffer' data-ref="TPMSizedBuffer">TPMSizedBuffer</a> <dfn class="decl" id="TPMLocality::r_buffer" title='TPMLocality::r_buffer' data-ref="TPMLocality::r_buffer">r_buffer</dfn>;</td></tr>
+<tr><th id="53">53</th><td>} <dfn class="typedef" id="TPMLocality" title='TPMLocality' data-type='struct TPMLocality' data-ref="TPMLocality">TPMLocality</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TPMTISEmuState" title='TPMTISEmuState' data-ref="TPMTISEmuState"><a class="type" href="#TPMTISEmuState" title='TPMTISEmuState' data-ref="TPMTISEmuState">TPMTISEmuState</a></dfn> {</td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="TPMTISEmuState::bh" title='TPMTISEmuState::bh' data-ref="TPMTISEmuState::bh">bh</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMTISEmuState::offset" title='TPMTISEmuState::offset' data-ref="TPMTISEmuState::offset">offset</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TPMTISEmuState::buf" title='TPMTISEmuState::buf' data-ref="TPMTISEmuState::buf">buf</dfn>[<a class="macro" href="#30" title="4096" data-ref="_M/TPM_TIS_BUFFER_MAX">TPM_TIS_BUFFER_MAX</a>];</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TPMTISEmuState::active_locty" title='TPMTISEmuState::active_locty' data-ref="TPMTISEmuState::active_locty">active_locty</dfn>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TPMTISEmuState::aborting_locty" title='TPMTISEmuState::aborting_locty' data-ref="TPMTISEmuState::aborting_locty">aborting_locty</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TPMTISEmuState::next_locty" title='TPMTISEmuState::next_locty' data-ref="TPMTISEmuState::next_locty">next_locty</dfn>;</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="#TPMLocality" title='TPMLocality' data-type='struct TPMLocality' data-ref="TPMLocality">TPMLocality</a> <dfn class="decl" id="TPMTISEmuState::loc" title='TPMTISEmuState::loc' data-ref="TPMTISEmuState::loc">loc</dfn>[<a class="macro" href="#24" title="5" data-ref="_M/TPM_TIS_NUM_LOCALITIES">TPM_TIS_NUM_LOCALITIES</a>];</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../include/hw/irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="TPMTISEmuState::irq" title='TPMTISEmuState::irq' data-ref="TPMTISEmuState::irq">irq</dfn>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="TPMTISEmuState::irq_num" title='TPMTISEmuState::irq_num' data-ref="TPMTISEmuState::irq_num">irq_num</dfn>;</td></tr>
+<tr><th id="68">68</th><td>} <dfn class="typedef" id="TPMTISEmuState" title='TPMTISEmuState' data-type='struct TPMTISEmuState' data-ref="TPMTISEmuState">TPMTISEmuState</dfn>;</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><u>#<span data-ppcond="17">endif</span> /* TPM_TPM_TIS_H */</u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='tpm_passthrough.c.html'>codebrowser/hw/tpm/tpm_passthrough.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

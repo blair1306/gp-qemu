@@ -1,0 +1,27 @@
+<dec f='codebrowser/include/block/snapshot.h' l='70' type='int bdrv_snapshot_load_tmp(BlockDriverState * bs, const char * snapshot_id, const char * name, Error ** errp)'/>
+<def f='codebrowser/block/snapshot.c' l='339' ll='365' type='int bdrv_snapshot_load_tmp(BlockDriverState * bs, const char * snapshot_id, const char * name, Error ** errp)'/>
+<use f='codebrowser/block/snapshot.c' l='374' u='c' c='bdrv_snapshot_load_tmp_by_id_or_name'/>
+<use f='codebrowser/block/snapshot.c' l='378' u='c' c='bdrv_snapshot_load_tmp_by_id_or_name'/>
+<doc f='codebrowser/block/snapshot.c' l='319'>/**
+ * Temporarily load an internal snapshot by @snapshot_id and @name.
+ * @bs: block device used in the operation
+ * @snapshot_id: unique snapshot ID, or NULL
+ * @name: snapshot name, or NULL
+ * @errp: location to store error
+ *
+ * If both @snapshot_id and @name are specified, load the first one with
+ * id @snapshot_id and name @name.
+ * If only @snapshot_id is specified, load the first one with id
+ * @snapshot_id.
+ * If only @name is specified, load the first one with name @name.
+ * if none is specified, return -EINVAL.
+ *
+ * Returns: 0 on success, -errno on fail. If @bs is not inserted, return
+ * -ENOMEDIUM. If @bs is not readonly, return -EINVAL. If @bs did not support
+ * internal snapshot, return -ENOTSUP. If qemu can&apos;t find a matching @id and
+ * @name, return -ENOENT. If @errp != NULL, it will always be filled on
+ * failure.
+ */</doc>
+<use f='codebrowser/qemu-img.c' l='2157' u='c' c='img_convert'/>
+<use f='codebrowser/qemu-img.c' l='4625' u='c' c='img_measure'/>
+<use f='codebrowser/qemu-nbd.c' l='980' u='c' c='main'/>

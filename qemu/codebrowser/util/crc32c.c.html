@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>crc32c.c source code [codebrowser/util/crc32c.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/crc32c.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='crc32c.c.html'>crc32c.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  Castagnoli CRC32C Checksum Algorithm</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Polynomial: 0x11EDC6F41</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> *  Castagnoli93: Guy Castagnoli and Stefan Braeuer and Martin Herrman</i></td></tr>
+<tr><th id="7">7</th><td><i> *               "Optimization of Cyclic Redundancy-Check Codes with 24</i></td></tr>
+<tr><th id="8">8</th><td><i> *                 and 32 Parity Bits",IEEE Transactions on Communication,</i></td></tr>
+<tr><th id="9">9</th><td><i> *                Volume 41, Number 6, June 1993</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> *  Copyright (c) 2013 Red Hat, Inc.,</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> *  Authors:</i></td></tr>
+<tr><th id="14">14</th><td><i> *   Jeff Cody &lt;jcody@redhat.com&gt;</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> *  Based on the Linux kernel cryptographic crc32c module,</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> *  Copyright (c) 2004 Cisco Systems, Inc.</i></td></tr>
+<tr><th id="19">19</th><td><i> *  Copyright (c) 2008 Herbert Xu &lt;herbert@gondor.apana.org.au&gt;</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * This program is free software; you can redistribute it and/or modify it</i></td></tr>
+<tr><th id="22">22</th><td><i> * under the terms of the GNU General Public License as published by the Free</i></td></tr>
+<tr><th id="23">23</th><td><i> * Software Foundation; either version 2 of the License, or (at your option)</i></td></tr>
+<tr><th id="24">24</th><td><i> * any later version.</i></td></tr>
+<tr><th id="25">25</th><td><i> *</i></td></tr>
+<tr><th id="26">26</th><td><i> */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu/crc32c.h.html">"qemu/crc32c.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i  data-doc="crc32c_table">/*</i></td></tr>
+<tr><th id="33">33</th><td><i  data-doc="crc32c_table"> * This is the CRC-32C table</i></td></tr>
+<tr><th id="34">34</th><td><i  data-doc="crc32c_table"> * Generated with:</i></td></tr>
+<tr><th id="35">35</th><td><i  data-doc="crc32c_table"> * width = 32 bits</i></td></tr>
+<tr><th id="36">36</th><td><i  data-doc="crc32c_table"> * poly = 0x1EDC6F41</i></td></tr>
+<tr><th id="37">37</th><td><i  data-doc="crc32c_table"> * reflect input bytes = true</i></td></tr>
+<tr><th id="38">38</th><td><i  data-doc="crc32c_table"> * reflect output bytes = true</i></td></tr>
+<tr><th id="39">39</th><td><i  data-doc="crc32c_table"> */</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="tu decl def" id="crc32c_table" title='crc32c_table' data-type='const uint32_t [256]' data-ref="crc32c_table">crc32c_table</dfn>[<var>256</var>] = {</td></tr>
+<tr><th id="42">42</th><td>    <var>0x00000000L</var>, <var>0xF26B8303L</var>, <var>0xE13B70F7L</var>, <var>0x1350F3F4L</var>,</td></tr>
+<tr><th id="43">43</th><td>    <var>0xC79A971FL</var>, <var>0x35F1141CL</var>, <var>0x26A1E7E8L</var>, <var>0xD4CA64EBL</var>,</td></tr>
+<tr><th id="44">44</th><td>    <var>0x8AD958CFL</var>, <var>0x78B2DBCCL</var>, <var>0x6BE22838L</var>, <var>0x9989AB3BL</var>,</td></tr>
+<tr><th id="45">45</th><td>    <var>0x4D43CFD0L</var>, <var>0xBF284CD3L</var>, <var>0xAC78BF27L</var>, <var>0x5E133C24L</var>,</td></tr>
+<tr><th id="46">46</th><td>    <var>0x105EC76FL</var>, <var>0xE235446CL</var>, <var>0xF165B798L</var>, <var>0x030E349BL</var>,</td></tr>
+<tr><th id="47">47</th><td>    <var>0xD7C45070L</var>, <var>0x25AFD373L</var>, <var>0x36FF2087L</var>, <var>0xC494A384L</var>,</td></tr>
+<tr><th id="48">48</th><td>    <var>0x9A879FA0L</var>, <var>0x68EC1CA3L</var>, <var>0x7BBCEF57L</var>, <var>0x89D76C54L</var>,</td></tr>
+<tr><th id="49">49</th><td>    <var>0x5D1D08BFL</var>, <var>0xAF768BBCL</var>, <var>0xBC267848L</var>, <var>0x4E4DFB4BL</var>,</td></tr>
+<tr><th id="50">50</th><td>    <var>0x20BD8EDEL</var>, <var>0xD2D60DDDL</var>, <var>0xC186FE29L</var>, <var>0x33ED7D2AL</var>,</td></tr>
+<tr><th id="51">51</th><td>    <var>0xE72719C1L</var>, <var>0x154C9AC2L</var>, <var>0x061C6936L</var>, <var>0xF477EA35L</var>,</td></tr>
+<tr><th id="52">52</th><td>    <var>0xAA64D611L</var>, <var>0x580F5512L</var>, <var>0x4B5FA6E6L</var>, <var>0xB93425E5L</var>,</td></tr>
+<tr><th id="53">53</th><td>    <var>0x6DFE410EL</var>, <var>0x9F95C20DL</var>, <var>0x8CC531F9L</var>, <var>0x7EAEB2FAL</var>,</td></tr>
+<tr><th id="54">54</th><td>    <var>0x30E349B1L</var>, <var>0xC288CAB2L</var>, <var>0xD1D83946L</var>, <var>0x23B3BA45L</var>,</td></tr>
+<tr><th id="55">55</th><td>    <var>0xF779DEAEL</var>, <var>0x05125DADL</var>, <var>0x1642AE59L</var>, <var>0xE4292D5AL</var>,</td></tr>
+<tr><th id="56">56</th><td>    <var>0xBA3A117EL</var>, <var>0x4851927DL</var>, <var>0x5B016189L</var>, <var>0xA96AE28AL</var>,</td></tr>
+<tr><th id="57">57</th><td>    <var>0x7DA08661L</var>, <var>0x8FCB0562L</var>, <var>0x9C9BF696L</var>, <var>0x6EF07595L</var>,</td></tr>
+<tr><th id="58">58</th><td>    <var>0x417B1DBCL</var>, <var>0xB3109EBFL</var>, <var>0xA0406D4BL</var>, <var>0x522BEE48L</var>,</td></tr>
+<tr><th id="59">59</th><td>    <var>0x86E18AA3L</var>, <var>0x748A09A0L</var>, <var>0x67DAFA54L</var>, <var>0x95B17957L</var>,</td></tr>
+<tr><th id="60">60</th><td>    <var>0xCBA24573L</var>, <var>0x39C9C670L</var>, <var>0x2A993584L</var>, <var>0xD8F2B687L</var>,</td></tr>
+<tr><th id="61">61</th><td>    <var>0x0C38D26CL</var>, <var>0xFE53516FL</var>, <var>0xED03A29BL</var>, <var>0x1F682198L</var>,</td></tr>
+<tr><th id="62">62</th><td>    <var>0x5125DAD3L</var>, <var>0xA34E59D0L</var>, <var>0xB01EAA24L</var>, <var>0x42752927L</var>,</td></tr>
+<tr><th id="63">63</th><td>    <var>0x96BF4DCCL</var>, <var>0x64D4CECFL</var>, <var>0x77843D3BL</var>, <var>0x85EFBE38L</var>,</td></tr>
+<tr><th id="64">64</th><td>    <var>0xDBFC821CL</var>, <var>0x2997011FL</var>, <var>0x3AC7F2EBL</var>, <var>0xC8AC71E8L</var>,</td></tr>
+<tr><th id="65">65</th><td>    <var>0x1C661503L</var>, <var>0xEE0D9600L</var>, <var>0xFD5D65F4L</var>, <var>0x0F36E6F7L</var>,</td></tr>
+<tr><th id="66">66</th><td>    <var>0x61C69362L</var>, <var>0x93AD1061L</var>, <var>0x80FDE395L</var>, <var>0x72966096L</var>,</td></tr>
+<tr><th id="67">67</th><td>    <var>0xA65C047DL</var>, <var>0x5437877EL</var>, <var>0x4767748AL</var>, <var>0xB50CF789L</var>,</td></tr>
+<tr><th id="68">68</th><td>    <var>0xEB1FCBADL</var>, <var>0x197448AEL</var>, <var>0x0A24BB5AL</var>, <var>0xF84F3859L</var>,</td></tr>
+<tr><th id="69">69</th><td>    <var>0x2C855CB2L</var>, <var>0xDEEEDFB1L</var>, <var>0xCDBE2C45L</var>, <var>0x3FD5AF46L</var>,</td></tr>
+<tr><th id="70">70</th><td>    <var>0x7198540DL</var>, <var>0x83F3D70EL</var>, <var>0x90A324FAL</var>, <var>0x62C8A7F9L</var>,</td></tr>
+<tr><th id="71">71</th><td>    <var>0xB602C312L</var>, <var>0x44694011L</var>, <var>0x5739B3E5L</var>, <var>0xA55230E6L</var>,</td></tr>
+<tr><th id="72">72</th><td>    <var>0xFB410CC2L</var>, <var>0x092A8FC1L</var>, <var>0x1A7A7C35L</var>, <var>0xE811FF36L</var>,</td></tr>
+<tr><th id="73">73</th><td>    <var>0x3CDB9BDDL</var>, <var>0xCEB018DEL</var>, <var>0xDDE0EB2AL</var>, <var>0x2F8B6829L</var>,</td></tr>
+<tr><th id="74">74</th><td>    <var>0x82F63B78L</var>, <var>0x709DB87BL</var>, <var>0x63CD4B8FL</var>, <var>0x91A6C88CL</var>,</td></tr>
+<tr><th id="75">75</th><td>    <var>0x456CAC67L</var>, <var>0xB7072F64L</var>, <var>0xA457DC90L</var>, <var>0x563C5F93L</var>,</td></tr>
+<tr><th id="76">76</th><td>    <var>0x082F63B7L</var>, <var>0xFA44E0B4L</var>, <var>0xE9141340L</var>, <var>0x1B7F9043L</var>,</td></tr>
+<tr><th id="77">77</th><td>    <var>0xCFB5F4A8L</var>, <var>0x3DDE77ABL</var>, <var>0x2E8E845FL</var>, <var>0xDCE5075CL</var>,</td></tr>
+<tr><th id="78">78</th><td>    <var>0x92A8FC17L</var>, <var>0x60C37F14L</var>, <var>0x73938CE0L</var>, <var>0x81F80FE3L</var>,</td></tr>
+<tr><th id="79">79</th><td>    <var>0x55326B08L</var>, <var>0xA759E80BL</var>, <var>0xB4091BFFL</var>, <var>0x466298FCL</var>,</td></tr>
+<tr><th id="80">80</th><td>    <var>0x1871A4D8L</var>, <var>0xEA1A27DBL</var>, <var>0xF94AD42FL</var>, <var>0x0B21572CL</var>,</td></tr>
+<tr><th id="81">81</th><td>    <var>0xDFEB33C7L</var>, <var>0x2D80B0C4L</var>, <var>0x3ED04330L</var>, <var>0xCCBBC033L</var>,</td></tr>
+<tr><th id="82">82</th><td>    <var>0xA24BB5A6L</var>, <var>0x502036A5L</var>, <var>0x4370C551L</var>, <var>0xB11B4652L</var>,</td></tr>
+<tr><th id="83">83</th><td>    <var>0x65D122B9L</var>, <var>0x97BAA1BAL</var>, <var>0x84EA524EL</var>, <var>0x7681D14DL</var>,</td></tr>
+<tr><th id="84">84</th><td>    <var>0x2892ED69L</var>, <var>0xDAF96E6AL</var>, <var>0xC9A99D9EL</var>, <var>0x3BC21E9DL</var>,</td></tr>
+<tr><th id="85">85</th><td>    <var>0xEF087A76L</var>, <var>0x1D63F975L</var>, <var>0x0E330A81L</var>, <var>0xFC588982L</var>,</td></tr>
+<tr><th id="86">86</th><td>    <var>0xB21572C9L</var>, <var>0x407EF1CAL</var>, <var>0x532E023EL</var>, <var>0xA145813DL</var>,</td></tr>
+<tr><th id="87">87</th><td>    <var>0x758FE5D6L</var>, <var>0x87E466D5L</var>, <var>0x94B49521L</var>, <var>0x66DF1622L</var>,</td></tr>
+<tr><th id="88">88</th><td>    <var>0x38CC2A06L</var>, <var>0xCAA7A905L</var>, <var>0xD9F75AF1L</var>, <var>0x2B9CD9F2L</var>,</td></tr>
+<tr><th id="89">89</th><td>    <var>0xFF56BD19L</var>, <var>0x0D3D3E1AL</var>, <var>0x1E6DCDEEL</var>, <var>0xEC064EEDL</var>,</td></tr>
+<tr><th id="90">90</th><td>    <var>0xC38D26C4L</var>, <var>0x31E6A5C7L</var>, <var>0x22B65633L</var>, <var>0xD0DDD530L</var>,</td></tr>
+<tr><th id="91">91</th><td>    <var>0x0417B1DBL</var>, <var>0xF67C32D8L</var>, <var>0xE52CC12CL</var>, <var>0x1747422FL</var>,</td></tr>
+<tr><th id="92">92</th><td>    <var>0x49547E0BL</var>, <var>0xBB3FFD08L</var>, <var>0xA86F0EFCL</var>, <var>0x5A048DFFL</var>,</td></tr>
+<tr><th id="93">93</th><td>    <var>0x8ECEE914L</var>, <var>0x7CA56A17L</var>, <var>0x6FF599E3L</var>, <var>0x9D9E1AE0L</var>,</td></tr>
+<tr><th id="94">94</th><td>    <var>0xD3D3E1ABL</var>, <var>0x21B862A8L</var>, <var>0x32E8915CL</var>, <var>0xC083125FL</var>,</td></tr>
+<tr><th id="95">95</th><td>    <var>0x144976B4L</var>, <var>0xE622F5B7L</var>, <var>0xF5720643L</var>, <var>0x07198540L</var>,</td></tr>
+<tr><th id="96">96</th><td>    <var>0x590AB964L</var>, <var>0xAB613A67L</var>, <var>0xB831C993L</var>, <var>0x4A5A4A90L</var>,</td></tr>
+<tr><th id="97">97</th><td>    <var>0x9E902E7BL</var>, <var>0x6CFBAD78L</var>, <var>0x7FAB5E8CL</var>, <var>0x8DC0DD8FL</var>,</td></tr>
+<tr><th id="98">98</th><td>    <var>0xE330A81AL</var>, <var>0x115B2B19L</var>, <var>0x020BD8EDL</var>, <var>0xF0605BEEL</var>,</td></tr>
+<tr><th id="99">99</th><td>    <var>0x24AA3F05L</var>, <var>0xD6C1BC06L</var>, <var>0xC5914FF2L</var>, <var>0x37FACCF1L</var>,</td></tr>
+<tr><th id="100">100</th><td>    <var>0x69E9F0D5L</var>, <var>0x9B8273D6L</var>, <var>0x88D28022L</var>, <var>0x7AB90321L</var>,</td></tr>
+<tr><th id="101">101</th><td>    <var>0xAE7367CAL</var>, <var>0x5C18E4C9L</var>, <var>0x4F48173DL</var>, <var>0xBD23943EL</var>,</td></tr>
+<tr><th id="102">102</th><td>    <var>0xF36E6F75L</var>, <var>0x0105EC76L</var>, <var>0x12551F82L</var>, <var>0xE03E9C81L</var>,</td></tr>
+<tr><th id="103">103</th><td>    <var>0x34F4F86AL</var>, <var>0xC69F7B69L</var>, <var>0xD5CF889DL</var>, <var>0x27A40B9EL</var>,</td></tr>
+<tr><th id="104">104</th><td>    <var>0x79B737BAL</var>, <var>0x8BDCB4B9L</var>, <var>0x988C474DL</var>, <var>0x6AE7C44EL</var>,</td></tr>
+<tr><th id="105">105</th><td>    <var>0xBE2DA0A5L</var>, <var>0x4C4623A6L</var>, <var>0x5F16D052L</var>, <var>0xAD7D5351L</var></td></tr>
+<tr><th id="106">106</th><td>};</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="crc32c" title='crc32c' data-ref="crc32c">crc32c</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="1crc" title='crc' data-type='uint32_t' data-ref="1crc">crc</dfn>, <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="2data" title='data' data-type='const uint8_t *' data-ref="2data">data</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col3 decl" id="3length" title='length' data-type='unsigned int' data-ref="3length">length</dfn>)</td></tr>
+<tr><th id="110">110</th><td>{</td></tr>
+<tr><th id="111">111</th><td>    <b>while</b> (<a class="local col3 ref" href="#3length" title='length' data-ref="3length">length</a>--) {</td></tr>
+<tr><th id="112">112</th><td>        <a class="local col1 ref" href="#1crc" title='crc' data-ref="1crc">crc</a> = <a class="tu ref" href="#crc32c_table" title='crc32c_table' data-use='r' data-ref="crc32c_table">crc32c_table</a>[(<a class="local col1 ref" href="#1crc" title='crc' data-ref="1crc">crc</a> ^ *<a class="local col2 ref" href="#2data" title='data' data-ref="2data">data</a>++) &amp; <var>0xFFL</var>] ^ (<a class="local col1 ref" href="#1crc" title='crc' data-ref="1crc">crc</a> &gt;&gt; <var>8</var>);</td></tr>
+<tr><th id="113">113</th><td>    }</td></tr>
+<tr><th id="114">114</th><td>    <b>return</b> <a class="local col1 ref" href="#1crc" title='crc' data-ref="1crc">crc</a>^<var>0xffffffff</var>;</td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

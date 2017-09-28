@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hd-geometry.c source code [codebrowser/hw/block/hd-geometry.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="partition "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/block/hd-geometry.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>block</a>/<a href='hd-geometry.c.html'>hd-geometry.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Hard disk geometry utilities</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2012 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="7">7</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This file incorporates work covered by the following copyright and</i></td></tr>
+<tr><th id="10">10</th><td><i> * permission notice:</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * Copyright (c) 2003 Fabrice Bellard</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="15">15</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="16">16</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="17">17</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="18">18</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="19">19</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="22">22</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="23">23</th><td><i> *</i></td></tr>
+<tr><th id="24">24</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="25">25</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="26">26</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="27">27</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="28">28</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="29">29</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="30">30</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../../include/qemu/bswap.h.html">"qemu/bswap.h"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../../include/hw/block/block.h.html">"hw/block/block.h"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="trace.h.html">"trace.h"</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>struct</b> <dfn class="type def" id="partition" title='partition' data-ref="partition">partition</dfn> {</td></tr>
+<tr><th id="40">40</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::boot_ind" title='partition::boot_ind' data-type='uint8_t' data-ref="partition::boot_ind">boot_ind</dfn>;           <i  data-doc="partition::boot_ind">/* 0x80 - active */</i></td></tr>
+<tr><th id="41">41</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::head" title='partition::head' data-type='uint8_t' data-ref="partition::head">head</dfn>;               <i  data-doc="partition::head">/* starting head */</i></td></tr>
+<tr><th id="42">42</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::sector" title='partition::sector' data-type='uint8_t' data-ref="partition::sector">sector</dfn>;             <i  data-doc="partition::sector">/* starting sector */</i></td></tr>
+<tr><th id="43">43</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::cyl" title='partition::cyl' data-type='uint8_t' data-ref="partition::cyl">cyl</dfn>;                <i  data-doc="partition::cyl">/* starting cylinder */</i></td></tr>
+<tr><th id="44">44</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::sys_ind" title='partition::sys_ind' data-type='uint8_t' data-ref="partition::sys_ind">sys_ind</dfn>;            <i  data-doc="partition::sys_ind">/* What partition type */</i></td></tr>
+<tr><th id="45">45</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::end_head" title='partition::end_head' data-type='uint8_t' data-ref="partition::end_head">end_head</dfn>;           <i  data-doc="partition::end_head">/* end head */</i></td></tr>
+<tr><th id="46">46</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::end_sector" title='partition::end_sector' data-type='uint8_t' data-ref="partition::end_sector">end_sector</dfn>;         <i  data-doc="partition::end_sector">/* end sector */</i></td></tr>
+<tr><th id="47">47</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="tu decl" id="partition::end_cyl" title='partition::end_cyl' data-type='uint8_t' data-ref="partition::end_cyl">end_cyl</dfn>;            <i  data-doc="partition::end_cyl">/* end cylinder */</i></td></tr>
+<tr><th id="48">48</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="tu decl" id="partition::start_sect" title='partition::start_sect' data-type='uint32_t' data-ref="partition::start_sect">start_sect</dfn>;        <i  data-doc="partition::start_sect">/* starting sector counting from 0 */</i></td></tr>
+<tr><th id="49">49</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="tu decl" id="partition::nr_sects" title='partition::nr_sects' data-type='uint32_t' data-ref="partition::nr_sects">nr_sects</dfn>;          <i  data-doc="partition::nr_sects">/* nr of sectors in partition */</i></td></tr>
+<tr><th id="50">50</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><i  data-doc="guess_disk_lchs">/* try to guess the disk logical geometry from the MSDOS partition table.</i></td></tr>
+<tr><th id="53">53</th><td><i  data-doc="guess_disk_lchs">   Return 0 if OK, -1 if could not guess */</i></td></tr>
+<tr><th id="54">54</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="guess_disk_lchs" title='guess_disk_lchs' data-type='int guess_disk_lchs(BlockBackend * blk, int * pcylinders, int * pheads, int * psectors)' data-ref="guess_disk_lchs">guess_disk_lchs</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col8 decl" id="68blk" title='blk' data-type='BlockBackend *' data-ref="68blk">blk</dfn>,</td></tr>
+<tr><th id="55">55</th><td>                           <em>int</em> *<dfn class="local col9 decl" id="69pcylinders" title='pcylinders' data-type='int *' data-ref="69pcylinders">pcylinders</dfn>, <em>int</em> *<dfn class="local col0 decl" id="70pheads" title='pheads' data-type='int *' data-ref="70pheads">pheads</dfn>, <em>int</em> *<dfn class="local col1 decl" id="71psectors" title='psectors' data-type='int *' data-ref="71psectors">psectors</dfn>)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col2 decl" id="72buf" title='buf' data-type='uint8_t [512]' data-ref="72buf">buf</dfn>[<a class="macro" href="../../include/block/block.h.html#116" title="(1ULL &lt;&lt; 9)" data-ref="_M/BDRV_SECTOR_SIZE">BDRV_SECTOR_SIZE</a>];</td></tr>
+<tr><th id="58">58</th><td>    <em>int</em> <dfn class="local col3 decl" id="73i" title='i' data-type='int' data-ref="73i">i</dfn>, <dfn class="local col4 decl" id="74heads" title='heads' data-type='int' data-ref="74heads">heads</dfn>, <dfn class="local col5 decl" id="75sectors" title='sectors' data-type='int' data-ref="75sectors">sectors</dfn>, <dfn class="local col6 decl" id="76cylinders" title='cylinders' data-type='int' data-ref="76cylinders">cylinders</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <b>struct</b> <a class="type" href="#partition" title='partition' data-ref="partition">partition</a> *<dfn class="local col7 decl" id="77p" title='p' data-type='struct partition *' data-ref="77p">p</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="78nr_sects" title='nr_sects' data-type='uint32_t' data-ref="78nr_sects">nr_sects</dfn>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="79nb_sectors" title='nb_sectors' data-type='uint64_t' data-ref="79nb_sectors">nb_sectors</dfn>;</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>    <a class="ref" href="../../include/sysemu/block-backend.h.html#blk_get_geometry" title='blk_get_geometry' data-ref="blk_get_geometry">blk_get_geometry</a>(<a class="local col8 ref" href="#68blk" title='blk' data-ref="68blk">blk</a>, &amp;<a class="local col9 ref" href="#79nb_sectors" title='nb_sectors' data-ref="79nb_sectors">nb_sectors</a>);</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc">     * The function will be invoked during startup not only in sync I/O mode,</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc">     * but also in async I/O mode. So the I/O throttling function has to</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc">     * be disabled temporarily here, not permanently.</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="70">70</th><td>    <b>if</b> (<a class="ref" href="../../include/sysemu/block-backend.h.html#blk_pread_unthrottled" title='blk_pread_unthrottled' data-ref="blk_pread_unthrottled">blk_pread_unthrottled</a>(<a class="local col8 ref" href="#68blk" title='blk' data-ref="68blk">blk</a>, <var>0</var>, <a class="local col2 ref" href="#72buf" title='buf' data-ref="72buf">buf</a>, <a class="macro" href="../../include/block/block.h.html#116" title="(1ULL &lt;&lt; 9)" data-ref="_M/BDRV_SECTOR_SIZE">BDRV_SECTOR_SIZE</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="71">71</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="72">72</th><td>    }</td></tr>
+<tr><th id="73">73</th><td>    <i>/* test msdos magic */</i></td></tr>
+<tr><th id="74">74</th><td>    <b>if</b> (<a class="local col2 ref" href="#72buf" title='buf' data-ref="72buf">buf</a>[<var>510</var>] != <var>0x55</var> || <a class="local col2 ref" href="#72buf" title='buf' data-ref="72buf">buf</a>[<var>511</var>] != <var>0xaa</var>) {</td></tr>
+<tr><th id="75">75</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="76">76</th><td>    }</td></tr>
+<tr><th id="77">77</th><td>    <b>for</b> (<a class="local col3 ref" href="#73i" title='i' data-ref="73i">i</a> = <var>0</var>; <a class="local col3 ref" href="#73i" title='i' data-ref="73i">i</a> &lt; <var>4</var>; <a class="local col3 ref" href="#73i" title='i' data-ref="73i">i</a>++) {</td></tr>
+<tr><th id="78">78</th><td>        <a class="local col7 ref" href="#77p" title='p' data-ref="77p">p</a> = ((<b>struct</b> <a class="type" href="#partition" title='partition' data-ref="partition">partition</a> *)(<a class="local col2 ref" href="#72buf" title='buf' data-ref="72buf">buf</a> + <var>0x1be</var>)) + <a class="local col3 ref" href="#73i" title='i' data-ref="73i">i</a>;</td></tr>
+<tr><th id="79">79</th><td>        <a class="local col8 ref" href="#78nr_sects" title='nr_sects' data-ref="78nr_sects">nr_sects</a> = <a class="ref" href="../../include/qemu/bswap.h.html#167" title='le32_to_cpu' data-ref="le32_to_cpu">le32_to_cpu</a>(<a class="local col7 ref" href="#77p" title='p' data-ref="77p">p</a>-&gt;<a class="tu ref" href="#partition::nr_sects" title='partition::nr_sects' data-use='r' data-ref="partition::nr_sects">nr_sects</a>);</td></tr>
+<tr><th id="80">80</th><td>        <b>if</b> (<a class="local col8 ref" href="#78nr_sects" title='nr_sects' data-ref="78nr_sects">nr_sects</a> &amp;&amp; <a class="local col7 ref" href="#77p" title='p' data-ref="77p">p</a>-&gt;<a class="tu ref" href="#partition::end_head" title='partition::end_head' data-use='r' data-ref="partition::end_head">end_head</a>) {</td></tr>
+<tr><th id="81">81</th><td>            <i>/* We make the assumption that the partition terminates on</i></td></tr>
+<tr><th id="82">82</th><td><i>               a cylinder boundary */</i></td></tr>
+<tr><th id="83">83</th><td>            <a class="local col4 ref" href="#74heads" title='heads' data-ref="74heads">heads</a> = <a class="local col7 ref" href="#77p" title='p' data-ref="77p">p</a>-&gt;<a class="tu ref" href="#partition::end_head" title='partition::end_head' data-use='r' data-ref="partition::end_head">end_head</a> + <var>1</var>;</td></tr>
+<tr><th id="84">84</th><td>            <a class="local col5 ref" href="#75sectors" title='sectors' data-ref="75sectors">sectors</a> = <a class="local col7 ref" href="#77p" title='p' data-ref="77p">p</a>-&gt;<a class="tu ref" href="#partition::end_sector" title='partition::end_sector' data-use='r' data-ref="partition::end_sector">end_sector</a> &amp; <var>63</var>;</td></tr>
+<tr><th id="85">85</th><td>            <b>if</b> (<a class="local col5 ref" href="#75sectors" title='sectors' data-ref="75sectors">sectors</a> == <var>0</var>) {</td></tr>
+<tr><th id="86">86</th><td>                <b>continue</b>;</td></tr>
+<tr><th id="87">87</th><td>            }</td></tr>
+<tr><th id="88">88</th><td>            <a class="local col6 ref" href="#76cylinders" title='cylinders' data-ref="76cylinders">cylinders</a> = <a class="local col9 ref" href="#79nb_sectors" title='nb_sectors' data-ref="79nb_sectors">nb_sectors</a> / (<a class="local col4 ref" href="#74heads" title='heads' data-ref="74heads">heads</a> * <a class="local col5 ref" href="#75sectors" title='sectors' data-ref="75sectors">sectors</a>);</td></tr>
+<tr><th id="89">89</th><td>            <b>if</b> (<a class="local col6 ref" href="#76cylinders" title='cylinders' data-ref="76cylinders">cylinders</a> &lt; <var>1</var> || <a class="local col6 ref" href="#76cylinders" title='cylinders' data-ref="76cylinders">cylinders</a> &gt; <var>16383</var>) {</td></tr>
+<tr><th id="90">90</th><td>                <b>continue</b>;</td></tr>
+<tr><th id="91">91</th><td>            }</td></tr>
+<tr><th id="92">92</th><td>            *<a class="local col0 ref" href="#70pheads" title='pheads' data-ref="70pheads">pheads</a> = <a class="local col4 ref" href="#74heads" title='heads' data-ref="74heads">heads</a>;</td></tr>
+<tr><th id="93">93</th><td>            *<a class="local col1 ref" href="#71psectors" title='psectors' data-ref="71psectors">psectors</a> = <a class="local col5 ref" href="#75sectors" title='sectors' data-ref="75sectors">sectors</a>;</td></tr>
+<tr><th id="94">94</th><td>            *<a class="local col9 ref" href="#69pcylinders" title='pcylinders' data-ref="69pcylinders">pcylinders</a> = <a class="local col6 ref" href="#76cylinders" title='cylinders' data-ref="76cylinders">cylinders</a>;</td></tr>
+<tr><th id="95">95</th><td>            <a class="ref" href="trace.h.html#trace_hd_geometry_lchs_guess" title='trace_hd_geometry_lchs_guess' data-ref="trace_hd_geometry_lchs_guess">trace_hd_geometry_lchs_guess</a>(<a class="local col8 ref" href="#68blk" title='blk' data-ref="68blk">blk</a>, <a class="local col6 ref" href="#76cylinders" title='cylinders' data-ref="76cylinders">cylinders</a>, <a class="local col4 ref" href="#74heads" title='heads' data-ref="74heads">heads</a>, <a class="local col5 ref" href="#75sectors" title='sectors' data-ref="75sectors">sectors</a>);</td></tr>
+<tr><th id="96">96</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="97">97</th><td>        }</td></tr>
+<tr><th id="98">98</th><td>    }</td></tr>
+<tr><th id="99">99</th><td>    <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="100">100</th><td>}</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="guess_chs_for_size" title='guess_chs_for_size' data-type='void guess_chs_for_size(BlockBackend * blk, uint32_t * pcyls, uint32_t * pheads, uint32_t * psecs)' data-ref="guess_chs_for_size">guess_chs_for_size</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col0 decl" id="80blk" title='blk' data-type='BlockBackend *' data-ref="80blk">blk</dfn>,</td></tr>
+<tr><th id="103">103</th><td>                <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col1 decl" id="81pcyls" title='pcyls' data-type='uint32_t *' data-ref="81pcyls">pcyls</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col2 decl" id="82pheads" title='pheads' data-type='uint32_t *' data-ref="82pheads">pheads</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col3 decl" id="83psecs" title='psecs' data-type='uint32_t *' data-ref="83psecs">psecs</dfn>)</td></tr>
+<tr><th id="104">104</th><td>{</td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="84nb_sectors" title='nb_sectors' data-type='uint64_t' data-ref="84nb_sectors">nb_sectors</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <em>int</em> <dfn class="local col5 decl" id="85cylinders" title='cylinders' data-type='int' data-ref="85cylinders">cylinders</dfn>;</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <a class="ref" href="../../include/sysemu/block-backend.h.html#blk_get_geometry" title='blk_get_geometry' data-ref="blk_get_geometry">blk_get_geometry</a>(<a class="local col0 ref" href="#80blk" title='blk' data-ref="80blk">blk</a>, &amp;<a class="local col4 ref" href="#84nb_sectors" title='nb_sectors' data-ref="84nb_sectors">nb_sectors</a>);</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a> = <a class="local col4 ref" href="#84nb_sectors" title='nb_sectors' data-ref="84nb_sectors">nb_sectors</a> / (<var>16</var> * <var>63</var>);</td></tr>
+<tr><th id="111">111</th><td>    <b>if</b> (<a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a> &gt; <var>16383</var>) {</td></tr>
+<tr><th id="112">112</th><td>        <a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a> = <var>16383</var>;</td></tr>
+<tr><th id="113">113</th><td>    } <b>else</b> <b>if</b> (<a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a> &lt; <var>2</var>) {</td></tr>
+<tr><th id="114">114</th><td>        <a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a> = <var>2</var>;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td>    *<a class="local col1 ref" href="#81pcyls" title='pcyls' data-ref="81pcyls">pcyls</a> = <a class="local col5 ref" href="#85cylinders" title='cylinders' data-ref="85cylinders">cylinders</a>;</td></tr>
+<tr><th id="117">117</th><td>    *<a class="local col2 ref" href="#82pheads" title='pheads' data-ref="82pheads">pheads</a> = <var>16</var>;</td></tr>
+<tr><th id="118">118</th><td>    *<a class="local col3 ref" href="#83psecs" title='psecs' data-ref="83psecs">psecs</a> = <var>63</var>;</td></tr>
+<tr><th id="119">119</th><td>}</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><em>void</em> <dfn class="decl def" id="hd_geometry_guess" title='hd_geometry_guess' data-ref="hd_geometry_guess">hd_geometry_guess</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col6 decl" id="86blk" title='blk' data-type='BlockBackend *' data-ref="86blk">blk</dfn>,</td></tr>
+<tr><th id="122">122</th><td>                       <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col7 decl" id="87pcyls" title='pcyls' data-type='uint32_t *' data-ref="87pcyls">pcyls</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col8 decl" id="88pheads" title='pheads' data-type='uint32_t *' data-ref="88pheads">pheads</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col9 decl" id="89psecs" title='psecs' data-type='uint32_t *' data-ref="89psecs">psecs</dfn>,</td></tr>
+<tr><th id="123">123</th><td>                       <em>int</em> *<dfn class="local col0 decl" id="90ptrans" title='ptrans' data-type='int *' data-ref="90ptrans">ptrans</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    <em>int</em> <dfn class="local col1 decl" id="91cylinders" title='cylinders' data-type='int' data-ref="91cylinders">cylinders</dfn>, <dfn class="local col2 decl" id="92heads" title='heads' data-type='int' data-ref="92heads">heads</dfn>, <dfn class="local col3 decl" id="93secs" title='secs' data-type='int' data-ref="93secs">secs</dfn>, <dfn class="local col4 decl" id="94translation" title='translation' data-type='int' data-ref="94translation">translation</dfn>;</td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="../../include/block/block.h.html#HDGeometry" title='HDGeometry' data-type='struct HDGeometry' data-ref="HDGeometry">HDGeometry</a> <dfn class="local col5 decl" id="95geo" title='geo' data-type='HDGeometry' data-ref="95geo">geo</dfn>;</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <i>/* Try to probe the backing device geometry, otherwise fallback</i></td></tr>
+<tr><th id="129">129</th><td><i>       to the old logic. (as of 12/2014 probing only succeeds on DASDs) */</i></td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (<a class="ref" href="../../include/sysemu/block-backend.h.html#blk_probe_geometry" title='blk_probe_geometry' data-ref="blk_probe_geometry">blk_probe_geometry</a>(<a class="local col6 ref" href="#86blk" title='blk' data-ref="86blk">blk</a>, &amp;<a class="local col5 ref" href="#95geo" title='geo' data-ref="95geo">geo</a>) == <var>0</var>) {</td></tr>
+<tr><th id="131">131</th><td>        *<a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a> = <a class="local col5 ref" href="#95geo" title='geo' data-ref="95geo">geo</a>.<a class="ref" href="../../include/block/block.h.html#HDGeometry::cylinders" title='HDGeometry::cylinders' data-ref="HDGeometry::cylinders">cylinders</a>;</td></tr>
+<tr><th id="132">132</th><td>        *<a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a> = <a class="local col5 ref" href="#95geo" title='geo' data-ref="95geo">geo</a>.<a class="ref" href="../../include/block/block.h.html#HDGeometry::sectors" title='HDGeometry::sectors' data-ref="HDGeometry::sectors">sectors</a>;</td></tr>
+<tr><th id="133">133</th><td>        *<a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a> = <a class="local col5 ref" href="#95geo" title='geo' data-ref="95geo">geo</a>.<a class="ref" href="../../include/block/block.h.html#HDGeometry::heads" title='HDGeometry::heads' data-ref="HDGeometry::heads">heads</a>;</td></tr>
+<tr><th id="134">134</th><td>        <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a> = <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE">BIOS_ATA_TRANSLATION_NONE</a>;</td></tr>
+<tr><th id="135">135</th><td>    } <b>else</b> <b>if</b> (<a class="tu ref" href="#guess_disk_lchs" title='guess_disk_lchs' data-use='c' data-ref="guess_disk_lchs">guess_disk_lchs</a>(<a class="local col6 ref" href="#86blk" title='blk' data-ref="86blk">blk</a>, &amp;<a class="local col1 ref" href="#91cylinders" title='cylinders' data-ref="91cylinders">cylinders</a>, &amp;<a class="local col2 ref" href="#92heads" title='heads' data-ref="92heads">heads</a>, &amp;<a class="local col3 ref" href="#93secs" title='secs' data-ref="93secs">secs</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="136">136</th><td>        <i>/* no LCHS guess: use a standard physical disk geometry  */</i></td></tr>
+<tr><th id="137">137</th><td>        <a class="tu ref" href="#guess_chs_for_size" title='guess_chs_for_size' data-use='c' data-ref="guess_chs_for_size">guess_chs_for_size</a>(<a class="local col6 ref" href="#86blk" title='blk' data-ref="86blk">blk</a>, <a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a>, <a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a>, <a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a>);</td></tr>
+<tr><th id="138">138</th><td>        <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a> = <a class="ref" href="#hd_bios_chs_auto_trans" title='hd_bios_chs_auto_trans' data-ref="hd_bios_chs_auto_trans">hd_bios_chs_auto_trans</a>(*<a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a>, *<a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a>, *<a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a>);</td></tr>
+<tr><th id="139">139</th><td>    } <b>else</b> <b>if</b> (<a class="local col2 ref" href="#92heads" title='heads' data-ref="92heads">heads</a> &gt; <var>16</var>) {</td></tr>
+<tr><th id="140">140</th><td>        <i>/* LCHS guess with heads &gt; 16 means that a BIOS LBA</i></td></tr>
+<tr><th id="141">141</th><td><i>           translation was active, so a standard physical disk</i></td></tr>
+<tr><th id="142">142</th><td><i>           geometry is OK */</i></td></tr>
+<tr><th id="143">143</th><td>        <a class="tu ref" href="#guess_chs_for_size" title='guess_chs_for_size' data-use='c' data-ref="guess_chs_for_size">guess_chs_for_size</a>(<a class="local col6 ref" href="#86blk" title='blk' data-ref="86blk">blk</a>, <a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a>, <a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a>, <a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a>);</td></tr>
+<tr><th id="144">144</th><td>        <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a> = *<a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a> * *<a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a> &lt;= <var>131072</var></td></tr>
+<tr><th id="145">145</th><td>            ? <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_LARGE" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_LARGE' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_LARGE">BIOS_ATA_TRANSLATION_LARGE</a></td></tr>
+<tr><th id="146">146</th><td>            : <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA">BIOS_ATA_TRANSLATION_LBA</a>;</td></tr>
+<tr><th id="147">147</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="148">148</th><td>        <i>/* LCHS guess with heads &lt;= 16: use as physical geometry */</i></td></tr>
+<tr><th id="149">149</th><td>        *<a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a> = <a class="local col1 ref" href="#91cylinders" title='cylinders' data-ref="91cylinders">cylinders</a>;</td></tr>
+<tr><th id="150">150</th><td>        *<a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a> = <a class="local col2 ref" href="#92heads" title='heads' data-ref="92heads">heads</a>;</td></tr>
+<tr><th id="151">151</th><td>        *<a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a> = <a class="local col3 ref" href="#93secs" title='secs' data-ref="93secs">secs</a>;</td></tr>
+<tr><th id="152">152</th><td>        <i>/* disable any translation to be in sync with</i></td></tr>
+<tr><th id="153">153</th><td><i>           the logical geometry */</i></td></tr>
+<tr><th id="154">154</th><td>        <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a> = <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE">BIOS_ATA_TRANSLATION_NONE</a>;</td></tr>
+<tr><th id="155">155</th><td>    }</td></tr>
+<tr><th id="156">156</th><td>    <b>if</b> (<a class="local col0 ref" href="#90ptrans" title='ptrans' data-ref="90ptrans">ptrans</a>) {</td></tr>
+<tr><th id="157">157</th><td>        *<a class="local col0 ref" href="#90ptrans" title='ptrans' data-ref="90ptrans">ptrans</a> = <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a>;</td></tr>
+<tr><th id="158">158</th><td>    }</td></tr>
+<tr><th id="159">159</th><td>    <a class="ref" href="trace.h.html#trace_hd_geometry_guess" title='trace_hd_geometry_guess' data-ref="trace_hd_geometry_guess">trace_hd_geometry_guess</a>(<a class="local col6 ref" href="#86blk" title='blk' data-ref="86blk">blk</a>, *<a class="local col7 ref" href="#87pcyls" title='pcyls' data-ref="87pcyls">pcyls</a>, *<a class="local col8 ref" href="#88pheads" title='pheads' data-ref="88pheads">pheads</a>, *<a class="local col9 ref" href="#89psecs" title='psecs' data-ref="89psecs">psecs</a>, <a class="local col4 ref" href="#94translation" title='translation' data-ref="94translation">translation</a>);</td></tr>
+<tr><th id="160">160</th><td>}</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><em>int</em> <dfn class="decl def" id="hd_bios_chs_auto_trans" title='hd_bios_chs_auto_trans' data-ref="hd_bios_chs_auto_trans">hd_bios_chs_auto_trans</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="96cyls" title='cyls' data-type='uint32_t' data-ref="96cyls">cyls</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="97heads" title='heads' data-type='uint32_t' data-ref="97heads">heads</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="98secs" title='secs' data-type='uint32_t' data-ref="98secs">secs</dfn>)</td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>    <b>return</b> <a class="local col6 ref" href="#96cyls" title='cyls' data-ref="96cyls">cyls</a> &lt;= <var>1024</var> &amp;&amp; <a class="local col7 ref" href="#97heads" title='heads' data-ref="97heads">heads</a> &lt;= <var>16</var> &amp;&amp; <a class="local col8 ref" href="#98secs" title='secs' data-ref="98secs">secs</a> &lt;= <var>63</var></td></tr>
+<tr><th id="165">165</th><td>        ? <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_NONE">BIOS_ATA_TRANSLATION_NONE</a></td></tr>
+<tr><th id="166">166</th><td>        : <a class="enum" href="../../qapi-types.h.html#BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA" title='BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA' data-ref="BiosAtaTranslation::BIOS_ATA_TRANSLATION_LBA">BIOS_ATA_TRANSLATION_LBA</a>;</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

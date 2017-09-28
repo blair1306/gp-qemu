@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>i2c.h source code [codebrowser/include/hw/i2c/i2c.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="I2CSlave,I2CSlaveClass,i2c_event "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/i2c/i2c.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>i2c</a>/<a href='i2c.h.html'>i2c.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_I2C_H">QEMU_I2C_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_I2C_H" data-ref="_M/QEMU_I2C_H">QEMU_I2C_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><i>/* The QEMU I2C implementation only supports simple transfers that complete</i></td></tr>
+<tr><th id="7">7</th><td><i>   immediately.  It does not support slave devices that need to be able to</i></td></tr>
+<tr><th id="8">8</th><td><i>   defer their response (eg. CPU slave interfaces where the data is supplied</i></td></tr>
+<tr><th id="9">9</th><td><i>   by the device driver in response to an interrupt).  */</i></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><b>enum</b> <dfn class="type def" id="i2c_event" title='i2c_event' data-ref="i2c_event">i2c_event</dfn> {</td></tr>
+<tr><th id="12">12</th><td>    <dfn class="enum" id="i2c_event::I2C_START_RECV" title='i2c_event::I2C_START_RECV' data-ref="i2c_event::I2C_START_RECV">I2C_START_RECV</dfn>,</td></tr>
+<tr><th id="13">13</th><td>    <dfn class="enum" id="i2c_event::I2C_START_SEND" title='i2c_event::I2C_START_SEND' data-ref="i2c_event::I2C_START_SEND">I2C_START_SEND</dfn>,</td></tr>
+<tr><th id="14">14</th><td>    <dfn class="enum" id="i2c_event::I2C_FINISH" title='i2c_event::I2C_FINISH' data-ref="i2c_event::I2C_FINISH">I2C_FINISH</dfn>,</td></tr>
+<tr><th id="15">15</th><td>    <dfn class="enum" id="i2c_event::I2C_NACK" title='i2c_event::I2C_NACK' data-ref="i2c_event::I2C_NACK">I2C_NACK</dfn> <i>/* Masker NACKed a receive byte.  */</i></td></tr>
+<tr><th id="16">16</th><td>};</td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#I2CSlave" title='I2CSlave' data-ref="I2CSlave">I2CSlave</a> <dfn class="typedef" id="I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</dfn>;</td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/TYPE_I2C_SLAVE" data-ref="_M/TYPE_I2C_SLAVE">TYPE_I2C_SLAVE</dfn> "i2c-slave"</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/I2C_SLAVE" data-ref="_M/I2C_SLAVE">I2C_SLAVE</dfn>(obj) \</u></td></tr>
+<tr><th id="22">22</th><td><u>     OBJECT_CHECK(I2CSlave, (obj), TYPE_I2C_SLAVE)</u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/I2C_SLAVE_CLASS" data-ref="_M/I2C_SLAVE_CLASS">I2C_SLAVE_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="24">24</th><td><u>     OBJECT_CLASS_CHECK(I2CSlaveClass, (klass), TYPE_I2C_SLAVE)</u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/I2C_SLAVE_GET_CLASS" data-ref="_M/I2C_SLAVE_GET_CLASS">I2C_SLAVE_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="26">26</th><td><u>     OBJECT_GET_CLASS(I2CSlaveClass, (obj), TYPE_I2C_SLAVE)</u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="I2CSlaveClass" title='I2CSlaveClass' data-ref="I2CSlaveClass"><a class="type" href="#I2CSlaveClass" title='I2CSlaveClass' data-ref="I2CSlaveClass">I2CSlaveClass</a></dfn></td></tr>
+<tr><th id="29">29</th><td>{</td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="I2CSlaveClass::parent_class" title='I2CSlaveClass::parent_class' data-ref="I2CSlaveClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td>    <i>/* Callbacks provided by the device.  */</i></td></tr>
+<tr><th id="33">33</th><td>    <em>int</em> (*<dfn class="decl" id="I2CSlaveClass::init" title='I2CSlaveClass::init' data-ref="I2CSlaveClass::init">init</dfn>)(<a class="typedef" href="#I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</a> *<dfn class="local col1 decl" id="1dev" title='dev' data-type='I2CSlave *' data-ref="1dev">dev</dfn>);</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td>    <i>/* Master to slave. Returns non-zero for a NAK, 0 for success. */</i></td></tr>
+<tr><th id="36">36</th><td>    <em>int</em> (*<dfn class="decl" id="I2CSlaveClass::send" title='I2CSlaveClass::send' data-ref="I2CSlaveClass::send">send</dfn>)(<a class="typedef" href="#I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</a> *<dfn class="local col2 decl" id="2s" title='s' data-type='I2CSlave *' data-ref="2s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col3 decl" id="3data" title='data' data-type='uint8_t' data-ref="3data">data</dfn>);</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td>    <i>/*</i></td></tr>
+<tr><th id="39">39</th><td><i>     * Slave to master.  This cannot fail, the device should always</i></td></tr>
+<tr><th id="40">40</th><td><i>     * return something here.  Negative values probably result in 0xff</i></td></tr>
+<tr><th id="41">41</th><td><i>     * and a possible log from the driver, and shouldn't be used.</i></td></tr>
+<tr><th id="42">42</th><td><i>     */</i></td></tr>
+<tr><th id="43">43</th><td>    <em>int</em> (*<dfn class="decl" id="I2CSlaveClass::recv" title='I2CSlaveClass::recv' data-ref="I2CSlaveClass::recv">recv</dfn>)(<a class="typedef" href="#I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</a> *<dfn class="local col4 decl" id="4s" title='s' data-type='I2CSlave *' data-ref="4s">s</dfn>);</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <i>/*</i></td></tr>
+<tr><th id="46">46</th><td><i>     * Notify the slave of a bus state change.  For start event,</i></td></tr>
+<tr><th id="47">47</th><td><i>     * returns non-zero to NAK an operation.  For other events the</i></td></tr>
+<tr><th id="48">48</th><td><i>     * return code is not used and should be zero.</i></td></tr>
+<tr><th id="49">49</th><td><i>     */</i></td></tr>
+<tr><th id="50">50</th><td>    <em>int</em> (*<dfn class="decl" id="I2CSlaveClass::event" title='I2CSlaveClass::event' data-ref="I2CSlaveClass::event">event</dfn>)(<a class="typedef" href="#I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</a> *<dfn class="local col5 decl" id="5s" title='s' data-type='I2CSlave *' data-ref="5s">s</dfn>, <b>enum</b> <a class="type" href="#i2c_event" title='i2c_event' data-ref="i2c_event">i2c_event</a> <dfn class="local col6 decl" id="6event" title='event' data-type='enum i2c_event' data-ref="6event">event</dfn>);</td></tr>
+<tr><th id="51">51</th><td>} <dfn class="typedef" id="I2CSlaveClass" title='I2CSlaveClass' data-type='struct I2CSlaveClass' data-ref="I2CSlaveClass">I2CSlaveClass</dfn>;</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><b>struct</b> <dfn class="type def" id="I2CSlave" title='I2CSlave' data-ref="I2CSlave">I2CSlave</dfn></td></tr>
+<tr><th id="54">54</th><td>{</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="I2CSlave::qdev" title='I2CSlave::qdev' data-ref="I2CSlave::qdev">qdev</dfn>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <i>/* Remaining fields for internal use by the I2C code.  */</i></td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="I2CSlave::address" title='I2CSlave::address' data-ref="I2CSlave::address">address</dfn>;</td></tr>
+<tr><th id="59">59</th><td>};</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<a class="decl" href="../../../hw/i2c/core.c.html#i2c_init_bus" title='i2c_init_bus' data-ref="i2c_init_bus" id="i2c_init_bus">i2c_init_bus</a>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="7parent" title='parent' data-type='DeviceState *' data-ref="7parent">parent</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="8name" title='name' data-type='const char *' data-ref="8name">name</dfn>);</td></tr>
+<tr><th id="62">62</th><td><em>void</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_set_slave_address" title='i2c_set_slave_address' data-ref="i2c_set_slave_address" id="i2c_set_slave_address">i2c_set_slave_address</a>(<a class="typedef" href="#I2CSlave" title='I2CSlave' data-type='struct I2CSlave' data-ref="I2CSlave">I2CSlave</a> *<dfn class="local col9 decl" id="9dev" title='dev' data-type='I2CSlave *' data-ref="9dev">dev</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col0 decl" id="10address" title='address' data-type='uint8_t' data-ref="10address">address</dfn>);</td></tr>
+<tr><th id="63">63</th><td><em>int</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_bus_busy" title='i2c_bus_busy' data-ref="i2c_bus_busy" id="i2c_bus_busy">i2c_bus_busy</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col1 decl" id="11bus" title='bus' data-type='I2CBus *' data-ref="11bus">bus</dfn>);</td></tr>
+<tr><th id="64">64</th><td><em>int</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_start_transfer" title='i2c_start_transfer' data-ref="i2c_start_transfer" id="i2c_start_transfer">i2c_start_transfer</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col2 decl" id="12bus" title='bus' data-type='I2CBus *' data-ref="12bus">bus</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col3 decl" id="13address" title='address' data-type='uint8_t' data-ref="13address">address</dfn>, <em>int</em> <dfn class="local col4 decl" id="14recv" title='recv' data-type='int' data-ref="14recv">recv</dfn>);</td></tr>
+<tr><th id="65">65</th><td><em>void</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_end_transfer" title='i2c_end_transfer' data-ref="i2c_end_transfer" id="i2c_end_transfer">i2c_end_transfer</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col5 decl" id="15bus" title='bus' data-type='I2CBus *' data-ref="15bus">bus</dfn>);</td></tr>
+<tr><th id="66">66</th><td><em>void</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_nack" title='i2c_nack' data-ref="i2c_nack" id="i2c_nack">i2c_nack</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col6 decl" id="16bus" title='bus' data-type='I2CBus *' data-ref="16bus">bus</dfn>);</td></tr>
+<tr><th id="67">67</th><td><em>int</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_send_recv" title='i2c_send_recv' data-ref="i2c_send_recv" id="i2c_send_recv">i2c_send_recv</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col7 decl" id="17bus" title='bus' data-type='I2CBus *' data-ref="17bus">bus</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="18data" title='data' data-type='uint8_t *' data-ref="18data">data</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="19send" title='send' data-type='_Bool' data-ref="19send">send</dfn>);</td></tr>
+<tr><th id="68">68</th><td><em>int</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_send" title='i2c_send' data-ref="i2c_send" id="i2c_send">i2c_send</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col0 decl" id="20bus" title='bus' data-type='I2CBus *' data-ref="20bus">bus</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col1 decl" id="21data" title='data' data-type='uint8_t' data-ref="21data">data</dfn>);</td></tr>
+<tr><th id="69">69</th><td><em>int</em> <a class="decl" href="../../../hw/i2c/core.c.html#i2c_recv" title='i2c_recv' data-ref="i2c_recv" id="i2c_recv">i2c_recv</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col2 decl" id="22bus" title='bus' data-type='I2CBus *' data-ref="22bus">bus</dfn>);</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<a class="decl" href="../../../hw/i2c/core.c.html#i2c_create_slave" title='i2c_create_slave' data-ref="i2c_create_slave" id="i2c_create_slave">i2c_create_slave</a>(<a class="typedef" href="../../qemu/typedefs.h.html#I2CBus" title='I2CBus' data-type='struct I2CBus' data-ref="I2CBus">I2CBus</a> *<dfn class="local col3 decl" id="23bus" title='bus' data-type='I2CBus *' data-ref="23bus">bus</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="24name" title='name' data-type='const char *' data-ref="24name">name</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col5 decl" id="25addr" title='addr' data-type='uint8_t' data-ref="25addr">addr</dfn>);</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>/* wm8750.c */</i></td></tr>
+<tr><th id="74">74</th><td><em>void</em> <dfn class="decl" id="wm8750_data_req_set" title='wm8750_data_req_set' data-ref="wm8750_data_req_set">wm8750_data_req_set</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col6 decl" id="26dev" title='dev' data-type='DeviceState *' data-ref="26dev">dev</dfn>,</td></tr>
+<tr><th id="75">75</th><td>                <em>void</em> (*<dfn class="local col7 decl" id="27data_req" title='data_req' data-type='void (*)(void *, int, int)' data-ref="27data_req">data_req</dfn>)(<em>void</em> *, <em>int</em>, <em>int</em>), <em>void</em> *<dfn class="local col8 decl" id="28opaque" title='opaque' data-type='void *' data-ref="28opaque">opaque</dfn>);</td></tr>
+<tr><th id="76">76</th><td><em>void</em> <dfn class="decl" id="wm8750_dac_dat" title='wm8750_dac_dat' data-ref="wm8750_dac_dat">wm8750_dac_dat</dfn>(<em>void</em> *<dfn class="local col9 decl" id="29opaque" title='opaque' data-type='void *' data-ref="29opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="30sample" title='sample' data-type='uint32_t' data-ref="30sample">sample</dfn>);</td></tr>
+<tr><th id="77">77</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="wm8750_adc_dat" title='wm8750_adc_dat' data-ref="wm8750_adc_dat">wm8750_adc_dat</dfn>(<em>void</em> *<dfn class="local col1 decl" id="31opaque" title='opaque' data-type='void *' data-ref="31opaque">opaque</dfn>);</td></tr>
+<tr><th id="78">78</th><td><em>void</em> *<dfn class="decl" id="wm8750_dac_buffer" title='wm8750_dac_buffer' data-ref="wm8750_dac_buffer">wm8750_dac_buffer</dfn>(<em>void</em> *<dfn class="local col2 decl" id="32opaque" title='opaque' data-type='void *' data-ref="32opaque">opaque</dfn>, <em>int</em> <dfn class="local col3 decl" id="33samples" title='samples' data-type='int' data-ref="33samples">samples</dfn>);</td></tr>
+<tr><th id="79">79</th><td><em>void</em> <dfn class="decl" id="wm8750_dac_commit" title='wm8750_dac_commit' data-ref="wm8750_dac_commit">wm8750_dac_commit</dfn>(<em>void</em> *<dfn class="local col4 decl" id="34opaque" title='opaque' data-type='void *' data-ref="34opaque">opaque</dfn>);</td></tr>
+<tr><th id="80">80</th><td><em>void</em> <dfn class="decl" id="wm8750_set_bclk_in" title='wm8750_set_bclk_in' data-ref="wm8750_set_bclk_in">wm8750_set_bclk_in</dfn>(<em>void</em> *<dfn class="local col5 decl" id="35opaque" title='opaque' data-type='void *' data-ref="35opaque">opaque</dfn>, <em>int</em> <dfn class="local col6 decl" id="36new_hz" title='new_hz' data-type='int' data-ref="36new_hz">new_hz</dfn>);</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i>/* lm832x.c */</i></td></tr>
+<tr><th id="83">83</th><td><em>void</em> <dfn class="decl" id="lm832x_key_event" title='lm832x_key_event' data-ref="lm832x_key_event">lm832x_key_event</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="37dev" title='dev' data-type='DeviceState *' data-ref="37dev">dev</dfn>, <em>int</em> <dfn class="local col8 decl" id="38key" title='key' data-type='int' data-ref="38key">key</dfn>, <em>int</em> <dfn class="local col9 decl" id="39state" title='state' data-type='int' data-ref="39state">state</dfn>);</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_i2c_slave" title='vmstate_i2c_slave' data-ref="vmstate_i2c_slave">vmstate_i2c_slave</dfn>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_I2C_SLAVE" data-ref="_M/VMSTATE_I2C_SLAVE">VMSTATE_I2C_SLAVE</dfn>(_field, _state) {                          \</u></td></tr>
+<tr><th id="88">88</th><td><u>    .name       = (stringify(_field)),                               \</u></td></tr>
+<tr><th id="89">89</th><td><u>    .size       = sizeof(I2CSlave),                                  \</u></td></tr>
+<tr><th id="90">90</th><td><u>    .vmsd       = &amp;vmstate_i2c_slave,                                \</u></td></tr>
+<tr><th id="91">91</th><td><u>    .flags      = VMS_STRUCT,                                        \</u></td></tr>
+<tr><th id="92">92</th><td><u>    .offset     = vmstate_offset_value(_state, _field, I2CSlave),    \</u></td></tr>
+<tr><th id="93">93</th><td><u>}</u></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i2c/core.c.html'>codebrowser/hw/i2c/core.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

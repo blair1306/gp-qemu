@@ -1,0 +1,29 @@
+<dec f='codebrowser/include/block/snapshot.h' l='61' type='int bdrv_snapshot_delete(BlockDriverState * bs, const char * snapshot_id, const char * name, Error ** errp)'/>
+<def f='codebrowser/block/snapshot.c' l='248' ll='281' type='int bdrv_snapshot_delete(BlockDriverState * bs, const char * snapshot_id, const char * name, Error ** errp)'/>
+<use f='codebrowser/block/snapshot.c' l='271' u='c' c='bdrv_snapshot_delete'/>
+<use f='codebrowser/block/snapshot.c' l='290' u='c' c='bdrv_snapshot_delete_by_id_or_name'/>
+<use f='codebrowser/block/snapshot.c' l='294' u='c' c='bdrv_snapshot_delete_by_id_or_name'/>
+<doc f='codebrowser/block/snapshot.c' l='226'>/**
+ * Delete an internal snapshot by @snapshot_id and @name.
+ * @bs: block device used in the operation
+ * @snapshot_id: unique snapshot ID, or NULL
+ * @name: snapshot name, or NULL
+ * @errp: location to store error
+ *
+ * If both @snapshot_id and @name are specified, delete the first one with
+ * id @snapshot_id and name @name.
+ * If only @snapshot_id is specified, delete the first one with id
+ * @snapshot_id.
+ * If only @name is specified, delete the first one with name @name.
+ * if none is specified, return -EINVAL.
+ *
+ * Returns: 0 on success, -errno on failure. If @bs is not inserted, return
+ * -ENOMEDIUM. If @snapshot_id and @name are both NULL, return -EINVAL. If @bs
+ * does not support internal snapshot deletion, return -ENOTSUP. If @bs does
+ * not support parameter @snapshot_id or @name, or one of them is not correctly
+ * specified, return -EINVAL. If @bs can&apos;t find one matching @id and @name,
+ * return -ENOENT. If @errp != NULL, it will always be filled with error
+ * message on failure.
+ */</doc>
+<use f='codebrowser/blockdev.c' l='1336' u='c' c='qmp_blockdev_snapshot_delete_internal_sync'/>
+<use f='codebrowser/blockdev.c' l='1584' u='c' c='internal_snapshot_abort'/>

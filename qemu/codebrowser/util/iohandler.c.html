@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>iohandler.c source code [codebrowser/util/iohandler.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ChildProcessRecord "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/iohandler.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='iohandler.c.html'>iohandler.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator - managing I/O handler</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#<span data-ppcond="32">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/wait.h.html">&lt;sys/wait.h&gt;</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#<span data-ppcond="32">endif</span></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i  data-doc="iohandler_ctx">/* This context runs on top of main loop. We can't reuse qemu_aio_context</i></td></tr>
+<tr><th id="37">37</th><td><i  data-doc="iohandler_ctx"> * because iohandlers mustn't be polled by aio_poll(qemu_aio_context). */</i></td></tr>
+<tr><th id="38">38</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="tu decl def" id="iohandler_ctx" title='iohandler_ctx' data-type='AioContext *' data-ref="iohandler_ctx">iohandler_ctx</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="iohandler_init" title='iohandler_init' data-type='void iohandler_init()' data-ref="iohandler_init">iohandler_init</dfn>(<em>void</em>)</td></tr>
+<tr><th id="41">41</th><td>{</td></tr>
+<tr><th id="42">42</th><td>    <b>if</b> (!<a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='r' data-ref="iohandler_ctx">iohandler_ctx</a>) {</td></tr>
+<tr><th id="43">43</th><td>        <a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='w' data-ref="iohandler_ctx">iohandler_ctx</a> = <a class="ref" href="../include/block/aio.h.html#aio_context_new" title='aio_context_new' data-ref="aio_context_new">aio_context_new</a>(&amp;<a class="ref" href="../include/qapi/error.h.html#error_abort" title='error_abort' data-ref="error_abort">error_abort</a>);</td></tr>
+<tr><th id="44">44</th><td>    }</td></tr>
+<tr><th id="45">45</th><td>}</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl def" id="iohandler_get_aio_context" title='iohandler_get_aio_context' data-ref="iohandler_get_aio_context">iohandler_get_aio_context</dfn>(<em>void</em>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <a class="tu ref" href="#iohandler_init" title='iohandler_init' data-use='c' data-ref="iohandler_init">iohandler_init</a>();</td></tr>
+<tr><th id="50">50</th><td>    <b>return</b> <a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='r' data-ref="iohandler_ctx">iohandler_ctx</a>;</td></tr>
+<tr><th id="51">51</th><td>}</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="decl def" id="iohandler_get_g_source" title='iohandler_get_g_source' data-ref="iohandler_get_g_source">iohandler_get_g_source</dfn>(<em>void</em>)</td></tr>
+<tr><th id="54">54</th><td>{</td></tr>
+<tr><th id="55">55</th><td>    <a class="tu ref" href="#iohandler_init" title='iohandler_init' data-use='c' data-ref="iohandler_init">iohandler_init</a>();</td></tr>
+<tr><th id="56">56</th><td>    <b>return</b> <a class="ref" href="../include/block/aio.h.html#aio_get_g_source" title='aio_get_g_source' data-ref="aio_get_g_source">aio_get_g_source</a>(<a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='r' data-ref="iohandler_ctx">iohandler_ctx</a>);</td></tr>
+<tr><th id="57">57</th><td>}</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><em>void</em> <dfn class="decl def" id="qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</dfn>(<em>int</em> <dfn class="local col1 decl" id="1fd" title='fd' data-type='int' data-ref="1fd">fd</dfn>,</td></tr>
+<tr><th id="60">60</th><td>                         <a class="typedef" href="../include/block/aio.h.html#IOHandler" title='IOHandler' data-type='void (void *)' data-ref="IOHandler">IOHandler</a> *<dfn class="local col2 decl" id="2fd_read" title='fd_read' data-type='IOHandler *' data-ref="2fd_read">fd_read</dfn>,</td></tr>
+<tr><th id="61">61</th><td>                         <a class="typedef" href="../include/block/aio.h.html#IOHandler" title='IOHandler' data-type='void (void *)' data-ref="IOHandler">IOHandler</a> *<dfn class="local col3 decl" id="3fd_write" title='fd_write' data-type='IOHandler *' data-ref="3fd_write">fd_write</dfn>,</td></tr>
+<tr><th id="62">62</th><td>                         <em>void</em> *<dfn class="local col4 decl" id="4opaque" title='opaque' data-type='void *' data-ref="4opaque">opaque</dfn>)</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <a class="tu ref" href="#iohandler_init" title='iohandler_init' data-use='c' data-ref="iohandler_init">iohandler_init</a>();</td></tr>
+<tr><th id="65">65</th><td>    <a class="ref" href="../include/block/aio.h.html#aio_set_fd_handler" title='aio_set_fd_handler' data-ref="aio_set_fd_handler">aio_set_fd_handler</a>(<a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='r' data-ref="iohandler_ctx">iohandler_ctx</a>, <a class="local col1 ref" href="#1fd" title='fd' data-ref="1fd">fd</a>, <span class="macro" title="0" data-ref="_M/false">false</span>,</td></tr>
+<tr><th id="66">66</th><td>                       <a class="local col2 ref" href="#2fd_read" title='fd_read' data-ref="2fd_read">fd_read</a>, <a class="local col3 ref" href="#3fd_write" title='fd_write' data-ref="3fd_write">fd_write</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col4 ref" href="#4opaque" title='opaque' data-ref="4opaque">opaque</a>);</td></tr>
+<tr><th id="67">67</th><td>}</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><em>void</em> <dfn class="decl def" id="event_notifier_set_handler" title='event_notifier_set_handler' data-ref="event_notifier_set_handler">event_notifier_set_handler</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *<dfn class="local col5 decl" id="5e" title='e' data-type='EventNotifier *' data-ref="5e">e</dfn>,</td></tr>
+<tr><th id="70">70</th><td>                                <a class="typedef" href="../include/qemu/event_notifier.h.html#EventNotifierHandler" title='EventNotifierHandler' data-type='void (EventNotifier *)' data-ref="EventNotifierHandler">EventNotifierHandler</a> *<dfn class="local col6 decl" id="6handler" title='handler' data-type='EventNotifierHandler *' data-ref="6handler">handler</dfn>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    <a class="tu ref" href="#iohandler_init" title='iohandler_init' data-use='c' data-ref="iohandler_init">iohandler_init</a>();</td></tr>
+<tr><th id="73">73</th><td>    <a class="ref" href="../include/block/aio.h.html#aio_set_event_notifier" title='aio_set_event_notifier' data-ref="aio_set_event_notifier">aio_set_event_notifier</a>(<a class="tu ref" href="#iohandler_ctx" title='iohandler_ctx' data-use='r' data-ref="iohandler_ctx">iohandler_ctx</a>, <a class="local col5 ref" href="#5e" title='e' data-ref="5e">e</a>, <span class="macro" title="0" data-ref="_M/false">false</span>,</td></tr>
+<tr><th id="74">74</th><td>                           <a class="local col6 ref" href="#6handler" title='handler' data-ref="6handler">handler</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>/* reaping of zombies.  right now we're not passing the status to</i></td></tr>
+<tr><th id="78">78</th><td><i>   anyone, but it would be possible to add a callback.  */</i></td></tr>
+<tr><th id="79">79</th><td><u>#<span data-ppcond="79">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="80">80</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ChildProcessRecord" title='ChildProcessRecord' data-ref="ChildProcessRecord"><a class="type" href="#ChildProcessRecord" title='ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a></dfn> {</td></tr>
+<tr><th id="81">81</th><td>    <em>int</em> <dfn class="tu decl" id="ChildProcessRecord::pid" title='ChildProcessRecord::pid' data-type='int' data-ref="ChildProcessRecord::pid">pid</dfn>;</td></tr>
+<tr><th id="82">82</th><td>    <a class="macro" href="../include/qemu/queue.h.html#94" title="struct { struct ChildProcessRecord *le_next; struct ChildProcessRecord **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#ChildProcessRecord" title='ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a>) <dfn class="tu decl" id="ChildProcessRecord::next" title='ChildProcessRecord::next' data-type='struct (anonymous struct at /home/jon/workspace/qemu/util/iohandler.c:82:5)' data-ref="ChildProcessRecord::next">next</dfn>;</td></tr>
+<tr><th id="83">83</th><td>} <dfn class="typedef" id="ChildProcessRecord" title='ChildProcessRecord' data-type='struct ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</dfn>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><em>static</em> <a class="macro" href="../include/qemu/queue.h.html#86" title="struct { struct ChildProcessRecord *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#ChildProcessRecord" title='ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a>) <dfn class="tu decl def" id="child_watches" title='child_watches' data-type='struct (anonymous struct at /home/jon/workspace/qemu/util/iohandler.c:85:8)' data-ref="child_watches">child_watches</dfn> =</td></tr>
+<tr><th id="86">86</th><td>    <a class="macro" href="../include/qemu/queue.h.html#91" title="{ ((void*)0) }" data-ref="_M/QLIST_HEAD_INITIALIZER">QLIST_HEAD_INITIALIZER</a>(child_watches);</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="tu decl def" id="sigchld_bh" title='sigchld_bh' data-type='QEMUBH *' data-ref="sigchld_bh">sigchld_bh</dfn>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="sigchld_handler" title='sigchld_handler' data-type='void sigchld_handler(int signal)' data-ref="sigchld_handler">sigchld_handler</dfn>(<em>int</em> <dfn class="local col7 decl" id="7signal" title='signal' data-type='int' data-ref="7signal">signal</dfn>)</td></tr>
+<tr><th id="91">91</th><td>{</td></tr>
+<tr><th id="92">92</th><td>    <a class="ref" href="../include/block/aio.h.html#qemu_bh_schedule" title='qemu_bh_schedule' data-ref="qemu_bh_schedule">qemu_bh_schedule</a>(<a class="tu ref" href="#sigchld_bh" title='sigchld_bh' data-use='r' data-ref="sigchld_bh">sigchld_bh</a>);</td></tr>
+<tr><th id="93">93</th><td>}</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="sigchld_bh_handler" title='sigchld_bh_handler' data-type='void sigchld_bh_handler(void * opaque)' data-ref="sigchld_bh_handler">sigchld_bh_handler</dfn>(<em>void</em> *<dfn class="local col8 decl" id="8opaque" title='opaque' data-type='void *' data-ref="8opaque">opaque</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="#ChildProcessRecord" title='ChildProcessRecord' data-type='struct ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a> *<dfn class="local col9 decl" id="9rec" title='rec' data-type='ChildProcessRecord *' data-ref="9rec">rec</dfn>, *<dfn class="local col0 decl" id="10next" title='next' data-type='ChildProcessRecord *' data-ref="10next">next</dfn>;</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>    <a class="macro" href="../include/qemu/queue.h.html#154" title="for ((rec) = ((&amp;child_watches)-&gt;lh_first); (rec) &amp;&amp; ((next) = ((rec)-&gt;next.le_next), 1); (rec) = (next))" data-ref="_M/QLIST_FOREACH_SAFE">QLIST_FOREACH_SAFE</a>(<a class="local col9 ref" href="#9rec" title='rec' data-ref="9rec">rec</a>, &amp;<a class="tu ref" href="#child_watches" title='child_watches' data-use='a' data-ref="child_watches">child_watches</a>, <a class="tu ref" href="#ChildProcessRecord::next" title='ChildProcessRecord::next' data-use='m' data-ref="ChildProcessRecord::next">next</a>, <a class="local col0 ref" href="#10next" title='next' data-ref="10next">next</a>) {</td></tr>
+<tr><th id="100">100</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/wait.h.html#waitpid" title='waitpid' data-ref="waitpid">waitpid</a>(<a class="local col9 ref" href="#9rec" title='rec' data-ref="9rec">rec</a>-&gt;<a class="tu ref" href="#ChildProcessRecord::pid" title='ChildProcessRecord::pid' data-use='r' data-ref="ChildProcessRecord::pid">pid</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/waitflags.h.html#25" title="1" data-ref="_M/WNOHANG">WNOHANG</a>) == <a class="local col9 ref" href="#9rec" title='rec' data-ref="9rec">rec</a>-&gt;<a class="tu ref" href="#ChildProcessRecord::pid" title='ChildProcessRecord::pid' data-use='r' data-ref="ChildProcessRecord::pid">pid</a>) {</td></tr>
+<tr><th id="101">101</th><td>            <a class="macro" href="../include/qemu/queue.h.html#142" title="do { if ((rec)-&gt;next.le_next != ((void*)0)) (rec)-&gt;next.le_next-&gt;next.le_prev = (rec)-&gt;next.le_prev; *(rec)-&gt;next.le_prev = (rec)-&gt;next.le_next; } while ( 0)" data-ref="_M/QLIST_REMOVE">QLIST_REMOVE</a>(<a class="local col9 ref" href="#9rec" title='rec' data-ref="9rec">rec</a>, <a class="tu ref" href="#ChildProcessRecord::next" title='ChildProcessRecord::next' data-use='m' data-ref="ChildProcessRecord::next">next</a>);</td></tr>
+<tr><th id="102">102</th><td>            <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col9 ref" href="#9rec" title='rec' data-ref="9rec">rec</a>);</td></tr>
+<tr><th id="103">103</th><td>        }</td></tr>
+<tr><th id="104">104</th><td>    }</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_init_child_watch" title='qemu_init_child_watch' data-type='void qemu_init_child_watch()' data-ref="qemu_init_child_watch">qemu_init_child_watch</dfn>(<em>void</em>)</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a> <dfn class="local col1 decl" id="11act" title='act' data-type='struct sigaction' data-ref="11act">act</dfn>;</td></tr>
+<tr><th id="110">110</th><td>    <a class="tu ref" href="#sigchld_bh" title='sigchld_bh' data-use='w' data-ref="sigchld_bh">sigchld_bh</a> = <a class="ref" href="../include/qemu/main-loop.h.html#qemu_bh_new" title='qemu_bh_new' data-ref="qemu_bh_new">qemu_bh_new</a>(<a class="tu ref" href="#sigchld_bh_handler" title='sigchld_bh_handler' data-use='r' data-ref="sigchld_bh_handler">sigchld_bh_handler</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col1 ref" href="#11act" title='act' data-ref="11act">act</a>, <var>0</var>, <b>sizeof</b>(<a class="local col1 ref" href="#11act" title='act' data-ref="11act">act</a>));</td></tr>
+<tr><th id="113">113</th><td>    <a class="local col1 ref" href="#11act" title='act' data-ref="11act">act</a>.<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a> = <a class="tu ref" href="#sigchld_handler" title='sigchld_handler' data-use='r' data-ref="sigchld_handler">sigchld_handler</a>;</td></tr>
+<tr><th id="114">114</th><td>    <a class="local col1 ref" href="#11act" title='act' data-ref="11act">act</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_flags" title='sigaction::sa_flags' data-ref="sigaction::sa_flags">sa_flags</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#53" title="1" data-ref="_M/SA_NOCLDSTOP">SA_NOCLDSTOP</a>;</td></tr>
+<tr><th id="115">115</th><td>    <a class="ref" href="../../include/signal.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/signum.h.html#50" title="17" data-ref="_M/SIGCHLD">SIGCHLD</a>, &amp;<a class="local col1 ref" href="#11act" title='act' data-ref="11act">act</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="116">116</th><td>}</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><em>int</em> <dfn class="decl def" id="qemu_add_child_watch" title='qemu_add_child_watch' data-ref="qemu_add_child_watch">qemu_add_child_watch</dfn>(<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#pid_t" title='pid_t' data-type='__pid_t' data-ref="pid_t">pid_t</a> <dfn class="local col2 decl" id="12pid" title='pid' data-type='pid_t' data-ref="12pid">pid</dfn>)</td></tr>
+<tr><th id="119">119</th><td>{</td></tr>
+<tr><th id="120">120</th><td>    <a class="typedef" href="#ChildProcessRecord" title='ChildProcessRecord' data-type='struct ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a> *<dfn class="local col3 decl" id="13rec" title='rec' data-type='ChildProcessRecord *' data-ref="13rec">rec</dfn>;</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td>    <b>if</b> (!<a class="tu ref" href="#sigchld_bh" title='sigchld_bh' data-use='r' data-ref="sigchld_bh">sigchld_bh</a>) {</td></tr>
+<tr><th id="123">123</th><td>        <a class="tu ref" href="#qemu_init_child_watch" title='qemu_init_child_watch' data-use='c' data-ref="qemu_init_child_watch">qemu_init_child_watch</a>();</td></tr>
+<tr><th id="124">124</th><td>    }</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <a class="macro" href="../include/qemu/queue.h.html#149" title="for ((rec) = ((&amp;child_watches)-&gt;lh_first); (rec); (rec) = ((rec)-&gt;next.le_next))" data-ref="_M/QLIST_FOREACH">QLIST_FOREACH</a>(<a class="local col3 ref" href="#13rec" title='rec' data-ref="13rec">rec</a>, &amp;<a class="tu ref" href="#child_watches" title='child_watches' data-use='a' data-ref="child_watches">child_watches</a>, <a class="tu ref" href="#ChildProcessRecord::next" title='ChildProcessRecord::next' data-use='m' data-ref="ChildProcessRecord::next">next</a>) {</td></tr>
+<tr><th id="127">127</th><td>        <b>if</b> (<a class="local col3 ref" href="#13rec" title='rec' data-ref="13rec">rec</a>-&gt;<a class="tu ref" href="#ChildProcessRecord::pid" title='ChildProcessRecord::pid' data-use='r' data-ref="ChildProcessRecord::pid">pid</a> == <a class="local col2 ref" href="#12pid" title='pid' data-ref="12pid">pid</a>) {</td></tr>
+<tr><th id="128">128</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="129">129</th><td>        }</td></tr>
+<tr><th id="130">130</th><td>    }</td></tr>
+<tr><th id="131">131</th><td>    <a class="local col3 ref" href="#13rec" title='rec' data-ref="13rec">rec</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#ChildProcessRecord" title='ChildProcessRecord' data-type='struct ChildProcessRecord' data-ref="ChildProcessRecord">ChildProcessRecord</a>));</td></tr>
+<tr><th id="132">132</th><td>    <a class="local col3 ref" href="#13rec" title='rec' data-ref="13rec">rec</a>-&gt;<a class="tu ref" href="#ChildProcessRecord::pid" title='ChildProcessRecord::pid' data-use='w' data-ref="ChildProcessRecord::pid">pid</a> = <a class="local col2 ref" href="#12pid" title='pid' data-ref="12pid">pid</a>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="macro" href="../include/qemu/queue.h.html#135" title="do { if (((rec)-&gt;next.le_next = (&amp;child_watches)-&gt;lh_first) != ((void*)0)) (&amp;child_watches)-&gt;lh_first-&gt;next.le_prev = &amp;(rec)-&gt;next.le_next; (&amp;child_watches)-&gt;lh_first = (rec); (rec)-&gt;next.le_prev = &amp;(&amp;child_watches)-&gt;lh_first; } while ( 0)" data-ref="_M/QLIST_INSERT_HEAD">QLIST_INSERT_HEAD</a>(&amp;<a class="tu ref" href="#child_watches" title='child_watches' data-use='a' data-ref="child_watches">child_watches</a>, <a class="local col3 ref" href="#13rec" title='rec' data-ref="13rec">rec</a>, <a class="tu ref" href="#ChildProcessRecord::next" title='ChildProcessRecord::next' data-use='m' data-ref="ChildProcessRecord::next">next</a>);</td></tr>
+<tr><th id="134">134</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="135">135</th><td>}</td></tr>
+<tr><th id="136">136</th><td><u>#<span data-ppcond="79">endif</span></u></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

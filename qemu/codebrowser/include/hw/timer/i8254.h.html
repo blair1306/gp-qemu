@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>i8254.h source code [codebrowser/include/hw/timer/i8254.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="PITChannelInfo "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/timer/i8254.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>timer</a>/<a href='i8254.h.html'>i8254.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU 8253/8254 interval timer emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2004 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/HW_I8254_H">HW_I8254_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/HW_I8254_H" data-ref="_M/HW_I8254_H">HW_I8254_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/PIT_FREQ" data-ref="_M/PIT_FREQ">PIT_FREQ</dfn> 1193182</u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="PITChannelInfo" title='PITChannelInfo' data-ref="PITChannelInfo"><a class="type" href="#PITChannelInfo" title='PITChannelInfo' data-ref="PITChannelInfo">PITChannelInfo</a></dfn> {</td></tr>
+<tr><th id="34">34</th><td>    <em>int</em> <dfn class="decl" id="PITChannelInfo::gate" title='PITChannelInfo::gate' data-ref="PITChannelInfo::gate">gate</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    <em>int</em> <dfn class="decl" id="PITChannelInfo::mode" title='PITChannelInfo::mode' data-ref="PITChannelInfo::mode">mode</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <em>int</em> <dfn class="decl" id="PITChannelInfo::initial_count" title='PITChannelInfo::initial_count' data-ref="PITChannelInfo::initial_count">initial_count</dfn>;</td></tr>
+<tr><th id="37">37</th><td>    <em>int</em> <dfn class="decl" id="PITChannelInfo::out" title='PITChannelInfo::out' data-ref="PITChannelInfo::out">out</dfn>;</td></tr>
+<tr><th id="38">38</th><td>} <dfn class="typedef" id="PITChannelInfo" title='PITChannelInfo' data-type='struct PITChannelInfo' data-ref="PITChannelInfo">PITChannelInfo</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/TYPE_PIT_COMMON" data-ref="_M/TYPE_PIT_COMMON">TYPE_PIT_COMMON</dfn> "pit-common"</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/PIT_COMMON" data-ref="_M/PIT_COMMON">PIT_COMMON</dfn>(obj) \</u></td></tr>
+<tr><th id="42">42</th><td><u>     OBJECT_CHECK(PITCommonState, (obj), TYPE_PIT_COMMON)</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/PIT_COMMON_CLASS" data-ref="_M/PIT_COMMON_CLASS">PIT_COMMON_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="44">44</th><td><u>     OBJECT_CLASS_CHECK(PITCommonClass, (klass), TYPE_PIT_COMMON)</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/PIT_COMMON_GET_CLASS" data-ref="_M/PIT_COMMON_GET_CLASS">PIT_COMMON_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="46">46</th><td><u>     OBJECT_GET_CLASS(PITCommonClass, (obj), TYPE_PIT_COMMON)</u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/TYPE_I8254" data-ref="_M/TYPE_I8254">TYPE_I8254</dfn> "isa-pit"</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/TYPE_KVM_I8254" data-ref="_M/TYPE_KVM_I8254">TYPE_KVM_I8254</dfn> "kvm-pit"</u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="decl def" id="pit_init" title='pit_init' data-ref="pit_init">pit_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col1 decl" id="1bus" title='bus' data-type='ISABus *' data-ref="1bus">bus</dfn>, <em>int</em> <dfn class="local col2 decl" id="2base" title='base' data-type='int' data-ref="2base">base</dfn>, <em>int</em> <dfn class="local col3 decl" id="3isa_irq" title='isa_irq' data-type='int' data-ref="3isa_irq">isa_irq</dfn>,</td></tr>
+<tr><th id="52">52</th><td>                                  <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col4 decl" id="4alt_irq" title='alt_irq' data-type='qemu_irq' data-ref="4alt_irq">alt_irq</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col5 decl" id="5dev" title='dev' data-type='DeviceState *' data-ref="5dev">dev</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col6 decl" id="6d" title='d' data-type='ISADevice *' data-ref="6d">d</dfn>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <a class="local col6 ref" href="#6d" title='d' data-ref="6d">d</a> = <a class="ref" href="../isa/isa.h.html#isa_create" title='isa_create' data-ref="isa_create">isa_create</a>(<a class="local col1 ref" href="#1bus" title='bus' data-ref="1bus">bus</a>, <a class="macro" href="#48" title="&quot;isa-pit&quot;" data-ref="_M/TYPE_I8254">TYPE_I8254</a>);</td></tr>
+<tr><th id="58">58</th><td>    <a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a> = <a class="macro" href="../qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((d))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/include/hw/timer/i8254.h&quot;, 58, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col6 ref" href="#6d" title='d' data-ref="6d">d</a>);</td></tr>
+<tr><th id="59">59</th><td>    <a class="ref" href="../qdev-properties.h.html#qdev_prop_set_uint32" title='qdev_prop_set_uint32' data-ref="qdev_prop_set_uint32">qdev_prop_set_uint32</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <q>"iobase"</q>, <a class="local col2 ref" href="#2base" title='base' data-ref="2base">base</a>);</td></tr>
+<tr><th id="60">60</th><td>    <a class="ref" href="../qdev-core.h.html#qdev_init_nofail" title='qdev_init_nofail' data-ref="qdev_init_nofail">qdev_init_nofail</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>);</td></tr>
+<tr><th id="61">61</th><td>    <a class="ref" href="../qdev-core.h.html#qdev_connect_gpio_out" title='qdev_connect_gpio_out' data-ref="qdev_connect_gpio_out">qdev_connect_gpio_out</a>(<a class="local col5 ref" href="#5dev" title='dev' data-ref="5dev">dev</a>, <var>0</var>,</td></tr>
+<tr><th id="62">62</th><td>                          <a class="local col3 ref" href="#3isa_irq" title='isa_irq' data-ref="3isa_irq">isa_irq</a> &gt;= <var>0</var> ? <a class="ref" href="../isa/isa.h.html#isa_get_irq" title='isa_get_irq' data-ref="isa_get_irq">isa_get_irq</a>(<a class="local col6 ref" href="#6d" title='d' data-ref="6d">d</a>, <a class="local col3 ref" href="#3isa_irq" title='isa_irq' data-ref="3isa_irq">isa_irq</a>) : <a class="local col4 ref" href="#4alt_irq" title='alt_irq' data-ref="4alt_irq">alt_irq</a>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>    <b>return</b> <a class="local col6 ref" href="#6d" title='d' data-ref="6d">d</a>;</td></tr>
+<tr><th id="65">65</th><td>}</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="decl def" id="kvm_pit_init" title='kvm_pit_init' data-ref="kvm_pit_init">kvm_pit_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col7 decl" id="7bus" title='bus' data-type='ISABus *' data-ref="7bus">bus</dfn>, <em>int</em> <dfn class="local col8 decl" id="8base" title='base' data-type='int' data-ref="8base">base</dfn>)</td></tr>
+<tr><th id="68">68</th><td>{</td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col9 decl" id="9dev" title='dev' data-type='DeviceState *' data-ref="9dev">dev</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col0 decl" id="10d" title='d' data-type='ISADevice *' data-ref="10d">d</dfn>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a> = <a class="ref" href="../isa/isa.h.html#isa_create" title='isa_create' data-ref="isa_create">isa_create</a>(<a class="local col7 ref" href="#7bus" title='bus' data-ref="7bus">bus</a>, <a class="macro" href="#49" title="&quot;kvm-pit&quot;" data-ref="_M/TYPE_KVM_I8254">TYPE_KVM_I8254</a>);</td></tr>
+<tr><th id="73">73</th><td>    <a class="local col9 ref" href="#9dev" title='dev' data-ref="9dev">dev</a> = <a class="macro" href="../qdev-core.h.html#16" title="((DeviceState *)object_dynamic_cast_assert(((Object *)((d))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/include/hw/timer/i8254.h&quot;, 73, __func__))" data-ref="_M/DEVICE">DEVICE</a>(<a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a>);</td></tr>
+<tr><th id="74">74</th><td>    <a class="ref" href="../qdev-properties.h.html#qdev_prop_set_uint32" title='qdev_prop_set_uint32' data-ref="qdev_prop_set_uint32">qdev_prop_set_uint32</a>(<a class="local col9 ref" href="#9dev" title='dev' data-ref="9dev">dev</a>, <q>"iobase"</q>, <a class="local col8 ref" href="#8base" title='base' data-ref="8base">base</a>);</td></tr>
+<tr><th id="75">75</th><td>    <a class="ref" href="../qdev-core.h.html#qdev_init_nofail" title='qdev_init_nofail' data-ref="qdev_init_nofail">qdev_init_nofail</a>(<a class="local col9 ref" href="#9dev" title='dev' data-ref="9dev">dev</a>);</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <b>return</b> <a class="local col0 ref" href="#10d" title='d' data-ref="10d">d</a>;</td></tr>
+<tr><th id="78">78</th><td>}</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><em>void</em> <dfn class="decl" id="pit_set_gate" title='pit_set_gate' data-ref="pit_set_gate">pit_set_gate</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col1 decl" id="11dev" title='dev' data-type='ISADevice *' data-ref="11dev">dev</dfn>, <em>int</em> <dfn class="local col2 decl" id="12channel" title='channel' data-type='int' data-ref="12channel">channel</dfn>, <em>int</em> <dfn class="local col3 decl" id="13val" title='val' data-type='int' data-ref="13val">val</dfn>);</td></tr>
+<tr><th id="81">81</th><td><em>void</em> <dfn class="decl" id="pit_get_channel_info" title='pit_get_channel_info' data-ref="pit_get_channel_info">pit_get_channel_info</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col4 decl" id="14dev" title='dev' data-type='ISADevice *' data-ref="14dev">dev</dfn>, <em>int</em> <dfn class="local col5 decl" id="15channel" title='channel' data-type='int' data-ref="15channel">channel</dfn>, <a class="typedef" href="#PITChannelInfo" title='PITChannelInfo' data-type='struct PITChannelInfo' data-ref="PITChannelInfo">PITChannelInfo</a> *<dfn class="local col6 decl" id="16info" title='info' data-type='PITChannelInfo *' data-ref="16info">info</dfn>);</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><u>#<span data-ppcond="25">endif</span> /* HW_I8254_H */</u></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/audio/pcspk.c.html'>codebrowser/hw/audio/pcspk.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

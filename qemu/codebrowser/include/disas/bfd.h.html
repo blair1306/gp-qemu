@@ -1,0 +1,525 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>bfd.h source code [codebrowser/include/disas/bfd.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="bfd_architecture,bfd_endian,bfd_flavour,dis_insn_type,disassemble_info,symbol_cache_entry "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/disas/bfd.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>disas</a>/<a href='bfd.h.html'>bfd.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/* Interface between the opcode library and its callers.</i></td></tr>
+<tr><th id="2">2</th><td><i>   Written by Cygnus Support, 1993.</i></td></tr>
+<tr><th id="3">3</th><td><i></i></td></tr>
+<tr><th id="4">4</th><td><i>   The opcode library (libopcodes.a) provides instruction decoders for</i></td></tr>
+<tr><th id="5">5</th><td><i>   a large variety of instruction sets, callable with an identical</i></td></tr>
+<tr><th id="6">6</th><td><i>   interface, for making instruction-processing programs more independent</i></td></tr>
+<tr><th id="7">7</th><td><i>   of the instruction set being processed.  */</i></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><u>#<span data-ppcond="9">ifndef</span> <span class="macro" data-ref="_M/DISAS_BFD_H">DISAS_BFD_H</span></u></td></tr>
+<tr><th id="10">10</th><td><u>#define <dfn class="macro" id="_M/DISAS_BFD_H" data-ref="_M/DISAS_BFD_H">DISAS_BFD_H</dfn></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../qemu/fprintf-fn.h.html">"qemu/fprintf-fn.h"</a></u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><b>typedef</b> <em>void</em> *<dfn class="typedef" id="PTR" title='PTR' data-type='void *' data-ref="PTR">PTR</dfn>;</td></tr>
+<tr><th id="15">15</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="typedef" id="bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</dfn>;</td></tr>
+<tr><th id="16">16</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="typedef" id="bfd_signed_vma" title='bfd_signed_vma' data-type='int64_t' data-ref="bfd_signed_vma">bfd_signed_vma</dfn>;</td></tr>
+<tr><th id="17">17</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="typedef" id="bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</dfn>;</td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/sprintf_vma" data-ref="_M/sprintf_vma">sprintf_vma</dfn>(s,x) sprintf (s, "%0" PRIx64, x)</u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/snprintf_vma" data-ref="_M/snprintf_vma">snprintf_vma</dfn>(s,ss,x) snprintf (s, ss, "%0" PRIx64, x)</u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/BFD64" data-ref="_M/BFD64">BFD64</dfn></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><b>enum</b> <dfn class="type def" id="bfd_flavour" title='bfd_flavour' data-ref="bfd_flavour">bfd_flavour</dfn> {</td></tr>
+<tr><th id="24">24</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_unknown_flavour" title='bfd_flavour::bfd_target_unknown_flavour' data-ref="bfd_flavour::bfd_target_unknown_flavour">bfd_target_unknown_flavour</dfn>,</td></tr>
+<tr><th id="25">25</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_aout_flavour" title='bfd_flavour::bfd_target_aout_flavour' data-ref="bfd_flavour::bfd_target_aout_flavour">bfd_target_aout_flavour</dfn>,</td></tr>
+<tr><th id="26">26</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_coff_flavour" title='bfd_flavour::bfd_target_coff_flavour' data-ref="bfd_flavour::bfd_target_coff_flavour">bfd_target_coff_flavour</dfn>,</td></tr>
+<tr><th id="27">27</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_ecoff_flavour" title='bfd_flavour::bfd_target_ecoff_flavour' data-ref="bfd_flavour::bfd_target_ecoff_flavour">bfd_target_ecoff_flavour</dfn>,</td></tr>
+<tr><th id="28">28</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_elf_flavour" title='bfd_flavour::bfd_target_elf_flavour' data-ref="bfd_flavour::bfd_target_elf_flavour">bfd_target_elf_flavour</dfn>,</td></tr>
+<tr><th id="29">29</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_ieee_flavour" title='bfd_flavour::bfd_target_ieee_flavour' data-ref="bfd_flavour::bfd_target_ieee_flavour">bfd_target_ieee_flavour</dfn>,</td></tr>
+<tr><th id="30">30</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_nlm_flavour" title='bfd_flavour::bfd_target_nlm_flavour' data-ref="bfd_flavour::bfd_target_nlm_flavour">bfd_target_nlm_flavour</dfn>,</td></tr>
+<tr><th id="31">31</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_oasys_flavour" title='bfd_flavour::bfd_target_oasys_flavour' data-ref="bfd_flavour::bfd_target_oasys_flavour">bfd_target_oasys_flavour</dfn>,</td></tr>
+<tr><th id="32">32</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_tekhex_flavour" title='bfd_flavour::bfd_target_tekhex_flavour' data-ref="bfd_flavour::bfd_target_tekhex_flavour">bfd_target_tekhex_flavour</dfn>,</td></tr>
+<tr><th id="33">33</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_srec_flavour" title='bfd_flavour::bfd_target_srec_flavour' data-ref="bfd_flavour::bfd_target_srec_flavour">bfd_target_srec_flavour</dfn>,</td></tr>
+<tr><th id="34">34</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_ihex_flavour" title='bfd_flavour::bfd_target_ihex_flavour' data-ref="bfd_flavour::bfd_target_ihex_flavour">bfd_target_ihex_flavour</dfn>,</td></tr>
+<tr><th id="35">35</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_som_flavour" title='bfd_flavour::bfd_target_som_flavour' data-ref="bfd_flavour::bfd_target_som_flavour">bfd_target_som_flavour</dfn>,</td></tr>
+<tr><th id="36">36</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_os9k_flavour" title='bfd_flavour::bfd_target_os9k_flavour' data-ref="bfd_flavour::bfd_target_os9k_flavour">bfd_target_os9k_flavour</dfn>,</td></tr>
+<tr><th id="37">37</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_versados_flavour" title='bfd_flavour::bfd_target_versados_flavour' data-ref="bfd_flavour::bfd_target_versados_flavour">bfd_target_versados_flavour</dfn>,</td></tr>
+<tr><th id="38">38</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_msdos_flavour" title='bfd_flavour::bfd_target_msdos_flavour' data-ref="bfd_flavour::bfd_target_msdos_flavour">bfd_target_msdos_flavour</dfn>,</td></tr>
+<tr><th id="39">39</th><td>  <dfn class="enum" id="bfd_flavour::bfd_target_evax_flavour" title='bfd_flavour::bfd_target_evax_flavour' data-ref="bfd_flavour::bfd_target_evax_flavour">bfd_target_evax_flavour</dfn></td></tr>
+<tr><th id="40">40</th><td>};</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><b>enum</b> <dfn class="type def" id="bfd_endian" title='bfd_endian' data-ref="bfd_endian">bfd_endian</dfn> { <dfn class="enum" id="bfd_endian::BFD_ENDIAN_BIG" title='bfd_endian::BFD_ENDIAN_BIG' data-ref="bfd_endian::BFD_ENDIAN_BIG">BFD_ENDIAN_BIG</dfn>, <dfn class="enum" id="bfd_endian::BFD_ENDIAN_LITTLE" title='bfd_endian::BFD_ENDIAN_LITTLE' data-ref="bfd_endian::BFD_ENDIAN_LITTLE">BFD_ENDIAN_LITTLE</dfn>, <dfn class="enum" id="bfd_endian::BFD_ENDIAN_UNKNOWN" title='bfd_endian::BFD_ENDIAN_UNKNOWN' data-ref="bfd_endian::BFD_ENDIAN_UNKNOWN">BFD_ENDIAN_UNKNOWN</dfn> };</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>enum</b> <dfn class="type def" id="bfd_architecture" title='bfd_architecture' data-ref="bfd_architecture">bfd_architecture</dfn></td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_unknown" title='bfd_architecture::bfd_arch_unknown' data-ref="bfd_architecture::bfd_arch_unknown">bfd_arch_unknown</dfn>,    <i>/* File arch not known */</i></td></tr>
+<tr><th id="47">47</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_obscure" title='bfd_architecture::bfd_arch_obscure' data-ref="bfd_architecture::bfd_arch_obscure">bfd_arch_obscure</dfn>,    <i>/* Arch known, not one of these */</i></td></tr>
+<tr><th id="48">48</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_m68k" title='bfd_architecture::bfd_arch_m68k' data-ref="bfd_architecture::bfd_arch_m68k">bfd_arch_m68k</dfn>,       <i>/* Motorola 68xxx */</i></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68000" data-ref="_M/bfd_mach_m68000">bfd_mach_m68000</dfn> 1</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68008" data-ref="_M/bfd_mach_m68008">bfd_mach_m68008</dfn> 2</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68010" data-ref="_M/bfd_mach_m68010">bfd_mach_m68010</dfn> 3</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68020" data-ref="_M/bfd_mach_m68020">bfd_mach_m68020</dfn> 4</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68030" data-ref="_M/bfd_mach_m68030">bfd_mach_m68030</dfn> 5</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68040" data-ref="_M/bfd_mach_m68040">bfd_mach_m68040</dfn> 6</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m68060" data-ref="_M/bfd_mach_m68060">bfd_mach_m68060</dfn> 7</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_cpu32" data-ref="_M/bfd_mach_cpu32">bfd_mach_cpu32</dfn>  8</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf5200" data-ref="_M/bfd_mach_mcf5200">bfd_mach_mcf5200</dfn>  9</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf5206e" data-ref="_M/bfd_mach_mcf5206e">bfd_mach_mcf5206e</dfn> 10</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf5307" data-ref="_M/bfd_mach_mcf5307">bfd_mach_mcf5307</dfn>  11</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf5407" data-ref="_M/bfd_mach_mcf5407">bfd_mach_mcf5407</dfn>  12</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf528x" data-ref="_M/bfd_mach_mcf528x">bfd_mach_mcf528x</dfn>  13</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcfv4e" data-ref="_M/bfd_mach_mcfv4e">bfd_mach_mcfv4e</dfn>   14</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf521x" data-ref="_M/bfd_mach_mcf521x">bfd_mach_mcf521x</dfn>   15</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf5249" data-ref="_M/bfd_mach_mcf5249">bfd_mach_mcf5249</dfn>   16</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf547x" data-ref="_M/bfd_mach_mcf547x">bfd_mach_mcf547x</dfn>   17</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mcf548x" data-ref="_M/bfd_mach_mcf548x">bfd_mach_mcf548x</dfn>   18</u></td></tr>
+<tr><th id="67">67</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_vax" title='bfd_architecture::bfd_arch_vax' data-ref="bfd_architecture::bfd_arch_vax">bfd_arch_vax</dfn>,        <i>/* DEC Vax */</i></td></tr>
+<tr><th id="68">68</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_i960" title='bfd_architecture::bfd_arch_i960' data-ref="bfd_architecture::bfd_arch_i960">bfd_arch_i960</dfn>,       <i>/* Intel 960 */</i></td></tr>
+<tr><th id="69">69</th><td>     <i>/* The order of the following is important.</i></td></tr>
+<tr><th id="70">70</th><td><i>       lower number indicates a machine type that</i></td></tr>
+<tr><th id="71">71</th><td><i>       only accepts a subset of the instructions</i></td></tr>
+<tr><th id="72">72</th><td><i>       available to machines with higher numbers.</i></td></tr>
+<tr><th id="73">73</th><td><i>       The exception is the "ca", which is</i></td></tr>
+<tr><th id="74">74</th><td><i>       incompatible with all other machines except</i></td></tr>
+<tr><th id="75">75</th><td><i>       "core". */</i></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_core" data-ref="_M/bfd_mach_i960_core">bfd_mach_i960_core</dfn>      1</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_ka_sa" data-ref="_M/bfd_mach_i960_ka_sa">bfd_mach_i960_ka_sa</dfn>     2</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_kb_sb" data-ref="_M/bfd_mach_i960_kb_sb">bfd_mach_i960_kb_sb</dfn>     3</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_mc" data-ref="_M/bfd_mach_i960_mc">bfd_mach_i960_mc</dfn>        4</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_xa" data-ref="_M/bfd_mach_i960_xa">bfd_mach_i960_xa</dfn>        5</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_ca" data-ref="_M/bfd_mach_i960_ca">bfd_mach_i960_ca</dfn>        6</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_jx" data-ref="_M/bfd_mach_i960_jx">bfd_mach_i960_jx</dfn>        7</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i960_hx" data-ref="_M/bfd_mach_i960_hx">bfd_mach_i960_hx</dfn>        8</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_a29k" title='bfd_architecture::bfd_arch_a29k' data-ref="bfd_architecture::bfd_arch_a29k">bfd_arch_a29k</dfn>,       <i>/* AMD 29000 */</i></td></tr>
+<tr><th id="87">87</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_sparc" title='bfd_architecture::bfd_arch_sparc' data-ref="bfd_architecture::bfd_arch_sparc">bfd_arch_sparc</dfn>,      <i>/* SPARC */</i></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc" data-ref="_M/bfd_mach_sparc">bfd_mach_sparc</dfn>                 1</u></td></tr>
+<tr><th id="89">89</th><td><i>/* The difference between v8plus and v9 is that v9 is a true 64 bit env.  */</i></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_sparclet" data-ref="_M/bfd_mach_sparc_sparclet">bfd_mach_sparc_sparclet</dfn>        2</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_sparclite" data-ref="_M/bfd_mach_sparc_sparclite">bfd_mach_sparc_sparclite</dfn>       3</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v8plus" data-ref="_M/bfd_mach_sparc_v8plus">bfd_mach_sparc_v8plus</dfn>          4</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v8plusa" data-ref="_M/bfd_mach_sparc_v8plusa">bfd_mach_sparc_v8plusa</dfn>         5 /* with ultrasparc add'ns.  */</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_sparclite_le" data-ref="_M/bfd_mach_sparc_sparclite_le">bfd_mach_sparc_sparclite_le</dfn>    6</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v9" data-ref="_M/bfd_mach_sparc_v9">bfd_mach_sparc_v9</dfn>              7</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v9a" data-ref="_M/bfd_mach_sparc_v9a">bfd_mach_sparc_v9a</dfn>             8 /* with ultrasparc add'ns.  */</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v8plusb" data-ref="_M/bfd_mach_sparc_v8plusb">bfd_mach_sparc_v8plusb</dfn>         9 /* with cheetah add'ns.  */</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v9b" data-ref="_M/bfd_mach_sparc_v9b">bfd_mach_sparc_v9b</dfn>             10 /* with cheetah add'ns.  */</u></td></tr>
+<tr><th id="99">99</th><td><i>/* Nonzero if MACH has the v9 instruction set.  */</i></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sparc_v9_p" data-ref="_M/bfd_mach_sparc_v9_p">bfd_mach_sparc_v9_p</dfn>(mach) \</u></td></tr>
+<tr><th id="101">101</th><td><u>  ((mach) &gt;= bfd_mach_sparc_v8plus &amp;&amp; (mach) &lt;= bfd_mach_sparc_v9b \</u></td></tr>
+<tr><th id="102">102</th><td><u>   &amp;&amp; (mach) != bfd_mach_sparc_sparclite_le)</u></td></tr>
+<tr><th id="103">103</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_mips" title='bfd_architecture::bfd_arch_mips' data-ref="bfd_architecture::bfd_arch_mips">bfd_arch_mips</dfn>,       <i>/* MIPS Rxxxx */</i></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips3000" data-ref="_M/bfd_mach_mips3000">bfd_mach_mips3000</dfn>              3000</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips3900" data-ref="_M/bfd_mach_mips3900">bfd_mach_mips3900</dfn>              3900</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4000" data-ref="_M/bfd_mach_mips4000">bfd_mach_mips4000</dfn>              4000</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4010" data-ref="_M/bfd_mach_mips4010">bfd_mach_mips4010</dfn>              4010</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4100" data-ref="_M/bfd_mach_mips4100">bfd_mach_mips4100</dfn>              4100</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4300" data-ref="_M/bfd_mach_mips4300">bfd_mach_mips4300</dfn>              4300</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4400" data-ref="_M/bfd_mach_mips4400">bfd_mach_mips4400</dfn>              4400</u></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4600" data-ref="_M/bfd_mach_mips4600">bfd_mach_mips4600</dfn>              4600</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips4650" data-ref="_M/bfd_mach_mips4650">bfd_mach_mips4650</dfn>              4650</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips5000" data-ref="_M/bfd_mach_mips5000">bfd_mach_mips5000</dfn>              5000</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips6000" data-ref="_M/bfd_mach_mips6000">bfd_mach_mips6000</dfn>              6000</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips8000" data-ref="_M/bfd_mach_mips8000">bfd_mach_mips8000</dfn>              8000</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips10000" data-ref="_M/bfd_mach_mips10000">bfd_mach_mips10000</dfn>             10000</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_mips16" data-ref="_M/bfd_mach_mips16">bfd_mach_mips16</dfn>                16</u></td></tr>
+<tr><th id="118">118</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_i386" title='bfd_architecture::bfd_arch_i386' data-ref="bfd_architecture::bfd_arch_i386">bfd_arch_i386</dfn>,       <i>/* Intel 386 */</i></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i386_i386" data-ref="_M/bfd_mach_i386_i386">bfd_mach_i386_i386</dfn> 0</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i386_i8086" data-ref="_M/bfd_mach_i386_i8086">bfd_mach_i386_i8086</dfn> 1</u></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_i386_i386_intel_syntax" data-ref="_M/bfd_mach_i386_i386_intel_syntax">bfd_mach_i386_i386_intel_syntax</dfn> 2</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_x86_64" data-ref="_M/bfd_mach_x86_64">bfd_mach_x86_64</dfn> 3</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_x86_64_intel_syntax" data-ref="_M/bfd_mach_x86_64_intel_syntax">bfd_mach_x86_64_intel_syntax</dfn> 4</u></td></tr>
+<tr><th id="124">124</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_we32k" title='bfd_architecture::bfd_arch_we32k' data-ref="bfd_architecture::bfd_arch_we32k">bfd_arch_we32k</dfn>,      <i>/* AT&amp;T WE32xxx */</i></td></tr>
+<tr><th id="125">125</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_tahoe" title='bfd_architecture::bfd_arch_tahoe' data-ref="bfd_architecture::bfd_arch_tahoe">bfd_arch_tahoe</dfn>,      <i>/* CCI/Harris Tahoe */</i></td></tr>
+<tr><th id="126">126</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_i860" title='bfd_architecture::bfd_arch_i860' data-ref="bfd_architecture::bfd_arch_i860">bfd_arch_i860</dfn>,       <i>/* Intel 860 */</i></td></tr>
+<tr><th id="127">127</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_romp" title='bfd_architecture::bfd_arch_romp' data-ref="bfd_architecture::bfd_arch_romp">bfd_arch_romp</dfn>,       <i>/* IBM ROMP PC/RT */</i></td></tr>
+<tr><th id="128">128</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_alliant" title='bfd_architecture::bfd_arch_alliant' data-ref="bfd_architecture::bfd_arch_alliant">bfd_arch_alliant</dfn>,    <i>/* Alliant */</i></td></tr>
+<tr><th id="129">129</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_convex" title='bfd_architecture::bfd_arch_convex' data-ref="bfd_architecture::bfd_arch_convex">bfd_arch_convex</dfn>,     <i>/* Convex */</i></td></tr>
+<tr><th id="130">130</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_m88k" title='bfd_architecture::bfd_arch_m88k' data-ref="bfd_architecture::bfd_arch_m88k">bfd_arch_m88k</dfn>,       <i>/* Motorola 88xxx */</i></td></tr>
+<tr><th id="131">131</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_pyramid" title='bfd_architecture::bfd_arch_pyramid' data-ref="bfd_architecture::bfd_arch_pyramid">bfd_arch_pyramid</dfn>,    <i>/* Pyramid Technology */</i></td></tr>
+<tr><th id="132">132</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_h8300" title='bfd_architecture::bfd_arch_h8300' data-ref="bfd_architecture::bfd_arch_h8300">bfd_arch_h8300</dfn>,      <i>/* Hitachi H8/300 */</i></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_h8300" data-ref="_M/bfd_mach_h8300">bfd_mach_h8300</dfn>   1</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_h8300h" data-ref="_M/bfd_mach_h8300h">bfd_mach_h8300h</dfn>  2</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_h8300s" data-ref="_M/bfd_mach_h8300s">bfd_mach_h8300s</dfn>  3</u></td></tr>
+<tr><th id="136">136</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_powerpc" title='bfd_architecture::bfd_arch_powerpc' data-ref="bfd_architecture::bfd_arch_powerpc">bfd_arch_powerpc</dfn>,    <i>/* PowerPC */</i></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc" data-ref="_M/bfd_mach_ppc">bfd_mach_ppc</dfn>           0</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc64" data-ref="_M/bfd_mach_ppc64">bfd_mach_ppc64</dfn>         1</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_403" data-ref="_M/bfd_mach_ppc_403">bfd_mach_ppc_403</dfn>       403</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_403gc" data-ref="_M/bfd_mach_ppc_403gc">bfd_mach_ppc_403gc</dfn>     4030</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_e500" data-ref="_M/bfd_mach_ppc_e500">bfd_mach_ppc_e500</dfn>      500</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_505" data-ref="_M/bfd_mach_ppc_505">bfd_mach_ppc_505</dfn>       505</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_601" data-ref="_M/bfd_mach_ppc_601">bfd_mach_ppc_601</dfn>       601</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_602" data-ref="_M/bfd_mach_ppc_602">bfd_mach_ppc_602</dfn>       602</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_603" data-ref="_M/bfd_mach_ppc_603">bfd_mach_ppc_603</dfn>       603</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_ec603e" data-ref="_M/bfd_mach_ppc_ec603e">bfd_mach_ppc_ec603e</dfn>    6031</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_604" data-ref="_M/bfd_mach_ppc_604">bfd_mach_ppc_604</dfn>       604</u></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_620" data-ref="_M/bfd_mach_ppc_620">bfd_mach_ppc_620</dfn>       620</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_630" data-ref="_M/bfd_mach_ppc_630">bfd_mach_ppc_630</dfn>       630</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_750" data-ref="_M/bfd_mach_ppc_750">bfd_mach_ppc_750</dfn>       750</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_860" data-ref="_M/bfd_mach_ppc_860">bfd_mach_ppc_860</dfn>       860</u></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_a35" data-ref="_M/bfd_mach_ppc_a35">bfd_mach_ppc_a35</dfn>       35</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_rs64ii" data-ref="_M/bfd_mach_ppc_rs64ii">bfd_mach_ppc_rs64ii</dfn>    642</u></td></tr>
+<tr><th id="154">154</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_rs64iii" data-ref="_M/bfd_mach_ppc_rs64iii">bfd_mach_ppc_rs64iii</dfn>   643</u></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ppc_7400" data-ref="_M/bfd_mach_ppc_7400">bfd_mach_ppc_7400</dfn>      7400</u></td></tr>
+<tr><th id="156">156</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_rs6000" title='bfd_architecture::bfd_arch_rs6000' data-ref="bfd_architecture::bfd_arch_rs6000">bfd_arch_rs6000</dfn>,     <i>/* IBM RS/6000 */</i></td></tr>
+<tr><th id="157">157</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_hppa" title='bfd_architecture::bfd_arch_hppa' data-ref="bfd_architecture::bfd_arch_hppa">bfd_arch_hppa</dfn>,       <i>/* HP PA RISC */</i></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_hppa10" data-ref="_M/bfd_mach_hppa10">bfd_mach_hppa10</dfn>        10</u></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_hppa11" data-ref="_M/bfd_mach_hppa11">bfd_mach_hppa11</dfn>        11</u></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_hppa20" data-ref="_M/bfd_mach_hppa20">bfd_mach_hppa20</dfn>        20</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_hppa20w" data-ref="_M/bfd_mach_hppa20w">bfd_mach_hppa20w</dfn>       25</u></td></tr>
+<tr><th id="162">162</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_d10v" title='bfd_architecture::bfd_arch_d10v' data-ref="bfd_architecture::bfd_arch_d10v">bfd_arch_d10v</dfn>,       <i>/* Mitsubishi D10V */</i></td></tr>
+<tr><th id="163">163</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_z8k" title='bfd_architecture::bfd_arch_z8k' data-ref="bfd_architecture::bfd_arch_z8k">bfd_arch_z8k</dfn>,        <i>/* Zilog Z8000 */</i></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_z8001" data-ref="_M/bfd_mach_z8001">bfd_mach_z8001</dfn>         1</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_z8002" data-ref="_M/bfd_mach_z8002">bfd_mach_z8002</dfn>         2</u></td></tr>
+<tr><th id="166">166</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_h8500" title='bfd_architecture::bfd_arch_h8500' data-ref="bfd_architecture::bfd_arch_h8500">bfd_arch_h8500</dfn>,      <i>/* Hitachi H8/500 */</i></td></tr>
+<tr><th id="167">167</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_sh" title='bfd_architecture::bfd_arch_sh' data-ref="bfd_architecture::bfd_arch_sh">bfd_arch_sh</dfn>,         <i>/* Hitachi SH */</i></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh" data-ref="_M/bfd_mach_sh">bfd_mach_sh</dfn>            1</u></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh2" data-ref="_M/bfd_mach_sh2">bfd_mach_sh2</dfn>        0x20</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh_dsp" data-ref="_M/bfd_mach_sh_dsp">bfd_mach_sh_dsp</dfn>     0x2d</u></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh2a" data-ref="_M/bfd_mach_sh2a">bfd_mach_sh2a</dfn>       0x2a</u></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh2a_nofpu" data-ref="_M/bfd_mach_sh2a_nofpu">bfd_mach_sh2a_nofpu</dfn> 0x2b</u></td></tr>
+<tr><th id="173">173</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh2e" data-ref="_M/bfd_mach_sh2e">bfd_mach_sh2e</dfn>       0x2e</u></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh3" data-ref="_M/bfd_mach_sh3">bfd_mach_sh3</dfn>        0x30</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh3_nommu" data-ref="_M/bfd_mach_sh3_nommu">bfd_mach_sh3_nommu</dfn>  0x31</u></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh3_dsp" data-ref="_M/bfd_mach_sh3_dsp">bfd_mach_sh3_dsp</dfn>    0x3d</u></td></tr>
+<tr><th id="177">177</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh3e" data-ref="_M/bfd_mach_sh3e">bfd_mach_sh3e</dfn>       0x3e</u></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4" data-ref="_M/bfd_mach_sh4">bfd_mach_sh4</dfn>        0x40</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4_nofpu" data-ref="_M/bfd_mach_sh4_nofpu">bfd_mach_sh4_nofpu</dfn>  0x41</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4_nommu_nofpu" data-ref="_M/bfd_mach_sh4_nommu_nofpu">bfd_mach_sh4_nommu_nofpu</dfn>  0x42</u></td></tr>
+<tr><th id="181">181</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4a" data-ref="_M/bfd_mach_sh4a">bfd_mach_sh4a</dfn>       0x4a</u></td></tr>
+<tr><th id="182">182</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4a_nofpu" data-ref="_M/bfd_mach_sh4a_nofpu">bfd_mach_sh4a_nofpu</dfn> 0x4b</u></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh4al_dsp" data-ref="_M/bfd_mach_sh4al_dsp">bfd_mach_sh4al_dsp</dfn>  0x4d</u></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_sh5" data-ref="_M/bfd_mach_sh5">bfd_mach_sh5</dfn>        0x50</u></td></tr>
+<tr><th id="185">185</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_alpha" title='bfd_architecture::bfd_arch_alpha' data-ref="bfd_architecture::bfd_arch_alpha">bfd_arch_alpha</dfn>,      <i>/* Dec Alpha */</i></td></tr>
+<tr><th id="186">186</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_alpha" data-ref="_M/bfd_mach_alpha">bfd_mach_alpha</dfn> 1</u></td></tr>
+<tr><th id="187">187</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_alpha_ev4" data-ref="_M/bfd_mach_alpha_ev4">bfd_mach_alpha_ev4</dfn>  0x10</u></td></tr>
+<tr><th id="188">188</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_alpha_ev5" data-ref="_M/bfd_mach_alpha_ev5">bfd_mach_alpha_ev5</dfn>  0x20</u></td></tr>
+<tr><th id="189">189</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_alpha_ev6" data-ref="_M/bfd_mach_alpha_ev6">bfd_mach_alpha_ev6</dfn>  0x30</u></td></tr>
+<tr><th id="190">190</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_arm" title='bfd_architecture::bfd_arch_arm' data-ref="bfd_architecture::bfd_arch_arm">bfd_arch_arm</dfn>,        <i>/* Advanced Risc Machines ARM */</i></td></tr>
+<tr><th id="191">191</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_unknown" data-ref="_M/bfd_mach_arm_unknown">bfd_mach_arm_unknown</dfn>	0</u></td></tr>
+<tr><th id="192">192</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_2" data-ref="_M/bfd_mach_arm_2">bfd_mach_arm_2</dfn>		1</u></td></tr>
+<tr><th id="193">193</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_2a" data-ref="_M/bfd_mach_arm_2a">bfd_mach_arm_2a</dfn>		2</u></td></tr>
+<tr><th id="194">194</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_3" data-ref="_M/bfd_mach_arm_3">bfd_mach_arm_3</dfn>		3</u></td></tr>
+<tr><th id="195">195</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_3M" data-ref="_M/bfd_mach_arm_3M">bfd_mach_arm_3M</dfn> 	4</u></td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_4" data-ref="_M/bfd_mach_arm_4">bfd_mach_arm_4</dfn> 		5</u></td></tr>
+<tr><th id="197">197</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_4T" data-ref="_M/bfd_mach_arm_4T">bfd_mach_arm_4T</dfn> 	6</u></td></tr>
+<tr><th id="198">198</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_5" data-ref="_M/bfd_mach_arm_5">bfd_mach_arm_5</dfn> 		7</u></td></tr>
+<tr><th id="199">199</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_5T" data-ref="_M/bfd_mach_arm_5T">bfd_mach_arm_5T</dfn>		8</u></td></tr>
+<tr><th id="200">200</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_5TE" data-ref="_M/bfd_mach_arm_5TE">bfd_mach_arm_5TE</dfn>	9</u></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_XScale" data-ref="_M/bfd_mach_arm_XScale">bfd_mach_arm_XScale</dfn>	10</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_ep9312" data-ref="_M/bfd_mach_arm_ep9312">bfd_mach_arm_ep9312</dfn>	11</u></td></tr>
+<tr><th id="203">203</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_iWMMXt" data-ref="_M/bfd_mach_arm_iWMMXt">bfd_mach_arm_iWMMXt</dfn>	12</u></td></tr>
+<tr><th id="204">204</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arm_iWMMXt2" data-ref="_M/bfd_mach_arm_iWMMXt2">bfd_mach_arm_iWMMXt2</dfn>	13</u></td></tr>
+<tr><th id="205">205</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_ns32k" title='bfd_architecture::bfd_arch_ns32k' data-ref="bfd_architecture::bfd_arch_ns32k">bfd_arch_ns32k</dfn>,      <i>/* National Semiconductors ns32000 */</i></td></tr>
+<tr><th id="206">206</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_w65" title='bfd_architecture::bfd_arch_w65' data-ref="bfd_architecture::bfd_arch_w65">bfd_arch_w65</dfn>,        <i>/* WDC 65816 */</i></td></tr>
+<tr><th id="207">207</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_tic30" title='bfd_architecture::bfd_arch_tic30' data-ref="bfd_architecture::bfd_arch_tic30">bfd_arch_tic30</dfn>,      <i>/* Texas Instruments TMS320C30 */</i></td></tr>
+<tr><th id="208">208</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_v850" title='bfd_architecture::bfd_arch_v850' data-ref="bfd_architecture::bfd_arch_v850">bfd_arch_v850</dfn>,       <i>/* NEC V850 */</i></td></tr>
+<tr><th id="209">209</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_v850" data-ref="_M/bfd_mach_v850">bfd_mach_v850</dfn>          0</u></td></tr>
+<tr><th id="210">210</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_arc" title='bfd_architecture::bfd_arch_arc' data-ref="bfd_architecture::bfd_arch_arc">bfd_arch_arc</dfn>,        <i>/* Argonaut RISC Core */</i></td></tr>
+<tr><th id="211">211</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_arc_base" data-ref="_M/bfd_mach_arc_base">bfd_mach_arc_base</dfn> 0</u></td></tr>
+<tr><th id="212">212</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_m32r" title='bfd_architecture::bfd_arch_m32r' data-ref="bfd_architecture::bfd_arch_m32r">bfd_arch_m32r</dfn>,       <i>/* Mitsubishi M32R/D */</i></td></tr>
+<tr><th id="213">213</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_m32r" data-ref="_M/bfd_mach_m32r">bfd_mach_m32r</dfn>          0  /* backwards compatibility */</u></td></tr>
+<tr><th id="214">214</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_mn10200" title='bfd_architecture::bfd_arch_mn10200' data-ref="bfd_architecture::bfd_arch_mn10200">bfd_arch_mn10200</dfn>,    <i>/* Matsushita MN10200 */</i></td></tr>
+<tr><th id="215">215</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_mn10300" title='bfd_architecture::bfd_arch_mn10300' data-ref="bfd_architecture::bfd_arch_mn10300">bfd_arch_mn10300</dfn>,    <i>/* Matsushita MN10300 */</i></td></tr>
+<tr><th id="216">216</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_cris" title='bfd_architecture::bfd_arch_cris' data-ref="bfd_architecture::bfd_arch_cris">bfd_arch_cris</dfn>,       <i>/* Axis CRIS */</i></td></tr>
+<tr><th id="217">217</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_cris_v0_v10" data-ref="_M/bfd_mach_cris_v0_v10">bfd_mach_cris_v0_v10</dfn>   255</u></td></tr>
+<tr><th id="218">218</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_cris_v32" data-ref="_M/bfd_mach_cris_v32">bfd_mach_cris_v32</dfn>      32</u></td></tr>
+<tr><th id="219">219</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_cris_v10_v32" data-ref="_M/bfd_mach_cris_v10_v32">bfd_mach_cris_v10_v32</dfn>  1032</u></td></tr>
+<tr><th id="220">220</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_microblaze" title='bfd_architecture::bfd_arch_microblaze' data-ref="bfd_architecture::bfd_arch_microblaze">bfd_arch_microblaze</dfn>, <i>/* Xilinx MicroBlaze.  */</i></td></tr>
+<tr><th id="221">221</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_moxie" title='bfd_architecture::bfd_arch_moxie' data-ref="bfd_architecture::bfd_arch_moxie">bfd_arch_moxie</dfn>,      <i>/* The Moxie core.  */</i></td></tr>
+<tr><th id="222">222</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_ia64" title='bfd_architecture::bfd_arch_ia64' data-ref="bfd_architecture::bfd_arch_ia64">bfd_arch_ia64</dfn>,      <i>/* HP/Intel ia64 */</i></td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ia64_elf64" data-ref="_M/bfd_mach_ia64_elf64">bfd_mach_ia64_elf64</dfn>    64</u></td></tr>
+<tr><th id="224">224</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_ia64_elf32" data-ref="_M/bfd_mach_ia64_elf32">bfd_mach_ia64_elf32</dfn>    32</u></td></tr>
+<tr><th id="225">225</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_nios2" title='bfd_architecture::bfd_arch_nios2' data-ref="bfd_architecture::bfd_arch_nios2">bfd_arch_nios2</dfn>,	<i>/* Nios II */</i></td></tr>
+<tr><th id="226">226</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_nios2" data-ref="_M/bfd_mach_nios2">bfd_mach_nios2</dfn>          0</u></td></tr>
+<tr><th id="227">227</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_nios2r1" data-ref="_M/bfd_mach_nios2r1">bfd_mach_nios2r1</dfn>        1</u></td></tr>
+<tr><th id="228">228</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_nios2r2" data-ref="_M/bfd_mach_nios2r2">bfd_mach_nios2r2</dfn>        2</u></td></tr>
+<tr><th id="229">229</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_lm32" title='bfd_architecture::bfd_arch_lm32' data-ref="bfd_architecture::bfd_arch_lm32">bfd_arch_lm32</dfn>,       <i>/* Lattice Mico32 */</i></td></tr>
+<tr><th id="230">230</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_lm32" data-ref="_M/bfd_mach_lm32">bfd_mach_lm32</dfn> 1</u></td></tr>
+<tr><th id="231">231</th><td>  <dfn class="enum" id="bfd_architecture::bfd_arch_last" title='bfd_architecture::bfd_arch_last' data-ref="bfd_architecture::bfd_arch_last">bfd_arch_last</dfn></td></tr>
+<tr><th id="232">232</th><td>  };</td></tr>
+<tr><th id="233">233</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_s390_31" data-ref="_M/bfd_mach_s390_31">bfd_mach_s390_31</dfn> 31</u></td></tr>
+<tr><th id="234">234</th><td><u>#define <dfn class="macro" id="_M/bfd_mach_s390_64" data-ref="_M/bfd_mach_s390_64">bfd_mach_s390_64</dfn> 64</u></td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="symbol_cache_entry" title='symbol_cache_entry' data-ref="symbol_cache_entry"><a class="type" href="#symbol_cache_entry" title='symbol_cache_entry' data-ref="symbol_cache_entry">symbol_cache_entry</a></dfn></td></tr>
+<tr><th id="237">237</th><td>{</td></tr>
+<tr><th id="238">238</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="symbol_cache_entry::name" title='symbol_cache_entry::name' data-ref="symbol_cache_entry::name">name</dfn>;</td></tr>
+<tr><th id="239">239</th><td>    <b>union</b></td></tr>
+<tr><th id="240">240</th><td>    {</td></tr>
+<tr><th id="241">241</th><td>        <a class="typedef" href="#PTR" title='PTR' data-type='void *' data-ref="PTR">PTR</a> <dfn class="decl" id="symbol_cache_entry::(anonymous)::p" title='symbol_cache_entry::(anonymous union)::p' data-ref="symbol_cache_entry::(anonymous)::p">p</dfn>;</td></tr>
+<tr><th id="242">242</th><td>        <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="symbol_cache_entry::(anonymous)::i" title='symbol_cache_entry::(anonymous union)::i' data-ref="symbol_cache_entry::(anonymous)::i">i</dfn>;</td></tr>
+<tr><th id="243">243</th><td>    } <dfn class="decl" id="symbol_cache_entry::udata" title='symbol_cache_entry::udata' data-ref="symbol_cache_entry::udata">udata</dfn>;</td></tr>
+<tr><th id="244">244</th><td>} <dfn class="typedef" id="asymbol" title='asymbol' data-type='struct symbol_cache_entry' data-ref="asymbol">asymbol</dfn>;</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td><b>enum</b> <dfn class="type def" id="dis_insn_type" title='dis_insn_type' data-ref="dis_insn_type">dis_insn_type</dfn> {</td></tr>
+<tr><th id="247">247</th><td>  <dfn class="enum" id="dis_insn_type::dis_noninsn" title='dis_insn_type::dis_noninsn' data-ref="dis_insn_type::dis_noninsn">dis_noninsn</dfn>,			<i>/* Not a valid instruction */</i></td></tr>
+<tr><th id="248">248</th><td>  <dfn class="enum" id="dis_insn_type::dis_nonbranch" title='dis_insn_type::dis_nonbranch' data-ref="dis_insn_type::dis_nonbranch">dis_nonbranch</dfn>,		<i>/* Not a branch instruction */</i></td></tr>
+<tr><th id="249">249</th><td>  <dfn class="enum" id="dis_insn_type::dis_branch" title='dis_insn_type::dis_branch' data-ref="dis_insn_type::dis_branch">dis_branch</dfn>,			<i>/* Unconditional branch */</i></td></tr>
+<tr><th id="250">250</th><td>  <dfn class="enum" id="dis_insn_type::dis_condbranch" title='dis_insn_type::dis_condbranch' data-ref="dis_insn_type::dis_condbranch">dis_condbranch</dfn>,		<i>/* Conditional branch */</i></td></tr>
+<tr><th id="251">251</th><td>  <dfn class="enum" id="dis_insn_type::dis_jsr" title='dis_insn_type::dis_jsr' data-ref="dis_insn_type::dis_jsr">dis_jsr</dfn>,			<i>/* Jump to subroutine */</i></td></tr>
+<tr><th id="252">252</th><td>  <dfn class="enum" id="dis_insn_type::dis_condjsr" title='dis_insn_type::dis_condjsr' data-ref="dis_insn_type::dis_condjsr">dis_condjsr</dfn>,			<i>/* Conditional jump to subroutine */</i></td></tr>
+<tr><th id="253">253</th><td>  <dfn class="enum" id="dis_insn_type::dis_dref" title='dis_insn_type::dis_dref' data-ref="dis_insn_type::dis_dref">dis_dref</dfn>,			<i>/* Data reference instruction */</i></td></tr>
+<tr><th id="254">254</th><td>  <dfn class="enum" id="dis_insn_type::dis_dref2" title='dis_insn_type::dis_dref2' data-ref="dis_insn_type::dis_dref2">dis_dref2</dfn>			<i>/* Two data references in instruction */</i></td></tr>
+<tr><th id="255">255</th><td>};</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><i>/* This struct is passed into the instruction decoding routine,</i></td></tr>
+<tr><th id="258">258</th><td><i>   and is passed back out into each callback.  The various fields are used</i></td></tr>
+<tr><th id="259">259</th><td><i>   for conveying information from your main routine into your callbacks,</i></td></tr>
+<tr><th id="260">260</th><td><i>   for passing information into the instruction decoders (such as the</i></td></tr>
+<tr><th id="261">261</th><td><i>   addresses of the callback functions), or for passing information</i></td></tr>
+<tr><th id="262">262</th><td><i>   back from the instruction decoders to their callers.</i></td></tr>
+<tr><th id="263">263</th><td><i></i></td></tr>
+<tr><th id="264">264</th><td><i>   It must be initialized before it is first passed; this can be done</i></td></tr>
+<tr><th id="265">265</th><td><i>   by hand, or using one of the initialization macros below.  */</i></td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="disassemble_info" title='disassemble_info' data-ref="disassemble_info"><a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a></dfn> {</td></tr>
+<tr><th id="268">268</th><td>  <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="decl" id="disassemble_info::fprintf_func" title='disassemble_info::fprintf_func' data-ref="disassemble_info::fprintf_func">fprintf_func</dfn>;</td></tr>
+<tr><th id="269">269</th><td>  <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="decl" id="disassemble_info::stream" title='disassemble_info::stream' data-ref="disassemble_info::stream">stream</dfn>;</td></tr>
+<tr><th id="270">270</th><td>  <a class="typedef" href="#PTR" title='PTR' data-type='void *' data-ref="PTR">PTR</a> <dfn class="decl" id="disassemble_info::application_data" title='disassemble_info::application_data' data-ref="disassemble_info::application_data">application_data</dfn>;</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>  <i>/* Target description.  We could replace this with a pointer to the bfd,</i></td></tr>
+<tr><th id="273">273</th><td><i>     but that would require one.  There currently isn't any such requirement</i></td></tr>
+<tr><th id="274">274</th><td><i>     so to avoid introducing one we record these explicitly.  */</i></td></tr>
+<tr><th id="275">275</th><td>  <i>/* The bfd_flavour.  This can be bfd_target_unknown_flavour.  */</i></td></tr>
+<tr><th id="276">276</th><td>  <b>enum</b> <a class="type" href="#bfd_flavour" title='bfd_flavour' data-ref="bfd_flavour">bfd_flavour</a> <dfn class="decl" id="disassemble_info::flavour" title='disassemble_info::flavour' data-ref="disassemble_info::flavour">flavour</dfn>;</td></tr>
+<tr><th id="277">277</th><td>  <i>/* The bfd_arch value.  */</i></td></tr>
+<tr><th id="278">278</th><td>  <b>enum</b> <a class="type" href="#bfd_architecture" title='bfd_architecture' data-ref="bfd_architecture">bfd_architecture</a> <dfn class="decl" id="disassemble_info::arch" title='disassemble_info::arch' data-ref="disassemble_info::arch">arch</dfn>;</td></tr>
+<tr><th id="279">279</th><td>  <i>/* The bfd_mach value.  */</i></td></tr>
+<tr><th id="280">280</th><td>  <em>unsigned</em> <em>long</em> <dfn class="decl" id="disassemble_info::mach" title='disassemble_info::mach' data-ref="disassemble_info::mach">mach</dfn>;</td></tr>
+<tr><th id="281">281</th><td>  <i>/* Endianness (for bi-endian cpus).  Mono-endian cpus can ignore this.  */</i></td></tr>
+<tr><th id="282">282</th><td>  <b>enum</b> <a class="type" href="#bfd_endian" title='bfd_endian' data-ref="bfd_endian">bfd_endian</a> <dfn class="decl" id="disassemble_info::endian" title='disassemble_info::endian' data-ref="disassemble_info::endian">endian</dfn>;</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>  <i>/* An array of pointers to symbols either at the location being disassembled</i></td></tr>
+<tr><th id="285">285</th><td><i>     or at the start of the function being disassembled.  The array is sorted</i></td></tr>
+<tr><th id="286">286</th><td><i>     so that the first symbol is intended to be the one used.  The others are</i></td></tr>
+<tr><th id="287">287</th><td><i>     present for any misc. purposes.  This is not set reliably, but if it is</i></td></tr>
+<tr><th id="288">288</th><td><i>     not NULL, it is correct.  */</i></td></tr>
+<tr><th id="289">289</th><td>  <a class="typedef" href="#asymbol" title='asymbol' data-type='struct symbol_cache_entry' data-ref="asymbol">asymbol</a> **<dfn class="decl" id="disassemble_info::symbols" title='disassemble_info::symbols' data-ref="disassemble_info::symbols">symbols</dfn>;</td></tr>
+<tr><th id="290">290</th><td>  <i>/* Number of symbols in array.  */</i></td></tr>
+<tr><th id="291">291</th><td>  <em>int</em> <dfn class="decl" id="disassemble_info::num_symbols" title='disassemble_info::num_symbols' data-ref="disassemble_info::num_symbols">num_symbols</dfn>;</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td>  <i>/* For use by the disassembler.</i></td></tr>
+<tr><th id="294">294</th><td><i>     The top 16 bits are reserved for public use (and are documented here).</i></td></tr>
+<tr><th id="295">295</th><td><i>     The bottom 16 bits are for the internal use of the disassembler.  */</i></td></tr>
+<tr><th id="296">296</th><td>  <em>unsigned</em> <em>long</em> <dfn class="decl" id="disassemble_info::flags" title='disassemble_info::flags' data-ref="disassemble_info::flags">flags</dfn>;</td></tr>
+<tr><th id="297">297</th><td><u>#define <dfn class="macro" id="_M/INSN_HAS_RELOC" data-ref="_M/INSN_HAS_RELOC">INSN_HAS_RELOC</dfn>	0x80000000</u></td></tr>
+<tr><th id="298">298</th><td><u>#define <dfn class="macro" id="_M/INSN_ARM_BE32" data-ref="_M/INSN_ARM_BE32">INSN_ARM_BE32</dfn>	0x00010000</u></td></tr>
+<tr><th id="299">299</th><td>  <a class="typedef" href="#PTR" title='PTR' data-type='void *' data-ref="PTR">PTR</a> <dfn class="decl" id="disassemble_info::private_data" title='disassemble_info::private_data' data-ref="disassemble_info::private_data">private_data</dfn>;</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>  <i>/* Function used to get bytes to disassemble.  MEMADDR is the</i></td></tr>
+<tr><th id="302">302</th><td><i>     address of the stuff to be disassembled, MYADDR is the address to</i></td></tr>
+<tr><th id="303">303</th><td><i>     put the bytes in, and LENGTH is the number of bytes to read.</i></td></tr>
+<tr><th id="304">304</th><td><i>     INFO is a pointer to this struct.</i></td></tr>
+<tr><th id="305">305</th><td><i>     Returns an errno value or 0 for success.  */</i></td></tr>
+<tr><th id="306">306</th><td>  <em>int</em> (*<dfn class="decl" id="disassemble_info::read_memory_func" title='disassemble_info::read_memory_func' data-ref="disassemble_info::read_memory_func">read_memory_func</dfn>)</td></tr>
+<tr><th id="307">307</th><td>    (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col3 decl" id="8933memaddr" title='memaddr' data-type='bfd_vma' data-ref="8933memaddr">memaddr</dfn>, <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col4 decl" id="8934myaddr" title='myaddr' data-type='bfd_byte *' data-ref="8934myaddr">myaddr</dfn>, <em>int</em> <dfn class="local col5 decl" id="8935length" title='length' data-type='int' data-ref="8935length">length</dfn>,</td></tr>
+<tr><th id="308">308</th><td>	     <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col6 decl" id="8936info" title='info' data-type='struct disassemble_info *' data-ref="8936info">info</dfn>);</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>  <i>/* A place to stash the real read_memory_func if read_memory_func wants to</i></td></tr>
+<tr><th id="311">311</th><td><i>     do some funky address arithmetic or similar (e.g. for ARM BE32 mode).  */</i></td></tr>
+<tr><th id="312">312</th><td>  <em>int</em> (*<dfn class="decl" id="disassemble_info::read_memory_inner_func" title='disassemble_info::read_memory_inner_func' data-ref="disassemble_info::read_memory_inner_func">read_memory_inner_func</dfn>)</td></tr>
+<tr><th id="313">313</th><td>    (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col7 decl" id="8937memaddr" title='memaddr' data-type='bfd_vma' data-ref="8937memaddr">memaddr</dfn>, <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col8 decl" id="8938myaddr" title='myaddr' data-type='bfd_byte *' data-ref="8938myaddr">myaddr</dfn>, <em>int</em> <dfn class="local col9 decl" id="8939length" title='length' data-type='int' data-ref="8939length">length</dfn>,</td></tr>
+<tr><th id="314">314</th><td>             <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col0 decl" id="8940info" title='info' data-type='struct disassemble_info *' data-ref="8940info">info</dfn>);</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>  <i>/* Function which should be called if we get an error that we can't</i></td></tr>
+<tr><th id="317">317</th><td><i>     recover from.  STATUS is the errno value from read_memory_func and</i></td></tr>
+<tr><th id="318">318</th><td><i>     MEMADDR is the address that we were trying to read.  INFO is a</i></td></tr>
+<tr><th id="319">319</th><td><i>     pointer to this struct.  */</i></td></tr>
+<tr><th id="320">320</th><td>  <em>void</em> (*<dfn class="decl" id="disassemble_info::memory_error_func" title='disassemble_info::memory_error_func' data-ref="disassemble_info::memory_error_func">memory_error_func</dfn>)</td></tr>
+<tr><th id="321">321</th><td>    (<em>int</em> <dfn class="local col1 decl" id="8941status" title='status' data-type='int' data-ref="8941status">status</dfn>, <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col2 decl" id="8942memaddr" title='memaddr' data-type='bfd_vma' data-ref="8942memaddr">memaddr</dfn>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col3 decl" id="8943info" title='info' data-type='struct disassemble_info *' data-ref="8943info">info</dfn>);</td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td>  <i>/* Function called to print ADDR.  */</i></td></tr>
+<tr><th id="324">324</th><td>  <em>void</em> (*<dfn class="decl" id="disassemble_info::print_address_func" title='disassemble_info::print_address_func' data-ref="disassemble_info::print_address_func">print_address_func</dfn>)</td></tr>
+<tr><th id="325">325</th><td>    (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col4 decl" id="8944addr" title='addr' data-type='bfd_vma' data-ref="8944addr">addr</dfn>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col5 decl" id="8945info" title='info' data-type='struct disassemble_info *' data-ref="8945info">info</dfn>);</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>    <i>/* Function called to print an instruction. The function is architecture</i></td></tr>
+<tr><th id="328">328</th><td><i>     * specific.</i></td></tr>
+<tr><th id="329">329</th><td><i>     */</i></td></tr>
+<tr><th id="330">330</th><td>    <em>int</em> (*<dfn class="decl" id="disassemble_info::print_insn" title='disassemble_info::print_insn' data-ref="disassemble_info::print_insn">print_insn</dfn>)(<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col6 decl" id="8946addr" title='addr' data-type='bfd_vma' data-ref="8946addr">addr</dfn>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col7 decl" id="8947info" title='info' data-type='struct disassemble_info *' data-ref="8947info">info</dfn>);</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td>  <i>/* Function called to determine if there is a symbol at the given ADDR.</i></td></tr>
+<tr><th id="333">333</th><td><i>     If there is, the function returns 1, otherwise it returns 0.</i></td></tr>
+<tr><th id="334">334</th><td><i>     This is used by ports which support an overlay manager where</i></td></tr>
+<tr><th id="335">335</th><td><i>     the overlay number is held in the top part of an address.  In</i></td></tr>
+<tr><th id="336">336</th><td><i>     some circumstances we want to include the overlay number in the</i></td></tr>
+<tr><th id="337">337</th><td><i>     address, (normally because there is a symbol associated with</i></td></tr>
+<tr><th id="338">338</th><td><i>     that address), but sometimes we want to mask out the overlay bits.  */</i></td></tr>
+<tr><th id="339">339</th><td>  <em>int</em> (* <dfn class="decl" id="disassemble_info::symbol_at_address_func" title='disassemble_info::symbol_at_address_func' data-ref="disassemble_info::symbol_at_address_func">symbol_at_address_func</dfn>)</td></tr>
+<tr><th id="340">340</th><td>    (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="local col8 decl" id="8948addr" title='addr' data-type='bfd_vma' data-ref="8948addr">addr</dfn>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> * <dfn class="local col9 decl" id="8949info" title='info' data-type='struct disassemble_info *' data-ref="8949info">info</dfn>);</td></tr>
+<tr><th id="341">341</th><td></td></tr>
+<tr><th id="342">342</th><td>  <i>/* These are for buffer_read_memory.  */</i></td></tr>
+<tr><th id="343">343</th><td>  <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="decl" id="disassemble_info::buffer" title='disassemble_info::buffer' data-ref="disassemble_info::buffer">buffer</dfn>;</td></tr>
+<tr><th id="344">344</th><td>  <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="disassemble_info::buffer_vma" title='disassemble_info::buffer_vma' data-ref="disassemble_info::buffer_vma">buffer_vma</dfn>;</td></tr>
+<tr><th id="345">345</th><td>  <em>int</em> <dfn class="decl" id="disassemble_info::buffer_length" title='disassemble_info::buffer_length' data-ref="disassemble_info::buffer_length">buffer_length</dfn>;</td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td>  <i>/* This variable may be set by the instruction decoder.  It suggests</i></td></tr>
+<tr><th id="348">348</th><td><i>      the number of bytes objdump should display on a single line.  If</i></td></tr>
+<tr><th id="349">349</th><td><i>      the instruction decoder sets this, it should always set it to</i></td></tr>
+<tr><th id="350">350</th><td><i>      the same value in order to get reasonable looking output.  */</i></td></tr>
+<tr><th id="351">351</th><td>  <em>int</em> <dfn class="decl" id="disassemble_info::bytes_per_line" title='disassemble_info::bytes_per_line' data-ref="disassemble_info::bytes_per_line">bytes_per_line</dfn>;</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td>  <i>/* the next two variables control the way objdump displays the raw data */</i></td></tr>
+<tr><th id="354">354</th><td>  <i>/* For example, if bytes_per_line is 8 and bytes_per_chunk is 4, the */</i></td></tr>
+<tr><th id="355">355</th><td>  <i>/* output will look like this:</i></td></tr>
+<tr><th id="356">356</th><td><i>     00:   00000000 00000000</i></td></tr>
+<tr><th id="357">357</th><td><i>     with the chunks displayed according to "display_endian". */</i></td></tr>
+<tr><th id="358">358</th><td>  <em>int</em> <dfn class="decl" id="disassemble_info::bytes_per_chunk" title='disassemble_info::bytes_per_chunk' data-ref="disassemble_info::bytes_per_chunk">bytes_per_chunk</dfn>;</td></tr>
+<tr><th id="359">359</th><td>  <b>enum</b> <a class="type" href="#bfd_endian" title='bfd_endian' data-ref="bfd_endian">bfd_endian</a> <dfn class="decl" id="disassemble_info::display_endian" title='disassemble_info::display_endian' data-ref="disassemble_info::display_endian">display_endian</dfn>;</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>  <i>/* Results from instruction decoders.  Not all decoders yet support</i></td></tr>
+<tr><th id="362">362</th><td><i>     this information.  This info is set each time an instruction is</i></td></tr>
+<tr><th id="363">363</th><td><i>     decoded, and is only valid for the last such instruction.</i></td></tr>
+<tr><th id="364">364</th><td><i></i></td></tr>
+<tr><th id="365">365</th><td><i>     To determine whether this decoder supports this information, set</i></td></tr>
+<tr><th id="366">366</th><td><i>     insn_info_valid to 0, decode an instruction, then check it.  */</i></td></tr>
+<tr><th id="367">367</th><td></td></tr>
+<tr><th id="368">368</th><td>  <em>char</em> <dfn class="decl" id="disassemble_info::insn_info_valid" title='disassemble_info::insn_info_valid' data-ref="disassemble_info::insn_info_valid">insn_info_valid</dfn>;		<i>/* Branch info has been set. */</i></td></tr>
+<tr><th id="369">369</th><td>  <em>char</em> <dfn class="decl" id="disassemble_info::branch_delay_insns" title='disassemble_info::branch_delay_insns' data-ref="disassemble_info::branch_delay_insns">branch_delay_insns</dfn>;	<i>/* How many sequential insn's will run before</i></td></tr>
+<tr><th id="370">370</th><td><i>				   a branch takes effect.  (0 = normal) */</i></td></tr>
+<tr><th id="371">371</th><td>  <em>char</em> <dfn class="decl" id="disassemble_info::data_size" title='disassemble_info::data_size' data-ref="disassemble_info::data_size">data_size</dfn>;		<i>/* Size of data reference in insn, in bytes */</i></td></tr>
+<tr><th id="372">372</th><td>  <b>enum</b> <a class="type" href="#dis_insn_type" title='dis_insn_type' data-ref="dis_insn_type">dis_insn_type</a> <dfn class="decl" id="disassemble_info::insn_type" title='disassemble_info::insn_type' data-ref="disassemble_info::insn_type">insn_type</dfn>;	<i>/* Type of instruction */</i></td></tr>
+<tr><th id="373">373</th><td>  <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="disassemble_info::target" title='disassemble_info::target' data-ref="disassemble_info::target">target</dfn>;		<i>/* Target address of branch or dref, if known;</i></td></tr>
+<tr><th id="374">374</th><td><i>				   zero if unknown.  */</i></td></tr>
+<tr><th id="375">375</th><td>  <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="disassemble_info::target2" title='disassemble_info::target2' data-ref="disassemble_info::target2">target2</dfn>;		<i>/* Second target address for dref2 */</i></td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td>  <i>/* Command line options specific to the target disassembler.  */</i></td></tr>
+<tr><th id="378">378</th><td>  <em>char</em> * <dfn class="decl" id="disassemble_info::disassembler_options" title='disassemble_info::disassembler_options' data-ref="disassemble_info::disassembler_options">disassembler_options</dfn>;</td></tr>
+<tr><th id="379">379</th><td></td></tr>
+<tr><th id="380">380</th><td>} <dfn class="typedef" id="disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</dfn>;</td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td><i>/* Standard disassemblers.  Disassemble one instruction at the given</i></td></tr>
+<tr><th id="384">384</th><td><i>   target address.  Return number of bytes processed.  */</i></td></tr>
+<tr><th id="385">385</th><td><b>typedef</b> <em>int</em> (*<dfn class="typedef" id="disassembler_ftype" title='disassembler_ftype' data-type='int (*)(bfd_vma, disassemble_info *)' data-ref="disassembler_ftype">disassembler_ftype</dfn>) (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a> *);</td></tr>
+<tr><th id="386">386</th><td></td></tr>
+<tr><th id="387">387</th><td><em>int</em> <dfn class="decl" id="print_insn_tci" title='print_insn_tci' data-ref="print_insn_tci">print_insn_tci</dfn>(<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="388">388</th><td><em>int</em> <dfn class="decl" id="print_insn_big_mips" title='print_insn_big_mips' data-ref="print_insn_big_mips">print_insn_big_mips</dfn>         (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="389">389</th><td><em>int</em> <dfn class="decl" id="print_insn_little_mips" title='print_insn_little_mips' data-ref="print_insn_little_mips">print_insn_little_mips</dfn>      (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="390">390</th><td><em>int</em> <dfn class="decl" id="print_insn_i386" title='print_insn_i386' data-ref="print_insn_i386">print_insn_i386</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="391">391</th><td><em>int</em> <dfn class="decl" id="print_insn_m68k" title='print_insn_m68k' data-ref="print_insn_m68k">print_insn_m68k</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="392">392</th><td><em>int</em> <dfn class="decl" id="print_insn_z8001" title='print_insn_z8001' data-ref="print_insn_z8001">print_insn_z8001</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="393">393</th><td><em>int</em> <dfn class="decl" id="print_insn_z8002" title='print_insn_z8002' data-ref="print_insn_z8002">print_insn_z8002</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="394">394</th><td><em>int</em> <dfn class="decl" id="print_insn_h8300" title='print_insn_h8300' data-ref="print_insn_h8300">print_insn_h8300</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="395">395</th><td><em>int</em> <dfn class="decl" id="print_insn_h8300h" title='print_insn_h8300h' data-ref="print_insn_h8300h">print_insn_h8300h</dfn>           (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="396">396</th><td><em>int</em> <dfn class="decl" id="print_insn_h8300s" title='print_insn_h8300s' data-ref="print_insn_h8300s">print_insn_h8300s</dfn>           (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="397">397</th><td><em>int</em> <dfn class="decl" id="print_insn_h8500" title='print_insn_h8500' data-ref="print_insn_h8500">print_insn_h8500</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="398">398</th><td><em>int</em> <dfn class="decl" id="print_insn_arm_a64" title='print_insn_arm_a64' data-ref="print_insn_arm_a64">print_insn_arm_a64</dfn>          (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="399">399</th><td><em>int</em> <dfn class="decl" id="print_insn_alpha" title='print_insn_alpha' data-ref="print_insn_alpha">print_insn_alpha</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="400">400</th><td><a class="typedef" href="#disassembler_ftype" title='disassembler_ftype' data-type='int (*)(bfd_vma, disassemble_info *)' data-ref="disassembler_ftype">disassembler_ftype</a> <dfn class="decl" id="arc_get_disassembler" title='arc_get_disassembler' data-ref="arc_get_disassembler">arc_get_disassembler</dfn> (<em>int</em>, <em>int</em>);</td></tr>
+<tr><th id="401">401</th><td><em>int</em> <dfn class="decl" id="print_insn_arm" title='print_insn_arm' data-ref="print_insn_arm">print_insn_arm</dfn>              (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="402">402</th><td><em>int</em> <dfn class="decl" id="print_insn_sparc" title='print_insn_sparc' data-ref="print_insn_sparc">print_insn_sparc</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="403">403</th><td><em>int</em> <dfn class="decl" id="print_insn_big_a29k" title='print_insn_big_a29k' data-ref="print_insn_big_a29k">print_insn_big_a29k</dfn>         (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="404">404</th><td><em>int</em> <dfn class="decl" id="print_insn_little_a29k" title='print_insn_little_a29k' data-ref="print_insn_little_a29k">print_insn_little_a29k</dfn>      (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="405">405</th><td><em>int</em> <dfn class="decl" id="print_insn_i960" title='print_insn_i960' data-ref="print_insn_i960">print_insn_i960</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="406">406</th><td><em>int</em> <dfn class="decl" id="print_insn_sh" title='print_insn_sh' data-ref="print_insn_sh">print_insn_sh</dfn>               (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="407">407</th><td><em>int</em> <dfn class="decl" id="print_insn_shl" title='print_insn_shl' data-ref="print_insn_shl">print_insn_shl</dfn>              (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="408">408</th><td><em>int</em> <dfn class="decl" id="print_insn_hppa" title='print_insn_hppa' data-ref="print_insn_hppa">print_insn_hppa</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="409">409</th><td><em>int</em> <dfn class="decl" id="print_insn_m32r" title='print_insn_m32r' data-ref="print_insn_m32r">print_insn_m32r</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="410">410</th><td><em>int</em> <dfn class="decl" id="print_insn_m88k" title='print_insn_m88k' data-ref="print_insn_m88k">print_insn_m88k</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="411">411</th><td><em>int</em> <dfn class="decl" id="print_insn_mn10200" title='print_insn_mn10200' data-ref="print_insn_mn10200">print_insn_mn10200</dfn>          (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="412">412</th><td><em>int</em> <dfn class="decl" id="print_insn_mn10300" title='print_insn_mn10300' data-ref="print_insn_mn10300">print_insn_mn10300</dfn>          (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="413">413</th><td><em>int</em> <dfn class="decl" id="print_insn_moxie" title='print_insn_moxie' data-ref="print_insn_moxie">print_insn_moxie</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="414">414</th><td><em>int</em> <dfn class="decl" id="print_insn_ns32k" title='print_insn_ns32k' data-ref="print_insn_ns32k">print_insn_ns32k</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="415">415</th><td><em>int</em> <dfn class="decl" id="print_insn_big_powerpc" title='print_insn_big_powerpc' data-ref="print_insn_big_powerpc">print_insn_big_powerpc</dfn>      (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="416">416</th><td><em>int</em> <dfn class="decl" id="print_insn_little_powerpc" title='print_insn_little_powerpc' data-ref="print_insn_little_powerpc">print_insn_little_powerpc</dfn>   (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="417">417</th><td><em>int</em> <dfn class="decl" id="print_insn_rs6000" title='print_insn_rs6000' data-ref="print_insn_rs6000">print_insn_rs6000</dfn>           (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="418">418</th><td><em>int</em> <dfn class="decl" id="print_insn_w65" title='print_insn_w65' data-ref="print_insn_w65">print_insn_w65</dfn>              (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="419">419</th><td><em>int</em> <dfn class="decl" id="print_insn_d10v" title='print_insn_d10v' data-ref="print_insn_d10v">print_insn_d10v</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="420">420</th><td><em>int</em> <dfn class="decl" id="print_insn_v850" title='print_insn_v850' data-ref="print_insn_v850">print_insn_v850</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="421">421</th><td><em>int</em> <dfn class="decl" id="print_insn_tic30" title='print_insn_tic30' data-ref="print_insn_tic30">print_insn_tic30</dfn>            (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="422">422</th><td><em>int</em> <dfn class="decl" id="print_insn_ppc" title='print_insn_ppc' data-ref="print_insn_ppc">print_insn_ppc</dfn>              (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="423">423</th><td><em>int</em> <dfn class="decl" id="print_insn_s390" title='print_insn_s390' data-ref="print_insn_s390">print_insn_s390</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="424">424</th><td><em>int</em> <dfn class="decl" id="print_insn_crisv32" title='print_insn_crisv32' data-ref="print_insn_crisv32">print_insn_crisv32</dfn>          (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="425">425</th><td><em>int</em> <dfn class="decl" id="print_insn_crisv10" title='print_insn_crisv10' data-ref="print_insn_crisv10">print_insn_crisv10</dfn>          (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="426">426</th><td><em>int</em> <dfn class="decl" id="print_insn_microblaze" title='print_insn_microblaze' data-ref="print_insn_microblaze">print_insn_microblaze</dfn>       (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="427">427</th><td><em>int</em> <dfn class="decl" id="print_insn_ia64" title='print_insn_ia64' data-ref="print_insn_ia64">print_insn_ia64</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="428">428</th><td><em>int</em> <dfn class="decl" id="print_insn_lm32" title='print_insn_lm32' data-ref="print_insn_lm32">print_insn_lm32</dfn>             (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="429">429</th><td><em>int</em> <dfn class="decl" id="print_insn_big_nios2" title='print_insn_big_nios2' data-ref="print_insn_big_nios2">print_insn_big_nios2</dfn>        (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="430">430</th><td><em>int</em> <dfn class="decl" id="print_insn_little_nios2" title='print_insn_little_nios2' data-ref="print_insn_little_nios2">print_insn_little_nios2</dfn>     (<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a>*);</td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td><u>#<span data-ppcond="432">if</span> 0</u></td></tr>
+<tr><th id="433">433</th><td><i>/* Fetch the disassembler for a given BFD, if that support is available.  */</i></td></tr>
+<tr><th id="434">434</th><td>disassembler_ftype disassembler(bfd *);</td></tr>
+<tr><th id="435">435</th><td><u>#<span data-ppcond="432">endif</span></u></td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td></td></tr>
+<tr><th id="438">438</th><td><i>/* This block of definitions is for particular callers who read instructions</i></td></tr>
+<tr><th id="439">439</th><td><i>   into a buffer before calling the instruction decoder.  */</i></td></tr>
+<tr><th id="440">440</th><td></td></tr>
+<tr><th id="441">441</th><td><i>/* Here is a function which callers may wish to use for read_memory_func.</i></td></tr>
+<tr><th id="442">442</th><td><i>   It gets bytes from a buffer.  */</i></td></tr>
+<tr><th id="443">443</th><td><em>int</em> <dfn class="decl" id="buffer_read_memory" title='buffer_read_memory' data-ref="buffer_read_memory">buffer_read_memory</dfn>(<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *, <em>int</em>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *);</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+<tr><th id="445">445</th><td><i>/* This function goes with buffer_read_memory.</i></td></tr>
+<tr><th id="446">446</th><td><i>   It prints a message using info-&gt;fprintf_func and info-&gt;stream.  */</i></td></tr>
+<tr><th id="447">447</th><td><em>void</em> <dfn class="decl" id="perror_memory" title='perror_memory' data-ref="perror_memory">perror_memory</dfn>(<em>int</em>, <a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *);</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td></td></tr>
+<tr><th id="450">450</th><td><i>/* Just print the address in hex.  This is included for completeness even</i></td></tr>
+<tr><th id="451">451</th><td><i>   though both GDB and objdump provide their own (to print symbolic</i></td></tr>
+<tr><th id="452">452</th><td><i>   addresses).  */</i></td></tr>
+<tr><th id="453">453</th><td><em>void</em> <dfn class="decl" id="generic_print_address" title='generic_print_address' data-ref="generic_print_address">generic_print_address</dfn>(<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *);</td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td><i>/* Always true.  */</i></td></tr>
+<tr><th id="456">456</th><td><em>int</em> <dfn class="decl" id="generic_symbol_at_address" title='generic_symbol_at_address' data-ref="generic_symbol_at_address">generic_symbol_at_address</dfn>(<a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a>, <b>struct</b> <a class="type" href="#disassemble_info" title='disassemble_info' data-ref="disassemble_info">disassemble_info</a> *);</td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td><i>/* Macro to initialize a disassemble_info struct.  This should be called</i></td></tr>
+<tr><th id="459">459</th><td><i>   by all applications creating such a struct.  */</i></td></tr>
+<tr><th id="460">460</th><td><u>#define <dfn class="macro" id="_M/INIT_DISASSEMBLE_INFO" data-ref="_M/INIT_DISASSEMBLE_INFO">INIT_DISASSEMBLE_INFO</dfn>(INFO, STREAM, FPRINTF_FUNC) \</u></td></tr>
+<tr><th id="461">461</th><td><u>  (INFO).flavour = bfd_target_unknown_flavour, \</u></td></tr>
+<tr><th id="462">462</th><td><u>  (INFO).arch = bfd_arch_unknown, \</u></td></tr>
+<tr><th id="463">463</th><td><u>  (INFO).mach = 0, \</u></td></tr>
+<tr><th id="464">464</th><td><u>  (INFO).endian = BFD_ENDIAN_UNKNOWN, \</u></td></tr>
+<tr><th id="465">465</th><td><u>  INIT_DISASSEMBLE_INFO_NO_ARCH(INFO, STREAM, FPRINTF_FUNC)</u></td></tr>
+<tr><th id="466">466</th><td></td></tr>
+<tr><th id="467">467</th><td><i>/* Call this macro to initialize only the internal variables for the</i></td></tr>
+<tr><th id="468">468</th><td><i>   disassembler.  Architecture dependent things such as byte order, or machine</i></td></tr>
+<tr><th id="469">469</th><td><i>   variant are not touched by this macro.  This makes things much easier for</i></td></tr>
+<tr><th id="470">470</th><td><i>   GDB which must initialize these things separately.  */</i></td></tr>
+<tr><th id="471">471</th><td></td></tr>
+<tr><th id="472">472</th><td><u>#define <dfn class="macro" id="_M/INIT_DISASSEMBLE_INFO_NO_ARCH" data-ref="_M/INIT_DISASSEMBLE_INFO_NO_ARCH">INIT_DISASSEMBLE_INFO_NO_ARCH</dfn>(INFO, STREAM, FPRINTF_FUNC) \</u></td></tr>
+<tr><th id="473">473</th><td><u>  (INFO).fprintf_func = (FPRINTF_FUNC), \</u></td></tr>
+<tr><th id="474">474</th><td><u>  (INFO).stream = (STREAM), \</u></td></tr>
+<tr><th id="475">475</th><td><u>  (INFO).symbols = NULL, \</u></td></tr>
+<tr><th id="476">476</th><td><u>  (INFO).num_symbols = 0, \</u></td></tr>
+<tr><th id="477">477</th><td><u>  (INFO).private_data = NULL, \</u></td></tr>
+<tr><th id="478">478</th><td><u>  (INFO).buffer = NULL, \</u></td></tr>
+<tr><th id="479">479</th><td><u>  (INFO).buffer_vma = 0, \</u></td></tr>
+<tr><th id="480">480</th><td><u>  (INFO).buffer_length = 0, \</u></td></tr>
+<tr><th id="481">481</th><td><u>  (INFO).read_memory_func = buffer_read_memory, \</u></td></tr>
+<tr><th id="482">482</th><td><u>  (INFO).memory_error_func = perror_memory, \</u></td></tr>
+<tr><th id="483">483</th><td><u>  (INFO).print_address_func = generic_print_address, \</u></td></tr>
+<tr><th id="484">484</th><td><u>  (INFO).print_insn = NULL, \</u></td></tr>
+<tr><th id="485">485</th><td><u>  (INFO).symbol_at_address_func = generic_symbol_at_address, \</u></td></tr>
+<tr><th id="486">486</th><td><u>  (INFO).flags = 0, \</u></td></tr>
+<tr><th id="487">487</th><td><u>  (INFO).bytes_per_line = 0, \</u></td></tr>
+<tr><th id="488">488</th><td><u>  (INFO).bytes_per_chunk = 0, \</u></td></tr>
+<tr><th id="489">489</th><td><u>  (INFO).display_endian = BFD_ENDIAN_UNKNOWN, \</u></td></tr>
+<tr><th id="490">490</th><td><u>  (INFO).disassembler_options = NULL, \</u></td></tr>
+<tr><th id="491">491</th><td><u>  (INFO).insn_info_valid = 0</u></td></tr>
+<tr><th id="492">492</th><td></td></tr>
+<tr><th id="493">493</th><td><u>#<span data-ppcond="493">ifndef</span> <span class="macro" data-ref="_M/ATTRIBUTE_UNUSED">ATTRIBUTE_UNUSED</span></u></td></tr>
+<tr><th id="494">494</th><td><u>#define <dfn class="macro" id="_M/ATTRIBUTE_UNUSED" data-ref="_M/ATTRIBUTE_UNUSED">ATTRIBUTE_UNUSED</dfn> __attribute__((unused))</u></td></tr>
+<tr><th id="495">495</th><td><u>#<span data-ppcond="493">endif</span></u></td></tr>
+<tr><th id="496">496</th><td></td></tr>
+<tr><th id="497">497</th><td><i>/* from libbfd */</i></td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td><a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="bfd_getl64" title='bfd_getl64' data-ref="bfd_getl64">bfd_getl64</dfn> (<em>const</em> <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col0 decl" id="8950addr" title='addr' data-type='const bfd_byte *' data-ref="8950addr">addr</dfn>);</td></tr>
+<tr><th id="500">500</th><td><a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="bfd_getl32" title='bfd_getl32' data-ref="bfd_getl32">bfd_getl32</dfn> (<em>const</em> <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col1 decl" id="8951addr" title='addr' data-type='const bfd_byte *' data-ref="8951addr">addr</dfn>);</td></tr>
+<tr><th id="501">501</th><td><a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="bfd_getb32" title='bfd_getb32' data-ref="bfd_getb32">bfd_getb32</dfn> (<em>const</em> <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col2 decl" id="8952addr" title='addr' data-type='const bfd_byte *' data-ref="8952addr">addr</dfn>);</td></tr>
+<tr><th id="502">502</th><td><a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="bfd_getl16" title='bfd_getl16' data-ref="bfd_getl16">bfd_getl16</dfn> (<em>const</em> <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col3 decl" id="8953addr" title='addr' data-type='const bfd_byte *' data-ref="8953addr">addr</dfn>);</td></tr>
+<tr><th id="503">503</th><td><a class="typedef" href="#bfd_vma" title='bfd_vma' data-type='uint64_t' data-ref="bfd_vma">bfd_vma</a> <dfn class="decl" id="bfd_getb16" title='bfd_getb16' data-ref="bfd_getb16">bfd_getb16</dfn> (<em>const</em> <a class="typedef" href="#bfd_byte" title='bfd_byte' data-type='uint8_t' data-ref="bfd_byte">bfd_byte</a> *<dfn class="local col4 decl" id="8954addr" title='addr' data-type='const bfd_byte *' data-ref="8954addr">addr</dfn>);</td></tr>
+<tr><th id="504">504</th><td><b>typedef</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="typedef" id="bfd_boolean" title='bfd_boolean' data-type='_Bool' data-ref="bfd_boolean">bfd_boolean</dfn>;</td></tr>
+<tr><th id="505">505</th><td></td></tr>
+<tr><th id="506">506</th><td><u>#<span data-ppcond="9">endif</span> /* DISAS_BFD_H */</u></td></tr>
+<tr><th id="507">507</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

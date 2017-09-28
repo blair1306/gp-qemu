@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>throttle.h source code [codebrowser/include/qemu/throttle.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="LeakyBucket,ThrottleConfig,ThrottleState,ThrottleTimers "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/throttle.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='throttle.h.html'>throttle.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU throttling infrastructure</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) Nodalink, EURL. 2013-2014</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) Igalia, S.L. 2015-2016</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Authors:</i></td></tr>
+<tr><th id="8">8</th><td><i> *   Benoît Canet &lt;benoit.canet@nodalink.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *   Alberto Garcia &lt;berto@igalia.com&gt;</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="12">12</th><td><i> * modify it under the terms of the GNU General Public License as</i></td></tr>
+<tr><th id="13">13</th><td><i> * published by the Free Software Foundation; either version 2 or</i></td></tr>
+<tr><th id="14">14</th><td><i> * (at your option) version 3 of the License.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="17">17</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="18">18</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="19">19</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="22">22</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/THROTTLE_H">THROTTLE_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/THROTTLE_H" data-ref="_M/THROTTLE_H">THROTTLE_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/THROTTLE_VALUE_MAX" data-ref="_M/THROTTLE_VALUE_MAX">THROTTLE_VALUE_MAX</dfn> 1000000000000000LL</u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="34">34</th><td>    <dfn class="enum" id="THROTTLE_BPS_TOTAL" title='THROTTLE_BPS_TOTAL' data-ref="THROTTLE_BPS_TOTAL">THROTTLE_BPS_TOTAL</dfn>,</td></tr>
+<tr><th id="35">35</th><td>    <dfn class="enum" id="THROTTLE_BPS_READ" title='THROTTLE_BPS_READ' data-ref="THROTTLE_BPS_READ">THROTTLE_BPS_READ</dfn>,</td></tr>
+<tr><th id="36">36</th><td>    <dfn class="enum" id="THROTTLE_BPS_WRITE" title='THROTTLE_BPS_WRITE' data-ref="THROTTLE_BPS_WRITE">THROTTLE_BPS_WRITE</dfn>,</td></tr>
+<tr><th id="37">37</th><td>    <dfn class="enum" id="THROTTLE_OPS_TOTAL" title='THROTTLE_OPS_TOTAL' data-ref="THROTTLE_OPS_TOTAL">THROTTLE_OPS_TOTAL</dfn>,</td></tr>
+<tr><th id="38">38</th><td>    <dfn class="enum" id="THROTTLE_OPS_READ" title='THROTTLE_OPS_READ' data-ref="THROTTLE_OPS_READ">THROTTLE_OPS_READ</dfn>,</td></tr>
+<tr><th id="39">39</th><td>    <dfn class="enum" id="THROTTLE_OPS_WRITE" title='THROTTLE_OPS_WRITE' data-ref="THROTTLE_OPS_WRITE">THROTTLE_OPS_WRITE</dfn>,</td></tr>
+<tr><th id="40">40</th><td>    <dfn class="enum" id="BUCKETS_COUNT" title='BUCKETS_COUNT' data-ref="BUCKETS_COUNT">BUCKETS_COUNT</dfn>,</td></tr>
+<tr><th id="41">41</th><td>} <dfn class="typedef" id="BucketType" title='BucketType' data-type='enum BucketType' data-ref="BucketType">BucketType</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i>/*</i></td></tr>
+<tr><th id="44">44</th><td><i> * This module implements I/O limits using the leaky bucket</i></td></tr>
+<tr><th id="45">45</th><td><i> * algorithm. The code is independent of the I/O units, but it is</i></td></tr>
+<tr><th id="46">46</th><td><i> * currently used for bytes per second and operations per second.</i></td></tr>
+<tr><th id="47">47</th><td><i> *</i></td></tr>
+<tr><th id="48">48</th><td><i> * Three parameters can be set by the user:</i></td></tr>
+<tr><th id="49">49</th><td><i> *</i></td></tr>
+<tr><th id="50">50</th><td><i> * - avg: the desired I/O limits in units per second.</i></td></tr>
+<tr><th id="51">51</th><td><i> * - max: the limit during bursts, also in units per second.</i></td></tr>
+<tr><th id="52">52</th><td><i> * - burst_length: the maximum length of the burst period, in seconds.</i></td></tr>
+<tr><th id="53">53</th><td><i> *</i></td></tr>
+<tr><th id="54">54</th><td><i> * Here's how it works:</i></td></tr>
+<tr><th id="55">55</th><td><i> *</i></td></tr>
+<tr><th id="56">56</th><td><i> * - The bucket level (number of performed I/O units) is kept in</i></td></tr>
+<tr><th id="57">57</th><td><i> *   bkt.level and leaks at a rate of bkt.avg units per second.</i></td></tr>
+<tr><th id="58">58</th><td><i> *</i></td></tr>
+<tr><th id="59">59</th><td><i> * - The size of the bucket is bkt.max * bkt.burst_length. Once the</i></td></tr>
+<tr><th id="60">60</th><td><i> *   bucket is full no more I/O is performed until the bucket leaks</i></td></tr>
+<tr><th id="61">61</th><td><i> *   again. This is what makes the I/O rate bkt.avg.</i></td></tr>
+<tr><th id="62">62</th><td><i> *</i></td></tr>
+<tr><th id="63">63</th><td><i> * - The bkt.avg rate does not apply until the bucket is full,</i></td></tr>
+<tr><th id="64">64</th><td><i> *   allowing the user to do bursts until then. The I/O limit during</i></td></tr>
+<tr><th id="65">65</th><td><i> *   bursts is bkt.max. To enforce this limit we keep an additional</i></td></tr>
+<tr><th id="66">66</th><td><i> *   bucket in bkt.burst_length that leaks at a rate of bkt.max units</i></td></tr>
+<tr><th id="67">67</th><td><i> *   per second.</i></td></tr>
+<tr><th id="68">68</th><td><i> *</i></td></tr>
+<tr><th id="69">69</th><td><i> * - Because of all of the above, the user can perform I/O at a</i></td></tr>
+<tr><th id="70">70</th><td><i> *   maximum of bkt.max units per second for at most bkt.burst_length</i></td></tr>
+<tr><th id="71">71</th><td><i> *   seconds in a row. After that the bucket will be full and the I/O</i></td></tr>
+<tr><th id="72">72</th><td><i> *   rate will go down to bkt.avg.</i></td></tr>
+<tr><th id="73">73</th><td><i> *</i></td></tr>
+<tr><th id="74">74</th><td><i> * - Since the bucket always leaks at a rate of bkt.avg, this also</i></td></tr>
+<tr><th id="75">75</th><td><i> *   determines how much the user needs to wait before being able to</i></td></tr>
+<tr><th id="76">76</th><td><i> *   do bursts again.</i></td></tr>
+<tr><th id="77">77</th><td><i> */</i></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="LeakyBucket" title='LeakyBucket' data-ref="LeakyBucket"><a class="type" href="#LeakyBucket" title='LeakyBucket' data-ref="LeakyBucket">LeakyBucket</a></dfn> {</td></tr>
+<tr><th id="80">80</th><td>    <em>double</em>  <dfn class="decl" id="LeakyBucket::avg" title='LeakyBucket::avg' data-ref="LeakyBucket::avg">avg</dfn>;              <i>/* average goal in units per second */</i></td></tr>
+<tr><th id="81">81</th><td>    <em>double</em>  <dfn class="decl" id="LeakyBucket::max" title='LeakyBucket::max' data-ref="LeakyBucket::max">max</dfn>;              <i>/* leaky bucket max burst in units */</i></td></tr>
+<tr><th id="82">82</th><td>    <em>double</em>  <dfn class="decl" id="LeakyBucket::level" title='LeakyBucket::level' data-ref="LeakyBucket::level">level</dfn>;            <i>/* bucket level in units */</i></td></tr>
+<tr><th id="83">83</th><td>    <em>double</em>  <dfn class="decl" id="LeakyBucket::burst_level" title='LeakyBucket::burst_level' data-ref="LeakyBucket::burst_level">burst_level</dfn>;      <i>/* bucket level in units (for computing bursts) */</i></td></tr>
+<tr><th id="84">84</th><td>    <em>unsigned</em> <dfn class="decl" id="LeakyBucket::burst_length" title='LeakyBucket::burst_length' data-ref="LeakyBucket::burst_length">burst_length</dfn>;    <i>/* max length of the burst period, in seconds */</i></td></tr>
+<tr><th id="85">85</th><td>} <dfn class="typedef" id="LeakyBucket" title='LeakyBucket' data-type='struct LeakyBucket' data-ref="LeakyBucket">LeakyBucket</dfn>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><i>/* The following structure is used to configure a ThrottleState</i></td></tr>
+<tr><th id="88">88</th><td><i> * It contains a bit of state: the bucket field of the LeakyBucket structure.</i></td></tr>
+<tr><th id="89">89</th><td><i> * However it allows to keep the code clean and the bucket field is reset to</i></td></tr>
+<tr><th id="90">90</th><td><i> * zero at the right time.</i></td></tr>
+<tr><th id="91">91</th><td><i> */</i></td></tr>
+<tr><th id="92">92</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ThrottleConfig" title='ThrottleConfig' data-ref="ThrottleConfig"><a class="type" href="#ThrottleConfig" title='ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a></dfn> {</td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="#LeakyBucket" title='LeakyBucket' data-type='struct LeakyBucket' data-ref="LeakyBucket">LeakyBucket</a> <dfn class="decl" id="ThrottleConfig::buckets" title='ThrottleConfig::buckets' data-ref="ThrottleConfig::buckets">buckets</dfn>[<a class="enum" href="#BUCKETS_COUNT" title='BUCKETS_COUNT' data-ref="BUCKETS_COUNT">BUCKETS_COUNT</a>]; <i>/* leaky buckets */</i></td></tr>
+<tr><th id="94">94</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="ThrottleConfig::op_size" title='ThrottleConfig::op_size' data-ref="ThrottleConfig::op_size">op_size</dfn>;         <i>/* size of an operation in bytes */</i></td></tr>
+<tr><th id="95">95</th><td>} <dfn class="typedef" id="ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</dfn>;</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ThrottleState" title='ThrottleState' data-ref="ThrottleState"><a class="type" href="#ThrottleState" title='ThrottleState' data-ref="ThrottleState">ThrottleState</a></dfn> {</td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> <dfn class="decl" id="ThrottleState::cfg" title='ThrottleState::cfg' data-ref="ThrottleState::cfg">cfg</dfn>;       <i>/* configuration */</i></td></tr>
+<tr><th id="99">99</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="ThrottleState::previous_leak" title='ThrottleState::previous_leak' data-ref="ThrottleState::previous_leak">previous_leak</dfn>;    <i>/* timestamp of the last leak done */</i></td></tr>
+<tr><th id="100">100</th><td>} <dfn class="typedef" id="ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</dfn>;</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ThrottleTimers" title='ThrottleTimers' data-ref="ThrottleTimers"><a class="type" href="#ThrottleTimers" title='ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a></dfn> {</td></tr>
+<tr><th id="103">103</th><td>    <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="ThrottleTimers::timers" title='ThrottleTimers::timers' data-ref="ThrottleTimers::timers">timers</dfn>[<var>2</var>];     <i>/* timers used to do the throttling */</i></td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="timer.h.html#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="decl" id="ThrottleTimers::clock_type" title='ThrottleTimers::clock_type' data-ref="ThrottleTimers::clock_type">clock_type</dfn>; <i>/* the clock used */</i></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <i>/* Callbacks */</i></td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="timer.h.html#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="decl" id="ThrottleTimers::read_timer_cb" title='ThrottleTimers::read_timer_cb' data-ref="ThrottleTimers::read_timer_cb">read_timer_cb</dfn>;</td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="timer.h.html#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="decl" id="ThrottleTimers::write_timer_cb" title='ThrottleTimers::write_timer_cb' data-ref="ThrottleTimers::write_timer_cb">write_timer_cb</dfn>;</td></tr>
+<tr><th id="109">109</th><td>    <em>void</em> *<dfn class="decl" id="ThrottleTimers::timer_opaque" title='ThrottleTimers::timer_opaque' data-ref="ThrottleTimers::timer_opaque">timer_opaque</dfn>;</td></tr>
+<tr><th id="110">110</th><td>} <dfn class="typedef" id="ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</dfn>;</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>/* operations on single leaky buckets */</i></td></tr>
+<tr><th id="113">113</th><td><em>void</em> <dfn class="decl" id="throttle_leak_bucket" title='throttle_leak_bucket' data-ref="throttle_leak_bucket">throttle_leak_bucket</dfn>(<a class="typedef" href="#LeakyBucket" title='LeakyBucket' data-type='struct LeakyBucket' data-ref="LeakyBucket">LeakyBucket</a> *<dfn class="local col8 decl" id="668bkt" title='bkt' data-type='LeakyBucket *' data-ref="668bkt">bkt</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col9 decl" id="669delta" title='delta' data-type='int64_t' data-ref="669delta">delta</dfn>);</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="throttle_compute_wait" title='throttle_compute_wait' data-ref="throttle_compute_wait">throttle_compute_wait</dfn>(<a class="typedef" href="#LeakyBucket" title='LeakyBucket' data-type='struct LeakyBucket' data-ref="LeakyBucket">LeakyBucket</a> *<dfn class="local col0 decl" id="670bkt" title='bkt' data-type='LeakyBucket *' data-ref="670bkt">bkt</dfn>);</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><i>/* init/destroy cycle */</i></td></tr>
+<tr><th id="118">118</th><td><em>void</em> <dfn class="decl" id="throttle_init" title='throttle_init' data-ref="throttle_init">throttle_init</dfn>(<a class="typedef" href="#ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</a> *<dfn class="local col1 decl" id="671ts" title='ts' data-type='ThrottleState *' data-ref="671ts">ts</dfn>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><em>void</em> <dfn class="decl" id="throttle_timers_init" title='throttle_timers_init' data-ref="throttle_timers_init">throttle_timers_init</dfn>(<a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col2 decl" id="672tt" title='tt' data-type='ThrottleTimers *' data-ref="672tt">tt</dfn>,</td></tr>
+<tr><th id="121">121</th><td>                          <a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col3 decl" id="673aio_context" title='aio_context' data-type='AioContext *' data-ref="673aio_context">aio_context</dfn>,</td></tr>
+<tr><th id="122">122</th><td>                          <a class="typedef" href="timer.h.html#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col4 decl" id="674clock_type" title='clock_type' data-type='QEMUClockType' data-ref="674clock_type">clock_type</dfn>,</td></tr>
+<tr><th id="123">123</th><td>                          <a class="typedef" href="timer.h.html#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col5 decl" id="675read_timer_cb" title='read_timer_cb' data-type='QEMUTimerCB *' data-ref="675read_timer_cb">read_timer_cb</dfn>,</td></tr>
+<tr><th id="124">124</th><td>                          <a class="typedef" href="timer.h.html#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col6 decl" id="676write_timer_cb" title='write_timer_cb' data-type='QEMUTimerCB *' data-ref="676write_timer_cb">write_timer_cb</dfn>,</td></tr>
+<tr><th id="125">125</th><td>                          <em>void</em> *<dfn class="local col7 decl" id="677timer_opaque" title='timer_opaque' data-type='void *' data-ref="677timer_opaque">timer_opaque</dfn>);</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><em>void</em> <dfn class="decl" id="throttle_timers_destroy" title='throttle_timers_destroy' data-ref="throttle_timers_destroy">throttle_timers_destroy</dfn>(<a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col8 decl" id="678tt" title='tt' data-type='ThrottleTimers *' data-ref="678tt">tt</dfn>);</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><em>void</em> <dfn class="decl" id="throttle_timers_detach_aio_context" title='throttle_timers_detach_aio_context' data-ref="throttle_timers_detach_aio_context">throttle_timers_detach_aio_context</dfn>(<a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col9 decl" id="679tt" title='tt' data-type='ThrottleTimers *' data-ref="679tt">tt</dfn>);</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><em>void</em> <dfn class="decl" id="throttle_timers_attach_aio_context" title='throttle_timers_attach_aio_context' data-ref="throttle_timers_attach_aio_context">throttle_timers_attach_aio_context</dfn>(<a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col0 decl" id="680tt" title='tt' data-type='ThrottleTimers *' data-ref="680tt">tt</dfn>,</td></tr>
+<tr><th id="132">132</th><td>                                        <a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col1 decl" id="681new_context" title='new_context' data-type='AioContext *' data-ref="681new_context">new_context</dfn>);</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="throttle_timers_are_initialized" title='throttle_timers_are_initialized' data-ref="throttle_timers_are_initialized">throttle_timers_are_initialized</dfn>(<a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col2 decl" id="682tt" title='tt' data-type='ThrottleTimers *' data-ref="682tt">tt</dfn>);</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><i>/* configuration */</i></td></tr>
+<tr><th id="137">137</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="throttle_enabled" title='throttle_enabled' data-ref="throttle_enabled">throttle_enabled</dfn>(<a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> *<dfn class="local col3 decl" id="683cfg" title='cfg' data-type='ThrottleConfig *' data-ref="683cfg">cfg</dfn>);</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="throttle_is_valid" title='throttle_is_valid' data-ref="throttle_is_valid">throttle_is_valid</dfn>(<a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> *<dfn class="local col4 decl" id="684cfg" title='cfg' data-type='ThrottleConfig *' data-ref="684cfg">cfg</dfn>, <a class="typedef" href="typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="685errp" title='errp' data-type='Error **' data-ref="685errp">errp</dfn>);</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><em>void</em> <dfn class="decl" id="throttle_config" title='throttle_config' data-ref="throttle_config">throttle_config</dfn>(<a class="typedef" href="#ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</a> *<dfn class="local col6 decl" id="686ts" title='ts' data-type='ThrottleState *' data-ref="686ts">ts</dfn>,</td></tr>
+<tr><th id="142">142</th><td>                     <a class="typedef" href="timer.h.html#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col7 decl" id="687clock_type" title='clock_type' data-type='QEMUClockType' data-ref="687clock_type">clock_type</dfn>,</td></tr>
+<tr><th id="143">143</th><td>                     <a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> *<dfn class="local col8 decl" id="688cfg" title='cfg' data-type='ThrottleConfig *' data-ref="688cfg">cfg</dfn>);</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><em>void</em> <dfn class="decl" id="throttle_get_config" title='throttle_get_config' data-ref="throttle_get_config">throttle_get_config</dfn>(<a class="typedef" href="#ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</a> *<dfn class="local col9 decl" id="689ts" title='ts' data-type='ThrottleState *' data-ref="689ts">ts</dfn>, <a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> *<dfn class="local col0 decl" id="690cfg" title='cfg' data-type='ThrottleConfig *' data-ref="690cfg">cfg</dfn>);</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><em>void</em> <dfn class="decl" id="throttle_config_init" title='throttle_config_init' data-ref="throttle_config_init">throttle_config_init</dfn>(<a class="typedef" href="#ThrottleConfig" title='ThrottleConfig' data-type='struct ThrottleConfig' data-ref="ThrottleConfig">ThrottleConfig</a> *<dfn class="local col1 decl" id="691cfg" title='cfg' data-type='ThrottleConfig *' data-ref="691cfg">cfg</dfn>);</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><i>/* usage */</i></td></tr>
+<tr><th id="150">150</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="throttle_schedule_timer" title='throttle_schedule_timer' data-ref="throttle_schedule_timer">throttle_schedule_timer</dfn>(<a class="typedef" href="#ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</a> *<dfn class="local col2 decl" id="692ts" title='ts' data-type='ThrottleState *' data-ref="692ts">ts</dfn>,</td></tr>
+<tr><th id="151">151</th><td>                             <a class="typedef" href="#ThrottleTimers" title='ThrottleTimers' data-type='struct ThrottleTimers' data-ref="ThrottleTimers">ThrottleTimers</a> *<dfn class="local col3 decl" id="693tt" title='tt' data-type='ThrottleTimers *' data-ref="693tt">tt</dfn>,</td></tr>
+<tr><th id="152">152</th><td>                             <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="694is_write" title='is_write' data-type='_Bool' data-ref="694is_write">is_write</dfn>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="decl" id="throttle_account" title='throttle_account' data-ref="throttle_account">throttle_account</dfn>(<a class="typedef" href="#ThrottleState" title='ThrottleState' data-type='struct ThrottleState' data-ref="ThrottleState">ThrottleState</a> *<dfn class="local col5 decl" id="695ts" title='ts' data-type='ThrottleState *' data-ref="695ts">ts</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="696is_write" title='is_write' data-type='_Bool' data-ref="696is_write">is_write</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="697size" title='size' data-type='uint64_t' data-ref="697size">size</dfn>);</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../block.c.html'>codebrowser/block.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>uboot_image.h source code [codebrowser/hw/core/uboot_image.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="uboot_image_header "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/core/uboot_image.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>core</a>/<a href='uboot_image.h.html'>uboot_image.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * (C) Copyright 2000-2005</i></td></tr>
+<tr><th id="3">3</th><td><i> * Wolfgang Denk, DENX Software Engineering, wd@denx.de.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * See file CREDITS for list of people who contributed to this</i></td></tr>
+<tr><th id="6">6</th><td><i> * project.</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This program is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="9">9</th><td><i> * modify it under the terms of the GNU General Public License as</i></td></tr>
+<tr><th id="10">10</th><td><i> * published by the Free Software Foundation; either version 2 of</i></td></tr>
+<tr><th id="11">11</th><td><i> * the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the</i></td></tr>
+<tr><th id="16">16</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="19">19</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> ********************************************************************</i></td></tr>
+<tr><th id="22">22</th><td><i> * NOTE: This header file defines an interface to U-Boot. Including</i></td></tr>
+<tr><th id="23">23</th><td><i> * this (unmodified) header file in another file is considered normal</i></td></tr>
+<tr><th id="24">24</th><td><i> * use of U-Boot, and does *not* fall under the heading of "derived</i></td></tr>
+<tr><th id="25">25</th><td><i> * work".</i></td></tr>
+<tr><th id="26">26</th><td><i> ********************************************************************</i></td></tr>
+<tr><th id="27">27</th><td><i> */</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifndef</span> <span class="macro" data-ref="_M/UBOOT_IMAGE_H">UBOOT_IMAGE_H</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/UBOOT_IMAGE_H" data-ref="_M/UBOOT_IMAGE_H">UBOOT_IMAGE_H</dfn></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i>/*</i></td></tr>
+<tr><th id="33">33</th><td><i> * Operating System Codes</i></td></tr>
+<tr><th id="34">34</th><td><i> */</i></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/IH_OS_INVALID" data-ref="_M/IH_OS_INVALID">IH_OS_INVALID</dfn>		0	/* Invalid OS	*/</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/IH_OS_OPENBSD" data-ref="_M/IH_OS_OPENBSD">IH_OS_OPENBSD</dfn>		1	/* OpenBSD	*/</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/IH_OS_NETBSD" data-ref="_M/IH_OS_NETBSD">IH_OS_NETBSD</dfn>		2	/* NetBSD	*/</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/IH_OS_FREEBSD" data-ref="_M/IH_OS_FREEBSD">IH_OS_FREEBSD</dfn>		3	/* FreeBSD	*/</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/IH_OS_4_4BSD" data-ref="_M/IH_OS_4_4BSD">IH_OS_4_4BSD</dfn>		4	/* 4.4BSD	*/</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/IH_OS_LINUX" data-ref="_M/IH_OS_LINUX">IH_OS_LINUX</dfn>		5	/* Linux	*/</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/IH_OS_SVR4" data-ref="_M/IH_OS_SVR4">IH_OS_SVR4</dfn>		6	/* SVR4		*/</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/IH_OS_ESIX" data-ref="_M/IH_OS_ESIX">IH_OS_ESIX</dfn>		7	/* Esix		*/</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/IH_OS_SOLARIS" data-ref="_M/IH_OS_SOLARIS">IH_OS_SOLARIS</dfn>		8	/* Solaris	*/</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/IH_OS_IRIX" data-ref="_M/IH_OS_IRIX">IH_OS_IRIX</dfn>		9	/* Irix		*/</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/IH_OS_SCO" data-ref="_M/IH_OS_SCO">IH_OS_SCO</dfn>		10	/* SCO		*/</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/IH_OS_DELL" data-ref="_M/IH_OS_DELL">IH_OS_DELL</dfn>		11	/* Dell		*/</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/IH_OS_NCR" data-ref="_M/IH_OS_NCR">IH_OS_NCR</dfn>		12	/* NCR		*/</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/IH_OS_LYNXOS" data-ref="_M/IH_OS_LYNXOS">IH_OS_LYNXOS</dfn>		13	/* LynxOS	*/</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/IH_OS_VXWORKS" data-ref="_M/IH_OS_VXWORKS">IH_OS_VXWORKS</dfn>		14	/* VxWorks	*/</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/IH_OS_PSOS" data-ref="_M/IH_OS_PSOS">IH_OS_PSOS</dfn>		15	/* pSOS		*/</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/IH_OS_QNX" data-ref="_M/IH_OS_QNX">IH_OS_QNX</dfn>		16	/* QNX		*/</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/IH_OS_U_BOOT" data-ref="_M/IH_OS_U_BOOT">IH_OS_U_BOOT</dfn>		17	/* Firmware	*/</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/IH_OS_RTEMS" data-ref="_M/IH_OS_RTEMS">IH_OS_RTEMS</dfn>		18	/* RTEMS	*/</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/IH_OS_ARTOS" data-ref="_M/IH_OS_ARTOS">IH_OS_ARTOS</dfn>		19	/* ARTOS	*/</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/IH_OS_UNITY" data-ref="_M/IH_OS_UNITY">IH_OS_UNITY</dfn>		20	/* Unity OS	*/</u></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><i>/*</i></td></tr>
+<tr><th id="58">58</th><td><i> * CPU Architecture Codes (supported by Linux)</i></td></tr>
+<tr><th id="59">59</th><td><i> */</i></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_INVALID" data-ref="_M/IH_CPU_INVALID">IH_CPU_INVALID</dfn>		0	/* Invalid CPU	*/</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_ALPHA" data-ref="_M/IH_CPU_ALPHA">IH_CPU_ALPHA</dfn>		1	/* Alpha	*/</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_ARM" data-ref="_M/IH_CPU_ARM">IH_CPU_ARM</dfn>		2	/* ARM		*/</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_I386" data-ref="_M/IH_CPU_I386">IH_CPU_I386</dfn>		3	/* Intel x86	*/</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_IA64" data-ref="_M/IH_CPU_IA64">IH_CPU_IA64</dfn>		4	/* IA64		*/</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_MIPS" data-ref="_M/IH_CPU_MIPS">IH_CPU_MIPS</dfn>		5	/* MIPS		*/</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_MIPS64" data-ref="_M/IH_CPU_MIPS64">IH_CPU_MIPS64</dfn>		6	/* MIPS	 64 Bit */</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_PPC" data-ref="_M/IH_CPU_PPC">IH_CPU_PPC</dfn>		7	/* PowerPC	*/</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_S390" data-ref="_M/IH_CPU_S390">IH_CPU_S390</dfn>		8	/* IBM S390	*/</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_SH" data-ref="_M/IH_CPU_SH">IH_CPU_SH</dfn>		9	/* SuperH	*/</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_SPARC" data-ref="_M/IH_CPU_SPARC">IH_CPU_SPARC</dfn>		10	/* Sparc	*/</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_SPARC64" data-ref="_M/IH_CPU_SPARC64">IH_CPU_SPARC64</dfn>		11	/* Sparc 64 Bit */</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_M68K" data-ref="_M/IH_CPU_M68K">IH_CPU_M68K</dfn>		12	/* M68K		*/</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_NIOS" data-ref="_M/IH_CPU_NIOS">IH_CPU_NIOS</dfn>		13	/* Nios-32	*/</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_MICROBLAZE" data-ref="_M/IH_CPU_MICROBLAZE">IH_CPU_MICROBLAZE</dfn>	14	/* MicroBlaze   */</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_NIOS2" data-ref="_M/IH_CPU_NIOS2">IH_CPU_NIOS2</dfn>		15	/* Nios-II	*/</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_BLACKFIN" data-ref="_M/IH_CPU_BLACKFIN">IH_CPU_BLACKFIN</dfn>		16	/* Blackfin	*/</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/IH_CPU_AVR32" data-ref="_M/IH_CPU_AVR32">IH_CPU_AVR32</dfn>		17	/* AVR32	*/</u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>/*</i></td></tr>
+<tr><th id="80">80</th><td><i> * Image Types</i></td></tr>
+<tr><th id="81">81</th><td><i> *</i></td></tr>
+<tr><th id="82">82</th><td><i> * "Standalone Programs" are directly runnable in the environment</i></td></tr>
+<tr><th id="83">83</th><td><i> *	provided by U-Boot; it is expected that (if they behave</i></td></tr>
+<tr><th id="84">84</th><td><i> *	well) you can continue to work in U-Boot after return from</i></td></tr>
+<tr><th id="85">85</th><td><i> *	the Standalone Program.</i></td></tr>
+<tr><th id="86">86</th><td><i> * "OS Kernel Images" are usually images of some Embedded OS which</i></td></tr>
+<tr><th id="87">87</th><td><i> *	will take over control completely. Usually these programs</i></td></tr>
+<tr><th id="88">88</th><td><i> *	will install their own set of exception handlers, device</i></td></tr>
+<tr><th id="89">89</th><td><i> *	drivers, set up the MMU, etc. - this means, that you cannot</i></td></tr>
+<tr><th id="90">90</th><td><i> *	expect to re-enter U-Boot except by resetting the CPU.</i></td></tr>
+<tr><th id="91">91</th><td><i> * "RAMDisk Images" are more or less just data blocks, and their</i></td></tr>
+<tr><th id="92">92</th><td><i> *	parameters (address, size) are passed to an OS kernel that is</i></td></tr>
+<tr><th id="93">93</th><td><i> *	being started.</i></td></tr>
+<tr><th id="94">94</th><td><i> * "Multi-File Images" contain several images, typically an OS</i></td></tr>
+<tr><th id="95">95</th><td><i> *	(Linux) kernel image and one or more data images like</i></td></tr>
+<tr><th id="96">96</th><td><i> *	RAMDisks. This construct is useful for instance when you want</i></td></tr>
+<tr><th id="97">97</th><td><i> *	to boot over the network using BOOTP etc., where the boot</i></td></tr>
+<tr><th id="98">98</th><td><i> *	server provides just a single image file, but you want to get</i></td></tr>
+<tr><th id="99">99</th><td><i> *	for instance an OS kernel and a RAMDisk image.</i></td></tr>
+<tr><th id="100">100</th><td><i> *</i></td></tr>
+<tr><th id="101">101</th><td><i> *	"Multi-File Images" start with a list of image sizes, each</i></td></tr>
+<tr><th id="102">102</th><td><i> *	image size (in bytes) specified by an "uint32_t" in network</i></td></tr>
+<tr><th id="103">103</th><td><i> *	byte order. This list is terminated by an "(uint32_t)0".</i></td></tr>
+<tr><th id="104">104</th><td><i> *	Immediately after the terminating 0 follow the images, one by</i></td></tr>
+<tr><th id="105">105</th><td><i> *	one, all aligned on "uint32_t" boundaries (size rounded up to</i></td></tr>
+<tr><th id="106">106</th><td><i> *	a multiple of 4 bytes - except for the last file).</i></td></tr>
+<tr><th id="107">107</th><td><i> *</i></td></tr>
+<tr><th id="108">108</th><td><i> * "Firmware Images" are binary images containing firmware (like</i></td></tr>
+<tr><th id="109">109</th><td><i> *	U-Boot or FPGA images) which usually will be programmed to</i></td></tr>
+<tr><th id="110">110</th><td><i> *	flash memory.</i></td></tr>
+<tr><th id="111">111</th><td><i> *</i></td></tr>
+<tr><th id="112">112</th><td><i> * "Script files" are command sequences that will be executed by</i></td></tr>
+<tr><th id="113">113</th><td><i> *	U-Boot's command interpreter; this feature is especially</i></td></tr>
+<tr><th id="114">114</th><td><i> *	useful when you configure U-Boot to use a real shell (hush)</i></td></tr>
+<tr><th id="115">115</th><td><i> *	as command interpreter (=&gt; Shell Scripts).</i></td></tr>
+<tr><th id="116">116</th><td><i> */</i></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_INVALID" data-ref="_M/IH_TYPE_INVALID">IH_TYPE_INVALID</dfn>		0	/* Invalid Image		*/</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_STANDALONE" data-ref="_M/IH_TYPE_STANDALONE">IH_TYPE_STANDALONE</dfn>	1	/* Standalone Program		*/</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_KERNEL" data-ref="_M/IH_TYPE_KERNEL">IH_TYPE_KERNEL</dfn>		2	/* OS Kernel Image		*/</u></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_RAMDISK" data-ref="_M/IH_TYPE_RAMDISK">IH_TYPE_RAMDISK</dfn>		3	/* RAMDisk Image		*/</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_MULTI" data-ref="_M/IH_TYPE_MULTI">IH_TYPE_MULTI</dfn>		4	/* Multi-File Image		*/</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_FIRMWARE" data-ref="_M/IH_TYPE_FIRMWARE">IH_TYPE_FIRMWARE</dfn>	5	/* Firmware Image		*/</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_SCRIPT" data-ref="_M/IH_TYPE_SCRIPT">IH_TYPE_SCRIPT</dfn>		6	/* Script file			*/</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_FILESYSTEM" data-ref="_M/IH_TYPE_FILESYSTEM">IH_TYPE_FILESYSTEM</dfn>	7	/* Filesystem Image (any type)	*/</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/IH_TYPE_FLATDT" data-ref="_M/IH_TYPE_FLATDT">IH_TYPE_FLATDT</dfn>		8	/* Binary Flat Device Tree Blob	*/</u></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><i>/*</i></td></tr>
+<tr><th id="129">129</th><td><i> * Compression Types</i></td></tr>
+<tr><th id="130">130</th><td><i> */</i></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/IH_COMP_NONE" data-ref="_M/IH_COMP_NONE">IH_COMP_NONE</dfn>		0	/*  No	 Compression Used	*/</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/IH_COMP_GZIP" data-ref="_M/IH_COMP_GZIP">IH_COMP_GZIP</dfn>		1	/* gzip	 Compression Used	*/</u></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/IH_COMP_BZIP2" data-ref="_M/IH_COMP_BZIP2">IH_COMP_BZIP2</dfn>		2	/* bzip2 Compression Used	*/</u></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/IH_MAGIC" data-ref="_M/IH_MAGIC">IH_MAGIC</dfn>	0x27051956	/* Image Magic Number		*/</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/IH_NMLEN" data-ref="_M/IH_NMLEN">IH_NMLEN</dfn>		32	/* Image Name Length		*/</u></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><i>/*</i></td></tr>
+<tr><th id="139">139</th><td><i> * all data in network byte order (aka natural aka bigendian)</i></td></tr>
+<tr><th id="140">140</th><td><i> */</i></td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="uboot_image_header" title='uboot_image_header' data-ref="uboot_image_header"><a class="type" href="#uboot_image_header" title='uboot_image_header' data-ref="uboot_image_header">uboot_image_header</a></dfn> {</td></tr>
+<tr><th id="143">143</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_magic" title='uboot_image_header::ih_magic' data-ref="uboot_image_header::ih_magic">ih_magic</dfn>;	<i>/* Image Header Magic Number	*/</i></td></tr>
+<tr><th id="144">144</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_hcrc" title='uboot_image_header::ih_hcrc' data-ref="uboot_image_header::ih_hcrc">ih_hcrc</dfn>;	<i>/* Image Header CRC Checksum	*/</i></td></tr>
+<tr><th id="145">145</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_time" title='uboot_image_header::ih_time' data-ref="uboot_image_header::ih_time">ih_time</dfn>;	<i>/* Image Creation Timestamp	*/</i></td></tr>
+<tr><th id="146">146</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_size" title='uboot_image_header::ih_size' data-ref="uboot_image_header::ih_size">ih_size</dfn>;	<i>/* Image Data Size		*/</i></td></tr>
+<tr><th id="147">147</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_load" title='uboot_image_header::ih_load' data-ref="uboot_image_header::ih_load">ih_load</dfn>;	<i>/* Data	 Load  Address		*/</i></td></tr>
+<tr><th id="148">148</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_ep" title='uboot_image_header::ih_ep' data-ref="uboot_image_header::ih_ep">ih_ep</dfn>;		<i>/* Entry Point Address		*/</i></td></tr>
+<tr><th id="149">149</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="uboot_image_header::ih_dcrc" title='uboot_image_header::ih_dcrc' data-ref="uboot_image_header::ih_dcrc">ih_dcrc</dfn>;	<i>/* Image Data CRC Checksum	*/</i></td></tr>
+<tr><th id="150">150</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>		<dfn class="decl" id="uboot_image_header::ih_os" title='uboot_image_header::ih_os' data-ref="uboot_image_header::ih_os">ih_os</dfn>;		<i>/* Operating System		*/</i></td></tr>
+<tr><th id="151">151</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>		<dfn class="decl" id="uboot_image_header::ih_arch" title='uboot_image_header::ih_arch' data-ref="uboot_image_header::ih_arch">ih_arch</dfn>;	<i>/* CPU architecture		*/</i></td></tr>
+<tr><th id="152">152</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>		<dfn class="decl" id="uboot_image_header::ih_type" title='uboot_image_header::ih_type' data-ref="uboot_image_header::ih_type">ih_type</dfn>;	<i>/* Image Type			*/</i></td></tr>
+<tr><th id="153">153</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>		<dfn class="decl" id="uboot_image_header::ih_comp" title='uboot_image_header::ih_comp' data-ref="uboot_image_header::ih_comp">ih_comp</dfn>;	<i>/* Compression Type		*/</i></td></tr>
+<tr><th id="154">154</th><td>	<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>		<dfn class="decl" id="uboot_image_header::ih_name" title='uboot_image_header::ih_name' data-ref="uboot_image_header::ih_name">ih_name</dfn>[<a class="macro" href="#136" title="32" data-ref="_M/IH_NMLEN">IH_NMLEN</a>];	<i>/* Image Name		*/</i></td></tr>
+<tr><th id="155">155</th><td>} <dfn class="typedef" id="uboot_image_header_t" title='uboot_image_header_t' data-type='struct uboot_image_header' data-ref="uboot_image_header_t">uboot_image_header_t</dfn>;</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><u>#<span data-ppcond="29">endif</span> /* UBOOT_IMAGE_H */</u></td></tr>
+<tr><th id="159">159</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='loader.c.html'>codebrowser/hw/core/loader.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

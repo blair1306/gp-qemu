@@ -1,0 +1,32 @@
+<dec f='codebrowser/include/qemu/cutils.h' l='138' type='int parse_uint(const char * s, unsigned long long * value, char ** endptr, int base)'/>
+<use f='codebrowser/qapi/opts-visitor.c' l='460' u='c' c='opts_type_uint64'/>
+<def f='codebrowser/util/cutils.c' l='465' ll='503' type='int parse_uint(const char * s, unsigned long long * value, char ** endptr, int base)'/>
+<use f='codebrowser/util/cutils.c' l='524' u='c' c='parse_uint_full'/>
+<doc f='codebrowser/util/cutils.c' l='437'>/**
+ * parse_uint:
+ *
+ * @s: String to parse
+ * @value: Destination for parsed integer value
+ * @endptr: Destination for pointer to first character not consumed
+ * @base: integer base, between 2 and 36 inclusive, or 0
+ *
+ * Parse unsigned integer
+ *
+ * Parsed syntax is like strtoull()&apos;s: arbitrary whitespace, a single optional
+ * &apos;+&apos; or &apos;-&apos;, an optional &quot;0x&quot; if @base is 0 or 16, one or more digits.
+ *
+ * If @s is null, or @base is invalid, or @s doesn&apos;t start with an
+ * integer in the syntax above, set *@value to 0, *@endptr to @s, and
+ * return -EINVAL.
+ *
+ * Set *@endptr to point right beyond the parsed integer (even if the integer
+ * overflows or is negative, all digits will be parsed and *@endptr will
+ * point right beyond them).
+ *
+ * If the integer is negative, set *@value to 0, and return -ERANGE.
+ *
+ * If the integer overflows unsigned long long, set *@value to
+ * ULLONG_MAX, and return -ERANGE.
+ *
+ * Else, set *@value to the parsed integer, and return 0.
+ */</doc>

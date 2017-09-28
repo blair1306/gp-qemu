@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>unicode.c source code [codebrowser/util/unicode.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/unicode.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='unicode.c.html'>unicode.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Dealing with Unicode</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2013 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Markus Armbruster &lt;armbru@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="10">10</th><td><i> * later.  See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu/unicode.h.html">"qemu/unicode.h"</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="17">17</th><td><i class="doc"> * mod_utf8_codepoint:</i></td></tr>
+<tr><th id="18">18</th><td><i class="doc"> *<span class="command"> @s</span>: string encoded in modified UTF-8</i></td></tr>
+<tr><th id="19">19</th><td><i class="doc"> *<span class="command"> @n</span>: maximum number of bytes to read from<span class="command"> @s</span>, if less than 6</i></td></tr>
+<tr><th id="20">20</th><td><i class="doc"> *<span class="command"> @end</span>: set to end of sequence on return</i></td></tr>
+<tr><th id="21">21</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> * Convert the modified UTF-8 sequence at the start of<span class="command"> @s</span>.  Modified</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> * UTF-8 is exactly like UTF-8, except U+0000 is encoded as</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * <span class="command">"\xC<span class="command">0\x80</span></span>".</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * If<span class="command"> @n</span> is zero or<span class="command"> @s</span> points to a zero byte, the sequence is invalid,</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> * and<span class="command"> @end</span> is set to<span class="command"> @s</span>.</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> * If<span class="command"> @s</span> points to an impossible byte (0xFE or 0xFF) or a continuation</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * byte, the sequence is invalid, and<span class="command"> @end</span> is set to<span class="command"> @s</span> + 1</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> * Else, the first byte determines how many continuation bytes are</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * expected.  If there are fewer, the sequence is invalid, and<span class="command"> @end</span> is</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * set to<span class="command"> @s</span> + 1 + actual number of continuation bytes.  Else, the</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * sequence is well-formed, and<span class="command"> @end</span> is set to<span class="command"> @s</span> + 1 + expected</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * number of continuation bytes.</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> * A well-formed sequence is valid unless it encodes a codepoint</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * outside the Unicode range U+0000..U+10FFFF, one of Unicode's 66</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * noncharacters, a surrogate codepoint, or is overlong.  Except the</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * overlong sequence <span class="command">"\xC<span class="command">0\x80</span></span>" is valid.</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * Conversion succeeds if and only if the sequence is valid.</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> * Returns: the Unicode codepoint on success, -1 on failure.</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="47">47</th><td><em>int</em> <dfn class="decl def" id="mod_utf8_codepoint" title='mod_utf8_codepoint' data-ref="mod_utf8_codepoint">mod_utf8_codepoint</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1s" title='s' data-type='const char *' data-ref="1s">s</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col2 decl" id="2n" title='n' data-type='size_t' data-ref="2n">n</dfn>, <em>char</em> **<dfn class="local col3 decl" id="3end" title='end' data-type='char **' data-ref="3end">end</dfn>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <em>static</em> <em>int</em> <dfn class="local col4 decl" id="4min_cp" title='min_cp' data-type='int [5]' data-ref="4min_cp">min_cp</dfn>[<var>5</var>] = { <var>0x80</var>, <var>0x800</var>, <var>0x10000</var>, <var>0x200000</var>, <var>0x4000000</var> };</td></tr>
+<tr><th id="50">50</th><td>    <em>const</em> <em>unsigned</em> <em>char</em> *<dfn class="local col5 decl" id="5p" title='p' data-type='const unsigned char *' data-ref="5p">p</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <em>unsigned</em> <dfn class="local col6 decl" id="6byte" title='byte' data-type='unsigned int' data-ref="6byte">byte</dfn>, <dfn class="local col7 decl" id="7mask" title='mask' data-type='unsigned int' data-ref="7mask">mask</dfn>, <dfn class="local col8 decl" id="8len" title='len' data-type='unsigned int' data-ref="8len">len</dfn>, <dfn class="local col9 decl" id="9i" title='i' data-type='unsigned int' data-ref="9i">i</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <em>int</em> <dfn class="local col0 decl" id="10cp" title='cp' data-type='int' data-ref="10cp">cp</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>    <b>if</b> (<a class="local col2 ref" href="#2n" title='n' data-ref="2n">n</a> == <var>0</var> || *<a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a> == <var>0</var>) {</td></tr>
+<tr><th id="55">55</th><td>        <i>/* empty sequence */</i></td></tr>
+<tr><th id="56">56</th><td>        *<a class="local col3 ref" href="#3end" title='end' data-ref="3end">end</a> = (<em>char</em> *)<a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a>;</td></tr>
+<tr><th id="57">57</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="58">58</th><td>    }</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>    <a class="local col5 ref" href="#5p" title='p' data-ref="5p">p</a> = (<em>const</em> <em>unsigned</em> <em>char</em> *)<a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> = *<a class="local col5 ref" href="#5p" title='p' data-ref="5p">p</a>++;</td></tr>
+<tr><th id="62">62</th><td>    <b>if</b> (<a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &lt; <var>0x80</var>) {</td></tr>
+<tr><th id="63">63</th><td>        <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a>;              <i>/* one byte sequence */</i></td></tr>
+<tr><th id="64">64</th><td>    } <b>else</b> <b>if</b> (<a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &gt;= <var>0xFE</var>) {</td></tr>
+<tr><th id="65">65</th><td>        <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;                <i>/* impossible bytes 0xFE, 0xFF */</i></td></tr>
+<tr><th id="66">66</th><td>    } <b>else</b> <b>if</b> ((<a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &amp; <var>0x40</var>) == <var>0</var>) {</td></tr>
+<tr><th id="67">67</th><td>        <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;                <i>/* unexpected continuation byte */</i></td></tr>
+<tr><th id="68">68</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="69">69</th><td>        <i>/* multi-byte sequence */</i></td></tr>
+<tr><th id="70">70</th><td>        <a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a> = <var>0</var>;</td></tr>
+<tr><th id="71">71</th><td>        <b>for</b> (<a class="local col7 ref" href="#7mask" title='mask' data-ref="7mask">mask</a> = <var>0x80</var>; <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &amp; <a class="local col7 ref" href="#7mask" title='mask' data-ref="7mask">mask</a>; <a class="local col7 ref" href="#7mask" title='mask' data-ref="7mask">mask</a> &gt;&gt;= <var>1</var>) {</td></tr>
+<tr><th id="72">72</th><td>            <a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a>++;</td></tr>
+<tr><th id="73">73</th><td>        }</td></tr>
+<tr><th id="74">74</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((len &gt; 1 &amp;&amp; len &lt; 7) ? (void) (0) : __assert_fail (&quot;len &gt; 1 &amp;&amp; len &lt; 7&quot;, &quot;/home/jon/workspace/qemu/util/unicode.c&quot;, 74, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a> &gt; <var>1</var> &amp;&amp; <a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a> &lt; <var>7</var>);</td></tr>
+<tr><th id="75">75</th><td>        <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &amp; (<a class="local col7 ref" href="#7mask" title='mask' data-ref="7mask">mask</a> - <var>1</var>);</td></tr>
+<tr><th id="76">76</th><td>        <b>for</b> (<a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> = <var>1</var>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> &lt; <a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a>; <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a>++) {</td></tr>
+<tr><th id="77">77</th><td>            <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> = <a class="local col9 ref" href="#9i" title='i' data-ref="9i">i</a> &lt; <a class="local col2 ref" href="#2n" title='n' data-ref="2n">n</a> ? *<a class="local col5 ref" href="#5p" title='p' data-ref="5p">p</a> : <var>0</var>;</td></tr>
+<tr><th id="78">78</th><td>            <b>if</b> ((<a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &amp; <var>0xC0</var>) != <var>0x80</var>) {</td></tr>
+<tr><th id="79">79</th><td>                <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;        <i>/* continuation byte missing */</i></td></tr>
+<tr><th id="80">80</th><td>                <b>goto</b> <a class="lbl" href="#11out" data-ref="11out">out</a>;</td></tr>
+<tr><th id="81">81</th><td>            }</td></tr>
+<tr><th id="82">82</th><td>            <a class="local col5 ref" href="#5p" title='p' data-ref="5p">p</a>++;</td></tr>
+<tr><th id="83">83</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &lt;&lt;= <var>6</var>;</td></tr>
+<tr><th id="84">84</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> |= <a class="local col6 ref" href="#6byte" title='byte' data-ref="6byte">byte</a> &amp; <var>0x3F</var>;</td></tr>
+<tr><th id="85">85</th><td>        }</td></tr>
+<tr><th id="86">86</th><td>        <b>if</b> (<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &gt; <var>0x10FFFF</var>) {</td></tr>
+<tr><th id="87">87</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;            <i>/* beyond Unicode range */</i></td></tr>
+<tr><th id="88">88</th><td>        } <b>else</b> <b>if</b> ((<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &gt;= <var>0xFDD0</var> &amp;&amp; <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &lt;= <var>0xFDEF</var>)</td></tr>
+<tr><th id="89">89</th><td>                   || (<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &amp; <var>0xFFFE</var>) == <var>0xFFFE</var>) {</td></tr>
+<tr><th id="90">90</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;            <i>/* noncharacter */</i></td></tr>
+<tr><th id="91">91</th><td>        } <b>else</b> <b>if</b> (<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &gt;= <var>0xD800</var> &amp;&amp; <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &lt;= <var>0xDFFF</var>) {</td></tr>
+<tr><th id="92">92</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;            <i>/* surrogate code point */</i></td></tr>
+<tr><th id="93">93</th><td>        } <b>else</b> <b>if</b> (<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> &lt; <a class="local col4 ref" href="#4min_cp" title='min_cp' data-ref="4min_cp">min_cp</a>[<a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a> - <var>2</var>] &amp;&amp; !(<a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> == <var>0</var> &amp;&amp; <a class="local col8 ref" href="#8len" title='len' data-ref="8len">len</a> == <var>2</var>)) {</td></tr>
+<tr><th id="94">94</th><td>            <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a> = -<var>1</var>;            <i>/* overlong, not \xC0\x80 */</i></td></tr>
+<tr><th id="95">95</th><td>        }</td></tr>
+<tr><th id="96">96</th><td>    }</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><dfn class="lbl" id="11out" data-ref="11out">out</dfn>:</td></tr>
+<tr><th id="99">99</th><td>    *<a class="local col3 ref" href="#3end" title='end' data-ref="3end">end</a> = (<em>char</em> *)<a class="local col5 ref" href="#5p" title='p' data-ref="5p">p</a>;</td></tr>
+<tr><th id="100">100</th><td>    <b>return</b> <a class="local col0 ref" href="#10cp" title='cp' data-ref="10cp">cp</a>;</td></tr>
+<tr><th id="101">101</th><td>}</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

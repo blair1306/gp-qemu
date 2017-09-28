@@ -1,0 +1,405 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hcd-ehci.h source code [codebrowser/hw/usb/hcd-ehci.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="EHCIPCIState,EHCIPacket,EHCIQueue,EHCIState,EHCISysBusState,EHCIfstn,EHCIitd,EHCIqh,EHCIqtd,EHCIsitd,FUSBH200EHCIState,SysBusEHCIClass,async_state "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/usb/hcd-ehci.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>usb</a>/<a href='hcd-ehci.h.html'>hcd-ehci.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU USB EHCI Emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="5">5</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="6">6</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="7">7</th><td><i> * version 2 of the License, or(at your option) any later version.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="10">10</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="11">11</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="12">12</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="15">15</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="18">ifndef</span> <span class="macro" data-ref="_M/HW_USB_HCD_EHCI_H">HW_USB_HCD_EHCI_H</span></u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/HW_USB_HCD_EHCI_H" data-ref="_M/HW_USB_HCD_EHCI_H">HW_USB_HCD_EHCI_H</dfn></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../../include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../include/qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../../include/hw/usb.h.html">"hw/usb.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../include/sysemu/dma.h.html">"sysemu/dma.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/hw/pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/hw/sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifndef</span> <span class="macro" data-ref="_M/EHCI_DEBUG">EHCI_DEBUG</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/EHCI_DEBUG" data-ref="_M/EHCI_DEBUG">EHCI_DEBUG</dfn>   0</u></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="29">endif</span></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="33">if</span> <a class="macro" href="#30" title="0" data-ref="_M/EHCI_DEBUG">EHCI_DEBUG</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#define DPRINTF printf</u></td></tr>
+<tr><th id="35">35</th><td><u>#<span data-ppcond="33">else</span></u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/DPRINTF" data-ref="_M/DPRINTF">DPRINTF</dfn>(...)</u></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="33">endif</span></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/MMIO_SIZE" data-ref="_M/MMIO_SIZE">MMIO_SIZE</dfn>        0x1000</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/CAPA_SIZE" data-ref="_M/CAPA_SIZE">CAPA_SIZE</dfn>        0x10</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/NB_PORTS" data-ref="_M/NB_PORTS">NB_PORTS</dfn>         6        /* Max. Number of downstream ports */</u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#EHCIPacket" title='EHCIPacket' data-ref="EHCIPacket">EHCIPacket</a> <dfn class="typedef" id="EHCIPacket" title='EHCIPacket' data-type='struct EHCIPacket' data-ref="EHCIPacket">EHCIPacket</dfn>;</td></tr>
+<tr><th id="45">45</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#EHCIQueue" title='EHCIQueue' data-ref="EHCIQueue">EHCIQueue</a> <dfn class="typedef" id="EHCIQueue" title='EHCIQueue' data-type='struct EHCIQueue' data-ref="EHCIQueue">EHCIQueue</dfn>;</td></tr>
+<tr><th id="46">46</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#EHCIState" title='EHCIState' data-ref="EHCIState">EHCIState</a> <dfn class="typedef" id="EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</dfn>;</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><i>/*  EHCI spec version 1.0 Section 3.3</i></td></tr>
+<tr><th id="49">49</th><td><i> */</i></td></tr>
+<tr><th id="50">50</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIitd" title='EHCIitd' data-ref="EHCIitd"><a class="type" href="#EHCIitd" title='EHCIitd' data-ref="EHCIitd">EHCIitd</a></dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIitd::next" title='EHCIitd::next' data-ref="EHCIitd::next">next</dfn>;</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIitd::transact" title='EHCIitd::transact' data-ref="EHCIitd::transact">transact</dfn>[<var>8</var>];</td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_ACTIVE" data-ref="_M/ITD_XACT_ACTIVE">ITD_XACT_ACTIVE</dfn>          (1 &lt;&lt; 31)</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_DBERROR" data-ref="_M/ITD_XACT_DBERROR">ITD_XACT_DBERROR</dfn>         (1 &lt;&lt; 30)</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_BABBLE" data-ref="_M/ITD_XACT_BABBLE">ITD_XACT_BABBLE</dfn>          (1 &lt;&lt; 29)</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_XACTERR" data-ref="_M/ITD_XACT_XACTERR">ITD_XACT_XACTERR</dfn>         (1 &lt;&lt; 28)</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_LENGTH_MASK" data-ref="_M/ITD_XACT_LENGTH_MASK">ITD_XACT_LENGTH_MASK</dfn>     0x0fff0000</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_LENGTH_SH" data-ref="_M/ITD_XACT_LENGTH_SH">ITD_XACT_LENGTH_SH</dfn>       16</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_IOC" data-ref="_M/ITD_XACT_IOC">ITD_XACT_IOC</dfn>             (1 &lt;&lt; 15)</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_PGSEL_MASK" data-ref="_M/ITD_XACT_PGSEL_MASK">ITD_XACT_PGSEL_MASK</dfn>      0x00007000</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_PGSEL_SH" data-ref="_M/ITD_XACT_PGSEL_SH">ITD_XACT_PGSEL_SH</dfn>        12</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/ITD_XACT_OFFSET_MASK" data-ref="_M/ITD_XACT_OFFSET_MASK">ITD_XACT_OFFSET_MASK</dfn>     0x00000fff</u></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIitd::bufptr" title='EHCIitd::bufptr' data-ref="EHCIitd::bufptr">bufptr</dfn>[<var>7</var>];</td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_MASK" data-ref="_M/ITD_BUFPTR_MASK">ITD_BUFPTR_MASK</dfn>          0xfffff000</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_SH" data-ref="_M/ITD_BUFPTR_SH">ITD_BUFPTR_SH</dfn>            12</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_EP_MASK" data-ref="_M/ITD_BUFPTR_EP_MASK">ITD_BUFPTR_EP_MASK</dfn>       0x00000f00</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_EP_SH" data-ref="_M/ITD_BUFPTR_EP_SH">ITD_BUFPTR_EP_SH</dfn>         8</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_DEVADDR_MASK" data-ref="_M/ITD_BUFPTR_DEVADDR_MASK">ITD_BUFPTR_DEVADDR_MASK</dfn>  0x0000007f</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_DEVADDR_SH" data-ref="_M/ITD_BUFPTR_DEVADDR_SH">ITD_BUFPTR_DEVADDR_SH</dfn>    0</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_DIRECTION" data-ref="_M/ITD_BUFPTR_DIRECTION">ITD_BUFPTR_DIRECTION</dfn>     (1 &lt;&lt; 11)</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_MAXPKT_MASK" data-ref="_M/ITD_BUFPTR_MAXPKT_MASK">ITD_BUFPTR_MAXPKT_MASK</dfn>   0x000007ff</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_MAXPKT_SH" data-ref="_M/ITD_BUFPTR_MAXPKT_SH">ITD_BUFPTR_MAXPKT_SH</dfn>     0</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_MULT_MASK" data-ref="_M/ITD_BUFPTR_MULT_MASK">ITD_BUFPTR_MULT_MASK</dfn>     0x00000003</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/ITD_BUFPTR_MULT_SH" data-ref="_M/ITD_BUFPTR_MULT_SH">ITD_BUFPTR_MULT_SH</dfn>       0</u></td></tr>
+<tr><th id="77">77</th><td>} <dfn class="typedef" id="EHCIitd" title='EHCIitd' data-type='struct EHCIitd' data-ref="EHCIitd">EHCIitd</dfn>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>/*  EHCI spec version 1.0 Section 3.4</i></td></tr>
+<tr><th id="80">80</th><td><i> */</i></td></tr>
+<tr><th id="81">81</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIsitd" title='EHCIsitd' data-ref="EHCIsitd"><a class="type" href="#EHCIsitd" title='EHCIsitd' data-ref="EHCIsitd">EHCIsitd</a></dfn> {</td></tr>
+<tr><th id="82">82</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::next" title='EHCIsitd::next' data-ref="EHCIsitd::next">next</dfn>;                  <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="83">83</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::epchar" title='EHCIsitd::epchar' data-ref="EHCIsitd::epchar">epchar</dfn>;</td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_IO" data-ref="_M/SITD_EPCHAR_IO">SITD_EPCHAR_IO</dfn>              (1 &lt;&lt; 31)</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_PORTNUM_MASK" data-ref="_M/SITD_EPCHAR_PORTNUM_MASK">SITD_EPCHAR_PORTNUM_MASK</dfn>    0x7f000000</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_PORTNUM_SH" data-ref="_M/SITD_EPCHAR_PORTNUM_SH">SITD_EPCHAR_PORTNUM_SH</dfn>      24</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_HUBADD_MASK" data-ref="_M/SITD_EPCHAR_HUBADD_MASK">SITD_EPCHAR_HUBADD_MASK</dfn>     0x007f0000</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_HUBADDR_SH" data-ref="_M/SITD_EPCHAR_HUBADDR_SH">SITD_EPCHAR_HUBADDR_SH</dfn>      16</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_EPNUM_MASK" data-ref="_M/SITD_EPCHAR_EPNUM_MASK">SITD_EPCHAR_EPNUM_MASK</dfn>      0x00000f00</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_EPNUM_SH" data-ref="_M/SITD_EPCHAR_EPNUM_SH">SITD_EPCHAR_EPNUM_SH</dfn>        8</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/SITD_EPCHAR_DEVADDR_MASK" data-ref="_M/SITD_EPCHAR_DEVADDR_MASK">SITD_EPCHAR_DEVADDR_MASK</dfn>    0x0000007f</u></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::uframe" title='EHCIsitd::uframe' data-ref="EHCIsitd::uframe">uframe</dfn>;</td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/SITD_UFRAME_CMASK_MASK" data-ref="_M/SITD_UFRAME_CMASK_MASK">SITD_UFRAME_CMASK_MASK</dfn>      0x0000ff00</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/SITD_UFRAME_CMASK_SH" data-ref="_M/SITD_UFRAME_CMASK_SH">SITD_UFRAME_CMASK_SH</dfn>        8</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/SITD_UFRAME_SMASK_MASK" data-ref="_M/SITD_UFRAME_SMASK_MASK">SITD_UFRAME_SMASK_MASK</dfn>      0x000000ff</u></td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::results" title='EHCIsitd::results' data-ref="EHCIsitd::results">results</dfn>;</td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_IOC" data-ref="_M/SITD_RESULTS_IOC">SITD_RESULTS_IOC</dfn>              (1 &lt;&lt; 31)</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_PGSEL" data-ref="_M/SITD_RESULTS_PGSEL">SITD_RESULTS_PGSEL</dfn>            (1 &lt;&lt; 30)</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_TBYTES_MASK" data-ref="_M/SITD_RESULTS_TBYTES_MASK">SITD_RESULTS_TBYTES_MASK</dfn>      0x03ff0000</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_TYBYTES_SH" data-ref="_M/SITD_RESULTS_TYBYTES_SH">SITD_RESULTS_TYBYTES_SH</dfn>       16</u></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_CPROGMASK_MASK" data-ref="_M/SITD_RESULTS_CPROGMASK_MASK">SITD_RESULTS_CPROGMASK_MASK</dfn>   0x0000ff00</u></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_CPROGMASK_SH" data-ref="_M/SITD_RESULTS_CPROGMASK_SH">SITD_RESULTS_CPROGMASK_SH</dfn>     8</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_ACTIVE" data-ref="_M/SITD_RESULTS_ACTIVE">SITD_RESULTS_ACTIVE</dfn>           (1 &lt;&lt; 7)</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_ERR" data-ref="_M/SITD_RESULTS_ERR">SITD_RESULTS_ERR</dfn>              (1 &lt;&lt; 6)</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_DBERR" data-ref="_M/SITD_RESULTS_DBERR">SITD_RESULTS_DBERR</dfn>            (1 &lt;&lt; 5)</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_BABBLE" data-ref="_M/SITD_RESULTS_BABBLE">SITD_RESULTS_BABBLE</dfn>           (1 &lt;&lt; 4)</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_XACTERR" data-ref="_M/SITD_RESULTS_XACTERR">SITD_RESULTS_XACTERR</dfn>          (1 &lt;&lt; 3)</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_MISSEDUF" data-ref="_M/SITD_RESULTS_MISSEDUF">SITD_RESULTS_MISSEDUF</dfn>         (1 &lt;&lt; 2)</u></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/SITD_RESULTS_SPLITXSTATE" data-ref="_M/SITD_RESULTS_SPLITXSTATE">SITD_RESULTS_SPLITXSTATE</dfn>      (1 &lt;&lt; 1)</u></td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::bufptr" title='EHCIsitd::bufptr' data-ref="EHCIsitd::bufptr">bufptr</dfn>[<var>2</var>];</td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/SITD_BUFPTR_MASK" data-ref="_M/SITD_BUFPTR_MASK">SITD_BUFPTR_MASK</dfn>              0xfffff000</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/SITD_BUFPTR_CURROFF_MASK" data-ref="_M/SITD_BUFPTR_CURROFF_MASK">SITD_BUFPTR_CURROFF_MASK</dfn>      0x00000fff</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/SITD_BUFPTR_TPOS_MASK" data-ref="_M/SITD_BUFPTR_TPOS_MASK">SITD_BUFPTR_TPOS_MASK</dfn>         0x00000018</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/SITD_BUFPTR_TPOS_SH" data-ref="_M/SITD_BUFPTR_TPOS_SH">SITD_BUFPTR_TPOS_SH</dfn>           3</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/SITD_BUFPTR_TCNT_MASK" data-ref="_M/SITD_BUFPTR_TCNT_MASK">SITD_BUFPTR_TCNT_MASK</dfn>         0x00000007</u></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIsitd::backptr" title='EHCIsitd::backptr' data-ref="EHCIsitd::backptr">backptr</dfn>;                 <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="121">121</th><td>} <dfn class="typedef" id="EHCIsitd" title='EHCIsitd' data-type='struct EHCIsitd' data-ref="EHCIsitd">EHCIsitd</dfn>;</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><i>/*  EHCI spec version 1.0 Section 3.5</i></td></tr>
+<tr><th id="124">124</th><td><i> */</i></td></tr>
+<tr><th id="125">125</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIqtd" title='EHCIqtd' data-ref="EHCIqtd"><a class="type" href="#EHCIqtd" title='EHCIqtd' data-ref="EHCIqtd">EHCIqtd</a></dfn> {</td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqtd::next" title='EHCIqtd::next' data-ref="EHCIqtd::next">next</dfn>;                    <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="127">127</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqtd::altnext" title='EHCIqtd::altnext' data-ref="EHCIqtd::altnext">altnext</dfn>;                 <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqtd::token" title='EHCIqtd::token' data-ref="EHCIqtd::token">token</dfn>;</td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_DTOGGLE" data-ref="_M/QTD_TOKEN_DTOGGLE">QTD_TOKEN_DTOGGLE</dfn>             (1 &lt;&lt; 31)</u></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_TBYTES_MASK" data-ref="_M/QTD_TOKEN_TBYTES_MASK">QTD_TOKEN_TBYTES_MASK</dfn>         0x7fff0000</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_TBYTES_SH" data-ref="_M/QTD_TOKEN_TBYTES_SH">QTD_TOKEN_TBYTES_SH</dfn>           16</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_IOC" data-ref="_M/QTD_TOKEN_IOC">QTD_TOKEN_IOC</dfn>                 (1 &lt;&lt; 15)</u></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_CPAGE_MASK" data-ref="_M/QTD_TOKEN_CPAGE_MASK">QTD_TOKEN_CPAGE_MASK</dfn>          0x00007000</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_CPAGE_SH" data-ref="_M/QTD_TOKEN_CPAGE_SH">QTD_TOKEN_CPAGE_SH</dfn>            12</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_CERR_MASK" data-ref="_M/QTD_TOKEN_CERR_MASK">QTD_TOKEN_CERR_MASK</dfn>           0x00000c00</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_CERR_SH" data-ref="_M/QTD_TOKEN_CERR_SH">QTD_TOKEN_CERR_SH</dfn>             10</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_PID_MASK" data-ref="_M/QTD_TOKEN_PID_MASK">QTD_TOKEN_PID_MASK</dfn>            0x00000300</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_PID_SH" data-ref="_M/QTD_TOKEN_PID_SH">QTD_TOKEN_PID_SH</dfn>              8</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_ACTIVE" data-ref="_M/QTD_TOKEN_ACTIVE">QTD_TOKEN_ACTIVE</dfn>              (1 &lt;&lt; 7)</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_HALT" data-ref="_M/QTD_TOKEN_HALT">QTD_TOKEN_HALT</dfn>                (1 &lt;&lt; 6)</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_DBERR" data-ref="_M/QTD_TOKEN_DBERR">QTD_TOKEN_DBERR</dfn>               (1 &lt;&lt; 5)</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_BABBLE" data-ref="_M/QTD_TOKEN_BABBLE">QTD_TOKEN_BABBLE</dfn>              (1 &lt;&lt; 4)</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_XACTERR" data-ref="_M/QTD_TOKEN_XACTERR">QTD_TOKEN_XACTERR</dfn>             (1 &lt;&lt; 3)</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_MISSEDUF" data-ref="_M/QTD_TOKEN_MISSEDUF">QTD_TOKEN_MISSEDUF</dfn>            (1 &lt;&lt; 2)</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_SPLITXSTATE" data-ref="_M/QTD_TOKEN_SPLITXSTATE">QTD_TOKEN_SPLITXSTATE</dfn>         (1 &lt;&lt; 1)</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/QTD_TOKEN_PING" data-ref="_M/QTD_TOKEN_PING">QTD_TOKEN_PING</dfn>                (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqtd::bufptr" title='EHCIqtd::bufptr' data-ref="EHCIqtd::bufptr">bufptr</dfn>[<var>5</var>];               <i>/* Standard buffer pointer */</i></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/QTD_BUFPTR_MASK" data-ref="_M/QTD_BUFPTR_MASK">QTD_BUFPTR_MASK</dfn>               0xfffff000</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/QTD_BUFPTR_SH" data-ref="_M/QTD_BUFPTR_SH">QTD_BUFPTR_SH</dfn>                 12</u></td></tr>
+<tr><th id="151">151</th><td>} <dfn class="typedef" id="EHCIqtd" title='EHCIqtd' data-type='struct EHCIqtd' data-ref="EHCIqtd">EHCIqtd</dfn>;</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i>/*  EHCI spec version 1.0 Section 3.6</i></td></tr>
+<tr><th id="154">154</th><td><i> */</i></td></tr>
+<tr><th id="155">155</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIqh" title='EHCIqh' data-ref="EHCIqh"><a class="type" href="#EHCIqh" title='EHCIqh' data-ref="EHCIqh">EHCIqh</a></dfn> {</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::next" title='EHCIqh::next' data-ref="EHCIqh::next">next</dfn>;                    <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>    <i>/* endpoint characteristics */</i></td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::epchar" title='EHCIqh::epchar' data-ref="EHCIqh::epchar">epchar</dfn>;</td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_RL_MASK" data-ref="_M/QH_EPCHAR_RL_MASK">QH_EPCHAR_RL_MASK</dfn>             0xf0000000</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_RL_SH" data-ref="_M/QH_EPCHAR_RL_SH">QH_EPCHAR_RL_SH</dfn>               28</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_C" data-ref="_M/QH_EPCHAR_C">QH_EPCHAR_C</dfn>                   (1 &lt;&lt; 27)</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_MPLEN_MASK" data-ref="_M/QH_EPCHAR_MPLEN_MASK">QH_EPCHAR_MPLEN_MASK</dfn>          0x07FF0000</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_MPLEN_SH" data-ref="_M/QH_EPCHAR_MPLEN_SH">QH_EPCHAR_MPLEN_SH</dfn>            16</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_H" data-ref="_M/QH_EPCHAR_H">QH_EPCHAR_H</dfn>                   (1 &lt;&lt; 15)</u></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_DTC" data-ref="_M/QH_EPCHAR_DTC">QH_EPCHAR_DTC</dfn>                 (1 &lt;&lt; 14)</u></td></tr>
+<tr><th id="167">167</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_EPS_MASK" data-ref="_M/QH_EPCHAR_EPS_MASK">QH_EPCHAR_EPS_MASK</dfn>            0x00003000</u></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_EPS_SH" data-ref="_M/QH_EPCHAR_EPS_SH">QH_EPCHAR_EPS_SH</dfn>              12</u></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/EHCI_QH_EPS_FULL" data-ref="_M/EHCI_QH_EPS_FULL">EHCI_QH_EPS_FULL</dfn>              0</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/EHCI_QH_EPS_LOW" data-ref="_M/EHCI_QH_EPS_LOW">EHCI_QH_EPS_LOW</dfn>               1</u></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/EHCI_QH_EPS_HIGH" data-ref="_M/EHCI_QH_EPS_HIGH">EHCI_QH_EPS_HIGH</dfn>              2</u></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/EHCI_QH_EPS_RESERVED" data-ref="_M/EHCI_QH_EPS_RESERVED">EHCI_QH_EPS_RESERVED</dfn>          3</u></td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_EP_MASK" data-ref="_M/QH_EPCHAR_EP_MASK">QH_EPCHAR_EP_MASK</dfn>             0x00000f00</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_EP_SH" data-ref="_M/QH_EPCHAR_EP_SH">QH_EPCHAR_EP_SH</dfn>               8</u></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_I" data-ref="_M/QH_EPCHAR_I">QH_EPCHAR_I</dfn>                   (1 &lt;&lt; 7)</u></td></tr>
+<tr><th id="177">177</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_DEVADDR_MASK" data-ref="_M/QH_EPCHAR_DEVADDR_MASK">QH_EPCHAR_DEVADDR_MASK</dfn>        0x0000007f</u></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/QH_EPCHAR_DEVADDR_SH" data-ref="_M/QH_EPCHAR_DEVADDR_SH">QH_EPCHAR_DEVADDR_SH</dfn>          0</u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td>    <i>/* endpoint capabilities */</i></td></tr>
+<tr><th id="181">181</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::epcap" title='EHCIqh::epcap' data-ref="EHCIqh::epcap">epcap</dfn>;</td></tr>
+<tr><th id="182">182</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_MULT_MASK" data-ref="_M/QH_EPCAP_MULT_MASK">QH_EPCAP_MULT_MASK</dfn>            0xc0000000</u></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_MULT_SH" data-ref="_M/QH_EPCAP_MULT_SH">QH_EPCAP_MULT_SH</dfn>              30</u></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_PORTNUM_MASK" data-ref="_M/QH_EPCAP_PORTNUM_MASK">QH_EPCAP_PORTNUM_MASK</dfn>         0x3f800000</u></td></tr>
+<tr><th id="185">185</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_PORTNUM_SH" data-ref="_M/QH_EPCAP_PORTNUM_SH">QH_EPCAP_PORTNUM_SH</dfn>           23</u></td></tr>
+<tr><th id="186">186</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_HUBADDR_MASK" data-ref="_M/QH_EPCAP_HUBADDR_MASK">QH_EPCAP_HUBADDR_MASK</dfn>         0x007f0000</u></td></tr>
+<tr><th id="187">187</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_HUBADDR_SH" data-ref="_M/QH_EPCAP_HUBADDR_SH">QH_EPCAP_HUBADDR_SH</dfn>           16</u></td></tr>
+<tr><th id="188">188</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_CMASK_MASK" data-ref="_M/QH_EPCAP_CMASK_MASK">QH_EPCAP_CMASK_MASK</dfn>           0x0000ff00</u></td></tr>
+<tr><th id="189">189</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_CMASK_SH" data-ref="_M/QH_EPCAP_CMASK_SH">QH_EPCAP_CMASK_SH</dfn>             8</u></td></tr>
+<tr><th id="190">190</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_SMASK_MASK" data-ref="_M/QH_EPCAP_SMASK_MASK">QH_EPCAP_SMASK_MASK</dfn>           0x000000ff</u></td></tr>
+<tr><th id="191">191</th><td><u>#define <dfn class="macro" id="_M/QH_EPCAP_SMASK_SH" data-ref="_M/QH_EPCAP_SMASK_SH">QH_EPCAP_SMASK_SH</dfn>             0</u></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::current_qtd" title='EHCIqh::current_qtd' data-ref="EHCIqh::current_qtd">current_qtd</dfn>;             <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="194">194</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::next_qtd" title='EHCIqh::next_qtd' data-ref="EHCIqh::next_qtd">next_qtd</dfn>;                <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="195">195</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::altnext_qtd" title='EHCIqh::altnext_qtd' data-ref="EHCIqh::altnext_qtd">altnext_qtd</dfn>;</td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/QH_ALTNEXT_NAKCNT_MASK" data-ref="_M/QH_ALTNEXT_NAKCNT_MASK">QH_ALTNEXT_NAKCNT_MASK</dfn>        0x0000001e</u></td></tr>
+<tr><th id="197">197</th><td><u>#define <dfn class="macro" id="_M/QH_ALTNEXT_NAKCNT_SH" data-ref="_M/QH_ALTNEXT_NAKCNT_SH">QH_ALTNEXT_NAKCNT_SH</dfn>          1</u></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::token" title='EHCIqh::token' data-ref="EHCIqh::token">token</dfn>;                   <i>/* Same as QTD token */</i></td></tr>
+<tr><th id="200">200</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIqh::bufptr" title='EHCIqh::bufptr' data-ref="EHCIqh::bufptr">bufptr</dfn>[<var>5</var>];               <i>/* Standard buffer pointer */</i></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/BUFPTR_CPROGMASK_MASK" data-ref="_M/BUFPTR_CPROGMASK_MASK">BUFPTR_CPROGMASK_MASK</dfn>         0x000000ff</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/BUFPTR_FRAMETAG_MASK" data-ref="_M/BUFPTR_FRAMETAG_MASK">BUFPTR_FRAMETAG_MASK</dfn>          0x0000001f</u></td></tr>
+<tr><th id="203">203</th><td><u>#define <dfn class="macro" id="_M/BUFPTR_SBYTES_MASK" data-ref="_M/BUFPTR_SBYTES_MASK">BUFPTR_SBYTES_MASK</dfn>            0x00000fe0</u></td></tr>
+<tr><th id="204">204</th><td><u>#define <dfn class="macro" id="_M/BUFPTR_SBYTES_SH" data-ref="_M/BUFPTR_SBYTES_SH">BUFPTR_SBYTES_SH</dfn>              5</u></td></tr>
+<tr><th id="205">205</th><td>} <dfn class="typedef" id="EHCIqh" title='EHCIqh' data-type='struct EHCIqh' data-ref="EHCIqh">EHCIqh</dfn>;</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><i>/*  EHCI spec version 1.0 Section 3.7</i></td></tr>
+<tr><th id="208">208</th><td><i> */</i></td></tr>
+<tr><th id="209">209</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIfstn" title='EHCIfstn' data-ref="EHCIfstn"><a class="type" href="#EHCIfstn" title='EHCIfstn' data-ref="EHCIfstn">EHCIfstn</a></dfn> {</td></tr>
+<tr><th id="210">210</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIfstn::next" title='EHCIfstn::next' data-ref="EHCIfstn::next">next</dfn>;                    <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="211">211</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIfstn::backptr" title='EHCIfstn::backptr' data-ref="EHCIfstn::backptr">backptr</dfn>;                 <i>/* Standard next link pointer */</i></td></tr>
+<tr><th id="212">212</th><td>} <dfn class="typedef" id="EHCIfstn" title='EHCIfstn' data-type='struct EHCIfstn' data-ref="EHCIfstn">EHCIfstn</dfn>;</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><b>enum</b> <dfn class="type def" id="async_state" title='async_state' data-ref="async_state">async_state</dfn> {</td></tr>
+<tr><th id="215">215</th><td>    <dfn class="enum" id="async_state::EHCI_ASYNC_NONE" title='async_state::EHCI_ASYNC_NONE' data-ref="async_state::EHCI_ASYNC_NONE">EHCI_ASYNC_NONE</dfn> = <var>0</var>,</td></tr>
+<tr><th id="216">216</th><td>    <dfn class="enum" id="async_state::EHCI_ASYNC_INITIALIZED" title='async_state::EHCI_ASYNC_INITIALIZED' data-ref="async_state::EHCI_ASYNC_INITIALIZED">EHCI_ASYNC_INITIALIZED</dfn>,</td></tr>
+<tr><th id="217">217</th><td>    <dfn class="enum" id="async_state::EHCI_ASYNC_INFLIGHT" title='async_state::EHCI_ASYNC_INFLIGHT' data-ref="async_state::EHCI_ASYNC_INFLIGHT">EHCI_ASYNC_INFLIGHT</dfn>,</td></tr>
+<tr><th id="218">218</th><td>    <dfn class="enum" id="async_state::EHCI_ASYNC_FINISHED" title='async_state::EHCI_ASYNC_FINISHED' data-ref="async_state::EHCI_ASYNC_FINISHED">EHCI_ASYNC_FINISHED</dfn>,</td></tr>
+<tr><th id="219">219</th><td>};</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><b>struct</b> <dfn class="type def" id="EHCIPacket" title='EHCIPacket' data-ref="EHCIPacket">EHCIPacket</dfn> {</td></tr>
+<tr><th id="222">222</th><td>    <a class="typedef" href="#EHCIQueue" title='EHCIQueue' data-type='struct EHCIQueue' data-ref="EHCIQueue">EHCIQueue</a> *<dfn class="decl" id="EHCIPacket::queue" title='EHCIPacket::queue' data-ref="EHCIPacket::queue">queue</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="macro" href="../../include/qemu/queue.h.html#359" title="struct { struct EHCIPacket *tqe_next; struct EHCIPacket * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#EHCIPacket" title='EHCIPacket' data-ref="EHCIPacket">EHCIPacket</a>) <dfn class="decl" id="EHCIPacket::next" title='EHCIPacket::next' data-ref="EHCIPacket::next">next</dfn>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>    <a class="typedef" href="#EHCIqtd" title='EHCIqtd' data-type='struct EHCIqtd' data-ref="EHCIqtd">EHCIqtd</a> <dfn class="decl" id="EHCIPacket::qtd" title='EHCIPacket::qtd' data-ref="EHCIPacket::qtd">qtd</dfn>;           <i>/* copy of current QTD (being worked on) */</i></td></tr>
+<tr><th id="226">226</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIPacket::qtdaddr" title='EHCIPacket::qtdaddr' data-ref="EHCIPacket::qtdaddr">qtdaddr</dfn>;      <i>/* address QTD read from                 */</i></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPacket" title='USBPacket' data-type='struct USBPacket' data-ref="USBPacket">USBPacket</a> <dfn class="decl" id="EHCIPacket::packet" title='EHCIPacket::packet' data-ref="EHCIPacket::packet">packet</dfn>;</td></tr>
+<tr><th id="229">229</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUSGList" title='QEMUSGList' data-type='struct QEMUSGList' data-ref="QEMUSGList">QEMUSGList</a> <dfn class="decl" id="EHCIPacket::sgl" title='EHCIPacket::sgl' data-ref="EHCIPacket::sgl">sgl</dfn>;</td></tr>
+<tr><th id="230">230</th><td>    <em>int</em> <dfn class="decl" id="EHCIPacket::pid" title='EHCIPacket::pid' data-ref="EHCIPacket::pid">pid</dfn>;</td></tr>
+<tr><th id="231">231</th><td>    <b>enum</b> <a class="type" href="#async_state" title='async_state' data-ref="async_state">async_state</a> <dfn class="decl" id="EHCIPacket::async" title='EHCIPacket::async' data-ref="EHCIPacket::async">async</dfn>;</td></tr>
+<tr><th id="232">232</th><td>};</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><b>struct</b> <dfn class="type def" id="EHCIQueue" title='EHCIQueue' data-ref="EHCIQueue">EHCIQueue</dfn> {</td></tr>
+<tr><th id="235">235</th><td>    <a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> *<dfn class="decl" id="EHCIQueue::ehci" title='EHCIQueue::ehci' data-ref="EHCIQueue::ehci">ehci</dfn>;</td></tr>
+<tr><th id="236">236</th><td>    <a class="macro" href="../../include/qemu/queue.h.html#359" title="struct { struct EHCIQueue *tqe_next; struct EHCIQueue * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#EHCIQueue" title='EHCIQueue' data-ref="EHCIQueue">EHCIQueue</a>) <dfn class="decl" id="EHCIQueue::next" title='EHCIQueue::next' data-ref="EHCIQueue::next">next</dfn>;</td></tr>
+<tr><th id="237">237</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIQueue::seen" title='EHCIQueue::seen' data-ref="EHCIQueue::seen">seen</dfn>;</td></tr>
+<tr><th id="238">238</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="EHCIQueue::ts" title='EHCIQueue::ts' data-ref="EHCIQueue::ts">ts</dfn>;</td></tr>
+<tr><th id="239">239</th><td>    <em>int</em> <dfn class="decl" id="EHCIQueue::async" title='EHCIQueue::async' data-ref="EHCIQueue::async">async</dfn>;</td></tr>
+<tr><th id="240">240</th><td>    <em>int</em> <dfn class="decl" id="EHCIQueue::transact_ctr" title='EHCIQueue::transact_ctr' data-ref="EHCIQueue::transact_ctr">transact_ctr</dfn>;</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td>    <i>/* cached data from guest - needs to be flushed</i></td></tr>
+<tr><th id="243">243</th><td><i>     * when guest removes an entry (doorbell, handshake sequence)</i></td></tr>
+<tr><th id="244">244</th><td><i>     */</i></td></tr>
+<tr><th id="245">245</th><td>    <a class="typedef" href="#EHCIqh" title='EHCIqh' data-type='struct EHCIqh' data-ref="EHCIqh">EHCIqh</a> <dfn class="decl" id="EHCIQueue::qh" title='EHCIQueue::qh' data-ref="EHCIQueue::qh">qh</dfn>;             <i>/* copy of current QH (being worked on) */</i></td></tr>
+<tr><th id="246">246</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIQueue::qhaddr" title='EHCIQueue::qhaddr' data-ref="EHCIQueue::qhaddr">qhaddr</dfn>;       <i>/* address QH read from                 */</i></td></tr>
+<tr><th id="247">247</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIQueue::qtdaddr" title='EHCIQueue::qtdaddr' data-ref="EHCIQueue::qtdaddr">qtdaddr</dfn>;      <i>/* address QTD read from                */</i></td></tr>
+<tr><th id="248">248</th><td>    <em>int</em> <dfn class="decl" id="EHCIQueue::last_pid" title='EHCIQueue::last_pid' data-ref="EHCIQueue::last_pid">last_pid</dfn>;          <i>/* pid of last packet executed          */</i></td></tr>
+<tr><th id="249">249</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBDevice" title='USBDevice' data-type='struct USBDevice' data-ref="USBDevice">USBDevice</a> *<dfn class="decl" id="EHCIQueue::dev" title='EHCIQueue::dev' data-ref="EHCIQueue::dev">dev</dfn>;</td></tr>
+<tr><th id="250">250</th><td>    <a class="macro" href="../../include/qemu/queue.h.html#349" title="struct pkts_head { struct EHCIPacket *tqh_first; struct EHCIPacket * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="pkts_head" title='pkts_head' data-ref="pkts_head"><a class="type" href="#250" title='pkts_head' data-ref="pkts_head">pkts_head</a></dfn>, <a class="type" href="#EHCIPacket" title='EHCIPacket' data-ref="EHCIPacket">EHCIPacket</a>) <dfn class="decl" id="EHCIQueue::packets" title='EHCIQueue::packets' data-ref="EHCIQueue::packets">packets</dfn>;</td></tr>
+<tr><th id="251">251</th><td>};</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td><b>typedef</b> <a class="macro" href="../../include/qemu/queue.h.html#349" title="struct EHCIQueueHead { struct EHCIQueue *tqh_first; struct EHCIQueue * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="EHCIQueueHead" title='EHCIQueueHead' data-ref="EHCIQueueHead"><a class="type" href="#253" title='EHCIQueueHead' data-ref="EHCIQueueHead">EHCIQueueHead</a></dfn>, <a class="type" href="#EHCIQueue" title='EHCIQueue' data-ref="EHCIQueue">EHCIQueue</a>) <dfn class="typedef" id="EHCIQueueHead" title='EHCIQueueHead' data-type='struct EHCIQueueHead' data-ref="EHCIQueueHead">EHCIQueueHead</dfn>;</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><b>struct</b> <dfn class="type def" id="EHCIState" title='EHCIState' data-ref="EHCIState">EHCIState</dfn> {</td></tr>
+<tr><th id="256">256</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBBus" title='USBBus' data-type='struct USBBus' data-ref="USBBus">USBBus</a> <dfn class="decl" id="EHCIState::bus" title='EHCIState::bus' data-ref="EHCIState::bus">bus</dfn>;</td></tr>
+<tr><th id="257">257</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="EHCIState::device" title='EHCIState::device' data-ref="EHCIState::device">device</dfn>;</td></tr>
+<tr><th id="258">258</th><td>    <a class="typedef" href="../../include/hw/irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="EHCIState::irq" title='EHCIState::irq' data-ref="EHCIState::irq">irq</dfn>;</td></tr>
+<tr><th id="259">259</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="EHCIState::mem" title='EHCIState::mem' data-ref="EHCIState::mem">mem</dfn>;</td></tr>
+<tr><th id="260">260</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="decl" id="EHCIState::as" title='EHCIState::as' data-ref="EHCIState::as">as</dfn>;</td></tr>
+<tr><th id="261">261</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="EHCIState::mem_caps" title='EHCIState::mem_caps' data-ref="EHCIState::mem_caps">mem_caps</dfn>;</td></tr>
+<tr><th id="262">262</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="EHCIState::mem_opreg" title='EHCIState::mem_opreg' data-ref="EHCIState::mem_opreg">mem_opreg</dfn>;</td></tr>
+<tr><th id="263">263</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="EHCIState::mem_ports" title='EHCIState::mem_ports' data-ref="EHCIState::mem_ports">mem_ports</dfn>;</td></tr>
+<tr><th id="264">264</th><td>    <em>int</em> <dfn class="decl" id="EHCIState::companion_count" title='EHCIState::companion_count' data-ref="EHCIState::companion_count">companion_count</dfn>;</td></tr>
+<tr><th id="265">265</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="EHCIState::companion_enable" title='EHCIState::companion_enable' data-ref="EHCIState::companion_enable">companion_enable</dfn>;</td></tr>
+<tr><th id="266">266</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="EHCIState::capsbase" title='EHCIState::capsbase' data-ref="EHCIState::capsbase">capsbase</dfn>;</td></tr>
+<tr><th id="267">267</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="EHCIState::opregbase" title='EHCIState::opregbase' data-ref="EHCIState::opregbase">opregbase</dfn>;</td></tr>
+<tr><th id="268">268</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="EHCIState::portscbase" title='EHCIState::portscbase' data-ref="EHCIState::portscbase">portscbase</dfn>;</td></tr>
+<tr><th id="269">269</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="EHCIState::portnr" title='EHCIState::portnr' data-ref="EHCIState::portnr">portnr</dfn>;</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td>    <i>/* properties */</i></td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::maxframes" title='EHCIState::maxframes' data-ref="EHCIState::maxframes">maxframes</dfn>;</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>    <i>/*</i></td></tr>
+<tr><th id="275">275</th><td><i>     *  EHCI spec version 1.0 Section 2.3</i></td></tr>
+<tr><th id="276">276</th><td><i>     *  Host Controller Operational Registers</i></td></tr>
+<tr><th id="277">277</th><td><i>     */</i></td></tr>
+<tr><th id="278">278</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="EHCIState::caps" title='EHCIState::caps' data-ref="EHCIState::caps">caps</dfn>[<a class="macro" href="#40" title="0x10" data-ref="_M/CAPA_SIZE">CAPA_SIZE</a>];</td></tr>
+<tr><th id="279">279</th><td>    <b>union</b> {</td></tr>
+<tr><th id="280">280</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymous)::opreg" title='EHCIState::(anonymous union)::opreg' data-ref="EHCIState::(anonymous)::opreg">opreg</dfn>[<var>0x44</var>/<b>sizeof</b>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)];</td></tr>
+<tr><th id="281">281</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="282">282</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::usbcmd" title='EHCIState::(anonymous union)::(anonymous struct)::usbcmd' data-ref="EHCIState::(anonymousunion)::(anonymous)::usbcmd">usbcmd</dfn>;</td></tr>
+<tr><th id="283">283</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::usbsts" title='EHCIState::(anonymous union)::(anonymous struct)::usbsts' data-ref="EHCIState::(anonymousunion)::(anonymous)::usbsts">usbsts</dfn>;</td></tr>
+<tr><th id="284">284</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::usbintr" title='EHCIState::(anonymous union)::(anonymous struct)::usbintr' data-ref="EHCIState::(anonymousunion)::(anonymous)::usbintr">usbintr</dfn>;</td></tr>
+<tr><th id="285">285</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::frindex" title='EHCIState::(anonymous union)::(anonymous struct)::frindex' data-ref="EHCIState::(anonymousunion)::(anonymous)::frindex">frindex</dfn>;</td></tr>
+<tr><th id="286">286</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::ctrldssegment" title='EHCIState::(anonymous union)::(anonymous struct)::ctrldssegment' data-ref="EHCIState::(anonymousunion)::(anonymous)::ctrldssegment">ctrldssegment</dfn>;</td></tr>
+<tr><th id="287">287</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::periodiclistbase" title='EHCIState::(anonymous union)::(anonymous struct)::periodiclistbase' data-ref="EHCIState::(anonymousunion)::(anonymous)::periodiclistbase">periodiclistbase</dfn>;</td></tr>
+<tr><th id="288">288</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::asynclistaddr" title='EHCIState::(anonymous union)::(anonymous struct)::asynclistaddr' data-ref="EHCIState::(anonymousunion)::(anonymous)::asynclistaddr">asynclistaddr</dfn>;</td></tr>
+<tr><th id="289">289</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::notused" title='EHCIState::(anonymous union)::(anonymous struct)::notused' data-ref="EHCIState::(anonymousunion)::(anonymous)::notused">notused</dfn>[<var>9</var>];</td></tr>
+<tr><th id="290">290</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::(anonymousunion)::(anonymous)::configflag" title='EHCIState::(anonymous union)::(anonymous struct)::configflag' data-ref="EHCIState::(anonymousunion)::(anonymous)::configflag">configflag</dfn>;</td></tr>
+<tr><th id="291">291</th><td>        };</td></tr>
+<tr><th id="292">292</th><td>    };</td></tr>
+<tr><th id="293">293</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::portsc" title='EHCIState::portsc' data-ref="EHCIState::portsc">portsc</dfn>[<a class="macro" href="#42" title="6" data-ref="_M/NB_PORTS">NB_PORTS</a>];</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td>    <i>/*</i></td></tr>
+<tr><th id="296">296</th><td><i>     *  Internal states, shadow registers, etc</i></td></tr>
+<tr><th id="297">297</th><td><i>     */</i></td></tr>
+<tr><th id="298">298</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="EHCIState::frame_timer" title='EHCIState::frame_timer' data-ref="EHCIState::frame_timer">frame_timer</dfn>;</td></tr>
+<tr><th id="299">299</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="EHCIState::async_bh" title='EHCIState::async_bh' data-ref="EHCIState::async_bh">async_bh</dfn>;</td></tr>
+<tr><th id="300">300</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="EHCIState::working" title='EHCIState::working' data-ref="EHCIState::working">working</dfn>;</td></tr>
+<tr><th id="301">301</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::astate" title='EHCIState::astate' data-ref="EHCIState::astate">astate</dfn>;         <i>/* Current state in asynchronous schedule */</i></td></tr>
+<tr><th id="302">302</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::pstate" title='EHCIState::pstate' data-ref="EHCIState::pstate">pstate</dfn>;         <i>/* Current state in periodic schedule     */</i></td></tr>
+<tr><th id="303">303</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPort" title='USBPort' data-type='struct USBPort' data-ref="USBPort">USBPort</a> <dfn class="decl" id="EHCIState::ports" title='EHCIState::ports' data-ref="EHCIState::ports">ports</dfn>[<a class="macro" href="#42" title="6" data-ref="_M/NB_PORTS">NB_PORTS</a>];</td></tr>
+<tr><th id="304">304</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPort" title='USBPort' data-type='struct USBPort' data-ref="USBPort">USBPort</a> *<dfn class="decl" id="EHCIState::companion_ports" title='EHCIState::companion_ports' data-ref="EHCIState::companion_ports">companion_ports</dfn>[<a class="macro" href="#42" title="6" data-ref="_M/NB_PORTS">NB_PORTS</a>];</td></tr>
+<tr><th id="305">305</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::usbsts_pending" title='EHCIState::usbsts_pending' data-ref="EHCIState::usbsts_pending">usbsts_pending</dfn>;</td></tr>
+<tr><th id="306">306</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::usbsts_frindex" title='EHCIState::usbsts_frindex' data-ref="EHCIState::usbsts_frindex">usbsts_frindex</dfn>;</td></tr>
+<tr><th id="307">307</th><td>    <a class="typedef" href="#EHCIQueueHead" title='EHCIQueueHead' data-type='struct EHCIQueueHead' data-ref="EHCIQueueHead">EHCIQueueHead</a> <dfn class="decl" id="EHCIState::aqueues" title='EHCIState::aqueues' data-ref="EHCIState::aqueues">aqueues</dfn>;</td></tr>
+<tr><th id="308">308</th><td>    <a class="typedef" href="#EHCIQueueHead" title='EHCIQueueHead' data-type='struct EHCIQueueHead' data-ref="EHCIQueueHead">EHCIQueueHead</a> <dfn class="decl" id="EHCIState::pqueues" title='EHCIState::pqueues' data-ref="EHCIState::pqueues">pqueues</dfn>;</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>    <i>/* which address to look at next */</i></td></tr>
+<tr><th id="311">311</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::a_fetch_addr" title='EHCIState::a_fetch_addr' data-ref="EHCIState::a_fetch_addr">a_fetch_addr</dfn>;</td></tr>
+<tr><th id="312">312</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::p_fetch_addr" title='EHCIState::p_fetch_addr' data-ref="EHCIState::p_fetch_addr">p_fetch_addr</dfn>;</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPacket" title='USBPacket' data-type='struct USBPacket' data-ref="USBPacket">USBPacket</a> <dfn class="decl" id="EHCIState::ipacket" title='EHCIState::ipacket' data-ref="EHCIState::ipacket">ipacket</dfn>;</td></tr>
+<tr><th id="315">315</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUSGList" title='QEMUSGList' data-type='struct QEMUSGList' data-ref="QEMUSGList">QEMUSGList</a> <dfn class="decl" id="EHCIState::isgl" title='EHCIState::isgl' data-ref="EHCIState::isgl">isgl</dfn>;</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="EHCIState::last_run_ns" title='EHCIState::last_run_ns' data-ref="EHCIState::last_run_ns">last_run_ns</dfn>;</td></tr>
+<tr><th id="318">318</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::async_stepdown" title='EHCIState::async_stepdown' data-ref="EHCIState::async_stepdown">async_stepdown</dfn>;</td></tr>
+<tr><th id="319">319</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="EHCIState::periodic_sched_active" title='EHCIState::periodic_sched_active' data-ref="EHCIState::periodic_sched_active">periodic_sched_active</dfn>;</td></tr>
+<tr><th id="320">320</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="EHCIState::int_req_by_async" title='EHCIState::int_req_by_async' data-ref="EHCIState::int_req_by_async">int_req_by_async</dfn>;</td></tr>
+<tr><th id="321">321</th><td>    <a class="typedef" href="../../include/sysemu/sysemu.h.html#VMChangeStateEntry" title='VMChangeStateEntry' data-type='struct vm_change_state_entry' data-ref="VMChangeStateEntry">VMChangeStateEntry</a> *<dfn class="decl" id="EHCIState::vmstate" title='EHCIState::vmstate' data-ref="EHCIState::vmstate">vmstate</dfn>;</td></tr>
+<tr><th id="322">322</th><td>};</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_ehci" title='vmstate_ehci' data-ref="vmstate_ehci">vmstate_ehci</dfn>;</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td><em>void</em> <dfn class="decl" id="usb_ehci_init" title='usb_ehci_init' data-ref="usb_ehci_init">usb_ehci_init</dfn>(<a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='EHCIState *' data-ref="1s">s</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col2 decl" id="2dev" title='dev' data-type='DeviceState *' data-ref="2dev">dev</dfn>);</td></tr>
+<tr><th id="327">327</th><td><em>void</em> <dfn class="decl" id="usb_ehci_finalize" title='usb_ehci_finalize' data-ref="usb_ehci_finalize">usb_ehci_finalize</dfn>(<a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> *<dfn class="local col3 decl" id="3s" title='s' data-type='EHCIState *' data-ref="3s">s</dfn>);</td></tr>
+<tr><th id="328">328</th><td><em>void</em> <dfn class="decl" id="usb_ehci_realize" title='usb_ehci_realize' data-ref="usb_ehci_realize">usb_ehci_realize</dfn>(<a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> *<dfn class="local col4 decl" id="4s" title='s' data-type='EHCIState *' data-ref="4s">s</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col5 decl" id="5dev" title='dev' data-type='DeviceState *' data-ref="5dev">dev</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="6errp" title='errp' data-type='Error **' data-ref="6errp">errp</dfn>);</td></tr>
+<tr><th id="329">329</th><td><em>void</em> <dfn class="decl" id="usb_ehci_unrealize" title='usb_ehci_unrealize' data-ref="usb_ehci_unrealize">usb_ehci_unrealize</dfn>(<a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> *<dfn class="local col7 decl" id="7s" title='s' data-type='EHCIState *' data-ref="7s">s</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col8 decl" id="8dev" title='dev' data-type='DeviceState *' data-ref="8dev">dev</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="9errp" title='errp' data-type='Error **' data-ref="9errp">errp</dfn>);</td></tr>
+<tr><th id="330">330</th><td><em>void</em> <dfn class="decl" id="ehci_reset" title='ehci_reset' data-ref="ehci_reset">ehci_reset</dfn>(<em>void</em> *<dfn class="local col0 decl" id="10opaque" title='opaque' data-type='void *' data-ref="10opaque">opaque</dfn>);</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td><u>#define <dfn class="macro" id="_M/TYPE_PCI_EHCI" data-ref="_M/TYPE_PCI_EHCI">TYPE_PCI_EHCI</dfn> "pci-ehci-usb"</u></td></tr>
+<tr><th id="333">333</th><td><u>#define <dfn class="macro" id="_M/PCI_EHCI" data-ref="_M/PCI_EHCI">PCI_EHCI</dfn>(obj) OBJECT_CHECK(EHCIPCIState, (obj), TYPE_PCI_EHCI)</u></td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCIPCIState" title='EHCIPCIState' data-ref="EHCIPCIState"><a class="type" href="#EHCIPCIState" title='EHCIPCIState' data-ref="EHCIPCIState">EHCIPCIState</a></dfn> {</td></tr>
+<tr><th id="336">336</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="337">337</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="EHCIPCIState::pcidev" title='EHCIPCIState::pcidev' data-ref="EHCIPCIState::pcidev">pcidev</dfn>;</td></tr>
+<tr><th id="338">338</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>    <a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> <dfn class="decl" id="EHCIPCIState::ehci" title='EHCIPCIState::ehci' data-ref="EHCIPCIState::ehci">ehci</dfn>;</td></tr>
+<tr><th id="341">341</th><td>} <dfn class="typedef" id="EHCIPCIState" title='EHCIPCIState' data-type='struct EHCIPCIState' data-ref="EHCIPCIState">EHCIPCIState</dfn>;</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td><u>#define <dfn class="macro" id="_M/TYPE_SYS_BUS_EHCI" data-ref="_M/TYPE_SYS_BUS_EHCI">TYPE_SYS_BUS_EHCI</dfn> "sysbus-ehci-usb"</u></td></tr>
+<tr><th id="345">345</th><td><u>#define <dfn class="macro" id="_M/TYPE_EXYNOS4210_EHCI" data-ref="_M/TYPE_EXYNOS4210_EHCI">TYPE_EXYNOS4210_EHCI</dfn> "exynos4210-ehci-usb"</u></td></tr>
+<tr><th id="346">346</th><td><u>#define <dfn class="macro" id="_M/TYPE_TEGRA2_EHCI" data-ref="_M/TYPE_TEGRA2_EHCI">TYPE_TEGRA2_EHCI</dfn> "tegra2-ehci-usb"</u></td></tr>
+<tr><th id="347">347</th><td><u>#define <dfn class="macro" id="_M/TYPE_FUSBH200_EHCI" data-ref="_M/TYPE_FUSBH200_EHCI">TYPE_FUSBH200_EHCI</dfn> "fusbh200-ehci-usb"</u></td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td><u>#define <dfn class="macro" id="_M/SYS_BUS_EHCI" data-ref="_M/SYS_BUS_EHCI">SYS_BUS_EHCI</dfn>(obj) \</u></td></tr>
+<tr><th id="350">350</th><td><u>    OBJECT_CHECK(EHCISysBusState, (obj), TYPE_SYS_BUS_EHCI)</u></td></tr>
+<tr><th id="351">351</th><td><u>#define <dfn class="macro" id="_M/SYS_BUS_EHCI_CLASS" data-ref="_M/SYS_BUS_EHCI_CLASS">SYS_BUS_EHCI_CLASS</dfn>(class) \</u></td></tr>
+<tr><th id="352">352</th><td><u>    OBJECT_CLASS_CHECK(SysBusEHCIClass, (class), TYPE_SYS_BUS_EHCI)</u></td></tr>
+<tr><th id="353">353</th><td><u>#define <dfn class="macro" id="_M/SYS_BUS_EHCI_GET_CLASS" data-ref="_M/SYS_BUS_EHCI_GET_CLASS">SYS_BUS_EHCI_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="354">354</th><td><u>    OBJECT_GET_CLASS(SysBusEHCIClass, (obj), TYPE_SYS_BUS_EHCI)</u></td></tr>
+<tr><th id="355">355</th><td></td></tr>
+<tr><th id="356">356</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="EHCISysBusState" title='EHCISysBusState' data-ref="EHCISysBusState"><a class="type" href="#EHCISysBusState" title='EHCISysBusState' data-ref="EHCISysBusState">EHCISysBusState</a></dfn> {</td></tr>
+<tr><th id="357">357</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="358">358</th><td>    <a class="typedef" href="../../include/hw/sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="decl" id="EHCISysBusState::parent_obj" title='EHCISysBusState::parent_obj' data-ref="EHCISysBusState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="359">359</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>    <a class="typedef" href="#EHCIState" title='EHCIState' data-type='struct EHCIState' data-ref="EHCIState">EHCIState</a> <dfn class="decl" id="EHCISysBusState::ehci" title='EHCISysBusState::ehci' data-ref="EHCISysBusState::ehci">ehci</dfn>;</td></tr>
+<tr><th id="362">362</th><td>} <dfn class="typedef" id="EHCISysBusState" title='EHCISysBusState' data-type='struct EHCISysBusState' data-ref="EHCISysBusState">EHCISysBusState</dfn>;</td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="SysBusEHCIClass" title='SysBusEHCIClass' data-ref="SysBusEHCIClass"><a class="type" href="#SysBusEHCIClass" title='SysBusEHCIClass' data-ref="SysBusEHCIClass">SysBusEHCIClass</a></dfn> {</td></tr>
+<tr><th id="365">365</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="366">366</th><td>    <a class="typedef" href="../../include/hw/sysbus.h.html#SysBusDeviceClass" title='SysBusDeviceClass' data-type='struct SysBusDeviceClass' data-ref="SysBusDeviceClass">SysBusDeviceClass</a> <dfn class="decl" id="SysBusEHCIClass::parent_class" title='SysBusEHCIClass::parent_class' data-ref="SysBusEHCIClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="367">367</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SysBusEHCIClass::capsbase" title='SysBusEHCIClass::capsbase' data-ref="SysBusEHCIClass::capsbase">capsbase</dfn>;</td></tr>
+<tr><th id="370">370</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SysBusEHCIClass::opregbase" title='SysBusEHCIClass::opregbase' data-ref="SysBusEHCIClass::opregbase">opregbase</dfn>;</td></tr>
+<tr><th id="371">371</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SysBusEHCIClass::portscbase" title='SysBusEHCIClass::portscbase' data-ref="SysBusEHCIClass::portscbase">portscbase</dfn>;</td></tr>
+<tr><th id="372">372</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SysBusEHCIClass::portnr" title='SysBusEHCIClass::portnr' data-ref="SysBusEHCIClass::portnr">portnr</dfn>;</td></tr>
+<tr><th id="373">373</th><td>} <dfn class="typedef" id="SysBusEHCIClass" title='SysBusEHCIClass' data-type='struct SysBusEHCIClass' data-ref="SysBusEHCIClass">SysBusEHCIClass</dfn>;</td></tr>
+<tr><th id="374">374</th><td></td></tr>
+<tr><th id="375">375</th><td><u>#define <dfn class="macro" id="_M/FUSBH200_EHCI" data-ref="_M/FUSBH200_EHCI">FUSBH200_EHCI</dfn>(obj) \</u></td></tr>
+<tr><th id="376">376</th><td><u>    OBJECT_CHECK(FUSBH200EHCIState, (obj), TYPE_FUSBH200_EHCI)</u></td></tr>
+<tr><th id="377">377</th><td></td></tr>
+<tr><th id="378">378</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="FUSBH200EHCIState" title='FUSBH200EHCIState' data-ref="FUSBH200EHCIState"><a class="type" href="#FUSBH200EHCIState" title='FUSBH200EHCIState' data-ref="FUSBH200EHCIState">FUSBH200EHCIState</a></dfn> {</td></tr>
+<tr><th id="379">379</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="380">380</th><td>    <a class="typedef" href="#EHCISysBusState" title='EHCISysBusState' data-type='struct EHCISysBusState' data-ref="EHCISysBusState">EHCISysBusState</a> <dfn class="decl" id="FUSBH200EHCIState::parent_obj" title='FUSBH200EHCIState::parent_obj' data-ref="FUSBH200EHCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="381">381</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="FUSBH200EHCIState::mem_vendor" title='FUSBH200EHCIState::mem_vendor' data-ref="FUSBH200EHCIState::mem_vendor">mem_vendor</dfn>;</td></tr>
+<tr><th id="384">384</th><td>} <dfn class="typedef" id="FUSBH200EHCIState" title='FUSBH200EHCIState' data-type='struct FUSBH200EHCIState' data-ref="FUSBH200EHCIState">FUSBH200EHCIState</dfn>;</td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td><u>#<span data-ppcond="18">endif</span></u></td></tr>
+<tr><th id="387">387</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='hcd-ehci-pci.c.html'>codebrowser/hw/usb/hcd-ehci-pci.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

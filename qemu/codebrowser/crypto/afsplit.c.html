@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>afsplit.c source code [codebrowser/crypto/afsplit.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/crypto/afsplit.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>crypto</a>/<a href='afsplit.c.html'>afsplit.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Crypto anti forensic information splitter</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015-2016 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Derived from cryptsetup package lib/luks1/af.c</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Copyright (C) 2004, Clemens Fruhwirth &lt;clemens@endorphin.org&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> * Copyright (C) 2009-2012, Red Hat, Inc. All rights reserved.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="12">12</th><td><i> * modify it under the terms of the GNU General Public License</i></td></tr>
+<tr><th id="13">13</th><td><i> * as published by the Free Software Foundation; either version 2</i></td></tr>
+<tr><th id="14">14</th><td><i> * of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="17">17</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="18">18</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="19">19</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="22">22</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="23">23</th><td><i> *</i></td></tr>
+<tr><th id="24">24</th><td><i> */</i></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qemu/bswap.h.html">"qemu/bswap.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/crypto/afsplit.h.html">"crypto/afsplit.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/crypto/random.h.html">"crypto/random.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qcrypto_afsplit_xor" title='qcrypto_afsplit_xor' data-type='void qcrypto_afsplit_xor(size_t blocklen, const uint8_t * in1, const uint8_t * in2, uint8_t * out)' data-ref="qcrypto_afsplit_xor">qcrypto_afsplit_xor</dfn>(<span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="17blocklen" title='blocklen' data-type='size_t' data-ref="17blocklen">blocklen</dfn>,</td></tr>
+<tr><th id="33">33</th><td>                                <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="18in1" title='in1' data-type='const uint8_t *' data-ref="18in1">in1</dfn>,</td></tr>
+<tr><th id="34">34</th><td>                                <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="19in2" title='in2' data-type='const uint8_t *' data-ref="19in2">in2</dfn>,</td></tr>
+<tr><th id="35">35</th><td>                                <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="20out" title='out' data-type='uint8_t *' data-ref="20out">out</dfn>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="21i" title='i' data-type='size_t' data-ref="21i">i</dfn>;</td></tr>
+<tr><th id="38">38</th><td>    <b>for</b> (<a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a> = <var>0</var>; <a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a> &lt; <a class="local col7 ref" href="#17blocklen" title='blocklen' data-ref="17blocklen">blocklen</a>; <a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a>++) {</td></tr>
+<tr><th id="39">39</th><td>        <a class="local col0 ref" href="#20out" title='out' data-ref="20out">out</a>[<a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a>] = <a class="local col8 ref" href="#18in1" title='in1' data-ref="18in1">in1</a>[<a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a>] ^ <a class="local col9 ref" href="#19in2" title='in2' data-ref="19in2">in2</a>[<a class="local col1 ref" href="#21i" title='i' data-ref="21i">i</a>];</td></tr>
+<tr><th id="40">40</th><td>    }</td></tr>
+<tr><th id="41">41</th><td>}</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="qcrypto_afsplit_hash" title='qcrypto_afsplit_hash' data-type='int qcrypto_afsplit_hash(QCryptoHashAlgorithm hash, size_t blocklen, uint8_t * block, Error ** errp)' data-ref="qcrypto_afsplit_hash">qcrypto_afsplit_hash</dfn>(<a class="typedef" href="../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="local col2 decl" id="22hash" title='hash' data-type='QCryptoHashAlgorithm' data-ref="22hash">hash</dfn>,</td></tr>
+<tr><th id="45">45</th><td>                                <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col3 decl" id="23blocklen" title='blocklen' data-type='size_t' data-ref="23blocklen">blocklen</dfn>,</td></tr>
+<tr><th id="46">46</th><td>                                <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col4 decl" id="24block" title='block' data-type='uint8_t *' data-ref="24block">block</dfn>,</td></tr>
+<tr><th id="47">47</th><td>                                <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="25errp" title='errp' data-type='Error **' data-ref="25errp">errp</dfn>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="26digestlen" title='digestlen' data-type='size_t' data-ref="26digestlen">digestlen</dfn> = <a class="ref" href="../include/crypto/hash.h.html#qcrypto_hash_digest_len" title='qcrypto_hash_digest_len' data-ref="qcrypto_hash_digest_len">qcrypto_hash_digest_len</a>(<a class="local col2 ref" href="#22hash" title='hash' data-ref="22hash">hash</a>);</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="27hashcount" title='hashcount' data-type='size_t' data-ref="27hashcount">hashcount</dfn> = <a class="local col3 ref" href="#23blocklen" title='blocklen' data-ref="23blocklen">blocklen</a> / <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>;</td></tr>
+<tr><th id="52">52</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col8 decl" id="28finallen" title='finallen' data-type='size_t' data-ref="28finallen">finallen</dfn> = <a class="local col3 ref" href="#23blocklen" title='blocklen' data-ref="23blocklen">blocklen</a> % <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="29i" title='i' data-type='uint32_t' data-ref="29i">i</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <b>if</b> (<a class="local col8 ref" href="#28finallen" title='finallen' data-ref="28finallen">finallen</a>) {</td></tr>
+<tr><th id="56">56</th><td>        <a class="local col7 ref" href="#27hashcount" title='hashcount' data-ref="27hashcount">hashcount</a>++;</td></tr>
+<tr><th id="57">57</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="58">58</th><td>        <a class="local col8 ref" href="#28finallen" title='finallen' data-ref="28finallen">finallen</a> = <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>;</td></tr>
+<tr><th id="59">59</th><td>    }</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    <b>for</b> (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> = <var>0</var>; <a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> &lt; <a class="local col7 ref" href="#27hashcount" title='hashcount' data-ref="27hashcount">hashcount</a>; <a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>++) {</td></tr>
+<tr><th id="62">62</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="30out" title='out' data-type='uint8_t *' data-ref="30out">out</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="63">63</th><td>        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="31outlen" title='outlen' data-type='size_t' data-ref="31outlen">outlen</dfn> = <var>0</var>;</td></tr>
+<tr><th id="64">64</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="32iv" title='iv' data-type='uint32_t' data-ref="32iv">iv</dfn> = <a class="ref" href="../include/qemu/bswap.h.html#163" title='cpu_to_be32' data-ref="cpu_to_be32">cpu_to_be32</a>(<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>);</td></tr>
+<tr><th id="65">65</th><td>        <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="local col3 decl" id="33in" title='in' data-type='struct iovec [2]' data-ref="33in">in</dfn>[] = {</td></tr>
+<tr><th id="66">66</th><td>            { .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = &amp;<a class="local col2 ref" href="#32iv" title='iv' data-ref="32iv">iv</a>,</td></tr>
+<tr><th id="67">67</th><td>              .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a> = <b>sizeof</b>(<a class="local col2 ref" href="#32iv" title='iv' data-ref="32iv">iv</a>) },</td></tr>
+<tr><th id="68">68</th><td>            { .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = <a class="local col4 ref" href="#24block" title='block' data-ref="24block">block</a> + (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> * <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>),</td></tr>
+<tr><th id="69">69</th><td>              .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a> = (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> == (<a class="local col7 ref" href="#27hashcount" title='hashcount' data-ref="27hashcount">hashcount</a> - <var>1</var>)) ? <a class="local col8 ref" href="#28finallen" title='finallen' data-ref="28finallen">finallen</a> : <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a> },</td></tr>
+<tr><th id="70">70</th><td>        };</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>        <b>if</b> (<a class="ref" href="../include/crypto/hash.h.html#qcrypto_hash_bytesv" title='qcrypto_hash_bytesv' data-ref="qcrypto_hash_bytesv">qcrypto_hash_bytesv</a>(<a class="local col2 ref" href="#22hash" title='hash' data-ref="22hash">hash</a>,</td></tr>
+<tr><th id="73">73</th><td>                                <a class="local col3 ref" href="#33in" title='in' data-ref="33in">in</a>,</td></tr>
+<tr><th id="74">74</th><td>                                <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#303" title="(sizeof (in) / sizeof ((in)[0]))" data-ref="_M/G_N_ELEMENTS">G_N_ELEMENTS</a>(<a class="local col3 ref" href="#33in" title='in' data-ref="33in">in</a>),</td></tr>
+<tr><th id="75">75</th><td>                                &amp;<a class="local col0 ref" href="#30out" title='out' data-ref="30out">out</a>, &amp;<a class="local col1 ref" href="#31outlen" title='outlen' data-ref="31outlen">outlen</a>,</td></tr>
+<tr><th id="76">76</th><td>                                <a class="local col5 ref" href="#25errp" title='errp' data-ref="25errp">errp</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="77">77</th><td>            <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="78">78</th><td>        }</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((outlen == digestlen) ? (void) (0) : __assert_fail (&quot;outlen == digestlen&quot;, &quot;/home/jon/workspace/qemu/crypto/afsplit.c&quot;, 80, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col1 ref" href="#31outlen" title='outlen' data-ref="31outlen">outlen</a> == <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>);</td></tr>
+<tr><th id="81">81</th><td>        <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col4 ref" href="#24block" title='block' data-ref="24block">block</a> + (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> * <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>), <a class="local col0 ref" href="#30out" title='out' data-ref="30out">out</a>,</td></tr>
+<tr><th id="82">82</th><td>               (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> == (<a class="local col7 ref" href="#27hashcount" title='hashcount' data-ref="27hashcount">hashcount</a> - <var>1</var>)) ? <a class="local col8 ref" href="#28finallen" title='finallen' data-ref="28finallen">finallen</a> : <a class="local col6 ref" href="#26digestlen" title='digestlen' data-ref="26digestlen">digestlen</a>);</td></tr>
+<tr><th id="83">83</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col0 ref" href="#30out" title='out' data-ref="30out">out</a>);</td></tr>
+<tr><th id="84">84</th><td>    }</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="87">87</th><td>}</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>int</em> <dfn class="decl def" id="qcrypto_afsplit_encode" title='qcrypto_afsplit_encode' data-ref="qcrypto_afsplit_encode">qcrypto_afsplit_encode</dfn>(<a class="typedef" href="../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="local col4 decl" id="34hash" title='hash' data-type='QCryptoHashAlgorithm' data-ref="34hash">hash</dfn>,</td></tr>
+<tr><th id="91">91</th><td>                           <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="35blocklen" title='blocklen' data-type='size_t' data-ref="35blocklen">blocklen</dfn>,</td></tr>
+<tr><th id="92">92</th><td>                           <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="36stripes" title='stripes' data-type='uint32_t' data-ref="36stripes">stripes</dfn>,</td></tr>
+<tr><th id="93">93</th><td>                           <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="37in" title='in' data-type='const uint8_t *' data-ref="37in">in</dfn>,</td></tr>
+<tr><th id="94">94</th><td>                           <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="38out" title='out' data-type='uint8_t *' data-ref="38out">out</dfn>,</td></tr>
+<tr><th id="95">95</th><td>                           <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="39errp" title='errp' data-type='Error **' data-ref="39errp">errp</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="40block" title='block' data-type='uint8_t *' data-ref="40block">block</dfn> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((uint8_t *) g_malloc0_n ((blocklen), sizeof (uint8_t)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>, <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>);</td></tr>
+<tr><th id="98">98</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="41i" title='i' data-type='size_t' data-ref="41i">i</dfn>;</td></tr>
+<tr><th id="99">99</th><td>    <em>int</em> <dfn class="local col2 decl" id="42ret" title='ret' data-type='int' data-ref="42ret">ret</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <b>for</b> (<a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a> = <var>0</var>; <a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a> &lt; (<a class="local col6 ref" href="#36stripes" title='stripes' data-ref="36stripes">stripes</a> - <var>1</var>); <a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a>++) {</td></tr>
+<tr><th id="102">102</th><td>        <b>if</b> (<a class="ref" href="../include/crypto/random.h.html#qcrypto_random_bytes" title='qcrypto_random_bytes' data-ref="qcrypto_random_bytes">qcrypto_random_bytes</a>(<a class="local col8 ref" href="#38out" title='out' data-ref="38out">out</a> + (<a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a> * <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>), <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>, <a class="local col9 ref" href="#39errp" title='errp' data-ref="39errp">errp</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="103">103</th><td>            <b>goto</b> <a class="lbl" href="#43cleanup" data-ref="43cleanup">cleanup</a>;</td></tr>
+<tr><th id="104">104</th><td>        }</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>        <a class="tu ref" href="#qcrypto_afsplit_xor" title='qcrypto_afsplit_xor' data-use='c' data-ref="qcrypto_afsplit_xor">qcrypto_afsplit_xor</a>(<a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>,</td></tr>
+<tr><th id="107">107</th><td>                            <a class="local col8 ref" href="#38out" title='out' data-ref="38out">out</a> + (<a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a> * <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>),</td></tr>
+<tr><th id="108">108</th><td>                            <a class="local col0 ref" href="#40block" title='block' data-ref="40block">block</a>,</td></tr>
+<tr><th id="109">109</th><td>                            <a class="local col0 ref" href="#40block" title='block' data-ref="40block">block</a>);</td></tr>
+<tr><th id="110">110</th><td>        <b>if</b> (<a class="tu ref" href="#qcrypto_afsplit_hash" title='qcrypto_afsplit_hash' data-use='c' data-ref="qcrypto_afsplit_hash">qcrypto_afsplit_hash</a>(<a class="local col4 ref" href="#34hash" title='hash' data-ref="34hash">hash</a>, <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>, <a class="local col0 ref" href="#40block" title='block' data-ref="40block">block</a>,</td></tr>
+<tr><th id="111">111</th><td>                                 <a class="local col9 ref" href="#39errp" title='errp' data-ref="39errp">errp</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="112">112</th><td>            <b>goto</b> <a class="lbl" href="#43cleanup" data-ref="43cleanup">cleanup</a>;</td></tr>
+<tr><th id="113">113</th><td>        }</td></tr>
+<tr><th id="114">114</th><td>    }</td></tr>
+<tr><th id="115">115</th><td>    <a class="tu ref" href="#qcrypto_afsplit_xor" title='qcrypto_afsplit_xor' data-use='c' data-ref="qcrypto_afsplit_xor">qcrypto_afsplit_xor</a>(<a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>,</td></tr>
+<tr><th id="116">116</th><td>                        <a class="local col7 ref" href="#37in" title='in' data-ref="37in">in</a>,</td></tr>
+<tr><th id="117">117</th><td>                        <a class="local col0 ref" href="#40block" title='block' data-ref="40block">block</a>,</td></tr>
+<tr><th id="118">118</th><td>                        <a class="local col8 ref" href="#38out" title='out' data-ref="38out">out</a> + (<a class="local col1 ref" href="#41i" title='i' data-ref="41i">i</a> * <a class="local col5 ref" href="#35blocklen" title='blocklen' data-ref="35blocklen">blocklen</a>));</td></tr>
+<tr><th id="119">119</th><td>    <a class="local col2 ref" href="#42ret" title='ret' data-ref="42ret">ret</a> = <var>0</var>;</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td> <dfn class="lbl" id="43cleanup" data-ref="43cleanup">cleanup</dfn>:</td></tr>
+<tr><th id="122">122</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col0 ref" href="#40block" title='block' data-ref="40block">block</a>);</td></tr>
+<tr><th id="123">123</th><td>    <b>return</b> <a class="local col2 ref" href="#42ret" title='ret' data-ref="42ret">ret</a>;</td></tr>
+<tr><th id="124">124</th><td>}</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><em>int</em> <dfn class="decl def" id="qcrypto_afsplit_decode" title='qcrypto_afsplit_decode' data-ref="qcrypto_afsplit_decode">qcrypto_afsplit_decode</dfn>(<a class="typedef" href="../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="local col4 decl" id="44hash" title='hash' data-type='QCryptoHashAlgorithm' data-ref="44hash">hash</dfn>,</td></tr>
+<tr><th id="128">128</th><td>                           <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="45blocklen" title='blocklen' data-type='size_t' data-ref="45blocklen">blocklen</dfn>,</td></tr>
+<tr><th id="129">129</th><td>                           <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="46stripes" title='stripes' data-type='uint32_t' data-ref="46stripes">stripes</dfn>,</td></tr>
+<tr><th id="130">130</th><td>                           <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="47in" title='in' data-type='const uint8_t *' data-ref="47in">in</dfn>,</td></tr>
+<tr><th id="131">131</th><td>                           <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="48out" title='out' data-type='uint8_t *' data-ref="48out">out</dfn>,</td></tr>
+<tr><th id="132">132</th><td>                           <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="49errp" title='errp' data-type='Error **' data-ref="49errp">errp</dfn>)</td></tr>
+<tr><th id="133">133</th><td>{</td></tr>
+<tr><th id="134">134</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="50block" title='block' data-type='uint8_t *' data-ref="50block">block</dfn> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((uint8_t *) g_malloc0_n ((blocklen), sizeof (uint8_t)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>, <a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>);</td></tr>
+<tr><th id="135">135</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="51i" title='i' data-type='size_t' data-ref="51i">i</dfn>;</td></tr>
+<tr><th id="136">136</th><td>    <em>int</em> <dfn class="local col2 decl" id="52ret" title='ret' data-type='int' data-ref="52ret">ret</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    <b>for</b> (<a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a> = <var>0</var>; <a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a> &lt; (<a class="local col6 ref" href="#46stripes" title='stripes' data-ref="46stripes">stripes</a> - <var>1</var>); <a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a>++) {</td></tr>
+<tr><th id="139">139</th><td>        <a class="tu ref" href="#qcrypto_afsplit_xor" title='qcrypto_afsplit_xor' data-use='c' data-ref="qcrypto_afsplit_xor">qcrypto_afsplit_xor</a>(<a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>,</td></tr>
+<tr><th id="140">140</th><td>                            <a class="local col7 ref" href="#47in" title='in' data-ref="47in">in</a> + (<a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a> * <a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>),</td></tr>
+<tr><th id="141">141</th><td>                            <a class="local col0 ref" href="#50block" title='block' data-ref="50block">block</a>,</td></tr>
+<tr><th id="142">142</th><td>                            <a class="local col0 ref" href="#50block" title='block' data-ref="50block">block</a>);</td></tr>
+<tr><th id="143">143</th><td>        <b>if</b> (<a class="tu ref" href="#qcrypto_afsplit_hash" title='qcrypto_afsplit_hash' data-use='c' data-ref="qcrypto_afsplit_hash">qcrypto_afsplit_hash</a>(<a class="local col4 ref" href="#44hash" title='hash' data-ref="44hash">hash</a>, <a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>, <a class="local col0 ref" href="#50block" title='block' data-ref="50block">block</a>,</td></tr>
+<tr><th id="144">144</th><td>                                 <a class="local col9 ref" href="#49errp" title='errp' data-ref="49errp">errp</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="145">145</th><td>            <b>goto</b> <a class="lbl" href="#53cleanup" data-ref="53cleanup">cleanup</a>;</td></tr>
+<tr><th id="146">146</th><td>        }</td></tr>
+<tr><th id="147">147</th><td>    }</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>    <a class="tu ref" href="#qcrypto_afsplit_xor" title='qcrypto_afsplit_xor' data-use='c' data-ref="qcrypto_afsplit_xor">qcrypto_afsplit_xor</a>(<a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>,</td></tr>
+<tr><th id="150">150</th><td>                        <a class="local col7 ref" href="#47in" title='in' data-ref="47in">in</a> + (<a class="local col1 ref" href="#51i" title='i' data-ref="51i">i</a> * <a class="local col5 ref" href="#45blocklen" title='blocklen' data-ref="45blocklen">blocklen</a>),</td></tr>
+<tr><th id="151">151</th><td>                        <a class="local col0 ref" href="#50block" title='block' data-ref="50block">block</a>,</td></tr>
+<tr><th id="152">152</th><td>                        <a class="local col8 ref" href="#48out" title='out' data-ref="48out">out</a>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <a class="local col2 ref" href="#52ret" title='ret' data-ref="52ret">ret</a> = <var>0</var>;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td> <dfn class="lbl" id="53cleanup" data-ref="53cleanup">cleanup</dfn>:</td></tr>
+<tr><th id="157">157</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col0 ref" href="#50block" title='block' data-ref="50block">block</a>);</td></tr>
+<tr><th id="158">158</th><td>    <b>return</b> <a class="local col2 ref" href="#52ret" title='ret' data-ref="52ret">ret</a>;</td></tr>
+<tr><th id="159">159</th><td>}</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

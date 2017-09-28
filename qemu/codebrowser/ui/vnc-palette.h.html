@@ -1,0 +1,86 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>vnc-palette.h source code [codebrowser/ui/vnc-palette.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="VncPalette,VncPaletteEntry "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/ui/vnc-palette.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>ui</a>/<a href='vnc-palette.h.html'>vnc-palette.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU VNC display driver: palette hash table</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * From libvncserver/libvncserver/tight.c</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2000, 2001 Const Kaplinsky.  All Rights Reserved.</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 1999 AT&amp;T Laboratories Cambridge.  All Rights Reserved.</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Copyright (C) 2010 Corentin Chary &lt;corentin.chary@gmail.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="11">11</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="12">12</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="13">13</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="14">14</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="15">15</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="18">18</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="19">19</th><td><i> *</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="21">21</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="22">22</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="23">23</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="24">24</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="25">25</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="26">26</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="27">27</th><td><i> */</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifndef</span> <span class="macro" data-ref="_M/VNC_PALETTE_H">VNC_PALETTE_H</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/VNC_PALETTE_H" data-ref="_M/VNC_PALETTE_H">VNC_PALETTE_H</dfn></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../include/qapi/qmp/qlist.h.html">"qapi/qmp/qlist.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/VNC_PALETTE_HASH_SIZE" data-ref="_M/VNC_PALETTE_HASH_SIZE">VNC_PALETTE_HASH_SIZE</dfn> 256</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/VNC_PALETTE_MAX_SIZE" data-ref="_M/VNC_PALETTE_MAX_SIZE">VNC_PALETTE_MAX_SIZE</dfn>  256</u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncPaletteEntry" title='VncPaletteEntry' data-ref="VncPaletteEntry"><a class="type" href="#VncPaletteEntry" title='VncPaletteEntry' data-ref="VncPaletteEntry">VncPaletteEntry</a></dfn> {</td></tr>
+<tr><th id="39">39</th><td>    <em>int</em> <dfn class="decl" id="VncPaletteEntry::idx" title='VncPaletteEntry::idx' data-ref="VncPaletteEntry::idx">idx</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VncPaletteEntry::color" title='VncPaletteEntry::color' data-ref="VncPaletteEntry::color">color</dfn>;</td></tr>
+<tr><th id="41">41</th><td>    <a class="macro" href="../include/qemu/queue.h.html#94" title="struct { struct VncPaletteEntry *le_next; struct VncPaletteEntry **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#VncPaletteEntry" title='VncPaletteEntry' data-ref="VncPaletteEntry">VncPaletteEntry</a>) <dfn class="decl" id="VncPaletteEntry::next" title='VncPaletteEntry::next' data-ref="VncPaletteEntry::next">next</dfn>;</td></tr>
+<tr><th id="42">42</th><td>} <dfn class="typedef" id="VncPaletteEntry" title='VncPaletteEntry' data-type='struct VncPaletteEntry' data-ref="VncPaletteEntry">VncPaletteEntry</dfn>;</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VncPalette" title='VncPalette' data-ref="VncPalette"><a class="type" href="#VncPalette" title='VncPalette' data-ref="VncPalette">VncPalette</a></dfn> {</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="#VncPaletteEntry" title='VncPaletteEntry' data-type='struct VncPaletteEntry' data-ref="VncPaletteEntry">VncPaletteEntry</a> <dfn class="decl" id="VncPalette::pool" title='VncPalette::pool' data-ref="VncPalette::pool">pool</dfn>[<a class="macro" href="#36" title="256" data-ref="_M/VNC_PALETTE_MAX_SIZE">VNC_PALETTE_MAX_SIZE</a>];</td></tr>
+<tr><th id="46">46</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VncPalette::size" title='VncPalette::size' data-ref="VncPalette::size">size</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VncPalette::max" title='VncPalette::max' data-ref="VncPalette::max">max</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <em>int</em> <dfn class="decl" id="VncPalette::bpp" title='VncPalette::bpp' data-ref="VncPalette::bpp">bpp</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="macro" href="../include/qemu/queue.h.html#86" title="struct { struct VncPaletteEntry *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(,<a class="type" href="#VncPaletteEntry" title='VncPaletteEntry' data-ref="VncPaletteEntry">VncPaletteEntry</a>) <dfn class="decl" id="VncPalette::table" title='VncPalette::table' data-ref="VncPalette::table">table</dfn>[<a class="macro" href="#35" title="256" data-ref="_M/VNC_PALETTE_HASH_SIZE">VNC_PALETTE_HASH_SIZE</a>];</td></tr>
+<tr><th id="50">50</th><td>} <dfn class="typedef" id="VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</dfn>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="decl" id="palette_new" title='palette_new' data-ref="palette_new">palette_new</dfn>(<span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="27max" title='max' data-type='size_t' data-ref="27max">max</dfn>, <em>int</em> <dfn class="local col8 decl" id="28bpp" title='bpp' data-type='int' data-ref="28bpp">bpp</dfn>);</td></tr>
+<tr><th id="53">53</th><td><em>void</em> <dfn class="decl" id="palette_init" title='palette_init' data-ref="palette_init">palette_init</dfn>(<a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col9 decl" id="29palette" title='palette' data-type='VncPalette *' data-ref="29palette">palette</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col0 decl" id="30max" title='max' data-type='size_t' data-ref="30max">max</dfn>, <em>int</em> <dfn class="local col1 decl" id="31bpp" title='bpp' data-type='int' data-ref="31bpp">bpp</dfn>);</td></tr>
+<tr><th id="54">54</th><td><em>void</em> <dfn class="decl" id="palette_destroy" title='palette_destroy' data-ref="palette_destroy">palette_destroy</dfn>(<a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col2 decl" id="32palette" title='palette' data-type='VncPalette *' data-ref="32palette">palette</dfn>);</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><em>int</em> <dfn class="decl" id="palette_put" title='palette_put' data-ref="palette_put">palette_put</dfn>(<a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col3 decl" id="33palette" title='palette' data-type='VncPalette *' data-ref="33palette">palette</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="34color" title='color' data-type='uint32_t' data-ref="34color">color</dfn>);</td></tr>
+<tr><th id="57">57</th><td><em>int</em> <dfn class="decl" id="palette_idx" title='palette_idx' data-ref="palette_idx">palette_idx</dfn>(<em>const</em> <a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col5 decl" id="35palette" title='palette' data-type='const VncPalette *' data-ref="35palette">palette</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="36color" title='color' data-type='uint32_t' data-ref="36color">color</dfn>);</td></tr>
+<tr><th id="58">58</th><td><span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="palette_size" title='palette_size' data-ref="palette_size">palette_size</dfn>(<em>const</em> <a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col7 decl" id="37palette" title='palette' data-type='const VncPalette *' data-ref="37palette">palette</dfn>);</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><em>void</em> <dfn class="decl" id="palette_iter" title='palette_iter' data-ref="palette_iter">palette_iter</dfn>(<em>const</em> <a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col8 decl" id="38palette" title='palette' data-type='const VncPalette *' data-ref="38palette">palette</dfn>,</td></tr>
+<tr><th id="61">61</th><td>                  <em>void</em> (*<dfn class="local col9 decl" id="39iter" title='iter' data-type='void (*)(int, uint32_t, void *)' data-ref="39iter">iter</dfn>)(<em>int</em> <dfn class="local col0 decl" id="40idx" title='idx' data-type='int' data-ref="40idx">idx</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="41color" title='color' data-type='uint32_t' data-ref="41color">color</dfn>, <em>void</em> *<dfn class="local col2 decl" id="42opaque" title='opaque' data-type='void *' data-ref="42opaque">opaque</dfn>),</td></tr>
+<tr><th id="62">62</th><td>                  <em>void</em> *<dfn class="local col3 decl" id="43opaque" title='opaque' data-type='void *' data-ref="43opaque">opaque</dfn>);</td></tr>
+<tr><th id="63">63</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="palette_color" title='palette_color' data-ref="palette_color">palette_color</dfn>(<em>const</em> <a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col4 decl" id="44palette" title='palette' data-type='const VncPalette *' data-ref="44palette">palette</dfn>, <em>int</em> <dfn class="local col5 decl" id="45idx" title='idx' data-type='int' data-ref="45idx">idx</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col6 decl" id="46found" title='found' data-type='_Bool *' data-ref="46found">found</dfn>);</td></tr>
+<tr><th id="64">64</th><td><span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="palette_fill" title='palette_fill' data-ref="palette_fill">palette_fill</dfn>(<em>const</em> <a class="typedef" href="#VncPalette" title='VncPalette' data-type='struct VncPalette' data-ref="VncPalette">VncPalette</a> *<dfn class="local col7 decl" id="47palette" title='palette' data-type='const VncPalette *' data-ref="47palette">palette</dfn>,</td></tr>
+<tr><th id="65">65</th><td>                    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="48colors" title='colors' data-type='uint32_t *' data-ref="48colors">colors</dfn>[<a class="macro" href="#36" title="256" data-ref="_M/VNC_PALETTE_MAX_SIZE">VNC_PALETTE_MAX_SIZE</a>]);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><u>#<span data-ppcond="29">endif</span> /* VNC_PALETTE_H */</u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../hw/display/vmware_vga.c.html'>codebrowser/hw/display/vmware_vga.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

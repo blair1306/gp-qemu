@@ -1,0 +1,24 @@
+<dec f='include/iscsi/iscsi.h' l='326' type='int iscsi_connect_async(struct iscsi_context * iscsi, const char * portal, iscsi_command_cb cb, void * private_data)'/>
+<doc f='include/iscsi/iscsi.h' l='303'>/*
+ * Asynchronous call to connect a TCP connection to the target-host/port
+ *
+ * Returns:
+ *  0 if the call was initiated and a connection will be attempted. Result of
+ * the connection will be reported through the callback function.
+ * &lt;0 if there was an error. The callback function will not be invoked.
+ *
+ * This command is unique in that the callback can be invoked twice.
+ *
+ * Callback parameters :
+ * status can be either of :
+ *    ISCSI_STATUS_GOOD     : Connection was successful. Command_data is NULL.
+ *                            In this case the callback will be invoked a
+ *                            second time once the connection is torn down.
+ *
+ *    ISCSI_STATUS_ERROR    : Either failed to establish the connection, or
+ *                            an already established connection has failed
+ *                            with an error.
+ *
+ * The callback will NOT be invoked if the session is explicitely torn down
+ * through a call to iscsi_disconnect() or iscsi_destroy_context().
+ */</doc>

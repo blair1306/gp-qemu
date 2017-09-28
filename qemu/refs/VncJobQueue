@@ -1,0 +1,20 @@
+<def f='codebrowser/ui/vnc-jobs.c' l='55' ll='61'/>
+<size>136</size>
+<doc f='codebrowser/ui/vnc-jobs.c' l='36'>/*
+ * Locking:
+ *
+ * There are three levels of locking:
+ * - jobs queue lock: for each operation on the queue (push, pop, isEmpty?)
+ * - VncDisplay global lock: mainly used for framebuffer updates to avoid
+ *                      screen corruption if the framebuffer is updated
+ *                      while the worker is doing something.
+ * - VncState::output lock: used to make sure the output buffer is not corrupted
+ *                          if two threads try to write on it at the same time
+ *
+ * While the VNC worker thread is working, the VncDisplay global lock is held
+ * to avoid screen corruption (this does not block vnc_refresh() because it
+ * uses trylock()) but the output lock is not held because the thread works on
+ * its own output buffer.
+ * When the encoding job is done, the worker thread will hold the output lock
+ * and copy its output buffer in vs-&gt;output.
+ */</doc>

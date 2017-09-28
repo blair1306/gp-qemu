@@ -1,0 +1,53 @@
+<def f='codebrowser/include/crypto/cipher.h' l='79' ll='84'/>
+<size>24</size>
+<doc f='codebrowser/include/crypto/cipher.h' l='31'>/**
+ * QCryptoCipher:
+ *
+ * The QCryptoCipher object provides a way to perform encryption
+ * and decryption of data, with a standard API, regardless of the
+ * algorithm used. It further isolates the calling code from the
+ * details of the specific underlying implementation, whether
+ * built-in, libgcrypt or nettle.
+ *
+ * Each QCryptoCipher object is capable of performing both
+ * encryption and decryption, and can operate in a number
+ * or modes including ECB, CBC.
+ *
+ * &lt;example&gt;
+ *   &lt;title&gt;Encrypting data with AES-128 in CBC mode&lt;/title&gt;
+ *   &lt;programlisting&gt;
+ * QCryptoCipher *cipher;
+ * uint8_t key = ....;
+ * size_t keylen = 16;
+ * uint8_t iv = ....;
+ *
+ * if (!qcrypto_cipher_supports(QCRYPTO_CIPHER_ALG_AES_128)) {
+ *    error_report(errp, &quot;Feature &lt;blah&gt; requires AES cipher support&quot;);
+ *    return -1;
+ * }
+ *
+ * cipher = qcrypto_cipher_new(QCRYPTO_CIPHER_ALG_AES_128,
+ *                             QCRYPTO_CIPHER_MODE_CBC,
+ *                             key, keylen,
+ *                             errp);
+ * if (!cipher) {
+ *    return -1;
+ * }
+ *
+ * if (qcrypto_cipher_set_iv(cipher, iv, keylen, errp) &lt; 0) {
+ *    return -1;
+ * }
+ *
+ * if (qcrypto_cipher_encrypt(cipher, rawdata, encdata, datalen, errp) &lt; 0) {
+ *    return -1;
+ * }
+ *
+ * qcrypto_cipher_free(cipher);
+ *   &lt;/programlisting&gt;
+ * &lt;/example&gt;
+ *
+ */</doc>
+<mbr r='QCryptoCipher::alg' o='0' t='QCryptoCipherAlgorithm'/>
+<mbr r='QCryptoCipher::mode' o='32' t='QCryptoCipherMode'/>
+<mbr r='QCryptoCipher::opaque' o='64' t='void *'/>
+<mbr r='QCryptoCipher::driver' o='128' t='void *'/>

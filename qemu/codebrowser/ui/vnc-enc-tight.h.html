@@ -1,0 +1,201 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>vnc-enc-tight.h source code [codebrowser/ui/vnc-enc-tight.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/ui/vnc-enc-tight.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>ui</a>/<a href='vnc-enc-tight.h.html'>vnc-enc-tight.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU VNC display driver: tight encoding</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * From libvncserver/rfb/rfbproto.h</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2005 Rohit Kumar, Johannes E. Schindelin</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2000-2002 Constantin Kaplinsky.  All Rights Reserved.</i></td></tr>
+<tr><th id="7">7</th><td><i> * Copyright (C) 2000 Tridia Corporation.  All Rights Reserved.</i></td></tr>
+<tr><th id="8">8</th><td><i> * Copyright (C) 1999 AT&amp;T Laboratories Cambridge.  All Rights Reserved.</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="12">12</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="13">13</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="14">14</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="15">15</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="16">16</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="19">19</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="22">22</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="23">23</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="24">24</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="25">25</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="26">26</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="27">27</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="28">28</th><td><i> */</i></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#<span data-ppcond="30">ifndef</span> <span class="macro" data-ref="_M/VNC_ENC_TIGHT_H">VNC_ENC_TIGHT_H</span></u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/VNC_ENC_TIGHT_H" data-ref="_M/VNC_ENC_TIGHT_H">VNC_ENC_TIGHT_H</dfn></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>/*- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -</i></td></tr>
+<tr><th id="34">34</th><td><i> * Tight Encoding.</i></td></tr>
+<tr><th id="35">35</th><td><i> *</i></td></tr>
+<tr><th id="36">36</th><td><i> *-- The first byte of each Tight-encoded rectangle is a "compression control</i></td></tr>
+<tr><th id="37">37</th><td><i> *   byte". Its format is as follows (bit 0 is the least significant one):</i></td></tr>
+<tr><th id="38">38</th><td><i> *</i></td></tr>
+<tr><th id="39">39</th><td><i> *   bit 0:    if 1, then compression stream 0 should be reset;</i></td></tr>
+<tr><th id="40">40</th><td><i> *   bit 1:    if 1, then compression stream 1 should be reset;</i></td></tr>
+<tr><th id="41">41</th><td><i> *   bit 2:    if 1, then compression stream 2 should be reset;</i></td></tr>
+<tr><th id="42">42</th><td><i> *   bit 3:    if 1, then compression stream 3 should be reset;</i></td></tr>
+<tr><th id="43">43</th><td><i> *   bits 7-4: if 1000 (0x08), then the compression type is "fill",</i></td></tr>
+<tr><th id="44">44</th><td><i> *             if 1001 (0x09), then the compression type is "jpeg",</i></td></tr>
+<tr><th id="45">45</th><td><i> *             if 1010 (0x0A), then the compression type is "png",</i></td></tr>
+<tr><th id="46">46</th><td><i> *             if 0xxx, then the compression type is "basic",</i></td></tr>
+<tr><th id="47">47</th><td><i> *             values greater than 1010 are not valid.</i></td></tr>
+<tr><th id="48">48</th><td><i> *</i></td></tr>
+<tr><th id="49">49</th><td><i> * If the compression type is "basic", then bits 6..4 of the</i></td></tr>
+<tr><th id="50">50</th><td><i> * compression control byte (those xxx in 0xxx) specify the following:</i></td></tr>
+<tr><th id="51">51</th><td><i> *</i></td></tr>
+<tr><th id="52">52</th><td><i> *   bits 5-4:  decimal representation is the index of a particular zlib</i></td></tr>
+<tr><th id="53">53</th><td><i> *              stream which should be used for decompressing the data;</i></td></tr>
+<tr><th id="54">54</th><td><i> *   bit 6:     if 1, then a "filter id" byte is following this byte.</i></td></tr>
+<tr><th id="55">55</th><td><i> *</i></td></tr>
+<tr><th id="56">56</th><td><i> *-- The data that follows after the compression control byte described</i></td></tr>
+<tr><th id="57">57</th><td><i> * above depends on the compression type ("fill", "jpeg", "png" or "basic").</i></td></tr>
+<tr><th id="58">58</th><td><i> *</i></td></tr>
+<tr><th id="59">59</th><td><i> *-- If the compression type is "fill", then the only pixel value follows, in</i></td></tr>
+<tr><th id="60">60</th><td><i> * client pixel format (see NOTE 1). This value applies to all pixels of the</i></td></tr>
+<tr><th id="61">61</th><td><i> * rectangle.</i></td></tr>
+<tr><th id="62">62</th><td><i> *</i></td></tr>
+<tr><th id="63">63</th><td><i> *-- If the compression type is "jpeg" or "png", the following data stream</i></td></tr>
+<tr><th id="64">64</th><td><i> * looks like this:</i></td></tr>
+<tr><th id="65">65</th><td><i> *</i></td></tr>
+<tr><th id="66">66</th><td><i> *   1..3 bytes:  data size (N) in compact representation;</i></td></tr>
+<tr><th id="67">67</th><td><i> *   N bytes:     JPEG or PNG image.</i></td></tr>
+<tr><th id="68">68</th><td><i> *</i></td></tr>
+<tr><th id="69">69</th><td><i> * Data size is compactly represented in one, two or three bytes, according</i></td></tr>
+<tr><th id="70">70</th><td><i> * to the following scheme:</i></td></tr>
+<tr><th id="71">71</th><td><i> *</i></td></tr>
+<tr><th id="72">72</th><td><i> *  0xxxxxxx                    (for values 0..127)</i></td></tr>
+<tr><th id="73">73</th><td><i> *  1xxxxxxx 0yyyyyyy           (for values 128..16383)</i></td></tr>
+<tr><th id="74">74</th><td><i> *  1xxxxxxx 1yyyyyyy zzzzzzzz  (for values 16384..4194303)</i></td></tr>
+<tr><th id="75">75</th><td><i> *</i></td></tr>
+<tr><th id="76">76</th><td><i> * Here each character denotes one bit, xxxxxxx are the least significant 7</i></td></tr>
+<tr><th id="77">77</th><td><i> * bits of the value (bits 0-6), yyyyyyy are bits 7-13, and zzzzzzzz are the</i></td></tr>
+<tr><th id="78">78</th><td><i> * most significant 8 bits (bits 14-21). For example, decimal value 10000</i></td></tr>
+<tr><th id="79">79</th><td><i> * should be represented as two bytes: binary 10010000 01001110, or</i></td></tr>
+<tr><th id="80">80</th><td><i> * hexadecimal 90 4E.</i></td></tr>
+<tr><th id="81">81</th><td><i> *</i></td></tr>
+<tr><th id="82">82</th><td><i> *-- If the compression type is "basic" and bit 6 of the compression control</i></td></tr>
+<tr><th id="83">83</th><td><i> * byte was set to 1, then the next (second) byte specifies "filter id" which</i></td></tr>
+<tr><th id="84">84</th><td><i> * tells the decoder what filter type was used by the encoder to pre-process</i></td></tr>
+<tr><th id="85">85</th><td><i> * pixel data before the compression. The "filter id" byte can be one of the</i></td></tr>
+<tr><th id="86">86</th><td><i> * following:</i></td></tr>
+<tr><th id="87">87</th><td><i> *</i></td></tr>
+<tr><th id="88">88</th><td><i> *   0:  no filter ("copy" filter);</i></td></tr>
+<tr><th id="89">89</th><td><i> *   1:  "palette" filter;</i></td></tr>
+<tr><th id="90">90</th><td><i> *   2:  "gradient" filter.</i></td></tr>
+<tr><th id="91">91</th><td><i> *</i></td></tr>
+<tr><th id="92">92</th><td><i> *-- If bit 6 of the compression control byte is set to 0 (no "filter id"</i></td></tr>
+<tr><th id="93">93</th><td><i> * byte), or if the filter id is 0, then raw pixel values in the client</i></td></tr>
+<tr><th id="94">94</th><td><i> * format (see NOTE 1) will be compressed. See below details on the</i></td></tr>
+<tr><th id="95">95</th><td><i> * compression.</i></td></tr>
+<tr><th id="96">96</th><td><i> *</i></td></tr>
+<tr><th id="97">97</th><td><i> *-- The "gradient" filter pre-processes pixel data with a simple algorithm</i></td></tr>
+<tr><th id="98">98</th><td><i> * which converts each color component to a difference between a "predicted"</i></td></tr>
+<tr><th id="99">99</th><td><i> * intensity and the actual intensity. Such a technique does not affect</i></td></tr>
+<tr><th id="100">100</th><td><i> * uncompressed data size, but helps to compress photo-like images better.</i></td></tr>
+<tr><th id="101">101</th><td><i> * Pseudo-code for converting intensities to differences is the following:</i></td></tr>
+<tr><th id="102">102</th><td><i> *</i></td></tr>
+<tr><th id="103">103</th><td><i> *   P[i,j] := V[i-1,j] + V[i,j-1] - V[i-1,j-1];</i></td></tr>
+<tr><th id="104">104</th><td><i> *   if (P[i,j] &lt; 0) then P[i,j] := 0;</i></td></tr>
+<tr><th id="105">105</th><td><i> *   if (P[i,j] &gt; MAX) then P[i,j] := MAX;</i></td></tr>
+<tr><th id="106">106</th><td><i> *   D[i,j] := V[i,j] - P[i,j];</i></td></tr>
+<tr><th id="107">107</th><td><i> *</i></td></tr>
+<tr><th id="108">108</th><td><i> * Here V[i,j] is the intensity of a color component for a pixel at</i></td></tr>
+<tr><th id="109">109</th><td><i> * coordinates (i,j). MAX is the maximum value of intensity for a color</i></td></tr>
+<tr><th id="110">110</th><td><i> * component.</i></td></tr>
+<tr><th id="111">111</th><td><i> *</i></td></tr>
+<tr><th id="112">112</th><td><i> *-- The "palette" filter converts true-color pixel data to indexed colors</i></td></tr>
+<tr><th id="113">113</th><td><i> * and a palette which can consist of 2..256 colors. If the number of colors</i></td></tr>
+<tr><th id="114">114</th><td><i> * is 2, then each pixel is encoded in 1 bit, otherwise 8 bits is used to</i></td></tr>
+<tr><th id="115">115</th><td><i> * encode one pixel. 1-bit encoding is performed such way that the most</i></td></tr>
+<tr><th id="116">116</th><td><i> * significant bits correspond to the leftmost pixels, and each raw of pixels</i></td></tr>
+<tr><th id="117">117</th><td><i> * is aligned to the byte boundary. When "palette" filter is used, the</i></td></tr>
+<tr><th id="118">118</th><td><i> * palette is sent before the pixel data. The palette begins with an unsigned</i></td></tr>
+<tr><th id="119">119</th><td><i> * byte which value is the number of colors in the palette minus 1 (i.e. 1</i></td></tr>
+<tr><th id="120">120</th><td><i> * means 2 colors, 255 means 256 colors in the palette). Then follows the</i></td></tr>
+<tr><th id="121">121</th><td><i> * palette itself which consist of pixel values in client pixel format (see</i></td></tr>
+<tr><th id="122">122</th><td><i> * NOTE 1).</i></td></tr>
+<tr><th id="123">123</th><td><i> *</i></td></tr>
+<tr><th id="124">124</th><td><i> *-- The pixel data is compressed using the zlib library. But if the data</i></td></tr>
+<tr><th id="125">125</th><td><i> * size after applying the filter but before the compression is less then 12,</i></td></tr>
+<tr><th id="126">126</th><td><i> * then the data is sent as is, uncompressed. Four separate zlib streams</i></td></tr>
+<tr><th id="127">127</th><td><i> * (0..3) can be used and the decoder should read the actual stream id from</i></td></tr>
+<tr><th id="128">128</th><td><i> * the compression control byte (see NOTE 2).</i></td></tr>
+<tr><th id="129">129</th><td><i> *</i></td></tr>
+<tr><th id="130">130</th><td><i> * If the compression is not used, then the pixel data is sent as is,</i></td></tr>
+<tr><th id="131">131</th><td><i> * otherwise the data stream looks like this:</i></td></tr>
+<tr><th id="132">132</th><td><i> *</i></td></tr>
+<tr><th id="133">133</th><td><i> *   1..3 bytes:  data size (N) in compact representation;</i></td></tr>
+<tr><th id="134">134</th><td><i> *   N bytes:     zlib-compressed data.</i></td></tr>
+<tr><th id="135">135</th><td><i> *</i></td></tr>
+<tr><th id="136">136</th><td><i> * Data size is compactly represented in one, two or three bytes, just like</i></td></tr>
+<tr><th id="137">137</th><td><i> * in the "jpeg" compression method (see above).</i></td></tr>
+<tr><th id="138">138</th><td><i> *</i></td></tr>
+<tr><th id="139">139</th><td><i> *-- NOTE 1. If the color depth is 24, and all three color components are</i></td></tr>
+<tr><th id="140">140</th><td><i> * 8-bit wide, then one pixel in Tight encoding is always represented by</i></td></tr>
+<tr><th id="141">141</th><td><i> * three bytes, where the first byte is red component, the second byte is</i></td></tr>
+<tr><th id="142">142</th><td><i> * green component, and the third byte is blue component of the pixel color</i></td></tr>
+<tr><th id="143">143</th><td><i> * value. This applies to colors in palettes as well.</i></td></tr>
+<tr><th id="144">144</th><td><i> *</i></td></tr>
+<tr><th id="145">145</th><td><i> *-- NOTE 2. The decoder must reset compression streams' states before</i></td></tr>
+<tr><th id="146">146</th><td><i> * decoding the rectangle, if some of bits 0,1,2,3 in the compression control</i></td></tr>
+<tr><th id="147">147</th><td><i> * byte are set to 1. Note that the decoder must reset zlib streams even if</i></td></tr>
+<tr><th id="148">148</th><td><i> * the compression type is "fill", "jpeg" or "png".</i></td></tr>
+<tr><th id="149">149</th><td><i> *</i></td></tr>
+<tr><th id="150">150</th><td><i> *-- NOTE 3. The "gradient" filter and "jpeg" compression may be used only</i></td></tr>
+<tr><th id="151">151</th><td><i> * when bits-per-pixel value is either 16 or 32, not 8.</i></td></tr>
+<tr><th id="152">152</th><td><i> *</i></td></tr>
+<tr><th id="153">153</th><td><i> *-- NOTE 4. The width of any Tight-encoded rectangle cannot exceed 2048</i></td></tr>
+<tr><th id="154">154</th><td><i> * pixels. If a rectangle is wider, it must be split into several rectangles</i></td></tr>
+<tr><th id="155">155</th><td><i> * and each one should be encoded separately.</i></td></tr>
+<tr><th id="156">156</th><td><i> *</i></td></tr>
+<tr><th id="157">157</th><td><i> */</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_EXPLICIT_FILTER" data-ref="_M/VNC_TIGHT_EXPLICIT_FILTER">VNC_TIGHT_EXPLICIT_FILTER</dfn>       0x04</u></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_FILL" data-ref="_M/VNC_TIGHT_FILL">VNC_TIGHT_FILL</dfn>                  0x08</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_JPEG" data-ref="_M/VNC_TIGHT_JPEG">VNC_TIGHT_JPEG</dfn>                  0x09</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_PNG" data-ref="_M/VNC_TIGHT_PNG">VNC_TIGHT_PNG</dfn>                   0x0A</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_MAX_SUBENCODING" data-ref="_M/VNC_TIGHT_MAX_SUBENCODING">VNC_TIGHT_MAX_SUBENCODING</dfn>       0x0A</u></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><i>/* Filters to improve compression efficiency */</i></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_FILTER_COPY" data-ref="_M/VNC_TIGHT_FILTER_COPY">VNC_TIGHT_FILTER_COPY</dfn>             0x00</u></td></tr>
+<tr><th id="167">167</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_FILTER_PALETTE" data-ref="_M/VNC_TIGHT_FILTER_PALETTE">VNC_TIGHT_FILTER_PALETTE</dfn>          0x01</u></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_FILTER_GRADIENT" data-ref="_M/VNC_TIGHT_FILTER_GRADIENT">VNC_TIGHT_FILTER_GRADIENT</dfn>         0x02</u></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><i>/* Note: The following constant should not be changed. */</i></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_MIN_TO_COMPRESS" data-ref="_M/VNC_TIGHT_MIN_TO_COMPRESS">VNC_TIGHT_MIN_TO_COMPRESS</dfn> 12</u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i>/* The parameters below may be adjusted. */</i></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_MIN_SPLIT_RECT_SIZE" data-ref="_M/VNC_TIGHT_MIN_SPLIT_RECT_SIZE">VNC_TIGHT_MIN_SPLIT_RECT_SIZE</dfn>     4096</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_MIN_SOLID_SUBRECT_SIZE" data-ref="_M/VNC_TIGHT_MIN_SOLID_SUBRECT_SIZE">VNC_TIGHT_MIN_SOLID_SUBRECT_SIZE</dfn>  2048</u></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_MAX_SPLIT_TILE_SIZE" data-ref="_M/VNC_TIGHT_MAX_SPLIT_TILE_SIZE">VNC_TIGHT_MAX_SPLIT_TILE_SIZE</dfn>       16</u></td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_JPEG_MIN_RECT_SIZE" data-ref="_M/VNC_TIGHT_JPEG_MIN_RECT_SIZE">VNC_TIGHT_JPEG_MIN_RECT_SIZE</dfn>      4096</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_DETECT_SUBROW_WIDTH" data-ref="_M/VNC_TIGHT_DETECT_SUBROW_WIDTH">VNC_TIGHT_DETECT_SUBROW_WIDTH</dfn>        7</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_DETECT_MIN_WIDTH" data-ref="_M/VNC_TIGHT_DETECT_MIN_WIDTH">VNC_TIGHT_DETECT_MIN_WIDTH</dfn>           8</u></td></tr>
+<tr><th id="181">181</th><td><u>#define <dfn class="macro" id="_M/VNC_TIGHT_DETECT_MIN_HEIGHT" data-ref="_M/VNC_TIGHT_DETECT_MIN_HEIGHT">VNC_TIGHT_DETECT_MIN_HEIGHT</dfn>          8</u></td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td><u>#<span data-ppcond="30">endif</span> /* VNC_ENC_TIGHT_H */</u></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='vnc-enc-tight.c.html'>codebrowser/ui/vnc-enc-tight.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

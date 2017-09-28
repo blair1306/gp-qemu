@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>qmp-registry.c source code [codebrowser/qapi/qmp-registry.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/qapi/qmp-registry.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>qapi</a>/<a href='qmp-registry.c.html'>qmp-registry.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Core Definitions for QAPI/QMP Dispatch</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Michael Roth      &lt;mdroth@us.ibm.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.</i></td></tr>
+<tr><th id="11">11</th><td><i> * See the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/qapi/qmp/dispatch.h.html">"qapi/qmp/dispatch.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><em>void</em> <dfn class="decl def" id="qmp_register_command" title='qmp_register_command' data-ref="qmp_register_command">qmp_register_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col1 decl" id="1cmds" title='cmds' data-type='QmpCommandList *' data-ref="1cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="2name" title='name' data-type='const char *' data-ref="2name">name</dfn>,</td></tr>
+<tr><th id="19">19</th><td>                          <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandFunc" title='QmpCommandFunc' data-type='void (QDict *, QObject **, Error **)' data-ref="QmpCommandFunc">QmpCommandFunc</a> *<dfn class="local col3 decl" id="3fn" title='fn' data-type='QmpCommandFunc *' data-ref="3fn">fn</dfn>, <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandOptions" title='QmpCommandOptions' data-type='enum QmpCommandOptions' data-ref="QmpCommandOptions">QmpCommandOptions</a> <dfn class="local col4 decl" id="4options" title='options' data-type='QmpCommandOptions' data-ref="4options">options</dfn>)</td></tr>
+<tr><th id="20">20</th><td>{</td></tr>
+<tr><th id="21">21</th><td>    <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col5 decl" id="5cmd" title='cmd' data-type='QmpCommand *' data-ref="5cmd">cmd</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(*<a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>));</td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td>    <a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::name" title='QmpCommand::name' data-ref="QmpCommand::name">name</a> = <a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>;</td></tr>
+<tr><th id="24">24</th><td>    <a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::fn" title='QmpCommand::fn' data-ref="QmpCommand::fn">fn</a> = <a class="local col3 ref" href="#3fn" title='fn' data-ref="3fn">fn</a>;</td></tr>
+<tr><th id="25">25</th><td>    <a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::enabled" title='QmpCommand::enabled' data-ref="QmpCommand::enabled">enabled</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="26">26</th><td>    <a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::options" title='QmpCommand::options' data-ref="QmpCommand::options">options</a> = <a class="local col4 ref" href="#4options" title='options' data-ref="4options">options</a>;</td></tr>
+<tr><th id="27">27</th><td>    <a class="macro" href="../include/qemu/queue.h.html#379" title="do { (cmd)-&gt;node.tqe_next = ((void*)0); (cmd)-&gt;node.tqe_prev = (cmds)-&gt;tqh_last; *(cmds)-&gt;tqh_last = (cmd); (cmds)-&gt;tqh_last = &amp;(cmd)-&gt;node.tqe_next; } while ( 0)" data-ref="_M/QTAILQ_INSERT_TAIL">QTAILQ_INSERT_TAIL</a>(<a class="local col1 ref" href="#1cmds" title='cmds' data-ref="1cmds">cmds</a>, <a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>, <a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::node" title='QmpCommand::node' data-ref="QmpCommand::node">node</a>);</td></tr>
+<tr><th id="28">28</th><td>}</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><em>void</em> <dfn class="decl def" id="qmp_unregister_command" title='qmp_unregister_command' data-ref="qmp_unregister_command">qmp_unregister_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col6 decl" id="6cmds" title='cmds' data-type='QmpCommandList *' data-ref="6cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="7name" title='name' data-type='const char *' data-ref="7name">name</dfn>)</td></tr>
+<tr><th id="31">31</th><td>{</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col8 decl" id="8cmd" title='cmd' data-type='QmpCommand *' data-ref="8cmd">cmd</dfn> = <a class="ref" href="#qmp_find_command" title='qmp_find_command' data-ref="qmp_find_command">qmp_find_command</a>(<a class="local col6 ref" href="#6cmds" title='cmds' data-ref="6cmds">cmds</a>, <a class="local col7 ref" href="#7name" title='name' data-ref="7name">name</a>);</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>    <a class="macro" href="../include/qemu/queue.h.html#403" title="do { if (((cmd)-&gt;node.tqe_next) != ((void*)0)) (cmd)-&gt;node.tqe_next-&gt;node.tqe_prev = (cmd)-&gt;node.tqe_prev; else (cmds)-&gt;tqh_last = (cmd)-&gt;node.tqe_prev; *(cmd)-&gt;node.tqe_prev = (cmd)-&gt;node.tqe_next; (cmd)-&gt;node.tqe_prev = ((void*)0); } while ( 0)" data-ref="_M/QTAILQ_REMOVE">QTAILQ_REMOVE</a>(<a class="local col6 ref" href="#6cmds" title='cmds' data-ref="6cmds">cmds</a>, <a class="local col8 ref" href="#8cmd" title='cmd' data-ref="8cmd">cmd</a>, <a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::node" title='QmpCommand::node' data-ref="QmpCommand::node">node</a>);</td></tr>
+<tr><th id="35">35</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col8 ref" href="#8cmd" title='cmd' data-ref="8cmd">cmd</a>);</td></tr>
+<tr><th id="36">36</th><td>}</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="decl def" id="qmp_find_command" title='qmp_find_command' data-ref="qmp_find_command">qmp_find_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col9 decl" id="9cmds" title='cmds' data-type='QmpCommandList *' data-ref="9cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="10name" title='name' data-type='const char *' data-ref="10name">name</dfn>)</td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col1 decl" id="11cmd" title='cmd' data-type='QmpCommand *' data-ref="11cmd">cmd</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>    <a class="macro" href="../include/qemu/queue.h.html#413" title="for ((cmd) = ((cmds)-&gt;tqh_first); (cmd); (cmd) = ((cmd)-&gt;node.tqe_next))" data-ref="_M/QTAILQ_FOREACH">QTAILQ_FOREACH</a>(<a class="local col1 ref" href="#11cmd" title='cmd' data-ref="11cmd">cmd</a>, <a class="local col9 ref" href="#9cmds" title='cmds' data-ref="9cmds">cmds</a>, <a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::node" title='QmpCommand::node' data-ref="QmpCommand::node">node</a>) {</td></tr>
+<tr><th id="43">43</th><td>        <b>if</b> (<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col1 ref" href="#11cmd" title='cmd' data-ref="11cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::name" title='QmpCommand::name' data-ref="QmpCommand::name">name</a>, <a class="local col0 ref" href="#10name" title='name' data-ref="10name">name</a>) == <var>0</var>) {</td></tr>
+<tr><th id="44">44</th><td>            <b>return</b> <a class="local col1 ref" href="#11cmd" title='cmd' data-ref="11cmd">cmd</a>;</td></tr>
+<tr><th id="45">45</th><td>        }</td></tr>
+<tr><th id="46">46</th><td>    }</td></tr>
+<tr><th id="47">47</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qmp_toggle_command" title='qmp_toggle_command' data-type='void qmp_toggle_command(QmpCommandList * cmds, const char * name, _Bool enabled)' data-ref="qmp_toggle_command">qmp_toggle_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col2 decl" id="12cmds" title='cmds' data-type='QmpCommandList *' data-ref="12cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="13name" title='name' data-type='const char *' data-ref="13name">name</dfn>,</td></tr>
+<tr><th id="51">51</th><td>                               <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="14enabled" title='enabled' data-type='_Bool' data-ref="14enabled">enabled</dfn>)</td></tr>
+<tr><th id="52">52</th><td>{</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col5 decl" id="15cmd" title='cmd' data-type='QmpCommand *' data-ref="15cmd">cmd</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <a class="macro" href="../include/qemu/queue.h.html#413" title="for ((cmd) = ((cmds)-&gt;tqh_first); (cmd); (cmd) = ((cmd)-&gt;node.tqe_next))" data-ref="_M/QTAILQ_FOREACH">QTAILQ_FOREACH</a>(<a class="local col5 ref" href="#15cmd" title='cmd' data-ref="15cmd">cmd</a>, <a class="local col2 ref" href="#12cmds" title='cmds' data-ref="12cmds">cmds</a>, <a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::node" title='QmpCommand::node' data-ref="QmpCommand::node">node</a>) {</td></tr>
+<tr><th id="56">56</th><td>        <b>if</b> (<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col5 ref" href="#15cmd" title='cmd' data-ref="15cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::name" title='QmpCommand::name' data-ref="QmpCommand::name">name</a>, <a class="local col3 ref" href="#13name" title='name' data-ref="13name">name</a>) == <var>0</var>) {</td></tr>
+<tr><th id="57">57</th><td>            <a class="local col5 ref" href="#15cmd" title='cmd' data-ref="15cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::enabled" title='QmpCommand::enabled' data-ref="QmpCommand::enabled">enabled</a> = <a class="local col4 ref" href="#14enabled" title='enabled' data-ref="14enabled">enabled</a>;</td></tr>
+<tr><th id="58">58</th><td>            <b>return</b>;</td></tr>
+<tr><th id="59">59</th><td>        }</td></tr>
+<tr><th id="60">60</th><td>    }</td></tr>
+<tr><th id="61">61</th><td>}</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><em>void</em> <dfn class="decl def" id="qmp_disable_command" title='qmp_disable_command' data-ref="qmp_disable_command">qmp_disable_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col6 decl" id="16cmds" title='cmds' data-type='QmpCommandList *' data-ref="16cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="17name" title='name' data-type='const char *' data-ref="17name">name</dfn>)</td></tr>
+<tr><th id="64">64</th><td>{</td></tr>
+<tr><th id="65">65</th><td>    <a class="tu ref" href="#qmp_toggle_command" title='qmp_toggle_command' data-use='c' data-ref="qmp_toggle_command">qmp_toggle_command</a>(<a class="local col6 ref" href="#16cmds" title='cmds' data-ref="16cmds">cmds</a>, <a class="local col7 ref" href="#17name" title='name' data-ref="17name">name</a>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="66">66</th><td>}</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><em>void</em> <dfn class="decl def" id="qmp_enable_command" title='qmp_enable_command' data-ref="qmp_enable_command">qmp_enable_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col8 decl" id="18cmds" title='cmds' data-type='QmpCommandList *' data-ref="18cmds">cmds</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="19name" title='name' data-type='const char *' data-ref="19name">name</dfn>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>    <a class="tu ref" href="#qmp_toggle_command" title='qmp_toggle_command' data-use='c' data-ref="qmp_toggle_command">qmp_toggle_command</a>(<a class="local col8 ref" href="#18cmds" title='cmds' data-ref="18cmds">cmds</a>, <a class="local col9 ref" href="#19name" title='name' data-ref="19name">name</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qmp_command_is_enabled" title='qmp_command_is_enabled' data-ref="qmp_command_is_enabled">qmp_command_is_enabled</dfn>(<em>const</em> <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col0 decl" id="20cmd" title='cmd' data-type='const QmpCommand *' data-ref="20cmd">cmd</dfn>)</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>    <b>return</b> <a class="local col0 ref" href="#20cmd" title='cmd' data-ref="20cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::enabled" title='QmpCommand::enabled' data-ref="QmpCommand::enabled">enabled</a>;</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><em>const</em> <em>char</em> *<dfn class="decl def" id="qmp_command_name" title='qmp_command_name' data-ref="qmp_command_name">qmp_command_name</dfn>(<em>const</em> <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col1 decl" id="21cmd" title='cmd' data-type='const QmpCommand *' data-ref="21cmd">cmd</dfn>)</td></tr>
+<tr><th id="79">79</th><td>{</td></tr>
+<tr><th id="80">80</th><td>    <b>return</b> <a class="local col1 ref" href="#21cmd" title='cmd' data-ref="21cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::name" title='QmpCommand::name' data-ref="QmpCommand::name">name</a>;</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qmp_has_success_response" title='qmp_has_success_response' data-ref="qmp_has_success_response">qmp_has_success_response</dfn>(<em>const</em> <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col2 decl" id="22cmd" title='cmd' data-type='const QmpCommand *' data-ref="22cmd">cmd</dfn>)</td></tr>
+<tr><th id="84">84</th><td>{</td></tr>
+<tr><th id="85">85</th><td>    <b>return</b> !(<a class="local col2 ref" href="#22cmd" title='cmd' data-ref="22cmd">cmd</a>-&gt;<a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::options" title='QmpCommand::options' data-ref="QmpCommand::options">options</a> &amp; <a class="enum" href="../include/qapi/qmp/dispatch.h.html#QmpCommandOptions::QCO_NO_SUCCESS_RESP" title='QmpCommandOptions::QCO_NO_SUCCESS_RESP' data-ref="QmpCommandOptions::QCO_NO_SUCCESS_RESP">QCO_NO_SUCCESS_RESP</a>);</td></tr>
+<tr><th id="86">86</th><td>}</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><em>void</em> <dfn class="decl def" id="qmp_for_each_command" title='qmp_for_each_command' data-ref="qmp_for_each_command">qmp_for_each_command</dfn>(<a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommandList" title='QmpCommandList' data-type='struct QmpCommandList' data-ref="QmpCommandList">QmpCommandList</a> *<dfn class="local col3 decl" id="23cmds" title='cmds' data-type='QmpCommandList *' data-ref="23cmds">cmds</dfn>, <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#qmp_cmd_callback_fn" title='qmp_cmd_callback_fn' data-type='void (*)(QmpCommand *, void *)' data-ref="qmp_cmd_callback_fn">qmp_cmd_callback_fn</a> <dfn class="local col4 decl" id="24fn" title='fn' data-type='qmp_cmd_callback_fn' data-ref="24fn">fn</dfn>,</td></tr>
+<tr><th id="89">89</th><td>                          <em>void</em> *<dfn class="local col5 decl" id="25opaque" title='opaque' data-type='void *' data-ref="25opaque">opaque</dfn>)</td></tr>
+<tr><th id="90">90</th><td>{</td></tr>
+<tr><th id="91">91</th><td>    <a class="typedef" href="../include/qapi/qmp/dispatch.h.html#QmpCommand" title='QmpCommand' data-type='struct QmpCommand' data-ref="QmpCommand">QmpCommand</a> *<dfn class="local col6 decl" id="26cmd" title='cmd' data-type='QmpCommand *' data-ref="26cmd">cmd</dfn>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <a class="macro" href="../include/qemu/queue.h.html#413" title="for ((cmd) = ((cmds)-&gt;tqh_first); (cmd); (cmd) = ((cmd)-&gt;node.tqe_next))" data-ref="_M/QTAILQ_FOREACH">QTAILQ_FOREACH</a>(<a class="local col6 ref" href="#26cmd" title='cmd' data-ref="26cmd">cmd</a>, <a class="local col3 ref" href="#23cmds" title='cmds' data-ref="23cmds">cmds</a>, <a class="ref" href="../include/qapi/qmp/dispatch.h.html#QmpCommand::node" title='QmpCommand::node' data-ref="QmpCommand::node">node</a>) {</td></tr>
+<tr><th id="94">94</th><td>        <a class="local col4 ref" href="#24fn" title='fn' data-ref="24fn">fn</a>(<a class="local col6 ref" href="#26cmd" title='cmd' data-ref="26cmd">cmd</a>, <a class="local col5 ref" href="#25opaque" title='opaque' data-ref="25opaque">opaque</a>);</td></tr>
+<tr><th id="95">95</th><td>    }</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

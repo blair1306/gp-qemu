@@ -1,0 +1,186 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hmac.h source code [codebrowser/include/crypto/hmac.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QCryptoHmac "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/crypto/hmac.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>crypto</a>/<a href='hmac.h.html'>hmac.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Crypto hmac algorithms</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="7">7</th><td><i> * (at your option) any later version.  See the COPYING file in the</i></td></tr>
+<tr><th id="8">8</th><td><i> * top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#<span data-ppcond="12">ifndef</span> <span class="macro" data-ref="_M/QCRYPTO_HMAC_H">QCRYPTO_HMAC_H</span></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/QCRYPTO_HMAC_H" data-ref="_M/QCRYPTO_HMAC_H">QCRYPTO_HMAC_H</dfn></u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../../qapi-types.h.html">"qapi-types.h"</a></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QCryptoHmac" title='QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> <dfn class="typedef" id="QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</dfn>;</td></tr>
+<tr><th id="18">18</th><td><b>struct</b> <dfn class="type def" id="QCryptoHmac" title='QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</dfn> {</td></tr>
+<tr><th id="19">19</th><td>    <a class="typedef" href="../../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="decl" id="QCryptoHmac::alg" title='QCryptoHmac::alg' data-ref="QCryptoHmac::alg">alg</dfn>;</td></tr>
+<tr><th id="20">20</th><td>    <em>void</em> *<dfn class="decl" id="QCryptoHmac::opaque" title='QCryptoHmac::opaque' data-ref="QCryptoHmac::opaque">opaque</dfn>;</td></tr>
+<tr><th id="21">21</th><td>    <em>void</em> *<dfn class="decl" id="QCryptoHmac::driver" title='QCryptoHmac::driver' data-ref="QCryptoHmac::driver">driver</dfn>;</td></tr>
+<tr><th id="22">22</th><td>};</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * qcrypto_hmac_supports:</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * <span class="command">@alg</span>: the hmac algorithm</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> * Determine if <span class="command">@alg</span> hmac algorithm is supported by</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> * the current configured build</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> * Returns:</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> *  true if the algorithm is supported, false otherwise</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="34">34</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="decl" href="../../crypto/hmac-glib.c.html#qcrypto_hmac_supports" title='qcrypto_hmac_supports' data-ref="qcrypto_hmac_supports" id="qcrypto_hmac_supports">qcrypto_hmac_supports</a>(<a class="typedef" href="../../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="local col1 decl" id="1alg" title='alg' data-type='QCryptoHashAlgorithm' data-ref="1alg">alg</dfn>);</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * qcrypto_hmac_new:</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> * <span class="command">@alg</span>: the hmac algorithm</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> *<span class="command"> @key</span>: the key bytes</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> *<span class="command"> @nkey</span>: the length of<span class="command"> @key</span></i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to a NULL-initialized error object</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * Creates a new hmac object with the algorithm <span class="command">@alg</span></i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> * The<span class="command"> @key</span> parameter provides the bytes representing</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * the secret key to use. The<span class="command"> @nkey</span> parameter specifies</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> * the length of<span class="command"> @key</span> in bytes</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> * Note: must use qcrypto_hmac_free() to release the</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * returned hmac object when no longer required</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * Returns:</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> *  a new hmac object, or NULL on error</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="55">55</th><td><a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="decl" id="qcrypto_hmac_new" title='qcrypto_hmac_new' data-ref="qcrypto_hmac_new">qcrypto_hmac_new</dfn>(<a class="typedef" href="../../qapi-types.h.html#QCryptoHashAlgorithm" title='QCryptoHashAlgorithm' data-type='enum QCryptoHashAlgorithm' data-ref="QCryptoHashAlgorithm">QCryptoHashAlgorithm</a> <dfn class="local col2 decl" id="2alg" title='alg' data-type='QCryptoHashAlgorithm' data-ref="2alg">alg</dfn>,</td></tr>
+<tr><th id="56">56</th><td>                              <em>const</em> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="3key" title='key' data-type='const uint8_t *' data-ref="3key">key</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col4 decl" id="4nkey" title='nkey' data-type='size_t' data-ref="4nkey">nkey</dfn>,</td></tr>
+<tr><th id="57">57</th><td>                              <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="5errp" title='errp' data-type='Error **' data-ref="5errp">errp</dfn>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> * qcrypto_hmac_free:</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> *<span class="command"> @hmac</span>: the hmac object</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * Release the memory associated with<span class="command"> @hmac</span> that was</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> * previously allocated by qcrypto_hmac_new()</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="66">66</th><td><em>void</em> <dfn class="decl" id="qcrypto_hmac_free" title='qcrypto_hmac_free' data-ref="qcrypto_hmac_free">qcrypto_hmac_free</dfn>(<a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="local col6 decl" id="6hmac" title='hmac' data-type='QCryptoHmac *' data-ref="6hmac">hmac</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> * qcrypto_hmac_bytesv:</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *<span class="command"> @hmac</span>: the hmac object</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *<span class="command"> @iov</span>: the array of memory regions to hmac</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *<span class="command"> @niov</span>: the length of<span class="command"> @iov</span></i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> * <span class="command">@result</span>: pointer to hold output hmac</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> *<span class="command"> @resultlen</span>: pointer to hold length of <span class="command">@result</span></i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to a NULL-initialized error object</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> * Computes the hmac across all the memory regions</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> * present in<span class="command"> @iov</span>. The <span class="command">@result</span> pointer will be</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> * filled with raw bytes representing the computed</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * hmac, which will have length<span class="command"> @resultlen</span>. The</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * memory pointer in <span class="command">@result</span> must be released</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> * with a call to g_free() when no longer required.</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> * Returns:</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> *  0 on success, -1 on error</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="87">87</th><td><em>int</em> <dfn class="decl" id="qcrypto_hmac_bytesv" title='qcrypto_hmac_bytesv' data-ref="qcrypto_hmac_bytesv">qcrypto_hmac_bytesv</dfn>(<a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="local col7 decl" id="7hmac" title='hmac' data-type='QCryptoHmac *' data-ref="7hmac">hmac</dfn>,</td></tr>
+<tr><th id="88">88</th><td>                        <em>const</em> <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col8 decl" id="8iov" title='iov' data-type='const struct iovec *' data-ref="8iov">iov</dfn>,</td></tr>
+<tr><th id="89">89</th><td>                        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col9 decl" id="9niov" title='niov' data-type='size_t' data-ref="9niov">niov</dfn>,</td></tr>
+<tr><th id="90">90</th><td>                        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> **<dfn class="local col0 decl" id="10result" title='result' data-type='uint8_t **' data-ref="10result">result</dfn>,</td></tr>
+<tr><th id="91">91</th><td>                        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> *<dfn class="local col1 decl" id="11resultlen" title='resultlen' data-type='size_t *' data-ref="11resultlen">resultlen</dfn>,</td></tr>
+<tr><th id="92">92</th><td>                        <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="12errp" title='errp' data-type='Error **' data-ref="12errp">errp</dfn>);</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> * qcrypto_hmac_bytes:</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @hmac</span>: the hmac object</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> * <span class="command">@buf</span>: the memory region to hmac</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *<span class="command"> @len</span>: the length of <span class="command">@buf</span></i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> * <span class="command">@result</span>: pointer to hold output hmac</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> *<span class="command"> @resultlen</span>: pointer to hold length of <span class="command">@result</span></i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to a NULL-initialized error object</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> * Computes the hmac across all the memory region</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * <span class="command">@buf</span> of length<span class="command"> @len</span>. The <span class="command">@result</span> pointer will be</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> * filled with raw bytes representing the computed</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> * hmac, which will have length<span class="command"> @resultlen</span>. The</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> * memory pointer in <span class="command">@result</span> must be released</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> * with a call to g_free() when no longer required.</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> * Returns:</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> *  0 on success, -1 on error</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="113">113</th><td><em>int</em> <dfn class="decl" id="qcrypto_hmac_bytes" title='qcrypto_hmac_bytes' data-ref="qcrypto_hmac_bytes">qcrypto_hmac_bytes</dfn>(<a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="local col3 decl" id="13hmac" title='hmac' data-type='QCryptoHmac *' data-ref="13hmac">hmac</dfn>,</td></tr>
+<tr><th id="114">114</th><td>                       <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14buf" title='buf' data-type='const char *' data-ref="14buf">buf</dfn>,</td></tr>
+<tr><th id="115">115</th><td>                       <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="15len" title='len' data-type='size_t' data-ref="15len">len</dfn>,</td></tr>
+<tr><th id="116">116</th><td>                       <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> **<dfn class="local col6 decl" id="16result" title='result' data-type='uint8_t **' data-ref="16result">result</dfn>,</td></tr>
+<tr><th id="117">117</th><td>                       <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> *<dfn class="local col7 decl" id="17resultlen" title='resultlen' data-type='size_t *' data-ref="17resultlen">resultlen</dfn>,</td></tr>
+<tr><th id="118">118</th><td>                       <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="18errp" title='errp' data-type='Error **' data-ref="18errp">errp</dfn>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> * qcrypto_hmac_digestv:</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> *<span class="command"> @hmac</span>: the hmac object</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *<span class="command"> @iov</span>: the array of memory regions to hmac</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *<span class="command"> @niov</span>: the length of<span class="command"> @iov</span></i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> *<span class="command"> @digest</span>: pointer to hold output hmac</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to a NULL-initialized error object</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> * Computes the hmac across all the memory regions</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> * present in<span class="command"> @iov</span>. The<span class="command"> @digest</span> pointer will be</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> * filled with the printable hex digest of the computed</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> * hmac, which will be terminated by '\0'. The</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * memory pointer in<span class="command"> @digest</span> must be released</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> * with a call to g_free() when no longer required.</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> * Returns:</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> *  0 on success, -1 on error</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="138">138</th><td><em>int</em> <dfn class="decl" id="qcrypto_hmac_digestv" title='qcrypto_hmac_digestv' data-ref="qcrypto_hmac_digestv">qcrypto_hmac_digestv</dfn>(<a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="local col9 decl" id="19hmac" title='hmac' data-type='QCryptoHmac *' data-ref="19hmac">hmac</dfn>,</td></tr>
+<tr><th id="139">139</th><td>                         <em>const</em> <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col0 decl" id="20iov" title='iov' data-type='const struct iovec *' data-ref="20iov">iov</dfn>,</td></tr>
+<tr><th id="140">140</th><td>                         <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="21niov" title='niov' data-type='size_t' data-ref="21niov">niov</dfn>,</td></tr>
+<tr><th id="141">141</th><td>                         <em>char</em> **<dfn class="local col2 decl" id="22digest" title='digest' data-type='char **' data-ref="22digest">digest</dfn>,</td></tr>
+<tr><th id="142">142</th><td>                         <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="23errp" title='errp' data-type='Error **' data-ref="23errp">errp</dfn>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> * qcrypto_hmac_digest:</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> *<span class="command"> @hmac</span>: the hmac object</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> * <span class="command">@buf</span>: the memory region to hmac</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> *<span class="command"> @len</span>: the length of <span class="command">@buf</span></i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> *<span class="command"> @digest</span>: pointer to hold output hmac</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to a NULL-initialized error object</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> * Computes the hmac across all the memory region</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * <span class="command">@buf</span> of length<span class="command"> @len</span>. The<span class="command"> @digest</span> pointer will be</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * filled with the printable hex digest of the computed</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * hmac, which will be terminated by '\0'. The</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> * memory pointer in<span class="command"> @digest</span> must be released</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> * with a call to g_free() when no longer required.</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> * Returns: 0 on success, -1 on error</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="161">161</th><td><em>int</em> <dfn class="decl" id="qcrypto_hmac_digest" title='qcrypto_hmac_digest' data-ref="qcrypto_hmac_digest">qcrypto_hmac_digest</dfn>(<a class="typedef" href="#QCryptoHmac" title='QCryptoHmac' data-type='struct QCryptoHmac' data-ref="QCryptoHmac">QCryptoHmac</a> *<dfn class="local col4 decl" id="24hmac" title='hmac' data-type='QCryptoHmac *' data-ref="24hmac">hmac</dfn>,</td></tr>
+<tr><th id="162">162</th><td>                        <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="25buf" title='buf' data-type='const char *' data-ref="25buf">buf</dfn>,</td></tr>
+<tr><th id="163">163</th><td>                        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="26len" title='len' data-type='size_t' data-ref="26len">len</dfn>,</td></tr>
+<tr><th id="164">164</th><td>                        <em>char</em> **<dfn class="local col7 decl" id="27digest" title='digest' data-type='char **' data-ref="27digest">digest</dfn>,</td></tr>
+<tr><th id="165">165</th><td>                        <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="28errp" title='errp' data-type='Error **' data-ref="28errp">errp</dfn>);</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><u>#<span data-ppcond="12">endif</span></u></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../crypto/hmac-glib.c.html'>codebrowser/crypto/hmac-glib.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

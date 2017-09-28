@@ -1,0 +1,811 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>softfloat-macros.h source code [codebrowser/fpu/softfloat-macros.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/fpu/softfloat-macros.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>fpu</a>/<a href='softfloat-macros.h.html'>softfloat-macros.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU float support macros</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * The code in this source file is derived from release 2a of the SoftFloat</i></td></tr>
+<tr><th id="5">5</th><td><i> * IEC/IEEE Floating-point Arithmetic Package. Those parts of the code (and</i></td></tr>
+<tr><th id="6">6</th><td><i> * some later contributions) are provided under that license, as detailed below.</i></td></tr>
+<tr><th id="7">7</th><td><i> * It has subsequently been modified by contributors to the QEMU Project,</i></td></tr>
+<tr><th id="8">8</th><td><i> * so some portions are provided under:</i></td></tr>
+<tr><th id="9">9</th><td><i> *  the SoftFloat-2a license</i></td></tr>
+<tr><th id="10">10</th><td><i> *  the BSD license</i></td></tr>
+<tr><th id="11">11</th><td><i> *  GPL-v2-or-later</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * Any future contributions to this file after December 1st 2014 will be</i></td></tr>
+<tr><th id="14">14</th><td><i> * taken to be licensed under the Softfloat-2a license unless specifically</i></td></tr>
+<tr><th id="15">15</th><td><i> * indicated otherwise.</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><i>/*</i></td></tr>
+<tr><th id="19">19</th><td><i>===============================================================================</i></td></tr>
+<tr><th id="20">20</th><td><i>This C source fragment is part of the SoftFloat IEC/IEEE Floating-point</i></td></tr>
+<tr><th id="21">21</th><td><i>Arithmetic Package, Release 2a.</i></td></tr>
+<tr><th id="22">22</th><td><i></i></td></tr>
+<tr><th id="23">23</th><td><i>Written by John R. Hauser.  This work was made possible in part by the</i></td></tr>
+<tr><th id="24">24</th><td><i>International Computer Science Institute, located at Suite 600, 1947 Center</i></td></tr>
+<tr><th id="25">25</th><td><i>Street, Berkeley, California 94704.  Funding was partially provided by the</i></td></tr>
+<tr><th id="26">26</th><td><i>National Science Foundation under grant MIP-9311980.  The original version</i></td></tr>
+<tr><th id="27">27</th><td><i>of this code was written as part of a project to build a fixed-point vector</i></td></tr>
+<tr><th id="28">28</th><td><i>processor in collaboration with the University of California at Berkeley,</i></td></tr>
+<tr><th id="29">29</th><td><i>overseen by Profs. Nelson Morgan and John Wawrzynek.  More information</i></td></tr>
+<tr><th id="30">30</th><td><i>is available through the Web page `http://HTTP.CS.Berkeley.EDU/~jhauser/</i></td></tr>
+<tr><th id="31">31</th><td><i>arithmetic/SoftFloat.html'.</i></td></tr>
+<tr><th id="32">32</th><td><i></i></td></tr>
+<tr><th id="33">33</th><td><i>THIS SOFTWARE IS DISTRIBUTED AS IS, FOR FREE.  Although reasonable effort</i></td></tr>
+<tr><th id="34">34</th><td><i>has been made to avoid it, THIS SOFTWARE MAY CONTAIN FAULTS THAT WILL AT</i></td></tr>
+<tr><th id="35">35</th><td><i>TIMES RESULT IN INCORRECT BEHAVIOR.  USE OF THIS SOFTWARE IS RESTRICTED TO</i></td></tr>
+<tr><th id="36">36</th><td><i>PERSONS AND ORGANIZATIONS WHO CAN AND WILL TAKE FULL RESPONSIBILITY FOR ANY</i></td></tr>
+<tr><th id="37">37</th><td><i>AND ALL LOSSES, COSTS, OR OTHER PROBLEMS ARISING FROM ITS USE.</i></td></tr>
+<tr><th id="38">38</th><td><i></i></td></tr>
+<tr><th id="39">39</th><td><i>Derivative works are acceptable, even for commercial purposes, so long as</i></td></tr>
+<tr><th id="40">40</th><td><i>(1) they include prominent notice that the work is derivative, and (2) they</i></td></tr>
+<tr><th id="41">41</th><td><i>include prominent notice akin to these four paragraphs for those parts of</i></td></tr>
+<tr><th id="42">42</th><td><i>this code that are retained.</i></td></tr>
+<tr><th id="43">43</th><td><i></i></td></tr>
+<tr><th id="44">44</th><td><i>===============================================================================</i></td></tr>
+<tr><th id="45">45</th><td><i>*/</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i>/* BSD licensing:</i></td></tr>
+<tr><th id="48">48</th><td><i> * Copyright (c) 2006, Fabrice Bellard</i></td></tr>
+<tr><th id="49">49</th><td><i> * All rights reserved.</i></td></tr>
+<tr><th id="50">50</th><td><i> *</i></td></tr>
+<tr><th id="51">51</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="52">52</th><td><i> * modification, are permitted provided that the following conditions are met:</i></td></tr>
+<tr><th id="53">53</th><td><i> *</i></td></tr>
+<tr><th id="54">54</th><td><i> * 1. Redistributions of source code must retain the above copyright notice,</i></td></tr>
+<tr><th id="55">55</th><td><i> * this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="56">56</th><td><i> *</i></td></tr>
+<tr><th id="57">57</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright notice,</i></td></tr>
+<tr><th id="58">58</th><td><i> * this list of conditions and the following disclaimer in the documentation</i></td></tr>
+<tr><th id="59">59</th><td><i> * and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="60">60</th><td><i> *</i></td></tr>
+<tr><th id="61">61</th><td><i> * 3. Neither the name of the copyright holder nor the names of its contributors</i></td></tr>
+<tr><th id="62">62</th><td><i> * may be used to endorse or promote products derived from this software without</i></td></tr>
+<tr><th id="63">63</th><td><i> * specific prior written permission.</i></td></tr>
+<tr><th id="64">64</th><td><i> *</i></td></tr>
+<tr><th id="65">65</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"</i></td></tr>
+<tr><th id="66">66</th><td><i> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</i></td></tr>
+<tr><th id="67">67</th><td><i> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</i></td></tr>
+<tr><th id="68">68</th><td><i> * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE</i></td></tr>
+<tr><th id="69">69</th><td><i> * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR</i></td></tr>
+<tr><th id="70">70</th><td><i> * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF</i></td></tr>
+<tr><th id="71">71</th><td><i> * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS</i></td></tr>
+<tr><th id="72">72</th><td><i> * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN</i></td></tr>
+<tr><th id="73">73</th><td><i> * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)</i></td></tr>
+<tr><th id="74">74</th><td><i> * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF</i></td></tr>
+<tr><th id="75">75</th><td><i> * THE POSSIBILITY OF SUCH DAMAGE.</i></td></tr>
+<tr><th id="76">76</th><td><i> */</i></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><i>/* Portions of this work are licensed under the terms of the GNU GPL,</i></td></tr>
+<tr><th id="79">79</th><td><i> * version 2 or later. See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="80">80</th><td><i> */</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="83">83</th><td><i>| This macro tests for minimum version of the GNU C compiler.</i></td></tr>
+<tr><th id="84">84</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="85">85</th><td><u>#<span data-ppcond="85">if</span> defined(<span class="macro" data-ref="_M/__GNUC__">__GNUC__</span>) &amp;&amp; defined(<span class="macro" data-ref="_M/__GNUC_MINOR__">__GNUC_MINOR__</span>)</u></td></tr>
+<tr><th id="86">86</th><td><u># define <dfn class="macro" id="_M/SOFTFLOAT_GNUC_PREREQ" data-ref="_M/SOFTFLOAT_GNUC_PREREQ">SOFTFLOAT_GNUC_PREREQ</dfn>(maj, min) \</u></td></tr>
+<tr><th id="87">87</th><td><u>         ((__GNUC__ &lt;&lt; 16) + __GNUC_MINOR__ &gt;= ((maj) &lt;&lt; 16) + (min))</u></td></tr>
+<tr><th id="88">88</th><td><u>#<span data-ppcond="85">else</span></u></td></tr>
+<tr><th id="89">89</th><td><u># define SOFTFLOAT_GNUC_PREREQ(maj, min) 0</u></td></tr>
+<tr><th id="90">90</th><td><u>#<span data-ppcond="85">endif</span></u></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="94">94</th><td><i>| Shifts `a' right by the number of bits given in `count'.  If any nonzero</i></td></tr>
+<tr><th id="95">95</th><td><i>| bits are shifted off, they are ``jammed'' into the least significant bit of</i></td></tr>
+<tr><th id="96">96</th><td><i>| the result by setting the least significant bit to 1.  The value of `count'</i></td></tr>
+<tr><th id="97">97</th><td><i>| can be arbitrarily large; in particular, if `count' is greater than 32, the</i></td></tr>
+<tr><th id="98">98</th><td><i>| result will be either 0 or 1, depending on whether `a' is zero or nonzero.</i></td></tr>
+<tr><th id="99">99</th><td><i>| The result is stored in the location pointed to by `zPtr'.</i></td></tr>
+<tr><th id="100">100</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="shift32RightJamming" title='shift32RightJamming' data-ref="shift32RightJamming">shift32RightJamming</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="1a" title='a' data-type='uint32_t' data-ref="1a">a</dfn>, <em>int</em> <dfn class="local col2 decl" id="2count" title='count' data-type='int' data-ref="2count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col3 decl" id="3zPtr" title='zPtr' data-type='uint32_t *' data-ref="3zPtr">zPtr</dfn>)</td></tr>
+<tr><th id="103">103</th><td>{</td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="4z" title='z' data-type='uint32_t' data-ref="4z">z</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>if</b> ( <a class="local col2 ref" href="#2count" title='count' data-ref="2count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="107">107</th><td>        <a class="local col4 ref" href="#4z" title='z' data-ref="4z">z</a> = <a class="local col1 ref" href="#1a" title='a' data-ref="1a">a</a>;</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td>    <b>else</b> <b>if</b> ( <a class="local col2 ref" href="#2count" title='count' data-ref="2count">count</a> &lt; <var>32</var> ) {</td></tr>
+<tr><th id="110">110</th><td>        <a class="local col4 ref" href="#4z" title='z' data-ref="4z">z</a> = ( <a class="local col1 ref" href="#1a" title='a' data-ref="1a">a</a>&gt;&gt;<a class="local col2 ref" href="#2count" title='count' data-ref="2count">count</a> ) | ( ( <a class="local col1 ref" href="#1a" title='a' data-ref="1a">a</a>&lt;&lt;( ( - <a class="local col2 ref" href="#2count" title='count' data-ref="2count">count</a> ) &amp; <var>31</var> ) ) != <var>0</var> );</td></tr>
+<tr><th id="111">111</th><td>    }</td></tr>
+<tr><th id="112">112</th><td>    <b>else</b> {</td></tr>
+<tr><th id="113">113</th><td>        <a class="local col4 ref" href="#4z" title='z' data-ref="4z">z</a> = ( <a class="local col1 ref" href="#1a" title='a' data-ref="1a">a</a> != <var>0</var> );</td></tr>
+<tr><th id="114">114</th><td>    }</td></tr>
+<tr><th id="115">115</th><td>    *<a class="local col3 ref" href="#3zPtr" title='zPtr' data-ref="3zPtr">zPtr</a> = <a class="local col4 ref" href="#4z" title='z' data-ref="4z">z</a>;</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>}</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="120">120</th><td><i>| Shifts `a' right by the number of bits given in `count'.  If any nonzero</i></td></tr>
+<tr><th id="121">121</th><td><i>| bits are shifted off, they are ``jammed'' into the least significant bit of</i></td></tr>
+<tr><th id="122">122</th><td><i>| the result by setting the least significant bit to 1.  The value of `count'</i></td></tr>
+<tr><th id="123">123</th><td><i>| can be arbitrarily large; in particular, if `count' is greater than 64, the</i></td></tr>
+<tr><th id="124">124</th><td><i>| result will be either 0 or 1, depending on whether `a' is zero or nonzero.</i></td></tr>
+<tr><th id="125">125</th><td><i>| The result is stored in the location pointed to by `zPtr'.</i></td></tr>
+<tr><th id="126">126</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="shift64RightJamming" title='shift64RightJamming' data-ref="shift64RightJamming">shift64RightJamming</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="5a" title='a' data-type='uint64_t' data-ref="5a">a</dfn>, <em>int</em> <dfn class="local col6 decl" id="6count" title='count' data-type='int' data-ref="6count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col7 decl" id="7zPtr" title='zPtr' data-type='uint64_t *' data-ref="7zPtr">zPtr</dfn>)</td></tr>
+<tr><th id="129">129</th><td>{</td></tr>
+<tr><th id="130">130</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="8z" title='z' data-type='uint64_t' data-ref="8z">z</dfn>;</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>    <b>if</b> ( <a class="local col6 ref" href="#6count" title='count' data-ref="6count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="133">133</th><td>        <a class="local col8 ref" href="#8z" title='z' data-ref="8z">z</a> = <a class="local col5 ref" href="#5a" title='a' data-ref="5a">a</a>;</td></tr>
+<tr><th id="134">134</th><td>    }</td></tr>
+<tr><th id="135">135</th><td>    <b>else</b> <b>if</b> ( <a class="local col6 ref" href="#6count" title='count' data-ref="6count">count</a> &lt; <var>64</var> ) {</td></tr>
+<tr><th id="136">136</th><td>        <a class="local col8 ref" href="#8z" title='z' data-ref="8z">z</a> = ( <a class="local col5 ref" href="#5a" title='a' data-ref="5a">a</a>&gt;&gt;<a class="local col6 ref" href="#6count" title='count' data-ref="6count">count</a> ) | ( ( <a class="local col5 ref" href="#5a" title='a' data-ref="5a">a</a>&lt;&lt;( ( - <a class="local col6 ref" href="#6count" title='count' data-ref="6count">count</a> ) &amp; <var>63</var> ) ) != <var>0</var> );</td></tr>
+<tr><th id="137">137</th><td>    }</td></tr>
+<tr><th id="138">138</th><td>    <b>else</b> {</td></tr>
+<tr><th id="139">139</th><td>        <a class="local col8 ref" href="#8z" title='z' data-ref="8z">z</a> = ( <a class="local col5 ref" href="#5a" title='a' data-ref="5a">a</a> != <var>0</var> );</td></tr>
+<tr><th id="140">140</th><td>    }</td></tr>
+<tr><th id="141">141</th><td>    *<a class="local col7 ref" href="#7zPtr" title='zPtr' data-ref="7zPtr">zPtr</a> = <a class="local col8 ref" href="#8z" title='z' data-ref="8z">z</a>;</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="146">146</th><td><i>| Shifts the 128-bit value formed by concatenating `a0' and `a1' right by 64</i></td></tr>
+<tr><th id="147">147</th><td><i>| _plus_ the number of bits given in `count'.  The shifted result is at most</i></td></tr>
+<tr><th id="148">148</th><td><i>| 64 nonzero bits; this is stored at the location pointed to by `z0Ptr'.  The</i></td></tr>
+<tr><th id="149">149</th><td><i>| bits shifted off form a second 64-bit result as follows:  The _last_ bit</i></td></tr>
+<tr><th id="150">150</th><td><i>| shifted off is the most-significant bit of the extra result, and the other</i></td></tr>
+<tr><th id="151">151</th><td><i>| 63 bits of the extra result are all zero if and only if _all_but_the_last_</i></td></tr>
+<tr><th id="152">152</th><td><i>| bits shifted off were all zero.  This extra result is stored in the location</i></td></tr>
+<tr><th id="153">153</th><td><i>| pointed to by `z1Ptr'.  The value of `count' can be arbitrarily large.</i></td></tr>
+<tr><th id="154">154</th><td><i>|     (This routine makes more sense if `a0' and `a1' are considered to form a</i></td></tr>
+<tr><th id="155">155</th><td><i>| fixed-point value with binary point between `a0' and `a1'.  This fixed-point</i></td></tr>
+<tr><th id="156">156</th><td><i>| value is shifted right by the number of bits given in `count', and the</i></td></tr>
+<tr><th id="157">157</th><td><i>| integer part of the result is returned at the location pointed to by</i></td></tr>
+<tr><th id="158">158</th><td><i>| `z0Ptr'.  The fractional part of the result may be slightly corrupted as</i></td></tr>
+<tr><th id="159">159</th><td><i>| described above, and is returned at the location pointed to by `z1Ptr'.)</i></td></tr>
+<tr><th id="160">160</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="163">163</th><td> <dfn class="decl def" id="shift64ExtraRightJamming" title='shift64ExtraRightJamming' data-ref="shift64ExtraRightJamming">shift64ExtraRightJamming</dfn>(</td></tr>
+<tr><th id="164">164</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="9a0" title='a0' data-type='uint64_t' data-ref="9a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="10a1" title='a1' data-type='uint64_t' data-ref="10a1">a1</dfn>, <em>int</em> <dfn class="local col1 decl" id="11count" title='count' data-type='int' data-ref="11count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col2 decl" id="12z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="12z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col3 decl" id="13z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="13z1Ptr">z1Ptr</dfn>)</td></tr>
+<tr><th id="165">165</th><td>{</td></tr>
+<tr><th id="166">166</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="14z0" title='z0' data-type='uint64_t' data-ref="14z0">z0</dfn>, <dfn class="local col5 decl" id="15z1" title='z1' data-type='uint64_t' data-ref="15z1">z1</dfn>;</td></tr>
+<tr><th id="167">167</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col6 decl" id="16negCount" title='negCount' data-type='int8_t' data-ref="16negCount">negCount</dfn> = ( - <a class="local col1 ref" href="#11count" title='count' data-ref="11count">count</a> ) &amp; <var>63</var>;</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <b>if</b> ( <a class="local col1 ref" href="#11count" title='count' data-ref="11count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="170">170</th><td>        <a class="local col5 ref" href="#15z1" title='z1' data-ref="15z1">z1</a> = <a class="local col0 ref" href="#10a1" title='a1' data-ref="10a1">a1</a>;</td></tr>
+<tr><th id="171">171</th><td>        <a class="local col4 ref" href="#14z0" title='z0' data-ref="14z0">z0</a> = <a class="local col9 ref" href="#9a0" title='a0' data-ref="9a0">a0</a>;</td></tr>
+<tr><th id="172">172</th><td>    }</td></tr>
+<tr><th id="173">173</th><td>    <b>else</b> <b>if</b> ( <a class="local col1 ref" href="#11count" title='count' data-ref="11count">count</a> &lt; <var>64</var> ) {</td></tr>
+<tr><th id="174">174</th><td>        <a class="local col5 ref" href="#15z1" title='z1' data-ref="15z1">z1</a> = ( <a class="local col9 ref" href="#9a0" title='a0' data-ref="9a0">a0</a>&lt;&lt;<a class="local col6 ref" href="#16negCount" title='negCount' data-ref="16negCount">negCount</a> ) | ( <a class="local col0 ref" href="#10a1" title='a1' data-ref="10a1">a1</a> != <var>0</var> );</td></tr>
+<tr><th id="175">175</th><td>        <a class="local col4 ref" href="#14z0" title='z0' data-ref="14z0">z0</a> = <a class="local col9 ref" href="#9a0" title='a0' data-ref="9a0">a0</a>&gt;&gt;<a class="local col1 ref" href="#11count" title='count' data-ref="11count">count</a>;</td></tr>
+<tr><th id="176">176</th><td>    }</td></tr>
+<tr><th id="177">177</th><td>    <b>else</b> {</td></tr>
+<tr><th id="178">178</th><td>        <b>if</b> ( <a class="local col1 ref" href="#11count" title='count' data-ref="11count">count</a> == <var>64</var> ) {</td></tr>
+<tr><th id="179">179</th><td>            <a class="local col5 ref" href="#15z1" title='z1' data-ref="15z1">z1</a> = <a class="local col9 ref" href="#9a0" title='a0' data-ref="9a0">a0</a> | ( <a class="local col0 ref" href="#10a1" title='a1' data-ref="10a1">a1</a> != <var>0</var> );</td></tr>
+<tr><th id="180">180</th><td>        }</td></tr>
+<tr><th id="181">181</th><td>        <b>else</b> {</td></tr>
+<tr><th id="182">182</th><td>            <a class="local col5 ref" href="#15z1" title='z1' data-ref="15z1">z1</a> = ( ( <a class="local col9 ref" href="#9a0" title='a0' data-ref="9a0">a0</a> | <a class="local col0 ref" href="#10a1" title='a1' data-ref="10a1">a1</a> ) != <var>0</var> );</td></tr>
+<tr><th id="183">183</th><td>        }</td></tr>
+<tr><th id="184">184</th><td>        <a class="local col4 ref" href="#14z0" title='z0' data-ref="14z0">z0</a> = <var>0</var>;</td></tr>
+<tr><th id="185">185</th><td>    }</td></tr>
+<tr><th id="186">186</th><td>    *<a class="local col3 ref" href="#13z1Ptr" title='z1Ptr' data-ref="13z1Ptr">z1Ptr</a> = <a class="local col5 ref" href="#15z1" title='z1' data-ref="15z1">z1</a>;</td></tr>
+<tr><th id="187">187</th><td>    *<a class="local col2 ref" href="#12z0Ptr" title='z0Ptr' data-ref="12z0Ptr">z0Ptr</a> = <a class="local col4 ref" href="#14z0" title='z0' data-ref="14z0">z0</a>;</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>}</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="192">192</th><td><i>| Shifts the 128-bit value formed by concatenating `a0' and `a1' right by the</i></td></tr>
+<tr><th id="193">193</th><td><i>| number of bits given in `count'.  Any bits shifted off are lost.  The value</i></td></tr>
+<tr><th id="194">194</th><td><i>| of `count' can be arbitrarily large; in particular, if `count' is greater</i></td></tr>
+<tr><th id="195">195</th><td><i>| than 128, the result will be 0.  The result is broken into two 64-bit pieces</i></td></tr>
+<tr><th id="196">196</th><td><i>| which are stored at the locations pointed to by `z0Ptr' and `z1Ptr'.</i></td></tr>
+<tr><th id="197">197</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="200">200</th><td> <dfn class="decl def" id="shift128Right" title='shift128Right' data-ref="shift128Right">shift128Right</dfn>(</td></tr>
+<tr><th id="201">201</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="17a0" title='a0' data-type='uint64_t' data-ref="17a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="18a1" title='a1' data-type='uint64_t' data-ref="18a1">a1</dfn>, <em>int</em> <dfn class="local col9 decl" id="19count" title='count' data-type='int' data-ref="19count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col0 decl" id="20z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="20z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col1 decl" id="21z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="21z1Ptr">z1Ptr</dfn>)</td></tr>
+<tr><th id="202">202</th><td>{</td></tr>
+<tr><th id="203">203</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="22z0" title='z0' data-type='uint64_t' data-ref="22z0">z0</dfn>, <dfn class="local col3 decl" id="23z1" title='z1' data-type='uint64_t' data-ref="23z1">z1</dfn>;</td></tr>
+<tr><th id="204">204</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col4 decl" id="24negCount" title='negCount' data-type='int8_t' data-ref="24negCount">negCount</dfn> = ( - <a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> ) &amp; <var>63</var>;</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td>    <b>if</b> ( <a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="207">207</th><td>        <a class="local col3 ref" href="#23z1" title='z1' data-ref="23z1">z1</a> = <a class="local col8 ref" href="#18a1" title='a1' data-ref="18a1">a1</a>;</td></tr>
+<tr><th id="208">208</th><td>        <a class="local col2 ref" href="#22z0" title='z0' data-ref="22z0">z0</a> = <a class="local col7 ref" href="#17a0" title='a0' data-ref="17a0">a0</a>;</td></tr>
+<tr><th id="209">209</th><td>    }</td></tr>
+<tr><th id="210">210</th><td>    <b>else</b> <b>if</b> ( <a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> &lt; <var>64</var> ) {</td></tr>
+<tr><th id="211">211</th><td>        <a class="local col3 ref" href="#23z1" title='z1' data-ref="23z1">z1</a> = ( <a class="local col7 ref" href="#17a0" title='a0' data-ref="17a0">a0</a>&lt;&lt;<a class="local col4 ref" href="#24negCount" title='negCount' data-ref="24negCount">negCount</a> ) | ( <a class="local col8 ref" href="#18a1" title='a1' data-ref="18a1">a1</a>&gt;&gt;<a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> );</td></tr>
+<tr><th id="212">212</th><td>        <a class="local col2 ref" href="#22z0" title='z0' data-ref="22z0">z0</a> = <a class="local col7 ref" href="#17a0" title='a0' data-ref="17a0">a0</a>&gt;&gt;<a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a>;</td></tr>
+<tr><th id="213">213</th><td>    }</td></tr>
+<tr><th id="214">214</th><td>    <b>else</b> {</td></tr>
+<tr><th id="215">215</th><td>        <a class="local col3 ref" href="#23z1" title='z1' data-ref="23z1">z1</a> = (<a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> &lt; <var>128</var>) ? (<a class="local col7 ref" href="#17a0" title='a0' data-ref="17a0">a0</a> &gt;&gt; (<a class="local col9 ref" href="#19count" title='count' data-ref="19count">count</a> &amp; <var>63</var>)) : <var>0</var>;</td></tr>
+<tr><th id="216">216</th><td>        <a class="local col2 ref" href="#22z0" title='z0' data-ref="22z0">z0</a> = <var>0</var>;</td></tr>
+<tr><th id="217">217</th><td>    }</td></tr>
+<tr><th id="218">218</th><td>    *<a class="local col1 ref" href="#21z1Ptr" title='z1Ptr' data-ref="21z1Ptr">z1Ptr</a> = <a class="local col3 ref" href="#23z1" title='z1' data-ref="23z1">z1</a>;</td></tr>
+<tr><th id="219">219</th><td>    *<a class="local col0 ref" href="#20z0Ptr" title='z0Ptr' data-ref="20z0Ptr">z0Ptr</a> = <a class="local col2 ref" href="#22z0" title='z0' data-ref="22z0">z0</a>;</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>}</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="224">224</th><td><i>| Shifts the 128-bit value formed by concatenating `a0' and `a1' right by the</i></td></tr>
+<tr><th id="225">225</th><td><i>| number of bits given in `count'.  If any nonzero bits are shifted off, they</i></td></tr>
+<tr><th id="226">226</th><td><i>| are ``jammed'' into the least significant bit of the result by setting the</i></td></tr>
+<tr><th id="227">227</th><td><i>| least significant bit to 1.  The value of `count' can be arbitrarily large;</i></td></tr>
+<tr><th id="228">228</th><td><i>| in particular, if `count' is greater than 128, the result will be either</i></td></tr>
+<tr><th id="229">229</th><td><i>| 0 or 1, depending on whether the concatenation of `a0' and `a1' is zero or</i></td></tr>
+<tr><th id="230">230</th><td><i>| nonzero.  The result is broken into two 64-bit pieces which are stored at</i></td></tr>
+<tr><th id="231">231</th><td><i>| the locations pointed to by `z0Ptr' and `z1Ptr'.</i></td></tr>
+<tr><th id="232">232</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="235">235</th><td> <dfn class="decl def" id="shift128RightJamming" title='shift128RightJamming' data-ref="shift128RightJamming">shift128RightJamming</dfn>(</td></tr>
+<tr><th id="236">236</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="25a0" title='a0' data-type='uint64_t' data-ref="25a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="26a1" title='a1' data-type='uint64_t' data-ref="26a1">a1</dfn>, <em>int</em> <dfn class="local col7 decl" id="27count" title='count' data-type='int' data-ref="27count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="28z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="28z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col9 decl" id="29z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="29z1Ptr">z1Ptr</dfn>)</td></tr>
+<tr><th id="237">237</th><td>{</td></tr>
+<tr><th id="238">238</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="30z0" title='z0' data-type='uint64_t' data-ref="30z0">z0</dfn>, <dfn class="local col1 decl" id="31z1" title='z1' data-type='uint64_t' data-ref="31z1">z1</dfn>;</td></tr>
+<tr><th id="239">239</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col2 decl" id="32negCount" title='negCount' data-type='int8_t' data-ref="32negCount">negCount</dfn> = ( - <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> ) &amp; <var>63</var>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <b>if</b> ( <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="242">242</th><td>        <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a> = <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a>;</td></tr>
+<tr><th id="243">243</th><td>        <a class="local col0 ref" href="#30z0" title='z0' data-ref="30z0">z0</a> = <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a>;</td></tr>
+<tr><th id="244">244</th><td>    }</td></tr>
+<tr><th id="245">245</th><td>    <b>else</b> <b>if</b> ( <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> &lt; <var>64</var> ) {</td></tr>
+<tr><th id="246">246</th><td>        <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a> = ( <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a>&lt;&lt;<a class="local col2 ref" href="#32negCount" title='negCount' data-ref="32negCount">negCount</a> ) | ( <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a>&gt;&gt;<a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> ) | ( ( <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a>&lt;&lt;<a class="local col2 ref" href="#32negCount" title='negCount' data-ref="32negCount">negCount</a> ) != <var>0</var> );</td></tr>
+<tr><th id="247">247</th><td>        <a class="local col0 ref" href="#30z0" title='z0' data-ref="30z0">z0</a> = <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a>&gt;&gt;<a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a>;</td></tr>
+<tr><th id="248">248</th><td>    }</td></tr>
+<tr><th id="249">249</th><td>    <b>else</b> {</td></tr>
+<tr><th id="250">250</th><td>        <b>if</b> ( <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> == <var>64</var> ) {</td></tr>
+<tr><th id="251">251</th><td>            <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a> = <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a> | ( <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a> != <var>0</var> );</td></tr>
+<tr><th id="252">252</th><td>        }</td></tr>
+<tr><th id="253">253</th><td>        <b>else</b> <b>if</b> ( <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> &lt; <var>128</var> ) {</td></tr>
+<tr><th id="254">254</th><td>            <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a> = ( <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a>&gt;&gt;( <a class="local col7 ref" href="#27count" title='count' data-ref="27count">count</a> &amp; <var>63</var> ) ) | ( ( ( <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a>&lt;&lt;<a class="local col2 ref" href="#32negCount" title='negCount' data-ref="32negCount">negCount</a> ) | <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a> ) != <var>0</var> );</td></tr>
+<tr><th id="255">255</th><td>        }</td></tr>
+<tr><th id="256">256</th><td>        <b>else</b> {</td></tr>
+<tr><th id="257">257</th><td>            <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a> = ( ( <a class="local col5 ref" href="#25a0" title='a0' data-ref="25a0">a0</a> | <a class="local col6 ref" href="#26a1" title='a1' data-ref="26a1">a1</a> ) != <var>0</var> );</td></tr>
+<tr><th id="258">258</th><td>        }</td></tr>
+<tr><th id="259">259</th><td>        <a class="local col0 ref" href="#30z0" title='z0' data-ref="30z0">z0</a> = <var>0</var>;</td></tr>
+<tr><th id="260">260</th><td>    }</td></tr>
+<tr><th id="261">261</th><td>    *<a class="local col9 ref" href="#29z1Ptr" title='z1Ptr' data-ref="29z1Ptr">z1Ptr</a> = <a class="local col1 ref" href="#31z1" title='z1' data-ref="31z1">z1</a>;</td></tr>
+<tr><th id="262">262</th><td>    *<a class="local col8 ref" href="#28z0Ptr" title='z0Ptr' data-ref="28z0Ptr">z0Ptr</a> = <a class="local col0 ref" href="#30z0" title='z0' data-ref="30z0">z0</a>;</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>}</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="267">267</th><td><i>| Shifts the 192-bit value formed by concatenating `a0', `a1', and `a2' right</i></td></tr>
+<tr><th id="268">268</th><td><i>| by 64 _plus_ the number of bits given in `count'.  The shifted result is</i></td></tr>
+<tr><th id="269">269</th><td><i>| at most 128 nonzero bits; these are broken into two 64-bit pieces which are</i></td></tr>
+<tr><th id="270">270</th><td><i>| stored at the locations pointed to by `z0Ptr' and `z1Ptr'.  The bits shifted</i></td></tr>
+<tr><th id="271">271</th><td><i>| off form a third 64-bit result as follows:  The _last_ bit shifted off is</i></td></tr>
+<tr><th id="272">272</th><td><i>| the most-significant bit of the extra result, and the other 63 bits of the</i></td></tr>
+<tr><th id="273">273</th><td><i>| extra result are all zero if and only if _all_but_the_last_ bits shifted off</i></td></tr>
+<tr><th id="274">274</th><td><i>| were all zero.  This extra result is stored in the location pointed to by</i></td></tr>
+<tr><th id="275">275</th><td><i>| `z2Ptr'.  The value of `count' can be arbitrarily large.</i></td></tr>
+<tr><th id="276">276</th><td><i>|     (This routine makes more sense if `a0', `a1', and `a2' are considered</i></td></tr>
+<tr><th id="277">277</th><td><i>| to form a fixed-point value with binary point between `a1' and `a2'.  This</i></td></tr>
+<tr><th id="278">278</th><td><i>| fixed-point value is shifted right by the number of bits given in `count',</i></td></tr>
+<tr><th id="279">279</th><td><i>| and the integer part of the result is returned at the locations pointed to</i></td></tr>
+<tr><th id="280">280</th><td><i>| by `z0Ptr' and `z1Ptr'.  The fractional part of the result may be slightly</i></td></tr>
+<tr><th id="281">281</th><td><i>| corrupted as described above, and is returned at the location pointed to by</i></td></tr>
+<tr><th id="282">282</th><td><i>| `z2Ptr'.)</i></td></tr>
+<tr><th id="283">283</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="286">286</th><td> <dfn class="decl def" id="shift128ExtraRightJamming" title='shift128ExtraRightJamming' data-ref="shift128ExtraRightJamming">shift128ExtraRightJamming</dfn>(</td></tr>
+<tr><th id="287">287</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="33a0" title='a0' data-type='uint64_t' data-ref="33a0">a0</dfn>,</td></tr>
+<tr><th id="288">288</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="34a1" title='a1' data-type='uint64_t' data-ref="34a1">a1</dfn>,</td></tr>
+<tr><th id="289">289</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="35a2" title='a2' data-type='uint64_t' data-ref="35a2">a2</dfn>,</td></tr>
+<tr><th id="290">290</th><td>     <em>int</em> <dfn class="local col6 decl" id="36count" title='count' data-type='int' data-ref="36count">count</dfn>,</td></tr>
+<tr><th id="291">291</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col7 decl" id="37z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="37z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="292">292</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="38z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="38z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="293">293</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col9 decl" id="39z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="39z2Ptr">z2Ptr</dfn></td></tr>
+<tr><th id="294">294</th><td> )</td></tr>
+<tr><th id="295">295</th><td>{</td></tr>
+<tr><th id="296">296</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="40z0" title='z0' data-type='uint64_t' data-ref="40z0">z0</dfn>, <dfn class="local col1 decl" id="41z1" title='z1' data-type='uint64_t' data-ref="41z1">z1</dfn>, <dfn class="local col2 decl" id="42z2" title='z2' data-type='uint64_t' data-ref="42z2">z2</dfn>;</td></tr>
+<tr><th id="297">297</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col3 decl" id="43negCount" title='negCount' data-type='int8_t' data-ref="43negCount">negCount</dfn> = ( - <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> ) &amp; <var>63</var>;</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>    <b>if</b> ( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> == <var>0</var> ) {</td></tr>
+<tr><th id="300">300</th><td>        <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> = <a class="local col5 ref" href="#35a2" title='a2' data-ref="35a2">a2</a>;</td></tr>
+<tr><th id="301">301</th><td>        <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a> = <a class="local col4 ref" href="#34a1" title='a1' data-ref="34a1">a1</a>;</td></tr>
+<tr><th id="302">302</th><td>        <a class="local col0 ref" href="#40z0" title='z0' data-ref="40z0">z0</a> = <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>;</td></tr>
+<tr><th id="303">303</th><td>    }</td></tr>
+<tr><th id="304">304</th><td>    <b>else</b> {</td></tr>
+<tr><th id="305">305</th><td>        <b>if</b> ( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> &lt; <var>64</var> ) {</td></tr>
+<tr><th id="306">306</th><td>            <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> = <a class="local col4 ref" href="#34a1" title='a1' data-ref="34a1">a1</a>&lt;&lt;<a class="local col3 ref" href="#43negCount" title='negCount' data-ref="43negCount">negCount</a>;</td></tr>
+<tr><th id="307">307</th><td>            <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a> = ( <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>&lt;&lt;<a class="local col3 ref" href="#43negCount" title='negCount' data-ref="43negCount">negCount</a> ) | ( <a class="local col4 ref" href="#34a1" title='a1' data-ref="34a1">a1</a>&gt;&gt;<a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> );</td></tr>
+<tr><th id="308">308</th><td>            <a class="local col0 ref" href="#40z0" title='z0' data-ref="40z0">z0</a> = <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>&gt;&gt;<a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a>;</td></tr>
+<tr><th id="309">309</th><td>        }</td></tr>
+<tr><th id="310">310</th><td>        <b>else</b> {</td></tr>
+<tr><th id="311">311</th><td>            <b>if</b> ( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> == <var>64</var> ) {</td></tr>
+<tr><th id="312">312</th><td>                <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> = <a class="local col4 ref" href="#34a1" title='a1' data-ref="34a1">a1</a>;</td></tr>
+<tr><th id="313">313</th><td>                <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a> = <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>;</td></tr>
+<tr><th id="314">314</th><td>            }</td></tr>
+<tr><th id="315">315</th><td>            <b>else</b> {</td></tr>
+<tr><th id="316">316</th><td>                <a class="local col5 ref" href="#35a2" title='a2' data-ref="35a2">a2</a> |= <a class="local col4 ref" href="#34a1" title='a1' data-ref="34a1">a1</a>;</td></tr>
+<tr><th id="317">317</th><td>                <b>if</b> ( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> &lt; <var>128</var> ) {</td></tr>
+<tr><th id="318">318</th><td>                    <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> = <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>&lt;&lt;<a class="local col3 ref" href="#43negCount" title='negCount' data-ref="43negCount">negCount</a>;</td></tr>
+<tr><th id="319">319</th><td>                    <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a> = <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a>&gt;&gt;( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> &amp; <var>63</var> );</td></tr>
+<tr><th id="320">320</th><td>                }</td></tr>
+<tr><th id="321">321</th><td>                <b>else</b> {</td></tr>
+<tr><th id="322">322</th><td>                    <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> = ( <a class="local col6 ref" href="#36count" title='count' data-ref="36count">count</a> == <var>128</var> ) ? <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a> : ( <a class="local col3 ref" href="#33a0" title='a0' data-ref="33a0">a0</a> != <var>0</var> );</td></tr>
+<tr><th id="323">323</th><td>                    <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a> = <var>0</var>;</td></tr>
+<tr><th id="324">324</th><td>                }</td></tr>
+<tr><th id="325">325</th><td>            }</td></tr>
+<tr><th id="326">326</th><td>            <a class="local col0 ref" href="#40z0" title='z0' data-ref="40z0">z0</a> = <var>0</var>;</td></tr>
+<tr><th id="327">327</th><td>        }</td></tr>
+<tr><th id="328">328</th><td>        <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a> |= ( <a class="local col5 ref" href="#35a2" title='a2' data-ref="35a2">a2</a> != <var>0</var> );</td></tr>
+<tr><th id="329">329</th><td>    }</td></tr>
+<tr><th id="330">330</th><td>    *<a class="local col9 ref" href="#39z2Ptr" title='z2Ptr' data-ref="39z2Ptr">z2Ptr</a> = <a class="local col2 ref" href="#42z2" title='z2' data-ref="42z2">z2</a>;</td></tr>
+<tr><th id="331">331</th><td>    *<a class="local col8 ref" href="#38z1Ptr" title='z1Ptr' data-ref="38z1Ptr">z1Ptr</a> = <a class="local col1 ref" href="#41z1" title='z1' data-ref="41z1">z1</a>;</td></tr>
+<tr><th id="332">332</th><td>    *<a class="local col7 ref" href="#37z0Ptr" title='z0Ptr' data-ref="37z0Ptr">z0Ptr</a> = <a class="local col0 ref" href="#40z0" title='z0' data-ref="40z0">z0</a>;</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>}</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="337">337</th><td><i>| Shifts the 128-bit value formed by concatenating `a0' and `a1' left by the</i></td></tr>
+<tr><th id="338">338</th><td><i>| number of bits given in `count'.  Any bits shifted off are lost.  The value</i></td></tr>
+<tr><th id="339">339</th><td><i>| of `count' must be less than 64.  The result is broken into two 64-bit</i></td></tr>
+<tr><th id="340">340</th><td><i>| pieces which are stored at the locations pointed to by `z0Ptr' and `z1Ptr'.</i></td></tr>
+<tr><th id="341">341</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="344">344</th><td> <dfn class="decl def" id="shortShift128Left" title='shortShift128Left' data-ref="shortShift128Left">shortShift128Left</dfn>(</td></tr>
+<tr><th id="345">345</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="44a0" title='a0' data-type='uint64_t' data-ref="44a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="45a1" title='a1' data-type='uint64_t' data-ref="45a1">a1</dfn>, <em>int</em> <dfn class="local col6 decl" id="46count" title='count' data-type='int' data-ref="46count">count</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col7 decl" id="47z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="47z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="48z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="48z1Ptr">z1Ptr</dfn>)</td></tr>
+<tr><th id="346">346</th><td>{</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td>    *<a class="local col8 ref" href="#48z1Ptr" title='z1Ptr' data-ref="48z1Ptr">z1Ptr</a> = <a class="local col5 ref" href="#45a1" title='a1' data-ref="45a1">a1</a>&lt;&lt;<a class="local col6 ref" href="#46count" title='count' data-ref="46count">count</a>;</td></tr>
+<tr><th id="349">349</th><td>    *<a class="local col7 ref" href="#47z0Ptr" title='z0Ptr' data-ref="47z0Ptr">z0Ptr</a> =</td></tr>
+<tr><th id="350">350</th><td>        ( <a class="local col6 ref" href="#46count" title='count' data-ref="46count">count</a> == <var>0</var> ) ? <a class="local col4 ref" href="#44a0" title='a0' data-ref="44a0">a0</a> : ( <a class="local col4 ref" href="#44a0" title='a0' data-ref="44a0">a0</a>&lt;&lt;<a class="local col6 ref" href="#46count" title='count' data-ref="46count">count</a> ) | ( <a class="local col5 ref" href="#45a1" title='a1' data-ref="45a1">a1</a>&gt;&gt;( ( - <a class="local col6 ref" href="#46count" title='count' data-ref="46count">count</a> ) &amp; <var>63</var> ) );</td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td>}</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="355">355</th><td><i>| Shifts the 192-bit value formed by concatenating `a0', `a1', and `a2' left</i></td></tr>
+<tr><th id="356">356</th><td><i>| by the number of bits given in `count'.  Any bits shifted off are lost.</i></td></tr>
+<tr><th id="357">357</th><td><i>| The value of `count' must be less than 64.  The result is broken into three</i></td></tr>
+<tr><th id="358">358</th><td><i>| 64-bit pieces which are stored at the locations pointed to by `z0Ptr',</i></td></tr>
+<tr><th id="359">359</th><td><i>| `z1Ptr', and `z2Ptr'.</i></td></tr>
+<tr><th id="360">360</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="361">361</th><td></td></tr>
+<tr><th id="362">362</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="363">363</th><td> <dfn class="decl def" id="shortShift192Left" title='shortShift192Left' data-ref="shortShift192Left">shortShift192Left</dfn>(</td></tr>
+<tr><th id="364">364</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="49a0" title='a0' data-type='uint64_t' data-ref="49a0">a0</dfn>,</td></tr>
+<tr><th id="365">365</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="50a1" title='a1' data-type='uint64_t' data-ref="50a1">a1</dfn>,</td></tr>
+<tr><th id="366">366</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="51a2" title='a2' data-type='uint64_t' data-ref="51a2">a2</dfn>,</td></tr>
+<tr><th id="367">367</th><td>     <em>int</em> <dfn class="local col2 decl" id="52count" title='count' data-type='int' data-ref="52count">count</dfn>,</td></tr>
+<tr><th id="368">368</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col3 decl" id="53z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="53z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="369">369</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="54z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="54z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="370">370</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="55z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="55z2Ptr">z2Ptr</dfn></td></tr>
+<tr><th id="371">371</th><td> )</td></tr>
+<tr><th id="372">372</th><td>{</td></tr>
+<tr><th id="373">373</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="56z0" title='z0' data-type='uint64_t' data-ref="56z0">z0</dfn>, <dfn class="local col7 decl" id="57z1" title='z1' data-type='uint64_t' data-ref="57z1">z1</dfn>, <dfn class="local col8 decl" id="58z2" title='z2' data-type='uint64_t' data-ref="58z2">z2</dfn>;</td></tr>
+<tr><th id="374">374</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col9 decl" id="59negCount" title='negCount' data-type='int8_t' data-ref="59negCount">negCount</dfn>;</td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td>    <a class="local col8 ref" href="#58z2" title='z2' data-ref="58z2">z2</a> = <a class="local col1 ref" href="#51a2" title='a2' data-ref="51a2">a2</a>&lt;&lt;<a class="local col2 ref" href="#52count" title='count' data-ref="52count">count</a>;</td></tr>
+<tr><th id="377">377</th><td>    <a class="local col7 ref" href="#57z1" title='z1' data-ref="57z1">z1</a> = <a class="local col0 ref" href="#50a1" title='a1' data-ref="50a1">a1</a>&lt;&lt;<a class="local col2 ref" href="#52count" title='count' data-ref="52count">count</a>;</td></tr>
+<tr><th id="378">378</th><td>    <a class="local col6 ref" href="#56z0" title='z0' data-ref="56z0">z0</a> = <a class="local col9 ref" href="#49a0" title='a0' data-ref="49a0">a0</a>&lt;&lt;<a class="local col2 ref" href="#52count" title='count' data-ref="52count">count</a>;</td></tr>
+<tr><th id="379">379</th><td>    <b>if</b> ( <var>0</var> &lt; <a class="local col2 ref" href="#52count" title='count' data-ref="52count">count</a> ) {</td></tr>
+<tr><th id="380">380</th><td>        <a class="local col9 ref" href="#59negCount" title='negCount' data-ref="59negCount">negCount</a> = ( ( - <a class="local col2 ref" href="#52count" title='count' data-ref="52count">count</a> ) &amp; <var>63</var> );</td></tr>
+<tr><th id="381">381</th><td>        <a class="local col7 ref" href="#57z1" title='z1' data-ref="57z1">z1</a> |= <a class="local col1 ref" href="#51a2" title='a2' data-ref="51a2">a2</a>&gt;&gt;<a class="local col9 ref" href="#59negCount" title='negCount' data-ref="59negCount">negCount</a>;</td></tr>
+<tr><th id="382">382</th><td>        <a class="local col6 ref" href="#56z0" title='z0' data-ref="56z0">z0</a> |= <a class="local col0 ref" href="#50a1" title='a1' data-ref="50a1">a1</a>&gt;&gt;<a class="local col9 ref" href="#59negCount" title='negCount' data-ref="59negCount">negCount</a>;</td></tr>
+<tr><th id="383">383</th><td>    }</td></tr>
+<tr><th id="384">384</th><td>    *<a class="local col5 ref" href="#55z2Ptr" title='z2Ptr' data-ref="55z2Ptr">z2Ptr</a> = <a class="local col8 ref" href="#58z2" title='z2' data-ref="58z2">z2</a>;</td></tr>
+<tr><th id="385">385</th><td>    *<a class="local col4 ref" href="#54z1Ptr" title='z1Ptr' data-ref="54z1Ptr">z1Ptr</a> = <a class="local col7 ref" href="#57z1" title='z1' data-ref="57z1">z1</a>;</td></tr>
+<tr><th id="386">386</th><td>    *<a class="local col3 ref" href="#53z0Ptr" title='z0Ptr' data-ref="53z0Ptr">z0Ptr</a> = <a class="local col6 ref" href="#56z0" title='z0' data-ref="56z0">z0</a>;</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td>}</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="391">391</th><td><i>| Adds the 128-bit value formed by concatenating `a0' and `a1' to the 128-bit</i></td></tr>
+<tr><th id="392">392</th><td><i>| value formed by concatenating `b0' and `b1'.  Addition is modulo 2^128, so</i></td></tr>
+<tr><th id="393">393</th><td><i>| any carry out is lost.  The result is broken into two 64-bit pieces which</i></td></tr>
+<tr><th id="394">394</th><td><i>| are stored at the locations pointed to by `z0Ptr' and `z1Ptr'.</i></td></tr>
+<tr><th id="395">395</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="398">398</th><td> <dfn class="decl def" id="add128" title='add128' data-ref="add128">add128</dfn>(</td></tr>
+<tr><th id="399">399</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="60a0" title='a0' data-type='uint64_t' data-ref="60a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="61a1" title='a1' data-type='uint64_t' data-ref="61a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="62b0" title='b0' data-type='uint64_t' data-ref="62b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="63b1" title='b1' data-type='uint64_t' data-ref="63b1">b1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="64z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="64z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="65z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="65z1Ptr">z1Ptr</dfn> )</td></tr>
+<tr><th id="400">400</th><td>{</td></tr>
+<tr><th id="401">401</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="66z1" title='z1' data-type='uint64_t' data-ref="66z1">z1</dfn>;</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td>    <a class="local col6 ref" href="#66z1" title='z1' data-ref="66z1">z1</a> = <a class="local col1 ref" href="#61a1" title='a1' data-ref="61a1">a1</a> + <a class="local col3 ref" href="#63b1" title='b1' data-ref="63b1">b1</a>;</td></tr>
+<tr><th id="404">404</th><td>    *<a class="local col5 ref" href="#65z1Ptr" title='z1Ptr' data-ref="65z1Ptr">z1Ptr</a> = <a class="local col6 ref" href="#66z1" title='z1' data-ref="66z1">z1</a>;</td></tr>
+<tr><th id="405">405</th><td>    *<a class="local col4 ref" href="#64z0Ptr" title='z0Ptr' data-ref="64z0Ptr">z0Ptr</a> = <a class="local col0 ref" href="#60a0" title='a0' data-ref="60a0">a0</a> + <a class="local col2 ref" href="#62b0" title='b0' data-ref="62b0">b0</a> + ( <a class="local col6 ref" href="#66z1" title='z1' data-ref="66z1">z1</a> &lt; <a class="local col1 ref" href="#61a1" title='a1' data-ref="61a1">a1</a> );</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td>}</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="410">410</th><td><i>| Adds the 192-bit value formed by concatenating `a0', `a1', and `a2' to the</i></td></tr>
+<tr><th id="411">411</th><td><i>| 192-bit value formed by concatenating `b0', `b1', and `b2'.  Addition is</i></td></tr>
+<tr><th id="412">412</th><td><i>| modulo 2^192, so any carry out is lost.  The result is broken into three</i></td></tr>
+<tr><th id="413">413</th><td><i>| 64-bit pieces which are stored at the locations pointed to by `z0Ptr',</i></td></tr>
+<tr><th id="414">414</th><td><i>| `z1Ptr', and `z2Ptr'.</i></td></tr>
+<tr><th id="415">415</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="416">416</th><td></td></tr>
+<tr><th id="417">417</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="418">418</th><td> <dfn class="decl def" id="add192" title='add192' data-ref="add192">add192</dfn>(</td></tr>
+<tr><th id="419">419</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="67a0" title='a0' data-type='uint64_t' data-ref="67a0">a0</dfn>,</td></tr>
+<tr><th id="420">420</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="68a1" title='a1' data-type='uint64_t' data-ref="68a1">a1</dfn>,</td></tr>
+<tr><th id="421">421</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="69a2" title='a2' data-type='uint64_t' data-ref="69a2">a2</dfn>,</td></tr>
+<tr><th id="422">422</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="70b0" title='b0' data-type='uint64_t' data-ref="70b0">b0</dfn>,</td></tr>
+<tr><th id="423">423</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="71b1" title='b1' data-type='uint64_t' data-ref="71b1">b1</dfn>,</td></tr>
+<tr><th id="424">424</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="72b2" title='b2' data-type='uint64_t' data-ref="72b2">b2</dfn>,</td></tr>
+<tr><th id="425">425</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col3 decl" id="73z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="73z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="426">426</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="74z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="74z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="427">427</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="75z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="75z2Ptr">z2Ptr</dfn></td></tr>
+<tr><th id="428">428</th><td> )</td></tr>
+<tr><th id="429">429</th><td>{</td></tr>
+<tr><th id="430">430</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="76z0" title='z0' data-type='uint64_t' data-ref="76z0">z0</dfn>, <dfn class="local col7 decl" id="77z1" title='z1' data-type='uint64_t' data-ref="77z1">z1</dfn>, <dfn class="local col8 decl" id="78z2" title='z2' data-type='uint64_t' data-ref="78z2">z2</dfn>;</td></tr>
+<tr><th id="431">431</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col9 decl" id="79carry0" title='carry0' data-type='int8_t' data-ref="79carry0">carry0</dfn>, <dfn class="local col0 decl" id="80carry1" title='carry1' data-type='int8_t' data-ref="80carry1">carry1</dfn>;</td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td>    <a class="local col8 ref" href="#78z2" title='z2' data-ref="78z2">z2</a> = <a class="local col9 ref" href="#69a2" title='a2' data-ref="69a2">a2</a> + <a class="local col2 ref" href="#72b2" title='b2' data-ref="72b2">b2</a>;</td></tr>
+<tr><th id="434">434</th><td>    <a class="local col0 ref" href="#80carry1" title='carry1' data-ref="80carry1">carry1</a> = ( <a class="local col8 ref" href="#78z2" title='z2' data-ref="78z2">z2</a> &lt; <a class="local col9 ref" href="#69a2" title='a2' data-ref="69a2">a2</a> );</td></tr>
+<tr><th id="435">435</th><td>    <a class="local col7 ref" href="#77z1" title='z1' data-ref="77z1">z1</a> = <a class="local col8 ref" href="#68a1" title='a1' data-ref="68a1">a1</a> + <a class="local col1 ref" href="#71b1" title='b1' data-ref="71b1">b1</a>;</td></tr>
+<tr><th id="436">436</th><td>    <a class="local col9 ref" href="#79carry0" title='carry0' data-ref="79carry0">carry0</a> = ( <a class="local col7 ref" href="#77z1" title='z1' data-ref="77z1">z1</a> &lt; <a class="local col8 ref" href="#68a1" title='a1' data-ref="68a1">a1</a> );</td></tr>
+<tr><th id="437">437</th><td>    <a class="local col6 ref" href="#76z0" title='z0' data-ref="76z0">z0</a> = <a class="local col7 ref" href="#67a0" title='a0' data-ref="67a0">a0</a> + <a class="local col0 ref" href="#70b0" title='b0' data-ref="70b0">b0</a>;</td></tr>
+<tr><th id="438">438</th><td>    <a class="local col7 ref" href="#77z1" title='z1' data-ref="77z1">z1</a> += <a class="local col0 ref" href="#80carry1" title='carry1' data-ref="80carry1">carry1</a>;</td></tr>
+<tr><th id="439">439</th><td>    <a class="local col6 ref" href="#76z0" title='z0' data-ref="76z0">z0</a> += ( <a class="local col7 ref" href="#77z1" title='z1' data-ref="77z1">z1</a> &lt; <a class="local col0 ref" href="#80carry1" title='carry1' data-ref="80carry1">carry1</a> );</td></tr>
+<tr><th id="440">440</th><td>    <a class="local col6 ref" href="#76z0" title='z0' data-ref="76z0">z0</a> += <a class="local col9 ref" href="#79carry0" title='carry0' data-ref="79carry0">carry0</a>;</td></tr>
+<tr><th id="441">441</th><td>    *<a class="local col5 ref" href="#75z2Ptr" title='z2Ptr' data-ref="75z2Ptr">z2Ptr</a> = <a class="local col8 ref" href="#78z2" title='z2' data-ref="78z2">z2</a>;</td></tr>
+<tr><th id="442">442</th><td>    *<a class="local col4 ref" href="#74z1Ptr" title='z1Ptr' data-ref="74z1Ptr">z1Ptr</a> = <a class="local col7 ref" href="#77z1" title='z1' data-ref="77z1">z1</a>;</td></tr>
+<tr><th id="443">443</th><td>    *<a class="local col3 ref" href="#73z0Ptr" title='z0Ptr' data-ref="73z0Ptr">z0Ptr</a> = <a class="local col6 ref" href="#76z0" title='z0' data-ref="76z0">z0</a>;</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+<tr><th id="445">445</th><td>}</td></tr>
+<tr><th id="446">446</th><td></td></tr>
+<tr><th id="447">447</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="448">448</th><td><i>| Subtracts the 128-bit value formed by concatenating `b0' and `b1' from the</i></td></tr>
+<tr><th id="449">449</th><td><i>| 128-bit value formed by concatenating `a0' and `a1'.  Subtraction is modulo</i></td></tr>
+<tr><th id="450">450</th><td><i>| 2^128, so any borrow out (carry out) is lost.  The result is broken into two</i></td></tr>
+<tr><th id="451">451</th><td><i>| 64-bit pieces which are stored at the locations pointed to by `z0Ptr' and</i></td></tr>
+<tr><th id="452">452</th><td><i>| `z1Ptr'.</i></td></tr>
+<tr><th id="453">453</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="454">454</th><td></td></tr>
+<tr><th id="455">455</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="456">456</th><td> <dfn class="decl def" id="sub128" title='sub128' data-ref="sub128">sub128</dfn>(</td></tr>
+<tr><th id="457">457</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="81a0" title='a0' data-type='uint64_t' data-ref="81a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="82a1" title='a1' data-type='uint64_t' data-ref="82a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="83b0" title='b0' data-type='uint64_t' data-ref="83b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="84b1" title='b1' data-type='uint64_t' data-ref="84b1">b1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="85z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="85z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col6 decl" id="86z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="86z1Ptr">z1Ptr</dfn> )</td></tr>
+<tr><th id="458">458</th><td>{</td></tr>
+<tr><th id="459">459</th><td></td></tr>
+<tr><th id="460">460</th><td>    *<a class="local col6 ref" href="#86z1Ptr" title='z1Ptr' data-ref="86z1Ptr">z1Ptr</a> = <a class="local col2 ref" href="#82a1" title='a1' data-ref="82a1">a1</a> - <a class="local col4 ref" href="#84b1" title='b1' data-ref="84b1">b1</a>;</td></tr>
+<tr><th id="461">461</th><td>    *<a class="local col5 ref" href="#85z0Ptr" title='z0Ptr' data-ref="85z0Ptr">z0Ptr</a> = <a class="local col1 ref" href="#81a0" title='a0' data-ref="81a0">a0</a> - <a class="local col3 ref" href="#83b0" title='b0' data-ref="83b0">b0</a> - ( <a class="local col2 ref" href="#82a1" title='a1' data-ref="82a1">a1</a> &lt; <a class="local col4 ref" href="#84b1" title='b1' data-ref="84b1">b1</a> );</td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td>}</td></tr>
+<tr><th id="464">464</th><td></td></tr>
+<tr><th id="465">465</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="466">466</th><td><i>| Subtracts the 192-bit value formed by concatenating `b0', `b1', and `b2'</i></td></tr>
+<tr><th id="467">467</th><td><i>| from the 192-bit value formed by concatenating `a0', `a1', and `a2'.</i></td></tr>
+<tr><th id="468">468</th><td><i>| Subtraction is modulo 2^192, so any borrow out (carry out) is lost.  The</i></td></tr>
+<tr><th id="469">469</th><td><i>| result is broken into three 64-bit pieces which are stored at the locations</i></td></tr>
+<tr><th id="470">470</th><td><i>| pointed to by `z0Ptr', `z1Ptr', and `z2Ptr'.</i></td></tr>
+<tr><th id="471">471</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="472">472</th><td></td></tr>
+<tr><th id="473">473</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="474">474</th><td> <dfn class="decl def" id="sub192" title='sub192' data-ref="sub192">sub192</dfn>(</td></tr>
+<tr><th id="475">475</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="87a0" title='a0' data-type='uint64_t' data-ref="87a0">a0</dfn>,</td></tr>
+<tr><th id="476">476</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="88a1" title='a1' data-type='uint64_t' data-ref="88a1">a1</dfn>,</td></tr>
+<tr><th id="477">477</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="89a2" title='a2' data-type='uint64_t' data-ref="89a2">a2</dfn>,</td></tr>
+<tr><th id="478">478</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="90b0" title='b0' data-type='uint64_t' data-ref="90b0">b0</dfn>,</td></tr>
+<tr><th id="479">479</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="91b1" title='b1' data-type='uint64_t' data-ref="91b1">b1</dfn>,</td></tr>
+<tr><th id="480">480</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="92b2" title='b2' data-type='uint64_t' data-ref="92b2">b2</dfn>,</td></tr>
+<tr><th id="481">481</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col3 decl" id="93z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="93z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="482">482</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="94z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="94z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="483">483</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="95z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="95z2Ptr">z2Ptr</dfn></td></tr>
+<tr><th id="484">484</th><td> )</td></tr>
+<tr><th id="485">485</th><td>{</td></tr>
+<tr><th id="486">486</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="96z0" title='z0' data-type='uint64_t' data-ref="96z0">z0</dfn>, <dfn class="local col7 decl" id="97z1" title='z1' data-type='uint64_t' data-ref="97z1">z1</dfn>, <dfn class="local col8 decl" id="98z2" title='z2' data-type='uint64_t' data-ref="98z2">z2</dfn>;</td></tr>
+<tr><th id="487">487</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col9 decl" id="99borrow0" title='borrow0' data-type='int8_t' data-ref="99borrow0">borrow0</dfn>, <dfn class="local col0 decl" id="100borrow1" title='borrow1' data-type='int8_t' data-ref="100borrow1">borrow1</dfn>;</td></tr>
+<tr><th id="488">488</th><td></td></tr>
+<tr><th id="489">489</th><td>    <a class="local col8 ref" href="#98z2" title='z2' data-ref="98z2">z2</a> = <a class="local col9 ref" href="#89a2" title='a2' data-ref="89a2">a2</a> - <a class="local col2 ref" href="#92b2" title='b2' data-ref="92b2">b2</a>;</td></tr>
+<tr><th id="490">490</th><td>    <a class="local col0 ref" href="#100borrow1" title='borrow1' data-ref="100borrow1">borrow1</a> = ( <a class="local col9 ref" href="#89a2" title='a2' data-ref="89a2">a2</a> &lt; <a class="local col2 ref" href="#92b2" title='b2' data-ref="92b2">b2</a> );</td></tr>
+<tr><th id="491">491</th><td>    <a class="local col7 ref" href="#97z1" title='z1' data-ref="97z1">z1</a> = <a class="local col8 ref" href="#88a1" title='a1' data-ref="88a1">a1</a> - <a class="local col1 ref" href="#91b1" title='b1' data-ref="91b1">b1</a>;</td></tr>
+<tr><th id="492">492</th><td>    <a class="local col9 ref" href="#99borrow0" title='borrow0' data-ref="99borrow0">borrow0</a> = ( <a class="local col8 ref" href="#88a1" title='a1' data-ref="88a1">a1</a> &lt; <a class="local col1 ref" href="#91b1" title='b1' data-ref="91b1">b1</a> );</td></tr>
+<tr><th id="493">493</th><td>    <a class="local col6 ref" href="#96z0" title='z0' data-ref="96z0">z0</a> = <a class="local col7 ref" href="#87a0" title='a0' data-ref="87a0">a0</a> - <a class="local col0 ref" href="#90b0" title='b0' data-ref="90b0">b0</a>;</td></tr>
+<tr><th id="494">494</th><td>    <a class="local col6 ref" href="#96z0" title='z0' data-ref="96z0">z0</a> -= ( <a class="local col7 ref" href="#97z1" title='z1' data-ref="97z1">z1</a> &lt; <a class="local col0 ref" href="#100borrow1" title='borrow1' data-ref="100borrow1">borrow1</a> );</td></tr>
+<tr><th id="495">495</th><td>    <a class="local col7 ref" href="#97z1" title='z1' data-ref="97z1">z1</a> -= <a class="local col0 ref" href="#100borrow1" title='borrow1' data-ref="100borrow1">borrow1</a>;</td></tr>
+<tr><th id="496">496</th><td>    <a class="local col6 ref" href="#96z0" title='z0' data-ref="96z0">z0</a> -= <a class="local col9 ref" href="#99borrow0" title='borrow0' data-ref="99borrow0">borrow0</a>;</td></tr>
+<tr><th id="497">497</th><td>    *<a class="local col5 ref" href="#95z2Ptr" title='z2Ptr' data-ref="95z2Ptr">z2Ptr</a> = <a class="local col8 ref" href="#98z2" title='z2' data-ref="98z2">z2</a>;</td></tr>
+<tr><th id="498">498</th><td>    *<a class="local col4 ref" href="#94z1Ptr" title='z1Ptr' data-ref="94z1Ptr">z1Ptr</a> = <a class="local col7 ref" href="#97z1" title='z1' data-ref="97z1">z1</a>;</td></tr>
+<tr><th id="499">499</th><td>    *<a class="local col3 ref" href="#93z0Ptr" title='z0Ptr' data-ref="93z0Ptr">z0Ptr</a> = <a class="local col6 ref" href="#96z0" title='z0' data-ref="96z0">z0</a>;</td></tr>
+<tr><th id="500">500</th><td></td></tr>
+<tr><th id="501">501</th><td>}</td></tr>
+<tr><th id="502">502</th><td></td></tr>
+<tr><th id="503">503</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="504">504</th><td><i>| Multiplies `a' by `b' to obtain a 128-bit product.  The product is broken</i></td></tr>
+<tr><th id="505">505</th><td><i>| into two 64-bit pieces which are stored at the locations pointed to by</i></td></tr>
+<tr><th id="506">506</th><td><i>| `z0Ptr' and `z1Ptr'.</i></td></tr>
+<tr><th id="507">507</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="508">508</th><td></td></tr>
+<tr><th id="509">509</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="101a" title='a' data-type='uint64_t' data-ref="101a">a</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="102b" title='b' data-type='uint64_t' data-ref="102b">b</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col3 decl" id="103z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="103z0Ptr">z0Ptr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="104z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="104z1Ptr">z1Ptr</dfn> )</td></tr>
+<tr><th id="510">510</th><td>{</td></tr>
+<tr><th id="511">511</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="105aHigh" title='aHigh' data-type='uint32_t' data-ref="105aHigh">aHigh</dfn>, <dfn class="local col6 decl" id="106aLow" title='aLow' data-type='uint32_t' data-ref="106aLow">aLow</dfn>, <dfn class="local col7 decl" id="107bHigh" title='bHigh' data-type='uint32_t' data-ref="107bHigh">bHigh</dfn>, <dfn class="local col8 decl" id="108bLow" title='bLow' data-type='uint32_t' data-ref="108bLow">bLow</dfn>;</td></tr>
+<tr><th id="512">512</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="109z0" title='z0' data-type='uint64_t' data-ref="109z0">z0</dfn>, <dfn class="local col0 decl" id="110zMiddleA" title='zMiddleA' data-type='uint64_t' data-ref="110zMiddleA">zMiddleA</dfn>, <dfn class="local col1 decl" id="111zMiddleB" title='zMiddleB' data-type='uint64_t' data-ref="111zMiddleB">zMiddleB</dfn>, <dfn class="local col2 decl" id="112z1" title='z1' data-type='uint64_t' data-ref="112z1">z1</dfn>;</td></tr>
+<tr><th id="513">513</th><td></td></tr>
+<tr><th id="514">514</th><td>    <a class="local col6 ref" href="#106aLow" title='aLow' data-ref="106aLow">aLow</a> = <a class="local col1 ref" href="#101a" title='a' data-ref="101a">a</a>;</td></tr>
+<tr><th id="515">515</th><td>    <a class="local col5 ref" href="#105aHigh" title='aHigh' data-ref="105aHigh">aHigh</a> = <a class="local col1 ref" href="#101a" title='a' data-ref="101a">a</a>&gt;&gt;<var>32</var>;</td></tr>
+<tr><th id="516">516</th><td>    <a class="local col8 ref" href="#108bLow" title='bLow' data-ref="108bLow">bLow</a> = <a class="local col2 ref" href="#102b" title='b' data-ref="102b">b</a>;</td></tr>
+<tr><th id="517">517</th><td>    <a class="local col7 ref" href="#107bHigh" title='bHigh' data-ref="107bHigh">bHigh</a> = <a class="local col2 ref" href="#102b" title='b' data-ref="102b">b</a>&gt;&gt;<var>32</var>;</td></tr>
+<tr><th id="518">518</th><td>    <a class="local col2 ref" href="#112z1" title='z1' data-ref="112z1">z1</a> = ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col6 ref" href="#106aLow" title='aLow' data-ref="106aLow">aLow</a> ) * <a class="local col8 ref" href="#108bLow" title='bLow' data-ref="108bLow">bLow</a>;</td></tr>
+<tr><th id="519">519</th><td>    <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a> = ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col6 ref" href="#106aLow" title='aLow' data-ref="106aLow">aLow</a> ) * <a class="local col7 ref" href="#107bHigh" title='bHigh' data-ref="107bHigh">bHigh</a>;</td></tr>
+<tr><th id="520">520</th><td>    <a class="local col1 ref" href="#111zMiddleB" title='zMiddleB' data-ref="111zMiddleB">zMiddleB</a> = ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col5 ref" href="#105aHigh" title='aHigh' data-ref="105aHigh">aHigh</a> ) * <a class="local col8 ref" href="#108bLow" title='bLow' data-ref="108bLow">bLow</a>;</td></tr>
+<tr><th id="521">521</th><td>    <a class="local col9 ref" href="#109z0" title='z0' data-ref="109z0">z0</a> = ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col5 ref" href="#105aHigh" title='aHigh' data-ref="105aHigh">aHigh</a> ) * <a class="local col7 ref" href="#107bHigh" title='bHigh' data-ref="107bHigh">bHigh</a>;</td></tr>
+<tr><th id="522">522</th><td>    <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a> += <a class="local col1 ref" href="#111zMiddleB" title='zMiddleB' data-ref="111zMiddleB">zMiddleB</a>;</td></tr>
+<tr><th id="523">523</th><td>    <a class="local col9 ref" href="#109z0" title='z0' data-ref="109z0">z0</a> += ( ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) ( <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a> &lt; <a class="local col1 ref" href="#111zMiddleB" title='zMiddleB' data-ref="111zMiddleB">zMiddleB</a> ) )&lt;&lt;<var>32</var> ) + ( <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a>&gt;&gt;<var>32</var> );</td></tr>
+<tr><th id="524">524</th><td>    <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a> &lt;&lt;= <var>32</var>;</td></tr>
+<tr><th id="525">525</th><td>    <a class="local col2 ref" href="#112z1" title='z1' data-ref="112z1">z1</a> += <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a>;</td></tr>
+<tr><th id="526">526</th><td>    <a class="local col9 ref" href="#109z0" title='z0' data-ref="109z0">z0</a> += ( <a class="local col2 ref" href="#112z1" title='z1' data-ref="112z1">z1</a> &lt; <a class="local col0 ref" href="#110zMiddleA" title='zMiddleA' data-ref="110zMiddleA">zMiddleA</a> );</td></tr>
+<tr><th id="527">527</th><td>    *<a class="local col4 ref" href="#104z1Ptr" title='z1Ptr' data-ref="104z1Ptr">z1Ptr</a> = <a class="local col2 ref" href="#112z1" title='z1' data-ref="112z1">z1</a>;</td></tr>
+<tr><th id="528">528</th><td>    *<a class="local col3 ref" href="#103z0Ptr" title='z0Ptr' data-ref="103z0Ptr">z0Ptr</a> = <a class="local col9 ref" href="#109z0" title='z0' data-ref="109z0">z0</a>;</td></tr>
+<tr><th id="529">529</th><td></td></tr>
+<tr><th id="530">530</th><td>}</td></tr>
+<tr><th id="531">531</th><td></td></tr>
+<tr><th id="532">532</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="533">533</th><td><i>| Multiplies the 128-bit value formed by concatenating `a0' and `a1' by</i></td></tr>
+<tr><th id="534">534</th><td><i>| `b' to obtain a 192-bit product.  The product is broken into three 64-bit</i></td></tr>
+<tr><th id="535">535</th><td><i>| pieces which are stored at the locations pointed to by `z0Ptr', `z1Ptr', and</i></td></tr>
+<tr><th id="536">536</th><td><i>| `z2Ptr'.</i></td></tr>
+<tr><th id="537">537</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="538">538</th><td></td></tr>
+<tr><th id="539">539</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="540">540</th><td> <dfn class="decl def" id="mul128By64To192" title='mul128By64To192' data-ref="mul128By64To192">mul128By64To192</dfn>(</td></tr>
+<tr><th id="541">541</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="113a0" title='a0' data-type='uint64_t' data-ref="113a0">a0</dfn>,</td></tr>
+<tr><th id="542">542</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="114a1" title='a1' data-type='uint64_t' data-ref="114a1">a1</dfn>,</td></tr>
+<tr><th id="543">543</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="115b" title='b' data-type='uint64_t' data-ref="115b">b</dfn>,</td></tr>
+<tr><th id="544">544</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col6 decl" id="116z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="116z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="545">545</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col7 decl" id="117z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="117z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="546">546</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="118z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="118z2Ptr">z2Ptr</dfn></td></tr>
+<tr><th id="547">547</th><td> )</td></tr>
+<tr><th id="548">548</th><td>{</td></tr>
+<tr><th id="549">549</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="119z0" title='z0' data-type='uint64_t' data-ref="119z0">z0</dfn>, <dfn class="local col0 decl" id="120z1" title='z1' data-type='uint64_t' data-ref="120z1">z1</dfn>, <dfn class="local col1 decl" id="121z2" title='z2' data-type='uint64_t' data-ref="121z2">z2</dfn>, <dfn class="local col2 decl" id="122more1" title='more1' data-type='uint64_t' data-ref="122more1">more1</dfn>;</td></tr>
+<tr><th id="550">550</th><td></td></tr>
+<tr><th id="551">551</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col4 ref" href="#114a1" title='a1' data-ref="114a1">a1</a>, <a class="local col5 ref" href="#115b" title='b' data-ref="115b">b</a>, &amp;<a class="local col0 ref" href="#120z1" title='z1' data-ref="120z1">z1</a>, &amp;<a class="local col1 ref" href="#121z2" title='z2' data-ref="121z2">z2</a> );</td></tr>
+<tr><th id="552">552</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col3 ref" href="#113a0" title='a0' data-ref="113a0">a0</a>, <a class="local col5 ref" href="#115b" title='b' data-ref="115b">b</a>, &amp;<a class="local col9 ref" href="#119z0" title='z0' data-ref="119z0">z0</a>, &amp;<a class="local col2 ref" href="#122more1" title='more1' data-ref="122more1">more1</a> );</td></tr>
+<tr><th id="553">553</th><td>    <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col9 ref" href="#119z0" title='z0' data-ref="119z0">z0</a>, <a class="local col2 ref" href="#122more1" title='more1' data-ref="122more1">more1</a>, <var>0</var>, <a class="local col0 ref" href="#120z1" title='z1' data-ref="120z1">z1</a>, &amp;<a class="local col9 ref" href="#119z0" title='z0' data-ref="119z0">z0</a>, &amp;<a class="local col0 ref" href="#120z1" title='z1' data-ref="120z1">z1</a> );</td></tr>
+<tr><th id="554">554</th><td>    *<a class="local col8 ref" href="#118z2Ptr" title='z2Ptr' data-ref="118z2Ptr">z2Ptr</a> = <a class="local col1 ref" href="#121z2" title='z2' data-ref="121z2">z2</a>;</td></tr>
+<tr><th id="555">555</th><td>    *<a class="local col7 ref" href="#117z1Ptr" title='z1Ptr' data-ref="117z1Ptr">z1Ptr</a> = <a class="local col0 ref" href="#120z1" title='z1' data-ref="120z1">z1</a>;</td></tr>
+<tr><th id="556">556</th><td>    *<a class="local col6 ref" href="#116z0Ptr" title='z0Ptr' data-ref="116z0Ptr">z0Ptr</a> = <a class="local col9 ref" href="#119z0" title='z0' data-ref="119z0">z0</a>;</td></tr>
+<tr><th id="557">557</th><td></td></tr>
+<tr><th id="558">558</th><td>}</td></tr>
+<tr><th id="559">559</th><td></td></tr>
+<tr><th id="560">560</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="561">561</th><td><i>| Multiplies the 128-bit value formed by concatenating `a0' and `a1' to the</i></td></tr>
+<tr><th id="562">562</th><td><i>| 128-bit value formed by concatenating `b0' and `b1' to obtain a 256-bit</i></td></tr>
+<tr><th id="563">563</th><td><i>| product.  The product is broken into four 64-bit pieces which are stored at</i></td></tr>
+<tr><th id="564">564</th><td><i>| the locations pointed to by `z0Ptr', `z1Ptr', `z2Ptr', and `z3Ptr'.</i></td></tr>
+<tr><th id="565">565</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="568">568</th><td> <dfn class="decl def" id="mul128To256" title='mul128To256' data-ref="mul128To256">mul128To256</dfn>(</td></tr>
+<tr><th id="569">569</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="123a0" title='a0' data-type='uint64_t' data-ref="123a0">a0</dfn>,</td></tr>
+<tr><th id="570">570</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="124a1" title='a1' data-type='uint64_t' data-ref="124a1">a1</dfn>,</td></tr>
+<tr><th id="571">571</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="125b0" title='b0' data-type='uint64_t' data-ref="125b0">b0</dfn>,</td></tr>
+<tr><th id="572">572</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="126b1" title='b1' data-type='uint64_t' data-ref="126b1">b1</dfn>,</td></tr>
+<tr><th id="573">573</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col7 decl" id="127z0Ptr" title='z0Ptr' data-type='uint64_t *' data-ref="127z0Ptr">z0Ptr</dfn>,</td></tr>
+<tr><th id="574">574</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="128z1Ptr" title='z1Ptr' data-type='uint64_t *' data-ref="128z1Ptr">z1Ptr</dfn>,</td></tr>
+<tr><th id="575">575</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col9 decl" id="129z2Ptr" title='z2Ptr' data-type='uint64_t *' data-ref="129z2Ptr">z2Ptr</dfn>,</td></tr>
+<tr><th id="576">576</th><td>     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col0 decl" id="130z3Ptr" title='z3Ptr' data-type='uint64_t *' data-ref="130z3Ptr">z3Ptr</dfn></td></tr>
+<tr><th id="577">577</th><td> )</td></tr>
+<tr><th id="578">578</th><td>{</td></tr>
+<tr><th id="579">579</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="131z0" title='z0' data-type='uint64_t' data-ref="131z0">z0</dfn>, <dfn class="local col2 decl" id="132z1" title='z1' data-type='uint64_t' data-ref="132z1">z1</dfn>, <dfn class="local col3 decl" id="133z2" title='z2' data-type='uint64_t' data-ref="133z2">z2</dfn>, <dfn class="local col4 decl" id="134z3" title='z3' data-type='uint64_t' data-ref="134z3">z3</dfn>;</td></tr>
+<tr><th id="580">580</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="135more1" title='more1' data-type='uint64_t' data-ref="135more1">more1</dfn>, <dfn class="local col6 decl" id="136more2" title='more2' data-type='uint64_t' data-ref="136more2">more2</dfn>;</td></tr>
+<tr><th id="581">581</th><td></td></tr>
+<tr><th id="582">582</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col4 ref" href="#124a1" title='a1' data-ref="124a1">a1</a>, <a class="local col6 ref" href="#126b1" title='b1' data-ref="126b1">b1</a>, &amp;<a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a>, &amp;<a class="local col4 ref" href="#134z3" title='z3' data-ref="134z3">z3</a> );</td></tr>
+<tr><th id="583">583</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col4 ref" href="#124a1" title='a1' data-ref="124a1">a1</a>, <a class="local col5 ref" href="#125b0" title='b0' data-ref="125b0">b0</a>, &amp;<a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>, &amp;<a class="local col6 ref" href="#136more2" title='more2' data-ref="136more2">more2</a> );</td></tr>
+<tr><th id="584">584</th><td>    <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>, <a class="local col6 ref" href="#136more2" title='more2' data-ref="136more2">more2</a>, <var>0</var>, <a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a>, &amp;<a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>, &amp;<a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a> );</td></tr>
+<tr><th id="585">585</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col3 ref" href="#123a0" title='a0' data-ref="123a0">a0</a>, <a class="local col5 ref" href="#125b0" title='b0' data-ref="125b0">b0</a>, &amp;<a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>, &amp;<a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a> );</td></tr>
+<tr><th id="586">586</th><td>    <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>, <a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a>, <var>0</var>, <a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>, &amp;<a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>, &amp;<a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a> );</td></tr>
+<tr><th id="587">587</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col3 ref" href="#123a0" title='a0' data-ref="123a0">a0</a>, <a class="local col6 ref" href="#126b1" title='b1' data-ref="126b1">b1</a>, &amp;<a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a>, &amp;<a class="local col6 ref" href="#136more2" title='more2' data-ref="136more2">more2</a> );</td></tr>
+<tr><th id="588">588</th><td>    <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a>, <a class="local col6 ref" href="#136more2" title='more2' data-ref="136more2">more2</a>, <var>0</var>, <a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a>, &amp;<a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a>, &amp;<a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a> );</td></tr>
+<tr><th id="589">589</th><td>    <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>, <a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>, <var>0</var>, <a class="local col5 ref" href="#135more1" title='more1' data-ref="135more1">more1</a>, &amp;<a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>, &amp;<a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a> );</td></tr>
+<tr><th id="590">590</th><td>    *<a class="local col0 ref" href="#130z3Ptr" title='z3Ptr' data-ref="130z3Ptr">z3Ptr</a> = <a class="local col4 ref" href="#134z3" title='z3' data-ref="134z3">z3</a>;</td></tr>
+<tr><th id="591">591</th><td>    *<a class="local col9 ref" href="#129z2Ptr" title='z2Ptr' data-ref="129z2Ptr">z2Ptr</a> = <a class="local col3 ref" href="#133z2" title='z2' data-ref="133z2">z2</a>;</td></tr>
+<tr><th id="592">592</th><td>    *<a class="local col8 ref" href="#128z1Ptr" title='z1Ptr' data-ref="128z1Ptr">z1Ptr</a> = <a class="local col2 ref" href="#132z1" title='z1' data-ref="132z1">z1</a>;</td></tr>
+<tr><th id="593">593</th><td>    *<a class="local col7 ref" href="#127z0Ptr" title='z0Ptr' data-ref="127z0Ptr">z0Ptr</a> = <a class="local col1 ref" href="#131z0" title='z0' data-ref="131z0">z0</a>;</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td>}</td></tr>
+<tr><th id="596">596</th><td></td></tr>
+<tr><th id="597">597</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="598">598</th><td><i>| Returns an approximation to the 64-bit integer quotient obtained by dividing</i></td></tr>
+<tr><th id="599">599</th><td><i>| `b' into the 128-bit value formed by concatenating `a0' and `a1'.  The</i></td></tr>
+<tr><th id="600">600</th><td><i>| divisor `b' must be at least 2^63.  If q is the exact quotient truncated</i></td></tr>
+<tr><th id="601">601</th><td><i>| toward zero, the approximation returned lies between q and q + 2 inclusive.</i></td></tr>
+<tr><th id="602">602</th><td><i>| If the exact quotient q is larger than 64 bits, the maximum positive 64-bit</i></td></tr>
+<tr><th id="603">603</th><td><i>| unsigned integer is returned.</i></td></tr>
+<tr><th id="604">604</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="605">605</th><td></td></tr>
+<tr><th id="606">606</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="estimateDiv128To64" title='estimateDiv128To64' data-ref="estimateDiv128To64">estimateDiv128To64</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="137a0" title='a0' data-type='uint64_t' data-ref="137a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="138a1" title='a1' data-type='uint64_t' data-ref="138a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="139b" title='b' data-type='uint64_t' data-ref="139b">b</dfn> )</td></tr>
+<tr><th id="607">607</th><td>{</td></tr>
+<tr><th id="608">608</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="140b0" title='b0' data-type='uint64_t' data-ref="140b0">b0</dfn>, <dfn class="local col1 decl" id="141b1" title='b1' data-type='uint64_t' data-ref="141b1">b1</dfn>;</td></tr>
+<tr><th id="609">609</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="142rem0" title='rem0' data-type='uint64_t' data-ref="142rem0">rem0</dfn>, <dfn class="local col3 decl" id="143rem1" title='rem1' data-type='uint64_t' data-ref="143rem1">rem1</dfn>, <dfn class="local col4 decl" id="144term0" title='term0' data-type='uint64_t' data-ref="144term0">term0</dfn>, <dfn class="local col5 decl" id="145term1" title='term1' data-type='uint64_t' data-ref="145term1">term1</dfn>;</td></tr>
+<tr><th id="610">610</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="146z" title='z' data-type='uint64_t' data-ref="146z">z</dfn>;</td></tr>
+<tr><th id="611">611</th><td></td></tr>
+<tr><th id="612">612</th><td>    <b>if</b> ( <a class="local col9 ref" href="#139b" title='b' data-ref="139b">b</a> &lt;= <a class="local col7 ref" href="#137a0" title='a0' data-ref="137a0">a0</a> ) <b>return</b> <a class="macro" href="../include/fpu/softfloat.h.html#91" title="0xFFFFFFFFFFFFFFFFLL" data-ref="_M/LIT64">LIT64</a>( <var>0xFFFFFFFFFFFFFFFF</var> );</td></tr>
+<tr><th id="613">613</th><td>    <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a> = <a class="local col9 ref" href="#139b" title='b' data-ref="139b">b</a>&gt;&gt;<var>32</var>;</td></tr>
+<tr><th id="614">614</th><td>    <a class="local col6 ref" href="#146z" title='z' data-ref="146z">z</a> = ( <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a>&lt;&lt;<var>32</var> &lt;= <a class="local col7 ref" href="#137a0" title='a0' data-ref="137a0">a0</a> ) ? <a class="macro" href="../include/fpu/softfloat.h.html#91" title="0xFFFFFFFF00000000LL" data-ref="_M/LIT64">LIT64</a>( <var>0xFFFFFFFF00000000</var> ) : ( <a class="local col7 ref" href="#137a0" title='a0' data-ref="137a0">a0</a> / <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a> )&lt;&lt;<var>32</var>;</td></tr>
+<tr><th id="615">615</th><td>    <a class="ref" href="#mul64To128" title='mul64To128' data-ref="mul64To128">mul64To128</a>( <a class="local col9 ref" href="#139b" title='b' data-ref="139b">b</a>, <a class="local col6 ref" href="#146z" title='z' data-ref="146z">z</a>, &amp;<a class="local col4 ref" href="#144term0" title='term0' data-ref="144term0">term0</a>, &amp;<a class="local col5 ref" href="#145term1" title='term1' data-ref="145term1">term1</a> );</td></tr>
+<tr><th id="616">616</th><td>    <a class="ref" href="#sub128" title='sub128' data-ref="sub128">sub128</a>( <a class="local col7 ref" href="#137a0" title='a0' data-ref="137a0">a0</a>, <a class="local col8 ref" href="#138a1" title='a1' data-ref="138a1">a1</a>, <a class="local col4 ref" href="#144term0" title='term0' data-ref="144term0">term0</a>, <a class="local col5 ref" href="#145term1" title='term1' data-ref="145term1">term1</a>, &amp;<a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a>, &amp;<a class="local col3 ref" href="#143rem1" title='rem1' data-ref="143rem1">rem1</a> );</td></tr>
+<tr><th id="617">617</th><td>    <b>while</b> ( ( (<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a>) <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a> ) &lt; <var>0</var> ) {</td></tr>
+<tr><th id="618">618</th><td>        <a class="local col6 ref" href="#146z" title='z' data-ref="146z">z</a> -= <a class="macro" href="../include/fpu/softfloat.h.html#91" title="0x100000000LL" data-ref="_M/LIT64">LIT64</a>( <var>0x100000000</var> );</td></tr>
+<tr><th id="619">619</th><td>        <a class="local col1 ref" href="#141b1" title='b1' data-ref="141b1">b1</a> = <a class="local col9 ref" href="#139b" title='b' data-ref="139b">b</a>&lt;&lt;<var>32</var>;</td></tr>
+<tr><th id="620">620</th><td>        <a class="ref" href="#add128" title='add128' data-ref="add128">add128</a>( <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a>, <a class="local col3 ref" href="#143rem1" title='rem1' data-ref="143rem1">rem1</a>, <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a>, <a class="local col1 ref" href="#141b1" title='b1' data-ref="141b1">b1</a>, &amp;<a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a>, &amp;<a class="local col3 ref" href="#143rem1" title='rem1' data-ref="143rem1">rem1</a> );</td></tr>
+<tr><th id="621">621</th><td>    }</td></tr>
+<tr><th id="622">622</th><td>    <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a> = ( <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a>&lt;&lt;<var>32</var> ) | ( <a class="local col3 ref" href="#143rem1" title='rem1' data-ref="143rem1">rem1</a>&gt;&gt;<var>32</var> );</td></tr>
+<tr><th id="623">623</th><td>    <a class="local col6 ref" href="#146z" title='z' data-ref="146z">z</a> |= ( <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a>&lt;&lt;<var>32</var> &lt;= <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a> ) ? <var>0xFFFFFFFF</var> : <a class="local col2 ref" href="#142rem0" title='rem0' data-ref="142rem0">rem0</a> / <a class="local col0 ref" href="#140b0" title='b0' data-ref="140b0">b0</a>;</td></tr>
+<tr><th id="624">624</th><td>    <b>return</b> <a class="local col6 ref" href="#146z" title='z' data-ref="146z">z</a>;</td></tr>
+<tr><th id="625">625</th><td></td></tr>
+<tr><th id="626">626</th><td>}</td></tr>
+<tr><th id="627">627</th><td></td></tr>
+<tr><th id="628">628</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="629">629</th><td><i>| Returns an approximation to the square root of the 32-bit significand given</i></td></tr>
+<tr><th id="630">630</th><td><i>| by `a'.  Considered as an integer, `a' must be at least 2^31.  If bit 0 of</i></td></tr>
+<tr><th id="631">631</th><td><i>| `aExp' (the least significant bit) is 1, the integer returned approximates</i></td></tr>
+<tr><th id="632">632</th><td><i>| 2^31*sqrt(`a'/2^31), where `a' is considered an integer.  If bit 0 of `aExp'</i></td></tr>
+<tr><th id="633">633</th><td><i>| is 0, the integer returned approximates 2^31*sqrt(`a'/2^30).  In either</i></td></tr>
+<tr><th id="634">634</th><td><i>| case, the approximation returned lies strictly within +/-2 of the exact</i></td></tr>
+<tr><th id="635">635</th><td><i>| value.</i></td></tr>
+<tr><th id="636">636</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="637">637</th><td></td></tr>
+<tr><th id="638">638</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="estimateSqrt32" title='estimateSqrt32' data-ref="estimateSqrt32">estimateSqrt32</dfn>(<em>int</em> <dfn class="local col7 decl" id="147aExp" title='aExp' data-type='int' data-ref="147aExp">aExp</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="148a" title='a' data-type='uint32_t' data-ref="148a">a</dfn>)</td></tr>
+<tr><th id="639">639</th><td>{</td></tr>
+<tr><th id="640">640</th><td>    <em>static</em> <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col9 decl" id="149sqrtOddAdjustments" title='sqrtOddAdjustments' data-type='const uint16_t [16]' data-ref="149sqrtOddAdjustments">sqrtOddAdjustments</dfn>[] = {</td></tr>
+<tr><th id="641">641</th><td>        <var>0x0004</var>, <var>0x0022</var>, <var>0x005D</var>, <var>0x00B1</var>, <var>0x011D</var>, <var>0x019F</var>, <var>0x0236</var>, <var>0x02E0</var>,</td></tr>
+<tr><th id="642">642</th><td>        <var>0x039C</var>, <var>0x0468</var>, <var>0x0545</var>, <var>0x0631</var>, <var>0x072B</var>, <var>0x0832</var>, <var>0x0946</var>, <var>0x0A67</var></td></tr>
+<tr><th id="643">643</th><td>    };</td></tr>
+<tr><th id="644">644</th><td>    <em>static</em> <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="150sqrtEvenAdjustments" title='sqrtEvenAdjustments' data-type='const uint16_t [16]' data-ref="150sqrtEvenAdjustments">sqrtEvenAdjustments</dfn>[] = {</td></tr>
+<tr><th id="645">645</th><td>        <var>0x0A2D</var>, <var>0x08AF</var>, <var>0x075A</var>, <var>0x0629</var>, <var>0x051A</var>, <var>0x0429</var>, <var>0x0356</var>, <var>0x029E</var>,</td></tr>
+<tr><th id="646">646</th><td>        <var>0x0200</var>, <var>0x0179</var>, <var>0x0109</var>, <var>0x00AF</var>, <var>0x0068</var>, <var>0x0034</var>, <var>0x0012</var>, <var>0x0002</var></td></tr>
+<tr><th id="647">647</th><td>    };</td></tr>
+<tr><th id="648">648</th><td>    <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="local col1 decl" id="151index" title='index' data-type='int8_t' data-ref="151index">index</dfn>;</td></tr>
+<tr><th id="649">649</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="152z" title='z' data-type='uint32_t' data-ref="152z">z</dfn>;</td></tr>
+<tr><th id="650">650</th><td></td></tr>
+<tr><th id="651">651</th><td>    <a class="local col1 ref" href="#151index" title='index' data-ref="151index">index</a> = ( <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a>&gt;&gt;<var>27</var> ) &amp; <var>15</var>;</td></tr>
+<tr><th id="652">652</th><td>    <b>if</b> ( <a class="local col7 ref" href="#147aExp" title='aExp' data-ref="147aExp">aExp</a> &amp; <var>1</var> ) {</td></tr>
+<tr><th id="653">653</th><td>        <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> = <var>0x4000</var> + ( <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a>&gt;&gt;<var>17</var> ) - <a class="local col9 ref" href="#149sqrtOddAdjustments" title='sqrtOddAdjustments' data-ref="149sqrtOddAdjustments">sqrtOddAdjustments</a>[ (<em>int</em>)<a class="local col1 ref" href="#151index" title='index' data-ref="151index">index</a> ];</td></tr>
+<tr><th id="654">654</th><td>        <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> = ( ( <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> / <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> )&lt;&lt;<var>14</var> ) + ( <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a>&lt;&lt;<var>15</var> );</td></tr>
+<tr><th id="655">655</th><td>        <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> &gt;&gt;= <var>1</var>;</td></tr>
+<tr><th id="656">656</th><td>    }</td></tr>
+<tr><th id="657">657</th><td>    <b>else</b> {</td></tr>
+<tr><th id="658">658</th><td>        <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> = <var>0x8000</var> + ( <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a>&gt;&gt;<var>17</var> ) - <a class="local col0 ref" href="#150sqrtEvenAdjustments" title='sqrtEvenAdjustments' data-ref="150sqrtEvenAdjustments">sqrtEvenAdjustments</a>[ (<em>int</em>)<a class="local col1 ref" href="#151index" title='index' data-ref="151index">index</a> ];</td></tr>
+<tr><th id="659">659</th><td>        <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> = <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> / <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> + <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a>;</td></tr>
+<tr><th id="660">660</th><td>        <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> = ( <var>0x20000</var> &lt;= <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> ) ? <var>0xFFFF8000</var> : ( <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a>&lt;&lt;<var>15</var> );</td></tr>
+<tr><th id="661">661</th><td>        <b>if</b> ( <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> &lt;= <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> ) <b>return</b> (<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>) ( ( (<a class="typedef" href="../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a>) <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> )&gt;&gt;<var>1</var> );</td></tr>
+<tr><th id="662">662</th><td>    }</td></tr>
+<tr><th id="663">663</th><td>    <b>return</b> ( (<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>) ( ( ( (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col8 ref" href="#148a" title='a' data-ref="148a">a</a> )&lt;&lt;<var>31</var> ) / <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a> ) ) + ( <a class="local col2 ref" href="#152z" title='z' data-ref="152z">z</a>&gt;&gt;<var>1</var> );</td></tr>
+<tr><th id="664">664</th><td></td></tr>
+<tr><th id="665">665</th><td>}</td></tr>
+<tr><th id="666">666</th><td></td></tr>
+<tr><th id="667">667</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="668">668</th><td><i>| Returns the number of leading 0 bits before the most-significant 1 bit of</i></td></tr>
+<tr><th id="669">669</th><td><i>| `a'.  If `a' is zero, 32 is returned.</i></td></tr>
+<tr><th id="670">670</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="671">671</th><td></td></tr>
+<tr><th id="672">672</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="decl def" id="countLeadingZeros32" title='countLeadingZeros32' data-ref="countLeadingZeros32">countLeadingZeros32</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="153a" title='a' data-type='uint32_t' data-ref="153a">a</dfn> )</td></tr>
+<tr><th id="673">673</th><td>{</td></tr>
+<tr><th id="674">674</th><td><u>#<span data-ppcond="674">if</span> <a class="macro" href="#86" title="((4 &lt;&lt; 16) + 2 &gt;= ((3) &lt;&lt; 16) + (4))" data-ref="_M/SOFTFLOAT_GNUC_PREREQ">SOFTFLOAT_GNUC_PREREQ</a>(3, 4)</u></td></tr>
+<tr><th id="675">675</th><td>    <b>if</b> (<a class="local col3 ref" href="#153a" title='a' data-ref="153a">a</a>) {</td></tr>
+<tr><th id="676">676</th><td>        <b>return</b> <a class="ref" href="#676" title='__builtin_clz' data-ref="__builtin_clz">__builtin_clz</a>(<a class="local col3 ref" href="#153a" title='a' data-ref="153a">a</a>);</td></tr>
+<tr><th id="677">677</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="678">678</th><td>        <b>return</b> <var>32</var>;</td></tr>
+<tr><th id="679">679</th><td>    }</td></tr>
+<tr><th id="680">680</th><td><u>#<span data-ppcond="674">else</span></u></td></tr>
+<tr><th id="681">681</th><td>    <em>static</em> <em>const</em> int8_t countLeadingZerosHigh[] = {</td></tr>
+<tr><th id="682">682</th><td>        <var>8</var>, <var>7</var>, <var>6</var>, <var>6</var>, <var>5</var>, <var>5</var>, <var>5</var>, <var>5</var>, <var>4</var>, <var>4</var>, <var>4</var>, <var>4</var>, <var>4</var>, <var>4</var>, <var>4</var>, <var>4</var>,</td></tr>
+<tr><th id="683">683</th><td>        <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>, <var>3</var>,</td></tr>
+<tr><th id="684">684</th><td>        <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>,</td></tr>
+<tr><th id="685">685</th><td>        <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>, <var>2</var>,</td></tr>
+<tr><th id="686">686</th><td>        <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>,</td></tr>
+<tr><th id="687">687</th><td>        <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>,</td></tr>
+<tr><th id="688">688</th><td>        <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>,</td></tr>
+<tr><th id="689">689</th><td>        <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>, <var>1</var>,</td></tr>
+<tr><th id="690">690</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="691">691</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="692">692</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="693">693</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="694">694</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="695">695</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="696">696</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>,</td></tr>
+<tr><th id="697">697</th><td>        <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var>, <var>0</var></td></tr>
+<tr><th id="698">698</th><td>    };</td></tr>
+<tr><th id="699">699</th><td>    int8_t shiftCount;</td></tr>
+<tr><th id="700">700</th><td></td></tr>
+<tr><th id="701">701</th><td>    shiftCount = <var>0</var>;</td></tr>
+<tr><th id="702">702</th><td>    <b>if</b> ( a &lt; <var>0x10000</var> ) {</td></tr>
+<tr><th id="703">703</th><td>        shiftCount += <var>16</var>;</td></tr>
+<tr><th id="704">704</th><td>        a &lt;&lt;= <var>16</var>;</td></tr>
+<tr><th id="705">705</th><td>    }</td></tr>
+<tr><th id="706">706</th><td>    <b>if</b> ( a &lt; <var>0x1000000</var> ) {</td></tr>
+<tr><th id="707">707</th><td>        shiftCount += <var>8</var>;</td></tr>
+<tr><th id="708">708</th><td>        a &lt;&lt;= <var>8</var>;</td></tr>
+<tr><th id="709">709</th><td>    }</td></tr>
+<tr><th id="710">710</th><td>    shiftCount += countLeadingZerosHigh[ a&gt;&gt;<var>24</var> ];</td></tr>
+<tr><th id="711">711</th><td>    <b>return</b> shiftCount;</td></tr>
+<tr><th id="712">712</th><td><u>#<span data-ppcond="674">endif</span></u></td></tr>
+<tr><th id="713">713</th><td>}</td></tr>
+<tr><th id="714">714</th><td></td></tr>
+<tr><th id="715">715</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="716">716</th><td><i>| Returns the number of leading 0 bits before the most-significant 1 bit of</i></td></tr>
+<tr><th id="717">717</th><td><i>| `a'.  If `a' is zero, 64 is returned.</i></td></tr>
+<tr><th id="718">718</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="719">719</th><td></td></tr>
+<tr><th id="720">720</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a> <dfn class="decl def" id="countLeadingZeros64" title='countLeadingZeros64' data-ref="countLeadingZeros64">countLeadingZeros64</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="154a" title='a' data-type='uint64_t' data-ref="154a">a</dfn> )</td></tr>
+<tr><th id="721">721</th><td>{</td></tr>
+<tr><th id="722">722</th><td><u>#<span data-ppcond="722">if</span> <a class="macro" href="#86" title="((4 &lt;&lt; 16) + 2 &gt;= ((3) &lt;&lt; 16) + (4))" data-ref="_M/SOFTFLOAT_GNUC_PREREQ">SOFTFLOAT_GNUC_PREREQ</a>(3, 4)</u></td></tr>
+<tr><th id="723">723</th><td>    <b>if</b> (<a class="local col4 ref" href="#154a" title='a' data-ref="154a">a</a>) {</td></tr>
+<tr><th id="724">724</th><td>        <b>return</b> <a class="ref" href="#724" title='__builtin_clzll' data-ref="__builtin_clzll">__builtin_clzll</a>(<a class="local col4 ref" href="#154a" title='a' data-ref="154a">a</a>);</td></tr>
+<tr><th id="725">725</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="726">726</th><td>        <b>return</b> <var>64</var>;</td></tr>
+<tr><th id="727">727</th><td>    }</td></tr>
+<tr><th id="728">728</th><td><u>#<span data-ppcond="722">else</span></u></td></tr>
+<tr><th id="729">729</th><td>    int8_t shiftCount;</td></tr>
+<tr><th id="730">730</th><td></td></tr>
+<tr><th id="731">731</th><td>    shiftCount = <var>0</var>;</td></tr>
+<tr><th id="732">732</th><td>    <b>if</b> ( a &lt; ( (uint64_t) <var>1</var> )&lt;&lt;<var>32</var> ) {</td></tr>
+<tr><th id="733">733</th><td>        shiftCount += <var>32</var>;</td></tr>
+<tr><th id="734">734</th><td>    }</td></tr>
+<tr><th id="735">735</th><td>    <b>else</b> {</td></tr>
+<tr><th id="736">736</th><td>        a &gt;&gt;= <var>32</var>;</td></tr>
+<tr><th id="737">737</th><td>    }</td></tr>
+<tr><th id="738">738</th><td>    shiftCount += countLeadingZeros32( a );</td></tr>
+<tr><th id="739">739</th><td>    <b>return</b> shiftCount;</td></tr>
+<tr><th id="740">740</th><td><u>#<span data-ppcond="722">endif</span></u></td></tr>
+<tr><th id="741">741</th><td>}</td></tr>
+<tr><th id="742">742</th><td></td></tr>
+<tr><th id="743">743</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="744">744</th><td><i>| Returns 1 if the 128-bit value formed by concatenating `a0' and `a1'</i></td></tr>
+<tr><th id="745">745</th><td><i>| is equal to the 128-bit value formed by concatenating `b0' and `b1'.</i></td></tr>
+<tr><th id="746">746</th><td><i>| Otherwise, returns 0.</i></td></tr>
+<tr><th id="747">747</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="748">748</th><td></td></tr>
+<tr><th id="749">749</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../include/fpu/softfloat.h.html#flag" title='flag' data-type='uint8_t' data-ref="flag">flag</a> <dfn class="decl def" id="eq128" title='eq128' data-ref="eq128">eq128</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="155a0" title='a0' data-type='uint64_t' data-ref="155a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="156a1" title='a1' data-type='uint64_t' data-ref="156a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="157b0" title='b0' data-type='uint64_t' data-ref="157b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="158b1" title='b1' data-type='uint64_t' data-ref="158b1">b1</dfn> )</td></tr>
+<tr><th id="750">750</th><td>{</td></tr>
+<tr><th id="751">751</th><td></td></tr>
+<tr><th id="752">752</th><td>    <b>return</b> ( <a class="local col5 ref" href="#155a0" title='a0' data-ref="155a0">a0</a> == <a class="local col7 ref" href="#157b0" title='b0' data-ref="157b0">b0</a> ) &amp;&amp; ( <a class="local col6 ref" href="#156a1" title='a1' data-ref="156a1">a1</a> == <a class="local col8 ref" href="#158b1" title='b1' data-ref="158b1">b1</a> );</td></tr>
+<tr><th id="753">753</th><td></td></tr>
+<tr><th id="754">754</th><td>}</td></tr>
+<tr><th id="755">755</th><td></td></tr>
+<tr><th id="756">756</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="757">757</th><td><i>| Returns 1 if the 128-bit value formed by concatenating `a0' and `a1' is less</i></td></tr>
+<tr><th id="758">758</th><td><i>| than or equal to the 128-bit value formed by concatenating `b0' and `b1'.</i></td></tr>
+<tr><th id="759">759</th><td><i>| Otherwise, returns 0.</i></td></tr>
+<tr><th id="760">760</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="761">761</th><td></td></tr>
+<tr><th id="762">762</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../include/fpu/softfloat.h.html#flag" title='flag' data-type='uint8_t' data-ref="flag">flag</a> <dfn class="decl def" id="le128" title='le128' data-ref="le128">le128</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="159a0" title='a0' data-type='uint64_t' data-ref="159a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="160a1" title='a1' data-type='uint64_t' data-ref="160a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="161b0" title='b0' data-type='uint64_t' data-ref="161b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="162b1" title='b1' data-type='uint64_t' data-ref="162b1">b1</dfn> )</td></tr>
+<tr><th id="763">763</th><td>{</td></tr>
+<tr><th id="764">764</th><td></td></tr>
+<tr><th id="765">765</th><td>    <b>return</b> ( <a class="local col9 ref" href="#159a0" title='a0' data-ref="159a0">a0</a> &lt; <a class="local col1 ref" href="#161b0" title='b0' data-ref="161b0">b0</a> ) || ( ( <a class="local col9 ref" href="#159a0" title='a0' data-ref="159a0">a0</a> == <a class="local col1 ref" href="#161b0" title='b0' data-ref="161b0">b0</a> ) &amp;&amp; ( <a class="local col0 ref" href="#160a1" title='a1' data-ref="160a1">a1</a> &lt;= <a class="local col2 ref" href="#162b1" title='b1' data-ref="162b1">b1</a> ) );</td></tr>
+<tr><th id="766">766</th><td></td></tr>
+<tr><th id="767">767</th><td>}</td></tr>
+<tr><th id="768">768</th><td></td></tr>
+<tr><th id="769">769</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="770">770</th><td><i>| Returns 1 if the 128-bit value formed by concatenating `a0' and `a1' is less</i></td></tr>
+<tr><th id="771">771</th><td><i>| than the 128-bit value formed by concatenating `b0' and `b1'.  Otherwise,</i></td></tr>
+<tr><th id="772">772</th><td><i>| returns 0.</i></td></tr>
+<tr><th id="773">773</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="774">774</th><td></td></tr>
+<tr><th id="775">775</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../include/fpu/softfloat.h.html#flag" title='flag' data-type='uint8_t' data-ref="flag">flag</a> <dfn class="decl def" id="lt128" title='lt128' data-ref="lt128">lt128</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="163a0" title='a0' data-type='uint64_t' data-ref="163a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="164a1" title='a1' data-type='uint64_t' data-ref="164a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="165b0" title='b0' data-type='uint64_t' data-ref="165b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="166b1" title='b1' data-type='uint64_t' data-ref="166b1">b1</dfn> )</td></tr>
+<tr><th id="776">776</th><td>{</td></tr>
+<tr><th id="777">777</th><td></td></tr>
+<tr><th id="778">778</th><td>    <b>return</b> ( <a class="local col3 ref" href="#163a0" title='a0' data-ref="163a0">a0</a> &lt; <a class="local col5 ref" href="#165b0" title='b0' data-ref="165b0">b0</a> ) || ( ( <a class="local col3 ref" href="#163a0" title='a0' data-ref="163a0">a0</a> == <a class="local col5 ref" href="#165b0" title='b0' data-ref="165b0">b0</a> ) &amp;&amp; ( <a class="local col4 ref" href="#164a1" title='a1' data-ref="164a1">a1</a> &lt; <a class="local col6 ref" href="#166b1" title='b1' data-ref="166b1">b1</a> ) );</td></tr>
+<tr><th id="779">779</th><td></td></tr>
+<tr><th id="780">780</th><td>}</td></tr>
+<tr><th id="781">781</th><td></td></tr>
+<tr><th id="782">782</th><td><i>/*----------------------------------------------------------------------------</i></td></tr>
+<tr><th id="783">783</th><td><i>| Returns 1 if the 128-bit value formed by concatenating `a0' and `a1' is</i></td></tr>
+<tr><th id="784">784</th><td><i>| not equal to the 128-bit value formed by concatenating `b0' and `b1'.</i></td></tr>
+<tr><th id="785">785</th><td><i>| Otherwise, returns 0.</i></td></tr>
+<tr><th id="786">786</th><td><i>*----------------------------------------------------------------------------*/</i></td></tr>
+<tr><th id="787">787</th><td></td></tr>
+<tr><th id="788">788</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../include/fpu/softfloat.h.html#flag" title='flag' data-type='uint8_t' data-ref="flag">flag</a> <dfn class="decl def" id="ne128" title='ne128' data-ref="ne128">ne128</dfn>( <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="167a0" title='a0' data-type='uint64_t' data-ref="167a0">a0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="168a1" title='a1' data-type='uint64_t' data-ref="168a1">a1</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="169b0" title='b0' data-type='uint64_t' data-ref="169b0">b0</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="170b1" title='b1' data-type='uint64_t' data-ref="170b1">b1</dfn> )</td></tr>
+<tr><th id="789">789</th><td>{</td></tr>
+<tr><th id="790">790</th><td></td></tr>
+<tr><th id="791">791</th><td>    <b>return</b> ( <a class="local col7 ref" href="#167a0" title='a0' data-ref="167a0">a0</a> != <a class="local col9 ref" href="#169b0" title='b0' data-ref="169b0">b0</a> ) || ( <a class="local col8 ref" href="#168a1" title='a1' data-ref="168a1">a1</a> != <a class="local col0 ref" href="#170b1" title='b1' data-ref="170b1">b1</a> );</td></tr>
+<tr><th id="792">792</th><td></td></tr>
+<tr><th id="793">793</th><td>}</td></tr>
+<tr><th id="794">794</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='softfloat.c.html'>codebrowser/fpu/softfloat.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

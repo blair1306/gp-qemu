@@ -1,0 +1,72 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>chrp_nvram.h source code [codebrowser/include/hw/nvram/chrp_nvram.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/nvram/chrp_nvram.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>nvram</a>/<a href='chrp_nvram.h.html'>chrp_nvram.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Common Hardware Reference Platform NVRAM functions.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * This code is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="5">5</th><td><i> * it under the terms of the GNU General Public License as published</i></td></tr>
+<tr><th id="6">6</th><td><i> * by the Free Software Foundation; either version 2 of the License,</i></td></tr>
+<tr><th id="7">7</th><td><i> * or (at your option) any later version.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="10">10</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="11">11</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="12">12</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="15">15</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="18">ifndef</span> <span class="macro" data-ref="_M/CHRP_NVRAM_H">CHRP_NVRAM_H</span></u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/CHRP_NVRAM_H" data-ref="_M/CHRP_NVRAM_H">CHRP_NVRAM_H</dfn></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i>/* OpenBIOS NVRAM partition */</i></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="23">23</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="(anonymous)::signature" title='(anonymous struct)::signature' data-ref="(anonymous)::signature">signature</dfn>;</td></tr>
+<tr><th id="24">24</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="(anonymous)::checksum" title='(anonymous struct)::checksum' data-ref="(anonymous)::checksum">checksum</dfn>;</td></tr>
+<tr><th id="25">25</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="(anonymous)::len" title='(anonymous struct)::len' data-ref="(anonymous)::len">len</dfn>;       <i>/* Big endian, length divided by 16 */</i></td></tr>
+<tr><th id="26">26</th><td>    <em>char</em> <dfn class="decl" id="(anonymous)::name" title='(anonymous struct)::name' data-ref="(anonymous)::name">name</dfn>[<var>12</var>];</td></tr>
+<tr><th id="27">27</th><td>} <dfn class="typedef" id="ChrpNvramPartHdr" title='ChrpNvramPartHdr' data-type='struct ChrpNvramPartHdr' data-ref="ChrpNvramPartHdr">ChrpNvramPartHdr</dfn>;</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/CHRP_NVPART_SYSTEM" data-ref="_M/CHRP_NVPART_SYSTEM">CHRP_NVPART_SYSTEM</dfn> 0x70</u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/CHRP_NVPART_FREE" data-ref="_M/CHRP_NVPART_FREE">CHRP_NVPART_FREE</dfn> 0x7f</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="33">33</th><td><dfn class="decl def" id="chrp_nvram_finish_partition" title='chrp_nvram_finish_partition' data-ref="chrp_nvram_finish_partition">chrp_nvram_finish_partition</dfn>(<a class="typedef" href="#ChrpNvramPartHdr" title='ChrpNvramPartHdr' data-type='struct ChrpNvramPartHdr' data-ref="ChrpNvramPartHdr">ChrpNvramPartHdr</a> *<dfn class="local col1 decl" id="1header" title='header' data-type='ChrpNvramPartHdr *' data-ref="1header">header</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="2size" title='size' data-type='uint32_t' data-ref="2size">size</dfn>)</td></tr>
+<tr><th id="34">34</th><td>{</td></tr>
+<tr><th id="35">35</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col3 decl" id="3i" title='i' data-type='unsigned int' data-ref="3i">i</dfn>, <dfn class="local col4 decl" id="4sum" title='sum' data-type='unsigned int' data-ref="4sum">sum</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="5tmpptr" title='tmpptr' data-type='uint8_t *' data-ref="5tmpptr">tmpptr</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td>    <i>/* Length divided by 16 */</i></td></tr>
+<tr><th id="39">39</th><td>    <a class="local col1 ref" href="#1header" title='header' data-ref="1header">header</a>-&gt;<a class="ref" href="#(anonymous)::len" title='(anonymous struct)::len' data-ref="(anonymous)::len">len</a> = <a class="ref" href="../../qemu/bswap.h.html#162" title='cpu_to_be16' data-ref="cpu_to_be16">cpu_to_be16</a>(<a class="local col2 ref" href="#2size" title='size' data-ref="2size">size</a> &gt;&gt; <var>4</var>);</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <i>/* Checksum */</i></td></tr>
+<tr><th id="42">42</th><td>    <a class="local col5 ref" href="#5tmpptr" title='tmpptr' data-ref="5tmpptr">tmpptr</a> = (<a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col1 ref" href="#1header" title='header' data-ref="1header">header</a>;</td></tr>
+<tr><th id="43">43</th><td>    <a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> = *<a class="local col5 ref" href="#5tmpptr" title='tmpptr' data-ref="5tmpptr">tmpptr</a>;</td></tr>
+<tr><th id="44">44</th><td>    <b>for</b> (<a class="local col3 ref" href="#3i" title='i' data-ref="3i">i</a> = <var>0</var>; <a class="local col3 ref" href="#3i" title='i' data-ref="3i">i</a> &lt; <var>14</var>; <a class="local col3 ref" href="#3i" title='i' data-ref="3i">i</a>++) {</td></tr>
+<tr><th id="45">45</th><td>        <a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> += <a class="local col5 ref" href="#5tmpptr" title='tmpptr' data-ref="5tmpptr">tmpptr</a>[<var>2</var> + <a class="local col3 ref" href="#3i" title='i' data-ref="3i">i</a>];</td></tr>
+<tr><th id="46">46</th><td>        <a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> = (<a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> + ((<a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> &amp; <var>0xff00</var>) &gt;&gt; <var>8</var>)) &amp; <var>0xff</var>;</td></tr>
+<tr><th id="47">47</th><td>    }</td></tr>
+<tr><th id="48">48</th><td>    <a class="local col1 ref" href="#1header" title='header' data-ref="1header">header</a>-&gt;<a class="ref" href="#(anonymous)::checksum" title='(anonymous struct)::checksum' data-ref="(anonymous)::checksum">checksum</a> = <a class="local col4 ref" href="#4sum" title='sum' data-ref="4sum">sum</a> &amp; <var>0xff</var>;</td></tr>
+<tr><th id="49">49</th><td>}</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><em>int</em> <a class="decl" href="../../../hw/nvram/chrp_nvram.c.html#chrp_nvram_create_system_partition" title='chrp_nvram_create_system_partition' data-ref="chrp_nvram_create_system_partition" id="chrp_nvram_create_system_partition">chrp_nvram_create_system_partition</a>(<a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col6 decl" id="6data" title='data' data-type='uint8_t *' data-ref="6data">data</dfn>, <em>int</em> <dfn class="local col7 decl" id="7min_len" title='min_len' data-type='int' data-ref="7min_len">min_len</dfn>);</td></tr>
+<tr><th id="52">52</th><td><em>int</em> <a class="decl" href="../../../hw/nvram/chrp_nvram.c.html#chrp_nvram_create_free_partition" title='chrp_nvram_create_free_partition' data-ref="chrp_nvram_create_free_partition" id="chrp_nvram_create_free_partition">chrp_nvram_create_free_partition</a>(<a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="8data" title='data' data-type='uint8_t *' data-ref="8data">data</dfn>, <em>int</em> <dfn class="local col9 decl" id="9len" title='len' data-type='int' data-ref="9len">len</dfn>);</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><u>#<span data-ppcond="18">endif</span></u></td></tr>
+<tr><th id="55">55</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/nvram/chrp_nvram.c.html'>codebrowser/hw/nvram/chrp_nvram.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

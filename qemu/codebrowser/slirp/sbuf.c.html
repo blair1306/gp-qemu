@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>sbuf.c source code [codebrowser/slirp/sbuf.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/sbuf.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='sbuf.c.html'>sbuf.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1995 Danny Gasparovski.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Please read the file COPYRIGHT for the</i></td></tr>
+<tr><th id="5">5</th><td><i> * terms and conditions of the copyright.</i></td></tr>
+<tr><th id="6">6</th><td><i> */</i></td></tr>
+<tr><th id="7">7</th><td></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><em>static</em> <em>void</em> <a class="tu decl" href="#sbappendsb" title='sbappendsb' data-type='void sbappendsb(struct sbuf * sb, struct mbuf * m)' data-ref="sbappendsb">sbappendsb</a>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col1 decl" id="1sb" title='sb' data-type='struct sbuf *' data-ref="1sb">sb</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col2 decl" id="2m" title='m' data-type='struct mbuf *' data-ref="2m">m</dfn>);</td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><em>void</em></td></tr>
+<tr><th id="15">15</th><td><dfn class="decl def" id="sbfree" title='sbfree' data-ref="sbfree">sbfree</dfn>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col3 decl" id="3sb" title='sb' data-type='struct sbuf *' data-ref="3sb">sb</dfn>)</td></tr>
+<tr><th id="16">16</th><td>{</td></tr>
+<tr><th id="17">17</th><td>	<a class="ref" href="../../include/stdlib.h.html#free" title='free' data-ref="free">free</a>(<a class="local col3 ref" href="#3sb" title='sb' data-ref="3sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>);</td></tr>
+<tr><th id="18">18</th><td>}</td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><em>void</em></td></tr>
+<tr><th id="21">21</th><td><dfn class="decl def" id="sbdrop" title='sbdrop' data-ref="sbdrop">sbdrop</dfn>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col4 decl" id="4sb" title='sb' data-type='struct sbuf *' data-ref="4sb">sb</dfn>, <em>int</em> <dfn class="local col5 decl" id="5num" title='num' data-type='int' data-ref="5num">num</dfn>)</td></tr>
+<tr><th id="22">22</th><td>{</td></tr>
+<tr><th id="23">23</th><td>    <em>int</em> <dfn class="local col6 decl" id="6limit" title='limit' data-type='int' data-ref="6limit">limit</dfn> = <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> / <var>2</var>;</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td>	<i>/*</i></td></tr>
+<tr><th id="26">26</th><td><i>	 * We can only drop how much we have</i></td></tr>
+<tr><th id="27">27</th><td><i>	 * This should never succeed</i></td></tr>
+<tr><th id="28">28</th><td><i>	 */</i></td></tr>
+<tr><th id="29">29</th><td>	<b>if</b>(<a class="local col5 ref" href="#5num" title='num' data-ref="5num">num</a> &gt; <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>)</td></tr>
+<tr><th id="30">30</th><td>		<a class="local col5 ref" href="#5num" title='num' data-ref="5num">num</a> = <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>;</td></tr>
+<tr><th id="31">31</th><td>	<a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> -= <a class="local col5 ref" href="#5num" title='num' data-ref="5num">num</a>;</td></tr>
+<tr><th id="32">32</th><td>	<a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> += <a class="local col5 ref" href="#5num" title='num' data-ref="5num">num</a>;</td></tr>
+<tr><th id="33">33</th><td>	<b>if</b>(<a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> &gt;= <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>)</td></tr>
+<tr><th id="34">34</th><td>		<a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> -= <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>    <b>if</b> (<a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> &lt; <a class="local col6 ref" href="#6limit" title='limit' data-ref="6limit">limit</a> &amp;&amp; <a class="local col4 ref" href="#4sb" title='sb' data-ref="4sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> + <a class="local col5 ref" href="#5num" title='num' data-ref="5num">num</a> &gt;= <a class="local col6 ref" href="#6limit" title='limit' data-ref="6limit">limit</a>) {</td></tr>
+<tr><th id="37">37</th><td>        <a class="ref" href="../include/qemu/main-loop.h.html#qemu_notify_event" title='qemu_notify_event' data-ref="qemu_notify_event">qemu_notify_event</a>();</td></tr>
+<tr><th id="38">38</th><td>    }</td></tr>
+<tr><th id="39">39</th><td>}</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>void</em></td></tr>
+<tr><th id="42">42</th><td><dfn class="decl def" id="sbreserve" title='sbreserve' data-ref="sbreserve">sbreserve</dfn>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col7 decl" id="7sb" title='sb' data-type='struct sbuf *' data-ref="7sb">sb</dfn>, <em>int</em> <dfn class="local col8 decl" id="8size" title='size' data-type='int' data-ref="8size">size</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>	<b>if</b> (<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>) {</td></tr>
+<tr><th id="45">45</th><td>		<i>/* Already alloced, realloc if necessary */</i></td></tr>
+<tr><th id="46">46</th><td>		<b>if</b> (<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> != <a class="local col8 ref" href="#8size" title='size' data-ref="8size">size</a>) {</td></tr>
+<tr><th id="47">47</th><td>			<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> = <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> = <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> = (<em>char</em> *)<a class="ref" href="../../include/stdlib.h.html#realloc" title='realloc' data-ref="realloc">realloc</a>(<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>, <a class="local col8 ref" href="#8size" title='size' data-ref="8size">size</a>);</td></tr>
+<tr><th id="48">48</th><td>			<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> = <var>0</var>;</td></tr>
+<tr><th id="49">49</th><td>			<b>if</b> (<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>)</td></tr>
+<tr><th id="50">50</th><td>			   <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> = <a class="local col8 ref" href="#8size" title='size' data-ref="8size">size</a>;</td></tr>
+<tr><th id="51">51</th><td>			<b>else</b></td></tr>
+<tr><th id="52">52</th><td>			   <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> = <var>0</var>;</td></tr>
+<tr><th id="53">53</th><td>		}</td></tr>
+<tr><th id="54">54</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="55">55</th><td>		<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> = <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> = <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> = (<em>char</em> *)<a class="ref" href="../../include/stdlib.h.html#malloc" title='malloc' data-ref="malloc">malloc</a>(<a class="local col8 ref" href="#8size" title='size' data-ref="8size">size</a>);</td></tr>
+<tr><th id="56">56</th><td>		<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> = <var>0</var>;</td></tr>
+<tr><th id="57">57</th><td>		<b>if</b> (<a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>)</td></tr>
+<tr><th id="58">58</th><td>		   <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> = <a class="local col8 ref" href="#8size" title='size' data-ref="8size">size</a>;</td></tr>
+<tr><th id="59">59</th><td>		<b>else</b></td></tr>
+<tr><th id="60">60</th><td>		   <a class="local col7 ref" href="#7sb" title='sb' data-ref="7sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> = <var>0</var>;</td></tr>
+<tr><th id="61">61</th><td>	}</td></tr>
+<tr><th id="62">62</th><td>}</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i>/*</i></td></tr>
+<tr><th id="65">65</th><td><i> * Try and write() to the socket, whatever doesn't get written</i></td></tr>
+<tr><th id="66">66</th><td><i> * append to the buffer... for a host with a fast net connection,</i></td></tr>
+<tr><th id="67">67</th><td><i> * this prevents an unnecessary copy of the data</i></td></tr>
+<tr><th id="68">68</th><td><i> * (the socket is non-blocking, so we won't hang)</i></td></tr>
+<tr><th id="69">69</th><td><i> */</i></td></tr>
+<tr><th id="70">70</th><td><em>void</em></td></tr>
+<tr><th id="71">71</th><td><dfn class="decl def" id="sbappend" title='sbappend' data-ref="sbappend">sbappend</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col9 decl" id="9so" title='so' data-type='struct socket *' data-ref="9so">so</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col0 decl" id="10m" title='m' data-type='struct mbuf *' data-ref="10m">m</dfn>)</td></tr>
+<tr><th id="72">72</th><td>{</td></tr>
+<tr><th id="73">73</th><td>	<em>int</em> <dfn class="local col1 decl" id="11ret" title='ret' data-type='int' data-ref="11ret">ret</dfn> = <var>0</var>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>	<a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"sbappend"</q>);</td></tr>
+<tr><th id="76">76</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %p"</q>, so);</td></tr>
+<tr><th id="77">77</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m = %p"</q>, m);</td></tr>
+<tr><th id="78">78</th><td>	<a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m-&gt;m_len = %d"</q>, m-&gt;m_len);</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>	<i>/* Shouldn't happen, but...  e.g. foreign host closes connection */</i></td></tr>
+<tr><th id="81">81</th><td>	<b>if</b> (<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> &lt;= <var>0</var>) {</td></tr>
+<tr><th id="82">82</th><td>		<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="83">83</th><td>		<b>return</b>;</td></tr>
+<tr><th id="84">84</th><td>	}</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>	<i>/*</i></td></tr>
+<tr><th id="87">87</th><td><i>	 * If there is urgent data, call sosendoob</i></td></tr>
+<tr><th id="88">88</th><td><i>	 * if not all was sent, sowrite will take care of the rest</i></td></tr>
+<tr><th id="89">89</th><td><i>	 * (The rest of this function is just an optimisation)</i></td></tr>
+<tr><th id="90">90</th><td><i>	 */</i></td></tr>
+<tr><th id="91">91</th><td>	<b>if</b> (<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_urgc" title='socket::so_urgc' data-ref="socket::so_urgc">so_urgc</a>) {</td></tr>
+<tr><th id="92">92</th><td>		<a class="tu ref" href="#sbappendsb" title='sbappendsb' data-use='c' data-ref="sbappendsb">sbappendsb</a>(&amp;<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>, <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="93">93</th><td>		<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="94">94</th><td>		(<em>void</em>)<a class="ref" href="socket.h.html#sosendoob" title='sosendoob' data-ref="sosendoob">sosendoob</a>(<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>);</td></tr>
+<tr><th id="95">95</th><td>		<b>return</b>;</td></tr>
+<tr><th id="96">96</th><td>	}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>	<i>/*</i></td></tr>
+<tr><th id="99">99</th><td><i>	 * We only write if there's nothing in the buffer,</i></td></tr>
+<tr><th id="100">100</th><td><i>	 * ottherwise it'll arrive out of order, and hence corrupt</i></td></tr>
+<tr><th id="101">101</th><td><i>	 */</i></td></tr>
+<tr><th id="102">102</th><td>	<b>if</b> (!<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>.<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>)</td></tr>
+<tr><th id="103">103</th><td>	   <a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> = <a class="ref" href="main.h.html#slirp_send" title='slirp_send' data-ref="slirp_send">slirp_send</a>(<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>, <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>, <var>0</var>);</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>	<b>if</b> (<a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> &lt;= <var>0</var>) {</td></tr>
+<tr><th id="106">106</th><td>		<i>/*</i></td></tr>
+<tr><th id="107">107</th><td><i>		 * Nothing was written</i></td></tr>
+<tr><th id="108">108</th><td><i>		 * It's possible that the socket has closed, but</i></td></tr>
+<tr><th id="109">109</th><td><i>		 * we don't need to check because if it has closed,</i></td></tr>
+<tr><th id="110">110</th><td><i>		 * it will be detected in the normal way by soread()</i></td></tr>
+<tr><th id="111">111</th><td><i>		 */</i></td></tr>
+<tr><th id="112">112</th><td>		<a class="tu ref" href="#sbappendsb" title='sbappendsb' data-use='c' data-ref="sbappendsb">sbappendsb</a>(&amp;<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>, <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="113">113</th><td>	} <b>else</b> <b>if</b> (<a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> != <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>) {</td></tr>
+<tr><th id="114">114</th><td>		<i>/*</i></td></tr>
+<tr><th id="115">115</th><td><i>		 * Something was written, but not everything..</i></td></tr>
+<tr><th id="116">116</th><td><i>		 * sbappendsb the rest</i></td></tr>
+<tr><th id="117">117</th><td><i>		 */</i></td></tr>
+<tr><th id="118">118</th><td>		<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> -= <a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a>;</td></tr>
+<tr><th id="119">119</th><td>		<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a>;</td></tr>
+<tr><th id="120">120</th><td>		<a class="tu ref" href="#sbappendsb" title='sbappendsb' data-use='c' data-ref="sbappendsb">sbappendsb</a>(&amp;<a class="local col9 ref" href="#9so" title='so' data-ref="9so">so</a>-&gt;<a class="ref" href="socket.h.html#socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</a>, <a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="121">121</th><td>	} <i>/* else */</i></td></tr>
+<tr><th id="122">122</th><td>	<i>/* Whatever happened, we free the mbuf */</i></td></tr>
+<tr><th id="123">123</th><td>	<a class="ref" href="mbuf.h.html#m_free" title='m_free' data-ref="m_free">m_free</a>(<a class="local col0 ref" href="#10m" title='m' data-ref="10m">m</a>);</td></tr>
+<tr><th id="124">124</th><td>}</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><i  data-doc="sbappendsb">/*</i></td></tr>
+<tr><th id="127">127</th><td><i  data-doc="sbappendsb"> * Copy the data from m into sb</i></td></tr>
+<tr><th id="128">128</th><td><i  data-doc="sbappendsb"> * The caller is responsible to make sure there's enough room</i></td></tr>
+<tr><th id="129">129</th><td><i  data-doc="sbappendsb"> */</i></td></tr>
+<tr><th id="130">130</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="131">131</th><td><dfn class="tu decl def" id="sbappendsb" title='sbappendsb' data-type='void sbappendsb(struct sbuf * sb, struct mbuf * m)' data-ref="sbappendsb">sbappendsb</dfn>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col2 decl" id="12sb" title='sb' data-type='struct sbuf *' data-ref="12sb">sb</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col3 decl" id="13m" title='m' data-type='struct mbuf *' data-ref="13m">m</dfn>)</td></tr>
+<tr><th id="132">132</th><td>{</td></tr>
+<tr><th id="133">133</th><td>	<em>int</em> <dfn class="local col4 decl" id="14len" title='len' data-type='int' data-ref="14len">len</dfn>, <dfn class="local col5 decl" id="15n" title='n' data-type='int' data-ref="15n">n</dfn>,  <dfn class="local col6 decl" id="16nn" title='nn' data-type='int' data-ref="16nn">nn</dfn>;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>	<a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a> = <a class="local col3 ref" href="#13m" title='m' data-ref="13m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>	<b>if</b> (<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> &lt; <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a>) {</td></tr>
+<tr><th id="138">138</th><td>		<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> = <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> - <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>;</td></tr>
+<tr><th id="139">139</th><td>		<b>if</b> (<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> &gt; <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>) <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> = <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>;</td></tr>
+<tr><th id="140">140</th><td>		<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>, <a class="local col3 ref" href="#13m" title='m' data-ref="13m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>);</td></tr>
+<tr><th id="141">141</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="142">142</th><td>		<i>/* Do the right edge first */</i></td></tr>
+<tr><th id="143">143</th><td>		<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> = <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a> - <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>;</td></tr>
+<tr><th id="144">144</th><td>		<b>if</b> (<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> &gt; <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>) <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> = <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>;</td></tr>
+<tr><th id="145">145</th><td>		<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>, <a class="local col3 ref" href="#13m" title='m' data-ref="13m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>);</td></tr>
+<tr><th id="146">146</th><td>		<a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a> -= <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>;</td></tr>
+<tr><th id="147">147</th><td>		<b>if</b> (<a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>) {</td></tr>
+<tr><th id="148">148</th><td>			<i>/* Now the left edge */</i></td></tr>
+<tr><th id="149">149</th><td>			<a class="local col6 ref" href="#16nn" title='nn' data-ref="16nn">nn</a> = <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> - <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>;</td></tr>
+<tr><th id="150">150</th><td>			<b>if</b> (<a class="local col6 ref" href="#16nn" title='nn' data-ref="16nn">nn</a> &gt; <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>) <a class="local col6 ref" href="#16nn" title='nn' data-ref="16nn">nn</a> = <a class="local col4 ref" href="#14len" title='len' data-ref="14len">len</a>;</td></tr>
+<tr><th id="151">151</th><td>			<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>,<a class="local col3 ref" href="#13m" title='m' data-ref="13m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>+<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>,<a class="local col6 ref" href="#16nn" title='nn' data-ref="16nn">nn</a>);</td></tr>
+<tr><th id="152">152</th><td>			<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> += <a class="local col6 ref" href="#16nn" title='nn' data-ref="16nn">nn</a>;</td></tr>
+<tr><th id="153">153</th><td>		}</td></tr>
+<tr><th id="154">154</th><td>	}</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>	<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a> += <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>;</td></tr>
+<tr><th id="157">157</th><td>	<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> += <a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a>;</td></tr>
+<tr><th id="158">158</th><td>	<b>if</b> (<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> &gt;= <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>)</td></tr>
+<tr><th id="159">159</th><td>		<a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a> -= <a class="local col2 ref" href="#12sb" title='sb' data-ref="12sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>;</td></tr>
+<tr><th id="160">160</th><td>}</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><i>/*</i></td></tr>
+<tr><th id="163">163</th><td><i> * Copy data from sbuf to a normal, straight buffer</i></td></tr>
+<tr><th id="164">164</th><td><i> * Don't update the sbuf rptr, this will be</i></td></tr>
+<tr><th id="165">165</th><td><i> * done in sbdrop when the data is acked</i></td></tr>
+<tr><th id="166">166</th><td><i> */</i></td></tr>
+<tr><th id="167">167</th><td><em>void</em></td></tr>
+<tr><th id="168">168</th><td><dfn class="decl def" id="sbcopy" title='sbcopy' data-ref="sbcopy">sbcopy</dfn>(<b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> *<dfn class="local col7 decl" id="17sb" title='sb' data-type='struct sbuf *' data-ref="17sb">sb</dfn>, <em>int</em> <dfn class="local col8 decl" id="18off" title='off' data-type='int' data-ref="18off">off</dfn>, <em>int</em> <dfn class="local col9 decl" id="19len" title='len' data-type='int' data-ref="19len">len</dfn>, <em>char</em> *<dfn class="local col0 decl" id="20to" title='to' data-type='char *' data-ref="20to">to</dfn>)</td></tr>
+<tr><th id="169">169</th><td>{</td></tr>
+<tr><th id="170">170</th><td>	<em>char</em> *<dfn class="local col1 decl" id="21from" title='from' data-type='char *' data-ref="21from">from</dfn>;</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>	<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a> = <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_rptr" title='sbuf::sb_rptr' data-ref="sbuf::sb_rptr">sb_rptr</a> + <a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a>;</td></tr>
+<tr><th id="173">173</th><td>	<b>if</b> (<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a> &gt;= <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>)</td></tr>
+<tr><th id="174">174</th><td>		<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a> -= <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>;</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>	<b>if</b> (<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a> &lt; <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_wptr" title='sbuf::sb_wptr' data-ref="sbuf::sb_wptr">sb_wptr</a>) {</td></tr>
+<tr><th id="177">177</th><td>		<b>if</b> (<a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a> &gt; <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>) <a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a> = <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_cc" title='sbuf::sb_cc' data-ref="sbuf::sb_cc">sb_cc</a>;</td></tr>
+<tr><th id="178">178</th><td>		<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col0 ref" href="#20to" title='to' data-ref="20to">to</a>,<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a>,<a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>);</td></tr>
+<tr><th id="179">179</th><td>	} <b>else</b> {</td></tr>
+<tr><th id="180">180</th><td>		<i>/* re-use off */</i></td></tr>
+<tr><th id="181">181</th><td>		<a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a> = (<a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a> + <a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_datalen" title='sbuf::sb_datalen' data-ref="sbuf::sb_datalen">sb_datalen</a>) - <a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a>;</td></tr>
+<tr><th id="182">182</th><td>		<b>if</b> (<a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a> &gt; <a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>) <a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a> = <a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>;</td></tr>
+<tr><th id="183">183</th><td>		<a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col0 ref" href="#20to" title='to' data-ref="20to">to</a>,<a class="local col1 ref" href="#21from" title='from' data-ref="21from">from</a>,<a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a>);</td></tr>
+<tr><th id="184">184</th><td>		<a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a> -= <a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a>;</td></tr>
+<tr><th id="185">185</th><td>		<b>if</b> (<a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>)</td></tr>
+<tr><th id="186">186</th><td>		   <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col0 ref" href="#20to" title='to' data-ref="20to">to</a>+<a class="local col8 ref" href="#18off" title='off' data-ref="18off">off</a>,<a class="local col7 ref" href="#17sb" title='sb' data-ref="17sb">sb</a>-&gt;<a class="ref" href="sbuf.h.html#sbuf::sb_data" title='sbuf::sb_data' data-ref="sbuf::sb_data">sb_data</a>,<a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>);</td></tr>
+<tr><th id="187">187</th><td>	}</td></tr>
+<tr><th id="188">188</th><td>}</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

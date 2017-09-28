@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>char-file.c source code [codebrowser/chardev/char-file.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/chardev/char-file.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>chardev</a>/<a href='char-file.c.html'>char-file.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/chardev/char.h.html">"chardev/char.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#include "chardev/char-win.h"</u></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="29">else</span></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../include/chardev/char-fd.h.html">"chardev/char-fd.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="29">endif</span></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qmp_chardev_open_file" title='qmp_chardev_open_file' data-type='void qmp_chardev_open_file(Chardev * chr, ChardevBackend * backend, _Bool * be_opened, Error ** errp)' data-ref="qmp_chardev_open_file">qmp_chardev_open_file</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col1 decl" id="1chr" title='chr' data-type='Chardev *' data-ref="1chr">chr</dfn>,</td></tr>
+<tr><th id="36">36</th><td>                                  <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col2 decl" id="2backend" title='backend' data-type='ChardevBackend *' data-ref="2backend">backend</dfn>,</td></tr>
+<tr><th id="37">37</th><td>                                  <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col3 decl" id="3be_opened" title='be_opened' data-type='_Bool *' data-ref="3be_opened">be_opened</dfn>,</td></tr>
+<tr><th id="38">38</th><td>                                  <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="4errp" title='errp' data-type='Error **' data-ref="4errp">errp</dfn>)</td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevFile" title='ChardevFile' data-type='struct ChardevFile' data-ref="ChardevFile">ChardevFile</a> *<dfn class="local col5 decl" id="5file" title='file' data-type='ChardevFile *' data-ref="5file">file</dfn> = <a class="local col2 ref" href="#2backend" title='backend' data-ref="2backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::file" title='ChardevBackend::(anonymous union)::file' data-ref="ChardevBackend::(anonymous)::file">file</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevFile_wrapper::data" title='q_obj_ChardevFile_wrapper::data' data-ref="q_obj_ChardevFile_wrapper::data">data</a>;</td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="41">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="42">42</th><td>    HANDLE out;</td></tr>
+<tr><th id="43">43</th><td>    DWORD accessmode;</td></tr>
+<tr><th id="44">44</th><td>    DWORD flags;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>    <b>if</b> (file-&gt;has_in) {</td></tr>
+<tr><th id="47">47</th><td>        error_setg(errp, <q>"input file not supported"</q>);</td></tr>
+<tr><th id="48">48</th><td>        <b>return</b>;</td></tr>
+<tr><th id="49">49</th><td>    }</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td>    <b>if</b> (file-&gt;has_append &amp;&amp; file-&gt;append) {</td></tr>
+<tr><th id="52">52</th><td>        <i>/* Append to file if it already exists. */</i></td></tr>
+<tr><th id="53">53</th><td>        accessmode = FILE_GENERIC_WRITE &amp; ~FILE_WRITE_DATA;</td></tr>
+<tr><th id="54">54</th><td>        flags = OPEN_ALWAYS;</td></tr>
+<tr><th id="55">55</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="56">56</th><td>        <i>/* Truncate file if it already exists. */</i></td></tr>
+<tr><th id="57">57</th><td>        accessmode = GENERIC_WRITE;</td></tr>
+<tr><th id="58">58</th><td>        flags = CREATE_ALWAYS;</td></tr>
+<tr><th id="59">59</th><td>    }</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    out = CreateFile(file-&gt;out, accessmode, FILE_SHARE_READ, NULL, flags,</td></tr>
+<tr><th id="62">62</th><td>                     FILE_ATTRIBUTE_NORMAL, NULL);</td></tr>
+<tr><th id="63">63</th><td>    <b>if</b> (out == INVALID_HANDLE_VALUE) {</td></tr>
+<tr><th id="64">64</th><td>        error_setg(errp, <q>"open %s failed"</q>, file-&gt;out);</td></tr>
+<tr><th id="65">65</th><td>        <b>return</b>;</td></tr>
+<tr><th id="66">66</th><td>    }</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    win_chr_set_file(chr, out, false);</td></tr>
+<tr><th id="69">69</th><td><u>#<span data-ppcond="41">else</span></u></td></tr>
+<tr><th id="70">70</th><td>    <em>int</em> <dfn class="local col6 decl" id="6flags" title='flags' data-type='int' data-ref="6flags">flags</dfn>, <dfn class="local col7 decl" id="7in" title='in' data-type='int' data-ref="7in">in</dfn> = -<var>1</var>, <dfn class="local col8 decl" id="8out" title='out' data-type='int' data-ref="8out">out</dfn>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#44" title="01" data-ref="_M/O_WRONLY">O_WRONLY</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#47" title="0100" data-ref="_M/O_CREAT">O_CREAT</a> | <a class="macro" href="../include/qemu/osdep.h.html#114" title="0" data-ref="_M/O_BINARY">O_BINARY</a>;</td></tr>
+<tr><th id="73">73</th><td>    <b>if</b> (<a class="local col5 ref" href="#5file" title='file' data-ref="5file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::has_append" title='ChardevFile::has_append' data-ref="ChardevFile::has_append">has_append</a> &amp;&amp; <a class="local col5 ref" href="#5file" title='file' data-ref="5file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::append" title='ChardevFile::append' data-ref="ChardevFile::append">append</a>) {</td></tr>
+<tr><th id="74">74</th><td>        <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#59" title="02000" data-ref="_M/O_APPEND">O_APPEND</a>;</td></tr>
+<tr><th id="75">75</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="76">76</th><td>        <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#56" title="01000" data-ref="_M/O_TRUNC">O_TRUNC</a>;</td></tr>
+<tr><th id="77">77</th><td>    }</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <a class="local col8 ref" href="#8out" title='out' data-ref="8out">out</a> = <a class="ref" href="../include/chardev/char-fd.h.html#qmp_chardev_open_file_source" title='qmp_chardev_open_file_source' data-ref="qmp_chardev_open_file_source">qmp_chardev_open_file_source</a>(<a class="local col5 ref" href="#5file" title='file' data-ref="5file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::out" title='ChardevFile::out' data-ref="ChardevFile::out">out</a>, <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a>, <a class="local col4 ref" href="#4errp" title='errp' data-ref="4errp">errp</a>);</td></tr>
+<tr><th id="80">80</th><td>    <b>if</b> (<a class="local col8 ref" href="#8out" title='out' data-ref="8out">out</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="81">81</th><td>        <b>return</b>;</td></tr>
+<tr><th id="82">82</th><td>    }</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>    <b>if</b> (<a class="local col5 ref" href="#5file" title='file' data-ref="5file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::has_in" title='ChardevFile::has_in' data-ref="ChardevFile::has_in">has_in</a>) {</td></tr>
+<tr><th id="85">85</th><td>        <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#43" title="00" data-ref="_M/O_RDONLY">O_RDONLY</a>;</td></tr>
+<tr><th id="86">86</th><td>        <a class="local col7 ref" href="#7in" title='in' data-ref="7in">in</a> = <a class="ref" href="../include/chardev/char-fd.h.html#qmp_chardev_open_file_source" title='qmp_chardev_open_file_source' data-ref="qmp_chardev_open_file_source">qmp_chardev_open_file_source</a>(<a class="local col5 ref" href="#5file" title='file' data-ref="5file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::in" title='ChardevFile::in' data-ref="ChardevFile::in">in</a>, <a class="local col6 ref" href="#6flags" title='flags' data-ref="6flags">flags</a>, <a class="local col4 ref" href="#4errp" title='errp' data-ref="4errp">errp</a>);</td></tr>
+<tr><th id="87">87</th><td>        <b>if</b> (<a class="local col7 ref" href="#7in" title='in' data-ref="7in">in</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="88">88</th><td>            <a class="ref" href="../include/qemu/osdep.h.html#qemu_close" title='qemu_close' data-ref="qemu_close">qemu_close</a>(<a class="local col8 ref" href="#8out" title='out' data-ref="8out">out</a>);</td></tr>
+<tr><th id="89">89</th><td>            <b>return</b>;</td></tr>
+<tr><th id="90">90</th><td>        }</td></tr>
+<tr><th id="91">91</th><td>    }</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td>    <a class="ref" href="../include/chardev/char-fd.h.html#qemu_chr_open_fd" title='qemu_chr_open_fd' data-ref="qemu_chr_open_fd">qemu_chr_open_fd</a>(<a class="local col1 ref" href="#1chr" title='chr' data-ref="1chr">chr</a>, <a class="local col7 ref" href="#7in" title='in' data-ref="7in">in</a>, <a class="local col8 ref" href="#8out" title='out' data-ref="8out">out</a>);</td></tr>
+<tr><th id="94">94</th><td><u>#<span data-ppcond="41">endif</span></u></td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_parse_file_out" title='qemu_chr_parse_file_out' data-type='void qemu_chr_parse_file_out(QemuOpts * opts, ChardevBackend * backend, Error ** errp)' data-ref="qemu_chr_parse_file_out">qemu_chr_parse_file_out</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col9 decl" id="9opts" title='opts' data-type='QemuOpts *' data-ref="9opts">opts</dfn>, <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col0 decl" id="10backend" title='backend' data-type='ChardevBackend *' data-ref="10backend">backend</dfn>,</td></tr>
+<tr><th id="98">98</th><td>                                    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="11errp" title='errp' data-type='Error **' data-ref="11errp">errp</dfn>)</td></tr>
+<tr><th id="99">99</th><td>{</td></tr>
+<tr><th id="100">100</th><td>    <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="12path" title='path' data-type='const char *' data-ref="12path">path</dfn> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col9 ref" href="#9opts" title='opts' data-ref="9opts">opts</a>, <q>"path"</q>);</td></tr>
+<tr><th id="101">101</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevFile" title='ChardevFile' data-type='struct ChardevFile' data-ref="ChardevFile">ChardevFile</a> *<dfn class="local col3 decl" id="13file" title='file' data-type='ChardevFile *' data-ref="13file">file</dfn>;</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>    <a class="local col0 ref" href="#10backend" title='backend' data-ref="10backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::type" title='ChardevBackend::type' data-ref="ChardevBackend::type">type</a> = <a class="enum" href="../qapi-types.h.html#ChardevBackendKind::CHARDEV_BACKEND_KIND_FILE" title='ChardevBackendKind::CHARDEV_BACKEND_KIND_FILE' data-ref="ChardevBackendKind::CHARDEV_BACKEND_KIND_FILE">CHARDEV_BACKEND_KIND_FILE</a>;</td></tr>
+<tr><th id="104">104</th><td>    <b>if</b> (<a class="local col2 ref" href="#12path" title='path' data-ref="12path">path</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="105">105</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-file.c&quot;, 105, __func__, (&quot;chardev: file: no filename given&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col1 ref" href="#11errp" title='errp' data-ref="11errp">errp</a>, <q>"chardev: file: no filename given"</q>);</td></tr>
+<tr><th id="106">106</th><td>        <b>return</b>;</td></tr>
+<tr><th id="107">107</th><td>    }</td></tr>
+<tr><th id="108">108</th><td>    <a class="local col3 ref" href="#13file" title='file' data-ref="13file">file</a> = <a class="local col0 ref" href="#10backend" title='backend' data-ref="10backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::file" title='ChardevBackend::(anonymous union)::file' data-ref="ChardevBackend::(anonymous)::file">file</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevFile_wrapper::data" title='q_obj_ChardevFile_wrapper::data' data-ref="q_obj_ChardevFile_wrapper::data">data</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((ChardevFile *) g_malloc0_n ((1), sizeof (ChardevFile)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../qapi-types.h.html#ChardevFile" title='ChardevFile' data-type='struct ChardevFile' data-ref="ChardevFile">ChardevFile</a>, <var>1</var>);</td></tr>
+<tr><th id="109">109</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_parse_common" title='qemu_chr_parse_common' data-ref="qemu_chr_parse_common">qemu_chr_parse_common</a>(<a class="local col9 ref" href="#9opts" title='opts' data-ref="9opts">opts</a>, <a class="ref" href="../qapi-types.h.html#qapi_ChardevFile_base" title='qapi_ChardevFile_base' data-ref="qapi_ChardevFile_base">qapi_ChardevFile_base</a>(<a class="local col3 ref" href="#13file" title='file' data-ref="13file">file</a>));</td></tr>
+<tr><th id="110">110</th><td>    <a class="local col3 ref" href="#13file" title='file' data-ref="13file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::out" title='ChardevFile::out' data-ref="ChardevFile::out">out</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col2 ref" href="#12path" title='path' data-ref="12path">path</a>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <a class="local col3 ref" href="#13file" title='file' data-ref="13file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::has_append" title='ChardevFile::has_append' data-ref="ChardevFile::has_append">has_append</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="113">113</th><td>    <a class="local col3 ref" href="#13file" title='file' data-ref="13file">file</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevFile::append" title='ChardevFile::append' data-ref="ChardevFile::append">append</a> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get_bool" title='qemu_opt_get_bool' data-ref="qemu_opt_get_bool">qemu_opt_get_bool</a>(<a class="local col9 ref" href="#9opts" title='opts' data-ref="9opts">opts</a>, <q>"append"</q>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="114">114</th><td>}</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_file_class_init" title='char_file_class_init' data-type='void char_file_class_init(ObjectClass * oc, void * data)' data-ref="char_file_class_init">char_file_class_init</dfn>(<a class="typedef" href="../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col4 decl" id="14oc" title='oc' data-type='ObjectClass *' data-ref="14oc">oc</dfn>, <em>void</em> *<dfn class="local col5 decl" id="15data" title='data' data-type='void *' data-ref="15data">data</dfn>)</td></tr>
+<tr><th id="117">117</th><td>{</td></tr>
+<tr><th id="118">118</th><td>    <a class="typedef" href="../include/chardev/char.h.html#ChardevClass" title='ChardevClass' data-type='struct ChardevClass' data-ref="ChardevClass">ChardevClass</a> *<dfn class="local col6 decl" id="16cc" title='cc' data-type='ChardevClass *' data-ref="16cc">cc</dfn> = <a class="macro" href="../include/chardev/char.h.html#192" title="((ChardevClass *)object_class_dynamic_cast_assert(((ObjectClass *)((oc))), (&quot;chardev&quot;), &quot;/home/jon/workspace/qemu/chardev/char-file.c&quot;, 118, __func__))" data-ref="_M/CHARDEV_CLASS">CHARDEV_CLASS</a>(<a class="local col4 ref" href="#14oc" title='oc' data-ref="14oc">oc</a>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <a class="local col6 ref" href="#16cc" title='cc' data-ref="16cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::parse" title='ChardevClass::parse' data-ref="ChardevClass::parse">parse</a> = <a class="tu ref" href="#qemu_chr_parse_file_out" title='qemu_chr_parse_file_out' data-use='r' data-ref="qemu_chr_parse_file_out">qemu_chr_parse_file_out</a>;</td></tr>
+<tr><th id="121">121</th><td>    <a class="local col6 ref" href="#16cc" title='cc' data-ref="16cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::open" title='ChardevClass::open' data-ref="ChardevClass::open">open</a> = <a class="tu ref" href="#qmp_chardev_open_file" title='qmp_chardev_open_file' data-use='r' data-ref="qmp_chardev_open_file">qmp_chardev_open_file</a>;</td></tr>
+<tr><th id="122">122</th><td>}</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><em>static</em> <em>const</em> <a class="typedef" href="../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="char_file_type_info" title='char_file_type_info' data-type='const TypeInfo' data-ref="char_file_type_info">char_file_type_info</dfn> = {</td></tr>
+<tr><th id="125">125</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../include/chardev/char.h.html#206" title="&quot;chardev-file&quot;" data-ref="_M/TYPE_CHARDEV_FILE">TYPE_CHARDEV_FILE</a>,</td></tr>
+<tr><th id="126">126</th><td><u>#<span data-ppcond="126">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="127">127</th><td>    .parent = TYPE_CHARDEV_WIN,</td></tr>
+<tr><th id="128">128</th><td><u>#<span data-ppcond="126">else</span></u></td></tr>
+<tr><th id="129">129</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../include/chardev/char-fd.h.html#37" title="&quot;chardev-fd&quot;" data-ref="_M/TYPE_CHARDEV_FD">TYPE_CHARDEV_FD</a>,</td></tr>
+<tr><th id="130">130</th><td><u>#<span data-ppcond="126">endif</span></u></td></tr>
+<tr><th id="131">131</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a> = <a class="tu ref" href="#char_file_class_init" title='char_file_class_init' data-use='r' data-ref="char_file_class_init">char_file_class_init</a>,</td></tr>
+<tr><th id="132">132</th><td>};</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="register_types" title='register_types' data-type='void register_types()' data-ref="register_types">register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="135">135</th><td>{</td></tr>
+<tr><th id="136">136</th><td>    <a class="ref" href="../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#char_file_type_info" title='char_file_type_info' data-use='a' data-ref="char_file_type_info">char_file_type_info</a>);</td></tr>
+<tr><th id="137">137</th><td>}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><a class="macro" href="../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_register_types(void) { register_module_init(register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#register_types" title='register_types' data-use='r' data-ref="register_types">register_types</a>);</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

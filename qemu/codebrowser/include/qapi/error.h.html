@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>error.h source code [codebrowser/include/qapi/error.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ErrorClass "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qapi/error.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qapi</a>/<a href='error.h.html'>error.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Error Objects</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2011-2015 Red Hat, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Authors:</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *  Markus Armbruster &lt;armbru@redhat.com&gt;</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2.  See</i></td></tr>
+<tr><th id="12">12</th><td><i> * the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><i>/*</i></td></tr>
+<tr><th id="16">16</th><td><i> * Error reporting system loosely patterned after Glib's GError.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * Create an error:</i></td></tr>
+<tr><th id="19">19</th><td><i> *     error_setg(&amp;err, "situation normal, all fouled up");</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * Create an error and add additional explanation:</i></td></tr>
+<tr><th id="22">22</th><td><i> *     error_setg(&amp;err, "invalid quark");</i></td></tr>
+<tr><th id="23">23</th><td><i> *     error_append_hint(&amp;err, "Valid quarks are up, down, strange, "</i></td></tr>
+<tr><th id="24">24</th><td><i> *                       "charm, top, bottom.\n");</i></td></tr>
+<tr><th id="25">25</th><td><i> *</i></td></tr>
+<tr><th id="26">26</th><td><i> * Do *not* contract this to</i></td></tr>
+<tr><th id="27">27</th><td><i> *     error_setg(&amp;err, "invalid quark\n"</i></td></tr>
+<tr><th id="28">28</th><td><i> *                "Valid quarks are up, down, strange, charm, top, bottom.");</i></td></tr>
+<tr><th id="29">29</th><td><i> *</i></td></tr>
+<tr><th id="30">30</th><td><i> * Report an error to the current monitor if we have one, else stderr:</i></td></tr>
+<tr><th id="31">31</th><td><i> *     error_report_err(err);</i></td></tr>
+<tr><th id="32">32</th><td><i> * This frees the error object.</i></td></tr>
+<tr><th id="33">33</th><td><i> *</i></td></tr>
+<tr><th id="34">34</th><td><i> * Likewise, but with additional text prepended:</i></td></tr>
+<tr><th id="35">35</th><td><i> *     error_reportf_err(err, "Could not frobnicate '%s': ", name);</i></td></tr>
+<tr><th id="36">36</th><td><i> *</i></td></tr>
+<tr><th id="37">37</th><td><i> * Report an error somewhere else:</i></td></tr>
+<tr><th id="38">38</th><td><i> *     const char *msg = error_get_pretty(err);</i></td></tr>
+<tr><th id="39">39</th><td><i> *     do with msg what needs to be done...</i></td></tr>
+<tr><th id="40">40</th><td><i> *     error_free(err);</i></td></tr>
+<tr><th id="41">41</th><td><i> * Note that this loses hints added with error_append_hint().</i></td></tr>
+<tr><th id="42">42</th><td><i> *</i></td></tr>
+<tr><th id="43">43</th><td><i> * Handle an error without reporting it (just for completeness):</i></td></tr>
+<tr><th id="44">44</th><td><i> *     error_free(err);</i></td></tr>
+<tr><th id="45">45</th><td><i> *</i></td></tr>
+<tr><th id="46">46</th><td><i> * Assert that an expected error occurred, but clean it up without</i></td></tr>
+<tr><th id="47">47</th><td><i> * reporting it (primarily useful in testsuites):</i></td></tr>
+<tr><th id="48">48</th><td><i> *     error_free_or_abort(&amp;err);</i></td></tr>
+<tr><th id="49">49</th><td><i> *</i></td></tr>
+<tr><th id="50">50</th><td><i> * Pass an existing error to the caller:</i></td></tr>
+<tr><th id="51">51</th><td><i> *     error_propagate(errp, err);</i></td></tr>
+<tr><th id="52">52</th><td><i> * where Error **errp is a parameter, by convention the last one.</i></td></tr>
+<tr><th id="53">53</th><td><i> *</i></td></tr>
+<tr><th id="54">54</th><td><i> * Pass an existing error to the caller with the message modified:</i></td></tr>
+<tr><th id="55">55</th><td><i> *     error_propagate(errp, err);</i></td></tr>
+<tr><th id="56">56</th><td><i> *     error_prepend(errp, "Could not frobnicate '%s': ", name);</i></td></tr>
+<tr><th id="57">57</th><td><i> *</i></td></tr>
+<tr><th id="58">58</th><td><i> * Create a new error and pass it to the caller:</i></td></tr>
+<tr><th id="59">59</th><td><i> *     error_setg(errp, "situation normal, all fouled up");</i></td></tr>
+<tr><th id="60">60</th><td><i> *</i></td></tr>
+<tr><th id="61">61</th><td><i> * Call a function and receive an error from it:</i></td></tr>
+<tr><th id="62">62</th><td><i> *     Error *err = NULL;</i></td></tr>
+<tr><th id="63">63</th><td><i> *     foo(arg, &amp;err);</i></td></tr>
+<tr><th id="64">64</th><td><i> *     if (err) {</i></td></tr>
+<tr><th id="65">65</th><td><i> *         handle the error...</i></td></tr>
+<tr><th id="66">66</th><td><i> *     }</i></td></tr>
+<tr><th id="67">67</th><td><i> *</i></td></tr>
+<tr><th id="68">68</th><td><i> * Call a function ignoring errors:</i></td></tr>
+<tr><th id="69">69</th><td><i> *     foo(arg, NULL);</i></td></tr>
+<tr><th id="70">70</th><td><i> *</i></td></tr>
+<tr><th id="71">71</th><td><i> * Call a function aborting on errors:</i></td></tr>
+<tr><th id="72">72</th><td><i> *     foo(arg, &amp;error_abort);</i></td></tr>
+<tr><th id="73">73</th><td><i> *</i></td></tr>
+<tr><th id="74">74</th><td><i> * Call a function treating errors as fatal:</i></td></tr>
+<tr><th id="75">75</th><td><i> *     foo(arg, &amp;error_fatal);</i></td></tr>
+<tr><th id="76">76</th><td><i> *</i></td></tr>
+<tr><th id="77">77</th><td><i> * Receive an error and pass it on to the caller:</i></td></tr>
+<tr><th id="78">78</th><td><i> *     Error *err = NULL;</i></td></tr>
+<tr><th id="79">79</th><td><i> *     foo(arg, &amp;err);</i></td></tr>
+<tr><th id="80">80</th><td><i> *     if (err) {</i></td></tr>
+<tr><th id="81">81</th><td><i> *         handle the error...</i></td></tr>
+<tr><th id="82">82</th><td><i> *         error_propagate(errp, err);</i></td></tr>
+<tr><th id="83">83</th><td><i> *     }</i></td></tr>
+<tr><th id="84">84</th><td><i> * where Error **errp is a parameter, by convention the last one.</i></td></tr>
+<tr><th id="85">85</th><td><i> *</i></td></tr>
+<tr><th id="86">86</th><td><i> * Do *not* "optimize" this to</i></td></tr>
+<tr><th id="87">87</th><td><i> *     foo(arg, errp);</i></td></tr>
+<tr><th id="88">88</th><td><i> *     if (*errp) { // WRONG!</i></td></tr>
+<tr><th id="89">89</th><td><i> *         handle the error...</i></td></tr>
+<tr><th id="90">90</th><td><i> *     }</i></td></tr>
+<tr><th id="91">91</th><td><i> * because errp may be NULL!</i></td></tr>
+<tr><th id="92">92</th><td><i> *</i></td></tr>
+<tr><th id="93">93</th><td><i> * But when all you do with the error is pass it on, please use</i></td></tr>
+<tr><th id="94">94</th><td><i> *     foo(arg, errp);</i></td></tr>
+<tr><th id="95">95</th><td><i> * for readability.</i></td></tr>
+<tr><th id="96">96</th><td><i> *</i></td></tr>
+<tr><th id="97">97</th><td><i> * Receive and accumulate multiple errors (first one wins):</i></td></tr>
+<tr><th id="98">98</th><td><i> *     Error *err = NULL, *local_err = NULL;</i></td></tr>
+<tr><th id="99">99</th><td><i> *     foo(arg, &amp;err);</i></td></tr>
+<tr><th id="100">100</th><td><i> *     bar(arg, &amp;local_err);</i></td></tr>
+<tr><th id="101">101</th><td><i> *     error_propagate(&amp;err, local_err);</i></td></tr>
+<tr><th id="102">102</th><td><i> *     if (err) {</i></td></tr>
+<tr><th id="103">103</th><td><i> *         handle the error...</i></td></tr>
+<tr><th id="104">104</th><td><i> *     }</i></td></tr>
+<tr><th id="105">105</th><td><i> *</i></td></tr>
+<tr><th id="106">106</th><td><i> * Do *not* "optimize" this to</i></td></tr>
+<tr><th id="107">107</th><td><i> *     foo(arg, &amp;err);</i></td></tr>
+<tr><th id="108">108</th><td><i> *     bar(arg, &amp;err); // WRONG!</i></td></tr>
+<tr><th id="109">109</th><td><i> *     if (err) {</i></td></tr>
+<tr><th id="110">110</th><td><i> *         handle the error...</i></td></tr>
+<tr><th id="111">111</th><td><i> *     }</i></td></tr>
+<tr><th id="112">112</th><td><i> * because this may pass a non-null err to bar().</i></td></tr>
+<tr><th id="113">113</th><td><i> */</i></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><u>#<span data-ppcond="115">ifndef</span> <span class="macro" data-ref="_M/ERROR_H">ERROR_H</span></u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/ERROR_H" data-ref="_M/ERROR_H">ERROR_H</dfn></u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><u>#include <a href="../../qapi-types.h.html">"qapi-types.h"</a></u></td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><i>/*</i></td></tr>
+<tr><th id="121">121</th><td><i> * Overall category of an error.</i></td></tr>
+<tr><th id="122">122</th><td><i> * Based on the qapi type QapiErrorClass, but reproduced here for nicer</i></td></tr>
+<tr><th id="123">123</th><td><i> * enum names.</i></td></tr>
+<tr><th id="124">124</th><td><i> */</i></td></tr>
+<tr><th id="125">125</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="ErrorClass" title='ErrorClass' data-ref="ErrorClass"><a class="type" href="#ErrorClass" title='ErrorClass' data-ref="ErrorClass">ErrorClass</a></dfn> {</td></tr>
+<tr><th id="126">126</th><td>    <dfn class="enum" id="ErrorClass::ERROR_CLASS_GENERIC_ERROR" title='ErrorClass::ERROR_CLASS_GENERIC_ERROR' data-ref="ErrorClass::ERROR_CLASS_GENERIC_ERROR">ERROR_CLASS_GENERIC_ERROR</dfn> = <a class="enum" href="../../qapi-types.h.html#QapiErrorClass::QAPI_ERROR_CLASS_GENERICERROR" title='QapiErrorClass::QAPI_ERROR_CLASS_GENERICERROR' data-ref="QapiErrorClass::QAPI_ERROR_CLASS_GENERICERROR">QAPI_ERROR_CLASS_GENERICERROR</a>,</td></tr>
+<tr><th id="127">127</th><td>    <dfn class="enum" id="ErrorClass::ERROR_CLASS_COMMAND_NOT_FOUND" title='ErrorClass::ERROR_CLASS_COMMAND_NOT_FOUND' data-ref="ErrorClass::ERROR_CLASS_COMMAND_NOT_FOUND">ERROR_CLASS_COMMAND_NOT_FOUND</dfn> = <a class="enum" href="../../qapi-types.h.html#QapiErrorClass::QAPI_ERROR_CLASS_COMMANDNOTFOUND" title='QapiErrorClass::QAPI_ERROR_CLASS_COMMANDNOTFOUND' data-ref="QapiErrorClass::QAPI_ERROR_CLASS_COMMANDNOTFOUND">QAPI_ERROR_CLASS_COMMANDNOTFOUND</a>,</td></tr>
+<tr><th id="128">128</th><td>    <dfn class="enum" id="ErrorClass::ERROR_CLASS_DEVICE_NOT_ACTIVE" title='ErrorClass::ERROR_CLASS_DEVICE_NOT_ACTIVE' data-ref="ErrorClass::ERROR_CLASS_DEVICE_NOT_ACTIVE">ERROR_CLASS_DEVICE_NOT_ACTIVE</dfn> = <a class="enum" href="../../qapi-types.h.html#QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTACTIVE" title='QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTACTIVE' data-ref="QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTACTIVE">QAPI_ERROR_CLASS_DEVICENOTACTIVE</a>,</td></tr>
+<tr><th id="129">129</th><td>    <dfn class="enum" id="ErrorClass::ERROR_CLASS_DEVICE_NOT_FOUND" title='ErrorClass::ERROR_CLASS_DEVICE_NOT_FOUND' data-ref="ErrorClass::ERROR_CLASS_DEVICE_NOT_FOUND">ERROR_CLASS_DEVICE_NOT_FOUND</dfn> = <a class="enum" href="../../qapi-types.h.html#QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTFOUND" title='QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTFOUND' data-ref="QapiErrorClass::QAPI_ERROR_CLASS_DEVICENOTFOUND">QAPI_ERROR_CLASS_DEVICENOTFOUND</a>,</td></tr>
+<tr><th id="130">130</th><td>    <dfn class="enum" id="ErrorClass::ERROR_CLASS_KVM_MISSING_CAP" title='ErrorClass::ERROR_CLASS_KVM_MISSING_CAP' data-ref="ErrorClass::ERROR_CLASS_KVM_MISSING_CAP">ERROR_CLASS_KVM_MISSING_CAP</dfn> = <a class="enum" href="../../qapi-types.h.html#QapiErrorClass::QAPI_ERROR_CLASS_KVMMISSINGCAP" title='QapiErrorClass::QAPI_ERROR_CLASS_KVMMISSINGCAP' data-ref="QapiErrorClass::QAPI_ERROR_CLASS_KVMMISSINGCAP">QAPI_ERROR_CLASS_KVMMISSINGCAP</a>,</td></tr>
+<tr><th id="131">131</th><td>} <dfn class="typedef" id="ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</dfn>;</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><i>/*</i></td></tr>
+<tr><th id="134">134</th><td><i> * Get @err's human-readable error message.</i></td></tr>
+<tr><th id="135">135</th><td><i> */</i></td></tr>
+<tr><th id="136">136</th><td><em>const</em> <em>char</em> *<dfn class="decl" id="error_get_pretty" title='error_get_pretty' data-ref="error_get_pretty">error_get_pretty</dfn>(<em>const</em> <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col3 decl" id="9233err" title='err' data-type='const Error *' data-ref="9233err">err</dfn>);</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><i>/*</i></td></tr>
+<tr><th id="139">139</th><td><i> * Get @err's error class.</i></td></tr>
+<tr><th id="140">140</th><td><i> * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is</i></td></tr>
+<tr><th id="141">141</th><td><i> * strongly discouraged.</i></td></tr>
+<tr><th id="142">142</th><td><i> */</i></td></tr>
+<tr><th id="143">143</th><td><a class="typedef" href="#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="decl" id="error_get_class" title='error_get_class' data-ref="error_get_class">error_get_class</dfn>(<em>const</em> <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col4 decl" id="9234err" title='err' data-type='const Error *' data-ref="9234err">err</dfn>);</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/*</i></td></tr>
+<tr><th id="146">146</th><td><i> * Create a new error object and assign it to *@errp.</i></td></tr>
+<tr><th id="147">147</th><td><i> * If @errp is NULL, the error is ignored.  Don't bother creating one</i></td></tr>
+<tr><th id="148">148</th><td><i> * then.</i></td></tr>
+<tr><th id="149">149</th><td><i> * If @errp is &amp;error_abort, print a suitable message and abort().</i></td></tr>
+<tr><th id="150">150</th><td><i> * If @errp is &amp;error_fatal, print a suitable message and exit(1).</i></td></tr>
+<tr><th id="151">151</th><td><i> * If @errp is anything else, *@errp must be NULL.</i></td></tr>
+<tr><th id="152">152</th><td><i> * The new error's class is ERROR_CLASS_GENERIC_ERROR, and its</i></td></tr>
+<tr><th id="153">153</th><td><i> * human-readable error message is made from printf-style @fmt, ...</i></td></tr>
+<tr><th id="154">154</th><td><i> * The resulting message should be a single phrase, with no newline or</i></td></tr>
+<tr><th id="155">155</th><td><i> * trailing punctuation.</i></td></tr>
+<tr><th id="156">156</th><td><i> * Please don't error_setg(&amp;error_fatal, ...), use error_report() and</i></td></tr>
+<tr><th id="157">157</th><td><i> * exit(), because that's more obvious.</i></td></tr>
+<tr><th id="158">158</th><td><i> * Likewise, don't error_setg(&amp;error_abort, ...), use assert().</i></td></tr>
+<tr><th id="159">159</th><td><i> */</i></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/error_setg" data-ref="_M/error_setg">error_setg</dfn>(errp, fmt, ...)                              \</u></td></tr>
+<tr><th id="161">161</th><td><u>    error_setg_internal((errp), __FILE__, __LINE__, __func__,   \</u></td></tr>
+<tr><th id="162">162</th><td><u>                        (fmt), ## __VA_ARGS__)</u></td></tr>
+<tr><th id="163">163</th><td><em>void</em> <dfn class="decl" id="error_setg_internal" title='error_setg_internal' data-ref="error_setg_internal">error_setg_internal</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="9235errp" title='errp' data-type='Error **' data-ref="9235errp">errp</dfn>,</td></tr>
+<tr><th id="164">164</th><td>                         <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="9236src" title='src' data-type='const char *' data-ref="9236src">src</dfn>, <em>int</em> <dfn class="local col7 decl" id="9237line" title='line' data-type='int' data-ref="9237line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="9238func" title='func' data-type='const char *' data-ref="9238func">func</dfn>,</td></tr>
+<tr><th id="165">165</th><td>                         <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9239fmt" title='fmt' data-type='const char *' data-ref="9239fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="166">166</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 5, 6)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>5</var>, <var>6</var>);</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><i>/*</i></td></tr>
+<tr><th id="169">169</th><td><i> * Just like error_setg(), with @os_error info added to the message.</i></td></tr>
+<tr><th id="170">170</th><td><i> * If @os_error is non-zero, ": " + strerror(os_error) is appended to</i></td></tr>
+<tr><th id="171">171</th><td><i> * the human-readable error message.</i></td></tr>
+<tr><th id="172">172</th><td><i> *</i></td></tr>
+<tr><th id="173">173</th><td><i> * The value of errno (which usually can get clobbered by almost any</i></td></tr>
+<tr><th id="174">174</th><td><i> * function call) will be preserved.</i></td></tr>
+<tr><th id="175">175</th><td><i> */</i></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/error_setg_errno" data-ref="_M/error_setg_errno">error_setg_errno</dfn>(errp, os_error, fmt, ...)                      \</u></td></tr>
+<tr><th id="177">177</th><td><u>    error_setg_errno_internal((errp), __FILE__, __LINE__, __func__,     \</u></td></tr>
+<tr><th id="178">178</th><td><u>                              (os_error), (fmt), ## __VA_ARGS__)</u></td></tr>
+<tr><th id="179">179</th><td><em>void</em> <dfn class="decl" id="error_setg_errno_internal" title='error_setg_errno_internal' data-ref="error_setg_errno_internal">error_setg_errno_internal</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="9240errp" title='errp' data-type='Error **' data-ref="9240errp">errp</dfn>,</td></tr>
+<tr><th id="180">180</th><td>                               <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="9241fname" title='fname' data-type='const char *' data-ref="9241fname">fname</dfn>, <em>int</em> <dfn class="local col2 decl" id="9242line" title='line' data-type='int' data-ref="9242line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="9243func" title='func' data-type='const char *' data-ref="9243func">func</dfn>,</td></tr>
+<tr><th id="181">181</th><td>                               <em>int</em> <dfn class="local col4 decl" id="9244os_error" title='os_error' data-type='int' data-ref="9244os_error">os_error</dfn>, <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="9245fmt" title='fmt' data-type='const char *' data-ref="9245fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="182">182</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 6, 7)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>6</var>, <var>7</var>);</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><u>#<span data-ppcond="184">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="185">185</th><td><i>/*</i></td></tr>
+<tr><th id="186">186</th><td><i> * Just like error_setg(), with @win32_error info added to the message.</i></td></tr>
+<tr><th id="187">187</th><td><i> * If @win32_error is non-zero, ": " + g_win32_error_message(win32_err)</i></td></tr>
+<tr><th id="188">188</th><td><i> * is appended to the human-readable error message.</i></td></tr>
+<tr><th id="189">189</th><td><i> */</i></td></tr>
+<tr><th id="190">190</th><td><u>#define error_setg_win32(errp, win32_err, fmt, ...)                     \</u></td></tr>
+<tr><th id="191">191</th><td><u>    error_setg_win32_internal((errp), __FILE__, __LINE__, __func__,     \</u></td></tr>
+<tr><th id="192">192</th><td><u>                              (win32_err), (fmt), ## __VA_ARGS__)</u></td></tr>
+<tr><th id="193">193</th><td><em>void</em> error_setg_win32_internal(Error **errp,</td></tr>
+<tr><th id="194">194</th><td>                               <em>const</em> <em>char</em> *src, <em>int</em> line, <em>const</em> <em>char</em> *func,</td></tr>
+<tr><th id="195">195</th><td>                               <em>int</em> win32_err, <em>const</em> <em>char</em> *fmt, ...)</td></tr>
+<tr><th id="196">196</th><td>    GCC_FMT_ATTR(<var>6</var>, <var>7</var>);</td></tr>
+<tr><th id="197">197</th><td><u>#<span data-ppcond="184">endif</span></u></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><i>/*</i></td></tr>
+<tr><th id="200">200</th><td><i> * Propagate error object (if any) from @local_err to @dst_errp.</i></td></tr>
+<tr><th id="201">201</th><td><i> * If @local_err is NULL, do nothing (because there's nothing to</i></td></tr>
+<tr><th id="202">202</th><td><i> * propagate).</i></td></tr>
+<tr><th id="203">203</th><td><i> * Else, if @dst_errp is NULL, errors are being ignored.  Free the</i></td></tr>
+<tr><th id="204">204</th><td><i> * error object.</i></td></tr>
+<tr><th id="205">205</th><td><i> * Else, if @dst_errp is &amp;error_abort, print a suitable message and</i></td></tr>
+<tr><th id="206">206</th><td><i> * abort().</i></td></tr>
+<tr><th id="207">207</th><td><i> * Else, if @dst_errp is &amp;error_fatal, print a suitable message and</i></td></tr>
+<tr><th id="208">208</th><td><i> * exit(1).</i></td></tr>
+<tr><th id="209">209</th><td><i> * Else, if @dst_errp already contains an error, ignore this one: free</i></td></tr>
+<tr><th id="210">210</th><td><i> * the error object.</i></td></tr>
+<tr><th id="211">211</th><td><i> * Else, move the error object from @local_err to *@dst_errp.</i></td></tr>
+<tr><th id="212">212</th><td><i> * On return, @local_err is invalid.</i></td></tr>
+<tr><th id="213">213</th><td><i> * Please don't error_propagate(&amp;error_fatal, ...), use</i></td></tr>
+<tr><th id="214">214</th><td><i> * error_report_err() and exit(), because that's more obvious.</i></td></tr>
+<tr><th id="215">215</th><td><i> */</i></td></tr>
+<tr><th id="216">216</th><td><em>void</em> <dfn class="decl" id="error_propagate" title='error_propagate' data-ref="error_propagate">error_propagate</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="9246dst_errp" title='dst_errp' data-type='Error **' data-ref="9246dst_errp">dst_errp</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col7 decl" id="9247local_err" title='local_err' data-type='Error *' data-ref="9247local_err">local_err</dfn>);</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><i>/*</i></td></tr>
+<tr><th id="219">219</th><td><i> * Prepend some text to @errp's human-readable error message.</i></td></tr>
+<tr><th id="220">220</th><td><i> * The text is made by formatting @fmt, @ap like vprintf().</i></td></tr>
+<tr><th id="221">221</th><td><i> */</i></td></tr>
+<tr><th id="222">222</th><td><em>void</em> <dfn class="decl" id="error_vprepend" title='error_vprepend' data-ref="error_vprepend">error_vprepend</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="9248errp" title='errp' data-type='Error **' data-ref="9248errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9249fmt" title='fmt' data-type='const char *' data-ref="9249fmt">fmt</dfn>, <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col0 decl" id="9250ap" title='ap' data-type='struct __va_list_tag *' data-ref="9250ap">ap</dfn>);</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td><i>/*</i></td></tr>
+<tr><th id="225">225</th><td><i> * Prepend some text to @errp's human-readable error message.</i></td></tr>
+<tr><th id="226">226</th><td><i> * The text is made by formatting @fmt, ... like printf().</i></td></tr>
+<tr><th id="227">227</th><td><i> */</i></td></tr>
+<tr><th id="228">228</th><td><em>void</em> <dfn class="decl" id="error_prepend" title='error_prepend' data-ref="error_prepend">error_prepend</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="9251errp" title='errp' data-type='Error **' data-ref="9251errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="9252fmt" title='fmt' data-type='const char *' data-ref="9252fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="229">229</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><i>/*</i></td></tr>
+<tr><th id="232">232</th><td><i> * Append a printf-style human-readable explanation to an existing error.</i></td></tr>
+<tr><th id="233">233</th><td><i> * @errp may be NULL, but not &amp;error_fatal or &amp;error_abort.</i></td></tr>
+<tr><th id="234">234</th><td><i> * Trivially the case if you call it only after error_setg() or</i></td></tr>
+<tr><th id="235">235</th><td><i> * error_propagate().</i></td></tr>
+<tr><th id="236">236</th><td><i> * May be called multiple times.  The resulting hint should end with a</i></td></tr>
+<tr><th id="237">237</th><td><i> * newline.</i></td></tr>
+<tr><th id="238">238</th><td><i> */</i></td></tr>
+<tr><th id="239">239</th><td><em>void</em> <dfn class="decl" id="error_append_hint" title='error_append_hint' data-ref="error_append_hint">error_append_hint</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="9253errp" title='errp' data-type='Error **' data-ref="9253errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="9254fmt" title='fmt' data-type='const char *' data-ref="9254fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="240">240</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td><i>/*</i></td></tr>
+<tr><th id="243">243</th><td><i> * Convenience function to report open() failure.</i></td></tr>
+<tr><th id="244">244</th><td><i> */</i></td></tr>
+<tr><th id="245">245</th><td><u>#define <dfn class="macro" id="_M/error_setg_file_open" data-ref="_M/error_setg_file_open">error_setg_file_open</dfn>(errp, os_errno, filename)                  \</u></td></tr>
+<tr><th id="246">246</th><td><u>    error_setg_file_open_internal((errp), __FILE__, __LINE__, __func__, \</u></td></tr>
+<tr><th id="247">247</th><td><u>                                  (os_errno), (filename))</u></td></tr>
+<tr><th id="248">248</th><td><em>void</em> <dfn class="decl" id="error_setg_file_open_internal" title='error_setg_file_open_internal' data-ref="error_setg_file_open_internal">error_setg_file_open_internal</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="9255errp" title='errp' data-type='Error **' data-ref="9255errp">errp</dfn>,</td></tr>
+<tr><th id="249">249</th><td>                                   <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="9256src" title='src' data-type='const char *' data-ref="9256src">src</dfn>, <em>int</em> <dfn class="local col7 decl" id="9257line" title='line' data-type='int' data-ref="9257line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="9258func" title='func' data-type='const char *' data-ref="9258func">func</dfn>,</td></tr>
+<tr><th id="250">250</th><td>                                   <em>int</em> <dfn class="local col9 decl" id="9259os_errno" title='os_errno' data-type='int' data-ref="9259os_errno">os_errno</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="9260filename" title='filename' data-type='const char *' data-ref="9260filename">filename</dfn>);</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><i>/*</i></td></tr>
+<tr><th id="253">253</th><td><i> * Return an exact copy of @err.</i></td></tr>
+<tr><th id="254">254</th><td><i> */</i></td></tr>
+<tr><th id="255">255</th><td><a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="error_copy" title='error_copy' data-ref="error_copy">error_copy</dfn>(<em>const</em> <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col1 decl" id="9261err" title='err' data-type='const Error *' data-ref="9261err">err</dfn>);</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><i>/*</i></td></tr>
+<tr><th id="258">258</th><td><i> * Free @err.</i></td></tr>
+<tr><th id="259">259</th><td><i> * @err may be NULL.</i></td></tr>
+<tr><th id="260">260</th><td><i> */</i></td></tr>
+<tr><th id="261">261</th><td><em>void</em> <dfn class="decl" id="error_free" title='error_free' data-ref="error_free">error_free</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col2 decl" id="9262err" title='err' data-type='Error *' data-ref="9262err">err</dfn>);</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td><i>/*</i></td></tr>
+<tr><th id="264">264</th><td><i> * Convenience function to assert that *@errp is set, then silently free it.</i></td></tr>
+<tr><th id="265">265</th><td><i> */</i></td></tr>
+<tr><th id="266">266</th><td><em>void</em> <dfn class="decl" id="error_free_or_abort" title='error_free_or_abort' data-ref="error_free_or_abort">error_free_or_abort</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="9263errp" title='errp' data-type='Error **' data-ref="9263errp">errp</dfn>);</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><i>/*</i></td></tr>
+<tr><th id="269">269</th><td><i> * Convenience function to warn_report() and free @err.</i></td></tr>
+<tr><th id="270">270</th><td><i> */</i></td></tr>
+<tr><th id="271">271</th><td><em>void</em> <dfn class="decl" id="warn_report_err" title='warn_report_err' data-ref="warn_report_err">warn_report_err</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col4 decl" id="9264err" title='err' data-type='Error *' data-ref="9264err">err</dfn>);</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td><i>/*</i></td></tr>
+<tr><th id="274">274</th><td><i> * Convenience function to error_report() and free @err.</i></td></tr>
+<tr><th id="275">275</th><td><i> */</i></td></tr>
+<tr><th id="276">276</th><td><em>void</em> <dfn class="decl" id="error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col5 decl" id="9265err" title='err' data-type='Error *' data-ref="9265err">err</dfn>);</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><i>/*</i></td></tr>
+<tr><th id="279">279</th><td><i> * Convenience function to error_prepend(), warn_report() and free @err.</i></td></tr>
+<tr><th id="280">280</th><td><i> */</i></td></tr>
+<tr><th id="281">281</th><td><em>void</em> <dfn class="decl" id="warn_reportf_err" title='warn_reportf_err' data-ref="warn_reportf_err">warn_reportf_err</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col6 decl" id="9266err" title='err' data-type='Error *' data-ref="9266err">err</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="9267fmt" title='fmt' data-type='const char *' data-ref="9267fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="282">282</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>/*</i></td></tr>
+<tr><th id="285">285</th><td><i> * Convenience function to error_prepend(), error_report() and free @err.</i></td></tr>
+<tr><th id="286">286</th><td><i> */</i></td></tr>
+<tr><th id="287">287</th><td><em>void</em> <dfn class="decl" id="error_reportf_err" title='error_reportf_err' data-ref="error_reportf_err">error_reportf_err</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col8 decl" id="9268err" title='err' data-type='Error *' data-ref="9268err">err</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9269fmt" title='fmt' data-type='const char *' data-ref="9269fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="288">288</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><i>/*</i></td></tr>
+<tr><th id="291">291</th><td><i> * Just like error_setg(), except you get to specify the error class.</i></td></tr>
+<tr><th id="292">292</th><td><i> * Note: use of error classes other than ERROR_CLASS_GENERIC_ERROR is</i></td></tr>
+<tr><th id="293">293</th><td><i> * strongly discouraged.</i></td></tr>
+<tr><th id="294">294</th><td><i> */</i></td></tr>
+<tr><th id="295">295</th><td><u>#define <dfn class="macro" id="_M/error_set" data-ref="_M/error_set">error_set</dfn>(errp, err_class, fmt, ...)                    \</u></td></tr>
+<tr><th id="296">296</th><td><u>    error_set_internal((errp), __FILE__, __LINE__, __func__,    \</u></td></tr>
+<tr><th id="297">297</th><td><u>                       (err_class), (fmt), ## __VA_ARGS__)</u></td></tr>
+<tr><th id="298">298</th><td><em>void</em> <dfn class="decl" id="error_set_internal" title='error_set_internal' data-ref="error_set_internal">error_set_internal</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="9270errp" title='errp' data-type='Error **' data-ref="9270errp">errp</dfn>,</td></tr>
+<tr><th id="299">299</th><td>                        <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="9271src" title='src' data-type='const char *' data-ref="9271src">src</dfn>, <em>int</em> <dfn class="local col2 decl" id="9272line" title='line' data-type='int' data-ref="9272line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="9273func" title='func' data-type='const char *' data-ref="9273func">func</dfn>,</td></tr>
+<tr><th id="300">300</th><td>                        <a class="typedef" href="#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="local col4 decl" id="9274err_class" title='err_class' data-type='ErrorClass' data-ref="9274err_class">err_class</dfn>, <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="9275fmt" title='fmt' data-type='const char *' data-ref="9275fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="301">301</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 6, 7)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>6</var>, <var>7</var>);</td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><i>/*</i></td></tr>
+<tr><th id="304">304</th><td><i> * Special error destination to abort on error.</i></td></tr>
+<tr><th id="305">305</th><td><i> * See error_setg() and error_propagate() for details.</i></td></tr>
+<tr><th id="306">306</th><td><i> */</i></td></tr>
+<tr><th id="307">307</th><td><b>extern</b> <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="error_abort" title='error_abort' data-ref="error_abort">error_abort</dfn>;</td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td><i>/*</i></td></tr>
+<tr><th id="310">310</th><td><i> * Special error destination to exit(1) on error.</i></td></tr>
+<tr><th id="311">311</th><td><i> * See error_setg() and error_propagate() for details.</i></td></tr>
+<tr><th id="312">312</th><td><i> */</i></td></tr>
+<tr><th id="313">313</th><td><b>extern</b> <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</dfn>;</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td><u>#<span data-ppcond="115">endif</span></u></td></tr>
+<tr><th id="316">316</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

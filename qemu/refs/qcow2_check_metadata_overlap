@@ -1,0 +1,17 @@
+<dec f='codebrowser/block/qcow2.h' l='575' type='int qcow2_check_metadata_overlap(BlockDriverState * bs, int ign, int64_t offset, int64_t size)'/>
+<def f='codebrowser/block/qcow2-refcount.c' l='2453' ll='2558' type='int qcow2_check_metadata_overlap(BlockDriverState * bs, int ign, int64_t offset, int64_t size)'/>
+<use f='codebrowser/block/qcow2-refcount.c' l='2584' u='c' c='qcow2_pre_write_overlap_check'/>
+<doc f='codebrowser/block/qcow2-refcount.c' l='2439'>/*
+ * Checks if the given offset into the image file is actually free to use by
+ * looking for overlaps with important metadata sections (L1/L2 tables etc.),
+ * i.e. a sanity check without relying on the refcount tables.
+ *
+ * The ign parameter specifies what checks not to perform (being a bitmask of
+ * QCow2MetadataOverlap values), i.e., what sections to ignore.
+ *
+ * Returns:
+ * - 0 if writing to this offset will not affect the mentioned metadata
+ * - a positive QCow2MetadataOverlap value indicating one overlapping section
+ * - a negative value (-errno) indicating an error while performing a check,
+ *   e.g. when bdrv_read failed on QCOW2_OL_INACTIVE_L2
+ */</doc>

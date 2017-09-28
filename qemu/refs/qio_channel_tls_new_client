@@ -1,0 +1,29 @@
+<dec f='codebrowser/include/io/channel-tls.h' l='108' type='QIOChannelTLS * qio_channel_tls_new_client(QIOChannel * master, QCryptoTLSCreds * creds, const char * hostname, Error ** errp)'/>
+<use f='codebrowser/chardev/char-socket.c' l='651' u='c' c='tcp_chr_tls_init'/>
+<doc f='codebrowser/include/io/channel-tls.h' l='83'>/**
+ * qio_channel_tls_new_client:
+ * @master: the underlying channel object
+ * @creds: the credentials to use for TLS handshake
+ * @hostname: the user specified server hostname
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Create a new TLS channel that runs the client side of
+ * a TLS session. The TLS session handshake will use the
+ * credentials provided in @creds. The @hostname parameter
+ * should provide the user specified hostname of the server
+ * and will be validated against the server&apos;s credentials
+ * (ie CommonName of the x509 certificate)
+ *
+ * After creating the channel, it is mandatory to call
+ * the qio_channel_tls_handshake() method before attempting
+ * todo any I/O on the channel.
+ *
+ * Once the handshake has completed, all I/O should be done
+ * via the new TLS channel object and not the original
+ * master channel
+ *
+ * Returns: the new TLS channel object, or NULL
+ */</doc>
+<def f='codebrowser/io/channel-tls.c' l='101' ll='141' type='QIOChannelTLS * qio_channel_tls_new_client(QIOChannel * master, QCryptoTLSCreds * creds, const char * hostname, Error ** errp)'/>
+<use f='codebrowser/migration/tls.c' l='153' u='c' c='migration_tls_channel_connect'/>
+<use f='codebrowser/nbd/client.c' l='576' u='c' c='nbd_receive_starttls'/>

@@ -1,0 +1,87 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>channel.c source code [codebrowser/migration/channel.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/channel.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='channel.c.html'>channel.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU live migration channel operations</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Red Hat, Inc. 2016</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Daniel P. Berrange &lt;berrange@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * Contributions after 2012-01-13 are licensed under the terms of the</i></td></tr>
+<tr><th id="10">10</th><td><i> * GNU GPL, version 2 or (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="channel.h.html">"channel.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="tls.h.html">"tls.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="migration.h.html">"migration.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="qemu-file-channel.h.html">"qemu-file-channel.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="trace.h.html">"trace.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/io/channel-tls.h.html">"io/channel-tls.h"</a></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><em>void</em> <dfn class="decl def" id="migration_channel_process_incoming" title='migration_channel_process_incoming' data-ref="migration_channel_process_incoming">migration_channel_process_incoming</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col1 decl" id="751ioc" title='ioc' data-type='QIOChannel *' data-ref="751ioc">ioc</dfn>)</td></tr>
+<tr><th id="23">23</th><td>{</td></tr>
+<tr><th id="24">24</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col2 decl" id="752s" title='s' data-type='MigrationState *' data-ref="752s">s</dfn> = <a class="ref" href="migration.h.html#migrate_get_current" title='migrate_get_current' data-ref="migrate_get_current">migrate_get_current</a>();</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td>    <a class="ref" href="trace.h.html#trace_migration_set_incoming_channel" title='trace_migration_set_incoming_channel' data-ref="trace_migration_set_incoming_channel">trace_migration_set_incoming_channel</a>(</td></tr>
+<tr><th id="27">27</th><td>        <a class="local col1 ref" href="#751ioc" title='ioc' data-ref="751ioc">ioc</a>, <a class="ref" href="../include/qom/object.h.html#object_get_typename" title='object_get_typename' data-ref="object_get_typename">object_get_typename</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col1 ref" href="#751ioc" title='ioc' data-ref="751ioc">ioc</a>)));</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td>    <b>if</b> (<a class="local col2 ref" href="#752s" title='s' data-ref="752s">s</a>-&gt;<a class="ref" href="migration.h.html#MigrationState::parameters" title='MigrationState::parameters' data-ref="MigrationState::parameters">parameters</a>.<a class="ref" href="../qapi-types.h.html#MigrationParameters::tls_creds" title='MigrationParameters::tls_creds' data-ref="MigrationParameters::tls_creds">tls_creds</a> &amp;&amp;</td></tr>
+<tr><th id="30">30</th><td>        *<a class="local col2 ref" href="#752s" title='s' data-ref="752s">s</a>-&gt;<a class="ref" href="migration.h.html#MigrationState::parameters" title='MigrationState::parameters' data-ref="MigrationState::parameters">parameters</a>.<a class="ref" href="../qapi-types.h.html#MigrationParameters::tls_creds" title='MigrationParameters::tls_creds' data-ref="MigrationParameters::tls_creds">tls_creds</a> &amp;&amp;</td></tr>
+<tr><th id="31">31</th><td>        !<a class="ref" href="../include/qom/object.h.html#object_dynamic_cast" title='object_dynamic_cast' data-ref="object_dynamic_cast">object_dynamic_cast</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col1 ref" href="#751ioc" title='ioc' data-ref="751ioc">ioc</a>),</td></tr>
+<tr><th id="32">32</th><td>                             <a class="macro" href="../include/io/channel-tls.h.html#28" title="&quot;qio-channel-tls&quot;" data-ref="_M/TYPE_QIO_CHANNEL_TLS">TYPE_QIO_CHANNEL_TLS</a>)) {</td></tr>
+<tr><th id="33">33</th><td>        <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col3 decl" id="753local_err" title='local_err' data-type='Error *' data-ref="753local_err">local_err</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="34">34</th><td>        <a class="ref" href="tls.h.html#migration_tls_channel_process_incoming" title='migration_tls_channel_process_incoming' data-ref="migration_tls_channel_process_incoming">migration_tls_channel_process_incoming</a>(<a class="local col2 ref" href="#752s" title='s' data-ref="752s">s</a>, <a class="local col1 ref" href="#751ioc" title='ioc' data-ref="751ioc">ioc</a>, &amp;<a class="local col3 ref" href="#753local_err" title='local_err' data-ref="753local_err">local_err</a>);</td></tr>
+<tr><th id="35">35</th><td>        <b>if</b> (<a class="local col3 ref" href="#753local_err" title='local_err' data-ref="753local_err">local_err</a>) {</td></tr>
+<tr><th id="36">36</th><td>            <a class="ref" href="../include/qapi/error.h.html#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col3 ref" href="#753local_err" title='local_err' data-ref="753local_err">local_err</a>);</td></tr>
+<tr><th id="37">37</th><td>        }</td></tr>
+<tr><th id="38">38</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="39">39</th><td>        <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col4 decl" id="754f" title='f' data-type='QEMUFile *' data-ref="754f">f</dfn> = <a class="ref" href="qemu-file-channel.h.html#qemu_fopen_channel_input" title='qemu_fopen_channel_input' data-ref="qemu_fopen_channel_input">qemu_fopen_channel_input</a>(<a class="local col1 ref" href="#751ioc" title='ioc' data-ref="751ioc">ioc</a>);</td></tr>
+<tr><th id="40">40</th><td>        <a class="ref" href="migration.h.html#migration_fd_process_incoming" title='migration_fd_process_incoming' data-ref="migration_fd_process_incoming">migration_fd_process_incoming</a>(<a class="local col4 ref" href="#754f" title='f' data-ref="754f">f</a>);</td></tr>
+<tr><th id="41">41</th><td>    }</td></tr>
+<tr><th id="42">42</th><td>}</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><em>void</em> <dfn class="decl def" id="migration_channel_connect" title='migration_channel_connect' data-ref="migration_channel_connect">migration_channel_connect</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col5 decl" id="755s" title='s' data-type='MigrationState *' data-ref="755s">s</dfn>,</td></tr>
+<tr><th id="46">46</th><td>                               <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col6 decl" id="756ioc" title='ioc' data-type='QIOChannel *' data-ref="756ioc">ioc</dfn>,</td></tr>
+<tr><th id="47">47</th><td>                               <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="757hostname" title='hostname' data-type='const char *' data-ref="757hostname">hostname</dfn>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <a class="ref" href="trace.h.html#trace_migration_set_outgoing_channel" title='trace_migration_set_outgoing_channel' data-ref="trace_migration_set_outgoing_channel">trace_migration_set_outgoing_channel</a>(</td></tr>
+<tr><th id="50">50</th><td>        <a class="local col6 ref" href="#756ioc" title='ioc' data-ref="756ioc">ioc</a>, <a class="ref" href="../include/qom/object.h.html#object_get_typename" title='object_get_typename' data-ref="object_get_typename">object_get_typename</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col6 ref" href="#756ioc" title='ioc' data-ref="756ioc">ioc</a>)), <a class="local col7 ref" href="#757hostname" title='hostname' data-ref="757hostname">hostname</a>);</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <b>if</b> (<a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>-&gt;<a class="ref" href="migration.h.html#MigrationState::parameters" title='MigrationState::parameters' data-ref="MigrationState::parameters">parameters</a>.<a class="ref" href="../qapi-types.h.html#MigrationParameters::tls_creds" title='MigrationParameters::tls_creds' data-ref="MigrationParameters::tls_creds">tls_creds</a> &amp;&amp;</td></tr>
+<tr><th id="53">53</th><td>        *<a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>-&gt;<a class="ref" href="migration.h.html#MigrationState::parameters" title='MigrationState::parameters' data-ref="MigrationState::parameters">parameters</a>.<a class="ref" href="../qapi-types.h.html#MigrationParameters::tls_creds" title='MigrationParameters::tls_creds' data-ref="MigrationParameters::tls_creds">tls_creds</a> &amp;&amp;</td></tr>
+<tr><th id="54">54</th><td>        !<a class="ref" href="../include/qom/object.h.html#object_dynamic_cast" title='object_dynamic_cast' data-ref="object_dynamic_cast">object_dynamic_cast</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col6 ref" href="#756ioc" title='ioc' data-ref="756ioc">ioc</a>),</td></tr>
+<tr><th id="55">55</th><td>                             <a class="macro" href="../include/io/channel-tls.h.html#28" title="&quot;qio-channel-tls&quot;" data-ref="_M/TYPE_QIO_CHANNEL_TLS">TYPE_QIO_CHANNEL_TLS</a>)) {</td></tr>
+<tr><th id="56">56</th><td>        <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col8 decl" id="758local_err" title='local_err' data-type='Error *' data-ref="758local_err">local_err</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="57">57</th><td>        <a class="ref" href="tls.h.html#migration_tls_channel_connect" title='migration_tls_channel_connect' data-ref="migration_tls_channel_connect">migration_tls_channel_connect</a>(<a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>, <a class="local col6 ref" href="#756ioc" title='ioc' data-ref="756ioc">ioc</a>, <a class="local col7 ref" href="#757hostname" title='hostname' data-ref="757hostname">hostname</a>, &amp;<a class="local col8 ref" href="#758local_err" title='local_err' data-ref="758local_err">local_err</a>);</td></tr>
+<tr><th id="58">58</th><td>        <b>if</b> (<a class="local col8 ref" href="#758local_err" title='local_err' data-ref="758local_err">local_err</a>) {</td></tr>
+<tr><th id="59">59</th><td>            <a class="ref" href="migration.h.html#migrate_fd_error" title='migrate_fd_error' data-ref="migrate_fd_error">migrate_fd_error</a>(<a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>, <a class="local col8 ref" href="#758local_err" title='local_err' data-ref="758local_err">local_err</a>);</td></tr>
+<tr><th id="60">60</th><td>            <a class="ref" href="../include/qapi/error.h.html#error_free" title='error_free' data-ref="error_free">error_free</a>(<a class="local col8 ref" href="#758local_err" title='local_err' data-ref="758local_err">local_err</a>);</td></tr>
+<tr><th id="61">61</th><td>        }</td></tr>
+<tr><th id="62">62</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="63">63</th><td>        <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col9 decl" id="759f" title='f' data-type='QEMUFile *' data-ref="759f">f</dfn> = <a class="ref" href="qemu-file-channel.h.html#qemu_fopen_channel_output" title='qemu_fopen_channel_output' data-ref="qemu_fopen_channel_output">qemu_fopen_channel_output</a>(<a class="local col6 ref" href="#756ioc" title='ioc' data-ref="756ioc">ioc</a>);</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>        <a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>-&gt;<a class="ref" href="migration.h.html#MigrationState::to_dst_file" title='MigrationState::to_dst_file' data-ref="MigrationState::to_dst_file">to_dst_file</a> = <a class="local col9 ref" href="#759f" title='f' data-ref="759f">f</a>;</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>        <a class="ref" href="migration.h.html#migrate_fd_connect" title='migrate_fd_connect' data-ref="migrate_fd_connect">migrate_fd_connect</a>(<a class="local col5 ref" href="#755s" title='s' data-ref="755s">s</a>);</td></tr>
+<tr><th id="68">68</th><td>    }</td></tr>
+<tr><th id="69">69</th><td>}</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

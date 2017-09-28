@@ -1,0 +1,388 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>blockjob.h source code [codebrowser/include/block/blockjob.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="BlockJob,BlockJobCreateFlags "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/block/blockjob.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>block</a>/<a href='blockjob.h.html'>blockjob.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Declarations for long-running block device operations</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2011 IBM Corp.</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2012 Red Hat, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="8">8</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="9">9</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="10">10</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="11">11</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="12">12</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="15">15</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="18">18</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="19">19</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="21">21</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="22">22</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="23">23</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i> */</i></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#<span data-ppcond="26">ifndef</span> <span class="macro" data-ref="_M/BLOCKJOB_H">BLOCKJOB_H</span></u></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/BLOCKJOB_H" data-ref="_M/BLOCKJOB_H">BLOCKJOB_H</dfn></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="block.h.html">"block/block.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="BlockJobDriver" title='BlockJobDriver' data-ref="BlockJobDriver"><a class="type" href="#BlockJobDriver" title='BlockJobDriver' data-ref="BlockJobDriver">BlockJobDriver</a></dfn> <dfn class="typedef" id="BlockJobDriver" title='BlockJobDriver' data-type='struct BlockJobDriver' data-ref="BlockJobDriver">BlockJobDriver</dfn>;</td></tr>
+<tr><th id="32">32</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="BlockJobTxn" title='BlockJobTxn' data-ref="BlockJobTxn"><a class="type" href="#BlockJobTxn" title='BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</a></dfn> <dfn class="typedef" id="BlockJobTxn" title='BlockJobTxn' data-type='struct BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</dfn>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * BlockJob:</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * Long-running operation on a BlockDriverState.</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="39">39</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="BlockJob" title='BlockJob' data-ref="BlockJob"><a class="type" href="#BlockJob" title='BlockJob' data-ref="BlockJob">BlockJob</a></dfn> {</td></tr>
+<tr><th id="40">40</th><td>    <i class="doc">/** The job type, including the job vtable.  */</i></td></tr>
+<tr><th id="41">41</th><td>    <em>const</em> <a class="typedef" href="#BlockJobDriver" title='BlockJobDriver' data-type='struct BlockJobDriver' data-ref="BlockJobDriver">BlockJobDriver</a> *<dfn class="decl" id="BlockJob::driver" title='BlockJob::driver' data-ref="BlockJob::driver">driver</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td>    <i class="doc">/** The block device on which the job is operating.  */</i></td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="decl" id="BlockJob::blk" title='BlockJob::blk' data-ref="BlockJob::blk">blk</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc">     * The ID of the block job. May be NULL for internal jobs.</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="49">49</th><td>    <em>char</em> *<dfn class="decl" id="BlockJob::id" title='BlockJob::id' data-ref="BlockJob::id">id</dfn>;</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc">     * The coroutine that executes the job.  If not NULL, it is</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc">     * reentered when busy is false and the job is cancelled.</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="decl" id="BlockJob::co" title='BlockJob::co' data-ref="BlockJob::co">co</dfn>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc">     * Set to true if the job should cancel itself.  The flag must</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc">     * always be tested just before toggling the busy flag from false</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc">     * to true.  After a job has been cancelled, it should only yield</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc">     * if #aio_poll will ("sooner or later") reenter the coroutine.</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="63">63</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::cancelled" title='BlockJob::cancelled' data-ref="BlockJob::cancelled">cancelled</dfn>;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc">     * Counter for pause request. If non-zero, the block job is either paused,</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc">     * or if busy == true will pause itself as soon as possible.</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="69">69</th><td>    <em>int</em> <dfn class="decl" id="BlockJob::pause_count" title='BlockJob::pause_count' data-ref="BlockJob::pause_count">pause_count</dfn>;</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc">     * Set to true if the job is paused by user.  Can be unpaused with the</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc">     * block-job-resume QMP command.</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="75">75</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::user_paused" title='BlockJob::user_paused' data-ref="BlockJob::user_paused">user_paused</dfn>;</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc">     * Set to false by the job while the coroutine has yielded and may be</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc">     * re-entered by block_job_enter().  There may still be I/O or event loop</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc">     * activity pending.</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="82">82</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::busy" title='BlockJob::busy' data-ref="BlockJob::busy">busy</dfn>;</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc">     * Set to true by the job while it is in a quiescent state, where</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc">     * no I/O or event loop activity is pending.</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="88">88</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::paused" title='BlockJob::paused' data-ref="BlockJob::paused">paused</dfn>;</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc">     * Set to true when the job is ready to be completed.</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="93">93</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::ready" title='BlockJob::ready' data-ref="BlockJob::ready">ready</dfn>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <i class="doc">/**</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc">     * Set to true when the job has deferred work to the main loop.</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc">     */</i></td></tr>
+<tr><th id="98">98</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::deferred_to_main_loop" title='BlockJob::deferred_to_main_loop' data-ref="BlockJob::deferred_to_main_loop">deferred_to_main_loop</dfn>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <i class="doc">/** Element of the list of block jobs */</i></td></tr>
+<tr><th id="101">101</th><td>    <a class="macro" href="../qemu/queue.h.html#94" title="struct { struct BlockJob *le_next; struct BlockJob **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#BlockJob" title='BlockJob' data-ref="BlockJob">BlockJob</a>) <dfn class="decl" id="BlockJob::job_list" title='BlockJob::job_list' data-ref="BlockJob::job_list">job_list</dfn>;</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>    <i class="doc">/** Status that is published by the query-block-jobs QMP API */</i></td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../../qapi-types.h.html#BlockDeviceIoStatus" title='BlockDeviceIoStatus' data-type='enum BlockDeviceIoStatus' data-ref="BlockDeviceIoStatus">BlockDeviceIoStatus</a> <dfn class="decl" id="BlockJob::iostatus" title='BlockJob::iostatus' data-ref="BlockJob::iostatus">iostatus</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <i class="doc">/** Offset that is published by the query-block-jobs QMP API */</i></td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="BlockJob::offset" title='BlockJob::offset' data-ref="BlockJob::offset">offset</dfn>;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <i class="doc">/** Length that is published by the query-block-jobs QMP API */</i></td></tr>
+<tr><th id="110">110</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="BlockJob::len" title='BlockJob::len' data-ref="BlockJob::len">len</dfn>;</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <i class="doc">/** Speed that was set with<span class="command"> @block</span>_job_set_speed.  */</i></td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="BlockJob::speed" title='BlockJob::speed' data-ref="BlockJob::speed">speed</dfn>;</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <i class="doc">/** The completion function that will be called when the job completes.  */</i></td></tr>
+<tr><th id="116">116</th><td>    <a class="typedef" href="aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *<dfn class="decl" id="BlockJob::cb" title='BlockJob::cb' data-ref="BlockJob::cb">cb</dfn>;</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>    <i class="doc">/** Block other operations when block job is running */</i></td></tr>
+<tr><th id="119">119</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="BlockJob::blocker" title='BlockJob::blocker' data-ref="BlockJob::blocker">blocker</dfn>;</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>    <i class="doc">/** BlockDriverStates that are involved in this block job */</i></td></tr>
+<tr><th id="122">122</th><td>    <a class="typedef" href="../../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> *<dfn class="decl" id="BlockJob::nodes" title='BlockJob::nodes' data-ref="BlockJob::nodes">nodes</dfn>;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <i class="doc">/** The opaque value that is passed to the completion function.  */</i></td></tr>
+<tr><th id="125">125</th><td>    <em>void</em> *<dfn class="decl" id="BlockJob::opaque" title='BlockJob::opaque' data-ref="BlockJob::opaque">opaque</dfn>;</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>    <i class="doc">/** Reference count of the block job */</i></td></tr>
+<tr><th id="128">128</th><td>    <em>int</em> <dfn class="decl" id="BlockJob::refcnt" title='BlockJob::refcnt' data-ref="BlockJob::refcnt">refcnt</dfn>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>    <i>/* True if this job has reported completion by calling block_job_completed.</i></td></tr>
+<tr><th id="131">131</th><td><i>     */</i></td></tr>
+<tr><th id="132">132</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="BlockJob::completed" title='BlockJob::completed' data-ref="BlockJob::completed">completed</dfn>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <i>/* ret code passed to block_job_completed.</i></td></tr>
+<tr><th id="135">135</th><td><i>     */</i></td></tr>
+<tr><th id="136">136</th><td>    <em>int</em> <dfn class="decl" id="BlockJob::ret" title='BlockJob::ret' data-ref="BlockJob::ret">ret</dfn>;</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    <i class="doc">/** Non-NULL if this job is part of a transaction */</i></td></tr>
+<tr><th id="139">139</th><td>    <a class="typedef" href="#BlockJobTxn" title='BlockJobTxn' data-type='struct BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</a> *<dfn class="decl" id="BlockJob::txn" title='BlockJob::txn' data-ref="BlockJob::txn">txn</dfn>;</td></tr>
+<tr><th id="140">140</th><td>    <a class="macro" href="../qemu/queue.h.html#94" title="struct { struct BlockJob *le_next; struct BlockJob **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#BlockJob" title='BlockJob' data-ref="BlockJob">BlockJob</a>) <dfn class="decl" id="BlockJob::txn_list" title='BlockJob::txn_list' data-ref="BlockJob::txn_list">txn_list</dfn>;</td></tr>
+<tr><th id="141">141</th><td>} <dfn class="typedef" id="BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</dfn>;</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="BlockJobCreateFlags" title='BlockJobCreateFlags' data-ref="BlockJobCreateFlags"><a class="type" href="#BlockJobCreateFlags" title='BlockJobCreateFlags' data-ref="BlockJobCreateFlags">BlockJobCreateFlags</a></dfn> {</td></tr>
+<tr><th id="144">144</th><td>    <dfn class="enum" id="BlockJobCreateFlags::BLOCK_JOB_DEFAULT" title='BlockJobCreateFlags::BLOCK_JOB_DEFAULT' data-ref="BlockJobCreateFlags::BLOCK_JOB_DEFAULT">BLOCK_JOB_DEFAULT</dfn> = <var>0x00</var>,</td></tr>
+<tr><th id="145">145</th><td>    <dfn class="enum" id="BlockJobCreateFlags::BLOCK_JOB_INTERNAL" title='BlockJobCreateFlags::BLOCK_JOB_INTERNAL' data-ref="BlockJobCreateFlags::BLOCK_JOB_INTERNAL">BLOCK_JOB_INTERNAL</dfn> = <var>0x01</var>,</td></tr>
+<tr><th id="146">146</th><td>} <dfn class="typedef" id="BlockJobCreateFlags" title='BlockJobCreateFlags' data-type='enum BlockJobCreateFlags' data-ref="BlockJobCreateFlags">BlockJobCreateFlags</dfn>;</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * block_job_next:</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @job</span>: A block job, or %NULL.</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> * Get the next element from the list of block jobs after<span class="command"> @job</span>, or the</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * first one if<span class="command"> @job</span> is %NULL.</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * Returns the requested job, or %NULL if there are no more jobs left.</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="157">157</th><td><a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="decl" id="block_job_next" title='block_job_next' data-ref="block_job_next">block_job_next</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col7 decl" id="7697job" title='job' data-type='BlockJob *' data-ref="7697job">job</dfn>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> * block_job_get:</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> *<span class="command"> @id</span>: The id of the block job.</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> * Get the block job identified by<span class="command"> @id</span> (which must not be %NULL).</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * Returns the requested job, or %NULL if it doesn't exist.</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="167">167</th><td><a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="decl" id="block_job_get" title='block_job_get' data-ref="block_job_get">block_job_get</dfn>(<em>const</em> <em>char</em> *<dfn class="local col8 decl" id="7698id" title='id' data-type='const char *' data-ref="7698id">id</dfn>);</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> * block_job_add_bdrv:</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> *<span class="command"> @job</span>: A block job</i></td></tr>
+<tr><th id="172">172</th><td><i class="doc"> * <span class="command">@name</span>:<span class="verb"> The name to assign to the new BdrvChild</span></i></td></tr>
+<tr><th id="173">173</th><td><i class="doc"> *<span class="command"> @bs</span><span class="arg">:</span> A BlockDriverState that is involved in<span class="command"> @job</span></i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> *<span class="command"> @perm</span>,<span class="command"> @shared</span>_perm: Permissions to request on the node</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> * Add<span class="command"> @bs</span> <span class="arg">to</span> the list of BlockDriverState that are involved in</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> *<span class="command"> @job</span>. This means that all operations will be blocked on<span class="command"> @bs</span> <span class="arg">while</span></i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> *<span class="command"> @job</span> exists.</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="180">180</th><td><em>int</em> <dfn class="decl" id="block_job_add_bdrv" title='block_job_add_bdrv' data-ref="block_job_add_bdrv">block_job_add_bdrv</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col9 decl" id="7699job" title='job' data-type='BlockJob *' data-ref="7699job">job</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="7700name" title='name' data-type='const char *' data-ref="7700name">name</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#BlockDriverState" title='BlockDriverState' data-type='struct BlockDriverState' data-ref="BlockDriverState">BlockDriverState</a> *<dfn class="local col1 decl" id="7701bs" title='bs' data-type='BlockDriverState *' data-ref="7701bs">bs</dfn>,</td></tr>
+<tr><th id="181">181</th><td>                       <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="7702perm" title='perm' data-type='uint64_t' data-ref="7702perm">perm</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="7703shared_perm" title='shared_perm' data-type='uint64_t' data-ref="7703shared_perm">shared_perm</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="7704errp" title='errp' data-type='Error **' data-ref="7704errp">errp</dfn>);</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * block_job_remove_all_bdrv:</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> *<span class="command"> @job</span>: The block job</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> * Remove all BlockDriverStates from the list of nodes that are involved in the</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> * job. This removes the blockers added with block_job_add_bdrv().</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="190">190</th><td><em>void</em> <dfn class="decl" id="block_job_remove_all_bdrv" title='block_job_remove_all_bdrv' data-ref="block_job_remove_all_bdrv">block_job_remove_all_bdrv</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col5 decl" id="7705job" title='job' data-type='BlockJob *' data-ref="7705job">job</dfn>);</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> * block_job_set_speed:</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> *<span class="command"> @job</span>: The job to set the speed for.</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> *<span class="command"> @speed</span>: The new value</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> *<span class="command"> @errp</span>: Error object.</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> * Set a rate-limiting parameter for the job; the actual meaning may</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> * vary depending on the job type.</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="201">201</th><td><em>void</em> <dfn class="decl" id="block_job_set_speed" title='block_job_set_speed' data-ref="block_job_set_speed">block_job_set_speed</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col6 decl" id="7706job" title='job' data-type='BlockJob *' data-ref="7706job">job</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col7 decl" id="7707speed" title='speed' data-type='int64_t' data-ref="7707speed">speed</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="7708errp" title='errp' data-type='Error **' data-ref="7708errp">errp</dfn>);</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> * block_job_start:</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> *<span class="command"> @job</span>: A job that has not yet been started.</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> * Begins execution of a block job.</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> * Takes ownership of one reference to the job object.</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="210">210</th><td><em>void</em> <dfn class="decl" id="block_job_start" title='block_job_start' data-ref="block_job_start">block_job_start</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col9 decl" id="7709job" title='job' data-type='BlockJob *' data-ref="7709job">job</dfn>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> * block_job_cancel:</i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be canceled.</i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> * Asynchronously cancel the specified job.</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="218">218</th><td><em>void</em> <dfn class="decl" id="block_job_cancel" title='block_job_cancel' data-ref="block_job_cancel">block_job_cancel</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col0 decl" id="7710job" title='job' data-type='BlockJob *' data-ref="7710job">job</dfn>);</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="221">221</th><td><i class="doc"> * block_job_complete:</i></td></tr>
+<tr><th id="222">222</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be completed.</i></td></tr>
+<tr><th id="223">223</th><td><i class="doc"> *<span class="command"> @errp</span>: Error object.</i></td></tr>
+<tr><th id="224">224</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> * Asynchronously complete the specified job.</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="227">227</th><td><em>void</em> <dfn class="decl" id="block_job_complete" title='block_job_complete' data-ref="block_job_complete">block_job_complete</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col1 decl" id="7711job" title='job' data-type='BlockJob *' data-ref="7711job">job</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="7712errp" title='errp' data-type='Error **' data-ref="7712errp">errp</dfn>);</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="230">230</th><td><i class="doc"> * block_job_query:</i></td></tr>
+<tr><th id="231">231</th><td><i class="doc"> *<span class="command"> @job</span>: The job to get information about.</i></td></tr>
+<tr><th id="232">232</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="233">233</th><td><i class="doc"> * Return information about a job.</i></td></tr>
+<tr><th id="234">234</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="235">235</th><td><a class="typedef" href="../../qapi-types.h.html#BlockJobInfo" title='BlockJobInfo' data-type='struct BlockJobInfo' data-ref="BlockJobInfo">BlockJobInfo</a> *<dfn class="decl" id="block_job_query" title='block_job_query' data-ref="block_job_query">block_job_query</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col3 decl" id="7713job" title='job' data-type='BlockJob *' data-ref="7713job">job</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="7714errp" title='errp' data-type='Error **' data-ref="7714errp">errp</dfn>);</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> * block_job_user_pause:</i></td></tr>
+<tr><th id="239">239</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be paused.</i></td></tr>
+<tr><th id="240">240</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="241">241</th><td><i class="doc"> * Asynchronously pause the specified job.</i></td></tr>
+<tr><th id="242">242</th><td><i class="doc"> * Do not allow a resume until a matching call to block_job_user_resume.</i></td></tr>
+<tr><th id="243">243</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="244">244</th><td><em>void</em> <dfn class="decl" id="block_job_user_pause" title='block_job_user_pause' data-ref="block_job_user_pause">block_job_user_pause</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col5 decl" id="7715job" title='job' data-type='BlockJob *' data-ref="7715job">job</dfn>);</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="247">247</th><td><i class="doc"> * block_job_paused:</i></td></tr>
+<tr><th id="248">248</th><td><i class="doc"> *<span class="command"> @job</span>: The job to query.</i></td></tr>
+<tr><th id="249">249</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc"> * Returns true if the job is user-paused.</i></td></tr>
+<tr><th id="251">251</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="252">252</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="block_job_user_paused" title='block_job_user_paused' data-ref="block_job_user_paused">block_job_user_paused</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col6 decl" id="7716job" title='job' data-type='BlockJob *' data-ref="7716job">job</dfn>);</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="255">255</th><td><i class="doc"> * block_job_user_resume:</i></td></tr>
+<tr><th id="256">256</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be resumed.</i></td></tr>
+<tr><th id="257">257</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="258">258</th><td><i class="doc"> * Resume the specified job.</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc"> * Must be paired with a preceding block_job_user_pause.</i></td></tr>
+<tr><th id="260">260</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="261">261</th><td><em>void</em> <dfn class="decl" id="block_job_user_resume" title='block_job_user_resume' data-ref="block_job_user_resume">block_job_user_resume</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col7 decl" id="7717job" title='job' data-type='BlockJob *' data-ref="7717job">job</dfn>);</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> * block_job_cancel_sync:</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be canceled.</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> * Synchronously cancel the job.  The completion callback is called</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> * before the function returns.  The job may actually complete</i></td></tr>
+<tr><th id="269">269</th><td><i class="doc"> * instead of canceling itself; the circumstances under which this</i></td></tr>
+<tr><th id="270">270</th><td><i class="doc"> * happens depend on the kind of job that is active.</i></td></tr>
+<tr><th id="271">271</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="272">272</th><td><i class="doc"> * Returns the return value from the job if the job actually completed</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> * during the call, or -ECANCELED if it was canceled.</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="275">275</th><td><em>int</em> <dfn class="decl" id="block_job_cancel_sync" title='block_job_cancel_sync' data-ref="block_job_cancel_sync">block_job_cancel_sync</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col8 decl" id="7718job" title='job' data-type='BlockJob *' data-ref="7718job">job</dfn>);</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="278">278</th><td><i class="doc"> * block_job_cancel_sync_all:</i></td></tr>
+<tr><th id="279">279</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="280">280</th><td><i class="doc"> * Synchronously cancels all jobs using block_job_cancel_sync().</i></td></tr>
+<tr><th id="281">281</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="282">282</th><td><em>void</em> <dfn class="decl" id="block_job_cancel_sync_all" title='block_job_cancel_sync_all' data-ref="block_job_cancel_sync_all">block_job_cancel_sync_all</dfn>(<em>void</em>);</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="285">285</th><td><i class="doc"> * block_job_complete_sync:</i></td></tr>
+<tr><th id="286">286</th><td><i class="doc"> *<span class="command"> @job</span>: The job to be completed.</i></td></tr>
+<tr><th id="287">287</th><td><i class="doc"> *<span class="command"> @errp</span>: Error object which may be set by block_job_complete(); this is not</i></td></tr>
+<tr><th id="288">288</th><td><i class="doc"> *        necessarily set on every error, the job return value has to be</i></td></tr>
+<tr><th id="289">289</th><td><i class="doc"> *        checked as well.</i></td></tr>
+<tr><th id="290">290</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="291">291</th><td><i class="doc"> * Synchronously complete the job.  The completion callback is called before the</i></td></tr>
+<tr><th id="292">292</th><td><i class="doc"> * function returns, unless it is NULL (which is permissible when using this</i></td></tr>
+<tr><th id="293">293</th><td><i class="doc"> * function).</i></td></tr>
+<tr><th id="294">294</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="295">295</th><td><i class="doc"> * Returns the return value from the job.</i></td></tr>
+<tr><th id="296">296</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="297">297</th><td><em>int</em> <dfn class="decl" id="block_job_complete_sync" title='block_job_complete_sync' data-ref="block_job_complete_sync">block_job_complete_sync</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col9 decl" id="7719job" title='job' data-type='BlockJob *' data-ref="7719job">job</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="7720errp" title='errp' data-type='Error **' data-ref="7720errp">errp</dfn>);</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="300">300</th><td><i class="doc"> * block_job_iostatus_reset:</i></td></tr>
+<tr><th id="301">301</th><td><i class="doc"> *<span class="command"> @job</span>: The job whose I/O status should be reset.</i></td></tr>
+<tr><th id="302">302</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="303">303</th><td><i class="doc"> * Reset I/O status on<span class="command"> @job</span> and on BlockDriverState objects it uses,</i></td></tr>
+<tr><th id="304">304</th><td><i class="doc"> * other than job-&gt;blk.</i></td></tr>
+<tr><th id="305">305</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="306">306</th><td><em>void</em> <dfn class="decl" id="block_job_iostatus_reset" title='block_job_iostatus_reset' data-ref="block_job_iostatus_reset">block_job_iostatus_reset</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col1 decl" id="7721job" title='job' data-type='BlockJob *' data-ref="7721job">job</dfn>);</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="309">309</th><td><i class="doc"> * block_job_txn_new:</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="311">311</th><td><i class="doc"> * Allocate and return a new block job transaction.  Jobs can be added to the</i></td></tr>
+<tr><th id="312">312</th><td><i class="doc"> * transaction using block_job_txn_add_job().</i></td></tr>
+<tr><th id="313">313</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="314">314</th><td><i class="doc"> * The transaction is automatically freed when the last job completes or is</i></td></tr>
+<tr><th id="315">315</th><td><i class="doc"> * cancelled.</i></td></tr>
+<tr><th id="316">316</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="317">317</th><td><i class="doc"> * All jobs in the transaction either complete successfully or fail/cancel as a</i></td></tr>
+<tr><th id="318">318</th><td><i class="doc"> * group.  Jobs wait for each other before completing.  Cancelling one job</i></td></tr>
+<tr><th id="319">319</th><td><i class="doc"> * cancels all jobs in the transaction.</i></td></tr>
+<tr><th id="320">320</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="321">321</th><td><a class="typedef" href="#BlockJobTxn" title='BlockJobTxn' data-type='struct BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</a> *<dfn class="decl" id="block_job_txn_new" title='block_job_txn_new' data-ref="block_job_txn_new">block_job_txn_new</dfn>(<em>void</em>);</td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="324">324</th><td><i class="doc"> * block_job_ref:</i></td></tr>
+<tr><th id="325">325</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="326">326</th><td><i class="doc"> * Add a reference to BlockJob refcnt, it will be decreased with</i></td></tr>
+<tr><th id="327">327</th><td><i class="doc"> * block_job_unref, and then be freed if it comes to be the last</i></td></tr>
+<tr><th id="328">328</th><td><i class="doc"> * reference.</i></td></tr>
+<tr><th id="329">329</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="330">330</th><td><em>void</em> <dfn class="decl" id="block_job_ref" title='block_job_ref' data-ref="block_job_ref">block_job_ref</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col2 decl" id="7722job" title='job' data-type='BlockJob *' data-ref="7722job">job</dfn>);</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="333">333</th><td><i class="doc"> * block_job_unref:</i></td></tr>
+<tr><th id="334">334</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="335">335</th><td><i class="doc"> * Release a reference that was previously acquired with block_job_ref</i></td></tr>
+<tr><th id="336">336</th><td><i class="doc"> * or block_job_create. If it's the last reference to the object, it will be</i></td></tr>
+<tr><th id="337">337</th><td><i class="doc"> * freed.</i></td></tr>
+<tr><th id="338">338</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="339">339</th><td><em>void</em> <dfn class="decl" id="block_job_unref" title='block_job_unref' data-ref="block_job_unref">block_job_unref</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col3 decl" id="7723job" title='job' data-type='BlockJob *' data-ref="7723job">job</dfn>);</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="342">342</th><td><i class="doc"> * block_job_txn_unref:</i></td></tr>
+<tr><th id="343">343</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="344">344</th><td><i class="doc"> * Release a reference that was previously acquired with block_job_txn_add_job</i></td></tr>
+<tr><th id="345">345</th><td><i class="doc"> * or block_job_txn_new. If it's the last reference to the object, it will be</i></td></tr>
+<tr><th id="346">346</th><td><i class="doc"> * freed.</i></td></tr>
+<tr><th id="347">347</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="348">348</th><td><em>void</em> <dfn class="decl" id="block_job_txn_unref" title='block_job_txn_unref' data-ref="block_job_txn_unref">block_job_txn_unref</dfn>(<a class="typedef" href="#BlockJobTxn" title='BlockJobTxn' data-type='struct BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</a> *<dfn class="local col4 decl" id="7724txn" title='txn' data-type='BlockJobTxn *' data-ref="7724txn">txn</dfn>);</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="351">351</th><td><i class="doc"> * block_job_txn_add_job:</i></td></tr>
+<tr><th id="352">352</th><td><i class="doc"> *<span class="command"> @txn</span>: The transaction (may be NULL)</i></td></tr>
+<tr><th id="353">353</th><td><i class="doc"> *<span class="command"> @job</span>: Job to add to the transaction</i></td></tr>
+<tr><th id="354">354</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="355">355</th><td><i class="doc"> * Add<span class="command"> @job</span> to the transaction.  The<span class="command"> @job</span> must not already be in a transaction.</i></td></tr>
+<tr><th id="356">356</th><td><i class="doc"> * The caller must call either block_job_txn_unref() or block_job_completed()</i></td></tr>
+<tr><th id="357">357</th><td><i class="doc"> * to release the reference that is automatically grabbed here.</i></td></tr>
+<tr><th id="358">358</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="359">359</th><td><em>void</em> <dfn class="decl" id="block_job_txn_add_job" title='block_job_txn_add_job' data-ref="block_job_txn_add_job">block_job_txn_add_job</dfn>(<a class="typedef" href="#BlockJobTxn" title='BlockJobTxn' data-type='struct BlockJobTxn' data-ref="BlockJobTxn">BlockJobTxn</a> *<dfn class="local col5 decl" id="7725txn" title='txn' data-type='BlockJobTxn *' data-ref="7725txn">txn</dfn>, <a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col6 decl" id="7726job" title='job' data-type='BlockJob *' data-ref="7726job">job</dfn>);</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="362">362</th><td><i class="doc"> * block_job_is_internal:</i></td></tr>
+<tr><th id="363">363</th><td><i class="doc"> *<span class="command"> @job</span>: The job to determine if it is user-visible or not.</i></td></tr>
+<tr><th id="364">364</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="365">365</th><td><i class="doc"> * Returns true if the job should not be visible to the management layer.</i></td></tr>
+<tr><th id="366">366</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="367">367</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="block_job_is_internal" title='block_job_is_internal' data-ref="block_job_is_internal">block_job_is_internal</dfn>(<a class="typedef" href="#BlockJob" title='BlockJob' data-type='struct BlockJob' data-ref="BlockJob">BlockJob</a> *<dfn class="local col7 decl" id="7727job" title='job' data-type='BlockJob *' data-ref="7727job">job</dfn>);</td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td><u>#<span data-ppcond="26">endif</span></u></td></tr>
+<tr><th id="370">370</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

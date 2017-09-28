@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>checksum.c source code [codebrowser/net/checksum.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/net/checksum.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>net</a>/<a href='checksum.c.html'>checksum.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  IP checksumming functions.</i></td></tr>
+<tr><th id="3">3</th><td><i> *  (c) 2008 Gerd Hoffmann &lt;kraxel@redhat.com&gt;</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> *  This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="6">6</th><td><i> *  it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="7">7</th><td><i> *  the Free Software Foundation; under version 2 or later of the License.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> *  This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="10">10</th><td><i> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="11">11</th><td><i> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="12">12</th><td><i> *  GNU General Public License for more details.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> *  You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="15">15</th><td><i> *  along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/net/checksum.h.html">"net/checksum.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/net/eth.h.html">"net/eth.h"</a></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="net_checksum_add_cont" title='net_checksum_add_cont' data-ref="net_checksum_add_cont">net_checksum_add_cont</dfn>(<em>int</em> <dfn class="local col1 decl" id="1len" title='len' data-type='int' data-ref="1len">len</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="2buf" title='buf' data-type='uint8_t *' data-ref="2buf">buf</dfn>, <em>int</em> <dfn class="local col3 decl" id="3seq" title='seq' data-type='int' data-ref="3seq">seq</dfn>)</td></tr>
+<tr><th id="24">24</th><td>{</td></tr>
+<tr><th id="25">25</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="4sum1" title='sum1' data-type='uint32_t' data-ref="4sum1">sum1</dfn> = <var>0</var>, <dfn class="local col5 decl" id="5sum2" title='sum2' data-type='uint32_t' data-ref="5sum2">sum2</dfn> = <var>0</var>;</td></tr>
+<tr><th id="26">26</th><td>    <em>int</em> <dfn class="local col6 decl" id="6i" title='i' data-type='int' data-ref="6i">i</dfn>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td>    <b>for</b> (<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> = <var>0</var>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> &lt; <a class="local col1 ref" href="#1len" title='len' data-ref="1len">len</a> - <var>1</var>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> += <var>2</var>) {</td></tr>
+<tr><th id="29">29</th><td>        <a class="local col4 ref" href="#4sum1" title='sum1' data-ref="4sum1">sum1</a> += (<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)<a class="local col2 ref" href="#2buf" title='buf' data-ref="2buf">buf</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>];</td></tr>
+<tr><th id="30">30</th><td>        <a class="local col5 ref" href="#5sum2" title='sum2' data-ref="5sum2">sum2</a> += (<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)<a class="local col2 ref" href="#2buf" title='buf' data-ref="2buf">buf</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> + <var>1</var>];</td></tr>
+<tr><th id="31">31</th><td>    }</td></tr>
+<tr><th id="32">32</th><td>    <b>if</b> (<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> &lt; <a class="local col1 ref" href="#1len" title='len' data-ref="1len">len</a>) {</td></tr>
+<tr><th id="33">33</th><td>        <a class="local col4 ref" href="#4sum1" title='sum1' data-ref="4sum1">sum1</a> += (<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>)<a class="local col2 ref" href="#2buf" title='buf' data-ref="2buf">buf</a>[<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>];</td></tr>
+<tr><th id="34">34</th><td>    }</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>    <b>if</b> (<a class="local col3 ref" href="#3seq" title='seq' data-ref="3seq">seq</a> &amp; <var>1</var>) {</td></tr>
+<tr><th id="37">37</th><td>        <b>return</b> <a class="local col4 ref" href="#4sum1" title='sum1' data-ref="4sum1">sum1</a> + (<a class="local col5 ref" href="#5sum2" title='sum2' data-ref="5sum2">sum2</a> &lt;&lt; <var>8</var>);</td></tr>
+<tr><th id="38">38</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="39">39</th><td>        <b>return</b> <a class="local col5 ref" href="#5sum2" title='sum2' data-ref="5sum2">sum2</a> + (<a class="local col4 ref" href="#4sum1" title='sum1' data-ref="4sum1">sum1</a> &lt;&lt; <var>8</var>);</td></tr>
+<tr><th id="40">40</th><td>    }</td></tr>
+<tr><th id="41">41</th><td>}</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl def" id="net_checksum_finish" title='net_checksum_finish' data-ref="net_checksum_finish">net_checksum_finish</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="7sum" title='sum' data-type='uint32_t' data-ref="7sum">sum</dfn>)</td></tr>
+<tr><th id="44">44</th><td>{</td></tr>
+<tr><th id="45">45</th><td>    <b>while</b> (<a class="local col7 ref" href="#7sum" title='sum' data-ref="7sum">sum</a>&gt;&gt;<var>16</var>)</td></tr>
+<tr><th id="46">46</th><td>	<a class="local col7 ref" href="#7sum" title='sum' data-ref="7sum">sum</a> = (<a class="local col7 ref" href="#7sum" title='sum' data-ref="7sum">sum</a> &amp; <var>0xFFFF</var>)+(<a class="local col7 ref" href="#7sum" title='sum' data-ref="7sum">sum</a> &gt;&gt; <var>16</var>);</td></tr>
+<tr><th id="47">47</th><td>    <b>return</b> ~<a class="local col7 ref" href="#7sum" title='sum' data-ref="7sum">sum</a>;</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl def" id="net_checksum_tcpudp" title='net_checksum_tcpudp' data-ref="net_checksum_tcpudp">net_checksum_tcpudp</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col8 decl" id="8length" title='length' data-type='uint16_t' data-ref="8length">length</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col9 decl" id="9proto" title='proto' data-type='uint16_t' data-ref="9proto">proto</dfn>,</td></tr>
+<tr><th id="51">51</th><td>                             <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="10addrs" title='addrs' data-type='uint8_t *' data-ref="10addrs">addrs</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="11buf" title='buf' data-type='uint8_t *' data-ref="11buf">buf</dfn>)</td></tr>
+<tr><th id="52">52</th><td>{</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="12sum" title='sum' data-type='uint32_t' data-ref="12sum">sum</dfn> = <var>0</var>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <a class="local col2 ref" href="#12sum" title='sum' data-ref="12sum">sum</a> += <a class="ref" href="../include/net/checksum.h.html#net_checksum_add" title='net_checksum_add' data-ref="net_checksum_add">net_checksum_add</a>(<a class="local col8 ref" href="#8length" title='length' data-ref="8length">length</a>, <a class="local col1 ref" href="#11buf" title='buf' data-ref="11buf">buf</a>);         <i>// payload</i></td></tr>
+<tr><th id="56">56</th><td>    <a class="local col2 ref" href="#12sum" title='sum' data-ref="12sum">sum</a> += <a class="ref" href="../include/net/checksum.h.html#net_checksum_add" title='net_checksum_add' data-ref="net_checksum_add">net_checksum_add</a>(<var>8</var>, <a class="local col0 ref" href="#10addrs" title='addrs' data-ref="10addrs">addrs</a>);            <i>// src + dst address</i></td></tr>
+<tr><th id="57">57</th><td>    <a class="local col2 ref" href="#12sum" title='sum' data-ref="12sum">sum</a> += <a class="local col9 ref" href="#9proto" title='proto' data-ref="9proto">proto</a> + <a class="local col8 ref" href="#8length" title='length' data-ref="8length">length</a>;                        <i>// protocol &amp; length</i></td></tr>
+<tr><th id="58">58</th><td>    <b>return</b> <a class="ref" href="#net_checksum_finish" title='net_checksum_finish' data-ref="net_checksum_finish">net_checksum_finish</a>(<a class="local col2 ref" href="#12sum" title='sum' data-ref="12sum">sum</a>);</td></tr>
+<tr><th id="59">59</th><td>}</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><em>void</em> <dfn class="decl def" id="net_checksum_calculate" title='net_checksum_calculate' data-ref="net_checksum_calculate">net_checksum_calculate</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="13data" title='data' data-type='uint8_t *' data-ref="13data">data</dfn>, <em>int</em> <dfn class="local col4 decl" id="14length" title='length' data-type='int' data-ref="14length">length</dfn>)</td></tr>
+<tr><th id="62">62</th><td>{</td></tr>
+<tr><th id="63">63</th><td>    <em>int</em> <dfn class="local col5 decl" id="15mac_hdr_len" title='mac_hdr_len' data-type='int' data-ref="15mac_hdr_len">mac_hdr_len</dfn>, <dfn class="local col6 decl" id="16ip_len" title='ip_len' data-type='int' data-ref="16ip_len">ip_len</dfn>;</td></tr>
+<tr><th id="64">64</th><td>    <b>struct</b> <a class="type" href="../include/net/eth.h.html#ip_header" title='ip_header' data-ref="ip_header">ip_header</a> *<dfn class="local col7 decl" id="17ip" title='ip' data-type='struct ip_header *' data-ref="17ip">ip</dfn>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <i>/*</i></td></tr>
+<tr><th id="67">67</th><td><i>     * Note: We cannot assume "data" is aligned, so the all code uses</i></td></tr>
+<tr><th id="68">68</th><td><i>     * some macros that take care of possible unaligned access for</i></td></tr>
+<tr><th id="69">69</th><td><i>     * struct members (just in case).</i></td></tr>
+<tr><th id="70">70</th><td><i>     */</i></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <i>/* Ensure we have at least an Eth header */</i></td></tr>
+<tr><th id="73">73</th><td>    <b>if</b> (<a class="local col4 ref" href="#14length" title='length' data-ref="14length">length</a> &lt; <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#eth_header" title='eth_header' data-ref="eth_header">eth_header</a>)) {</td></tr>
+<tr><th id="74">74</th><td>        <b>return</b>;</td></tr>
+<tr><th id="75">75</th><td>    }</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <i>/* Handle the optionnal VLAN headers */</i></td></tr>
+<tr><th id="78">78</th><td>    <b>switch</b> (<a class="ref" href="../include/qemu/bswap.h.html#lduw_be_p" title='lduw_be_p' data-ref="lduw_be_p">lduw_be_p</a>(&amp;<a class="macro" href="../include/net/eth.h.html#188" title="((struct eth_header *)(data))" data-ref="_M/PKT_GET_ETH_HDR">PKT_GET_ETH_HDR</a>(<a class="local col3 ref" href="#13data" title='data' data-ref="13data">data</a>)-&gt;<a class="ref" href="../include/net/eth.h.html#eth_header::h_proto" title='eth_header::h_proto' data-ref="eth_header::h_proto">h_proto</a>)) {</td></tr>
+<tr><th id="79">79</th><td>    <b>case</b> <a class="macro" href="../include/net/eth.h.html#210" title="(0x8100)" data-ref="_M/ETH_P_VLAN">ETH_P_VLAN</a>:</td></tr>
+<tr><th id="80">80</th><td>        <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#eth_header" title='eth_header' data-ref="eth_header">eth_header</a>) +</td></tr>
+<tr><th id="81">81</th><td>                     <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#vlan_header" title='vlan_header' data-ref="vlan_header">vlan_header</a>);</td></tr>
+<tr><th id="82">82</th><td>        <b>break</b>;</td></tr>
+<tr><th id="83">83</th><td>    <b>case</b> <a class="macro" href="../include/net/eth.h.html#211" title="(0x88a8)" data-ref="_M/ETH_P_DVLAN">ETH_P_DVLAN</a>:</td></tr>
+<tr><th id="84">84</th><td>        <b>if</b> (<a class="ref" href="../include/qemu/bswap.h.html#lduw_be_p" title='lduw_be_p' data-ref="lduw_be_p">lduw_be_p</a>(&amp;<a class="macro" href="../include/net/eth.h.html#190" title="((struct vlan_header *) (((uint8_t *)(data)) + sizeof(struct eth_header)))" data-ref="_M/PKT_GET_VLAN_HDR">PKT_GET_VLAN_HDR</a>(<a class="local col3 ref" href="#13data" title='data' data-ref="13data">data</a>)-&gt;<a class="ref" href="../include/net/eth.h.html#vlan_header::h_proto" title='vlan_header::h_proto' data-ref="vlan_header::h_proto">h_proto</a>) == <a class="macro" href="../include/net/eth.h.html#210" title="(0x8100)" data-ref="_M/ETH_P_VLAN">ETH_P_VLAN</a>) {</td></tr>
+<tr><th id="85">85</th><td>            <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#eth_header" title='eth_header' data-ref="eth_header">eth_header</a>) +</td></tr>
+<tr><th id="86">86</th><td>                         <var>2</var> * <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#vlan_header" title='vlan_header' data-ref="vlan_header">vlan_header</a>);</td></tr>
+<tr><th id="87">87</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="88">88</th><td>            <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#eth_header" title='eth_header' data-ref="eth_header">eth_header</a>) +</td></tr>
+<tr><th id="89">89</th><td>                         <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#vlan_header" title='vlan_header' data-ref="vlan_header">vlan_header</a>);</td></tr>
+<tr><th id="90">90</th><td>        }</td></tr>
+<tr><th id="91">91</th><td>        <b>break</b>;</td></tr>
+<tr><th id="92">92</th><td>    <b>default</b>:</td></tr>
+<tr><th id="93">93</th><td>        <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#eth_header" title='eth_header' data-ref="eth_header">eth_header</a>);</td></tr>
+<tr><th id="94">94</th><td>        <b>break</b>;</td></tr>
+<tr><th id="95">95</th><td>    }</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <a class="local col4 ref" href="#14length" title='length' data-ref="14length">length</a> -= <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a>;</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>    <i>/* Now check we have an IP header (with an optionnal VLAN header) */</i></td></tr>
+<tr><th id="100">100</th><td>    <b>if</b> (<a class="local col4 ref" href="#14length" title='length' data-ref="14length">length</a> &lt; <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/net/eth.h.html#ip_header" title='ip_header' data-ref="ip_header">ip_header</a>)) {</td></tr>
+<tr><th id="101">101</th><td>        <b>return</b>;</td></tr>
+<tr><th id="102">102</th><td>    }</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a> = (<b>struct</b> <a class="type" href="../include/net/eth.h.html#ip_header" title='ip_header' data-ref="ip_header">ip_header</a> *)(<a class="local col3 ref" href="#13data" title='data' data-ref="13data">data</a> + <a class="local col5 ref" href="#15mac_hdr_len" title='mac_hdr_len' data-ref="15mac_hdr_len">mac_hdr_len</a>);</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>if</b> (<a class="macro" href="../include/net/eth.h.html#202" title="(((ip)-&gt;ip_ver_len &gt;&gt; 4) &amp; 0xf)" data-ref="_M/IP_HEADER_VERSION">IP_HEADER_VERSION</a>(<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>) != <a class="macro" href="../include/net/eth.h.html#215" title="(4)" data-ref="_M/IP_HEADER_VERSION_4">IP_HEADER_VERSION_4</a>) {</td></tr>
+<tr><th id="107">107</th><td>        <b>return</b>; <i>/* not IPv4 */</i></td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a> = <a class="ref" href="../include/qemu/bswap.h.html#lduw_be_p" title='lduw_be_p' data-ref="lduw_be_p">lduw_be_p</a>(&amp;<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_len" title='ip_header::ip_len' data-ref="ip_header::ip_len">ip_len</a>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <i>/* Last, check that we have enough data for the all IP frame */</i></td></tr>
+<tr><th id="113">113</th><td>    <b>if</b> (<a class="local col4 ref" href="#14length" title='length' data-ref="14length">length</a> &lt; <a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a>) {</td></tr>
+<tr><th id="114">114</th><td>        <b>return</b>;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a> -= <a class="macro" href="../include/net/eth.h.html#196" title="((((struct ip_header *)(ip))-&gt;ip_ver_len &amp; 0x0F) &lt;&lt; 2)" data-ref="_M/IP_HDR_GET_LEN">IP_HDR_GET_LEN</a>(<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>);</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <b>switch</b> (<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_p" title='ip_header::ip_p' data-ref="ip_header::ip_p">ip_p</a>) {</td></tr>
+<tr><th id="120">120</th><td>    <b>case</b> <a class="macro" href="../include/net/eth.h.html#217" title="(6)" data-ref="_M/IP_PROTO_TCP">IP_PROTO_TCP</a>:</td></tr>
+<tr><th id="121">121</th><td>    {</td></tr>
+<tr><th id="122">122</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col8 decl" id="18csum" title='csum' data-type='uint16_t' data-ref="18csum">csum</dfn>;</td></tr>
+<tr><th id="123">123</th><td>        <a class="typedef" href="../include/net/eth.h.html#tcp_header" title='tcp_header' data-type='struct tcp_header' data-ref="tcp_header">tcp_header</a> *<dfn class="local col9 decl" id="19tcp" title='tcp' data-type='tcp_header *' data-ref="19tcp">tcp</dfn> = (<a class="typedef" href="../include/net/eth.h.html#tcp_header" title='tcp_header' data-type='struct tcp_header' data-ref="tcp_header">tcp_header</a> *)(<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a> + <var>1</var>);</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>        <b>if</b> (<a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a> &lt; <b>sizeof</b>(<a class="typedef" href="../include/net/eth.h.html#tcp_header" title='tcp_header' data-type='struct tcp_header' data-ref="tcp_header">tcp_header</a>)) {</td></tr>
+<tr><th id="126">126</th><td>            <b>return</b>;</td></tr>
+<tr><th id="127">127</th><td>        }</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>        <i>/* Set csum to 0 */</i></td></tr>
+<tr><th id="130">130</th><td>        <a class="ref" href="../include/qemu/bswap.h.html#stw_he_p" title='stw_he_p' data-ref="stw_he_p">stw_he_p</a>(&amp;<a class="local col9 ref" href="#19tcp" title='tcp' data-ref="19tcp">tcp</a>-&gt;<a class="ref" href="../include/net/eth.h.html#tcp_header::th_sum" title='tcp_header::th_sum' data-ref="tcp_header::th_sum">th_sum</a>, <var>0</var>);</td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td>        <a class="local col8 ref" href="#18csum" title='csum' data-ref="18csum">csum</a> = <a class="ref" href="#net_checksum_tcpudp" title='net_checksum_tcpudp' data-ref="net_checksum_tcpudp">net_checksum_tcpudp</a>(<a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a>, <a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_p" title='ip_header::ip_p' data-ref="ip_header::ip_p">ip_p</a>,</td></tr>
+<tr><th id="133">133</th><td>                                   (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)&amp;<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_src" title='ip_header::ip_src' data-ref="ip_header::ip_src">ip_src</a>,</td></tr>
+<tr><th id="134">134</th><td>                                   (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col9 ref" href="#19tcp" title='tcp' data-ref="19tcp">tcp</a>);</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>        <i>/* Store computed csum */</i></td></tr>
+<tr><th id="137">137</th><td>        <a class="ref" href="../include/qemu/bswap.h.html#stw_be_p" title='stw_be_p' data-ref="stw_be_p">stw_be_p</a>(&amp;<a class="local col9 ref" href="#19tcp" title='tcp' data-ref="19tcp">tcp</a>-&gt;<a class="ref" href="../include/net/eth.h.html#tcp_header::th_sum" title='tcp_header::th_sum' data-ref="tcp_header::th_sum">th_sum</a>, <a class="local col8 ref" href="#18csum" title='csum' data-ref="18csum">csum</a>);</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td>        <b>break</b>;</td></tr>
+<tr><th id="140">140</th><td>    }</td></tr>
+<tr><th id="141">141</th><td>    <b>case</b> <a class="macro" href="../include/net/eth.h.html#218" title="(17)" data-ref="_M/IP_PROTO_UDP">IP_PROTO_UDP</a>:</td></tr>
+<tr><th id="142">142</th><td>    {</td></tr>
+<tr><th id="143">143</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="20csum" title='csum' data-type='uint16_t' data-ref="20csum">csum</dfn>;</td></tr>
+<tr><th id="144">144</th><td>        <a class="typedef" href="../include/net/eth.h.html#udp_header" title='udp_header' data-type='struct udp_header' data-ref="udp_header">udp_header</a> *<dfn class="local col1 decl" id="21udp" title='udp' data-type='udp_header *' data-ref="21udp">udp</dfn> = (<a class="typedef" href="../include/net/eth.h.html#udp_header" title='udp_header' data-type='struct udp_header' data-ref="udp_header">udp_header</a> *)(<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a> + <var>1</var>);</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>        <b>if</b> (<a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a> &lt; <b>sizeof</b>(<a class="typedef" href="../include/net/eth.h.html#udp_header" title='udp_header' data-type='struct udp_header' data-ref="udp_header">udp_header</a>)) {</td></tr>
+<tr><th id="147">147</th><td>            <b>return</b>;</td></tr>
+<tr><th id="148">148</th><td>        }</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td>        <i>/* Set csum to 0 */</i></td></tr>
+<tr><th id="151">151</th><td>        <a class="ref" href="../include/qemu/bswap.h.html#stw_he_p" title='stw_he_p' data-ref="stw_he_p">stw_he_p</a>(&amp;<a class="local col1 ref" href="#21udp" title='udp' data-ref="21udp">udp</a>-&gt;<a class="ref" href="../include/net/eth.h.html#udp_header::uh_sum" title='udp_header::uh_sum' data-ref="udp_header::uh_sum">uh_sum</a>, <var>0</var>);</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td>        <a class="local col0 ref" href="#20csum" title='csum' data-ref="20csum">csum</a> = <a class="ref" href="#net_checksum_tcpudp" title='net_checksum_tcpudp' data-ref="net_checksum_tcpudp">net_checksum_tcpudp</a>(<a class="local col6 ref" href="#16ip_len" title='ip_len' data-ref="16ip_len">ip_len</a>, <a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_p" title='ip_header::ip_p' data-ref="ip_header::ip_p">ip_p</a>,</td></tr>
+<tr><th id="154">154</th><td>                                   (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)&amp;<a class="local col7 ref" href="#17ip" title='ip' data-ref="17ip">ip</a>-&gt;<a class="ref" href="../include/net/eth.h.html#ip_header::ip_src" title='ip_header::ip_src' data-ref="ip_header::ip_src">ip_src</a>,</td></tr>
+<tr><th id="155">155</th><td>                                   (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col1 ref" href="#21udp" title='udp' data-ref="21udp">udp</a>);</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>        <i>/* Store computed csum */</i></td></tr>
+<tr><th id="158">158</th><td>        <a class="ref" href="../include/qemu/bswap.h.html#stw_be_p" title='stw_be_p' data-ref="stw_be_p">stw_be_p</a>(&amp;<a class="local col1 ref" href="#21udp" title='udp' data-ref="21udp">udp</a>-&gt;<a class="ref" href="../include/net/eth.h.html#udp_header::uh_sum" title='udp_header::uh_sum' data-ref="udp_header::uh_sum">uh_sum</a>, <a class="local col0 ref" href="#20csum" title='csum' data-ref="20csum">csum</a>);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>        <b>break</b>;</td></tr>
+<tr><th id="161">161</th><td>    }</td></tr>
+<tr><th id="162">162</th><td>    <b>default</b>:</td></tr>
+<tr><th id="163">163</th><td>        <i>/* Can't handle any other protocol */</i></td></tr>
+<tr><th id="164">164</th><td>        <b>break</b>;</td></tr>
+<tr><th id="165">165</th><td>    }</td></tr>
+<tr><th id="166">166</th><td>}</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a></td></tr>
+<tr><th id="169">169</th><td><dfn class="decl def" id="net_checksum_add_iov" title='net_checksum_add_iov' data-ref="net_checksum_add_iov">net_checksum_add_iov</dfn>(<em>const</em> <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col2 decl" id="22iov" title='iov' data-type='const struct iovec *' data-ref="22iov">iov</dfn>, <em>const</em> <em>unsigned</em> <em>int</em> <dfn class="local col3 decl" id="23iov_cnt" title='iov_cnt' data-type='const unsigned int' data-ref="23iov_cnt">iov_cnt</dfn>,</td></tr>
+<tr><th id="170">170</th><td>                     <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="24iov_off" title='iov_off' data-type='uint32_t' data-ref="24iov_off">iov_off</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="25size" title='size' data-type='uint32_t' data-ref="25size">size</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="26csum_offset" title='csum_offset' data-type='uint32_t' data-ref="26csum_offset">csum_offset</dfn>)</td></tr>
+<tr><th id="171">171</th><td>{</td></tr>
+<tr><th id="172">172</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="27iovec_off" title='iovec_off' data-type='size_t' data-ref="27iovec_off">iovec_off</dfn>, <dfn class="local col8 decl" id="28buf_off" title='buf_off' data-type='size_t' data-ref="28buf_off">buf_off</dfn>;</td></tr>
+<tr><th id="173">173</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col9 decl" id="29i" title='i' data-type='unsigned int' data-ref="29i">i</dfn>;</td></tr>
+<tr><th id="174">174</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="30res" title='res' data-type='uint32_t' data-ref="30res">res</dfn> = <var>0</var>;</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>    <a class="local col7 ref" href="#27iovec_off" title='iovec_off' data-ref="27iovec_off">iovec_off</a> = <var>0</var>;</td></tr>
+<tr><th id="177">177</th><td>    <a class="local col8 ref" href="#28buf_off" title='buf_off' data-ref="28buf_off">buf_off</a> = <var>0</var>;</td></tr>
+<tr><th id="178">178</th><td>    <b>for</b> (<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> = <var>0</var>; <a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a> &lt; <a class="local col3 ref" href="#23iov_cnt" title='iov_cnt' data-ref="23iov_cnt">iov_cnt</a> &amp;&amp; <a class="local col5 ref" href="#25size" title='size' data-ref="25size">size</a>; <a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>++) {</td></tr>
+<tr><th id="179">179</th><td>        <b>if</b> (<a class="local col4 ref" href="#24iov_off" title='iov_off' data-ref="24iov_off">iov_off</a> &lt; (<a class="local col7 ref" href="#27iovec_off" title='iovec_off' data-ref="27iovec_off">iovec_off</a> + <a class="local col2 ref" href="#22iov" title='iov' data-ref="22iov">iov</a>[<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>].<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a>)) {</td></tr>
+<tr><th id="180">180</th><td>            <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="31len" title='len' data-type='size_t' data-ref="31len">len</dfn> = <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#291" title="((((iovec_off + iov[i].iov_len) - iov_off) &lt; (size)) ? ((iovec_off + iov[i].iov_len) - iov_off) : (size))" data-ref="_M/MIN">MIN</a>((<a class="local col7 ref" href="#27iovec_off" title='iovec_off' data-ref="27iovec_off">iovec_off</a> + <a class="local col2 ref" href="#22iov" title='iov' data-ref="22iov">iov</a>[<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>].<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a>) - <a class="local col4 ref" href="#24iov_off" title='iov_off' data-ref="24iov_off">iov_off</a> , <a class="local col5 ref" href="#25size" title='size' data-ref="25size">size</a>);</td></tr>
+<tr><th id="181">181</th><td>            <em>void</em> *<dfn class="local col2 decl" id="32chunk_buf" title='chunk_buf' data-type='void *' data-ref="32chunk_buf">chunk_buf</dfn> = <a class="local col2 ref" href="#22iov" title='iov' data-ref="22iov">iov</a>[<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>].<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> + (<a class="local col4 ref" href="#24iov_off" title='iov_off' data-ref="24iov_off">iov_off</a> - <a class="local col7 ref" href="#27iovec_off" title='iovec_off' data-ref="27iovec_off">iovec_off</a>);</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>            <a class="local col0 ref" href="#30res" title='res' data-ref="30res">res</a> += <a class="ref" href="#net_checksum_add_cont" title='net_checksum_add_cont' data-ref="net_checksum_add_cont">net_checksum_add_cont</a>(<a class="local col1 ref" href="#31len" title='len' data-ref="31len">len</a>, <a class="local col2 ref" href="#32chunk_buf" title='chunk_buf' data-ref="32chunk_buf">chunk_buf</a>, <a class="local col6 ref" href="#26csum_offset" title='csum_offset' data-ref="26csum_offset">csum_offset</a>);</td></tr>
+<tr><th id="184">184</th><td>            <a class="local col6 ref" href="#26csum_offset" title='csum_offset' data-ref="26csum_offset">csum_offset</a> += <a class="local col1 ref" href="#31len" title='len' data-ref="31len">len</a>;</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>            <a class="local col8 ref" href="#28buf_off" title='buf_off' data-ref="28buf_off">buf_off</a> += <a class="local col1 ref" href="#31len" title='len' data-ref="31len">len</a>;</td></tr>
+<tr><th id="187">187</th><td>            <a class="local col4 ref" href="#24iov_off" title='iov_off' data-ref="24iov_off">iov_off</a> += <a class="local col1 ref" href="#31len" title='len' data-ref="31len">len</a>;</td></tr>
+<tr><th id="188">188</th><td>            <a class="local col5 ref" href="#25size" title='size' data-ref="25size">size</a> -= <a class="local col1 ref" href="#31len" title='len' data-ref="31len">len</a>;</td></tr>
+<tr><th id="189">189</th><td>        }</td></tr>
+<tr><th id="190">190</th><td>        <a class="local col7 ref" href="#27iovec_off" title='iovec_off' data-ref="27iovec_off">iovec_off</a> += <a class="local col2 ref" href="#22iov" title='iov' data-ref="22iov">iov</a>[<a class="local col9 ref" href="#29i" title='i' data-ref="29i">i</a>].<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a>;</td></tr>
+<tr><th id="191">191</th><td>    }</td></tr>
+<tr><th id="192">192</th><td>    <b>return</b> <a class="local col0 ref" href="#30res" title='res' data-ref="30res">res</a>;</td></tr>
+<tr><th id="193">193</th><td>}</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

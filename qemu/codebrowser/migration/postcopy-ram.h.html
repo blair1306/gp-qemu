@@ -1,0 +1,135 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>postcopy-ram.h source code [codebrowser/migration/postcopy-ram.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/postcopy-ram.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='postcopy-ram.h.html'>postcopy-ram.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Postcopy migration for RAM</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright 2013 Red Hat, Inc. and/or its affiliates</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Dave Gilbert  &lt;dgilbert@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td><u>#<span data-ppcond="13">ifndef</span> <span class="macro" data-ref="_M/QEMU_POSTCOPY_RAM_H">QEMU_POSTCOPY_RAM_H</span></u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/QEMU_POSTCOPY_RAM_H" data-ref="_M/QEMU_POSTCOPY_RAM_H">QEMU_POSTCOPY_RAM_H</dfn></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i>/* Return true if the host supports everything we need to do postcopy-ram */</i></td></tr>
+<tr><th id="17">17</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="postcopy_ram_supported_by_host" title='postcopy_ram_supported_by_host' data-ref="postcopy_ram_supported_by_host">postcopy_ram_supported_by_host</dfn>(<em>void</em>);</td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><i>/*</i></td></tr>
+<tr><th id="20">20</th><td><i> * Make all of RAM sensitive to accesses to areas that haven't yet been written</i></td></tr>
+<tr><th id="21">21</th><td><i> * and wire up anything necessary to deal with it.</i></td></tr>
+<tr><th id="22">22</th><td><i> */</i></td></tr>
+<tr><th id="23">23</th><td><em>int</em> <dfn class="decl" id="postcopy_ram_enable_notify" title='postcopy_ram_enable_notify' data-ref="postcopy_ram_enable_notify">postcopy_ram_enable_notify</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col5 decl" id="35mis" title='mis' data-type='MigrationIncomingState *' data-ref="35mis">mis</dfn>);</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><i>/*</i></td></tr>
+<tr><th id="26">26</th><td><i> * Initialise postcopy-ram, setting the RAM to a state where we can go into</i></td></tr>
+<tr><th id="27">27</th><td><i> * postcopy later; must be called prior to any precopy.</i></td></tr>
+<tr><th id="28">28</th><td><i> * called from ram.c's similarly named ram_postcopy_incoming_init</i></td></tr>
+<tr><th id="29">29</th><td><i> */</i></td></tr>
+<tr><th id="30">30</th><td><em>int</em> <dfn class="decl" id="postcopy_ram_incoming_init" title='postcopy_ram_incoming_init' data-ref="postcopy_ram_incoming_init">postcopy_ram_incoming_init</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col6 decl" id="36mis" title='mis' data-type='MigrationIncomingState *' data-ref="36mis">mis</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="37ram_pages" title='ram_pages' data-type='size_t' data-ref="37ram_pages">ram_pages</dfn>);</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i>/*</i></td></tr>
+<tr><th id="33">33</th><td><i> * At the end of a migration where postcopy_ram_incoming_init was called.</i></td></tr>
+<tr><th id="34">34</th><td><i> */</i></td></tr>
+<tr><th id="35">35</th><td><em>int</em> <dfn class="decl" id="postcopy_ram_incoming_cleanup" title='postcopy_ram_incoming_cleanup' data-ref="postcopy_ram_incoming_cleanup">postcopy_ram_incoming_cleanup</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col8 decl" id="38mis" title='mis' data-type='MigrationIncomingState *' data-ref="38mis">mis</dfn>);</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><i>/*</i></td></tr>
+<tr><th id="38">38</th><td><i> * Userfault requires us to mark RAM as NOHUGEPAGE prior to discard</i></td></tr>
+<tr><th id="39">39</th><td><i> * however leaving it until after precopy means that most of the precopy</i></td></tr>
+<tr><th id="40">40</th><td><i> * data is still THPd</i></td></tr>
+<tr><th id="41">41</th><td><i> */</i></td></tr>
+<tr><th id="42">42</th><td><em>int</em> <dfn class="decl" id="postcopy_ram_prepare_discard" title='postcopy_ram_prepare_discard' data-ref="postcopy_ram_prepare_discard">postcopy_ram_prepare_discard</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col9 decl" id="39mis" title='mis' data-type='MigrationIncomingState *' data-ref="39mis">mis</dfn>);</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i>/*</i></td></tr>
+<tr><th id="45">45</th><td><i> * Called at the start of each RAMBlock by the bitmap code.</i></td></tr>
+<tr><th id="46">46</th><td><i> * Returns a new PDS</i></td></tr>
+<tr><th id="47">47</th><td><i> */</i></td></tr>
+<tr><th id="48">48</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#PostcopyDiscardState" title='PostcopyDiscardState' data-type='struct PostcopyDiscardState' data-ref="PostcopyDiscardState">PostcopyDiscardState</a> *<dfn class="decl" id="postcopy_discard_send_init" title='postcopy_discard_send_init' data-ref="postcopy_discard_send_init">postcopy_discard_send_init</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col0 decl" id="40ms" title='ms' data-type='MigrationState *' data-ref="40ms">ms</dfn>,</td></tr>
+<tr><th id="49">49</th><td>                                                 <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="41name" title='name' data-type='const char *' data-ref="41name">name</dfn>);</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>/*</i></td></tr>
+<tr><th id="52">52</th><td><i> * Called by the bitmap code for each chunk to discard.</i></td></tr>
+<tr><th id="53">53</th><td><i> * May send a discard message, may just leave it queued to</i></td></tr>
+<tr><th id="54">54</th><td><i> * be sent later.</i></td></tr>
+<tr><th id="55">55</th><td><i> * @start,@length: a range of pages in the migration bitmap in the</i></td></tr>
+<tr><th id="56">56</th><td><i> *  RAM block passed to postcopy_discard_send_init() (length=1 is one page)</i></td></tr>
+<tr><th id="57">57</th><td><i> */</i></td></tr>
+<tr><th id="58">58</th><td><em>void</em> <dfn class="decl" id="postcopy_discard_send_range" title='postcopy_discard_send_range' data-ref="postcopy_discard_send_range">postcopy_discard_send_range</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col2 decl" id="42ms" title='ms' data-type='MigrationState *' data-ref="42ms">ms</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#PostcopyDiscardState" title='PostcopyDiscardState' data-type='struct PostcopyDiscardState' data-ref="PostcopyDiscardState">PostcopyDiscardState</a> *<dfn class="local col3 decl" id="43pds" title='pds' data-type='PostcopyDiscardState *' data-ref="43pds">pds</dfn>,</td></tr>
+<tr><th id="59">59</th><td>                                 <em>unsigned</em> <em>long</em> <dfn class="local col4 decl" id="44start" title='start' data-type='unsigned long' data-ref="44start">start</dfn>, <em>unsigned</em> <em>long</em> <dfn class="local col5 decl" id="45length" title='length' data-type='unsigned long' data-ref="45length">length</dfn>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><i>/*</i></td></tr>
+<tr><th id="62">62</th><td><i> * Called at the end of each RAMBlock by the bitmap code.</i></td></tr>
+<tr><th id="63">63</th><td><i> * Sends any outstanding discard messages, frees the PDS.</i></td></tr>
+<tr><th id="64">64</th><td><i> */</i></td></tr>
+<tr><th id="65">65</th><td><em>void</em> <dfn class="decl" id="postcopy_discard_send_finish" title='postcopy_discard_send_finish' data-ref="postcopy_discard_send_finish">postcopy_discard_send_finish</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col6 decl" id="46ms" title='ms' data-type='MigrationState *' data-ref="46ms">ms</dfn>,</td></tr>
+<tr><th id="66">66</th><td>                                  <a class="typedef" href="../include/qemu/typedefs.h.html#PostcopyDiscardState" title='PostcopyDiscardState' data-type='struct PostcopyDiscardState' data-ref="PostcopyDiscardState">PostcopyDiscardState</a> *<dfn class="local col7 decl" id="47pds" title='pds' data-type='PostcopyDiscardState *' data-ref="47pds">pds</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i>/*</i></td></tr>
+<tr><th id="69">69</th><td><i> * Place a page (from) at (host) efficiently</i></td></tr>
+<tr><th id="70">70</th><td><i> *    There are restrictions on how 'from' must be mapped, in general best</i></td></tr>
+<tr><th id="71">71</th><td><i> *    to use other postcopy_ routines to allocate.</i></td></tr>
+<tr><th id="72">72</th><td><i> * returns 0 on success</i></td></tr>
+<tr><th id="73">73</th><td><i> */</i></td></tr>
+<tr><th id="74">74</th><td><em>int</em> <dfn class="decl" id="postcopy_place_page" title='postcopy_place_page' data-ref="postcopy_place_page">postcopy_place_page</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col8 decl" id="48mis" title='mis' data-type='MigrationIncomingState *' data-ref="48mis">mis</dfn>, <em>void</em> *<dfn class="local col9 decl" id="49host" title='host' data-type='void *' data-ref="49host">host</dfn>, <em>void</em> *<dfn class="local col0 decl" id="50from" title='from' data-type='void *' data-ref="50from">from</dfn>,</td></tr>
+<tr><th id="75">75</th><td>                        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="51pagesize" title='pagesize' data-type='size_t' data-ref="51pagesize">pagesize</dfn>);</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>/*</i></td></tr>
+<tr><th id="78">78</th><td><i> * Place a zero page at (host) atomically</i></td></tr>
+<tr><th id="79">79</th><td><i> * returns 0 on success</i></td></tr>
+<tr><th id="80">80</th><td><i> */</i></td></tr>
+<tr><th id="81">81</th><td><em>int</em> <dfn class="decl" id="postcopy_place_page_zero" title='postcopy_place_page_zero' data-ref="postcopy_place_page_zero">postcopy_place_page_zero</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col2 decl" id="52mis" title='mis' data-type='MigrationIncomingState *' data-ref="52mis">mis</dfn>, <em>void</em> *<dfn class="local col3 decl" id="53host" title='host' data-type='void *' data-ref="53host">host</dfn>,</td></tr>
+<tr><th id="82">82</th><td>                             <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col4 decl" id="54pagesize" title='pagesize' data-type='size_t' data-ref="54pagesize">pagesize</dfn>);</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i>/* The current postcopy state is read/set by postcopy_state_get/set</i></td></tr>
+<tr><th id="85">85</th><td><i> * which update it atomically.</i></td></tr>
+<tr><th id="86">86</th><td><i> * The state is updated as postcopy messages are received, and</i></td></tr>
+<tr><th id="87">87</th><td><i> * in general only one thread should be writing to the state at any one</i></td></tr>
+<tr><th id="88">88</th><td><i> * time, initially the main thread and then the listen thread;</i></td></tr>
+<tr><th id="89">89</th><td><i> * Corner cases are where either thread finishes early and/or errors.</i></td></tr>
+<tr><th id="90">90</th><td><i> * The state is checked as messages are received to ensure that</i></td></tr>
+<tr><th id="91">91</th><td><i> * the source is sending us messages in the correct order.</i></td></tr>
+<tr><th id="92">92</th><td><i> * The state is also used by the RAM reception code to know if it</i></td></tr>
+<tr><th id="93">93</th><td><i> * has to place pages atomically, and the cleanup code at the end of</i></td></tr>
+<tr><th id="94">94</th><td><i> * the main thread to know if it has to delay cleanup until the end</i></td></tr>
+<tr><th id="95">95</th><td><i> * of postcopy.</i></td></tr>
+<tr><th id="96">96</th><td><i> */</i></td></tr>
+<tr><th id="97">97</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="98">98</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_NONE" title='POSTCOPY_INCOMING_NONE' data-ref="POSTCOPY_INCOMING_NONE">POSTCOPY_INCOMING_NONE</dfn> = <var>0</var>,  <i>/* Initial state - no postcopy */</i></td></tr>
+<tr><th id="99">99</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_ADVISE" title='POSTCOPY_INCOMING_ADVISE' data-ref="POSTCOPY_INCOMING_ADVISE">POSTCOPY_INCOMING_ADVISE</dfn>,</td></tr>
+<tr><th id="100">100</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_DISCARD" title='POSTCOPY_INCOMING_DISCARD' data-ref="POSTCOPY_INCOMING_DISCARD">POSTCOPY_INCOMING_DISCARD</dfn>,</td></tr>
+<tr><th id="101">101</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_LISTENING" title='POSTCOPY_INCOMING_LISTENING' data-ref="POSTCOPY_INCOMING_LISTENING">POSTCOPY_INCOMING_LISTENING</dfn>,</td></tr>
+<tr><th id="102">102</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_RUNNING" title='POSTCOPY_INCOMING_RUNNING' data-ref="POSTCOPY_INCOMING_RUNNING">POSTCOPY_INCOMING_RUNNING</dfn>,</td></tr>
+<tr><th id="103">103</th><td>    <dfn class="enum" id="POSTCOPY_INCOMING_END" title='POSTCOPY_INCOMING_END' data-ref="POSTCOPY_INCOMING_END">POSTCOPY_INCOMING_END</dfn></td></tr>
+<tr><th id="104">104</th><td>} <dfn class="typedef" id="PostcopyState" title='PostcopyState' data-type='enum PostcopyState' data-ref="PostcopyState">PostcopyState</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i>/*</i></td></tr>
+<tr><th id="107">107</th><td><i> * Allocate a page of memory that can be mapped at a later point in time</i></td></tr>
+<tr><th id="108">108</th><td><i> * using postcopy_place_page</i></td></tr>
+<tr><th id="109">109</th><td><i> * Returns: Pointer to allocated page</i></td></tr>
+<tr><th id="110">110</th><td><i> */</i></td></tr>
+<tr><th id="111">111</th><td><em>void</em> *<dfn class="decl" id="postcopy_get_tmp_page" title='postcopy_get_tmp_page' data-ref="postcopy_get_tmp_page">postcopy_get_tmp_page</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col5 decl" id="55mis" title='mis' data-type='MigrationIncomingState *' data-ref="55mis">mis</dfn>);</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><a class="typedef" href="#PostcopyState" title='PostcopyState' data-type='enum PostcopyState' data-ref="PostcopyState">PostcopyState</a> <dfn class="decl" id="postcopy_state_get" title='postcopy_state_get' data-ref="postcopy_state_get">postcopy_state_get</dfn>(<em>void</em>);</td></tr>
+<tr><th id="114">114</th><td><i>/* Set the state and return the old state */</i></td></tr>
+<tr><th id="115">115</th><td><a class="typedef" href="#PostcopyState" title='PostcopyState' data-type='enum PostcopyState' data-ref="PostcopyState">PostcopyState</a> <dfn class="decl" id="postcopy_state_set" title='postcopy_state_set' data-ref="postcopy_state_set">postcopy_state_set</dfn>(<a class="typedef" href="#PostcopyState" title='PostcopyState' data-type='enum PostcopyState' data-ref="PostcopyState">PostcopyState</a> <dfn class="local col6 decl" id="56new_state" title='new_state' data-type='PostcopyState' data-ref="56new_state">new_state</dfn>);</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><u>#<span data-ppcond="13">endif</span></u></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='migration.c.html'>codebrowser/migration/migration.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

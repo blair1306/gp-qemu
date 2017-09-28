@@ -1,0 +1,351 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>control.c source code [codebrowser/trace/control.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TraceEventGroup "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/trace/control.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>trace</a>/<a href='control.c.html'>control.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Interface for configuring and controlling the state of tracing events.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2011-2016 Lluís Vilanova &lt;vilanova@ac.upc.edu&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="7">7</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="8">8</th><td><i> */</i></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="control.h.html">"trace/control.h"</a></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/qemu/help_option.h.html">"qemu/help_option.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#<span data-ppcond="13">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_SIMPLE">CONFIG_TRACE_SIMPLE</span></u></td></tr>
+<tr><th id="14">14</th><td><u>#include "trace/simple.h"</u></td></tr>
+<tr><th id="15">15</th><td><u>#<span data-ppcond="13">endif</span></u></td></tr>
+<tr><th id="16">16</th><td><u>#<span data-ppcond="16">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_FTRACE">CONFIG_TRACE_FTRACE</span></u></td></tr>
+<tr><th id="17">17</th><td><u>#include "trace/ftrace.h"</u></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="16">endif</span></u></td></tr>
+<tr><th id="19">19</th><td><u>#<span data-ppcond="19">ifdef</span> <a class="macro" href="../config-host.h.html#88" data-ref="_M/CONFIG_TRACE_LOG">CONFIG_TRACE_LOG</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/qemu/log.h.html">"qemu/log.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="19">endif</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#<span data-ppcond="22">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_SYSLOG">CONFIG_TRACE_SYSLOG</span></u></td></tr>
+<tr><th id="23">23</th><td><u>#include &lt;syslog.h&gt;</u></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="22">endif</span></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qemu/config-file.h.html">"qemu/config-file.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/monitor/monitor.h.html">"monitor/monitor.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../trace-root.h.html">"trace-root.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><em>int</em> <dfn class="decl def" id="trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</dfn>;</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TraceEventGroup" title='TraceEventGroup' data-ref="TraceEventGroup"><a class="type" href="#TraceEventGroup" title='TraceEventGroup' data-ref="TraceEventGroup">TraceEventGroup</a></dfn> {</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> **<dfn class="tu decl" id="TraceEventGroup::events" title='TraceEventGroup::events' data-type='TraceEvent **' data-ref="TraceEventGroup::events">events</dfn>;</td></tr>
+<tr><th id="35">35</th><td>} <dfn class="typedef" id="TraceEventGroup" title='TraceEventGroup' data-type='struct TraceEventGroup' data-ref="TraceEventGroup">TraceEventGroup</dfn>;</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><em>static</em> <a class="typedef" href="#TraceEventGroup" title='TraceEventGroup' data-type='struct TraceEventGroup' data-ref="TraceEventGroup">TraceEventGroup</a> *<dfn class="tu decl def" id="event_groups" title='event_groups' data-type='TraceEventGroup *' data-ref="event_groups">event_groups</dfn>;</td></tr>
+<tr><th id="38">38</th><td><em>static</em> <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="tu decl def" id="nevent_groups" title='nevent_groups' data-type='size_t' data-ref="nevent_groups">nevent_groups</dfn>;</td></tr>
+<tr><th id="39">39</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="tu decl def" id="next_id" title='next_id' data-type='uint32_t' data-ref="next_id">next_id</dfn>;</td></tr>
+<tr><th id="40">40</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="tu decl def" id="next_vcpu_id" title='next_vcpu_id' data-type='uint32_t' data-ref="next_vcpu_id">next_vcpu_id</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#QemuOptsList" title='QemuOptsList' data-type='struct QemuOptsList' data-ref="QemuOptsList">QemuOptsList</a> <dfn class="decl def" id="qemu_trace_opts" title='qemu_trace_opts' data-ref="qemu_trace_opts">qemu_trace_opts</dfn> = {</td></tr>
+<tr><th id="43">43</th><td>    .<a class="ref" href="../include/qemu/option.h.html#QemuOptsList::name" title='QemuOptsList::name' data-ref="QemuOptsList::name">name</a> = <q>"trace"</q>,</td></tr>
+<tr><th id="44">44</th><td>    .<a class="ref" href="../include/qemu/option.h.html#QemuOptsList::implied_opt_name" title='QemuOptsList::implied_opt_name' data-ref="QemuOptsList::implied_opt_name">implied_opt_name</a> = <q>"enable"</q>,</td></tr>
+<tr><th id="45">45</th><td>    .<a class="ref" href="../include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a> = <a class="macro" href="../include/qemu/queue.h.html#351" title="{ ((void*)0), &amp;(qemu_trace_opts.head).tqh_first }" data-ref="_M/QTAILQ_HEAD_INITIALIZER">QTAILQ_HEAD_INITIALIZER</a>(<a class="ref" href="control.h.html#qemu_trace_opts" title='qemu_trace_opts' data-ref="qemu_trace_opts">qemu_trace_opts</a>.<a class="ref" href="../include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a>),</td></tr>
+<tr><th id="46">46</th><td>    .<a class="ref" href="../include/qemu/option.h.html#QemuOptsList::desc" title='QemuOptsList::desc' data-ref="QemuOptsList::desc">desc</a> = {</td></tr>
+<tr><th id="47">47</th><td>        {</td></tr>
+<tr><th id="48">48</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::name" title='QemuOptDesc::name' data-ref="QemuOptDesc::name">name</a> = <q>"enable"</q>,</td></tr>
+<tr><th id="49">49</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::type" title='QemuOptDesc::type' data-ref="QemuOptDesc::type">type</a> = <a class="enum" href="../include/qemu/option.h.html#QemuOptType::QEMU_OPT_STRING" title='QemuOptType::QEMU_OPT_STRING' data-ref="QemuOptType::QEMU_OPT_STRING">QEMU_OPT_STRING</a>,</td></tr>
+<tr><th id="50">50</th><td>        },</td></tr>
+<tr><th id="51">51</th><td>        {</td></tr>
+<tr><th id="52">52</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::name" title='QemuOptDesc::name' data-ref="QemuOptDesc::name">name</a> = <q>"events"</q>,</td></tr>
+<tr><th id="53">53</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::type" title='QemuOptDesc::type' data-ref="QemuOptDesc::type">type</a> = <a class="enum" href="../include/qemu/option.h.html#QemuOptType::QEMU_OPT_STRING" title='QemuOptType::QEMU_OPT_STRING' data-ref="QemuOptType::QEMU_OPT_STRING">QEMU_OPT_STRING</a>,</td></tr>
+<tr><th id="54">54</th><td>        },{</td></tr>
+<tr><th id="55">55</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::name" title='QemuOptDesc::name' data-ref="QemuOptDesc::name">name</a> = <q>"file"</q>,</td></tr>
+<tr><th id="56">56</th><td>            .<a class="ref" href="../include/qemu/option.h.html#QemuOptDesc::type" title='QemuOptDesc::type' data-ref="QemuOptDesc::type">type</a> = <a class="enum" href="../include/qemu/option.h.html#QemuOptType::QEMU_OPT_STRING" title='QemuOptType::QEMU_OPT_STRING' data-ref="QemuOptType::QEMU_OPT_STRING">QEMU_OPT_STRING</a>,</td></tr>
+<tr><th id="57">57</th><td>        },</td></tr>
+<tr><th id="58">58</th><td>        { <i>/* end of list */</i> }</td></tr>
+<tr><th id="59">59</th><td>    },</td></tr>
+<tr><th id="60">60</th><td>};</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><em>void</em> <dfn class="decl def" id="trace_event_register_group" title='trace_event_register_group' data-ref="trace_event_register_group">trace_event_register_group</dfn>(<a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> **<dfn class="local col1 decl" id="1events" title='events' data-type='TraceEvent **' data-ref="1events">events</dfn>)</td></tr>
+<tr><th id="64">64</th><td>{</td></tr>
+<tr><th id="65">65</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col2 decl" id="2i" title='i' data-type='size_t' data-ref="2i">i</dfn>;</td></tr>
+<tr><th id="66">66</th><td>    <b>for</b> (<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a> = <var>0</var>; <a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>] != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>++) {</td></tr>
+<tr><th id="67">67</th><td>        <a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>]-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::id" title='TraceEvent::id' data-ref="TraceEvent::id">id</a> = <a class="tu ref" href="#next_id" title='next_id' data-use='w' data-ref="next_id">next_id</a>++;</td></tr>
+<tr><th id="68">68</th><td>        <b>if</b> (<a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>]-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::vcpu_id" title='TraceEvent::vcpu_id' data-ref="TraceEvent::vcpu_id">vcpu_id</a> == <a class="macro" href="event-internal.h.html#17" title="((uint32_t)-1)" data-ref="_M/TRACE_VCPU_EVENT_NONE">TRACE_VCPU_EVENT_NONE</a>) {</td></tr>
+<tr><th id="69">69</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="70">70</th><td>        }</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>        <b>if</b> (<a class="macro" href="../include/qemu/compiler.h.html#57" title="__builtin_expect(!!(next_vcpu_id &lt; 32), 1)" data-ref="_M/likely">likely</a>(<a class="tu ref" href="#next_vcpu_id" title='next_vcpu_id' data-use='r' data-ref="next_vcpu_id">next_vcpu_id</a> &lt; <a class="macro" href="../include/qom/cpu.h.html#262" title="32" data-ref="_M/CPU_TRACE_DSTATE_MAX_EVENTS">CPU_TRACE_DSTATE_MAX_EVENTS</a>)) {</td></tr>
+<tr><th id="73">73</th><td>            <a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>]-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::vcpu_id" title='TraceEvent::vcpu_id' data-ref="TraceEvent::vcpu_id">vcpu_id</a> = <a class="tu ref" href="#next_vcpu_id" title='next_vcpu_id' data-use='w' data-ref="next_vcpu_id">next_vcpu_id</a>++;</td></tr>
+<tr><th id="74">74</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="75">75</th><td>            <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"WARNING: too many vcpu trace events; dropping '%s'"</q>,</td></tr>
+<tr><th id="76">76</th><td>                         <a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>]-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::name" title='TraceEvent::name' data-ref="TraceEvent::name">name</a>);</td></tr>
+<tr><th id="77">77</th><td>        }</td></tr>
+<tr><th id="78">78</th><td>    }</td></tr>
+<tr><th id="79">79</th><td>    <a class="tu ref" href="#event_groups" title='event_groups' data-use='w' data-ref="event_groups">event_groups</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#292" title="((TraceEventGroup *) g_realloc_n (event_groups, (nevent_groups + 1), sizeof (TraceEventGroup)))" data-ref="_M/g_renew">g_renew</a>(<a class="typedef" href="#TraceEventGroup" title='TraceEventGroup' data-type='struct TraceEventGroup' data-ref="TraceEventGroup">TraceEventGroup</a>, <a class="tu ref" href="#event_groups" title='event_groups' data-use='r' data-ref="event_groups">event_groups</a>, <a class="tu ref" href="#nevent_groups" title='nevent_groups' data-use='r' data-ref="nevent_groups">nevent_groups</a> + <var>1</var>);</td></tr>
+<tr><th id="80">80</th><td>    <a class="tu ref" href="#event_groups" title='event_groups' data-use='r' data-ref="event_groups">event_groups</a>[<a class="tu ref" href="#nevent_groups" title='nevent_groups' data-use='r' data-ref="nevent_groups">nevent_groups</a>].<a class="tu ref" href="#TraceEventGroup::events" title='TraceEventGroup::events' data-use='w' data-ref="TraceEventGroup::events">events</a> = <a class="local col1 ref" href="#1events" title='events' data-ref="1events">events</a>;</td></tr>
+<tr><th id="81">81</th><td>    <a class="tu ref" href="#nevent_groups" title='nevent_groups' data-use='w' data-ref="nevent_groups">nevent_groups</a>++;</td></tr>
+<tr><th id="82">82</th><td>}</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="decl def" id="trace_event_name" title='trace_event_name' data-ref="trace_event_name">trace_event_name</dfn>(<em>const</em> <em>char</em> *<dfn class="local col3 decl" id="3name" title='name' data-type='const char *' data-ref="3name">name</dfn>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((name != ((void*)0)) ? (void) (0) : __assert_fail (&quot;name != NULL&quot;, &quot;/home/jon/workspace/qemu/trace/control.c&quot;, 87, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col3 ref" href="#3name" title='name' data-ref="3name">name</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> <dfn class="local col4 decl" id="4iter" title='iter' data-type='TraceEventIter' data-ref="4iter">iter</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col5 decl" id="5ev" title='ev' data-type='TraceEvent *' data-ref="5ev">ev</dfn>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="ref" href="#trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</a>(&amp;<a class="local col4 ref" href="#4iter" title='iter' data-ref="4iter">iter</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="92">92</th><td>    <b>while</b> ((<a class="local col5 ref" href="#5ev" title='ev' data-ref="5ev">ev</a> = <a class="ref" href="#trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</a>(&amp;<a class="local col4 ref" href="#4iter" title='iter' data-ref="4iter">iter</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="93">93</th><td>        <b>if</b> (<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="ref" href="control.h.html#trace_event_get_name" title='trace_event_get_name' data-ref="trace_event_get_name">trace_event_get_name</a>(<a class="local col5 ref" href="#5ev" title='ev' data-ref="5ev">ev</a>), <a class="local col3 ref" href="#3name" title='name' data-ref="3name">name</a>) == <var>0</var>) {</td></tr>
+<tr><th id="94">94</th><td>            <b>return</b> <a class="local col5 ref" href="#5ev" title='ev' data-ref="5ev">ev</a>;</td></tr>
+<tr><th id="95">95</th><td>        }</td></tr>
+<tr><th id="96">96</th><td>    }</td></tr>
+<tr><th id="97">97</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="pattern_glob" title='pattern_glob' data-type='_Bool pattern_glob(const char * pat, const char * ev)' data-ref="pattern_glob">pattern_glob</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="6pat" title='pat' data-type='const char *' data-ref="6pat">pat</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="7ev" title='ev' data-type='const char *' data-ref="7ev">ev</dfn>)</td></tr>
+<tr><th id="101">101</th><td>{</td></tr>
+<tr><th id="102">102</th><td>    <b>while</b> (*<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a> != <kbd>'\0'</kbd> &amp;&amp; *<a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a> != <kbd>'\0'</kbd>) {</td></tr>
+<tr><th id="103">103</th><td>        <b>if</b> (*<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a> == *<a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a>) {</td></tr>
+<tr><th id="104">104</th><td>            <a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a>++;</td></tr>
+<tr><th id="105">105</th><td>            <a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a>++;</td></tr>
+<tr><th id="106">106</th><td>        }</td></tr>
+<tr><th id="107">107</th><td>        <b>else</b> <b>if</b> (*<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a> == <kbd>'*'</kbd>) {</td></tr>
+<tr><th id="108">108</th><td>            <b>if</b> (<a class="tu ref" href="#pattern_glob" title='pattern_glob' data-use='c' data-ref="pattern_glob">pattern_glob</a>(<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a>, <a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a>+<var>1</var>)) {</td></tr>
+<tr><th id="109">109</th><td>                <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="110">110</th><td>            } <b>else</b> <b>if</b> (<a class="tu ref" href="#pattern_glob" title='pattern_glob' data-use='c' data-ref="pattern_glob">pattern_glob</a>(<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a>+<var>1</var>, <a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a>)) {</td></tr>
+<tr><th id="111">111</th><td>                <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="112">112</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="113">113</th><td>                <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="114">114</th><td>            }</td></tr>
+<tr><th id="115">115</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="116">116</th><td>            <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="117">117</th><td>        }</td></tr>
+<tr><th id="118">118</th><td>    }</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <b>while</b> (*<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a> == <kbd>'*'</kbd>) {</td></tr>
+<tr><th id="121">121</th><td>        <a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a>++;</td></tr>
+<tr><th id="122">122</th><td>    }</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <b>if</b> (*<a class="local col6 ref" href="#6pat" title='pat' data-ref="6pat">pat</a> == <kbd>'\0'</kbd> &amp;&amp; *<a class="local col7 ref" href="#7ev" title='ev' data-ref="7ev">ev</a> == <kbd>'\0'</kbd>) {</td></tr>
+<tr><th id="125">125</th><td>        <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="126">126</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="127">127</th><td>        <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="128">128</th><td>    }</td></tr>
+<tr><th id="129">129</th><td>}</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><em>void</em> <dfn class="decl def" id="trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</dfn>(<a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> *<dfn class="local col8 decl" id="8iter" title='iter' data-type='TraceEventIter *' data-ref="8iter">iter</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9pattern" title='pattern' data-type='const char *' data-ref="9pattern">pattern</dfn>)</td></tr>
+<tr><th id="133">133</th><td>{</td></tr>
+<tr><th id="134">134</th><td>    <a class="local col8 ref" href="#8iter" title='iter' data-ref="8iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a> = <var>0</var>;</td></tr>
+<tr><th id="135">135</th><td>    <a class="local col8 ref" href="#8iter" title='iter' data-ref="8iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a> = <var>0</var>;</td></tr>
+<tr><th id="136">136</th><td>    <a class="local col8 ref" href="#8iter" title='iter' data-ref="8iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::pattern" title='TraceEventIter::pattern' data-ref="TraceEventIter::pattern">pattern</a> = <a class="local col9 ref" href="#9pattern" title='pattern' data-ref="9pattern">pattern</a>;</td></tr>
+<tr><th id="137">137</th><td>}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="decl def" id="trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</dfn>(<a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> *<dfn class="local col0 decl" id="10iter" title='iter' data-type='TraceEventIter *' data-ref="10iter">iter</dfn>)</td></tr>
+<tr><th id="140">140</th><td>{</td></tr>
+<tr><th id="141">141</th><td>    <b>while</b> (<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a> &lt; <a class="tu ref" href="#nevent_groups" title='nevent_groups' data-use='r' data-ref="nevent_groups">nevent_groups</a> &amp;&amp;</td></tr>
+<tr><th id="142">142</th><td>           <a class="tu ref" href="#event_groups" title='event_groups' data-use='r' data-ref="event_groups">event_groups</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a>].<a class="tu ref" href="#TraceEventGroup::events" title='TraceEventGroup::events' data-use='r' data-ref="TraceEventGroup::events">events</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a>] != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="143">143</th><td>        <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col1 decl" id="11ev" title='ev' data-type='TraceEvent *' data-ref="11ev">ev</dfn> = <a class="tu ref" href="#event_groups" title='event_groups' data-use='r' data-ref="event_groups">event_groups</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a>].<a class="tu ref" href="#TraceEventGroup::events" title='TraceEventGroup::events' data-use='r' data-ref="TraceEventGroup::events">events</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a>];</td></tr>
+<tr><th id="144">144</th><td>        <a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a>++;</td></tr>
+<tr><th id="145">145</th><td>        <b>if</b> (<a class="tu ref" href="#event_groups" title='event_groups' data-use='r' data-ref="event_groups">event_groups</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a>].<a class="tu ref" href="#TraceEventGroup::events" title='TraceEventGroup::events' data-use='r' data-ref="TraceEventGroup::events">events</a>[<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a>] == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="146">146</th><td>            <a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::event" title='TraceEventIter::event' data-ref="TraceEventIter::event">event</a> = <var>0</var>;</td></tr>
+<tr><th id="147">147</th><td>            <a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::group" title='TraceEventIter::group' data-ref="TraceEventIter::group">group</a>++;</td></tr>
+<tr><th id="148">148</th><td>        }</td></tr>
+<tr><th id="149">149</th><td>        <b>if</b> (!<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::pattern" title='TraceEventIter::pattern' data-ref="TraceEventIter::pattern">pattern</a> ||</td></tr>
+<tr><th id="150">150</th><td>            <a class="tu ref" href="#pattern_glob" title='pattern_glob' data-use='c' data-ref="pattern_glob">pattern_glob</a>(<a class="local col0 ref" href="#10iter" title='iter' data-ref="10iter">iter</a>-&gt;<a class="ref" href="control.h.html#TraceEventIter::pattern" title='TraceEventIter::pattern' data-ref="TraceEventIter::pattern">pattern</a>,</td></tr>
+<tr><th id="151">151</th><td>                         <a class="ref" href="control.h.html#trace_event_get_name" title='trace_event_get_name' data-ref="trace_event_get_name">trace_event_get_name</a>(<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>))) {</td></tr>
+<tr><th id="152">152</th><td>            <b>return</b> <a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>;</td></tr>
+<tr><th id="153">153</th><td>        }</td></tr>
+<tr><th id="154">154</th><td>    }</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <dfn class="decl def" id="trace_list_events" title='trace_list_events' data-ref="trace_list_events">trace_list_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="160">160</th><td>{</td></tr>
+<tr><th id="161">161</th><td>    <a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> <dfn class="local col2 decl" id="12iter" title='iter' data-type='TraceEventIter' data-ref="12iter">iter</dfn>;</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col3 decl" id="13ev" title='ev' data-type='TraceEvent *' data-ref="13ev">ev</dfn>;</td></tr>
+<tr><th id="163">163</th><td>    <a class="ref" href="#trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</a>(&amp;<a class="local col2 ref" href="#12iter" title='iter' data-ref="12iter">iter</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="164">164</th><td>    <b>while</b> ((<a class="local col3 ref" href="#13ev" title='ev' data-ref="13ev">ev</a> = <a class="ref" href="#trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</a>(&amp;<a class="local col2 ref" href="#12iter" title='iter' data-ref="12iter">iter</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="165">165</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"%s\n"</q>, <a class="ref" href="control.h.html#trace_event_get_name" title='trace_event_get_name' data-ref="trace_event_get_name">trace_event_get_name</a>(<a class="local col3 ref" href="#13ev" title='ev' data-ref="13ev">ev</a>));</td></tr>
+<tr><th id="166">166</th><td>    }</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="do_trace_enable_events" title='do_trace_enable_events' data-type='void do_trace_enable_events(const char * line_buf)' data-ref="do_trace_enable_events">do_trace_enable_events</dfn>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14line_buf" title='line_buf' data-type='const char *' data-ref="14line_buf">line_buf</dfn>)</td></tr>
+<tr><th id="170">170</th><td>{</td></tr>
+<tr><th id="171">171</th><td>    <em>const</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="15enable" title='enable' data-type='const _Bool' data-ref="15enable">enable</dfn> = (<kbd>'-'</kbd> != <a class="local col4 ref" href="#14line_buf" title='line_buf' data-ref="14line_buf">line_buf</a>[<var>0</var>]);</td></tr>
+<tr><th id="172">172</th><td>    <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="16line_ptr" title='line_ptr' data-type='const char *' data-ref="16line_ptr">line_ptr</dfn> = <a class="local col5 ref" href="#15enable" title='enable' data-ref="15enable">enable</a> ? <a class="local col4 ref" href="#14line_buf" title='line_buf' data-ref="14line_buf">line_buf</a> : <a class="local col4 ref" href="#14line_buf" title='line_buf' data-ref="14line_buf">line_buf</a> + <var>1</var>;</td></tr>
+<tr><th id="173">173</th><td>    <a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> <dfn class="local col7 decl" id="17iter" title='iter' data-type='TraceEventIter' data-ref="17iter">iter</dfn>;</td></tr>
+<tr><th id="174">174</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col8 decl" id="18ev" title='ev' data-type='TraceEvent *' data-ref="18ev">ev</dfn>;</td></tr>
+<tr><th id="175">175</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="19is_pattern" title='is_pattern' data-type='_Bool' data-ref="19is_pattern">is_pattern</dfn> = <a class="ref" href="control.h.html#trace_event_is_pattern" title='trace_event_is_pattern' data-ref="trace_event_is_pattern">trace_event_is_pattern</a>(<a class="local col6 ref" href="#16line_ptr" title='line_ptr' data-ref="16line_ptr">line_ptr</a>);</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>    <a class="ref" href="#trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</a>(&amp;<a class="local col7 ref" href="#17iter" title='iter' data-ref="17iter">iter</a>, <a class="local col6 ref" href="#16line_ptr" title='line_ptr' data-ref="16line_ptr">line_ptr</a>);</td></tr>
+<tr><th id="178">178</th><td>    <b>while</b> ((<a class="local col8 ref" href="#18ev" title='ev' data-ref="18ev">ev</a> = <a class="ref" href="#trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</a>(&amp;<a class="local col7 ref" href="#17iter" title='iter' data-ref="17iter">iter</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="179">179</th><td>        <b>if</b> (!<a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col8 ref" href="#18ev" title='ev' data-ref="18ev">ev</a>)) {</td></tr>
+<tr><th id="180">180</th><td>            <b>if</b> (!<a class="local col9 ref" href="#19is_pattern" title='is_pattern' data-ref="19is_pattern">is_pattern</a>) {</td></tr>
+<tr><th id="181">181</th><td>                <a class="ref" href="../include/qemu/error-report.h.html#warn_report" title='warn_report' data-ref="warn_report">warn_report</a>(<q>"trace event '%s' is not traceable"</q>,</td></tr>
+<tr><th id="182">182</th><td>                            <a class="local col6 ref" href="#16line_ptr" title='line_ptr' data-ref="16line_ptr">line_ptr</a>);</td></tr>
+<tr><th id="183">183</th><td>                <b>return</b>;</td></tr>
+<tr><th id="184">184</th><td>            }</td></tr>
+<tr><th id="185">185</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="186">186</th><td>        }</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>        <i>/* start tracing */</i></td></tr>
+<tr><th id="189">189</th><td>        <a class="ref" href="control.h.html#trace_event_set_state_dynamic" title='trace_event_set_state_dynamic' data-ref="trace_event_set_state_dynamic">trace_event_set_state_dynamic</a>(<a class="local col8 ref" href="#18ev" title='ev' data-ref="18ev">ev</a>, <a class="local col5 ref" href="#15enable" title='enable' data-ref="15enable">enable</a>);</td></tr>
+<tr><th id="190">190</th><td>        <b>if</b> (!<a class="local col9 ref" href="#19is_pattern" title='is_pattern' data-ref="19is_pattern">is_pattern</a>) {</td></tr>
+<tr><th id="191">191</th><td>            <b>return</b>;</td></tr>
+<tr><th id="192">192</th><td>        }</td></tr>
+<tr><th id="193">193</th><td>    }</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>    <b>if</b> (!<a class="local col9 ref" href="#19is_pattern" title='is_pattern' data-ref="19is_pattern">is_pattern</a>) {</td></tr>
+<tr><th id="196">196</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#warn_report" title='warn_report' data-ref="warn_report">warn_report</a>(<q>"trace event '%s' does not exist"</q>,</td></tr>
+<tr><th id="197">197</th><td>                    <a class="local col6 ref" href="#16line_ptr" title='line_ptr' data-ref="16line_ptr">line_ptr</a>);</td></tr>
+<tr><th id="198">198</th><td>    }</td></tr>
+<tr><th id="199">199</th><td>}</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td><em>void</em> <dfn class="decl def" id="trace_enable_events" title='trace_enable_events' data-ref="trace_enable_events">trace_enable_events</dfn>(<em>const</em> <em>char</em> *<dfn class="local col0 decl" id="20line_buf" title='line_buf' data-type='const char *' data-ref="20line_buf">line_buf</dfn>)</td></tr>
+<tr><th id="202">202</th><td>{</td></tr>
+<tr><th id="203">203</th><td>    <b>if</b> (<a class="ref" href="../include/qemu/help_option.h.html#is_help_option" title='is_help_option' data-ref="is_help_option">is_help_option</a>(<a class="local col0 ref" href="#20line_buf" title='line_buf' data-ref="20line_buf">line_buf</a>)) {</td></tr>
+<tr><th id="204">204</th><td>        <a class="ref" href="#trace_list_events" title='trace_list_events' data-ref="trace_list_events">trace_list_events</a>();</td></tr>
+<tr><th id="205">205</th><td>        <b>if</b> (<a class="ref" href="../include/monitor/monitor.h.html#cur_mon" title='cur_mon' data-ref="cur_mon">cur_mon</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="206">206</th><td>            <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>0</var>);</td></tr>
+<tr><th id="207">207</th><td>        }</td></tr>
+<tr><th id="208">208</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="209">209</th><td>        <a class="tu ref" href="#do_trace_enable_events" title='do_trace_enable_events' data-use='c' data-ref="do_trace_enable_events">do_trace_enable_events</a>(<a class="local col0 ref" href="#20line_buf" title='line_buf' data-ref="20line_buf">line_buf</a>);</td></tr>
+<tr><th id="210">210</th><td>    }</td></tr>
+<tr><th id="211">211</th><td>}</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="trace_init_events" title='trace_init_events' data-type='void trace_init_events(const char * fname)' data-ref="trace_init_events">trace_init_events</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="21fname" title='fname' data-type='const char *' data-ref="21fname">fname</dfn>)</td></tr>
+<tr><th id="214">214</th><td>{</td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="../include/qemu/error-report.h.html#Location" title='Location' data-type='struct Location' data-ref="Location">Location</a> <dfn class="local col2 decl" id="22loc" title='loc' data-type='Location' data-ref="22loc">loc</dfn>;</td></tr>
+<tr><th id="216">216</th><td>    <a class="typedef" href="../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col3 decl" id="23fp" title='fp' data-type='FILE *' data-ref="23fp">fp</dfn>;</td></tr>
+<tr><th id="217">217</th><td>    <em>char</em> <dfn class="local col4 decl" id="24line_buf" title='line_buf' data-type='char [1024]' data-ref="24line_buf">line_buf</dfn>[<var>1024</var>];</td></tr>
+<tr><th id="218">218</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="25line_idx" title='line_idx' data-type='size_t' data-ref="25line_idx">line_idx</dfn> = <var>0</var>;</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>    <b>if</b> (<a class="local col1 ref" href="#21fname" title='fname' data-ref="21fname">fname</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="221">221</th><td>        <b>return</b>;</td></tr>
+<tr><th id="222">222</th><td>    }</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#loc_push_none" title='loc_push_none' data-ref="loc_push_none">loc_push_none</a>(&amp;<a class="local col2 ref" href="#22loc" title='loc' data-ref="22loc">loc</a>);</td></tr>
+<tr><th id="225">225</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#loc_set_file" title='loc_set_file' data-ref="loc_set_file">loc_set_file</a>(<a class="local col1 ref" href="#21fname" title='fname' data-ref="21fname">fname</a>, <var>0</var>);</td></tr>
+<tr><th id="226">226</th><td>    <a class="local col3 ref" href="#23fp" title='fp' data-ref="23fp">fp</a> = <a class="ref" href="../../include/stdio.h.html#283" title='fopen' data-ref="fopen64">fopen</a>(<a class="local col1 ref" href="#21fname" title='fname' data-ref="21fname">fname</a>, <q>"r"</q>);</td></tr>
+<tr><th id="227">227</th><td>    <b>if</b> (!<a class="local col3 ref" href="#23fp" title='fp' data-ref="23fp">fp</a>) {</td></tr>
+<tr><th id="228">228</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"%s"</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="229">229</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="230">230</th><td>    }</td></tr>
+<tr><th id="231">231</th><td>    <b>while</b> (<a class="ref" href="../../include/stdio.h.html#fgets" title='fgets' data-ref="fgets">fgets</a>(<a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>, <b>sizeof</b>(<a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>), <a class="local col3 ref" href="#23fp" title='fp' data-ref="23fp">fp</a>)) {</td></tr>
+<tr><th id="232">232</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#loc_set_file" title='loc_set_file' data-ref="loc_set_file">loc_set_file</a>(<a class="local col1 ref" href="#21fname" title='fname' data-ref="21fname">fname</a>, ++<a class="local col5 ref" href="#25line_idx" title='line_idx' data-ref="25line_idx">line_idx</a>);</td></tr>
+<tr><th id="233">233</th><td>        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="26len" title='len' data-type='size_t' data-ref="26len">len</dfn> = <a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>);</td></tr>
+<tr><th id="234">234</th><td>        <b>if</b> (<a class="local col6 ref" href="#26len" title='len' data-ref="26len">len</a> &gt; <var>1</var>) {              <i>/* skip empty lines */</i></td></tr>
+<tr><th id="235">235</th><td>            <a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>[<a class="local col6 ref" href="#26len" title='len' data-ref="26len">len</a> - <var>1</var>] = <kbd>'\0'</kbd>;</td></tr>
+<tr><th id="236">236</th><td>            <b>if</b> (<kbd>'#'</kbd> == <a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>[<var>0</var>]) { <i>/* skip commented lines */</i></td></tr>
+<tr><th id="237">237</th><td>                <b>continue</b>;</td></tr>
+<tr><th id="238">238</th><td>            }</td></tr>
+<tr><th id="239">239</th><td>            <a class="ref" href="#trace_enable_events" title='trace_enable_events' data-ref="trace_enable_events">trace_enable_events</a>(<a class="local col4 ref" href="#24line_buf" title='line_buf' data-ref="24line_buf">line_buf</a>);</td></tr>
+<tr><th id="240">240</th><td>        }</td></tr>
+<tr><th id="241">241</th><td>    }</td></tr>
+<tr><th id="242">242</th><td>    <b>if</b> (<a class="ref" href="../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="local col3 ref" href="#23fp" title='fp' data-ref="23fp">fp</a>) != <var>0</var>) {</td></tr>
+<tr><th id="243">243</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#loc_set_file" title='loc_set_file' data-ref="loc_set_file">loc_set_file</a>(<a class="local col1 ref" href="#21fname" title='fname' data-ref="21fname">fname</a>, <var>0</var>);</td></tr>
+<tr><th id="244">244</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"%s"</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="245">245</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="246">246</th><td>    }</td></tr>
+<tr><th id="247">247</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#loc_pop" title='loc_pop' data-ref="loc_pop">loc_pop</a>(&amp;<a class="local col2 ref" href="#22loc" title='loc' data-ref="22loc">loc</a>);</td></tr>
+<tr><th id="248">248</th><td>}</td></tr>
+<tr><th id="249">249</th><td></td></tr>
+<tr><th id="250">250</th><td><em>void</em> <dfn class="decl def" id="trace_init_file" title='trace_init_file' data-ref="trace_init_file">trace_init_file</dfn>(<em>const</em> <em>char</em> *<dfn class="local col7 decl" id="27file" title='file' data-type='const char *' data-ref="27file">file</dfn>)</td></tr>
+<tr><th id="251">251</th><td>{</td></tr>
+<tr><th id="252">252</th><td><u>#<span data-ppcond="252">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_SIMPLE">CONFIG_TRACE_SIMPLE</span></u></td></tr>
+<tr><th id="253">253</th><td>    st_set_trace_file(file);</td></tr>
+<tr><th id="254">254</th><td><u>#<span data-ppcond="252">elif</span> defined <a class="macro" href="../config-host.h.html#88" data-ref="_M/CONFIG_TRACE_LOG">CONFIG_TRACE_LOG</a></u></td></tr>
+<tr><th id="255">255</th><td>    <i>/* If both the simple and the log backends are enabled, "-trace file"</i></td></tr>
+<tr><th id="256">256</th><td><i>     * only applies to the simple backend; use "-D" for the log backend.</i></td></tr>
+<tr><th id="257">257</th><td><i>     */</i></td></tr>
+<tr><th id="258">258</th><td>    <b>if</b> (<a class="local col7 ref" href="#27file" title='file' data-ref="27file">file</a>) {</td></tr>
+<tr><th id="259">259</th><td>        <a class="ref" href="../include/qemu/log.h.html#qemu_set_log_filename" title='qemu_set_log_filename' data-ref="qemu_set_log_filename">qemu_set_log_filename</a>(<a class="local col7 ref" href="#27file" title='file' data-ref="27file">file</a>, &amp;<a class="ref" href="../include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>);</td></tr>
+<tr><th id="260">260</th><td>    }</td></tr>
+<tr><th id="261">261</th><td><u>#<span data-ppcond="252">else</span></u></td></tr>
+<tr><th id="262">262</th><td>    <b>if</b> (file) {</td></tr>
+<tr><th id="263">263</th><td>        fprintf(stderr, <q>"error: -trace file=...: "</q></td></tr>
+<tr><th id="264">264</th><td>                <q>"option not supported by the selected tracing backends\n"</q>);</td></tr>
+<tr><th id="265">265</th><td>        exit(<var>1</var>);</td></tr>
+<tr><th id="266">266</th><td>    }</td></tr>
+<tr><th id="267">267</th><td><u>#<span data-ppcond="252">endif</span></u></td></tr>
+<tr><th id="268">268</th><td>}</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td><em>void</em> <dfn class="decl def" id="trace_fini_vcpu" title='trace_fini_vcpu' data-ref="trace_fini_vcpu">trace_fini_vcpu</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="28vcpu" title='vcpu' data-type='CPUState *' data-ref="28vcpu">vcpu</dfn>)</td></tr>
+<tr><th id="271">271</th><td>{</td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> <dfn class="local col9 decl" id="29iter" title='iter' data-type='TraceEventIter' data-ref="29iter">iter</dfn>;</td></tr>
+<tr><th id="273">273</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col0 decl" id="30ev" title='ev' data-type='TraceEvent *' data-ref="30ev">ev</dfn>;</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>    <a class="ref" href="../trace-root.h.html#trace_guest_cpu_exit" title='trace_guest_cpu_exit' data-ref="trace_guest_cpu_exit">trace_guest_cpu_exit</a>(<a class="local col8 ref" href="#28vcpu" title='vcpu' data-ref="28vcpu">vcpu</a>);</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>    <a class="ref" href="#trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</a>(&amp;<a class="local col9 ref" href="#29iter" title='iter' data-ref="29iter">iter</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="278">278</th><td>    <b>while</b> ((<a class="local col0 ref" href="#30ev" title='ev' data-ref="30ev">ev</a> = <a class="ref" href="#trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</a>(&amp;<a class="local col9 ref" href="#29iter" title='iter' data-ref="29iter">iter</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="279">279</th><td>        <b>if</b> (<a class="ref" href="control.h.html#trace_event_is_vcpu" title='trace_event_is_vcpu' data-ref="trace_event_is_vcpu">trace_event_is_vcpu</a>(<a class="local col0 ref" href="#30ev" title='ev' data-ref="30ev">ev</a>) &amp;&amp;</td></tr>
+<tr><th id="280">280</th><td>            <a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col0 ref" href="#30ev" title='ev' data-ref="30ev">ev</a>) &amp;&amp;</td></tr>
+<tr><th id="281">281</th><td>            <a class="ref" href="control.h.html#trace_event_get_vcpu_state_dynamic" title='trace_event_get_vcpu_state_dynamic' data-ref="trace_event_get_vcpu_state_dynamic">trace_event_get_vcpu_state_dynamic</a>(<a class="local col8 ref" href="#28vcpu" title='vcpu' data-ref="28vcpu">vcpu</a>, <a class="local col0 ref" href="#30ev" title='ev' data-ref="30ev">ev</a>)) {</td></tr>
+<tr><th id="282">282</th><td>            <i>/* must disable to affect the global counter */</i></td></tr>
+<tr><th id="283">283</th><td>            <a class="ref" href="control.h.html#trace_event_set_vcpu_state_dynamic" title='trace_event_set_vcpu_state_dynamic' data-ref="trace_event_set_vcpu_state_dynamic">trace_event_set_vcpu_state_dynamic</a>(<a class="local col8 ref" href="#28vcpu" title='vcpu' data-ref="28vcpu">vcpu</a>, <a class="local col0 ref" href="#30ev" title='ev' data-ref="30ev">ev</a>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="284">284</th><td>        }</td></tr>
+<tr><th id="285">285</th><td>    }</td></tr>
+<tr><th id="286">286</th><td>}</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="trace_init_backends" title='trace_init_backends' data-ref="trace_init_backends">trace_init_backends</dfn>(<em>void</em>)</td></tr>
+<tr><th id="289">289</th><td>{</td></tr>
+<tr><th id="290">290</th><td><u>#<span data-ppcond="290">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_SIMPLE">CONFIG_TRACE_SIMPLE</span></u></td></tr>
+<tr><th id="291">291</th><td>    <b>if</b> (!st_init()) {</td></tr>
+<tr><th id="292">292</th><td>        fprintf(stderr, <q>"failed to initialize simple tracing backend.\n"</q>);</td></tr>
+<tr><th id="293">293</th><td>        <b>return</b> false;</td></tr>
+<tr><th id="294">294</th><td>    }</td></tr>
+<tr><th id="295">295</th><td><u>#<span data-ppcond="290">endif</span></u></td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td><u>#<span data-ppcond="297">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_FTRACE">CONFIG_TRACE_FTRACE</span></u></td></tr>
+<tr><th id="298">298</th><td>    <b>if</b> (!ftrace_init()) {</td></tr>
+<tr><th id="299">299</th><td>        fprintf(stderr, <q>"failed to initialize ftrace backend.\n"</q>);</td></tr>
+<tr><th id="300">300</th><td>        <b>return</b> false;</td></tr>
+<tr><th id="301">301</th><td>    }</td></tr>
+<tr><th id="302">302</th><td><u>#<span data-ppcond="297">endif</span></u></td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td><u>#<span data-ppcond="304">ifdef</span> <span class="macro" data-ref="_M/CONFIG_TRACE_SYSLOG">CONFIG_TRACE_SYSLOG</span></u></td></tr>
+<tr><th id="305">305</th><td>    openlog(NULL, LOG_PID, LOG_DAEMON);</td></tr>
+<tr><th id="306">306</th><td><u>#<span data-ppcond="304">endif</span></u></td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="309">309</th><td>}</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td><em>char</em> *<dfn class="decl def" id="trace_opt_parse" title='trace_opt_parse' data-ref="trace_opt_parse">trace_opt_parse</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="31optarg" title='optarg' data-type='const char *' data-ref="31optarg">optarg</dfn>)</td></tr>
+<tr><th id="312">312</th><td>{</td></tr>
+<tr><th id="313">313</th><td>    <em>char</em> *<dfn class="local col2 decl" id="32trace_file" title='trace_file' data-type='char *' data-ref="32trace_file">trace_file</dfn>;</td></tr>
+<tr><th id="314">314</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col3 decl" id="33opts" title='opts' data-type='QemuOpts *' data-ref="33opts">opts</dfn> = <a class="ref" href="../include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(<a class="ref" href="../include/qemu/config-file.h.html#qemu_find_opts" title='qemu_find_opts' data-ref="qemu_find_opts">qemu_find_opts</a>(<q>"trace"</q>),</td></tr>
+<tr><th id="315">315</th><td>                                             <a class="local col1 ref" href="#31optarg" title='optarg' data-ref="31optarg">optarg</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="316">316</th><td>    <b>if</b> (!<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>) {</td></tr>
+<tr><th id="317">317</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="318">318</th><td>    }</td></tr>
+<tr><th id="319">319</th><td>    <b>if</b> (<a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>, <q>"enable"</q>)) {</td></tr>
+<tr><th id="320">320</th><td>        <a class="ref" href="#trace_enable_events" title='trace_enable_events' data-ref="trace_enable_events">trace_enable_events</a>(<a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>, <q>"enable"</q>));</td></tr>
+<tr><th id="321">321</th><td>    }</td></tr>
+<tr><th id="322">322</th><td>    <a class="tu ref" href="#trace_init_events" title='trace_init_events' data-use='c' data-ref="trace_init_events">trace_init_events</a>(<a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>, <q>"events"</q>));</td></tr>
+<tr><th id="323">323</th><td>    <a class="local col2 ref" href="#32trace_file" title='trace_file' data-ref="32trace_file">trace_file</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>, <q>"file"</q>));</td></tr>
+<tr><th id="324">324</th><td>    <a class="ref" href="../include/qemu/option.h.html#qemu_opts_del" title='qemu_opts_del' data-ref="qemu_opts_del">qemu_opts_del</a>(<a class="local col3 ref" href="#33opts" title='opts' data-ref="33opts">opts</a>);</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td>    <b>return</b> <a class="local col2 ref" href="#32trace_file" title='trace_file' data-ref="32trace_file">trace_file</a>;</td></tr>
+<tr><th id="327">327</th><td>}</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="trace_get_vcpu_event_count" title='trace_get_vcpu_event_count' data-ref="trace_get_vcpu_event_count">trace_get_vcpu_event_count</dfn>(<em>void</em>)</td></tr>
+<tr><th id="330">330</th><td>{</td></tr>
+<tr><th id="331">331</th><td>    <b>return</b> <a class="tu ref" href="#next_vcpu_id" title='next_vcpu_id' data-use='r' data-ref="next_vcpu_id">next_vcpu_id</a>;</td></tr>
+<tr><th id="332">332</th><td>}</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

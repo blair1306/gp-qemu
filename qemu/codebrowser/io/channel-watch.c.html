@@ -1,0 +1,372 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>channel-watch.c source code [codebrowser/io/channel-watch.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QIOChannelFDPairSource,QIOChannelFDSource "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/io/channel-watch.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>io</a>/<a href='channel-watch.c.html'>channel-watch.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU I/O channels watch helper APIs</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../include/io/channel-watch.h.html">"io/channel-watch.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> <dfn class="typedef" id="QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</dfn>;</td></tr>
+<tr><th id="25">25</th><td><b>struct</b> <dfn class="type def" id="QIOChannelFDSource" title='QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</dfn> {</td></tr>
+<tr><th id="26">26</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> <dfn class="tu decl" id="QIOChannelFDSource::parent" title='QIOChannelFDSource::parent' data-type='GSource' data-ref="QIOChannelFDSource::parent">parent</dfn>;</td></tr>
+<tr><th id="27">27</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> <dfn class="tu decl" id="QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-type='GPollFD' data-ref="QIOChannelFDSource::fd">fd</dfn>;</td></tr>
+<tr><th id="28">28</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="tu decl" id="QIOChannelFDSource::ioc" title='QIOChannelFDSource::ioc' data-type='QIOChannel *' data-ref="QIOChannelFDSource::ioc">ioc</dfn>;</td></tr>
+<tr><th id="29">29</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="tu decl" id="QIOChannelFDSource::condition" title='QIOChannelFDSource::condition' data-type='GIOCondition' data-ref="QIOChannelFDSource::condition">condition</dfn>;</td></tr>
+<tr><th id="30">30</th><td>};</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="33">ifdef</span> <span class="macro" data-ref="_M/CONFIG_WIN32">CONFIG_WIN32</span></u></td></tr>
+<tr><th id="34">34</th><td><b>typedef</b> <b>struct</b> QIOChannelSocketSource QIOChannelSocketSource;</td></tr>
+<tr><th id="35">35</th><td><b>struct</b> QIOChannelSocketSource {</td></tr>
+<tr><th id="36">36</th><td>    GSource parent;</td></tr>
+<tr><th id="37">37</th><td>    GPollFD fd;</td></tr>
+<tr><th id="38">38</th><td>    QIOChannel *ioc;</td></tr>
+<tr><th id="39">39</th><td>    SOCKET socket;</td></tr>
+<tr><th id="40">40</th><td>    <em>int</em> revents;</td></tr>
+<tr><th id="41">41</th><td>    GIOCondition condition;</td></tr>
+<tr><th id="42">42</th><td>};</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#<span data-ppcond="33">endif</span></u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> <dfn class="typedef" id="QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</dfn>;</td></tr>
+<tr><th id="48">48</th><td><b>struct</b> <dfn class="type def" id="QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</dfn> {</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> <dfn class="tu decl" id="QIOChannelFDPairSource::parent" title='QIOChannelFDPairSource::parent' data-type='GSource' data-ref="QIOChannelFDPairSource::parent">parent</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> <dfn class="tu decl" id="QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-type='GPollFD' data-ref="QIOChannelFDPairSource::fdread">fdread</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> <dfn class="tu decl" id="QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-type='GPollFD' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="tu decl" id="QIOChannelFDPairSource::ioc" title='QIOChannelFDPairSource::ioc' data-type='QIOChannel *' data-ref="QIOChannelFDPairSource::ioc">ioc</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="tu decl" id="QIOChannelFDPairSource::condition" title='QIOChannelFDPairSource::condition' data-type='GIOCondition' data-ref="QIOChannelFDPairSource::condition">condition</dfn>;</td></tr>
+<tr><th id="54">54</th><td>};</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="58">58</th><td><dfn class="tu decl def" id="qio_channel_fd_source_prepare" title='qio_channel_fd_source_prepare' data-type='gboolean qio_channel_fd_source_prepare(GSource * source, gint * timeout)' data-ref="qio_channel_fd_source_prepare">qio_channel_fd_source_prepare</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col1 decl" id="1source" title='source' data-type='GSource *' data-ref="1source">source</dfn> <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#141" title="__attribute__((__unused__))" data-ref="_M/G_GNUC_UNUSED">G_GNUC_UNUSED</a>,</td></tr>
+<tr><th id="59">59</th><td>                              <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gint" title='gint' data-type='int' data-ref="gint">gint</a> *<dfn class="local col2 decl" id="2timeout" title='timeout' data-type='gint *' data-ref="2timeout">timeout</dfn>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>    *<a class="local col2 ref" href="#2timeout" title='timeout' data-ref="2timeout">timeout</a> = -<var>1</var>;</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>    <b>return</b> <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="64">64</th><td>}</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="68">68</th><td><dfn class="tu decl def" id="qio_channel_fd_source_check" title='qio_channel_fd_source_check' data-type='gboolean qio_channel_fd_source_check(GSource * source)' data-ref="qio_channel_fd_source_check">qio_channel_fd_source_check</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col3 decl" id="3source" title='source' data-type='GSource *' data-ref="3source">source</dfn>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *<dfn class="local col4 decl" id="4ssource" title='ssource' data-type='QIOChannelFDSource *' data-ref="4ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *)<a class="local col3 ref" href="#3source" title='source' data-ref="3source">source</a>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <b>return</b> <a class="local col4 ref" href="#4ssource" title='ssource' data-ref="4ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-use='m' data-ref="QIOChannelFDSource::fd">fd</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a> &amp; <a class="local col4 ref" href="#4ssource" title='ssource' data-ref="4ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::condition" title='QIOChannelFDSource::condition' data-use='r' data-ref="QIOChannelFDSource::condition">condition</a>;</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="77">77</th><td><dfn class="tu decl def" id="qio_channel_fd_source_dispatch" title='qio_channel_fd_source_dispatch' data-type='gboolean qio_channel_fd_source_dispatch(GSource * source, GSourceFunc callback, gpointer user_data)' data-ref="qio_channel_fd_source_dispatch">qio_channel_fd_source_dispatch</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col5 decl" id="5source" title='source' data-type='GSource *' data-ref="5source">source</dfn>,</td></tr>
+<tr><th id="78">78</th><td>                               <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSourceFunc" title='GSourceFunc' data-type='gboolean (*)(gpointer)' data-ref="GSourceFunc">GSourceFunc</a> <dfn class="local col6 decl" id="6callback" title='callback' data-type='GSourceFunc' data-ref="6callback">callback</dfn>,</td></tr>
+<tr><th id="79">79</th><td>                               <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gpointer" title='gpointer' data-type='void *' data-ref="gpointer">gpointer</a> <dfn class="local col7 decl" id="7user_data" title='user_data' data-type='gpointer' data-ref="7user_data">user_data</dfn>)</td></tr>
+<tr><th id="80">80</th><td>{</td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannelFunc" title='QIOChannelFunc' data-type='gboolean (*)(QIOChannel *, GIOCondition, gpointer)' data-ref="QIOChannelFunc">QIOChannelFunc</a> <dfn class="local col8 decl" id="8func" title='func' data-type='QIOChannelFunc' data-ref="8func">func</dfn> = (<a class="typedef" href="../include/io/channel.h.html#QIOChannelFunc" title='QIOChannelFunc' data-type='gboolean (*)(QIOChannel *, GIOCondition, gpointer)' data-ref="QIOChannelFunc">QIOChannelFunc</a>)<a class="local col6 ref" href="#6callback" title='callback' data-ref="6callback">callback</a>;</td></tr>
+<tr><th id="82">82</th><td>    <a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *<dfn class="local col9 decl" id="9ssource" title='ssource' data-type='QIOChannelFDSource *' data-ref="9ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *)<a class="local col5 ref" href="#5source" title='source' data-ref="5source">source</a>;</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>    <b>return</b> (*<a class="local col8 ref" href="#8func" title='func' data-ref="8func">func</a>)(<a class="local col9 ref" href="#9ssource" title='ssource' data-ref="9ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::ioc" title='QIOChannelFDSource::ioc' data-use='r' data-ref="QIOChannelFDSource::ioc">ioc</a>,</td></tr>
+<tr><th id="85">85</th><td>                   <a class="local col9 ref" href="#9ssource" title='ssource' data-ref="9ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-use='m' data-ref="QIOChannelFDSource::fd">fd</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a> &amp; <a class="local col9 ref" href="#9ssource" title='ssource' data-ref="9ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::condition" title='QIOChannelFDSource::condition' data-use='r' data-ref="QIOChannelFDSource::condition">condition</a>,</td></tr>
+<tr><th id="86">86</th><td>                   <a class="local col7 ref" href="#7user_data" title='user_data' data-ref="7user_data">user_data</a>);</td></tr>
+<tr><th id="87">87</th><td>}</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="91">91</th><td><dfn class="tu decl def" id="qio_channel_fd_source_finalize" title='qio_channel_fd_source_finalize' data-type='void qio_channel_fd_source_finalize(GSource * source)' data-ref="qio_channel_fd_source_finalize">qio_channel_fd_source_finalize</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col0 decl" id="10source" title='source' data-type='GSource *' data-ref="10source">source</dfn>)</td></tr>
+<tr><th id="92">92</th><td>{</td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *<dfn class="local col1 decl" id="11ssource" title='ssource' data-type='QIOChannelFDSource *' data-ref="11ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *)<a class="local col0 ref" href="#10source" title='source' data-ref="10source">source</a>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <a class="ref" href="../include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ssource-&gt;ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col1 ref" href="#11ssource" title='ssource' data-ref="11ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::ioc" title='QIOChannelFDSource::ioc' data-use='r' data-ref="QIOChannelFDSource::ioc">ioc</a>));</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><u>#<span data-ppcond="99">ifdef</span> <span class="macro" data-ref="_M/CONFIG_WIN32">CONFIG_WIN32</span></u></td></tr>
+<tr><th id="100">100</th><td><em>static</em> gboolean</td></tr>
+<tr><th id="101">101</th><td>qio_channel_socket_source_prepare(GSource *source G_GNUC_UNUSED,</td></tr>
+<tr><th id="102">102</th><td>                                  gint *timeout)</td></tr>
+<tr><th id="103">103</th><td>{</td></tr>
+<tr><th id="104">104</th><td>    *timeout = -<var>1</var>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>return</b> FALSE;</td></tr>
+<tr><th id="107">107</th><td>}</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>/*</i></td></tr>
+<tr><th id="111">111</th><td><i> * NB, this impl only works when the socket is in non-blocking</i></td></tr>
+<tr><th id="112">112</th><td><i> * mode on Win32</i></td></tr>
+<tr><th id="113">113</th><td><i> */</i></td></tr>
+<tr><th id="114">114</th><td><em>static</em> gboolean</td></tr>
+<tr><th id="115">115</th><td>qio_channel_socket_source_check(GSource *source)</td></tr>
+<tr><th id="116">116</th><td>{</td></tr>
+<tr><th id="117">117</th><td>    <em>static</em> <b>struct</b> timeval tv0;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    QIOChannelSocketSource *ssource = (QIOChannelSocketSource *)source;</td></tr>
+<tr><th id="120">120</th><td>    WSANETWORKEVENTS ev;</td></tr>
+<tr><th id="121">121</th><td>    fd_set rfds, wfds, xfds;</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>    <b>if</b> (!ssource-&gt;condition) {</td></tr>
+<tr><th id="124">124</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="125">125</th><td>    }</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>    WSAEnumNetworkEvents(ssource-&gt;socket, ssource-&gt;ioc-&gt;event, &amp;ev);</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>    FD_ZERO(&amp;rfds);</td></tr>
+<tr><th id="130">130</th><td>    FD_ZERO(&amp;wfds);</td></tr>
+<tr><th id="131">131</th><td>    FD_ZERO(&amp;xfds);</td></tr>
+<tr><th id="132">132</th><td>    <b>if</b> (ssource-&gt;condition &amp; G_IO_IN) {</td></tr>
+<tr><th id="133">133</th><td>        FD_SET((SOCKET)ssource-&gt;socket, &amp;rfds);</td></tr>
+<tr><th id="134">134</th><td>    }</td></tr>
+<tr><th id="135">135</th><td>    <b>if</b> (ssource-&gt;condition &amp; G_IO_OUT) {</td></tr>
+<tr><th id="136">136</th><td>        FD_SET((SOCKET)ssource-&gt;socket, &amp;wfds);</td></tr>
+<tr><th id="137">137</th><td>    }</td></tr>
+<tr><th id="138">138</th><td>    <b>if</b> (ssource-&gt;condition &amp; G_IO_PRI) {</td></tr>
+<tr><th id="139">139</th><td>        FD_SET((SOCKET)ssource-&gt;socket, &amp;xfds);</td></tr>
+<tr><th id="140">140</th><td>    }</td></tr>
+<tr><th id="141">141</th><td>    ssource-&gt;revents = <var>0</var>;</td></tr>
+<tr><th id="142">142</th><td>    <b>if</b> (select(<var>0</var>, &amp;rfds, &amp;wfds, &amp;xfds, &amp;tv0) == <var>0</var>) {</td></tr>
+<tr><th id="143">143</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>    <b>if</b> (FD_ISSET(ssource-&gt;socket, &amp;rfds)) {</td></tr>
+<tr><th id="147">147</th><td>        ssource-&gt;revents |= G_IO_IN;</td></tr>
+<tr><th id="148">148</th><td>    }</td></tr>
+<tr><th id="149">149</th><td>    <b>if</b> (FD_ISSET(ssource-&gt;socket, &amp;wfds)) {</td></tr>
+<tr><th id="150">150</th><td>        ssource-&gt;revents |= G_IO_OUT;</td></tr>
+<tr><th id="151">151</th><td>    }</td></tr>
+<tr><th id="152">152</th><td>    <b>if</b> (FD_ISSET(ssource-&gt;socket, &amp;xfds)) {</td></tr>
+<tr><th id="153">153</th><td>        ssource-&gt;revents |= G_IO_PRI;</td></tr>
+<tr><th id="154">154</th><td>    }</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <b>return</b> ssource-&gt;revents;</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><em>static</em> gboolean</td></tr>
+<tr><th id="161">161</th><td>qio_channel_socket_source_dispatch(GSource *source,</td></tr>
+<tr><th id="162">162</th><td>                                   GSourceFunc callback,</td></tr>
+<tr><th id="163">163</th><td>                                   gpointer user_data)</td></tr>
+<tr><th id="164">164</th><td>{</td></tr>
+<tr><th id="165">165</th><td>    QIOChannelFunc func = (QIOChannelFunc)callback;</td></tr>
+<tr><th id="166">166</th><td>    QIOChannelSocketSource *ssource = (QIOChannelSocketSource *)source;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <b>return</b> (*func)(ssource-&gt;ioc, ssource-&gt;revents, user_data);</td></tr>
+<tr><th id="169">169</th><td>}</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="173">173</th><td>qio_channel_socket_source_finalize(GSource *source)</td></tr>
+<tr><th id="174">174</th><td>{</td></tr>
+<tr><th id="175">175</th><td>    QIOChannelSocketSource *ssource = (QIOChannelSocketSource *)source;</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>    object_unref(OBJECT(ssource-&gt;ioc));</td></tr>
+<tr><th id="178">178</th><td>}</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>GSourceFuncs qio_channel_socket_source_funcs = {</td></tr>
+<tr><th id="182">182</th><td>    qio_channel_socket_source_prepare,</td></tr>
+<tr><th id="183">183</th><td>    qio_channel_socket_source_check,</td></tr>
+<tr><th id="184">184</th><td>    qio_channel_socket_source_dispatch,</td></tr>
+<tr><th id="185">185</th><td>    qio_channel_socket_source_finalize</td></tr>
+<tr><th id="186">186</th><td>};</td></tr>
+<tr><th id="187">187</th><td><u>#<span data-ppcond="99">endif</span></u></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="191">191</th><td><dfn class="tu decl def" id="qio_channel_fd_pair_source_prepare" title='qio_channel_fd_pair_source_prepare' data-type='gboolean qio_channel_fd_pair_source_prepare(GSource * source, gint * timeout)' data-ref="qio_channel_fd_pair_source_prepare">qio_channel_fd_pair_source_prepare</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col2 decl" id="12source" title='source' data-type='GSource *' data-ref="12source">source</dfn> <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#141" title="__attribute__((__unused__))" data-ref="_M/G_GNUC_UNUSED">G_GNUC_UNUSED</a>,</td></tr>
+<tr><th id="192">192</th><td>                                   <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gint" title='gint' data-type='int' data-ref="gint">gint</a> *<dfn class="local col3 decl" id="13timeout" title='timeout' data-type='gint *' data-ref="13timeout">timeout</dfn>)</td></tr>
+<tr><th id="193">193</th><td>{</td></tr>
+<tr><th id="194">194</th><td>    *<a class="local col3 ref" href="#13timeout" title='timeout' data-ref="13timeout">timeout</a> = -<var>1</var>;</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <b>return</b> <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>;</td></tr>
+<tr><th id="197">197</th><td>}</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="201">201</th><td><dfn class="tu decl def" id="qio_channel_fd_pair_source_check" title='qio_channel_fd_pair_source_check' data-type='gboolean qio_channel_fd_pair_source_check(GSource * source)' data-ref="qio_channel_fd_pair_source_check">qio_channel_fd_pair_source_check</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col4 decl" id="14source" title='source' data-type='GSource *' data-ref="14source">source</dfn>)</td></tr>
+<tr><th id="202">202</th><td>{</td></tr>
+<tr><th id="203">203</th><td>    <a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *<dfn class="local col5 decl" id="15ssource" title='ssource' data-type='QIOChannelFDPairSource *' data-ref="15ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *)<a class="local col4 ref" href="#14source" title='source' data-ref="14source">source</a>;</td></tr>
+<tr><th id="204">204</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col6 decl" id="16poll_condition" title='poll_condition' data-type='GIOCondition' data-ref="16poll_condition">poll_condition</dfn> = <a class="local col5 ref" href="#15ssource" title='ssource' data-ref="15ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-use='m' data-ref="QIOChannelFDPairSource::fdread">fdread</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a> |</td></tr>
+<tr><th id="205">205</th><td>        <a class="local col5 ref" href="#15ssource" title='ssource' data-ref="15ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-use='m' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a>;</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <b>return</b> <a class="local col6 ref" href="#16poll_condition" title='poll_condition' data-ref="16poll_condition">poll_condition</a> &amp; <a class="local col5 ref" href="#15ssource" title='ssource' data-ref="15ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::condition" title='QIOChannelFDPairSource::condition' data-use='r' data-ref="QIOChannelFDPairSource::condition">condition</a>;</td></tr>
+<tr><th id="208">208</th><td>}</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gboolean" title='gboolean' data-type='gint' data-ref="gboolean">gboolean</a></td></tr>
+<tr><th id="212">212</th><td><dfn class="tu decl def" id="qio_channel_fd_pair_source_dispatch" title='qio_channel_fd_pair_source_dispatch' data-type='gboolean qio_channel_fd_pair_source_dispatch(GSource * source, GSourceFunc callback, gpointer user_data)' data-ref="qio_channel_fd_pair_source_dispatch">qio_channel_fd_pair_source_dispatch</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col7 decl" id="17source" title='source' data-type='GSource *' data-ref="17source">source</dfn>,</td></tr>
+<tr><th id="213">213</th><td>                                    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSourceFunc" title='GSourceFunc' data-type='gboolean (*)(gpointer)' data-ref="GSourceFunc">GSourceFunc</a> <dfn class="local col8 decl" id="18callback" title='callback' data-type='GSourceFunc' data-ref="18callback">callback</dfn>,</td></tr>
+<tr><th id="214">214</th><td>                                    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gpointer" title='gpointer' data-type='void *' data-ref="gpointer">gpointer</a> <dfn class="local col9 decl" id="19user_data" title='user_data' data-type='gpointer' data-ref="19user_data">user_data</dfn>)</td></tr>
+<tr><th id="215">215</th><td>{</td></tr>
+<tr><th id="216">216</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannelFunc" title='QIOChannelFunc' data-type='gboolean (*)(QIOChannel *, GIOCondition, gpointer)' data-ref="QIOChannelFunc">QIOChannelFunc</a> <dfn class="local col0 decl" id="20func" title='func' data-type='QIOChannelFunc' data-ref="20func">func</dfn> = (<a class="typedef" href="../include/io/channel.h.html#QIOChannelFunc" title='QIOChannelFunc' data-type='gboolean (*)(QIOChannel *, GIOCondition, gpointer)' data-ref="QIOChannelFunc">QIOChannelFunc</a>)<a class="local col8 ref" href="#18callback" title='callback' data-ref="18callback">callback</a>;</td></tr>
+<tr><th id="217">217</th><td>    <a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *<dfn class="local col1 decl" id="21ssource" title='ssource' data-type='QIOChannelFDPairSource *' data-ref="21ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *)<a class="local col7 ref" href="#17source" title='source' data-ref="17source">source</a>;</td></tr>
+<tr><th id="218">218</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col2 decl" id="22poll_condition" title='poll_condition' data-type='GIOCondition' data-ref="22poll_condition">poll_condition</dfn> = <a class="local col1 ref" href="#21ssource" title='ssource' data-ref="21ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-use='m' data-ref="QIOChannelFDPairSource::fdread">fdread</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a> |</td></tr>
+<tr><th id="219">219</th><td>        <a class="local col1 ref" href="#21ssource" title='ssource' data-ref="21ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-use='m' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::revents" title='_GPollFD::revents' data-ref="_GPollFD::revents">revents</a>;</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td>    <b>return</b> (*<a class="local col0 ref" href="#20func" title='func' data-ref="20func">func</a>)(<a class="local col1 ref" href="#21ssource" title='ssource' data-ref="21ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::ioc" title='QIOChannelFDPairSource::ioc' data-use='r' data-ref="QIOChannelFDPairSource::ioc">ioc</a>,</td></tr>
+<tr><th id="222">222</th><td>                   <a class="local col2 ref" href="#22poll_condition" title='poll_condition' data-ref="22poll_condition">poll_condition</a> &amp; <a class="local col1 ref" href="#21ssource" title='ssource' data-ref="21ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::condition" title='QIOChannelFDPairSource::condition' data-use='r' data-ref="QIOChannelFDPairSource::condition">condition</a>,</td></tr>
+<tr><th id="223">223</th><td>                   <a class="local col9 ref" href="#19user_data" title='user_data' data-ref="19user_data">user_data</a>);</td></tr>
+<tr><th id="224">224</th><td>}</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="228">228</th><td><dfn class="tu decl def" id="qio_channel_fd_pair_source_finalize" title='qio_channel_fd_pair_source_finalize' data-type='void qio_channel_fd_pair_source_finalize(GSource * source)' data-ref="qio_channel_fd_pair_source_finalize">qio_channel_fd_pair_source_finalize</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col3 decl" id="23source" title='source' data-type='GSource *' data-ref="23source">source</dfn>)</td></tr>
+<tr><th id="229">229</th><td>{</td></tr>
+<tr><th id="230">230</th><td>    <a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *<dfn class="local col4 decl" id="24ssource" title='ssource' data-type='QIOChannelFDPairSource *' data-ref="24ssource">ssource</dfn> = (<a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *)<a class="local col3 ref" href="#23source" title='source' data-ref="23source">source</a>;</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td>    <a class="ref" href="../include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ssource-&gt;ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col4 ref" href="#24ssource" title='ssource' data-ref="24ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::ioc" title='QIOChannelFDPairSource::ioc' data-use='r' data-ref="QIOChannelFDPairSource::ioc">ioc</a>));</td></tr>
+<tr><th id="233">233</th><td>}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSourceFuncs" title='GSourceFuncs' data-type='struct _GSourceFuncs' data-ref="GSourceFuncs">GSourceFuncs</a> <dfn class="decl def" id="qio_channel_fd_source_funcs" title='qio_channel_fd_source_funcs' data-ref="qio_channel_fd_source_funcs">qio_channel_fd_source_funcs</dfn> = {</td></tr>
+<tr><th id="237">237</th><td>    <a class="tu ref" href="#qio_channel_fd_source_prepare" title='qio_channel_fd_source_prepare' data-use='r' data-ref="qio_channel_fd_source_prepare">qio_channel_fd_source_prepare</a>,</td></tr>
+<tr><th id="238">238</th><td>    <a class="tu ref" href="#qio_channel_fd_source_check" title='qio_channel_fd_source_check' data-use='r' data-ref="qio_channel_fd_source_check">qio_channel_fd_source_check</a>,</td></tr>
+<tr><th id="239">239</th><td>    <a class="tu ref" href="#qio_channel_fd_source_dispatch" title='qio_channel_fd_source_dispatch' data-use='r' data-ref="qio_channel_fd_source_dispatch">qio_channel_fd_source_dispatch</a>,</td></tr>
+<tr><th id="240">240</th><td>    <a class="tu ref" href="#qio_channel_fd_source_finalize" title='qio_channel_fd_source_finalize' data-use='r' data-ref="qio_channel_fd_source_finalize">qio_channel_fd_source_finalize</a></td></tr>
+<tr><th id="241">241</th><td>};</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSourceFuncs" title='GSourceFuncs' data-type='struct _GSourceFuncs' data-ref="GSourceFuncs">GSourceFuncs</a> <dfn class="decl def" id="qio_channel_fd_pair_source_funcs" title='qio_channel_fd_pair_source_funcs' data-ref="qio_channel_fd_pair_source_funcs">qio_channel_fd_pair_source_funcs</dfn> = {</td></tr>
+<tr><th id="245">245</th><td>    <a class="tu ref" href="#qio_channel_fd_pair_source_prepare" title='qio_channel_fd_pair_source_prepare' data-ref="qio_channel_fd_pair_source_prepare">qio_channel_fd_pair_source_prepare</a>,</td></tr>
+<tr><th id="246">246</th><td>    <a class="tu ref" href="#qio_channel_fd_pair_source_check" title='qio_channel_fd_pair_source_check' data-ref="qio_channel_fd_pair_source_check">qio_channel_fd_pair_source_check</a>,</td></tr>
+<tr><th id="247">247</th><td>    <a class="tu ref" href="#qio_channel_fd_pair_source_dispatch" title='qio_channel_fd_pair_source_dispatch' data-ref="qio_channel_fd_pair_source_dispatch">qio_channel_fd_pair_source_dispatch</a>,</td></tr>
+<tr><th id="248">248</th><td>    <a class="tu ref" href="#qio_channel_fd_pair_source_finalize" title='qio_channel_fd_pair_source_finalize' data-ref="qio_channel_fd_pair_source_finalize">qio_channel_fd_pair_source_finalize</a></td></tr>
+<tr><th id="249">249</th><td>};</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="decl def" id="qio_channel_create_fd_watch" title='qio_channel_create_fd_watch' data-ref="qio_channel_create_fd_watch">qio_channel_create_fd_watch</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col5 decl" id="25ioc" title='ioc' data-type='QIOChannel *' data-ref="25ioc">ioc</dfn>,</td></tr>
+<tr><th id="253">253</th><td>                                     <em>int</em> <dfn class="local col6 decl" id="26fd" title='fd' data-type='int' data-ref="26fd">fd</dfn>,</td></tr>
+<tr><th id="254">254</th><td>                                     <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col7 decl" id="27condition" title='condition' data-type='GIOCondition' data-ref="27condition">condition</dfn>)</td></tr>
+<tr><th id="255">255</th><td>{</td></tr>
+<tr><th id="256">256</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col8 decl" id="28source" title='source' data-type='GSource *' data-ref="28source">source</dfn>;</td></tr>
+<tr><th id="257">257</th><td>    <a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *<dfn class="local col9 decl" id="29ssource" title='ssource' data-type='QIOChannelFDSource *' data-ref="29ssource">ssource</dfn>;</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td>    <a class="local col8 ref" href="#28source" title='source' data-ref="28source">source</a> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_new" title='g_source_new' data-ref="g_source_new">g_source_new</a>(&amp;<a class="ref" href="#qio_channel_fd_source_funcs" title='qio_channel_fd_source_funcs' data-ref="qio_channel_fd_source_funcs">qio_channel_fd_source_funcs</a>,</td></tr>
+<tr><th id="260">260</th><td>                          <b>sizeof</b>(<a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a>));</td></tr>
+<tr><th id="261">261</th><td>    <a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a> = (<a class="typedef" href="#QIOChannelFDSource" title='QIOChannelFDSource' data-type='struct QIOChannelFDSource' data-ref="QIOChannelFDSource">QIOChannelFDSource</a> *)<a class="local col8 ref" href="#28source" title='source' data-ref="28source">source</a>;</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>    <a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::ioc" title='QIOChannelFDSource::ioc' data-use='w' data-ref="QIOChannelFDSource::ioc">ioc</a> = <a class="local col5 ref" href="#25ioc" title='ioc' data-ref="25ioc">ioc</a>;</td></tr>
+<tr><th id="264">264</th><td>    <a class="ref" href="../include/qom/object.h.html#object_ref" title='object_ref' data-ref="object_ref">object_ref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col5 ref" href="#25ioc" title='ioc' data-ref="25ioc">ioc</a>));</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>    <a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::condition" title='QIOChannelFDSource::condition' data-use='w' data-ref="QIOChannelFDSource::condition">condition</a> = <a class="local col7 ref" href="#27condition" title='condition' data-ref="27condition">condition</a>;</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><u>#<span data-ppcond="268">ifdef</span> <span class="macro" data-ref="_M/CONFIG_WIN32">CONFIG_WIN32</span></u></td></tr>
+<tr><th id="269">269</th><td>    ssource-&gt;fd.fd = (gint64)_get_osfhandle(fd);</td></tr>
+<tr><th id="270">270</th><td><u>#<span data-ppcond="268">else</span></u></td></tr>
+<tr><th id="271">271</th><td>    <a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-use='m' data-ref="QIOChannelFDSource::fd">fd</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::fd" title='_GPollFD::fd' data-ref="_GPollFD::fd">fd</a> = <a class="local col6 ref" href="#26fd" title='fd' data-ref="26fd">fd</a>;</td></tr>
+<tr><th id="272">272</th><td><u>#<span data-ppcond="268">endif</span></u></td></tr>
+<tr><th id="273">273</th><td>    <a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-use='m' data-ref="QIOChannelFDSource::fd">fd</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::events" title='_GPollFD::events' data-ref="_GPollFD::events">events</a> = <a class="local col7 ref" href="#27condition" title='condition' data-ref="27condition">condition</a>;</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_add_poll" title='g_source_add_poll' data-ref="g_source_add_poll">g_source_add_poll</a>(<a class="local col8 ref" href="#28source" title='source' data-ref="28source">source</a>, &amp;<a class="local col9 ref" href="#29ssource" title='ssource' data-ref="29ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDSource::fd" title='QIOChannelFDSource::fd' data-use='a' data-ref="QIOChannelFDSource::fd">fd</a>);</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>    <b>return</b> <a class="local col8 ref" href="#28source" title='source' data-ref="28source">source</a>;</td></tr>
+<tr><th id="278">278</th><td>}</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><u>#<span data-ppcond="280">ifdef</span> <span class="macro" data-ref="_M/CONFIG_WIN32">CONFIG_WIN32</span></u></td></tr>
+<tr><th id="281">281</th><td>GSource *qio_channel_create_socket_watch(QIOChannel *ioc,</td></tr>
+<tr><th id="282">282</th><td>                                         <em>int</em> socket,</td></tr>
+<tr><th id="283">283</th><td>                                         GIOCondition condition)</td></tr>
+<tr><th id="284">284</th><td>{</td></tr>
+<tr><th id="285">285</th><td>    GSource *source;</td></tr>
+<tr><th id="286">286</th><td>    QIOChannelSocketSource *ssource;</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><u>#ifdef WIN32</u></td></tr>
+<tr><th id="289">289</th><td>    WSAEventSelect(socket, ioc-&gt;event,</td></tr>
+<tr><th id="290">290</th><td>                   FD_READ | FD_ACCEPT | FD_CLOSE |</td></tr>
+<tr><th id="291">291</th><td>                   FD_CONNECT | FD_WRITE | FD_OOB);</td></tr>
+<tr><th id="292">292</th><td><u>#endif</u></td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    source = g_source_new(&amp;qio_channel_socket_source_funcs,</td></tr>
+<tr><th id="295">295</th><td>                          <b>sizeof</b>(QIOChannelSocketSource));</td></tr>
+<tr><th id="296">296</th><td>    ssource = (QIOChannelSocketSource *)source;</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td>    ssource-&gt;ioc = ioc;</td></tr>
+<tr><th id="299">299</th><td>    object_ref(OBJECT(ioc));</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>    ssource-&gt;condition = condition;</td></tr>
+<tr><th id="302">302</th><td>    ssource-&gt;socket = socket;</td></tr>
+<tr><th id="303">303</th><td>    ssource-&gt;revents = <var>0</var>;</td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td>    ssource-&gt;fd.fd = (gintptr)ioc-&gt;event;</td></tr>
+<tr><th id="306">306</th><td>    ssource-&gt;fd.events = G_IO_IN;</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>    g_source_add_poll(source, &amp;ssource-&gt;fd);</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td>    <b>return</b> source;</td></tr>
+<tr><th id="311">311</th><td>}</td></tr>
+<tr><th id="312">312</th><td><u>#<span data-ppcond="280">else</span></u></td></tr>
+<tr><th id="313">313</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="decl def" id="qio_channel_create_socket_watch" title='qio_channel_create_socket_watch' data-ref="qio_channel_create_socket_watch">qio_channel_create_socket_watch</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col0 decl" id="30ioc" title='ioc' data-type='QIOChannel *' data-ref="30ioc">ioc</dfn>,</td></tr>
+<tr><th id="314">314</th><td>                                         <em>int</em> <dfn class="local col1 decl" id="31socket" title='socket' data-type='int' data-ref="31socket">socket</dfn>,</td></tr>
+<tr><th id="315">315</th><td>                                         <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col2 decl" id="32condition" title='condition' data-type='GIOCondition' data-ref="32condition">condition</dfn>)</td></tr>
+<tr><th id="316">316</th><td>{</td></tr>
+<tr><th id="317">317</th><td>    <b>return</b> <a class="ref" href="#qio_channel_create_fd_watch" title='qio_channel_create_fd_watch' data-ref="qio_channel_create_fd_watch">qio_channel_create_fd_watch</a>(<a class="local col0 ref" href="#30ioc" title='ioc' data-ref="30ioc">ioc</a>, <a class="local col1 ref" href="#31socket" title='socket' data-ref="31socket">socket</a>, <a class="local col2 ref" href="#32condition" title='condition' data-ref="32condition">condition</a>);</td></tr>
+<tr><th id="318">318</th><td>}</td></tr>
+<tr><th id="319">319</th><td><u>#<span data-ppcond="280">endif</span></u></td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td><a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="decl def" id="qio_channel_create_fd_pair_watch" title='qio_channel_create_fd_pair_watch' data-ref="qio_channel_create_fd_pair_watch">qio_channel_create_fd_pair_watch</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col3 decl" id="33ioc" title='ioc' data-type='QIOChannel *' data-ref="33ioc">ioc</dfn>,</td></tr>
+<tr><th id="322">322</th><td>                                          <em>int</em> <dfn class="local col4 decl" id="34fdread" title='fdread' data-type='int' data-ref="34fdread">fdread</dfn>,</td></tr>
+<tr><th id="323">323</th><td>                                          <em>int</em> <dfn class="local col5 decl" id="35fdwrite" title='fdwrite' data-type='int' data-ref="35fdwrite">fdwrite</dfn>,</td></tr>
+<tr><th id="324">324</th><td>                                          <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col6 decl" id="36condition" title='condition' data-type='GIOCondition' data-ref="36condition">condition</dfn>)</td></tr>
+<tr><th id="325">325</th><td>{</td></tr>
+<tr><th id="326">326</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col7 decl" id="37source" title='source' data-type='GSource *' data-ref="37source">source</dfn>;</td></tr>
+<tr><th id="327">327</th><td>    <a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *<dfn class="local col8 decl" id="38ssource" title='ssource' data-type='QIOChannelFDPairSource *' data-ref="38ssource">ssource</dfn>;</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td>    <a class="local col7 ref" href="#37source" title='source' data-ref="37source">source</a> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_new" title='g_source_new' data-ref="g_source_new">g_source_new</a>(&amp;<a class="ref" href="#qio_channel_fd_pair_source_funcs" title='qio_channel_fd_pair_source_funcs' data-ref="qio_channel_fd_pair_source_funcs">qio_channel_fd_pair_source_funcs</a>,</td></tr>
+<tr><th id="330">330</th><td>                          <b>sizeof</b>(<a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a>));</td></tr>
+<tr><th id="331">331</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a> = (<a class="typedef" href="#QIOChannelFDPairSource" title='QIOChannelFDPairSource' data-type='struct QIOChannelFDPairSource' data-ref="QIOChannelFDPairSource">QIOChannelFDPairSource</a> *)<a class="local col7 ref" href="#37source" title='source' data-ref="37source">source</a>;</td></tr>
+<tr><th id="332">332</th><td></td></tr>
+<tr><th id="333">333</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::ioc" title='QIOChannelFDPairSource::ioc' data-use='w' data-ref="QIOChannelFDPairSource::ioc">ioc</a> = <a class="local col3 ref" href="#33ioc" title='ioc' data-ref="33ioc">ioc</a>;</td></tr>
+<tr><th id="334">334</th><td>    <a class="ref" href="../include/qom/object.h.html#object_ref" title='object_ref' data-ref="object_ref">object_ref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col3 ref" href="#33ioc" title='ioc' data-ref="33ioc">ioc</a>));</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::condition" title='QIOChannelFDPairSource::condition' data-use='w' data-ref="QIOChannelFDPairSource::condition">condition</a> = <a class="local col6 ref" href="#36condition" title='condition' data-ref="36condition">condition</a>;</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td><u>#<span data-ppcond="338">ifdef</span> <span class="macro" data-ref="_M/CONFIG_WIN32">CONFIG_WIN32</span></u></td></tr>
+<tr><th id="339">339</th><td>    ssource-&gt;fdread.fd = (gint64)_get_osfhandle(fdread);</td></tr>
+<tr><th id="340">340</th><td>    ssource-&gt;fdwrite.fd = (gint64)_get_osfhandle(fdwrite);</td></tr>
+<tr><th id="341">341</th><td><u>#<span data-ppcond="338">else</span></u></td></tr>
+<tr><th id="342">342</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-use='m' data-ref="QIOChannelFDPairSource::fdread">fdread</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::fd" title='_GPollFD::fd' data-ref="_GPollFD::fd">fd</a> = <a class="local col4 ref" href="#34fdread" title='fdread' data-ref="34fdread">fdread</a>;</td></tr>
+<tr><th id="343">343</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-use='m' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::fd" title='_GPollFD::fd' data-ref="_GPollFD::fd">fd</a> = <a class="local col5 ref" href="#35fdwrite" title='fdwrite' data-ref="35fdwrite">fdwrite</a>;</td></tr>
+<tr><th id="344">344</th><td><u>#<span data-ppcond="338">endif</span></u></td></tr>
+<tr><th id="345">345</th><td></td></tr>
+<tr><th id="346">346</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-use='m' data-ref="QIOChannelFDPairSource::fdread">fdread</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::events" title='_GPollFD::events' data-ref="_GPollFD::events">events</a> = <a class="local col6 ref" href="#36condition" title='condition' data-ref="36condition">condition</a> &amp; <a class="enum" href="../../include/glib-2.0/glib/gmain.h.html#G_IO_IN" title='G_IO_IN' data-ref="G_IO_IN">G_IO_IN</a>;</td></tr>
+<tr><th id="347">347</th><td>    <a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-use='m' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</a>.<a class="ref" href="../../include/glib-2.0/glib/gpoll.h.html#_GPollFD::events" title='_GPollFD::events' data-ref="_GPollFD::events">events</a> = <a class="local col6 ref" href="#36condition" title='condition' data-ref="36condition">condition</a> &amp; <a class="enum" href="../../include/glib-2.0/glib/gmain.h.html#G_IO_OUT" title='G_IO_OUT' data-ref="G_IO_OUT">G_IO_OUT</a>;</td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_add_poll" title='g_source_add_poll' data-ref="g_source_add_poll">g_source_add_poll</a>(<a class="local col7 ref" href="#37source" title='source' data-ref="37source">source</a>, &amp;<a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdread" title='QIOChannelFDPairSource::fdread' data-use='a' data-ref="QIOChannelFDPairSource::fdread">fdread</a>);</td></tr>
+<tr><th id="350">350</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_add_poll" title='g_source_add_poll' data-ref="g_source_add_poll">g_source_add_poll</a>(<a class="local col7 ref" href="#37source" title='source' data-ref="37source">source</a>, &amp;<a class="local col8 ref" href="#38ssource" title='ssource' data-ref="38ssource">ssource</a>-&gt;<a class="tu ref" href="#QIOChannelFDPairSource::fdwrite" title='QIOChannelFDPairSource::fdwrite' data-use='a' data-ref="QIOChannelFDPairSource::fdwrite">fdwrite</a>);</td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td>    <b>return</b> <a class="local col7 ref" href="#37source" title='source' data-ref="37source">source</a>;</td></tr>
+<tr><th id="353">353</th><td>}</td></tr>
+<tr><th id="354">354</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

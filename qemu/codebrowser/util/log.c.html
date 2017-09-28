@@ -1,0 +1,345 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>log.c source code [codebrowser/util/log.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/log.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='log.c.html'>log.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Logging support</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright (c) 2003 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../include/qemu/log.h.html">"qemu/log.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../include/qemu/range.h.html">"qemu/range.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qemu/cutils.h.html">"qemu/cutils.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../trace/control.h.html">"trace/control.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="logfilename" title='logfilename' data-type='char *' data-ref="logfilename">logfilename</dfn>;</td></tr>
+<tr><th id="30">30</th><td><a class="typedef" href="../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="decl def" id="qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</dfn>;</td></tr>
+<tr><th id="31">31</th><td><em>int</em> <dfn class="decl def" id="qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</dfn>;</td></tr>
+<tr><th id="32">32</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="log_append" title='log_append' data-type='int' data-ref="log_append">log_append</dfn> = <var>0</var>;</td></tr>
+<tr><th id="33">33</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/garray.h.html#GArray" title='GArray' data-type='struct _GArray' data-ref="GArray">GArray</a> *<dfn class="tu decl def" id="debug_regions" title='debug_regions' data-type='GArray *' data-ref="debug_regions">debug_regions</dfn>;</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><i>/* Return the number of characters emitted.  */</i></td></tr>
+<tr><th id="36">36</th><td><em>int</em> <dfn class="decl def" id="qemu_log" title='qemu_log' data-ref="qemu_log">qemu_log</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1fmt" title='fmt' data-type='const char *' data-ref="1fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="37">37</th><td>{</td></tr>
+<tr><th id="38">38</th><td>    <em>int</em> <dfn class="local col2 decl" id="2ret" title='ret' data-type='int' data-ref="2ret">ret</dfn> = <var>0</var>;</td></tr>
+<tr><th id="39">39</th><td>    <b>if</b> (<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>) {</td></tr>
+<tr><th id="40">40</th><td>        <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col3 decl" id="3ap" title='ap' data-type='va_list' data-ref="3ap">ap</dfn>;</td></tr>
+<tr><th id="41">41</th><td>        <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col3 ref" href="#3ap" title='ap' data-ref="3ap">ap</a>, <a class="local col1 ref" href="#1fmt" title='fmt' data-ref="1fmt">fmt</a>);</td></tr>
+<tr><th id="42">42</th><td>        <a class="local col2 ref" href="#2ret" title='ret' data-ref="2ret">ret</a> = <a class="ref" href="../../include/stdio.h.html#vfprintf" title='vfprintf' data-ref="vfprintf">vfprintf</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>, <a class="local col1 ref" href="#1fmt" title='fmt' data-ref="1fmt">fmt</a>, <a class="local col3 ref" href="#3ap" title='ap' data-ref="3ap">ap</a>);</td></tr>
+<tr><th id="43">43</th><td>        <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col3 ref" href="#3ap" title='ap' data-ref="3ap">ap</a>);</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>        <i>/* Don't pass back error results.  */</i></td></tr>
+<tr><th id="46">46</th><td>        <b>if</b> (<a class="local col2 ref" href="#2ret" title='ret' data-ref="2ret">ret</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="47">47</th><td>            <a class="local col2 ref" href="#2ret" title='ret' data-ref="2ret">ret</a> = <var>0</var>;</td></tr>
+<tr><th id="48">48</th><td>        }</td></tr>
+<tr><th id="49">49</th><td>    }</td></tr>
+<tr><th id="50">50</th><td>    <b>return</b> <a class="local col2 ref" href="#2ret" title='ret' data-ref="2ret">ret</a>;</td></tr>
+<tr><th id="51">51</th><td>}</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="log_uses_own_buffers" title='log_uses_own_buffers' data-type='_Bool' data-ref="log_uses_own_buffers">log_uses_own_buffers</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>/* enable or disable low levels log */</i></td></tr>
+<tr><th id="56">56</th><td><em>void</em> <dfn class="decl def" id="qemu_set_log" title='qemu_set_log' data-ref="qemu_set_log">qemu_set_log</dfn>(<em>int</em> <dfn class="local col4 decl" id="4log_flags" title='log_flags' data-type='int' data-ref="4log_flags">log_flags</dfn>)</td></tr>
+<tr><th id="57">57</th><td>{</td></tr>
+<tr><th id="58">58</th><td>    <a class="ref" href="../include/qemu/log.h.html#qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</a> = <a class="local col4 ref" href="#4log_flags" title='log_flags' data-ref="4log_flags">log_flags</a>;</td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="59">ifdef</span> <a class="macro" href="../config-host.h.html#88" data-ref="_M/CONFIG_TRACE_LOG">CONFIG_TRACE_LOG</a></u></td></tr>
+<tr><th id="60">60</th><td>    <a class="ref" href="../include/qemu/log.h.html#qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</a> |= <a class="macro" href="../include/qemu/log.h.html#44" title="(1 &lt;&lt; 15)" data-ref="_M/LOG_TRACE">LOG_TRACE</a>;</td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="59">endif</span></u></td></tr>
+<tr><th id="62">62</th><td>    <b>if</b> (!<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> &amp;&amp;</td></tr>
+<tr><th id="63">63</th><td>        (<a class="ref" href="../include/sysemu/os-posix.h.html#is_daemonized" title='is_daemonized' data-ref="is_daemonized">is_daemonized</a>() ? <a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span> : <a class="ref" href="../include/qemu/log.h.html#qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</a>)) {</td></tr>
+<tr><th id="64">64</th><td>        <b>if</b> (<a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a>) {</td></tr>
+<tr><th id="65">65</th><td>            <a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> = <a class="ref" href="../../include/stdio.h.html#283" title='fopen' data-ref="fopen64">fopen</a>(<a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a>, <a class="tu ref" href="#log_append" title='log_append' data-use='r' data-ref="log_append">log_append</a> ? <q>"a"</q> : <q>"w"</q>);</td></tr>
+<tr><th id="66">66</th><td>            <b>if</b> (!<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>) {</td></tr>
+<tr><th id="67">67</th><td>                <a class="ref" href="../../include/stdio.h.html#perror" title='perror' data-ref="perror">perror</a>(<a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a>);</td></tr>
+<tr><th id="68">68</th><td>                <a class="ref" href="../../include/unistd.h.html#_exit" title='_exit' data-ref="_exit">_exit</a>(<var>1</var>);</td></tr>
+<tr><th id="69">69</th><td>            }</td></tr>
+<tr><th id="70">70</th><td>            <i>/* In case we are a daemon redirect stderr to logfile */</i></td></tr>
+<tr><th id="71">71</th><td>            <b>if</b> (<a class="ref" href="../include/sysemu/os-posix.h.html#is_daemonized" title='is_daemonized' data-ref="is_daemonized">is_daemonized</a>()) {</td></tr>
+<tr><th id="72">72</th><td>                <a class="ref" href="../../include/unistd.h.html#dup2" title='dup2' data-ref="dup2">dup2</a>(<a class="ref" href="../../include/stdio.h.html#fileno" title='fileno' data-ref="fileno">fileno</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>), <a class="macro" href="../../include/unistd.h.html#215" title="2" data-ref="_M/STDERR_FILENO">STDERR_FILENO</a>);</td></tr>
+<tr><th id="73">73</th><td>                <a class="ref" href="../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>);</td></tr>
+<tr><th id="74">74</th><td>                <i>/* This will skip closing logfile in qemu_log_close() */</i></td></tr>
+<tr><th id="75">75</th><td>                <a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> = <a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>;</td></tr>
+<tr><th id="76">76</th><td>            }</td></tr>
+<tr><th id="77">77</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="78">78</th><td>            <i>/* Default to stderr if no log file specified */</i></td></tr>
+<tr><th id="79">79</th><td>            <a class="macro" href="../../include/assert.h.html#88" title="((!is_daemonized()) ? (void) (0) : __assert_fail (&quot;!is_daemonized()&quot;, &quot;/home/jon/workspace/qemu/util/log.c&quot;, 79, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="ref" href="../include/sysemu/os-posix.h.html#is_daemonized" title='is_daemonized' data-ref="is_daemonized">is_daemonized</a>());</td></tr>
+<tr><th id="80">80</th><td>            <a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> = <a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>;</td></tr>
+<tr><th id="81">81</th><td>        }</td></tr>
+<tr><th id="82">82</th><td>        <i>/* must avoid mmap() usage of glibc by setting a buffer "by hand" */</i></td></tr>
+<tr><th id="83">83</th><td>        <b>if</b> (<a class="tu ref" href="#log_uses_own_buffers" title='log_uses_own_buffers' data-use='r' data-ref="log_uses_own_buffers">log_uses_own_buffers</a>) {</td></tr>
+<tr><th id="84">84</th><td>            <em>static</em> <em>char</em> <dfn class="local col5 decl" id="5logfile_buf" title='logfile_buf' data-type='char [4096]' data-ref="5logfile_buf">logfile_buf</dfn>[<var>4096</var>];</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>            <a class="ref" href="../../include/stdio.h.html#setvbuf" title='setvbuf' data-ref="setvbuf">setvbuf</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>, <a class="local col5 ref" href="#5logfile_buf" title='logfile_buf' data-ref="5logfile_buf">logfile_buf</a>, <a class="macro" href="../../include/stdio.h.html#121" title="1" data-ref="_M/_IOLBF">_IOLBF</a>, <b>sizeof</b>(<a class="local col5 ref" href="#5logfile_buf" title='logfile_buf' data-ref="5logfile_buf">logfile_buf</a>));</td></tr>
+<tr><th id="87">87</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="88">88</th><td><u>#<span data-ppcond="88">if</span> defined(<span class="macro" data-ref="_M/_WIN32">_WIN32</span>)</u></td></tr>
+<tr><th id="89">89</th><td>            <i>/* Win32 doesn't support line-buffering, so use unbuffered output. */</i></td></tr>
+<tr><th id="90">90</th><td>            setvbuf(qemu_logfile, NULL, _IONBF, <var>0</var>);</td></tr>
+<tr><th id="91">91</th><td><u>#<span data-ppcond="88">else</span></u></td></tr>
+<tr><th id="92">92</th><td>            <a class="ref" href="../../include/stdio.h.html#setvbuf" title='setvbuf' data-ref="setvbuf">setvbuf</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="macro" href="../../include/stdio.h.html#121" title="1" data-ref="_M/_IOLBF">_IOLBF</a>, <var>0</var>);</td></tr>
+<tr><th id="93">93</th><td><u>#<span data-ppcond="88">endif</span></u></td></tr>
+<tr><th id="94">94</th><td>            <a class="tu ref" href="#log_append" title='log_append' data-use='w' data-ref="log_append">log_append</a> = <var>1</var>;</td></tr>
+<tr><th id="95">95</th><td>        }</td></tr>
+<tr><th id="96">96</th><td>    }</td></tr>
+<tr><th id="97">97</th><td>    <b>if</b> (<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> &amp;&amp;</td></tr>
+<tr><th id="98">98</th><td>        (<a class="ref" href="../include/sysemu/os-posix.h.html#is_daemonized" title='is_daemonized' data-ref="is_daemonized">is_daemonized</a>() ? <a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span> : !<a class="ref" href="../include/qemu/log.h.html#qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</a>)) {</td></tr>
+<tr><th id="99">99</th><td>        <a class="ref" href="#qemu_log_close" title='qemu_log_close' data-ref="qemu_log_close">qemu_log_close</a>();</td></tr>
+<tr><th id="100">100</th><td>    }</td></tr>
+<tr><th id="101">101</th><td>}</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><em>void</em> <dfn class="decl def" id="qemu_log_needs_buffers" title='qemu_log_needs_buffers' data-ref="qemu_log_needs_buffers">qemu_log_needs_buffers</dfn>(<em>void</em>)</td></tr>
+<tr><th id="104">104</th><td>{</td></tr>
+<tr><th id="105">105</th><td>    <a class="tu ref" href="#log_uses_own_buffers" title='log_uses_own_buffers' data-use='w' data-ref="log_uses_own_buffers">log_uses_own_buffers</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="106">106</th><td>}</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><i>/*</i></td></tr>
+<tr><th id="109">109</th><td><i> * Allow the user to include %d in their logfile which will be</i></td></tr>
+<tr><th id="110">110</th><td><i> * substituted with the current PID. This is useful for debugging many</i></td></tr>
+<tr><th id="111">111</th><td><i> * nested linux-user tasks but will result in lots of logs.</i></td></tr>
+<tr><th id="112">112</th><td><i> */</i></td></tr>
+<tr><th id="113">113</th><td><em>void</em> <dfn class="decl def" id="qemu_set_log_filename" title='qemu_set_log_filename' data-ref="qemu_set_log_filename">qemu_set_log_filename</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="6filename" title='filename' data-type='const char *' data-ref="6filename">filename</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="7errp" title='errp' data-type='Error **' data-ref="7errp">errp</dfn>)</td></tr>
+<tr><th id="114">114</th><td>{</td></tr>
+<tr><th id="115">115</th><td>    <em>char</em> *<dfn class="local col8 decl" id="8pidstr" title='pidstr' data-type='char *' data-ref="8pidstr">pidstr</dfn>;</td></tr>
+<tr><th id="116">116</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="tu ref" href="#logfilename" title='logfilename' data-use='r' data-ref="logfilename">logfilename</a>);</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td>    <a class="local col8 ref" href="#8pidstr" title='pidstr' data-ref="8pidstr">pidstr</a> = <a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col6 ref" href="#6filename" title='filename' data-ref="6filename">filename</a>, <q>"%"</q>);</td></tr>
+<tr><th id="119">119</th><td>    <b>if</b> (<a class="local col8 ref" href="#8pidstr" title='pidstr' data-ref="8pidstr">pidstr</a>) {</td></tr>
+<tr><th id="120">120</th><td>        <i>/* We only accept one %d, no other format strings */</i></td></tr>
+<tr><th id="121">121</th><td>        <b>if</b> (<a class="local col8 ref" href="#8pidstr" title='pidstr' data-ref="8pidstr">pidstr</a>[<var>1</var>] != <kbd>'d'</kbd> || <a class="ref" href="../../include/string.h.html#strchr" title='strchr' data-ref="strchr">strchr</a>(<a class="local col8 ref" href="#8pidstr" title='pidstr' data-ref="8pidstr">pidstr</a> + <var>2</var>, <kbd>'%'</kbd>)) {</td></tr>
+<tr><th id="122">122</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 122, __func__, (&quot;Bad logfile format: %s&quot;), filename)" data-ref="_M/error_setg">error_setg</a>(<a class="local col7 ref" href="#7errp" title='errp' data-ref="7errp">errp</a>, <q>"Bad logfile format: %s"</q>, <a class="local col6 ref" href="#6filename" title='filename' data-ref="6filename">filename</a>);</td></tr>
+<tr><th id="123">123</th><td>            <b>return</b>;</td></tr>
+<tr><th id="124">124</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="125">125</th><td>            <a class="tu ref" href="#logfilename" title='logfilename' data-use='w' data-ref="logfilename">logfilename</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<a class="local col6 ref" href="#6filename" title='filename' data-ref="6filename">filename</a>, <a class="ref" href="../../include/unistd.h.html#getpid" title='getpid' data-ref="getpid">getpid</a>());</td></tr>
+<tr><th id="126">126</th><td>        }</td></tr>
+<tr><th id="127">127</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="128">128</th><td>        <a class="tu ref" href="#logfilename" title='logfilename' data-use='w' data-ref="logfilename">logfilename</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col6 ref" href="#6filename" title='filename' data-ref="6filename">filename</a>);</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td>    <a class="ref" href="#qemu_log_close" title='qemu_log_close' data-ref="qemu_log_close">qemu_log_close</a>();</td></tr>
+<tr><th id="131">131</th><td>    <a class="ref" href="#qemu_set_log" title='qemu_set_log' data-ref="qemu_set_log">qemu_set_log</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_loglevel" title='qemu_loglevel' data-ref="qemu_loglevel">qemu_loglevel</a>);</td></tr>
+<tr><th id="132">132</th><td>}</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><i>/* Returns true if addr is in our debug filter or no filter defined</i></td></tr>
+<tr><th id="135">135</th><td><i> */</i></td></tr>
+<tr><th id="136">136</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qemu_log_in_addr_range" title='qemu_log_in_addr_range' data-ref="qemu_log_in_addr_range">qemu_log_in_addr_range</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="9addr" title='addr' data-type='uint64_t' data-ref="9addr">addr</dfn>)</td></tr>
+<tr><th id="137">137</th><td>{</td></tr>
+<tr><th id="138">138</th><td>    <b>if</b> (<a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>) {</td></tr>
+<tr><th id="139">139</th><td>        <em>int</em> <dfn class="local col0 decl" id="10i" title='i' data-type='int' data-ref="10i">i</dfn> = <var>0</var>;</td></tr>
+<tr><th id="140">140</th><td>        <b>for</b> (<a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a> = <var>0</var>; <a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a> &lt; <a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/garray.h.html#_GArray::len" title='_GArray::len' data-ref="_GArray::len">len</a>; <a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>++) {</td></tr>
+<tr><th id="141">141</th><td>            <a class="typedef" href="../include/qemu/typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col1 decl" id="11range" title='range' data-type='Range *' data-ref="11range">range</dfn> = &amp;<a class="macro" href="../../include/glib-2.0/glib/garray.h.html#67" title="(((Range*) (void *) (debug_regions)-&gt;data) [(i)])" data-ref="_M/g_array_index">g_array_index</a>(<a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>, <a class="typedef" href="../include/qemu/typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a>, <a class="local col0 ref" href="#10i" title='i' data-ref="10i">i</a>);</td></tr>
+<tr><th id="142">142</th><td>            <b>if</b> (<a class="ref" href="../include/qemu/range.h.html#range_contains" title='range_contains' data-ref="range_contains">range_contains</a>(<a class="local col1 ref" href="#11range" title='range' data-ref="11range">range</a>, <a class="local col9 ref" href="#9addr" title='addr' data-ref="9addr">addr</a>)) {</td></tr>
+<tr><th id="143">143</th><td>                <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="144">144</th><td>            }</td></tr>
+<tr><th id="145">145</th><td>        }</td></tr>
+<tr><th id="146">146</th><td>        <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="147">147</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="148">148</th><td>        <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><em>void</em> <dfn class="decl def" id="qemu_set_dfilter_ranges" title='qemu_set_dfilter_ranges' data-ref="qemu_set_dfilter_ranges">qemu_set_dfilter_ranges</dfn>(<em>const</em> <em>char</em> *<dfn class="local col2 decl" id="12filter_spec" title='filter_spec' data-type='const char *' data-ref="12filter_spec">filter_spec</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="13errp" title='errp' data-type='Error **' data-ref="13errp">errp</dfn>)</td></tr>
+<tr><th id="154">154</th><td>{</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gtypes.h.html#gchar" title='gchar' data-type='char' data-ref="gchar">gchar</a> **<dfn class="local col4 decl" id="14ranges" title='ranges' data-type='gchar **' data-ref="14ranges">ranges</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strsplit" title='g_strsplit' data-ref="g_strsplit">g_strsplit</a>(<a class="local col2 ref" href="#12filter_spec" title='filter_spec' data-ref="12filter_spec">filter_spec</a>, <q>","</q>, <var>0</var>);</td></tr>
+<tr><th id="156">156</th><td>    <em>int</em> <dfn class="local col5 decl" id="15i" title='i' data-type='int' data-ref="15i">i</dfn>;</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>    <b>if</b> (<a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>) {</td></tr>
+<tr><th id="159">159</th><td>        <a class="ref" href="../../include/glib-2.0/glib/garray.h.html#g_array_unref" title='g_array_unref' data-ref="g_array_unref">g_array_unref</a>(<a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>);</td></tr>
+<tr><th id="160">160</th><td>        <a class="tu ref" href="#debug_regions" title='debug_regions' data-use='w' data-ref="debug_regions">debug_regions</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="161">161</th><td>    }</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td>    <a class="tu ref" href="#debug_regions" title='debug_regions' data-use='w' data-ref="debug_regions">debug_regions</a> = <a class="ref" href="../../include/glib-2.0/glib/garray.h.html#g_array_sized_new" title='g_array_sized_new' data-ref="g_array_sized_new">g_array_sized_new</a>(<a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>, <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>,</td></tr>
+<tr><th id="164">164</th><td>                                      <b>sizeof</b>(<a class="typedef" href="../include/qemu/typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a>), <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strv_length" title='g_strv_length' data-ref="g_strv_length">g_strv_length</a>(<a class="local col4 ref" href="#14ranges" title='ranges' data-ref="14ranges">ranges</a>));</td></tr>
+<tr><th id="165">165</th><td>    <b>for</b> (<a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a> = <var>0</var>; <a class="local col4 ref" href="#14ranges" title='ranges' data-ref="14ranges">ranges</a>[<a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a>]; <a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a>++) {</td></tr>
+<tr><th id="166">166</th><td>        <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="16r" title='r' data-type='const char *' data-ref="16r">r</dfn> = <a class="local col4 ref" href="#14ranges" title='ranges' data-ref="14ranges">ranges</a>[<a class="local col5 ref" href="#15i" title='i' data-ref="15i">i</a>];</td></tr>
+<tr><th id="167">167</th><td>        <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="17range_op" title='range_op' data-type='const char *' data-ref="17range_op">range_op</dfn>, *<dfn class="local col8 decl" id="18r2" title='r2' data-type='const char *' data-ref="18r2">r2</dfn>, *<dfn class="local col9 decl" id="19e" title='e' data-type='const char *' data-ref="19e">e</dfn>;</td></tr>
+<tr><th id="168">168</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="20r1val" title='r1val' data-type='uint64_t' data-ref="20r1val">r1val</dfn>, <dfn class="local col1 decl" id="21r2val" title='r2val' data-type='uint64_t' data-ref="21r2val">r2val</dfn>, <dfn class="local col2 decl" id="22lob" title='lob' data-type='uint64_t' data-ref="22lob">lob</dfn>, <dfn class="local col3 decl" id="23upb" title='upb' data-type='uint64_t' data-ref="23upb">upb</dfn>;</td></tr>
+<tr><th id="169">169</th><td>        <b>struct</b> <a class="type" href="../include/qemu/range.h.html#Range" title='Range' data-ref="Range">Range</a> <dfn class="local col4 decl" id="24range" title='range' data-type='struct Range' data-ref="24range">range</dfn>;</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>        <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> = <a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col6 ref" href="#16r" title='r' data-ref="16r">r</a>, <q>"-"</q>);</td></tr>
+<tr><th id="172">172</th><td>        <a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a> = <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> ? <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> + <var>1</var> : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="173">173</th><td>        <b>if</b> (!<a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>) {</td></tr>
+<tr><th id="174">174</th><td>            <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> = <a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col6 ref" href="#16r" title='r' data-ref="16r">r</a>, <q>"+"</q>);</td></tr>
+<tr><th id="175">175</th><td>            <a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a> = <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> ? <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> + <var>1</var> : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="176">176</th><td>        }</td></tr>
+<tr><th id="177">177</th><td>        <b>if</b> (!<a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>) {</td></tr>
+<tr><th id="178">178</th><td>            <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> = <a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col6 ref" href="#16r" title='r' data-ref="16r">r</a>, <q>".."</q>);</td></tr>
+<tr><th id="179">179</th><td>            <a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a> = <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> ? <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a> + <var>2</var> : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="180">180</th><td>        }</td></tr>
+<tr><th id="181">181</th><td>        <b>if</b> (!<a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>) {</td></tr>
+<tr><th id="182">182</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 182, __func__, (&quot;Bad range specifier&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#13errp" title='errp' data-ref="13errp">errp</a>, <q>"Bad range specifier"</q>);</td></tr>
+<tr><th id="183">183</th><td>            <b>goto</b> <a class="lbl" href="#25out" data-ref="25out">out</a>;</td></tr>
+<tr><th id="184">184</th><td>        }</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>        <b>if</b> (<a class="ref" href="../include/qemu/cutils.h.html#qemu_strtou64" title='qemu_strtou64' data-ref="qemu_strtou64">qemu_strtou64</a>(<a class="local col6 ref" href="#16r" title='r' data-ref="16r">r</a>, &amp;<a class="local col9 ref" href="#19e" title='e' data-ref="19e">e</a>, <var>0</var>, &amp;<a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a>)</td></tr>
+<tr><th id="187">187</th><td>            || <a class="local col9 ref" href="#19e" title='e' data-ref="19e">e</a> != <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>) {</td></tr>
+<tr><th id="188">188</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 189, __func__, (&quot;Invalid number to the left of %.*s&quot;), (int)(r2 - range_op), range_op)" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#13errp" title='errp' data-ref="13errp">errp</a>, <q>"Invalid number to the left of %.*s"</q>,</td></tr>
+<tr><th id="189">189</th><td>                       (<em>int</em>)(<a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a> - <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>), <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>);</td></tr>
+<tr><th id="190">190</th><td>            <b>goto</b> <a class="lbl" href="#25out" data-ref="25out">out</a>;</td></tr>
+<tr><th id="191">191</th><td>        }</td></tr>
+<tr><th id="192">192</th><td>        <b>if</b> (<a class="ref" href="../include/qemu/cutils.h.html#qemu_strtou64" title='qemu_strtou64' data-ref="qemu_strtou64">qemu_strtou64</a>(<a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>, &amp;<a class="local col1 ref" href="#21r2val" title='r2val' data-ref="21r2val">r2val</a>)) {</td></tr>
+<tr><th id="193">193</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 194, __func__, (&quot;Invalid number to the right of %.*s&quot;), (int)(r2 - range_op), range_op)" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#13errp" title='errp' data-ref="13errp">errp</a>, <q>"Invalid number to the right of %.*s"</q>,</td></tr>
+<tr><th id="194">194</th><td>                       (<em>int</em>)(<a class="local col8 ref" href="#18r2" title='r2' data-ref="18r2">r2</a> - <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>), <a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>);</td></tr>
+<tr><th id="195">195</th><td>            <b>goto</b> <a class="lbl" href="#25out" data-ref="25out">out</a>;</td></tr>
+<tr><th id="196">196</th><td>        }</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>        <b>switch</b> (*<a class="local col7 ref" href="#17range_op" title='range_op' data-ref="17range_op">range_op</a>) {</td></tr>
+<tr><th id="199">199</th><td>        <b>case</b> <kbd>'+'</kbd>:</td></tr>
+<tr><th id="200">200</th><td>            <a class="local col2 ref" href="#22lob" title='lob' data-ref="22lob">lob</a> = <a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a>;</td></tr>
+<tr><th id="201">201</th><td>            <a class="local col3 ref" href="#23upb" title='upb' data-ref="23upb">upb</a> = <a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a> + <a class="local col1 ref" href="#21r2val" title='r2val' data-ref="21r2val">r2val</a> - <var>1</var>;</td></tr>
+<tr><th id="202">202</th><td>            <b>break</b>;</td></tr>
+<tr><th id="203">203</th><td>        <b>case</b> <kbd>'-'</kbd>:</td></tr>
+<tr><th id="204">204</th><td>            <a class="local col3 ref" href="#23upb" title='upb' data-ref="23upb">upb</a> = <a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a>;</td></tr>
+<tr><th id="205">205</th><td>            <a class="local col2 ref" href="#22lob" title='lob' data-ref="22lob">lob</a> = <a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a> - (<a class="local col1 ref" href="#21r2val" title='r2val' data-ref="21r2val">r2val</a> - <var>1</var>);</td></tr>
+<tr><th id="206">206</th><td>            <b>break</b>;</td></tr>
+<tr><th id="207">207</th><td>        <b>case</b> <kbd>'.'</kbd>:</td></tr>
+<tr><th id="208">208</th><td>            <a class="local col2 ref" href="#22lob" title='lob' data-ref="22lob">lob</a> = <a class="local col0 ref" href="#20r1val" title='r1val' data-ref="20r1val">r1val</a>;</td></tr>
+<tr><th id="209">209</th><td>            <a class="local col3 ref" href="#23upb" title='upb' data-ref="23upb">upb</a> = <a class="local col1 ref" href="#21r2val" title='r2val' data-ref="21r2val">r2val</a>;</td></tr>
+<tr><th id="210">210</th><td>            <b>break</b>;</td></tr>
+<tr><th id="211">211</th><td>        <b>default</b>:</td></tr>
+<tr><th id="212">212</th><td>            <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 212, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="213">213</th><td>        }</td></tr>
+<tr><th id="214">214</th><td>        <b>if</b> (<a class="local col2 ref" href="#22lob" title='lob' data-ref="22lob">lob</a> &gt; <a class="local col3 ref" href="#23upb" title='upb' data-ref="23upb">upb</a>) {</td></tr>
+<tr><th id="215">215</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/log.c&quot;, 215, __func__, (&quot;Invalid range&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col3 ref" href="#13errp" title='errp' data-ref="13errp">errp</a>, <q>"Invalid range"</q>);</td></tr>
+<tr><th id="216">216</th><td>            <b>goto</b> <a class="lbl" href="#25out" data-ref="25out">out</a>;</td></tr>
+<tr><th id="217">217</th><td>        }</td></tr>
+<tr><th id="218">218</th><td>        <a class="ref" href="../include/qemu/range.h.html#range_set_bounds" title='range_set_bounds' data-ref="range_set_bounds">range_set_bounds</a>(&amp;<a class="local col4 ref" href="#24range" title='range' data-ref="24range">range</a>, <a class="local col2 ref" href="#22lob" title='lob' data-ref="22lob">lob</a>, <a class="local col3 ref" href="#23upb" title='upb' data-ref="23upb">upb</a>);</td></tr>
+<tr><th id="219">219</th><td>        <a class="macro" href="../../include/glib-2.0/glib/garray.h.html#64" title="g_array_append_vals (debug_regions, &amp;(range), 1)" data-ref="_M/g_array_append_val">g_array_append_val</a>(<a class="tu ref" href="#debug_regions" title='debug_regions' data-use='r' data-ref="debug_regions">debug_regions</a>, <a class="local col4 ref" href="#24range" title='range' data-ref="24range">range</a>);</td></tr>
+<tr><th id="220">220</th><td>    }</td></tr>
+<tr><th id="221">221</th><td><dfn class="lbl" id="25out" data-ref="25out">out</dfn>:</td></tr>
+<tr><th id="222">222</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strfreev" title='g_strfreev' data-ref="g_strfreev">g_strfreev</a>(<a class="local col4 ref" href="#14ranges" title='ranges' data-ref="14ranges">ranges</a>);</td></tr>
+<tr><th id="223">223</th><td>}</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><i>/* fflush() the log file */</i></td></tr>
+<tr><th id="226">226</th><td><em>void</em> <dfn class="decl def" id="qemu_log_flush" title='qemu_log_flush' data-ref="qemu_log_flush">qemu_log_flush</dfn>(<em>void</em>)</td></tr>
+<tr><th id="227">227</th><td>{</td></tr>
+<tr><th id="228">228</th><td>    <a class="ref" href="../../include/stdio.h.html#fflush" title='fflush' data-ref="fflush">fflush</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>);</td></tr>
+<tr><th id="229">229</th><td>}</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><i>/* Close the log file */</i></td></tr>
+<tr><th id="232">232</th><td><em>void</em> <dfn class="decl def" id="qemu_log_close" title='qemu_log_close' data-ref="qemu_log_close">qemu_log_close</dfn>(<em>void</em>)</td></tr>
+<tr><th id="233">233</th><td>{</td></tr>
+<tr><th id="234">234</th><td>    <b>if</b> (<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>) {</td></tr>
+<tr><th id="235">235</th><td>        <b>if</b> (<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> != <a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>) {</td></tr>
+<tr><th id="236">236</th><td>            <a class="ref" href="../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a>);</td></tr>
+<tr><th id="237">237</th><td>        }</td></tr>
+<tr><th id="238">238</th><td>        <a class="ref" href="../include/qemu/log.h.html#qemu_logfile" title='qemu_logfile' data-ref="qemu_logfile">qemu_logfile</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="239">239</th><td>    }</td></tr>
+<tr><th id="240">240</th><td>}</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td><em>const</em> <a class="typedef" href="../include/qemu/log.h.html#QEMULogItem" title='QEMULogItem' data-type='struct QEMULogItem' data-ref="QEMULogItem">QEMULogItem</a> <dfn class="decl def" id="qemu_log_items" title='qemu_log_items' data-ref="qemu_log_items">qemu_log_items</dfn>[] = {</td></tr>
+<tr><th id="243">243</th><td>    { <a class="macro" href="../include/qemu/log.h.html#30" title="(1 &lt;&lt; 0)" data-ref="_M/CPU_LOG_TB_OUT_ASM">CPU_LOG_TB_OUT_ASM</a>, <q>"out_asm"</q>,</td></tr>
+<tr><th id="244">244</th><td>      <q>"show generated host assembly code for each compiled TB"</q> },</td></tr>
+<tr><th id="245">245</th><td>    { <a class="macro" href="../include/qemu/log.h.html#31" title="(1 &lt;&lt; 1)" data-ref="_M/CPU_LOG_TB_IN_ASM">CPU_LOG_TB_IN_ASM</a>, <q>"in_asm"</q>,</td></tr>
+<tr><th id="246">246</th><td>      <q>"show target assembly code for each compiled TB"</q> },</td></tr>
+<tr><th id="247">247</th><td>    { <a class="macro" href="../include/qemu/log.h.html#32" title="(1 &lt;&lt; 2)" data-ref="_M/CPU_LOG_TB_OP">CPU_LOG_TB_OP</a>, <q>"op"</q>,</td></tr>
+<tr><th id="248">248</th><td>      <q>"show micro ops for each compiled TB"</q> },</td></tr>
+<tr><th id="249">249</th><td>    { <a class="macro" href="../include/qemu/log.h.html#33" title="(1 &lt;&lt; 3)" data-ref="_M/CPU_LOG_TB_OP_OPT">CPU_LOG_TB_OP_OPT</a>, <q>"op_opt"</q>,</td></tr>
+<tr><th id="250">250</th><td>      <q>"show micro ops after optimization"</q> },</td></tr>
+<tr><th id="251">251</th><td>    { <a class="macro" href="../include/qemu/log.h.html#45" title="(1 &lt;&lt; 16)" data-ref="_M/CPU_LOG_TB_OP_IND">CPU_LOG_TB_OP_IND</a>, <q>"op_ind"</q>,</td></tr>
+<tr><th id="252">252</th><td>      <q>"show micro ops before indirect lowering"</q> },</td></tr>
+<tr><th id="253">253</th><td>    { <a class="macro" href="../include/qemu/log.h.html#34" title="(1 &lt;&lt; 4)" data-ref="_M/CPU_LOG_INT">CPU_LOG_INT</a>, <q>"int"</q>,</td></tr>
+<tr><th id="254">254</th><td>      <q>"show interrupts/exceptions in short format"</q> },</td></tr>
+<tr><th id="255">255</th><td>    { <a class="macro" href="../include/qemu/log.h.html#35" title="(1 &lt;&lt; 5)" data-ref="_M/CPU_LOG_EXEC">CPU_LOG_EXEC</a>, <q>"exec"</q>,</td></tr>
+<tr><th id="256">256</th><td>      <q>"show trace before each executed TB (lots of logs)"</q> },</td></tr>
+<tr><th id="257">257</th><td>    { <a class="macro" href="../include/qemu/log.h.html#37" title="(1 &lt;&lt; 8)" data-ref="_M/CPU_LOG_TB_CPU">CPU_LOG_TB_CPU</a>, <q>"cpu"</q>,</td></tr>
+<tr><th id="258">258</th><td>      <q>"show CPU registers before entering a TB (lots of logs)"</q> },</td></tr>
+<tr><th id="259">259</th><td>    { <a class="macro" href="../include/qemu/log.h.html#41" title="(1 &lt;&lt; 12)" data-ref="_M/CPU_LOG_MMU">CPU_LOG_MMU</a>, <q>"mmu"</q>,</td></tr>
+<tr><th id="260">260</th><td>      <q>"log MMU-related activities"</q> },</td></tr>
+<tr><th id="261">261</th><td>    { <a class="macro" href="../include/qemu/log.h.html#36" title="(1 &lt;&lt; 6)" data-ref="_M/CPU_LOG_PCALL">CPU_LOG_PCALL</a>, <q>"pcall"</q>,</td></tr>
+<tr><th id="262">262</th><td>      <q>"x86 only: show protected mode far calls/returns/exceptions"</q> },</td></tr>
+<tr><th id="263">263</th><td>    { <a class="macro" href="../include/qemu/log.h.html#38" title="(1 &lt;&lt; 9)" data-ref="_M/CPU_LOG_RESET">CPU_LOG_RESET</a>, <q>"cpu_reset"</q>,</td></tr>
+<tr><th id="264">264</th><td>      <q>"show CPU state before CPU resets"</q> },</td></tr>
+<tr><th id="265">265</th><td>    { <a class="macro" href="../include/qemu/log.h.html#39" title="(1 &lt;&lt; 10)" data-ref="_M/LOG_UNIMP">LOG_UNIMP</a>, <q>"unimp"</q>,</td></tr>
+<tr><th id="266">266</th><td>      <q>"log unimplemented functionality"</q> },</td></tr>
+<tr><th id="267">267</th><td>    { <a class="macro" href="../include/qemu/log.h.html#40" title="(1 &lt;&lt; 11)" data-ref="_M/LOG_GUEST_ERROR">LOG_GUEST_ERROR</a>, <q>"guest_errors"</q>,</td></tr>
+<tr><th id="268">268</th><td>      <q>"log when the guest OS does something invalid (eg accessing a\n"</q></td></tr>
+<tr><th id="269">269</th><td>      <q>"non-existent register)"</q> },</td></tr>
+<tr><th id="270">270</th><td>    { <a class="macro" href="../include/qemu/log.h.html#43" title="(1 &lt;&lt; 14)" data-ref="_M/CPU_LOG_PAGE">CPU_LOG_PAGE</a>, <q>"page"</q>,</td></tr>
+<tr><th id="271">271</th><td>      <q>"dump pages at beginning of user mode emulation"</q> },</td></tr>
+<tr><th id="272">272</th><td>    { <a class="macro" href="../include/qemu/log.h.html#42" title="(1 &lt;&lt; 13)" data-ref="_M/CPU_LOG_TB_NOCHAIN">CPU_LOG_TB_NOCHAIN</a>, <q>"nochain"</q>,</td></tr>
+<tr><th id="273">273</th><td>      <q>"do not chain compiled TBs so that \"exec\" and \"cpu\" show\n"</q></td></tr>
+<tr><th id="274">274</th><td>      <q>"complete traces"</q> },</td></tr>
+<tr><th id="275">275</th><td>    { <var>0</var>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span> },</td></tr>
+<tr><th id="276">276</th><td>};</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><i>/* takes a comma separated list of log masks. Return 0 if error. */</i></td></tr>
+<tr><th id="279">279</th><td><em>int</em> <dfn class="decl def" id="qemu_str_to_log_mask" title='qemu_str_to_log_mask' data-ref="qemu_str_to_log_mask">qemu_str_to_log_mask</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="26str" title='str' data-type='const char *' data-ref="26str">str</dfn>)</td></tr>
+<tr><th id="280">280</th><td>{</td></tr>
+<tr><th id="281">281</th><td>    <em>const</em> <a class="typedef" href="../include/qemu/log.h.html#QEMULogItem" title='QEMULogItem' data-type='struct QEMULogItem' data-ref="QEMULogItem">QEMULogItem</a> *<dfn class="local col7 decl" id="27item" title='item' data-type='const QEMULogItem *' data-ref="27item">item</dfn>;</td></tr>
+<tr><th id="282">282</th><td>    <em>int</em> <dfn class="local col8 decl" id="28mask" title='mask' data-type='int' data-ref="28mask">mask</dfn> = <var>0</var>;</td></tr>
+<tr><th id="283">283</th><td>    <em>char</em> **<dfn class="local col9 decl" id="29parts" title='parts' data-type='char **' data-ref="29parts">parts</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strsplit" title='g_strsplit' data-ref="g_strsplit">g_strsplit</a>(<a class="local col6 ref" href="#26str" title='str' data-ref="26str">str</a>, <q>","</q>, <var>0</var>);</td></tr>
+<tr><th id="284">284</th><td>    <em>char</em> **<dfn class="local col0 decl" id="30tmp" title='tmp' data-type='char **' data-ref="30tmp">tmp</dfn>;</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td>    <b>for</b> (<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a> = <a class="local col9 ref" href="#29parts" title='parts' data-ref="29parts">parts</a>; <a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a> &amp;&amp; *<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>; <a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>++) {</td></tr>
+<tr><th id="287">287</th><td>        <b>if</b> (<a class="ref" href="../../include/glib-2.0/glib/ghash.h.html#g_str_equal" title='g_str_equal' data-ref="g_str_equal">g_str_equal</a>(*<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>, <q>"all"</q>)) {</td></tr>
+<tr><th id="288">288</th><td>            <b>for</b> (<a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a> = <a class="ref" href="../include/qemu/log.h.html#qemu_log_items" title='qemu_log_items' data-ref="qemu_log_items">qemu_log_items</a>; <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::mask" title='QEMULogItem::mask' data-ref="QEMULogItem::mask">mask</a> != <var>0</var>; <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>++) {</td></tr>
+<tr><th id="289">289</th><td>                <a class="local col8 ref" href="#28mask" title='mask' data-ref="28mask">mask</a> |= <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::mask" title='QEMULogItem::mask' data-ref="QEMULogItem::mask">mask</a>;</td></tr>
+<tr><th id="290">290</th><td>            }</td></tr>
+<tr><th id="291">291</th><td><u>#<span data-ppcond="291">ifdef</span> <a class="macro" href="../config-host.h.html#88" data-ref="_M/CONFIG_TRACE_LOG">CONFIG_TRACE_LOG</a></u></td></tr>
+<tr><th id="292">292</th><td>        } <b>else</b> <b>if</b> (<a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_str_has_prefix" title='g_str_has_prefix' data-ref="g_str_has_prefix">g_str_has_prefix</a>(*<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>, <q>"trace:"</q>) &amp;&amp; (*<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>)[<var>6</var>] != <kbd>'\0'</kbd>) {</td></tr>
+<tr><th id="293">293</th><td>            <a class="ref" href="../trace/control.h.html#trace_enable_events" title='trace_enable_events' data-ref="trace_enable_events">trace_enable_events</a>((*<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>) + <var>6</var>);</td></tr>
+<tr><th id="294">294</th><td>            <a class="local col8 ref" href="#28mask" title='mask' data-ref="28mask">mask</a> |= <a class="macro" href="../include/qemu/log.h.html#44" title="(1 &lt;&lt; 15)" data-ref="_M/LOG_TRACE">LOG_TRACE</a>;</td></tr>
+<tr><th id="295">295</th><td><u>#<span data-ppcond="291">endif</span></u></td></tr>
+<tr><th id="296">296</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="297">297</th><td>            <b>for</b> (<a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a> = <a class="ref" href="../include/qemu/log.h.html#qemu_log_items" title='qemu_log_items' data-ref="qemu_log_items">qemu_log_items</a>; <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::mask" title='QEMULogItem::mask' data-ref="QEMULogItem::mask">mask</a> != <var>0</var>; <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>++) {</td></tr>
+<tr><th id="298">298</th><td>                <b>if</b> (<a class="ref" href="../../include/glib-2.0/glib/ghash.h.html#g_str_equal" title='g_str_equal' data-ref="g_str_equal">g_str_equal</a>(*<a class="local col0 ref" href="#30tmp" title='tmp' data-ref="30tmp">tmp</a>, <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::name" title='QEMULogItem::name' data-ref="QEMULogItem::name">name</a>)) {</td></tr>
+<tr><th id="299">299</th><td>                    <b>goto</b> <a class="lbl" href="#31found" data-ref="31found">found</a>;</td></tr>
+<tr><th id="300">300</th><td>                }</td></tr>
+<tr><th id="301">301</th><td>            }</td></tr>
+<tr><th id="302">302</th><td>            <b>goto</b> <a class="lbl" href="#32error" data-ref="32error">error</a>;</td></tr>
+<tr><th id="303">303</th><td>        <dfn class="lbl" id="31found" data-ref="31found">found</dfn>:</td></tr>
+<tr><th id="304">304</th><td>            <a class="local col8 ref" href="#28mask" title='mask' data-ref="28mask">mask</a> |= <a class="local col7 ref" href="#27item" title='item' data-ref="27item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::mask" title='QEMULogItem::mask' data-ref="QEMULogItem::mask">mask</a>;</td></tr>
+<tr><th id="305">305</th><td>        }</td></tr>
+<tr><th id="306">306</th><td>    }</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strfreev" title='g_strfreev' data-ref="g_strfreev">g_strfreev</a>(<a class="local col9 ref" href="#29parts" title='parts' data-ref="29parts">parts</a>);</td></tr>
+<tr><th id="309">309</th><td>    <b>return</b> <a class="local col8 ref" href="#28mask" title='mask' data-ref="28mask">mask</a>;</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td> <dfn class="lbl" id="32error" data-ref="32error">error</dfn>:</td></tr>
+<tr><th id="312">312</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strfreev" title='g_strfreev' data-ref="g_strfreev">g_strfreev</a>(<a class="local col9 ref" href="#29parts" title='parts' data-ref="29parts">parts</a>);</td></tr>
+<tr><th id="313">313</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="314">314</th><td>}</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td><em>void</em> <dfn class="decl def" id="qemu_print_log_usage" title='qemu_print_log_usage' data-ref="qemu_print_log_usage">qemu_print_log_usage</dfn>(<a class="typedef" href="../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col3 decl" id="33f" title='f' data-type='FILE *' data-ref="33f">f</dfn>)</td></tr>
+<tr><th id="317">317</th><td>{</td></tr>
+<tr><th id="318">318</th><td>    <em>const</em> <a class="typedef" href="../include/qemu/log.h.html#QEMULogItem" title='QEMULogItem' data-type='struct QEMULogItem' data-ref="QEMULogItem">QEMULogItem</a> *<dfn class="local col4 decl" id="34item" title='item' data-type='const QEMULogItem *' data-ref="34item">item</dfn>;</td></tr>
+<tr><th id="319">319</th><td>    <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="local col3 ref" href="#33f" title='f' data-ref="33f">f</a>, <q>"Log items (comma separated):\n"</q>);</td></tr>
+<tr><th id="320">320</th><td>    <b>for</b> (<a class="local col4 ref" href="#34item" title='item' data-ref="34item">item</a> = <a class="ref" href="../include/qemu/log.h.html#qemu_log_items" title='qemu_log_items' data-ref="qemu_log_items">qemu_log_items</a>; <a class="local col4 ref" href="#34item" title='item' data-ref="34item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::mask" title='QEMULogItem::mask' data-ref="QEMULogItem::mask">mask</a> != <var>0</var>; <a class="local col4 ref" href="#34item" title='item' data-ref="34item">item</a>++) {</td></tr>
+<tr><th id="321">321</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="local col3 ref" href="#33f" title='f' data-ref="33f">f</a>, <q>"%-15s %s\n"</q>, <a class="local col4 ref" href="#34item" title='item' data-ref="34item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::name" title='QEMULogItem::name' data-ref="QEMULogItem::name">name</a>, <a class="local col4 ref" href="#34item" title='item' data-ref="34item">item</a>-&gt;<a class="ref" href="../include/qemu/log.h.html#QEMULogItem::help" title='QEMULogItem::help' data-ref="QEMULogItem::help">help</a>);</td></tr>
+<tr><th id="322">322</th><td>    }</td></tr>
+<tr><th id="323">323</th><td><u>#<span data-ppcond="323">ifdef</span> <a class="macro" href="../config-host.h.html#88" data-ref="_M/CONFIG_TRACE_LOG">CONFIG_TRACE_LOG</a></u></td></tr>
+<tr><th id="324">324</th><td>    <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="local col3 ref" href="#33f" title='f' data-ref="33f">f</a>, <q>"trace:PATTERN   enable trace events\n"</q>);</td></tr>
+<tr><th id="325">325</th><td>    <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="local col3 ref" href="#33f" title='f' data-ref="33f">f</a>, <q>"\nUse \"-d trace:help\" to get a list of trace events.\n\n"</q>);</td></tr>
+<tr><th id="326">326</th><td><u>#<span data-ppcond="323">endif</span></u></td></tr>
+<tr><th id="327">327</th><td>}</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

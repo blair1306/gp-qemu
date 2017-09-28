@@ -1,0 +1,23 @@
+<dec f='codebrowser/block/qcow2.h' l='598' type='int qcow2_alloc_cluster_offset(BlockDriverState * bs, uint64_t offset, unsigned int * bytes, uint64_t * host_offset, QCowL2Meta ** m)'/>
+<def f='codebrowser/block/qcow2-cluster.c' l='1374' ll='1479' type='int qcow2_alloc_cluster_offset(BlockDriverState * bs, uint64_t offset, unsigned int * bytes, uint64_t * host_offset, QCowL2Meta ** m)'/>
+<doc f='codebrowser/block/qcow2-cluster.c' l='1355'>/*
+ * alloc_cluster_offset
+ *
+ * For a given offset on the virtual disk, find the cluster offset in qcow2
+ * file. If the offset is not found, allocate a new cluster.
+ *
+ * If the cluster was already allocated, m-&gt;nb_clusters is set to 0 and
+ * other fields in m are meaningless.
+ *
+ * If the cluster is newly allocated, m-&gt;nb_clusters is set to the number of
+ * contiguous clusters that have been allocated. In this case, the other
+ * fields of m are valid and contain information about the first allocated
+ * cluster.
+ *
+ * If the request conflicts with another write request in flight, the coroutine
+ * is queued and will be reentered when the dependency has completed.
+ *
+ * Return 0 on success and -errno in error cases
+ */</doc>
+<use f='codebrowser/block/qcow2.c' l='1933' u='c' c='qcow2_co_pwritev'/>
+<use f='codebrowser/block/qcow2.c' l='2505' u='c' c='preallocate'/>

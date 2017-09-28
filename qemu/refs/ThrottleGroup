@@ -1,0 +1,26 @@
+<def f='codebrowser/block/throttle-groups.c' l='56' ll='69'/>
+<size>368</size>
+<doc f='codebrowser/block/throttle-groups.c' l='32'>/* The ThrottleGroup structure (with its ThrottleState) is shared
+ * among different BlockBackends and it&apos;s independent from
+ * AioContext, so in order to use it from different threads it needs
+ * its own locking.
+ *
+ * This locking is however handled internally in this file, so it&apos;s
+ * transparent to outside users.
+ *
+ * The whole ThrottleGroup structure is private and invisible to
+ * outside users, that only use it through its ThrottleState.
+ *
+ * In addition to the ThrottleGroup structure, BlockBackendPublic has
+ * fields that need to be accessed by other members of the group and
+ * therefore also need to be protected by this lock. Once a
+ * BlockBackend is registered in a group those fields can be accessed
+ * by other threads any time.
+ *
+ * Again, all this is handled internally and is mostly transparent to
+ * the outside. The &apos;throttle_timers&apos; field however has an additional
+ * constraint because it may be temporarily invalid (see for example
+ * blk_set_aio_context()). Therefore in this file a thread will
+ * access some other BlockBackend&apos;s timers only after verifying that
+ * that BlockBackend has throttled requests in the queue.
+ */</doc>

@@ -1,0 +1,360 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>eeprom93xx.c source code [codebrowser/hw/nvram/eeprom93xx.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="_eeprom_t "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/nvram/eeprom93xx.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>nvram</a>/<a href='eeprom93xx.c.html'>eeprom93xx.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU EEPROM 93xx emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2006-2007 Stefan Weil</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="7">7</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="8">8</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="9">9</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="14">14</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="17">17</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><i>/* Emulation for serial EEPROMs:</i></td></tr>
+<tr><th id="21">21</th><td><i> * NMC93C06 256-Bit (16 x 16)</i></td></tr>
+<tr><th id="22">22</th><td><i> * NMC93C46 1024-Bit (64 x 16)</i></td></tr>
+<tr><th id="23">23</th><td><i> * NMC93C56 2028 Bit (128 x 16)</i></td></tr>
+<tr><th id="24">24</th><td><i> * NMC93C66 4096 Bit (256 x 16)</i></td></tr>
+<tr><th id="25">25</th><td><i> * Compatible devices include FM93C46 and others.</i></td></tr>
+<tr><th id="26">26</th><td><i> *</i></td></tr>
+<tr><th id="27">27</th><td><i> * Other drivers use these interface functions:</i></td></tr>
+<tr><th id="28">28</th><td><i> * eeprom93xx_new   - add a new EEPROM (with 16, 64 or 256 words)</i></td></tr>
+<tr><th id="29">29</th><td><i> * eeprom93xx_free  - destroy EEPROM</i></td></tr>
+<tr><th id="30">30</th><td><i> * eeprom93xx_read  - read data from the EEPROM</i></td></tr>
+<tr><th id="31">31</th><td><i> * eeprom93xx_write - write data to the EEPROM</i></td></tr>
+<tr><th id="32">32</th><td><i> * eeprom93xx_data  - get EEPROM data array for external manipulation</i></td></tr>
+<tr><th id="33">33</th><td><i> *</i></td></tr>
+<tr><th id="34">34</th><td><i> * Todo list:</i></td></tr>
+<tr><th id="35">35</th><td><i> * - No emulation of EEPROM timings.</i></td></tr>
+<tr><th id="36">36</th><td><i> */</i></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../include/hw/nvram/eeprom93xx.h.html">"hw/nvram/eeprom93xx.h"</a></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* Debug EEPROM emulation. */</i></td></tr>
+<tr><th id="43">43</th><td><i>//~ #define DEBUG_EEPROM</i></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="45">ifdef</span> <span class="macro" data-ref="_M/DEBUG_EEPROM">DEBUG_EEPROM</span></u></td></tr>
+<tr><th id="46">46</th><td><u>#define logout(fmt, ...) fprintf(stderr, "EEPROM\t%-24s" fmt, __func__, ## __VA_ARGS__)</u></td></tr>
+<tr><th id="47">47</th><td><u>#<span data-ppcond="45">else</span></u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/logout" data-ref="_M/logout">logout</dfn>(fmt, ...) ((void)0)</u></td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="45">endif</span></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/EEPROM_INSTANCE" data-ref="_M/EEPROM_INSTANCE">EEPROM_INSTANCE</dfn>  0</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/OLD_EEPROM_VERSION" data-ref="_M/OLD_EEPROM_VERSION">OLD_EEPROM_VERSION</dfn> 20061112</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/EEPROM_VERSION" data-ref="_M/EEPROM_VERSION">EEPROM_VERSION</dfn> (OLD_EEPROM_VERSION + 1)</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#<span data-ppcond="55">if</span> 0</u></td></tr>
+<tr><th id="56">56</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="57">57</th><td>  eeprom_read  = <var>0x80</var>,   <i>/* read register xx */</i></td></tr>
+<tr><th id="58">58</th><td>  eeprom_write = <var>0x40</var>,   <i>/* write register xx */</i></td></tr>
+<tr><th id="59">59</th><td>  eeprom_erase = <var>0xc0</var>,   <i>/* erase register xx */</i></td></tr>
+<tr><th id="60">60</th><td>  eeprom_ewen  = <var>0x30</var>,   <i>/* erase / write enable */</i></td></tr>
+<tr><th id="61">61</th><td>  eeprom_ewds  = <var>0x00</var>,   <i>/* erase / write disable */</i></td></tr>
+<tr><th id="62">62</th><td>  eeprom_eral  = <var>0x20</var>,   <i>/* erase all registers */</i></td></tr>
+<tr><th id="63">63</th><td>  eeprom_wral  = <var>0x10</var>,   <i>/* write all registers */</i></td></tr>
+<tr><th id="64">64</th><td>  eeprom_amask = <var>0x0f</var>,</td></tr>
+<tr><th id="65">65</th><td>  eeprom_imask = <var>0xf0</var></td></tr>
+<tr><th id="66">66</th><td>} eeprom_instruction_t;</td></tr>
+<tr><th id="67">67</th><td><u>#<span data-ppcond="55">endif</span></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><u>#<span data-ppcond="69">ifdef</span> <span class="macro" data-ref="_M/DEBUG_EEPROM">DEBUG_EEPROM</span></u></td></tr>
+<tr><th id="70">70</th><td><em>static</em> <em>const</em> <em>char</em> *opstring[] = {</td></tr>
+<tr><th id="71">71</th><td>  <q>"extended"</q>, <q>"write"</q>, <q>"read"</q>, <q>"erase"</q></td></tr>
+<tr><th id="72">72</th><td>};</td></tr>
+<tr><th id="73">73</th><td><u>#<span data-ppcond="69">endif</span></u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><b>struct</b> <dfn class="type def" id="_eeprom_t" title='_eeprom_t' data-ref="_eeprom_t">_eeprom_t</dfn> {</td></tr>
+<tr><th id="76">76</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="_eeprom_t::tick" title='_eeprom_t::tick' data-ref="_eeprom_t::tick">tick</dfn>;</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="_eeprom_t::address" title='_eeprom_t::address' data-ref="_eeprom_t::address">address</dfn>;</td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="_eeprom_t::command" title='_eeprom_t::command' data-ref="_eeprom_t::command">command</dfn>;</td></tr>
+<tr><th id="79">79</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="_eeprom_t::writable" title='_eeprom_t::writable' data-ref="_eeprom_t::writable">writable</dfn>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="_eeprom_t::eecs" title='_eeprom_t::eecs' data-ref="_eeprom_t::eecs">eecs</dfn>;</td></tr>
+<tr><th id="82">82</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="_eeprom_t::eesk" title='_eeprom_t::eesk' data-ref="_eeprom_t::eesk">eesk</dfn>;</td></tr>
+<tr><th id="83">83</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</dfn>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</dfn>;</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</dfn>;</td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</dfn>[<var>0</var>];</td></tr>
+<tr><th id="89">89</th><td>};</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><i>/* Code for saving and restoring of EEPROM state. */</i></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i  data-doc="get_uint16_from_uint8">/* Restore an uint16_t from an uint8_t</i></td></tr>
+<tr><th id="94">94</th><td><i  data-doc="get_uint16_from_uint8">   This is a Big hack, but it is how the old state did it.</i></td></tr>
+<tr><th id="95">95</th><td><i  data-doc="get_uint16_from_uint8"> */</i></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="get_uint16_from_uint8" title='get_uint16_from_uint8' data-type='int get_uint16_from_uint8(QEMUFile * f, void * pv, size_t size, VMStateField * field)' data-ref="get_uint16_from_uint8">get_uint16_from_uint8</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col1 decl" id="1f" title='f' data-type='QEMUFile *' data-ref="1f">f</dfn>, <em>void</em> *<dfn class="local col2 decl" id="2pv" title='pv' data-type='void *' data-ref="2pv">pv</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col3 decl" id="3size" title='size' data-type='size_t' data-ref="3size">size</dfn>,</td></tr>
+<tr><th id="98">98</th><td>                                 <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a> *<dfn class="local col4 decl" id="4field" title='field' data-type='VMStateField *' data-ref="4field">field</dfn>)</td></tr>
+<tr><th id="99">99</th><td>{</td></tr>
+<tr><th id="100">100</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> *<dfn class="local col5 decl" id="5v" title='v' data-type='uint16_t *' data-ref="5v">v</dfn> = <a class="local col2 ref" href="#2pv" title='pv' data-ref="2pv">pv</a>;</td></tr>
+<tr><th id="101">101</th><td>    *<a class="local col5 ref" href="#5v" title='v' data-ref="5v">v</a> = <a class="ref" href="../../include/migration/qemu-file-types.h.html#qemu_get_ubyte" title='qemu_get_ubyte' data-ref="qemu_get_ubyte">qemu_get_ubyte</a>(<a class="local col1 ref" href="#1f" title='f' data-ref="1f">f</a>);</td></tr>
+<tr><th id="102">102</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="103">103</th><td>}</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="put_unused" title='put_unused' data-type='int put_unused(QEMUFile * f, void * pv, size_t size, VMStateField * field, QJSON * vmdesc)' data-ref="put_unused">put_unused</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col6 decl" id="6f" title='f' data-type='QEMUFile *' data-ref="6f">f</dfn>, <em>void</em> *<dfn class="local col7 decl" id="7pv" title='pv' data-type='void *' data-ref="7pv">pv</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col8 decl" id="8size" title='size' data-type='size_t' data-ref="8size">size</dfn>, <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a> *<dfn class="local col9 decl" id="9field" title='field' data-type='VMStateField *' data-ref="9field">field</dfn>,</td></tr>
+<tr><th id="106">106</th><td>                      <a class="typedef" href="../../migration/qjson.h.html#QJSON" title='QJSON' data-type='struct QJSON' data-ref="QJSON">QJSON</a> *<dfn class="local col0 decl" id="10vmdesc" title='vmdesc' data-type='QJSON *' data-ref="10vmdesc">vmdesc</dfn>)</td></tr>
+<tr><th id="107">107</th><td>{</td></tr>
+<tr><th id="108">108</th><td>    <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"uint16_from_uint8 is used only for backwards compatibility.\n"</q>);</td></tr>
+<tr><th id="109">109</th><td>    <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Never should be used to write a new state.\n"</q>);</td></tr>
+<tr><th id="110">110</th><td>    <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>0</var>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="113">113</th><td>}</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateInfo" title='VMStateInfo' data-type='struct VMStateInfo' data-ref="VMStateInfo">VMStateInfo</a> <dfn class="tu decl def" id="vmstate_hack_uint16_from_uint8" title='vmstate_hack_uint16_from_uint8' data-type='const VMStateInfo' data-ref="vmstate_hack_uint16_from_uint8">vmstate_hack_uint16_from_uint8</dfn> = {</td></tr>
+<tr><th id="116">116</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateInfo::name" title='VMStateInfo::name' data-ref="VMStateInfo::name">name</a> = <q>"uint16_from_uint8"</q>,</td></tr>
+<tr><th id="117">117</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateInfo::get" title='VMStateInfo::get' data-ref="VMStateInfo::get">get</a>  = <a class="tu ref" href="#get_uint16_from_uint8" title='get_uint16_from_uint8' data-use='r' data-ref="get_uint16_from_uint8">get_uint16_from_uint8</a>,</td></tr>
+<tr><th id="118">118</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateInfo::put" title='VMStateInfo::put' data-ref="VMStateInfo::put">put</a>  = <a class="tu ref" href="#put_unused" title='put_unused' data-use='r' data-ref="put_unused">put_unused</a>,</td></tr>
+<tr><th id="119">119</th><td>};</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_UINT16_HACK_TEST" data-ref="_M/VMSTATE_UINT16_HACK_TEST">VMSTATE_UINT16_HACK_TEST</dfn>(_f, _s, _t)                           \</u></td></tr>
+<tr><th id="122">122</th><td><u>    VMSTATE_SINGLE_TEST(_f, _s, _t, 0, <a class="tu ref" href="#vmstate_hack_uint16_from_uint8" title='vmstate_hack_uint16_from_uint8' data-use='a' data-ref="vmstate_hack_uint16_from_uint8">vmstate_hack_uint16_from_uint8</a>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>)</u></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="is_old_eeprom_version" title='is_old_eeprom_version' data-type='_Bool is_old_eeprom_version(void * opaque, int version_id)' data-ref="is_old_eeprom_version">is_old_eeprom_version</dfn>(<em>void</em> *<dfn class="local col1 decl" id="11opaque" title='opaque' data-type='void *' data-ref="11opaque">opaque</dfn>, <em>int</em> <dfn class="local col2 decl" id="12version_id" title='version_id' data-type='int' data-ref="12version_id">version_id</dfn>)</td></tr>
+<tr><th id="125">125</th><td>{</td></tr>
+<tr><th id="126">126</th><td>    <b>return</b> <a class="local col2 ref" href="#12version_id" title='version_id' data-ref="12version_id">version_id</a> == <a class="macro" href="#52" title="20061112" data-ref="_M/OLD_EEPROM_VERSION">OLD_EEPROM_VERSION</a>;</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="vmstate_eeprom" title='vmstate_eeprom' data-type='const VMStateDescription' data-ref="vmstate_eeprom">vmstate_eeprom</dfn> = {</td></tr>
+<tr><th id="130">130</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <q>"eeprom"</q>,</td></tr>
+<tr><th id="131">131</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <a class="macro" href="#53" title="(20061112 + 1)" data-ref="_M/EEPROM_VERSION">EEPROM_VERSION</a>,</td></tr>
+<tr><th id="132">132</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::minimum_version_id" title='VMStateDescription::minimum_version_id' data-ref="VMStateDescription::minimum_version_id">minimum_version_id</a> = <a class="macro" href="#52" title="20061112" data-ref="_M/OLD_EEPROM_VERSION">OLD_EEPROM_VERSION</a>,</td></tr>
+<tr><th id="133">133</th><td>    .<a class="ref" href="../../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="134">134</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;tick&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, tick) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;tick)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::tick" title='_eeprom_t::tick' data-ref="_eeprom_t::tick">tick</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="135">135</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;address&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, address) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;address)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::address" title='_eeprom_t::address' data-ref="_eeprom_t::address">address</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="136">136</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;command&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, command) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;command)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::command" title='_eeprom_t::command' data-ref="_eeprom_t::command">command</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="137">137</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;writable&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, writable) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;writable)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::writable" title='_eeprom_t::writable' data-ref="_eeprom_t::writable">writable</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;eecs&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, eecs) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;eecs)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::eecs" title='_eeprom_t::eecs' data-ref="_eeprom_t::eecs">eecs</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="140">140</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;eesk&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, eesk) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;eesk)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::eesk" title='_eeprom_t::eesk' data-ref="_eeprom_t::eesk">eesk</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="141">141</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;eedo&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, eedo) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;eedo)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#769" title="{ .name = (&quot;addrbits&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint8_t), .info = &amp;(vmstate_info_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, addrbits) + ((uint8_t*)0 - (typeof(((eeprom_t *)0)-&gt;addrbits)*)0)), }" data-ref="_M/VMSTATE_UINT8">VMSTATE_UINT8</a>(<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="144">144</th><td>        <a class="macro" href="#121" title="{ .name = (&quot;size&quot;), .version_id = (0), .field_exists = (is_old_eeprom_version), .size = sizeof(uint16_t), .info = &amp;(vmstate_hack_uint16_from_uint8), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, size) + ((uint16_t*)0 - (typeof(((eeprom_t *)0)-&gt;size)*)0)), }" data-ref="_M/VMSTATE_UINT16_HACK_TEST">VMSTATE_UINT16_HACK_TEST</a>(<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>, <a class="tu ref" href="#is_old_eeprom_version" title='is_old_eeprom_version' data-ref="is_old_eeprom_version">is_old_eeprom_version</a>),</td></tr>
+<tr><th id="145">145</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#989" title="{ .name = &quot;unused&quot;, .field_exists = (is_old_eeprom_version), .version_id = (0), .size = (1), .info = &amp;vmstate_info_unused_buffer, .flags = VMS_BUFFER, }" data-ref="_M/VMSTATE_UNUSED_TEST">VMSTATE_UNUSED_TEST</a>(<a class="tu ref" href="#is_old_eeprom_version" title='is_old_eeprom_version' data-ref="is_old_eeprom_version">is_old_eeprom_version</a>, <var>1</var>),</td></tr>
+<tr><th id="146">146</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#786" title="{ .name = (&quot;size&quot;), .err_hint = (((void*)0)), .version_id = ((20061112 + 1)), .field_exists = (0), .size = sizeof(uint16_t), .info = &amp;(vmstate_info_uint16_equal), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, size) + ((uint16_t*)0 - (typeof(((eeprom_t *)0)-&gt;size)*)0)), }" data-ref="_M/VMSTATE_UINT16_EQUAL_V">VMSTATE_UINT16_EQUAL_V</a>(<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>, <a class="macro" href="#53" title="(20061112 + 1)" data-ref="_M/EEPROM_VERSION">EEPROM_VERSION</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>),</td></tr>
+<tr><th id="147">147</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#771" title="{ .name = (&quot;data&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint16_t), .info = &amp;(vmstate_info_uint16), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(eeprom_t, data) + ((uint16_t*)0 - (typeof(((eeprom_t *)0)-&gt;data)*)0)), }" data-ref="_M/VMSTATE_UINT16">VMSTATE_UINT16</a>(<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>),</td></tr>
+<tr><th id="148">148</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#387" title="{ .name = (&quot;contents&quot;), .version_id = (0), .num_offset = (__builtin_offsetof(eeprom_t, size) + ((uint16_t*)0 - (typeof(((eeprom_t *)0)-&gt;size)*)0)), .info = &amp;(vmstate_info_uint16), .size = sizeof(uint16_t), .flags = VMS_VARRAY_UINT16, .offset = __builtin_offsetof(eeprom_t, contents), }" data-ref="_M/VMSTATE_VARRAY_UINT16_UNSAFE">VMSTATE_VARRAY_UINT16_UNSAFE</a>(contents, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a>, <a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>, <var>0</var>,</td></tr>
+<tr><th id="149">149</th><td>                                     <a class="ref" href="../../include/migration/vmstate.h.html#vmstate_info_uint16" title='vmstate_info_uint16' data-ref="vmstate_info_uint16">vmstate_info_uint16</a>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>),</td></tr>
+<tr><th id="150">150</th><td>        <a class="macro" href="../../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>()</td></tr>
+<tr><th id="151">151</th><td>    }</td></tr>
+<tr><th id="152">152</th><td>};</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="decl def" id="eeprom93xx_write" title='eeprom93xx_write' data-ref="eeprom93xx_write">eeprom93xx_write</dfn>(<a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="local col3 decl" id="13eeprom" title='eeprom' data-type='eeprom_t *' data-ref="13eeprom">eeprom</dfn>, <em>int</em> <dfn class="local col4 decl" id="14eecs" title='eecs' data-type='int' data-ref="14eecs">eecs</dfn>, <em>int</em> <dfn class="local col5 decl" id="15eesk" title='eesk' data-type='int' data-ref="15eesk">eesk</dfn>, <em>int</em> <dfn class="local col6 decl" id="16eedi" title='eedi' data-type='int' data-ref="16eedi">eedi</dfn>)</td></tr>
+<tr><th id="155">155</th><td>{</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col7 decl" id="17tick" title='tick' data-type='uint8_t' data-ref="17tick">tick</dfn> = <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::tick" title='_eeprom_t::tick' data-ref="_eeprom_t::tick">tick</a>;</td></tr>
+<tr><th id="157">157</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col8 decl" id="18eedo" title='eedo' data-type='uint8_t' data-ref="18eedo">eedo</dfn> = <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</a>;</td></tr>
+<tr><th id="158">158</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col9 decl" id="19address" title='address' data-type='uint16_t' data-ref="19address">address</dfn> = <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::address" title='_eeprom_t::address' data-ref="_eeprom_t::address">address</a>;</td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col0 decl" id="20command" title='command' data-type='uint8_t' data-ref="20command">command</dfn> = <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::command" title='_eeprom_t::command' data-ref="_eeprom_t::command">command</a>;</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>    <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"CS=%u SK=%u DI=%u DO=%u, tick = %u\n"</q>,</td></tr>
+<tr><th id="162">162</th><td>           eecs, eesk, eedi, eedo, tick);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <b>if</b> (!<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eecs" title='_eeprom_t::eecs' data-ref="_eeprom_t::eecs">eecs</a> &amp;&amp; <a class="local col4 ref" href="#14eecs" title='eecs' data-ref="14eecs">eecs</a>) {</td></tr>
+<tr><th id="165">165</th><td>        <i>/* Start chip select cycle. */</i></td></tr>
+<tr><th id="166">166</th><td>        <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"Cycle start, waiting for 1st start bit (0)\n"</q>);</td></tr>
+<tr><th id="167">167</th><td>        <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> = <var>0</var>;</td></tr>
+<tr><th id="168">168</th><td>        <a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> = <var>0x0</var>;</td></tr>
+<tr><th id="169">169</th><td>        <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> = <var>0x0</var>;</td></tr>
+<tr><th id="170">170</th><td>    } <b>else</b> <b>if</b> (<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eecs" title='_eeprom_t::eecs' data-ref="_eeprom_t::eecs">eecs</a> &amp;&amp; !<a class="local col4 ref" href="#14eecs" title='eecs' data-ref="14eecs">eecs</a>) {</td></tr>
+<tr><th id="171">171</th><td>        <i>/* End chip select cycle. This triggers write / erase. */</i></td></tr>
+<tr><th id="172">172</th><td>        <b>if</b> (<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::writable" title='_eeprom_t::writable' data-ref="_eeprom_t::writable">writable</a>) {</td></tr>
+<tr><th id="173">173</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col1 decl" id="21subcommand" title='subcommand' data-type='uint8_t' data-ref="21subcommand">subcommand</dfn> = <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> &gt;&gt; (<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a> - <var>2</var>);</td></tr>
+<tr><th id="174">174</th><td>            <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>0</var> &amp;&amp; <a class="local col1 ref" href="#21subcommand" title='subcommand' data-ref="21subcommand">subcommand</a> == <var>2</var>) {</td></tr>
+<tr><th id="175">175</th><td>                <i>/* Erase all. */</i></td></tr>
+<tr><th id="176">176</th><td>                <b>for</b> (<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> = <var>0</var>; <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> &lt; <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>; <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>++) {</td></tr>
+<tr><th id="177">177</th><td>                    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>] = <var>0xffff</var>;</td></tr>
+<tr><th id="178">178</th><td>                }</td></tr>
+<tr><th id="179">179</th><td>            } <b>else</b> <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>3</var>) {</td></tr>
+<tr><th id="180">180</th><td>                <i>/* Erase word. */</i></td></tr>
+<tr><th id="181">181</th><td>                <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>] = <var>0xffff</var>;</td></tr>
+<tr><th id="182">182</th><td>            } <b>else</b> <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> &gt;= <var>2</var> + <var>2</var> + <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a> + <var>16</var>) {</td></tr>
+<tr><th id="183">183</th><td>                <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>1</var>) {</td></tr>
+<tr><th id="184">184</th><td>                    <i>/* Write word. */</i></td></tr>
+<tr><th id="185">185</th><td>                    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>] &amp;= <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a>;</td></tr>
+<tr><th id="186">186</th><td>                } <b>else</b> <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>0</var> &amp;&amp; <a class="local col1 ref" href="#21subcommand" title='subcommand' data-ref="21subcommand">subcommand</a> == <var>1</var>) {</td></tr>
+<tr><th id="187">187</th><td>                    <i>/* Write all. */</i></td></tr>
+<tr><th id="188">188</th><td>                    <b>for</b> (<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> = <var>0</var>; <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> &lt; <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>; <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>++) {</td></tr>
+<tr><th id="189">189</th><td>                        <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>] &amp;= <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a>;</td></tr>
+<tr><th id="190">190</th><td>                    }</td></tr>
+<tr><th id="191">191</th><td>                }</td></tr>
+<tr><th id="192">192</th><td>            }</td></tr>
+<tr><th id="193">193</th><td>        }</td></tr>
+<tr><th id="194">194</th><td>        <i>/* Output DO is tristate, read results in 1. */</i></td></tr>
+<tr><th id="195">195</th><td>        <a class="local col8 ref" href="#18eedo" title='eedo' data-ref="18eedo">eedo</a> = <var>1</var>;</td></tr>
+<tr><th id="196">196</th><td>    } <b>else</b> <b>if</b> (<a class="local col4 ref" href="#14eecs" title='eecs' data-ref="14eecs">eecs</a> &amp;&amp; !<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eesk" title='_eeprom_t::eesk' data-ref="_eeprom_t::eesk">eesk</a> &amp;&amp; <a class="local col5 ref" href="#15eesk" title='eesk' data-ref="15eesk">eesk</a>) {</td></tr>
+<tr><th id="197">197</th><td>        <i>/* Raising edge of clock shifts data in. */</i></td></tr>
+<tr><th id="198">198</th><td>        <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> == <var>0</var>) {</td></tr>
+<tr><th id="199">199</th><td>            <i>/* Wait for 1st start bit. */</i></td></tr>
+<tr><th id="200">200</th><td>            <b>if</b> (<a class="local col6 ref" href="#16eedi" title='eedi' data-ref="16eedi">eedi</a> == <var>0</var>) {</td></tr>
+<tr><th id="201">201</th><td>                <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"Got correct 1st start bit, waiting for 2nd start bit (1)\n"</q>);</td></tr>
+<tr><th id="202">202</th><td>                <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>++;</td></tr>
+<tr><th id="203">203</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="204">204</th><td>                <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"wrong 1st start bit (is 1, should be 0)\n"</q>);</td></tr>
+<tr><th id="205">205</th><td>                <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> = <var>2</var>;</td></tr>
+<tr><th id="206">206</th><td>                <i>//~ assert(!"wrong start bit");</i></td></tr>
+<tr><th id="207">207</th><td>            }</td></tr>
+<tr><th id="208">208</th><td>        } <b>else</b> <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> == <var>1</var>) {</td></tr>
+<tr><th id="209">209</th><td>            <i>/* Wait for 2nd start bit. */</i></td></tr>
+<tr><th id="210">210</th><td>            <b>if</b> (<a class="local col6 ref" href="#16eedi" title='eedi' data-ref="16eedi">eedi</a> != <var>0</var>) {</td></tr>
+<tr><th id="211">211</th><td>                <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"Got correct 2nd start bit, getting command + address\n"</q>);</td></tr>
+<tr><th id="212">212</th><td>                <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>++;</td></tr>
+<tr><th id="213">213</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="214">214</th><td>                <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"1st start bit is longer than needed\n"</q>);</td></tr>
+<tr><th id="215">215</th><td>            }</td></tr>
+<tr><th id="216">216</th><td>        } <b>else</b> <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> &lt; <var>2</var> + <var>2</var>) {</td></tr>
+<tr><th id="217">217</th><td>            <i>/* Got 2 start bits, transfer 2 opcode bits. */</i></td></tr>
+<tr><th id="218">218</th><td>            <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>++;</td></tr>
+<tr><th id="219">219</th><td>            <a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> &lt;&lt;= <var>1</var>;</td></tr>
+<tr><th id="220">220</th><td>            <b>if</b> (<a class="local col6 ref" href="#16eedi" title='eedi' data-ref="16eedi">eedi</a>) {</td></tr>
+<tr><th id="221">221</th><td>                <a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> += <var>1</var>;</td></tr>
+<tr><th id="222">222</th><td>            }</td></tr>
+<tr><th id="223">223</th><td>        } <b>else</b> <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> &lt; <var>2</var> + <var>2</var> + <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a>) {</td></tr>
+<tr><th id="224">224</th><td>            <i>/* Got 2 start bits and 2 opcode bits, transfer all address bits. */</i></td></tr>
+<tr><th id="225">225</th><td>            <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>++;</td></tr>
+<tr><th id="226">226</th><td>            <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> = ((<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> &lt;&lt; <var>1</var>) | <a class="local col6 ref" href="#16eedi" title='eedi' data-ref="16eedi">eedi</a>);</td></tr>
+<tr><th id="227">227</th><td>            <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> == <var>2</var> + <var>2</var> + <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a>) {</td></tr>
+<tr><th id="228">228</th><td>                <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"%s command, address = 0x%02x (value 0x%04x)\n"</q>,</td></tr>
+<tr><th id="229">229</th><td>                       opstring[command], address, eeprom-&gt;contents[address]);</td></tr>
+<tr><th id="230">230</th><td>                <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>2</var>) {</td></tr>
+<tr><th id="231">231</th><td>                    <a class="local col8 ref" href="#18eedo" title='eedo' data-ref="18eedo">eedo</a> = <var>0</var>;</td></tr>
+<tr><th id="232">232</th><td>                }</td></tr>
+<tr><th id="233">233</th><td>                <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> = <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> % <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a>;</td></tr>
+<tr><th id="234">234</th><td>                <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>0</var>) {</td></tr>
+<tr><th id="235">235</th><td>                    <i>/* Command code in upper 2 bits of address. */</i></td></tr>
+<tr><th id="236">236</th><td>                    <b>switch</b> (<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a> &gt;&gt; (<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a> - <var>2</var>)) {</td></tr>
+<tr><th id="237">237</th><td>                    <b>case</b> <var>0</var>:</td></tr>
+<tr><th id="238">238</th><td>                        <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"write disable command\n"</q>);</td></tr>
+<tr><th id="239">239</th><td>                        <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::writable" title='_eeprom_t::writable' data-ref="_eeprom_t::writable">writable</a> = <var>0</var>;</td></tr>
+<tr><th id="240">240</th><td>                        <b>break</b>;</td></tr>
+<tr><th id="241">241</th><td>                    <b>case</b> <var>1</var>:</td></tr>
+<tr><th id="242">242</th><td>                        <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"write all command\n"</q>);</td></tr>
+<tr><th id="243">243</th><td>                        <b>break</b>;</td></tr>
+<tr><th id="244">244</th><td>                    <b>case</b> <var>2</var>:</td></tr>
+<tr><th id="245">245</th><td>                        <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"erase all command\n"</q>);</td></tr>
+<tr><th id="246">246</th><td>                        <b>break</b>;</td></tr>
+<tr><th id="247">247</th><td>                    <b>case</b> <var>3</var>:</td></tr>
+<tr><th id="248">248</th><td>                        <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"write enable command\n"</q>);</td></tr>
+<tr><th id="249">249</th><td>                        <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::writable" title='_eeprom_t::writable' data-ref="_eeprom_t::writable">writable</a> = <var>1</var>;</td></tr>
+<tr><th id="250">250</th><td>                        <b>break</b>;</td></tr>
+<tr><th id="251">251</th><td>                    }</td></tr>
+<tr><th id="252">252</th><td>                } <b>else</b> {</td></tr>
+<tr><th id="253">253</th><td>                    <i>/* Read, write or erase word. */</i></td></tr>
+<tr><th id="254">254</th><td>                    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a> = <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>];</td></tr>
+<tr><th id="255">255</th><td>                }</td></tr>
+<tr><th id="256">256</th><td>            }</td></tr>
+<tr><th id="257">257</th><td>        } <b>else</b> <b>if</b> (<a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a> &lt; <var>2</var> + <var>2</var> + <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a> + <var>16</var>) {</td></tr>
+<tr><th id="258">258</th><td>            <i>/* Transfer 16 data bits. */</i></td></tr>
+<tr><th id="259">259</th><td>            <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>++;</td></tr>
+<tr><th id="260">260</th><td>            <b>if</b> (<a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a> == <var>2</var>) {</td></tr>
+<tr><th id="261">261</th><td>                <i>/* Read word. */</i></td></tr>
+<tr><th id="262">262</th><td>                <a class="local col8 ref" href="#18eedo" title='eedo' data-ref="18eedo">eedo</a> = ((<a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a> &amp; <var>0x8000</var>) != <var>0</var>);</td></tr>
+<tr><th id="263">263</th><td>            }</td></tr>
+<tr><th id="264">264</th><td>            <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a> &lt;&lt;= <var>1</var>;</td></tr>
+<tr><th id="265">265</th><td>            <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::data" title='_eeprom_t::data' data-ref="_eeprom_t::data">data</a> += <a class="local col6 ref" href="#16eedi" title='eedi' data-ref="16eedi">eedi</a>;</td></tr>
+<tr><th id="266">266</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="267">267</th><td>            <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"additional unneeded tick, not processed\n"</q>);</td></tr>
+<tr><th id="268">268</th><td>        }</td></tr>
+<tr><th id="269">269</th><td>    }</td></tr>
+<tr><th id="270">270</th><td>    <i>/* Save status of EEPROM. */</i></td></tr>
+<tr><th id="271">271</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::tick" title='_eeprom_t::tick' data-ref="_eeprom_t::tick">tick</a> = <a class="local col7 ref" href="#17tick" title='tick' data-ref="17tick">tick</a>;</td></tr>
+<tr><th id="272">272</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eecs" title='_eeprom_t::eecs' data-ref="_eeprom_t::eecs">eecs</a> = <a class="local col4 ref" href="#14eecs" title='eecs' data-ref="14eecs">eecs</a>;</td></tr>
+<tr><th id="273">273</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eesk" title='_eeprom_t::eesk' data-ref="_eeprom_t::eesk">eesk</a> = <a class="local col5 ref" href="#15eesk" title='eesk' data-ref="15eesk">eesk</a>;</td></tr>
+<tr><th id="274">274</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</a> = <a class="local col8 ref" href="#18eedo" title='eedo' data-ref="18eedo">eedo</a>;</td></tr>
+<tr><th id="275">275</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::address" title='_eeprom_t::address' data-ref="_eeprom_t::address">address</a> = <a class="local col9 ref" href="#19address" title='address' data-ref="19address">address</a>;</td></tr>
+<tr><th id="276">276</th><td>    <a class="local col3 ref" href="#13eeprom" title='eeprom' data-ref="13eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::command" title='_eeprom_t::command' data-ref="_eeprom_t::command">command</a> = <a class="local col0 ref" href="#20command" title='command' data-ref="20command">command</a>;</td></tr>
+<tr><th id="277">277</th><td>}</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td><a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl def" id="eeprom93xx_read" title='eeprom93xx_read' data-ref="eeprom93xx_read">eeprom93xx_read</dfn>(<a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="local col2 decl" id="22eeprom" title='eeprom' data-type='eeprom_t *' data-ref="22eeprom">eeprom</dfn>)</td></tr>
+<tr><th id="280">280</th><td>{</td></tr>
+<tr><th id="281">281</th><td>    <i>/* Return status of pin DO (0 or 1). */</i></td></tr>
+<tr><th id="282">282</th><td>    <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"CS=%u DO=%u\n"</q>, eeprom-&gt;eecs, eeprom-&gt;eedo);</td></tr>
+<tr><th id="283">283</th><td>    <b>return</b> <a class="local col2 ref" href="#22eeprom" title='eeprom' data-ref="22eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</a>;</td></tr>
+<tr><th id="284">284</th><td>}</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td><u>#<span data-ppcond="286">if</span> 0</u></td></tr>
+<tr><th id="287">287</th><td><em>void</em> eeprom93xx_reset(eeprom_t *eeprom)</td></tr>
+<tr><th id="288">288</th><td>{</td></tr>
+<tr><th id="289">289</th><td>    <i>/* prepare eeprom */</i></td></tr>
+<tr><th id="290">290</th><td>    logout(<q>"eeprom = 0x%p\n"</q>, eeprom);</td></tr>
+<tr><th id="291">291</th><td>    eeprom-&gt;tick = <var>0</var>;</td></tr>
+<tr><th id="292">292</th><td>    eeprom-&gt;command = <var>0</var>;</td></tr>
+<tr><th id="293">293</th><td>}</td></tr>
+<tr><th id="294">294</th><td><u>#<span data-ppcond="286">endif</span></u></td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td><a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="decl def" id="eeprom93xx_new" title='eeprom93xx_new' data-ref="eeprom93xx_new">eeprom93xx_new</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col3 decl" id="23dev" title='dev' data-type='DeviceState *' data-ref="23dev">dev</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col4 decl" id="24nwords" title='nwords' data-type='uint16_t' data-ref="24nwords">nwords</dfn>)</td></tr>
+<tr><th id="297">297</th><td>{</td></tr>
+<tr><th id="298">298</th><td>    <i>/* Add a new EEPROM (with 16, 64 or 256 words). */</i></td></tr>
+<tr><th id="299">299</th><td>    <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="local col5 decl" id="25eeprom" title='eeprom' data-type='eeprom_t *' data-ref="25eeprom">eeprom</dfn>;</td></tr>
+<tr><th id="300">300</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col6 decl" id="26addrbits" title='addrbits' data-type='uint8_t' data-ref="26addrbits">addrbits</dfn>;</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>    <b>switch</b> (<a class="local col4 ref" href="#24nwords" title='nwords' data-ref="24nwords">nwords</a>) {</td></tr>
+<tr><th id="303">303</th><td>    <b>case</b> <var>16</var>:</td></tr>
+<tr><th id="304">304</th><td>    <b>case</b> <var>64</var>:</td></tr>
+<tr><th id="305">305</th><td>        <a class="local col6 ref" href="#26addrbits" title='addrbits' data-ref="26addrbits">addrbits</a> = <var>6</var>;</td></tr>
+<tr><th id="306">306</th><td>        <b>break</b>;</td></tr>
+<tr><th id="307">307</th><td>    <b>case</b> <var>128</var>:</td></tr>
+<tr><th id="308">308</th><td>    <b>case</b> <var>256</var>:</td></tr>
+<tr><th id="309">309</th><td>        <a class="local col6 ref" href="#26addrbits" title='addrbits' data-ref="26addrbits">addrbits</a> = <var>8</var>;</td></tr>
+<tr><th id="310">310</th><td>        <b>break</b>;</td></tr>
+<tr><th id="311">311</th><td>    <b>default</b>:</td></tr>
+<tr><th id="312">312</th><td>        <a class="macro" href="../../../include/assert.h.html#88" title="((!&quot;Unsupported EEPROM size, fallback to 64 words!&quot;) ? (void) (0) : __assert_fail (&quot;!\&quot;Unsupported EEPROM size, fallback to 64 words!\&quot;&quot;, &quot;/home/jon/workspace/qemu/hw/nvram/eeprom93xx.c&quot;, 312, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<q>"Unsupported EEPROM size, fallback to 64 words!"</q>);</td></tr>
+<tr><th id="313">313</th><td>        <a class="local col4 ref" href="#24nwords" title='nwords' data-ref="24nwords">nwords</a> = <var>64</var>;</td></tr>
+<tr><th id="314">314</th><td>        <a class="local col6 ref" href="#26addrbits" title='addrbits' data-ref="26addrbits">addrbits</a> = <var>6</var>;</td></tr>
+<tr><th id="315">315</th><td>    }</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td>    <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a> = (<a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *)<a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(*<a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>) + <a class="local col4 ref" href="#24nwords" title='nwords' data-ref="24nwords">nwords</a> * <var>2</var>);</td></tr>
+<tr><th id="318">318</th><td>    <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::size" title='_eeprom_t::size' data-ref="_eeprom_t::size">size</a> = <a class="local col4 ref" href="#24nwords" title='nwords' data-ref="24nwords">nwords</a>;</td></tr>
+<tr><th id="319">319</th><td>    <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::addrbits" title='_eeprom_t::addrbits' data-ref="_eeprom_t::addrbits">addrbits</a> = <a class="local col6 ref" href="#26addrbits" title='addrbits' data-ref="26addrbits">addrbits</a>;</td></tr>
+<tr><th id="320">320</th><td>    <i>/* Output DO is tristate, read results in 1. */</i></td></tr>
+<tr><th id="321">321</th><td>    <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::eedo" title='_eeprom_t::eedo' data-ref="_eeprom_t::eedo">eedo</a> = <var>1</var>;</td></tr>
+<tr><th id="322">322</th><td>    <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"eeprom = 0x%p, nwords = %u\n"</q>, eeprom, nwords);</td></tr>
+<tr><th id="323">323</th><td>    <a class="ref" href="../../include/migration/vmstate.h.html#vmstate_register" title='vmstate_register' data-ref="vmstate_register">vmstate_register</a>(<a class="local col3 ref" href="#23dev" title='dev' data-ref="23dev">dev</a>, <var>0</var>, &amp;<a class="tu ref" href="#vmstate_eeprom" title='vmstate_eeprom' data-use='a' data-ref="vmstate_eeprom">vmstate_eeprom</a>, <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>);</td></tr>
+<tr><th id="324">324</th><td>    <b>return</b> <a class="local col5 ref" href="#25eeprom" title='eeprom' data-ref="25eeprom">eeprom</a>;</td></tr>
+<tr><th id="325">325</th><td>}</td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td><em>void</em> <dfn class="decl def" id="eeprom93xx_free" title='eeprom93xx_free' data-ref="eeprom93xx_free">eeprom93xx_free</dfn>(<a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="27dev" title='dev' data-type='DeviceState *' data-ref="27dev">dev</dfn>, <a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="local col8 decl" id="28eeprom" title='eeprom' data-type='eeprom_t *' data-ref="28eeprom">eeprom</dfn>)</td></tr>
+<tr><th id="328">328</th><td>{</td></tr>
+<tr><th id="329">329</th><td>    <i>/* Destroy EEPROM. */</i></td></tr>
+<tr><th id="330">330</th><td>    <a class="macro" href="#48" title="((void)0)" data-ref="_M/logout">logout</a>(<q>"eeprom = 0x%p\n"</q>, eeprom);</td></tr>
+<tr><th id="331">331</th><td>    <a class="ref" href="../../include/migration/vmstate.h.html#vmstate_unregister" title='vmstate_unregister' data-ref="vmstate_unregister">vmstate_unregister</a>(<a class="local col7 ref" href="#27dev" title='dev' data-ref="27dev">dev</a>, &amp;<a class="tu ref" href="#vmstate_eeprom" title='vmstate_eeprom' data-use='a' data-ref="vmstate_eeprom">vmstate_eeprom</a>, <a class="local col8 ref" href="#28eeprom" title='eeprom' data-ref="28eeprom">eeprom</a>);</td></tr>
+<tr><th id="332">332</th><td>    <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col8 ref" href="#28eeprom" title='eeprom' data-ref="28eeprom">eeprom</a>);</td></tr>
+<tr><th id="333">333</th><td>}</td></tr>
+<tr><th id="334">334</th><td></td></tr>
+<tr><th id="335">335</th><td><a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> *<dfn class="decl def" id="eeprom93xx_data" title='eeprom93xx_data' data-ref="eeprom93xx_data">eeprom93xx_data</dfn>(<a class="typedef" href="../../include/hw/nvram/eeprom93xx.h.html#eeprom_t" title='eeprom_t' data-type='struct _eeprom_t' data-ref="eeprom_t">eeprom_t</a> *<dfn class="local col9 decl" id="29eeprom" title='eeprom' data-type='eeprom_t *' data-ref="29eeprom">eeprom</dfn>)</td></tr>
+<tr><th id="336">336</th><td>{</td></tr>
+<tr><th id="337">337</th><td>    <i>/* Get EEPROM data array. */</i></td></tr>
+<tr><th id="338">338</th><td>    <b>return</b> &amp;<a class="local col9 ref" href="#29eeprom" title='eeprom' data-ref="29eeprom">eeprom</a>-&gt;<a class="ref" href="#_eeprom_t::contents" title='_eeprom_t::contents' data-ref="_eeprom_t::contents">contents</a>[<var>0</var>];</td></tr>
+<tr><th id="339">339</th><td>}</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td><i>/* eof */</i></td></tr>
+<tr><th id="342">342</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,33 @@
+<dec f='codebrowser/include/hw/loader.h' l='97' type='int load_elf_ram(const char * filename, uint64_t (*)(void *, uint64_t) translate_fn, void * translate_opaque, uint64_t * pentry, uint64_t * lowaddr, uint64_t * highaddr, int big_endian, int elf_machine, int clear_lsb, int data_swab, AddressSpace * as, _Bool load_rom)'/>
+<doc f='codebrowser/include/hw/loader.h' l='68'>/** load_elf_ram:
+ * @filename: Path of ELF file
+ * @translate_fn: optional function to translate load addresses
+ * @translate_opaque: opaque data passed to @translate_fn
+ * @pentry: Populated with program entry point. Ignored if NULL.
+ * @lowaddr: Populated with lowest loaded address. Ignored if NULL.
+ * @highaddr: Populated with highest loaded address. Ignored if NULL.
+ * @bigendian: Expected ELF endianness. 0 for LE otherwise BE
+ * @elf_machine: Expected ELF machine type
+ * @clear_lsb: Set to mask off LSB of addresses (Some architectures use
+ *             this for non-address data)
+ * @data_swab: Set to order of byte swapping for data. 0 for no swap, 1
+ *             for swapping bytes within halfwords, 2 for bytes within
+ *             words and 3 for within doublewords.
+ * @as: The AddressSpace to load the ELF to. The value of address_space_memory
+ *      is used if nothing is supplied here.
+ * @load_rom : Load ELF binary as ROM
+ *
+ * Load an ELF file&apos;s contents to the emulated system&apos;s address space.
+ * Clients may optionally specify a callback to perform address
+ * translations. @pentry, @lowaddr and @highaddr are optional pointers
+ * which will be populated with various load information. @bigendian and
+ * @elf_machine give the expected endianness and machine for the ELF the
+ * load will fail if the target ELF does not match. Some architectures
+ * have some architecture-specific behaviours that come into effect when
+ * their particular values for @elf_machine are set.
+ * If @elf_machine is EM_NONE then the machine type will be read from the
+ * ELF header and no checks will be carried out against the machine type.
+ */</doc>
+<use f='codebrowser/hw/core/loader.c' l='440' u='c' c='load_elf_as'/>
+<def f='codebrowser/hw/core/loader.c' l='446' ll='502' type='int load_elf_ram(const char * filename, uint64_t (*)(void *, uint64_t) translate_fn, void * translate_opaque, uint64_t * pentry, uint64_t * lowaddr, uint64_t * highaddr, int big_endian, int elf_machine, int clear_lsb, int data_swab, AddressSpace * as, _Bool load_rom)'/>
+<doc f='codebrowser/hw/core/loader.c' l='445'>/* return &lt; 0 if error, otherwise the number of bytes loaded in memory */</doc>

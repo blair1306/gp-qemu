@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>gen-icount.h source code [codebrowser/include/exec/gen-icount.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/exec/gen-icount.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>exec</a>/<a href='gen-icount.h.html'>gen-icount.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/GEN_ICOUNT_H">GEN_ICOUNT_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/GEN_ICOUNT_H" data-ref="_M/GEN_ICOUNT_H">GEN_ICOUNT_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><i>/* Helpers for instruction counting code generation.  */</i></td></tr>
+<tr><th id="7">7</th><td></td></tr>
+<tr><th id="8">8</th><td><em>static</em> <em>int</em> <dfn class="decl def" id="icount_start_insn_idx" title='icount_start_insn_idx' data-ref="icount_start_insn_idx">icount_start_insn_idx</dfn>;</td></tr>
+<tr><th id="9">9</th><td><em>static</em> <a class="typedef" href="../../tcg/tcg.h.html#TCGLabel" title='TCGLabel' data-type='struct TCGLabel' data-ref="TCGLabel">TCGLabel</a> *<dfn class="decl def" id="exitreq_label" title='exitreq_label' data-ref="exitreq_label">exitreq_label</dfn>;</td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="gen_tb_start" title='gen_tb_start' data-ref="gen_tb_start">gen_tb_start</dfn>(<a class="typedef" href="tb-context.h.html#TranslationBlock" title='TranslationBlock' data-type='struct TranslationBlock' data-ref="TranslationBlock">TranslationBlock</a> *<dfn class="local col5 decl" id="675tb" title='tb' data-type='TranslationBlock *' data-ref="675tb">tb</dfn>)</td></tr>
+<tr><th id="12">12</th><td>{</td></tr>
+<tr><th id="13">13</th><td>    <a class="typedef" href="../../tcg/tcg.h.html#TCGv_i32" title='TCGv_i32' data-type='struct TCGv_i32_d *' data-ref="TCGv_i32">TCGv_i32</a> <dfn class="local col6 decl" id="676count" title='count' data-type='TCGv_i32' data-ref="676count">count</dfn>, <dfn class="local col7 decl" id="677imm" title='imm' data-type='TCGv_i32' data-ref="677imm">imm</dfn>;</td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td>    <a class="ref" href="#exitreq_label" title='exitreq_label' data-ref="exitreq_label">exitreq_label</a> = <a class="ref" href="../../tcg/tcg.h.html#gen_new_label" title='gen_new_label' data-ref="gen_new_label">gen_new_label</a>();</td></tr>
+<tr><th id="16">16</th><td>    <b>if</b> (<a class="local col5 ref" href="#675tb" title='tb' data-ref="675tb">tb</a>-&gt;<a class="ref" href="exec-all.h.html#TranslationBlock::cflags" title='TranslationBlock::cflags' data-ref="TranslationBlock::cflags">cflags</a> &amp; <a class="macro" href="exec-all.h.html#353" title="0x20000" data-ref="_M/CF_USE_ICOUNT">CF_USE_ICOUNT</a>) {</td></tr>
+<tr><th id="17">17</th><td>        <a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a> = <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_local_new_i32" title='tcg_temp_local_new_i32' data-ref="tcg_temp_local_new_i32">tcg_temp_local_new_i32</a>();</td></tr>
+<tr><th id="18">18</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="19">19</th><td>        <a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a> = <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_new_i32" title='tcg_temp_new_i32' data-ref="tcg_temp_new_i32">tcg_temp_new_i32</a>();</td></tr>
+<tr><th id="20">20</th><td>    }</td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_ld_i32" title='tcg_gen_ld_i32' data-ref="tcg_gen_ld_i32">tcg_gen_ld_i32</a>(<a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>, <a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::tcg_env" title='TCGContext::tcg_env' data-ref="TCGContext::tcg_env">tcg_env</a>,</td></tr>
+<tr><th id="23">23</th><td>                   -<a class="macro" href="../../target/i386/cpu.h.html#1294" title="__builtin_offsetof(X86CPU, env)" data-ref="_M/ENV_OFFSET">ENV_OFFSET</a> + <span class="macro" title="__builtin_offsetof(CPUState, icount_decr.u32)" data-ref="_M/offsetof">offsetof</span>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a>, icount_decr.u32));</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td>    <b>if</b> (<a class="local col5 ref" href="#675tb" title='tb' data-ref="675tb">tb</a>-&gt;<a class="ref" href="exec-all.h.html#TranslationBlock::cflags" title='TranslationBlock::cflags' data-ref="TranslationBlock::cflags">cflags</a> &amp; <a class="macro" href="exec-all.h.html#353" title="0x20000" data-ref="_M/CF_USE_ICOUNT">CF_USE_ICOUNT</a>) {</td></tr>
+<tr><th id="26">26</th><td>        <a class="local col7 ref" href="#677imm" title='imm' data-ref="677imm">imm</a> = <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_new_i32" title='tcg_temp_new_i32' data-ref="tcg_temp_new_i32">tcg_temp_new_i32</a>();</td></tr>
+<tr><th id="27">27</th><td>        <i>/* We emit a movi with a dummy immediate argument. Keep the insn index</i></td></tr>
+<tr><th id="28">28</th><td><i>         * of the movi so that we later (when we know the actual insn count)</i></td></tr>
+<tr><th id="29">29</th><td><i>         * can update the immediate argument with the actual insn count.  */</i></td></tr>
+<tr><th id="30">30</th><td>        <a class="ref" href="#icount_start_insn_idx" title='icount_start_insn_idx' data-ref="icount_start_insn_idx">icount_start_insn_idx</a> = <a class="ref" href="../../tcg/tcg.h.html#tcg_op_buf_count" title='tcg_op_buf_count' data-ref="tcg_op_buf_count">tcg_op_buf_count</a>();</td></tr>
+<tr><th id="31">31</th><td>        <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_movi_i32" title='tcg_gen_movi_i32' data-ref="tcg_gen_movi_i32">tcg_gen_movi_i32</a>(<a class="local col7 ref" href="#677imm" title='imm' data-ref="677imm">imm</a>, <var>0xdeadbeef</var>);</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>        <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_sub_i32" title='tcg_gen_sub_i32' data-ref="tcg_gen_sub_i32">tcg_gen_sub_i32</a>(<a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>, <a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>, <a class="local col7 ref" href="#677imm" title='imm' data-ref="677imm">imm</a>);</td></tr>
+<tr><th id="34">34</th><td>        <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_free_i32" title='tcg_temp_free_i32' data-ref="tcg_temp_free_i32">tcg_temp_free_i32</a>(<a class="local col7 ref" href="#677imm" title='imm' data-ref="677imm">imm</a>);</td></tr>
+<tr><th id="35">35</th><td>    }</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_brcondi_i32" title='tcg_gen_brcondi_i32' data-ref="tcg_gen_brcondi_i32">tcg_gen_brcondi_i32</a>(<a class="enum" href="../../tcg/tcg.h.html#TCG_COND_LT" title='TCG_COND_LT' data-ref="TCG_COND_LT">TCG_COND_LT</a>, <a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>, <var>0</var>, <a class="ref" href="#exitreq_label" title='exitreq_label' data-ref="exitreq_label">exitreq_label</a>);</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <b>if</b> (<a class="local col5 ref" href="#675tb" title='tb' data-ref="675tb">tb</a>-&gt;<a class="ref" href="exec-all.h.html#TranslationBlock::cflags" title='TranslationBlock::cflags' data-ref="TranslationBlock::cflags">cflags</a> &amp; <a class="macro" href="exec-all.h.html#353" title="0x20000" data-ref="_M/CF_USE_ICOUNT">CF_USE_ICOUNT</a>) {</td></tr>
+<tr><th id="40">40</th><td>        <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_st16_i32" title='tcg_gen_st16_i32' data-ref="tcg_gen_st16_i32">tcg_gen_st16_i32</a>(<a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>, <a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::tcg_env" title='TCGContext::tcg_env' data-ref="TCGContext::tcg_env">tcg_env</a>,</td></tr>
+<tr><th id="41">41</th><td>                         -<a class="macro" href="../../target/i386/cpu.h.html#1294" title="__builtin_offsetof(X86CPU, env)" data-ref="_M/ENV_OFFSET">ENV_OFFSET</a> + <span class="macro" title="__builtin_offsetof(CPUState, icount_decr.u16.low)" data-ref="_M/offsetof">offsetof</span>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a>, icount_decr.u16.low));</td></tr>
+<tr><th id="42">42</th><td>    }</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_free_i32" title='tcg_temp_free_i32' data-ref="tcg_temp_free_i32">tcg_temp_free_i32</a>(<a class="local col6 ref" href="#676count" title='count' data-ref="676count">count</a>);</td></tr>
+<tr><th id="45">45</th><td>}</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="gen_tb_end" title='gen_tb_end' data-ref="gen_tb_end">gen_tb_end</dfn>(<a class="typedef" href="tb-context.h.html#TranslationBlock" title='TranslationBlock' data-type='struct TranslationBlock' data-ref="TranslationBlock">TranslationBlock</a> *<dfn class="local col8 decl" id="678tb" title='tb' data-type='TranslationBlock *' data-ref="678tb">tb</dfn>, <em>int</em> <dfn class="local col9 decl" id="679num_insns" title='num_insns' data-type='int' data-ref="679num_insns">num_insns</dfn>)</td></tr>
+<tr><th id="48">48</th><td>{</td></tr>
+<tr><th id="49">49</th><td>    <b>if</b> (<a class="local col8 ref" href="#678tb" title='tb' data-ref="678tb">tb</a>-&gt;<a class="ref" href="exec-all.h.html#TranslationBlock::cflags" title='TranslationBlock::cflags' data-ref="TranslationBlock::cflags">cflags</a> &amp; <a class="macro" href="exec-all.h.html#353" title="0x20000" data-ref="_M/CF_USE_ICOUNT">CF_USE_ICOUNT</a>) {</td></tr>
+<tr><th id="50">50</th><td>        <i>/* Update the num_insn immediate parameter now that we know</i></td></tr>
+<tr><th id="51">51</th><td><i>         * the actual insn count.  */</i></td></tr>
+<tr><th id="52">52</th><td>        <a class="ref" href="../../tcg/tcg.h.html#tcg_set_insn_param" title='tcg_set_insn_param' data-ref="tcg_set_insn_param">tcg_set_insn_param</a>(<a class="ref" href="#icount_start_insn_idx" title='icount_start_insn_idx' data-ref="icount_start_insn_idx">icount_start_insn_idx</a>, <var>1</var>, <a class="local col9 ref" href="#679num_insns" title='num_insns' data-ref="679num_insns">num_insns</a>);</td></tr>
+<tr><th id="53">53</th><td>    }</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#gen_set_label" title='gen_set_label' data-ref="gen_set_label">gen_set_label</a>(<a class="ref" href="#exitreq_label" title='exitreq_label' data-ref="exitreq_label">exitreq_label</a>);</td></tr>
+<tr><th id="56">56</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_exit_tb" title='tcg_gen_exit_tb' data-ref="tcg_gen_exit_tb">tcg_gen_exit_tb</a>((<a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a>)<a class="local col8 ref" href="#678tb" title='tb' data-ref="678tb">tb</a> + <a class="macro" href="../../tcg/tcg.h.html#1101" title="3" data-ref="_M/TB_EXIT_REQUESTED">TB_EXIT_REQUESTED</a>);</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>    <i>/* Terminate the linked list.  */</i></td></tr>
+<tr><th id="59">59</th><td>    <a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::gen_op_buf" title='TCGContext::gen_op_buf' data-ref="TCGContext::gen_op_buf">gen_op_buf</a>[<a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::gen_op_buf" title='TCGContext::gen_op_buf' data-ref="TCGContext::gen_op_buf">gen_op_buf</a>[<var>0</var>].<a class="ref" href="../../tcg/tcg.h.html#TCGOp::prev" title='TCGOp::prev' data-ref="TCGOp::prev">prev</a>].<a class="ref" href="../../tcg/tcg.h.html#TCGOp::next" title='TCGOp::next' data-ref="TCGOp::next">next</a> = <var>0</var>;</td></tr>
+<tr><th id="60">60</th><td>}</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="gen_io_start" title='gen_io_start' data-ref="gen_io_start">gen_io_start</dfn>(<em>void</em>)</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../tcg/tcg.h.html#TCGv_i32" title='TCGv_i32' data-type='struct TCGv_i32_d *' data-ref="TCGv_i32">TCGv_i32</a> <dfn class="local col0 decl" id="680tmp" title='tmp' data-type='TCGv_i32' data-ref="680tmp">tmp</dfn> = <a class="ref" href="../../tcg/tcg.h.html#tcg_const_i32" title='tcg_const_i32' data-ref="tcg_const_i32">tcg_const_i32</a>(<var>1</var>);</td></tr>
+<tr><th id="65">65</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_st_i32" title='tcg_gen_st_i32' data-ref="tcg_gen_st_i32">tcg_gen_st_i32</a>(<a class="local col0 ref" href="#680tmp" title='tmp' data-ref="680tmp">tmp</a>, <a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::tcg_env" title='TCGContext::tcg_env' data-ref="TCGContext::tcg_env">tcg_env</a>,</td></tr>
+<tr><th id="66">66</th><td>                   -<a class="macro" href="../../target/i386/cpu.h.html#1294" title="__builtin_offsetof(X86CPU, env)" data-ref="_M/ENV_OFFSET">ENV_OFFSET</a> + <span class="macro" title="__builtin_offsetof(CPUState, can_do_io)" data-ref="_M/offsetof">offsetof</span>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a>, can_do_io));</td></tr>
+<tr><th id="67">67</th><td>    <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_free_i32" title='tcg_temp_free_i32' data-ref="tcg_temp_free_i32">tcg_temp_free_i32</a>(<a class="local col0 ref" href="#680tmp" title='tmp' data-ref="680tmp">tmp</a>);</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="gen_io_end" title='gen_io_end' data-ref="gen_io_end">gen_io_end</dfn>(<em>void</em>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="../../tcg/tcg.h.html#TCGv_i32" title='TCGv_i32' data-type='struct TCGv_i32_d *' data-ref="TCGv_i32">TCGv_i32</a> <dfn class="local col1 decl" id="681tmp" title='tmp' data-type='TCGv_i32' data-ref="681tmp">tmp</dfn> = <a class="ref" href="../../tcg/tcg.h.html#tcg_const_i32" title='tcg_const_i32' data-ref="tcg_const_i32">tcg_const_i32</a>(<var>0</var>);</td></tr>
+<tr><th id="73">73</th><td>    <a class="ref" href="../../tcg/tcg-op.h.html#tcg_gen_st_i32" title='tcg_gen_st_i32' data-ref="tcg_gen_st_i32">tcg_gen_st_i32</a>(<a class="local col1 ref" href="#681tmp" title='tmp' data-ref="681tmp">tmp</a>, <a class="ref" href="../../tcg/tcg.h.html#tcg_ctx" title='tcg_ctx' data-ref="tcg_ctx">tcg_ctx</a>.<a class="ref" href="../../tcg/tcg.h.html#TCGContext::tcg_env" title='TCGContext::tcg_env' data-ref="TCGContext::tcg_env">tcg_env</a>,</td></tr>
+<tr><th id="74">74</th><td>                   -<a class="macro" href="../../target/i386/cpu.h.html#1294" title="__builtin_offsetof(X86CPU, env)" data-ref="_M/ENV_OFFSET">ENV_OFFSET</a> + <span class="macro" title="__builtin_offsetof(CPUState, can_do_io)" data-ref="_M/offsetof">offsetof</span>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a>, can_do_io));</td></tr>
+<tr><th id="75">75</th><td>    <a class="ref" href="../../tcg/tcg.h.html#tcg_temp_free_i32" title='tcg_temp_free_i32' data-ref="tcg_temp_free_i32">tcg_temp_free_i32</a>(<a class="local col1 ref" href="#681tmp" title='tmp' data-ref="681tmp">tmp</a>);</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../target/i386/translate.c.html'>codebrowser/target/i386/translate.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

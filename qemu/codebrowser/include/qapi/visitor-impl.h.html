@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>visitor-impl.h source code [codebrowser/include/qapi/visitor-impl.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="Visitor,VisitorType "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qapi/visitor-impl.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qapi</a>/<a href='visitor-impl.h.html'>visitor-impl.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Core Definitions for QAPI Visitor implementations</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2012-2016 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Author: Paolo Bonizni &lt;pbonzini@redhat.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2.1 or later.</i></td></tr>
+<tr><th id="9">9</th><td><i> * See the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td><u>#<span data-ppcond="12">ifndef</span> <span class="macro" data-ref="_M/QAPI_VISITOR_IMPL_H">QAPI_VISITOR_IMPL_H</span></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/QAPI_VISITOR_IMPL_H" data-ref="_M/QAPI_VISITOR_IMPL_H">QAPI_VISITOR_IMPL_H</dfn></u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="visitor.h.html">"qapi/visitor.h"</a></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><i>/*</i></td></tr>
+<tr><th id="18">18</th><td><i> * This file describes the callback interface for implementing a QAPI</i></td></tr>
+<tr><th id="19">19</th><td><i> * visitor.  For the client interface, see visitor.h.  When</i></td></tr>
+<tr><th id="20">20</th><td><i> * implementing the callbacks, it is easiest to declare a struct with</i></td></tr>
+<tr><th id="21">21</th><td><i> * 'Visitor visitor;' as the first member.  A callback's contract</i></td></tr>
+<tr><th id="22">22</th><td><i> * matches the corresponding public functions' contract unless stated</i></td></tr>
+<tr><th id="23">23</th><td><i> * otherwise.  In the comments below, some callbacks are marked "must</i></td></tr>
+<tr><th id="24">24</th><td><i> * be set for $TYPE visits to work"; if a visitor implementation omits</i></td></tr>
+<tr><th id="25">25</th><td><i> * that callback, it should also document that it is only useful for a</i></td></tr>
+<tr><th id="26">26</th><td><i> * subset of QAPI.</i></td></tr>
+<tr><th id="27">27</th><td><i> */</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i>/*</i></td></tr>
+<tr><th id="30">30</th><td><i> * There are four classes of visitors; setting the class determines</i></td></tr>
+<tr><th id="31">31</th><td><i> * how QAPI enums are visited, as well as what additional restrictions</i></td></tr>
+<tr><th id="32">32</th><td><i> * can be asserted.  The values are intentionally chosen so as to</i></td></tr>
+<tr><th id="33">33</th><td><i> * permit some assertions based on whether a given bit is set (that</i></td></tr>
+<tr><th id="34">34</th><td><i> * is, some assertions apply to input and clone visitors, some</i></td></tr>
+<tr><th id="35">35</th><td><i> * assertions apply to output and clone visitors).</i></td></tr>
+<tr><th id="36">36</th><td><i> */</i></td></tr>
+<tr><th id="37">37</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="VisitorType" title='VisitorType' data-ref="VisitorType"><a class="type" href="#VisitorType" title='VisitorType' data-ref="VisitorType">VisitorType</a></dfn> {</td></tr>
+<tr><th id="38">38</th><td>    <dfn class="enum" id="VisitorType::VISITOR_INPUT" title='VisitorType::VISITOR_INPUT' data-ref="VisitorType::VISITOR_INPUT">VISITOR_INPUT</dfn> = <var>1</var>,</td></tr>
+<tr><th id="39">39</th><td>    <dfn class="enum" id="VisitorType::VISITOR_OUTPUT" title='VisitorType::VISITOR_OUTPUT' data-ref="VisitorType::VISITOR_OUTPUT">VISITOR_OUTPUT</dfn> = <var>2</var>,</td></tr>
+<tr><th id="40">40</th><td>    <dfn class="enum" id="VisitorType::VISITOR_CLONE" title='VisitorType::VISITOR_CLONE' data-ref="VisitorType::VISITOR_CLONE">VISITOR_CLONE</dfn> = <var>3</var>,</td></tr>
+<tr><th id="41">41</th><td>    <dfn class="enum" id="VisitorType::VISITOR_DEALLOC" title='VisitorType::VISITOR_DEALLOC' data-ref="VisitorType::VISITOR_DEALLOC">VISITOR_DEALLOC</dfn> = <var>4</var>,</td></tr>
+<tr><th id="42">42</th><td>} <dfn class="typedef" id="VisitorType" title='VisitorType' data-type='enum VisitorType' data-ref="VisitorType">VisitorType</dfn>;</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>struct</b> <dfn class="type def" id="Visitor" title='Visitor' data-ref="Visitor">Visitor</dfn></td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>    <i>/* Must be set to visit structs */</i></td></tr>
+<tr><th id="47">47</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::start_struct" title='Visitor::start_struct' data-ref="Visitor::start_struct">start_struct</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col1 decl" id="1v" title='v' data-type='Visitor *' data-ref="1v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="2name" title='name' data-type='const char *' data-ref="2name">name</dfn>, <em>void</em> **<dfn class="local col3 decl" id="3obj" title='obj' data-type='void **' data-ref="3obj">obj</dfn>,</td></tr>
+<tr><th id="48">48</th><td>                         <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col4 decl" id="4size" title='size' data-type='size_t' data-ref="4size">size</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="5errp" title='errp' data-type='Error **' data-ref="5errp">errp</dfn>);</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <i>/* Optional; intended for input visitors */</i></td></tr>
+<tr><th id="51">51</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::check_struct" title='Visitor::check_struct' data-ref="Visitor::check_struct">check_struct</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col6 decl" id="6v" title='v' data-type='Visitor *' data-ref="6v">v</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="7errp" title='errp' data-type='Error **' data-ref="7errp">errp</dfn>);</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>    <i>/* Must be set to visit structs */</i></td></tr>
+<tr><th id="54">54</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::end_struct" title='Visitor::end_struct' data-ref="Visitor::end_struct">end_struct</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col8 decl" id="8v" title='v' data-type='Visitor *' data-ref="8v">v</dfn>, <em>void</em> **<dfn class="local col9 decl" id="9obj" title='obj' data-type='void **' data-ref="9obj">obj</dfn>);</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <i>/* Must be set; implementations may require @list to be non-null,</i></td></tr>
+<tr><th id="57">57</th><td><i>     * but must document it. */</i></td></tr>
+<tr><th id="58">58</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::start_list" title='Visitor::start_list' data-ref="Visitor::start_list">start_list</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col0 decl" id="10v" title='v' data-type='Visitor *' data-ref="10v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="11name" title='name' data-type='const char *' data-ref="11name">name</dfn>, <a class="typedef" href="visitor.h.html#GenericList" title='GenericList' data-type='struct GenericList' data-ref="GenericList">GenericList</a> **<dfn class="local col2 decl" id="12list" title='list' data-type='GenericList **' data-ref="12list">list</dfn>,</td></tr>
+<tr><th id="59">59</th><td>                       <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col3 decl" id="13size" title='size' data-type='size_t' data-ref="13size">size</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="14errp" title='errp' data-type='Error **' data-ref="14errp">errp</dfn>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="visitor.h.html#GenericList" title='GenericList' data-type='struct GenericList' data-ref="GenericList">GenericList</a> *(*<dfn class="decl" id="Visitor::next_list" title='Visitor::next_list' data-ref="Visitor::next_list">next_list</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col5 decl" id="15v" title='v' data-type='Visitor *' data-ref="15v">v</dfn>, <a class="typedef" href="visitor.h.html#GenericList" title='GenericList' data-type='struct GenericList' data-ref="GenericList">GenericList</a> *<dfn class="local col6 decl" id="16tail" title='tail' data-type='GenericList *' data-ref="16tail">tail</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col7 decl" id="17size" title='size' data-type='size_t' data-ref="17size">size</dfn>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>    <i>/* Optional; intended for input visitors */</i></td></tr>
+<tr><th id="65">65</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::check_list" title='Visitor::check_list' data-ref="Visitor::check_list">check_list</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col8 decl" id="18v" title='v' data-type='Visitor *' data-ref="18v">v</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="19errp" title='errp' data-type='Error **' data-ref="19errp">errp</dfn>);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="68">68</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::end_list" title='Visitor::end_list' data-ref="Visitor::end_list">end_list</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col0 decl" id="20v" title='v' data-type='Visitor *' data-ref="20v">v</dfn>, <em>void</em> **<dfn class="local col1 decl" id="21list" title='list' data-type='void **' data-ref="21list">list</dfn>);</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td>    <i>/* Must be set by input and dealloc visitors to visit alternates;</i></td></tr>
+<tr><th id="71">71</th><td><i>     * optional for output visitors. */</i></td></tr>
+<tr><th id="72">72</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::start_alternate" title='Visitor::start_alternate' data-ref="Visitor::start_alternate">start_alternate</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col2 decl" id="22v" title='v' data-type='Visitor *' data-ref="22v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="23name" title='name' data-type='const char *' data-ref="23name">name</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                            <a class="typedef" href="visitor.h.html#GenericAlternate" title='GenericAlternate' data-type='struct GenericAlternate' data-ref="GenericAlternate">GenericAlternate</a> **<dfn class="local col4 decl" id="24obj" title='obj' data-type='GenericAlternate **' data-ref="24obj">obj</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="25size" title='size' data-type='size_t' data-ref="25size">size</dfn>,</td></tr>
+<tr><th id="74">74</th><td>                            <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="26errp" title='errp' data-type='Error **' data-ref="26errp">errp</dfn>);</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>    <i>/* Optional, needed for dealloc visitor */</i></td></tr>
+<tr><th id="77">77</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::end_alternate" title='Visitor::end_alternate' data-ref="Visitor::end_alternate">end_alternate</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col7 decl" id="27v" title='v' data-type='Visitor *' data-ref="27v">v</dfn>, <em>void</em> **<dfn class="local col8 decl" id="28obj" title='obj' data-type='void **' data-ref="28obj">obj</dfn>);</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="80">80</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_int64" title='Visitor::type_int64' data-ref="Visitor::type_int64">type_int64</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col9 decl" id="29v" title='v' data-type='Visitor *' data-ref="29v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="30name" title='name' data-type='const char *' data-ref="30name">name</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> *<dfn class="local col1 decl" id="31obj" title='obj' data-type='int64_t *' data-ref="31obj">obj</dfn>,</td></tr>
+<tr><th id="81">81</th><td>                       <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="32errp" title='errp' data-type='Error **' data-ref="32errp">errp</dfn>);</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="84">84</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_uint64" title='Visitor::type_uint64' data-ref="Visitor::type_uint64">type_uint64</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col3 decl" id="33v" title='v' data-type='Visitor *' data-ref="33v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="34name" title='name' data-type='const char *' data-ref="34name">name</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col5 decl" id="35obj" title='obj' data-type='uint64_t *' data-ref="35obj">obj</dfn>,</td></tr>
+<tr><th id="85">85</th><td>                        <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="36errp" title='errp' data-type='Error **' data-ref="36errp">errp</dfn>);</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <i>/* Optional; fallback is type_uint64() */</i></td></tr>
+<tr><th id="88">88</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_size" title='Visitor::type_size' data-ref="Visitor::type_size">type_size</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col7 decl" id="37v" title='v' data-type='Visitor *' data-ref="37v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="38name" title='name' data-type='const char *' data-ref="38name">name</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col9 decl" id="39obj" title='obj' data-type='uint64_t *' data-ref="39obj">obj</dfn>,</td></tr>
+<tr><th id="89">89</th><td>                      <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="40errp" title='errp' data-type='Error **' data-ref="40errp">errp</dfn>);</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="92">92</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_bool" title='Visitor::type_bool' data-ref="Visitor::type_bool">type_bool</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col1 decl" id="41v" title='v' data-type='Visitor *' data-ref="41v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="42name" title='name' data-type='const char *' data-ref="42name">name</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col3 decl" id="43obj" title='obj' data-type='_Bool *' data-ref="43obj">obj</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="44errp" title='errp' data-type='Error **' data-ref="44errp">errp</dfn>);</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="95">95</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_str" title='Visitor::type_str' data-ref="Visitor::type_str">type_str</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col5 decl" id="45v" title='v' data-type='Visitor *' data-ref="45v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="46name" title='name' data-type='const char *' data-ref="46name">name</dfn>, <em>char</em> **<dfn class="local col7 decl" id="47obj" title='obj' data-type='char **' data-ref="47obj">obj</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="48errp" title='errp' data-type='Error **' data-ref="48errp">errp</dfn>);</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <i>/* Must be set to visit numbers */</i></td></tr>
+<tr><th id="98">98</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_number" title='Visitor::type_number' data-ref="Visitor::type_number">type_number</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col9 decl" id="49v" title='v' data-type='Visitor *' data-ref="49v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="50name" title='name' data-type='const char *' data-ref="50name">name</dfn>, <em>double</em> *<dfn class="local col1 decl" id="51obj" title='obj' data-type='double *' data-ref="51obj">obj</dfn>,</td></tr>
+<tr><th id="99">99</th><td>                        <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="52errp" title='errp' data-type='Error **' data-ref="52errp">errp</dfn>);</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <i>/* Must be set to visit arbitrary QTypes */</i></td></tr>
+<tr><th id="102">102</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_any" title='Visitor::type_any' data-ref="Visitor::type_any">type_any</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col3 decl" id="53v" title='v' data-type='Visitor *' data-ref="53v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="54name" title='name' data-type='const char *' data-ref="54name">name</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> **<dfn class="local col5 decl" id="55obj" title='obj' data-type='QObject **' data-ref="55obj">obj</dfn>,</td></tr>
+<tr><th id="103">103</th><td>                     <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="56errp" title='errp' data-type='Error **' data-ref="56errp">errp</dfn>);</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <i>/* Must be set to visit explicit null values.  */</i></td></tr>
+<tr><th id="106">106</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::type_null" title='Visitor::type_null' data-ref="Visitor::type_null">type_null</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col7 decl" id="57v" title='v' data-type='Visitor *' data-ref="57v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="58name" title='name' data-type='const char *' data-ref="58name">name</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#QNull" title='QNull' data-type='struct QNull' data-ref="QNull">QNull</a> **<dfn class="local col9 decl" id="59obj" title='obj' data-type='QNull **' data-ref="59obj">obj</dfn>,</td></tr>
+<tr><th id="107">107</th><td>                      <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="60errp" title='errp' data-type='Error **' data-ref="60errp">errp</dfn>);</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <i>/* Must be set for input visitors to visit structs, optional otherwise.</i></td></tr>
+<tr><th id="110">110</th><td><i>       The core takes care of the return type in the public interface. */</i></td></tr>
+<tr><th id="111">111</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::optional" title='Visitor::optional' data-ref="Visitor::optional">optional</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col1 decl" id="61v" title='v' data-type='Visitor *' data-ref="61v">v</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="62name" title='name' data-type='const char *' data-ref="62name">name</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col3 decl" id="63present" title='present' data-type='_Bool *' data-ref="63present">present</dfn>);</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="114">114</th><td>    <a class="typedef" href="#VisitorType" title='VisitorType' data-type='enum VisitorType' data-ref="VisitorType">VisitorType</a> <dfn class="decl" id="Visitor::type" title='Visitor::type' data-ref="Visitor::type">type</dfn>;</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td>    <i>/* Must be set for output visitors, optional otherwise. */</i></td></tr>
+<tr><th id="117">117</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::complete" title='Visitor::complete' data-ref="Visitor::complete">complete</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col4 decl" id="64v" title='v' data-type='Visitor *' data-ref="64v">v</dfn>, <em>void</em> *<dfn class="local col5 decl" id="65opaque" title='opaque' data-type='void *' data-ref="65opaque">opaque</dfn>);</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <i>/* Must be set */</i></td></tr>
+<tr><th id="120">120</th><td>    <em>void</em> (*<dfn class="decl" id="Visitor::free" title='Visitor::free' data-ref="Visitor::free">free</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#Visitor" title='Visitor' data-type='struct Visitor' data-ref="Visitor">Visitor</a> *<dfn class="local col6 decl" id="66v" title='v' data-type='Visitor *' data-ref="66v">v</dfn>);</td></tr>
+<tr><th id="121">121</th><td>};</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><u>#<span data-ppcond="12">endif</span></u></td></tr>
+<tr><th id="124">124</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../qapi/opts-visitor.c.html'>codebrowser/qapi/opts-visitor.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

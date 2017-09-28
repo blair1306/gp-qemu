@@ -1,0 +1,42 @@
+<def f='codebrowser/include/qemu/throttle.h' l='79' ll='85'/>
+<size>40</size>
+<doc f='codebrowser/include/qemu/throttle.h' l='43'>/*
+ * This module implements I/O limits using the leaky bucket
+ * algorithm. The code is independent of the I/O units, but it is
+ * currently used for bytes per second and operations per second.
+ *
+ * Three parameters can be set by the user:
+ *
+ * - avg: the desired I/O limits in units per second.
+ * - max: the limit during bursts, also in units per second.
+ * - burst_length: the maximum length of the burst period, in seconds.
+ *
+ * Here&apos;s how it works:
+ *
+ * - The bucket level (number of performed I/O units) is kept in
+ *   bkt.level and leaks at a rate of bkt.avg units per second.
+ *
+ * - The size of the bucket is bkt.max * bkt.burst_length. Once the
+ *   bucket is full no more I/O is performed until the bucket leaks
+ *   again. This is what makes the I/O rate bkt.avg.
+ *
+ * - The bkt.avg rate does not apply until the bucket is full,
+ *   allowing the user to do bursts until then. The I/O limit during
+ *   bursts is bkt.max. To enforce this limit we keep an additional
+ *   bucket in bkt.burst_length that leaks at a rate of bkt.max units
+ *   per second.
+ *
+ * - Because of all of the above, the user can perform I/O at a
+ *   maximum of bkt.max units per second for at most bkt.burst_length
+ *   seconds in a row. After that the bucket will be full and the I/O
+ *   rate will go down to bkt.avg.
+ *
+ * - Since the bucket always leaks at a rate of bkt.avg, this also
+ *   determines how much the user needs to wait before being able to
+ *   do bursts again.
+ */</doc>
+<mbr r='LeakyBucket::avg' o='0' t='double'/>
+<mbr r='LeakyBucket::max' o='64' t='double'/>
+<mbr r='LeakyBucket::level' o='128' t='double'/>
+<mbr r='LeakyBucket::burst_level' o='192' t='double'/>
+<mbr r='LeakyBucket::burst_length' o='256' t='unsigned int'/>

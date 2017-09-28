@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>qemu-coroutine-sleep.c source code [codebrowser/util/qemu-coroutine-sleep.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CoSleepCB "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/qemu-coroutine-sleep.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='qemu-coroutine-sleep.c.html'>qemu-coroutine-sleep.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU coroutine sleep</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Hajnoczi    &lt;stefanha@linux.vnet.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/qemu/coroutine.h.html">"qemu/coroutine.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CoSleepCB" title='CoSleepCB' data-ref="CoSleepCB"><a class="type" href="#CoSleepCB" title='CoSleepCB' data-ref="CoSleepCB">CoSleepCB</a></dfn> {</td></tr>
+<tr><th id="20">20</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="tu decl" id="CoSleepCB::ts" title='CoSleepCB::ts' data-type='QEMUTimer *' data-ref="CoSleepCB::ts">ts</dfn>;</td></tr>
+<tr><th id="21">21</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="tu decl" id="CoSleepCB::co" title='CoSleepCB::co' data-type='Coroutine *' data-ref="CoSleepCB::co">co</dfn>;</td></tr>
+<tr><th id="22">22</th><td>} <dfn class="typedef" id="CoSleepCB" title='CoSleepCB' data-type='struct CoSleepCB' data-ref="CoSleepCB">CoSleepCB</dfn>;</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="co_sleep_cb" title='co_sleep_cb' data-type='void co_sleep_cb(void * opaque)' data-ref="co_sleep_cb">co_sleep_cb</dfn>(<em>void</em> *<dfn class="local col1 decl" id="1opaque" title='opaque' data-type='void *' data-ref="1opaque">opaque</dfn>)</td></tr>
+<tr><th id="25">25</th><td>{</td></tr>
+<tr><th id="26">26</th><td>    <a class="typedef" href="#CoSleepCB" title='CoSleepCB' data-type='struct CoSleepCB' data-ref="CoSleepCB">CoSleepCB</a> *<dfn class="local col2 decl" id="2sleep_cb" title='sleep_cb' data-type='CoSleepCB *' data-ref="2sleep_cb">sleep_cb</dfn> = <a class="local col1 ref" href="#1opaque" title='opaque' data-ref="1opaque">opaque</a>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td>    <a class="ref" href="../include/block/aio.h.html#aio_co_wake" title='aio_co_wake' data-ref="aio_co_wake">aio_co_wake</a>(<a class="local col2 ref" href="#2sleep_cb" title='sleep_cb' data-ref="2sleep_cb">sleep_cb</a>-&gt;<a class="tu ref" href="#CoSleepCB::co" title='CoSleepCB::co' data-use='r' data-ref="CoSleepCB::co">co</a>);</td></tr>
+<tr><th id="29">29</th><td>}</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><em>void</em> <a class="macro" href="../include/qemu/coroutine.h.html#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl def" id="co_aio_sleep_ns" title='co_aio_sleep_ns' data-ref="co_aio_sleep_ns">co_aio_sleep_ns</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col3 decl" id="3ctx" title='ctx' data-type='AioContext *' data-ref="3ctx">ctx</dfn>, <a class="typedef" href="../include/qemu/timer.h.html#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col4 decl" id="4type" title='type' data-type='QEMUClockType' data-ref="4type">type</dfn>,</td></tr>
+<tr><th id="32">32</th><td>                                  <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col5 decl" id="5ns" title='ns' data-type='int64_t' data-ref="5ns">ns</dfn>)</td></tr>
+<tr><th id="33">33</th><td>{</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="#CoSleepCB" title='CoSleepCB' data-type='struct CoSleepCB' data-ref="CoSleepCB">CoSleepCB</a> <dfn class="local col6 decl" id="6sleep_cb" title='sleep_cb' data-type='CoSleepCB' data-ref="6sleep_cb">sleep_cb</dfn> = {</td></tr>
+<tr><th id="35">35</th><td>        .<a class="tu ref" href="#CoSleepCB::co" title='CoSleepCB::co' data-use='w' data-ref="CoSleepCB::co">co</a> = <a class="ref" href="../include/qemu/coroutine.h.html#qemu_coroutine_self" title='qemu_coroutine_self' data-ref="qemu_coroutine_self">qemu_coroutine_self</a>(),</td></tr>
+<tr><th id="36">36</th><td>    };</td></tr>
+<tr><th id="37">37</th><td>    <a class="local col6 ref" href="#6sleep_cb" title='sleep_cb' data-ref="6sleep_cb">sleep_cb</a>.<a class="tu ref" href="#CoSleepCB::ts" title='CoSleepCB::ts' data-use='w' data-ref="CoSleepCB::ts">ts</a> = <a class="ref" href="../include/block/aio.h.html#aio_timer_new" title='aio_timer_new' data-ref="aio_timer_new">aio_timer_new</a>(<a class="local col3 ref" href="#3ctx" title='ctx' data-ref="3ctx">ctx</a>, <a class="local col4 ref" href="#4type" title='type' data-ref="4type">type</a>, <a class="macro" href="../include/qemu/timer.h.html#14" title="1" data-ref="_M/SCALE_NS">SCALE_NS</a>, <a class="tu ref" href="#co_sleep_cb" title='co_sleep_cb' data-use='r' data-ref="co_sleep_cb">co_sleep_cb</a>, &amp;<a class="local col6 ref" href="#6sleep_cb" title='sleep_cb' data-ref="6sleep_cb">sleep_cb</a>);</td></tr>
+<tr><th id="38">38</th><td>    <a class="ref" href="../include/qemu/timer.h.html#timer_mod" title='timer_mod' data-ref="timer_mod">timer_mod</a>(<a class="local col6 ref" href="#6sleep_cb" title='sleep_cb' data-ref="6sleep_cb">sleep_cb</a>.<a class="tu ref" href="#CoSleepCB::ts" title='CoSleepCB::ts' data-use='r' data-ref="CoSleepCB::ts">ts</a>, <a class="ref" href="../include/qemu/timer.h.html#qemu_clock_get_ns" title='qemu_clock_get_ns' data-ref="qemu_clock_get_ns">qemu_clock_get_ns</a>(<a class="local col4 ref" href="#4type" title='type' data-ref="4type">type</a>) + <a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>);</td></tr>
+<tr><th id="39">39</th><td>    <a class="ref" href="../include/qemu/coroutine.h.html#qemu_coroutine_yield" title='qemu_coroutine_yield' data-ref="qemu_coroutine_yield">qemu_coroutine_yield</a>();</td></tr>
+<tr><th id="40">40</th><td>    <a class="ref" href="../include/qemu/timer.h.html#timer_del" title='timer_del' data-ref="timer_del">timer_del</a>(<a class="local col6 ref" href="#6sleep_cb" title='sleep_cb' data-ref="6sleep_cb">sleep_cb</a>.<a class="tu ref" href="#CoSleepCB::ts" title='CoSleepCB::ts' data-use='r' data-ref="CoSleepCB::ts">ts</a>);</td></tr>
+<tr><th id="41">41</th><td>    <a class="ref" href="../include/qemu/timer.h.html#timer_free" title='timer_free' data-ref="timer_free">timer_free</a>(<a class="local col6 ref" href="#6sleep_cb" title='sleep_cb' data-ref="6sleep_cb">sleep_cb</a>.<a class="tu ref" href="#CoSleepCB::ts" title='CoSleepCB::ts' data-use='r' data-ref="CoSleepCB::ts">ts</a>);</td></tr>
+<tr><th id="42">42</th><td>}</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

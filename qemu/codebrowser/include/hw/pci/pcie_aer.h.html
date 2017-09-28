@@ -1,0 +1,122 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pcie_aer.h source code [codebrowser/include/hw/pci/pcie_aer.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="PCIEAERErr,PCIEAERLog,PCIEAERMsg "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/pci/pcie_aer.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>pci</a>/<a href='pcie_aer.h.html'>pcie_aer.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * pcie_aer.h</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010 Isaku Yamahata &lt;yamahata at valinux co jp&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *                    VA Linux Systems Japan K.K.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="8">8</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="9">9</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="10">10</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="13">13</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="14">14</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="15">15</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="18">18</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifndef</span> <span class="macro" data-ref="_M/QEMU_PCIE_AER_H">QEMU_PCIE_AER_H</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/QEMU_PCIE_AER_H" data-ref="_M/QEMU_PCIE_AER_H">QEMU_PCIE_AER_H</dfn></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><i>/* definitions which PCIExpressDevice uses */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i>/* AER log */</i></td></tr>
+<tr><th id="29">29</th><td><b>struct</b> <dfn class="type def" id="PCIEAERLog" title='PCIEAERLog' data-ref="PCIEAERLog">PCIEAERLog</dfn> {</td></tr>
+<tr><th id="30">30</th><td>    <i>/* This structure is saved/loaded.</i></td></tr>
+<tr><th id="31">31</th><td><i>       So explicitly size them instead of unsigned int */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>    <i>/* the number of currently recorded log in log member */</i></td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCIEAERLog::log_num" title='PCIEAERLog::log_num' data-ref="PCIEAERLog::log_num">log_num</dfn>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td>    <i>/*</i></td></tr>
+<tr><th id="37">37</th><td><i>     * The maximum number of the log. Errors can be logged up to this.</i></td></tr>
+<tr><th id="38">38</th><td><i>     *</i></td></tr>
+<tr><th id="39">39</th><td><i>     * This is configurable property.</i></td></tr>
+<tr><th id="40">40</th><td><i>     * The specified value will be clipped down to PCIE_AER_LOG_MAX_LIMIT</i></td></tr>
+<tr><th id="41">41</th><td><i>     * to avoid unreasonable memory usage.</i></td></tr>
+<tr><th id="42">42</th><td><i>     * I bet that 128 log size would be big enough, otherwise too many errors</i></td></tr>
+<tr><th id="43">43</th><td><i>     * for system to function normaly. But could consecutive errors occur?</i></td></tr>
+<tr><th id="44">44</th><td><i>     */</i></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_LOG_MAX_DEFAULT" data-ref="_M/PCIE_AER_LOG_MAX_DEFAULT">PCIE_AER_LOG_MAX_DEFAULT</dfn>        8</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_LOG_MAX_LIMIT" data-ref="_M/PCIE_AER_LOG_MAX_LIMIT">PCIE_AER_LOG_MAX_LIMIT</dfn>          128</u></td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCIEAERLog::log_max" title='PCIEAERLog::log_max' data-ref="PCIEAERLog::log_max">log_max</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <i>/* Error log. log_max-sized array */</i></td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIEAERErr" title='PCIEAERErr' data-type='struct PCIEAERErr' data-ref="PCIEAERErr">PCIEAERErr</a> *<dfn class="decl" id="PCIEAERLog::log" title='PCIEAERLog::log' data-ref="PCIEAERLog::log">log</dfn>;</td></tr>
+<tr><th id="51">51</th><td>};</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><i>/* aer error message: error signaling message has only error severity and</i></td></tr>
+<tr><th id="54">54</th><td><i>   source id. See 2.2.8.3 error signaling messages */</i></td></tr>
+<tr><th id="55">55</th><td><b>struct</b> <dfn class="type def" id="PCIEAERMsg" title='PCIEAERMsg' data-ref="PCIEAERMsg">PCIEAERMsg</dfn> {</td></tr>
+<tr><th id="56">56</th><td>    <i>/*</i></td></tr>
+<tr><th id="57">57</th><td><i>     * PCI_ERR_ROOT_CMD_{COR, NONFATAL, FATAL}_EN</i></td></tr>
+<tr><th id="58">58</th><td><i>     * = PCI_EXP_DEVCTL_{CERE, NFERE, FERE}</i></td></tr>
+<tr><th id="59">59</th><td><i>     */</i></td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PCIEAERMsg::severity" title='PCIEAERMsg::severity' data-ref="PCIEAERMsg::severity">severity</dfn>;</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCIEAERMsg::source_id" title='PCIEAERMsg::source_id' data-ref="PCIEAERMsg::source_id">source_id</dfn>; <i>/* bdf */</i></td></tr>
+<tr><th id="63">63</th><td>};</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span></td></tr>
+<tr><th id="66">66</th><td><dfn class="decl def" id="pcie_aer_msg_is_uncor" title='pcie_aer_msg_is_uncor' data-ref="pcie_aer_msg_is_uncor">pcie_aer_msg_is_uncor</dfn>(<em>const</em> <a class="typedef" href="../../qemu/typedefs.h.html#PCIEAERMsg" title='PCIEAERMsg' data-type='struct PCIEAERMsg' data-ref="PCIEAERMsg">PCIEAERMsg</a> *<dfn class="local col1 decl" id="271msg" title='msg' data-type='const PCIEAERMsg *' data-ref="271msg">msg</dfn>)</td></tr>
+<tr><th id="67">67</th><td>{</td></tr>
+<tr><th id="68">68</th><td>    <b>return</b> <a class="local col1 ref" href="#271msg" title='msg' data-ref="271msg">msg</a>-&gt;<a class="ref" href="#PCIEAERMsg::severity" title='PCIEAERMsg::severity' data-ref="PCIEAERMsg::severity">severity</a> == <a class="macro" href="../../standard-headers/linux/pci_regs.h.html#739" title="0x00000002" data-ref="_M/PCI_ERR_ROOT_CMD_NONFATAL_EN">PCI_ERR_ROOT_CMD_NONFATAL_EN</a> ||</td></tr>
+<tr><th id="69">69</th><td>        <a class="local col1 ref" href="#271msg" title='msg' data-ref="271msg">msg</a>-&gt;<a class="ref" href="#PCIEAERMsg::severity" title='PCIEAERMsg::severity' data-ref="PCIEAERMsg::severity">severity</a> == <a class="macro" href="../../standard-headers/linux/pci_regs.h.html#741" title="0x00000004" data-ref="_M/PCI_ERR_ROOT_CMD_FATAL_EN">PCI_ERR_ROOT_CMD_FATAL_EN</a>;</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><i>/* error */</i></td></tr>
+<tr><th id="73">73</th><td><b>struct</b> <dfn class="type def" id="PCIEAERErr" title='PCIEAERErr' data-ref="PCIEAERErr">PCIEAERErr</dfn> {</td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PCIEAERErr::status" title='PCIEAERErr::status' data-ref="PCIEAERErr::status">status</dfn>;    <i>/* error status bits */</i></td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCIEAERErr::source_id" title='PCIEAERErr::source_id' data-ref="PCIEAERErr::source_id">source_id</dfn>; <i>/* bdf */</i></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_ERR_IS_CORRECTABLE" data-ref="_M/PCIE_AER_ERR_IS_CORRECTABLE">PCIE_AER_ERR_IS_CORRECTABLE</dfn>     0x1     /* correctable/uncorrectable */</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_ERR_MAYBE_ADVISORY" data-ref="_M/PCIE_AER_ERR_MAYBE_ADVISORY">PCIE_AER_ERR_MAYBE_ADVISORY</dfn>     0x2     /* maybe advisory non-fatal */</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_ERR_HEADER_VALID" data-ref="_M/PCIE_AER_ERR_HEADER_VALID">PCIE_AER_ERR_HEADER_VALID</dfn>       0x4     /* TLP header is logged */</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/PCIE_AER_ERR_TLP_PREFIX_PRESENT" data-ref="_M/PCIE_AER_ERR_TLP_PREFIX_PRESENT">PCIE_AER_ERR_TLP_PREFIX_PRESENT</dfn> 0x8     /* TLP Prefix is logged */</u></td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="PCIEAERErr::flags" title='PCIEAERErr::flags' data-ref="PCIEAERErr::flags">flags</dfn>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PCIEAERErr::header" title='PCIEAERErr::header' data-ref="PCIEAERErr::header">header</dfn>[<var>4</var>]; <i>/* TLP header */</i></td></tr>
+<tr><th id="84">84</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PCIEAERErr::prefix" title='PCIEAERErr::prefix' data-ref="PCIEAERErr::prefix">prefix</dfn>[<var>4</var>]; <i>/* TLP header prefix */</i></td></tr>
+<tr><th id="85">85</th><td>};</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_pcie_aer_log" title='vmstate_pcie_aer_log' data-ref="vmstate_pcie_aer_log">vmstate_pcie_aer_log</dfn>;</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><em>int</em> <dfn class="decl" id="pcie_aer_init" title='pcie_aer_init' data-ref="pcie_aer_init">pcie_aer_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col2 decl" id="272dev" title='dev' data-type='PCIDevice *' data-ref="272dev">dev</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col3 decl" id="273cap_ver" title='cap_ver' data-type='uint8_t' data-ref="273cap_ver">cap_ver</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col4 decl" id="274offset" title='offset' data-type='uint16_t' data-ref="274offset">offset</dfn>,</td></tr>
+<tr><th id="90">90</th><td>                  <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col5 decl" id="275size" title='size' data-type='uint16_t' data-ref="275size">size</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="276errp" title='errp' data-type='Error **' data-ref="276errp">errp</dfn>);</td></tr>
+<tr><th id="91">91</th><td><em>void</em> <dfn class="decl" id="pcie_aer_exit" title='pcie_aer_exit' data-ref="pcie_aer_exit">pcie_aer_exit</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col7 decl" id="277dev" title='dev' data-type='PCIDevice *' data-ref="277dev">dev</dfn>);</td></tr>
+<tr><th id="92">92</th><td><em>void</em> <dfn class="decl" id="pcie_aer_write_config" title='pcie_aer_write_config' data-ref="pcie_aer_write_config">pcie_aer_write_config</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col8 decl" id="278dev" title='dev' data-type='PCIDevice *' data-ref="278dev">dev</dfn>,</td></tr>
+<tr><th id="93">93</th><td>                           <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="279addr" title='addr' data-type='uint32_t' data-ref="279addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="280val" title='val' data-type='uint32_t' data-ref="280val">val</dfn>, <em>int</em> <dfn class="local col1 decl" id="281len" title='len' data-type='int' data-ref="281len">len</dfn>);</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><i>/* aer root port */</i></td></tr>
+<tr><th id="96">96</th><td><em>void</em> <dfn class="decl" id="pcie_aer_root_set_vector" title='pcie_aer_root_set_vector' data-ref="pcie_aer_root_set_vector">pcie_aer_root_set_vector</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col2 decl" id="282dev" title='dev' data-type='PCIDevice *' data-ref="282dev">dev</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col3 decl" id="283vector" title='vector' data-type='unsigned int' data-ref="283vector">vector</dfn>);</td></tr>
+<tr><th id="97">97</th><td><em>void</em> <dfn class="decl" id="pcie_aer_root_init" title='pcie_aer_root_init' data-ref="pcie_aer_root_init">pcie_aer_root_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col4 decl" id="284dev" title='dev' data-type='PCIDevice *' data-ref="284dev">dev</dfn>);</td></tr>
+<tr><th id="98">98</th><td><em>void</em> <dfn class="decl" id="pcie_aer_root_reset" title='pcie_aer_root_reset' data-ref="pcie_aer_root_reset">pcie_aer_root_reset</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col5 decl" id="285dev" title='dev' data-type='PCIDevice *' data-ref="285dev">dev</dfn>);</td></tr>
+<tr><th id="99">99</th><td><em>void</em> <dfn class="decl" id="pcie_aer_root_write_config" title='pcie_aer_root_write_config' data-ref="pcie_aer_root_write_config">pcie_aer_root_write_config</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col6 decl" id="286dev" title='dev' data-type='PCIDevice *' data-ref="286dev">dev</dfn>,</td></tr>
+<tr><th id="100">100</th><td>                                <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="287addr" title='addr' data-type='uint32_t' data-ref="287addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="288val" title='val' data-type='uint32_t' data-ref="288val">val</dfn>, <em>int</em> <dfn class="local col9 decl" id="289len" title='len' data-type='int' data-ref="289len">len</dfn>,</td></tr>
+<tr><th id="101">101</th><td>                                <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="290root_cmd_prev" title='root_cmd_prev' data-type='uint32_t' data-ref="290root_cmd_prev">root_cmd_prev</dfn>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><u>#<span data-ppcond="21">endif</span> /* QEMU_PCIE_AER_H */</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../accel/kvm/kvm-all.c.html'>codebrowser/accel/kvm/kvm-all.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

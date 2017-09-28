@@ -1,0 +1,228 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>dhcpv6.c source code [codebrowser/slirp/dhcpv6.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="requested_infos "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/dhcpv6.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='dhcpv6.c.html'>dhcpv6.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * SLIRP stateless DHCPv6</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * We only support stateless DHCPv6, e.g. for network booting.</i></td></tr>
+<tr><th id="5">5</th><td><i> * See RFC 3315, RFC 3736, RFC 3646 and RFC 5970 for details.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Copyright 2016 Thomas Huth, Red Hat Inc.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="10">10</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="11">11</th><td><i> * the Free Software Foundation; either version 2 of the License,</i></td></tr>
+<tr><th id="12">12</th><td><i> * or (at your option) any later version.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="15">15</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="16">16</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="17">17</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="20">20</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="21">21</th><td><i> */</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/log.h.html">"qemu/log.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="dhcpv6.h.html">"dhcpv6.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i>/* DHCPv6 message types */</i></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/MSGTYPE_REPLY" data-ref="_M/MSGTYPE_REPLY">MSGTYPE_REPLY</dfn>        7</u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/MSGTYPE_INFO_REQUEST" data-ref="_M/MSGTYPE_INFO_REQUEST">MSGTYPE_INFO_REQUEST</dfn> 11</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i>/* DHCPv6 option types */</i></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/OPTION_CLIENTID" data-ref="_M/OPTION_CLIENTID">OPTION_CLIENTID</dfn>      1</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/OPTION_IAADDR" data-ref="_M/OPTION_IAADDR">OPTION_IAADDR</dfn>        5</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/OPTION_ORO" data-ref="_M/OPTION_ORO">OPTION_ORO</dfn>           6</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/OPTION_DNS_SERVERS" data-ref="_M/OPTION_DNS_SERVERS">OPTION_DNS_SERVERS</dfn>   23</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/OPTION_BOOTFILE_URL" data-ref="_M/OPTION_BOOTFILE_URL">OPTION_BOOTFILE_URL</dfn>  59</u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>struct</b> <dfn class="type def" id="requested_infos" title='requested_infos' data-ref="requested_infos">requested_infos</dfn> {</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="tu decl" id="requested_infos::client_id" title='requested_infos::client_id' data-type='uint8_t *' data-ref="requested_infos::client_id">client_id</dfn>;</td></tr>
+<tr><th id="41">41</th><td>    <em>int</em> <dfn class="tu decl" id="requested_infos::client_id_len" title='requested_infos::client_id_len' data-type='int' data-ref="requested_infos::client_id_len">client_id_len</dfn>;</td></tr>
+<tr><th id="42">42</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="requested_infos::want_dns" title='requested_infos::want_dns' data-type='_Bool' data-ref="requested_infos::want_dns">want_dns</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="requested_infos::want_boot_url" title='requested_infos::want_boot_url' data-type='_Bool' data-ref="requested_infos::want_boot_url">want_boot_url</dfn>;</td></tr>
+<tr><th id="44">44</th><td>};</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i class="doc" data-doc="dhcpv6_parse_info_request">/**</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> * Analyze the info request message sent by the client to see what data it</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> * provided and what it wants to have. The information is gathered in the</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> * "requested_infos" struct. Note that client_id (if provided) points into</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> * the odata region, thus the caller must keep odata valid as long as it</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> * needs to access the requested_infos struct.</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc" data-doc="dhcpv6_parse_info_request"> */</i></td></tr>
+<tr><th id="53">53</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="dhcpv6_parse_info_request" title='dhcpv6_parse_info_request' data-type='int dhcpv6_parse_info_request(uint8_t * odata, int olen, struct requested_infos * ri)' data-ref="dhcpv6_parse_info_request">dhcpv6_parse_info_request</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="3odata" title='odata' data-type='uint8_t *' data-ref="3odata">odata</dfn>, <em>int</em> <dfn class="local col4 decl" id="4olen" title='olen' data-type='int' data-ref="4olen">olen</dfn>,</td></tr>
+<tr><th id="54">54</th><td>                                     <b>struct</b> <a class="type" href="#requested_infos" title='requested_infos' data-ref="requested_infos">requested_infos</a> *<dfn class="local col5 decl" id="5ri" title='ri' data-type='struct requested_infos *' data-ref="5ri">ri</dfn>)</td></tr>
+<tr><th id="55">55</th><td>{</td></tr>
+<tr><th id="56">56</th><td>    <em>int</em> <dfn class="local col6 decl" id="6i" title='i' data-type='int' data-ref="6i">i</dfn>, <dfn class="local col7 decl" id="7req_opt" title='req_opt' data-type='int' data-ref="7req_opt">req_opt</dfn>;</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>    <b>while</b> (<a class="local col4 ref" href="#4olen" title='olen' data-ref="4olen">olen</a> &gt; <var>4</var>) {</td></tr>
+<tr><th id="59">59</th><td>        <i>/* Parse one option */</i></td></tr>
+<tr><th id="60">60</th><td>        <em>int</em> <dfn class="local col8 decl" id="8option" title='option' data-type='int' data-ref="8option">option</dfn> = <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>0</var>] &lt;&lt; <var>8</var> | <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>1</var>];</td></tr>
+<tr><th id="61">61</th><td>        <em>int</em> <dfn class="local col9 decl" id="9len" title='len' data-type='int' data-ref="9len">len</dfn> = <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>2</var>] &lt;&lt; <var>8</var> | <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>3</var>];</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>        <b>if</b> (<a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a> + <var>4</var> &gt; <a class="local col4 ref" href="#4olen" title='olen' data-ref="4olen">olen</a>) {</td></tr>
+<tr><th id="64">64</th><td>            <a class="macro" href="../include/qemu/log.h.html#91" title="do { if (__builtin_expect(!!(qemu_loglevel_mask((1 &lt;&lt; 11))), 0)) { qemu_log(&quot;Guest sent bad DHCPv6 packet!\n&quot;); } } while (0)" data-ref="_M/qemu_log_mask">qemu_log_mask</a>(<a class="macro" href="../include/qemu/log.h.html#40" title="(1 &lt;&lt; 11)" data-ref="_M/LOG_GUEST_ERROR">LOG_GUEST_ERROR</a>, <q>"Guest sent bad DHCPv6 packet!\n"</q>);</td></tr>
+<tr><th id="65">65</th><td>            <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#10" title="7" data-ref="_M/E2BIG">E2BIG</a>;</td></tr>
+<tr><th id="66">66</th><td>        }</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>        <b>switch</b> (<a class="local col8 ref" href="#8option" title='option' data-ref="8option">option</a>) {</td></tr>
+<tr><th id="69">69</th><td>        <b>case</b> <a class="macro" href="#34" title="5" data-ref="_M/OPTION_IAADDR">OPTION_IAADDR</a>:</td></tr>
+<tr><th id="70">70</th><td>            <i>/* According to RFC3315, we must discard requests with IA option */</i></td></tr>
+<tr><th id="71">71</th><td>            <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>;</td></tr>
+<tr><th id="72">72</th><td>        <b>case</b> <a class="macro" href="#33" title="1" data-ref="_M/OPTION_CLIENTID">OPTION_CLIENTID</a>:</td></tr>
+<tr><th id="73">73</th><td>            <b>if</b> (<a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a> &gt; <var>256</var>) {</td></tr>
+<tr><th id="74">74</th><td>                <i>/* Avoid very long IDs which could cause problems later */</i></td></tr>
+<tr><th id="75">75</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#10" title="7" data-ref="_M/E2BIG">E2BIG</a>;</td></tr>
+<tr><th id="76">76</th><td>            }</td></tr>
+<tr><th id="77">77</th><td>            <a class="local col5 ref" href="#5ri" title='ri' data-ref="5ri">ri</a>-&gt;<a class="tu ref" href="#requested_infos::client_id" title='requested_infos::client_id' data-use='w' data-ref="requested_infos::client_id">client_id</a> = <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a> + <var>4</var>;</td></tr>
+<tr><th id="78">78</th><td>            <a class="local col5 ref" href="#5ri" title='ri' data-ref="5ri">ri</a>-&gt;<a class="tu ref" href="#requested_infos::client_id_len" title='requested_infos::client_id_len' data-use='w' data-ref="requested_infos::client_id_len">client_id_len</a> = <a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a>;</td></tr>
+<tr><th id="79">79</th><td>            <b>break</b>;</td></tr>
+<tr><th id="80">80</th><td>        <b>case</b> <a class="macro" href="#35" title="6" data-ref="_M/OPTION_ORO">OPTION_ORO</a>:        <i>/* Option request option */</i></td></tr>
+<tr><th id="81">81</th><td>            <b>if</b> (<a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a> &amp; <var>1</var>) {</td></tr>
+<tr><th id="82">82</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>;</td></tr>
+<tr><th id="83">83</th><td>            }</td></tr>
+<tr><th id="84">84</th><td>            <i>/* Check which options the client wants to have */</i></td></tr>
+<tr><th id="85">85</th><td>            <b>for</b> (<a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> = <var>0</var>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> &lt; <a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a>; <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> += <var>2</var>) {</td></tr>
+<tr><th id="86">86</th><td>                <a class="local col7 ref" href="#7req_opt" title='req_opt' data-ref="7req_opt">req_opt</a> = <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>4</var> + <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a>] &lt;&lt; <var>8</var> | <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a>[<var>4</var> + <a class="local col6 ref" href="#6i" title='i' data-ref="6i">i</a> + <var>1</var>];</td></tr>
+<tr><th id="87">87</th><td>                <b>switch</b> (<a class="local col7 ref" href="#7req_opt" title='req_opt' data-ref="7req_opt">req_opt</a>) {</td></tr>
+<tr><th id="88">88</th><td>                <b>case</b> <a class="macro" href="#36" title="23" data-ref="_M/OPTION_DNS_SERVERS">OPTION_DNS_SERVERS</a>:</td></tr>
+<tr><th id="89">89</th><td>                    <a class="local col5 ref" href="#5ri" title='ri' data-ref="5ri">ri</a>-&gt;<a class="tu ref" href="#requested_infos::want_dns" title='requested_infos::want_dns' data-use='w' data-ref="requested_infos::want_dns">want_dns</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="90">90</th><td>                    <b>break</b>;</td></tr>
+<tr><th id="91">91</th><td>                <b>case</b> <a class="macro" href="#37" title="59" data-ref="_M/OPTION_BOOTFILE_URL">OPTION_BOOTFILE_URL</a>:</td></tr>
+<tr><th id="92">92</th><td>                    <a class="local col5 ref" href="#5ri" title='ri' data-ref="5ri">ri</a>-&gt;<a class="tu ref" href="#requested_infos::want_boot_url" title='requested_infos::want_boot_url' data-use='w' data-ref="requested_infos::want_boot_url">want_boot_url</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="93">93</th><td>                    <b>break</b>;</td></tr>
+<tr><th id="94">94</th><td>                <b>default</b>:</td></tr>
+<tr><th id="95">95</th><td>                    <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>"dhcpv6: Unsupported option request %d\n"</q>,</td></tr>
+<tr><th id="96">96</th><td>                                req_opt));</td></tr>
+<tr><th id="97">97</th><td>                }</td></tr>
+<tr><th id="98">98</th><td>            }</td></tr>
+<tr><th id="99">99</th><td>            <b>break</b>;</td></tr>
+<tr><th id="100">100</th><td>        <b>default</b>:</td></tr>
+<tr><th id="101">101</th><td>            <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>"dhcpv6 info req: Unsupported option %d, len=%d\n"</q>,</td></tr>
+<tr><th id="102">102</th><td>                        option, len));</td></tr>
+<tr><th id="103">103</th><td>        }</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>        <a class="local col3 ref" href="#3odata" title='odata' data-ref="3odata">odata</a> += <a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a> + <var>4</var>;</td></tr>
+<tr><th id="106">106</th><td>        <a class="local col4 ref" href="#4olen" title='olen' data-ref="4olen">olen</a> -= <a class="local col9 ref" href="#9len" title='len' data-ref="9len">len</a> + <var>4</var>;</td></tr>
+<tr><th id="107">107</th><td>    }</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="110">110</th><td>}</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i class="doc" data-doc="dhcpv6_info_request">/**</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc" data-doc="dhcpv6_info_request"> * Handle information request messages</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc" data-doc="dhcpv6_info_request"> */</i></td></tr>
+<tr><th id="116">116</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="dhcpv6_info_request" title='dhcpv6_info_request' data-type='void dhcpv6_info_request(Slirp * slirp, struct sockaddr_in6 * srcsas, uint32_t xid, uint8_t * odata, int olen)' data-ref="dhcpv6_info_request">dhcpv6_info_request</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col0 decl" id="10slirp" title='slirp' data-type='Slirp *' data-ref="10slirp">slirp</dfn>, <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *<dfn class="local col1 decl" id="11srcsas" title='srcsas' data-type='struct sockaddr_in6 *' data-ref="11srcsas">srcsas</dfn>,</td></tr>
+<tr><th id="117">117</th><td>                                <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="12xid" title='xid' data-type='uint32_t' data-ref="12xid">xid</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="13odata" title='odata' data-type='uint8_t *' data-ref="13odata">odata</dfn>, <em>int</em> <dfn class="local col4 decl" id="14olen" title='olen' data-type='int' data-ref="14olen">olen</dfn>)</td></tr>
+<tr><th id="118">118</th><td>{</td></tr>
+<tr><th id="119">119</th><td>    <b>struct</b> <a class="type" href="#requested_infos" title='requested_infos' data-ref="requested_infos">requested_infos</a> <dfn class="local col5 decl" id="15ri" title='ri' data-type='struct requested_infos' data-ref="15ri">ri</dfn> = { <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span> };</td></tr>
+<tr><th id="120">120</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> <dfn class="local col6 decl" id="16sa6" title='sa6' data-type='struct sockaddr_in6' data-ref="16sa6">sa6</dfn>, <dfn class="local col7 decl" id="17da6" title='da6' data-type='struct sockaddr_in6' data-ref="17da6">da6</dfn>;</td></tr>
+<tr><th id="121">121</th><td>    <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col8 decl" id="18m" title='m' data-type='struct mbuf *' data-ref="18m">m</dfn>;</td></tr>
+<tr><th id="122">122</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="19resp" title='resp' data-type='uint8_t *' data-ref="19resp">resp</dfn>;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    <b>if</b> (<a class="tu ref" href="#dhcpv6_parse_info_request" title='dhcpv6_parse_info_request' data-use='c' data-ref="dhcpv6_parse_info_request">dhcpv6_parse_info_request</a>(<a class="local col3 ref" href="#13odata" title='odata' data-ref="13odata">odata</a>, <a class="local col4 ref" href="#14olen" title='olen' data-ref="14olen">olen</a>, &amp;<a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="125">125</th><td>        <b>return</b>;</td></tr>
+<tr><th id="126">126</th><td>    }</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td>    <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a> = <a class="ref" href="mbuf.h.html#m_get" title='m_get' data-ref="m_get">m_get</a>(<a class="local col0 ref" href="#10slirp" title='slirp' data-ref="10slirp">slirp</a>);</td></tr>
+<tr><th id="129">129</th><td>    <b>if</b> (!<a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>) {</td></tr>
+<tr><th id="130">130</th><td>        <b>return</b>;</td></tr>
+<tr><th id="131">131</th><td>    }</td></tr>
+<tr><th id="132">132</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(<a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>, <var>0</var>, <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_size" title='mbuf::m_size' data-ref="mbuf::m_size">m_size</a>);</td></tr>
+<tr><th id="133">133</th><td>    <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <a class="macro" href="if.h.html#21" title="(2 + 14)" data-ref="_M/IF_MAXLINKHDR">IF_MAXLINKHDR</a>;</td></tr>
+<tr><th id="134">134</th><td>    <a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> + <b>sizeof</b>(<b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a>) + <b>sizeof</b>(<b>struct</b> <a class="type" href="udp.h.html#udphdr" title='udphdr' data-ref="udphdr">udphdr</a>);</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td>    <i>/* Fill in response */</i></td></tr>
+<tr><th id="137">137</th><td>    *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#29" title="7" data-ref="_M/MSGTYPE_REPLY">MSGTYPE_REPLY</a>;</td></tr>
+<tr><th id="138">138</th><td>    *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>)(<a class="local col2 ref" href="#12xid" title='xid' data-ref="12xid">xid</a> &gt;&gt; <var>16</var>);</td></tr>
+<tr><th id="139">139</th><td>    *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>)(<a class="local col2 ref" href="#12xid" title='xid' data-ref="12xid">xid</a> &gt;&gt; <var>8</var>);</td></tr>
+<tr><th id="140">140</th><td>    *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>)<a class="local col2 ref" href="#12xid" title='xid' data-ref="12xid">xid</a>;</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    <b>if</b> (<a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id" title='requested_infos::client_id' data-use='r' data-ref="requested_infos::client_id">client_id</a>) {</td></tr>
+<tr><th id="143">143</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#33" title="1" data-ref="_M/OPTION_CLIENTID">OPTION_CLIENTID</a> &gt;&gt; <var>8</var>;         <i>/* option-code high byte */</i></td></tr>
+<tr><th id="144">144</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#33" title="1" data-ref="_M/OPTION_CLIENTID">OPTION_CLIENTID</a>;              <i>/* option-code low byte */</i></td></tr>
+<tr><th id="145">145</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id_len" title='requested_infos::client_id_len' data-use='r' data-ref="requested_infos::client_id_len">client_id_len</a> &gt;&gt; <var>8</var>;        <i>/* option-len high byte */</i></td></tr>
+<tr><th id="146">146</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id_len" title='requested_infos::client_id_len' data-use='r' data-ref="requested_infos::client_id_len">client_id_len</a>;             <i>/* option-len low byte */</i></td></tr>
+<tr><th id="147">147</th><td>        <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>, <a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id" title='requested_infos::client_id' data-use='r' data-ref="requested_infos::client_id">client_id</a>, <a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id_len" title='requested_infos::client_id_len' data-use='r' data-ref="requested_infos::client_id_len">client_id_len</a>);</td></tr>
+<tr><th id="148">148</th><td>        <a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> += <a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::client_id_len" title='requested_infos::client_id_len' data-use='r' data-ref="requested_infos::client_id_len">client_id_len</a>;</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>    <b>if</b> (<a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::want_dns" title='requested_infos::want_dns' data-use='r' data-ref="requested_infos::want_dns">want_dns</a>) {</td></tr>
+<tr><th id="151">151</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#36" title="23" data-ref="_M/OPTION_DNS_SERVERS">OPTION_DNS_SERVERS</a> &gt;&gt; <var>8</var>;      <i>/* option-code high byte */</i></td></tr>
+<tr><th id="152">152</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#36" title="23" data-ref="_M/OPTION_DNS_SERVERS">OPTION_DNS_SERVERS</a>;           <i>/* option-code low byte */</i></td></tr>
+<tr><th id="153">153</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <var>0</var>;                            <i>/* option-len high byte */</i></td></tr>
+<tr><th id="154">154</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <var>16</var>;                           <i>/* option-len low byte */</i></td></tr>
+<tr><th id="155">155</th><td>        <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>, &amp;<a class="local col0 ref" href="#10slirp" title='slirp' data-ref="10slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vnameserver_addr6" title='Slirp::vnameserver_addr6' data-ref="Slirp::vnameserver_addr6">vnameserver_addr6</a>, <var>16</var>);</td></tr>
+<tr><th id="156">156</th><td>        <a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> += <var>16</var>;</td></tr>
+<tr><th id="157">157</th><td>    }</td></tr>
+<tr><th id="158">158</th><td>    <b>if</b> (<a class="local col5 ref" href="#15ri" title='ri' data-ref="15ri">ri</a>.<a class="tu ref" href="#requested_infos::want_boot_url" title='requested_infos::want_boot_url' data-use='r' data-ref="requested_infos::want_boot_url">want_boot_url</a>) {</td></tr>
+<tr><th id="159">159</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="20sa" title='sa' data-type='uint8_t *' data-ref="20sa">sa</dfn> = <a class="local col0 ref" href="#10slirp" title='slirp' data-ref="10slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vhost_addr6" title='Slirp::vhost_addr6' data-ref="Slirp::vhost_addr6">vhost_addr6</a>.<a class="macro" href="../../include/netinet/in.h.html#221" title="__in6_u.__u6_addr8" data-ref="_M/s6_addr">s6_addr</a>;</td></tr>
+<tr><th id="160">160</th><td>        <em>int</em> <dfn class="local col1 decl" id="21slen" title='slen' data-type='int' data-ref="21slen">slen</dfn>, <dfn class="local col2 decl" id="22smaxlen" title='smaxlen' data-type='int' data-ref="22smaxlen">smaxlen</dfn>;</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#37" title="59" data-ref="_M/OPTION_BOOTFILE_URL">OPTION_BOOTFILE_URL</a> &gt;&gt; <var>8</var>;     <i>/* option-code high byte */</i></td></tr>
+<tr><th id="163">163</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="macro" href="#37" title="59" data-ref="_M/OPTION_BOOTFILE_URL">OPTION_BOOTFILE_URL</a>;          <i>/* option-code low byte */</i></td></tr>
+<tr><th id="164">164</th><td>        <a class="local col2 ref" href="#22smaxlen" title='smaxlen' data-ref="22smaxlen">smaxlen</a> = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> + <a class="macro" href="if.h.html#16" title="1500" data-ref="_M/IF_MTU">IF_MTU</a> - (<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> + <var>2</var>);</td></tr>
+<tr><th id="165">165</th><td>        <a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a> = <a class="ref" href="../../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>((<em>char</em> *)<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> + <var>2</var>, <a class="local col2 ref" href="#22smaxlen" title='smaxlen' data-ref="22smaxlen">smaxlen</a>,</td></tr>
+<tr><th id="166">166</th><td>                        <q>"tftp://[%02x%02x:%02x%02x:%02x%02x:%02x%02x:"</q></td></tr>
+<tr><th id="167">167</th><td>                                <q>"%02x%02x:%02x%02x:%02x%02x:%02x%02x]/%s"</q>,</td></tr>
+<tr><th id="168">168</th><td>                        <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>0</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>1</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>2</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>3</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>4</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>5</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>6</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>7</var>],</td></tr>
+<tr><th id="169">169</th><td>                        <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>8</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>9</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>10</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>11</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>12</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>13</var>], <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>14</var>],</td></tr>
+<tr><th id="170">170</th><td>                        <a class="local col0 ref" href="#20sa" title='sa' data-ref="20sa">sa</a>[<var>15</var>], <a class="local col0 ref" href="#10slirp" title='slirp' data-ref="10slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::bootp_filename" title='Slirp::bootp_filename' data-ref="Slirp::bootp_filename">bootp_filename</a>);</td></tr>
+<tr><th id="171">171</th><td>        <a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a> = <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#291" title="(((slen) &lt; (smaxlen)) ? (slen) : (smaxlen))" data-ref="_M/MIN">MIN</a>(<a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a>, <a class="local col2 ref" href="#22smaxlen" title='smaxlen' data-ref="22smaxlen">smaxlen</a>);</td></tr>
+<tr><th id="172">172</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a> &gt;&gt; <var>8</var>;                    <i>/* option-len high byte */</i></td></tr>
+<tr><th id="173">173</th><td>        *<a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a>++ = <a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a>;                         <i>/* option-len low byte */</i></td></tr>
+<tr><th id="174">174</th><td>        <a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> += <a class="local col1 ref" href="#21slen" title='slen' data-ref="21slen">slen</a>;</td></tr>
+<tr><th id="175">175</th><td>    }</td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td>    <a class="local col6 ref" href="#16sa6" title='sa6' data-ref="16sa6">sa6</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_addr" title='sockaddr_in6::sin6_addr' data-ref="sockaddr_in6::sin6_addr">sin6_addr</a> = <a class="local col0 ref" href="#10slirp" title='slirp' data-ref="10slirp">slirp</a>-&gt;<a class="ref" href="slirp.h.html#Slirp::vhost_addr6" title='Slirp::vhost_addr6' data-ref="Slirp::vhost_addr6">vhost_addr6</a>;</td></tr>
+<tr><th id="178">178</th><td>    <a class="local col6 ref" href="#16sa6" title='sa6' data-ref="16sa6">sa6</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_port" title='sockaddr_in6::sin6_port' data-ref="sockaddr_in6::sin6_port">sin6_port</a> = <a class="macro" href="dhcpv6.h.html#12" title="547" data-ref="_M/DHCPV6_SERVER_PORT">DHCPV6_SERVER_PORT</a>;</td></tr>
+<tr><th id="179">179</th><td>    <a class="local col7 ref" href="#17da6" title='da6' data-ref="17da6">da6</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_addr" title='sockaddr_in6::sin6_addr' data-ref="sockaddr_in6::sin6_addr">sin6_addr</a> = <a class="local col1 ref" href="#11srcsas" title='srcsas' data-ref="11srcsas">srcsas</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_addr" title='sockaddr_in6::sin6_addr' data-ref="sockaddr_in6::sin6_addr">sin6_addr</a>;</td></tr>
+<tr><th id="180">180</th><td>    <a class="local col7 ref" href="#17da6" title='da6' data-ref="17da6">da6</a>.<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_port" title='sockaddr_in6::sin6_port' data-ref="sockaddr_in6::sin6_port">sin6_port</a> = <a class="local col1 ref" href="#11srcsas" title='srcsas' data-ref="11srcsas">srcsas</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_port" title='sockaddr_in6::sin6_port' data-ref="sockaddr_in6::sin6_port">sin6_port</a>;</td></tr>
+<tr><th id="181">181</th><td>    <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> += <b>sizeof</b>(<b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a>) + <b>sizeof</b>(<b>struct</b> <a class="type" href="udp.h.html#udphdr" title='udphdr' data-ref="udphdr">udphdr</a>);</td></tr>
+<tr><th id="182">182</th><td>    <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> = <a class="local col9 ref" href="#19resp" title='resp' data-ref="19resp">resp</a> - (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a>;</td></tr>
+<tr><th id="183">183</th><td>    <a class="ref" href="udp.h.html#udp6_output" title='udp6_output' data-ref="udp6_output">udp6_output</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col8 ref" href="#18m" title='m' data-ref="18m">m</a>, &amp;<a class="local col6 ref" href="#16sa6" title='sa6' data-ref="16sa6">sa6</a>, &amp;<a class="local col7 ref" href="#17da6" title='da6' data-ref="17da6">da6</a>);</td></tr>
+<tr><th id="184">184</th><td>}</td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> * Handle DHCPv6 messages sent by the client</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="189">189</th><td><em>void</em> <dfn class="decl def" id="dhcpv6_input" title='dhcpv6_input' data-ref="dhcpv6_input">dhcpv6_input</dfn>(<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *<dfn class="local col3 decl" id="23srcsas" title='srcsas' data-type='struct sockaddr_in6 *' data-ref="23srcsas">srcsas</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col4 decl" id="24m" title='m' data-type='struct mbuf *' data-ref="24m">m</dfn>)</td></tr>
+<tr><th id="190">190</th><td>{</td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="25data" title='data' data-type='uint8_t *' data-ref="25data">data</dfn> = (<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col4 ref" href="#24m" title='m' data-ref="24m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_data" title='mbuf::m_data' data-ref="mbuf::m_data">m_data</a> + <b>sizeof</b>(<b>struct</b> <a class="type" href="udp.h.html#udphdr" title='udphdr' data-ref="udphdr">udphdr</a>);</td></tr>
+<tr><th id="192">192</th><td>    <em>int</em> <dfn class="local col6 decl" id="26data_len" title='data_len' data-type='int' data-ref="26data_len">data_len</dfn> = <a class="local col4 ref" href="#24m" title='m' data-ref="24m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::m_len" title='mbuf::m_len' data-ref="mbuf::m_len">m_len</a> - <b>sizeof</b>(<b>struct</b> <a class="type" href="udp.h.html#udphdr" title='udphdr' data-ref="udphdr">udphdr</a>);</td></tr>
+<tr><th id="193">193</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="27xid" title='xid' data-type='uint32_t' data-ref="27xid">xid</dfn>;</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>    <b>if</b> (<a class="local col6 ref" href="#26data_len" title='data_len' data-ref="26data_len">data_len</a> &lt; <var>4</var>) {</td></tr>
+<tr><th id="196">196</th><td>        <b>return</b>;</td></tr>
+<tr><th id="197">197</th><td>    }</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>    <a class="local col7 ref" href="#27xid" title='xid' data-ref="27xid">xid</a> = <a class="ref" href="../../include/netinet/in.h.html#ntohl" title='ntohl' data-ref="ntohl">ntohl</a>(*(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *)<a class="local col5 ref" href="#25data" title='data' data-ref="25data">data</a>) &amp; <var>0xffffff</var>;</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td>    <b>switch</b> (<a class="local col5 ref" href="#25data" title='data' data-ref="25data">data</a>[<var>0</var>]) {</td></tr>
+<tr><th id="202">202</th><td>    <b>case</b> <a class="macro" href="#30" title="11" data-ref="_M/MSGTYPE_INFO_REQUEST">MSGTYPE_INFO_REQUEST</a>:</td></tr>
+<tr><th id="203">203</th><td>        <a class="tu ref" href="#dhcpv6_info_request" title='dhcpv6_info_request' data-use='c' data-ref="dhcpv6_info_request">dhcpv6_info_request</a>(<a class="local col4 ref" href="#24m" title='m' data-ref="24m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>, <a class="local col3 ref" href="#23srcsas" title='srcsas' data-ref="23srcsas">srcsas</a>, <a class="local col7 ref" href="#27xid" title='xid' data-ref="27xid">xid</a>, &amp;<a class="local col5 ref" href="#25data" title='data' data-ref="25data">data</a>[<var>4</var>], <a class="local col6 ref" href="#26data_len" title='data_len' data-ref="26data_len">data_len</a> - <var>4</var>);</td></tr>
+<tr><th id="204">204</th><td>        <b>break</b>;</td></tr>
+<tr><th id="205">205</th><td>    <b>default</b>:</td></tr>
+<tr><th id="206">206</th><td>        <a class="macro" href="debug.h.html#31" title="" data-ref="_M/DEBUG_MISC">DEBUG_MISC</a>((dfd, <q>"dhcpv6_input: Unsupported message type 0x%x\n"</q>,</td></tr>
+<tr><th id="207">207</th><td>                    data[<var>0</var>]));</td></tr>
+<tr><th id="208">208</th><td>    }</td></tr>
+<tr><th id="209">209</th><td>}</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>module.h source code [codebrowser/include/qemu/module.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/module.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='module.h.html'>module.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Module Infrastructure</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2009</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2.  See</i></td></tr>
+<tr><th id="10">10</th><td><i> * the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/QEMU_MODULE_H">QEMU_MODULE_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/QEMU_MODULE_H" data-ref="_M/QEMU_MODULE_H">QEMU_MODULE_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/DSO_STAMP_FUN" data-ref="_M/DSO_STAMP_FUN">DSO_STAMP_FUN</dfn>         glue(qemu_stamp, CONFIG_STAMP)</u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/DSO_STAMP_FUN_STR" data-ref="_M/DSO_STAMP_FUN_STR">DSO_STAMP_FUN_STR</dfn>     stringify(DSO_STAMP_FUN)</u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifdef</span> <span class="macro" data-ref="_M/BUILD_DSO">BUILD_DSO</span></u></td></tr>
+<tr><th id="22">22</th><td><em>void</em> DSO_STAMP_FUN(<em>void</em>);</td></tr>
+<tr><th id="23">23</th><td><i>/* This is a dummy symbol to identify a loaded DSO as a QEMU module, so we can</i></td></tr>
+<tr><th id="24">24</th><td><i> * distinguish "version mismatch" from "not a QEMU module", when the stamp</i></td></tr>
+<tr><th id="25">25</th><td><i> * check fails during module loading */</i></td></tr>
+<tr><th id="26">26</th><td><em>void</em> qemu_module_dummy(<em>void</em>);</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#define module_init(function, type)                                         \</u></td></tr>
+<tr><th id="29">29</th><td><u>static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \</u></td></tr>
+<tr><th id="30">30</th><td><u>{                                                                           \</u></td></tr>
+<tr><th id="31">31</th><td><u>    register_dso_module_init(function, type);                               \</u></td></tr>
+<tr><th id="32">32</th><td><u>}</u></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="21">else</span></u></td></tr>
+<tr><th id="34">34</th><td><i>/* This should not be used directly.  Use block_init etc. instead.  */</i></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/module_init" data-ref="_M/module_init">module_init</dfn>(function, type)                                         \</u></td></tr>
+<tr><th id="36">36</th><td><u>static void __attribute__((constructor)) do_qemu_init_ ## function(void)    \</u></td></tr>
+<tr><th id="37">37</th><td><u>{                                                                           \</u></td></tr>
+<tr><th id="38">38</th><td><u>    register_module_init(function, type);                                   \</u></td></tr>
+<tr><th id="39">39</th><td><u>}</u></td></tr>
+<tr><th id="40">40</th><td><u>#<span data-ppcond="21">endif</span></u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="43">43</th><td>    <dfn class="enum" id="MODULE_INIT_BLOCK" title='MODULE_INIT_BLOCK' data-ref="MODULE_INIT_BLOCK">MODULE_INIT_BLOCK</dfn>,</td></tr>
+<tr><th id="44">44</th><td>    <dfn class="enum" id="MODULE_INIT_OPTS" title='MODULE_INIT_OPTS' data-ref="MODULE_INIT_OPTS">MODULE_INIT_OPTS</dfn>,</td></tr>
+<tr><th id="45">45</th><td>    <dfn class="enum" id="MODULE_INIT_QOM" title='MODULE_INIT_QOM' data-ref="MODULE_INIT_QOM">MODULE_INIT_QOM</dfn>,</td></tr>
+<tr><th id="46">46</th><td>    <dfn class="enum" id="MODULE_INIT_TRACE" title='MODULE_INIT_TRACE' data-ref="MODULE_INIT_TRACE">MODULE_INIT_TRACE</dfn>,</td></tr>
+<tr><th id="47">47</th><td>    <dfn class="enum" id="MODULE_INIT_MAX" title='MODULE_INIT_MAX' data-ref="MODULE_INIT_MAX">MODULE_INIT_MAX</dfn></td></tr>
+<tr><th id="48">48</th><td>} <dfn class="typedef" id="module_init_type" title='module_init_type' data-type='enum module_init_type' data-ref="module_init_type">module_init_type</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/block_init" data-ref="_M/block_init">block_init</dfn>(function) module_init(function, MODULE_INIT_BLOCK)</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/opts_init" data-ref="_M/opts_init">opts_init</dfn>(function) module_init(function, MODULE_INIT_OPTS)</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/type_init" data-ref="_M/type_init">type_init</dfn>(function) module_init(function, MODULE_INIT_QOM)</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/trace_init" data-ref="_M/trace_init">trace_init</dfn>(function) module_init(function, MODULE_INIT_TRACE)</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/block_module_load_one" data-ref="_M/block_module_load_one">block_module_load_one</dfn>(lib) module_load_one("block-", lib)</u></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><em>void</em> <dfn class="decl" id="register_module_init" title='register_module_init' data-ref="register_module_init">register_module_init</dfn>(<em>void</em> (*<dfn class="local col9 decl" id="7079fn" title='fn' data-type='void (*)(void)' data-ref="7079fn">fn</dfn>)(<em>void</em>), <a class="typedef" href="#module_init_type" title='module_init_type' data-type='enum module_init_type' data-ref="module_init_type">module_init_type</a> <dfn class="local col0 decl" id="7080type" title='type' data-type='module_init_type' data-ref="7080type">type</dfn>);</td></tr>
+<tr><th id="58">58</th><td><em>void</em> <dfn class="decl" id="register_dso_module_init" title='register_dso_module_init' data-ref="register_dso_module_init">register_dso_module_init</dfn>(<em>void</em> (*<dfn class="local col1 decl" id="7081fn" title='fn' data-type='void (*)(void)' data-ref="7081fn">fn</dfn>)(<em>void</em>), <a class="typedef" href="#module_init_type" title='module_init_type' data-type='enum module_init_type' data-ref="module_init_type">module_init_type</a> <dfn class="local col2 decl" id="7082type" title='type' data-type='module_init_type' data-ref="7082type">type</dfn>);</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><em>void</em> <dfn class="decl" id="module_call_init" title='module_call_init' data-ref="module_call_init">module_call_init</dfn>(<a class="typedef" href="#module_init_type" title='module_init_type' data-type='enum module_init_type' data-ref="module_init_type">module_init_type</a> <dfn class="local col3 decl" id="7083type" title='type' data-type='module_init_type' data-ref="7083type">type</dfn>);</td></tr>
+<tr><th id="61">61</th><td><em>void</em> <dfn class="decl" id="module_load_one" title='module_load_one' data-ref="module_load_one">module_load_one</dfn>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="7084prefix" title='prefix' data-type='const char *' data-ref="7084prefix">prefix</dfn>, <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="7085lib_name" title='lib_name' data-type='const char *' data-ref="7085lib_name">lib_name</dfn>);</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="64">64</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

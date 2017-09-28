@@ -1,0 +1,34 @@
+<dec f='codebrowser/include/qemu/unicode.h' l='4' type='int mod_utf8_codepoint(const char * s, size_t n, char ** end)'/>
+<use f='codebrowser/qobject/qjson.c' l='153' u='c' c='to_json'/>
+<def f='codebrowser/util/unicode.c' l='47' ll='101' type='int mod_utf8_codepoint(const char * s, size_t n, char ** end)'/>
+<doc f='codebrowser/util/unicode.c' l='16'>/**
+ * mod_utf8_codepoint:
+ * @s: string encoded in modified UTF-8
+ * @n: maximum number of bytes to read from @s, if less than 6
+ * @end: set to end of sequence on return
+ *
+ * Convert the modified UTF-8 sequence at the start of @s.  Modified
+ * UTF-8 is exactly like UTF-8, except U+0000 is encoded as
+ * &quot;\xC0\x80&quot;.
+ *
+ * If @n is zero or @s points to a zero byte, the sequence is invalid,
+ * and @end is set to @s.
+ *
+ * If @s points to an impossible byte (0xFE or 0xFF) or a continuation
+ * byte, the sequence is invalid, and @end is set to @s + 1
+ *
+ * Else, the first byte determines how many continuation bytes are
+ * expected.  If there are fewer, the sequence is invalid, and @end is
+ * set to @s + 1 + actual number of continuation bytes.  Else, the
+ * sequence is well-formed, and @end is set to @s + 1 + expected
+ * number of continuation bytes.
+ *
+ * A well-formed sequence is valid unless it encodes a codepoint
+ * outside the Unicode range U+0000..U+10FFFF, one of Unicode&apos;s 66
+ * noncharacters, a surrogate codepoint, or is overlong.  Except the
+ * overlong sequence &quot;\xC0\x80&quot; is valid.
+ *
+ * Conversion succeeds if and only if the sequence is valid.
+ *
+ * Returns: the Unicode codepoint on success, -1 on failure.
+ */</doc>

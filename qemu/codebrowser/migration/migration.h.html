@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>migration.h source code [codebrowser/migration/migration.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="MigrationClass,MigrationIncomingState,MigrationState "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/migration.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='migration.h.html'>migration.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU live migration</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2008</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2.  See</i></td></tr>
+<tr><th id="10">10</th><td><i> * the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/QEMU_MIGRATION_H">QEMU_MIGRATION_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/QEMU_MIGRATION_H" data-ref="_M/QEMU_MIGRATION_H">QEMU_MIGRATION_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../qapi-types.h.html">"qapi-types.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/exec/cpu-common.h.html">"exec/cpu-common.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/qemu/coroutine_int.h.html">"qemu/coroutine_int.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../include/hw/qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><i>/* State for the incoming migration */</i></td></tr>
+<tr><th id="25">25</th><td><b>struct</b> <dfn class="type def" id="MigrationIncomingState" title='MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</dfn> {</td></tr>
+<tr><th id="26">26</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="decl" id="MigrationIncomingState::from_src_file" title='MigrationIncomingState::from_src_file' data-ref="MigrationIncomingState::from_src_file">from_src_file</dfn>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td>    <i>/*</i></td></tr>
+<tr><th id="29">29</th><td><i>     * Free at the start of the main state load, set as the main thread finishes</i></td></tr>
+<tr><th id="30">30</th><td><i>     * loading state.</i></td></tr>
+<tr><th id="31">31</th><td><i>     */</i></td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> <dfn class="decl" id="MigrationIncomingState::main_thread_load_event" title='MigrationIncomingState::main_thread_load_event' data-ref="MigrationIncomingState::main_thread_load_event">main_thread_load_event</dfn>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span>         <dfn class="decl" id="MigrationIncomingState::largest_page_size" title='MigrationIncomingState::largest_page_size' data-ref="MigrationIncomingState::largest_page_size">largest_page_size</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>           <dfn class="decl" id="MigrationIncomingState::have_fault_thread" title='MigrationIncomingState::have_fault_thread' data-ref="MigrationIncomingState::have_fault_thread">have_fault_thread</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a>     <dfn class="decl" id="MigrationIncomingState::fault_thread" title='MigrationIncomingState::fault_thread' data-ref="MigrationIncomingState::fault_thread">fault_thread</dfn>;</td></tr>
+<tr><th id="37">37</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a>  <dfn class="decl" id="MigrationIncomingState::fault_thread_sem" title='MigrationIncomingState::fault_thread_sem' data-ref="MigrationIncomingState::fault_thread_sem">fault_thread_sem</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>           <dfn class="decl" id="MigrationIncomingState::have_listen_thread" title='MigrationIncomingState::have_listen_thread' data-ref="MigrationIncomingState::have_listen_thread">have_listen_thread</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a>     <dfn class="decl" id="MigrationIncomingState::listen_thread" title='MigrationIncomingState::listen_thread' data-ref="MigrationIncomingState::listen_thread">listen_thread</dfn>;</td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a>  <dfn class="decl" id="MigrationIncomingState::listen_thread_sem" title='MigrationIncomingState::listen_thread_sem' data-ref="MigrationIncomingState::listen_thread_sem">listen_thread_sem</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td>    <i>/* For the kernel to send us notifications */</i></td></tr>
+<tr><th id="44">44</th><td>    <em>int</em>       <dfn class="decl" id="MigrationIncomingState::userfault_fd" title='MigrationIncomingState::userfault_fd' data-ref="MigrationIncomingState::userfault_fd">userfault_fd</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <i>/* To tell the fault_thread to quit */</i></td></tr>
+<tr><th id="46">46</th><td>    <em>int</em>       <dfn class="decl" id="MigrationIncomingState::userfault_quit_fd" title='MigrationIncomingState::userfault_quit_fd' data-ref="MigrationIncomingState::userfault_quit_fd">userfault_quit_fd</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="decl" id="MigrationIncomingState::to_src_file" title='MigrationIncomingState::to_src_file' data-ref="MigrationIncomingState::to_src_file">to_src_file</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="MigrationIncomingState::rp_mutex" title='MigrationIncomingState::rp_mutex' data-ref="MigrationIncomingState::rp_mutex">rp_mutex</dfn>;    <i>/* We send replies from multiple threads */</i></td></tr>
+<tr><th id="49">49</th><td>    <em>void</em>     *<dfn class="decl" id="MigrationIncomingState::postcopy_tmp_page" title='MigrationIncomingState::postcopy_tmp_page' data-ref="MigrationIncomingState::postcopy_tmp_page">postcopy_tmp_page</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <em>void</em>     *<dfn class="decl" id="MigrationIncomingState::postcopy_tmp_zero_page" title='MigrationIncomingState::postcopy_tmp_zero_page' data-ref="MigrationIncomingState::postcopy_tmp_zero_page">postcopy_tmp_zero_page</dfn>;</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="MigrationIncomingState::bh" title='MigrationIncomingState::bh' data-ref="MigrationIncomingState::bh">bh</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>    <em>int</em> <dfn class="decl" id="MigrationIncomingState::state" title='MigrationIncomingState::state' data-ref="MigrationIncomingState::state">state</dfn>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationIncomingState::have_colo_incoming_thread" title='MigrationIncomingState::have_colo_incoming_thread' data-ref="MigrationIncomingState::have_colo_incoming_thread">have_colo_incoming_thread</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> <dfn class="decl" id="MigrationIncomingState::colo_incoming_thread" title='MigrationIncomingState::colo_incoming_thread' data-ref="MigrationIncomingState::colo_incoming_thread">colo_incoming_thread</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <i>/* The coroutine we should enter (back) after failover */</i></td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="decl" id="MigrationIncomingState::migration_incoming_co" title='MigrationIncomingState::migration_incoming_co' data-ref="MigrationIncomingState::migration_incoming_co">migration_incoming_co</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> <dfn class="decl" id="MigrationIncomingState::colo_incoming_sem" title='MigrationIncomingState::colo_incoming_sem' data-ref="MigrationIncomingState::colo_incoming_sem">colo_incoming_sem</dfn>;</td></tr>
+<tr><th id="61">61</th><td>};</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="decl" id="migration_incoming_get_current" title='migration_incoming_get_current' data-ref="migration_incoming_get_current">migration_incoming_get_current</dfn>(<em>void</em>);</td></tr>
+<tr><th id="64">64</th><td><em>void</em> <dfn class="decl" id="migration_incoming_state_destroy" title='migration_incoming_state_destroy' data-ref="migration_incoming_state_destroy">migration_incoming_state_destroy</dfn>(<em>void</em>);</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/TYPE_MIGRATION" data-ref="_M/TYPE_MIGRATION">TYPE_MIGRATION</dfn> "migration"</u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/MIGRATION_CLASS" data-ref="_M/MIGRATION_CLASS">MIGRATION_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="69">69</th><td><u>    OBJECT_CLASS_CHECK(MigrationClass, (klass), TYPE_MIGRATION)</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/MIGRATION_OBJ" data-ref="_M/MIGRATION_OBJ">MIGRATION_OBJ</dfn>(obj) \</u></td></tr>
+<tr><th id="71">71</th><td><u>    OBJECT_CHECK(MigrationState, (obj), TYPE_MIGRATION)</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/MIGRATION_GET_CLASS" data-ref="_M/MIGRATION_GET_CLASS">MIGRATION_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="73">73</th><td><u>    OBJECT_GET_CLASS(MigrationClass, (obj), TYPE_MIGRATION)</u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="MigrationClass" title='MigrationClass' data-ref="MigrationClass"><a class="type" href="#MigrationClass" title='MigrationClass' data-ref="MigrationClass">MigrationClass</a></dfn> {</td></tr>
+<tr><th id="76">76</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../include/hw/qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="MigrationClass::parent_class" title='MigrationClass::parent_class' data-ref="MigrationClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="78">78</th><td>} <dfn class="typedef" id="MigrationClass" title='MigrationClass' data-type='struct MigrationClass' data-ref="MigrationClass">MigrationClass</dfn>;</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><b>struct</b> <dfn class="type def" id="MigrationState" title='MigrationState' data-ref="MigrationState">MigrationState</dfn></td></tr>
+<tr><th id="81">81</th><td>{</td></tr>
+<tr><th id="82">82</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="83">83</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="MigrationState::parent_obj" title='MigrationState::parent_obj' data-ref="MigrationState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="86">86</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="MigrationState::bytes_xfer" title='MigrationState::bytes_xfer' data-ref="MigrationState::bytes_xfer">bytes_xfer</dfn>;</td></tr>
+<tr><th id="87">87</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="MigrationState::xfer_limit" title='MigrationState::xfer_limit' data-ref="MigrationState::xfer_limit">xfer_limit</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> <dfn class="decl" id="MigrationState::thread" title='MigrationState::thread' data-ref="MigrationState::thread">thread</dfn>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="MigrationState::cleanup_bh" title='MigrationState::cleanup_bh' data-ref="MigrationState::cleanup_bh">cleanup_bh</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="decl" id="MigrationState::to_dst_file" title='MigrationState::to_dst_file' data-ref="MigrationState::to_dst_file">to_dst_file</dfn>;</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>    <i>/* params from 'migrate-set-parameters' */</i></td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="../qapi-types.h.html#MigrationParameters" title='MigrationParameters' data-type='struct MigrationParameters' data-ref="MigrationParameters">MigrationParameters</a> <dfn class="decl" id="MigrationState::parameters" title='MigrationState::parameters' data-ref="MigrationState::parameters">parameters</dfn>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <em>int</em> <dfn class="decl" id="MigrationState::state" title='MigrationState::state' data-ref="MigrationState::state">state</dfn>;</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td>    <i>/* State related to return path */</i></td></tr>
+<tr><th id="98">98</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="99">99</th><td>        <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a>     *<dfn class="decl" id="MigrationState::(anonymous)::from_dst_file" title='MigrationState::(anonymous struct)::from_dst_file' data-ref="MigrationState::(anonymous)::from_dst_file">from_dst_file</dfn>;</td></tr>
+<tr><th id="100">100</th><td>        <a class="typedef" href="../include/qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a>    <dfn class="decl" id="MigrationState::(anonymous)::rp_thread" title='MigrationState::(anonymous struct)::rp_thread' data-ref="MigrationState::(anonymous)::rp_thread">rp_thread</dfn>;</td></tr>
+<tr><th id="101">101</th><td>        <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>          <dfn class="decl" id="MigrationState::(anonymous)::error" title='MigrationState::(anonymous struct)::error' data-ref="MigrationState::(anonymous)::error">error</dfn>;</td></tr>
+<tr><th id="102">102</th><td>    } <dfn class="decl" id="MigrationState::rp_state" title='MigrationState::rp_state' data-ref="MigrationState::rp_state">rp_state</dfn>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td>    <em>double</em> <dfn class="decl" id="MigrationState::mbps" title='MigrationState::mbps' data-ref="MigrationState::mbps">mbps</dfn>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::total_time" title='MigrationState::total_time' data-ref="MigrationState::total_time">total_time</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::downtime" title='MigrationState::downtime' data-ref="MigrationState::downtime">downtime</dfn>;</td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::expected_downtime" title='MigrationState::expected_downtime' data-ref="MigrationState::expected_downtime">expected_downtime</dfn>;</td></tr>
+<tr><th id="108">108</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::enabled_capabilities" title='MigrationState::enabled_capabilities' data-ref="MigrationState::enabled_capabilities">enabled_capabilities</dfn>[<a class="enum" href="../qapi-types.h.html#MigrationCapability::MIGRATION_CAPABILITY__MAX" title='MigrationCapability::MIGRATION_CAPABILITY__MAX' data-ref="MigrationCapability::MIGRATION_CAPABILITY__MAX">MIGRATION_CAPABILITY__MAX</a>];</td></tr>
+<tr><th id="109">109</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::xbzrle_cache_size" title='MigrationState::xbzrle_cache_size' data-ref="MigrationState::xbzrle_cache_size">xbzrle_cache_size</dfn>;</td></tr>
+<tr><th id="110">110</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::setup_time" title='MigrationState::setup_time' data-ref="MigrationState::setup_time">setup_time</dfn>;</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <i>/* Flag set once the migration has been asked to enter postcopy */</i></td></tr>
+<tr><th id="113">113</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::start_postcopy" title='MigrationState::start_postcopy' data-ref="MigrationState::start_postcopy">start_postcopy</dfn>;</td></tr>
+<tr><th id="114">114</th><td>    <i>/* Flag set after postcopy has sent the device state */</i></td></tr>
+<tr><th id="115">115</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::postcopy_after_devices" title='MigrationState::postcopy_after_devices' data-ref="MigrationState::postcopy_after_devices">postcopy_after_devices</dfn>;</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <i>/* Flag set once the migration thread is running (and needs joining) */</i></td></tr>
+<tr><th id="118">118</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::migration_thread_running" title='MigrationState::migration_thread_running' data-ref="MigrationState::migration_thread_running">migration_thread_running</dfn>;</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <i>/* Flag set once the migration thread called bdrv_inactivate_all */</i></td></tr>
+<tr><th id="121">121</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::block_inactive" title='MigrationState::block_inactive' data-ref="MigrationState::block_inactive">block_inactive</dfn>;</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>    <i>/* The semaphore is used to notify COLO thread that failover is finished */</i></td></tr>
+<tr><th id="124">124</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> <dfn class="decl" id="MigrationState::colo_exit_sem" title='MigrationState::colo_exit_sem' data-ref="MigrationState::colo_exit_sem">colo_exit_sem</dfn>;</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <i>/* The semaphore is used to notify COLO thread to do checkpoint */</i></td></tr>
+<tr><th id="127">127</th><td>    <a class="typedef" href="../include/qemu/thread.h.html#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> <dfn class="decl" id="MigrationState::colo_checkpoint_sem" title='MigrationState::colo_checkpoint_sem' data-ref="MigrationState::colo_checkpoint_sem">colo_checkpoint_sem</dfn>;</td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="MigrationState::colo_checkpoint_time" title='MigrationState::colo_checkpoint_time' data-ref="MigrationState::colo_checkpoint_time">colo_checkpoint_time</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="MigrationState::colo_delay_timer" title='MigrationState::colo_delay_timer' data-ref="MigrationState::colo_delay_timer">colo_delay_timer</dfn>;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <i>/* The last error that occurred */</i></td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="MigrationState::error" title='MigrationState::error' data-ref="MigrationState::error">error</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <i>/* Do we have to clean up -b/-i from old migrate parameters */</i></td></tr>
+<tr><th id="134">134</th><td>    <i>/* This feature is deprecated and will be removed */</i></td></tr>
+<tr><th id="135">135</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::must_remove_block_options" title='MigrationState::must_remove_block_options' data-ref="MigrationState::must_remove_block_options">must_remove_block_options</dfn>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <i>/*</i></td></tr>
+<tr><th id="138">138</th><td><i>     * Global switch on whether we need to store the global state</i></td></tr>
+<tr><th id="139">139</th><td><i>     * during migration.</i></td></tr>
+<tr><th id="140">140</th><td><i>     */</i></td></tr>
+<tr><th id="141">141</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::store_global_state" title='MigrationState::store_global_state' data-ref="MigrationState::store_global_state">store_global_state</dfn>;</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td>    <i>/* Whether the VM is only allowing for migratable devices */</i></td></tr>
+<tr><th id="144">144</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::only_migratable" title='MigrationState::only_migratable' data-ref="MigrationState::only_migratable">only_migratable</dfn>;</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td>    <i>/* Whether we send QEMU_VM_CONFIGURATION during migration */</i></td></tr>
+<tr><th id="147">147</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::send_configuration" title='MigrationState::send_configuration' data-ref="MigrationState::send_configuration">send_configuration</dfn>;</td></tr>
+<tr><th id="148">148</th><td>    <i>/* Whether we send section footer during migration */</i></td></tr>
+<tr><th id="149">149</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MigrationState::send_section_footer" title='MigrationState::send_section_footer' data-ref="MigrationState::send_section_footer">send_section_footer</dfn>;</td></tr>
+<tr><th id="150">150</th><td>};</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><em>void</em> <dfn class="decl" id="migrate_set_state" title='migrate_set_state' data-ref="migrate_set_state">migrate_set_state</dfn>(<em>int</em> *<dfn class="local col6 decl" id="6state" title='state' data-type='int *' data-ref="6state">state</dfn>, <em>int</em> <dfn class="local col7 decl" id="7old_state" title='old_state' data-type='int' data-ref="7old_state">old_state</dfn>, <em>int</em> <dfn class="local col8 decl" id="8new_state" title='new_state' data-type='int' data-ref="8new_state">new_state</dfn>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="decl" id="migration_fd_process_incoming" title='migration_fd_process_incoming' data-ref="migration_fd_process_incoming">migration_fd_process_incoming</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col9 decl" id="9f" title='f' data-type='QEMUFile *' data-ref="9f">f</dfn>);</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="migrate_max_downtime" title='migrate_max_downtime' data-ref="migrate_max_downtime">migrate_max_downtime</dfn>(<em>void</em>);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><em>void</em> <dfn class="decl" id="migrate_fd_error" title='migrate_fd_error' data-ref="migrate_fd_error">migrate_fd_error</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col0 decl" id="10s" title='s' data-type='MigrationState *' data-ref="10s">s</dfn>, <em>const</em> <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col1 decl" id="11error" title='error' data-type='const Error *' data-ref="11error">error</dfn>);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><em>void</em> <dfn class="decl" id="migrate_fd_connect" title='migrate_fd_connect' data-ref="migrate_fd_connect">migrate_fd_connect</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="local col2 decl" id="12s" title='s' data-type='MigrationState *' data-ref="12s">s</dfn>);</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="decl" id="migrate_init" title='migrate_init' data-ref="migrate_init">migrate_init</dfn>(<em>void</em>);</td></tr>
+<tr><th id="163">163</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migration_is_blocked" title='migration_is_blocked' data-ref="migration_is_blocked">migration_is_blocked</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="13errp" title='errp' data-type='Error **' data-ref="13errp">errp</dfn>);</td></tr>
+<tr><th id="164">164</th><td><i>/* True if outgoing migration has entered postcopy phase */</i></td></tr>
+<tr><th id="165">165</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migration_in_postcopy" title='migration_in_postcopy' data-ref="migration_in_postcopy">migration_in_postcopy</dfn>(<em>void</em>);</td></tr>
+<tr><th id="166">166</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#MigrationState" title='MigrationState' data-type='struct MigrationState' data-ref="MigrationState">MigrationState</a> *<dfn class="decl" id="migrate_get_current" title='migrate_get_current' data-ref="migrate_get_current">migrate_get_current</dfn>(<em>void</em>);</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_release_ram" title='migrate_release_ram' data-ref="migrate_release_ram">migrate_release_ram</dfn>(<em>void</em>);</td></tr>
+<tr><th id="169">169</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_postcopy_ram" title='migrate_postcopy_ram' data-ref="migrate_postcopy_ram">migrate_postcopy_ram</dfn>(<em>void</em>);</td></tr>
+<tr><th id="170">170</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_zero_blocks" title='migrate_zero_blocks' data-ref="migrate_zero_blocks">migrate_zero_blocks</dfn>(<em>void</em>);</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_auto_converge" title='migrate_auto_converge' data-ref="migrate_auto_converge">migrate_auto_converge</dfn>(<em>void</em>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><em>int</em> <dfn class="decl" id="migrate_use_xbzrle" title='migrate_use_xbzrle' data-ref="migrate_use_xbzrle">migrate_use_xbzrle</dfn>(<em>void</em>);</td></tr>
+<tr><th id="175">175</th><td><a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="migrate_xbzrle_cache_size" title='migrate_xbzrle_cache_size' data-ref="migrate_xbzrle_cache_size">migrate_xbzrle_cache_size</dfn>(<em>void</em>);</td></tr>
+<tr><th id="176">176</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_colo_enabled" title='migrate_colo_enabled' data-ref="migrate_colo_enabled">migrate_colo_enabled</dfn>(<em>void</em>);</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_use_block" title='migrate_use_block' data-ref="migrate_use_block">migrate_use_block</dfn>(<em>void</em>);</td></tr>
+<tr><th id="179">179</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_use_block_incremental" title='migrate_use_block_incremental' data-ref="migrate_use_block_incremental">migrate_use_block_incremental</dfn>(<em>void</em>);</td></tr>
+<tr><th id="180">180</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_use_return_path" title='migrate_use_return_path' data-ref="migrate_use_return_path">migrate_use_return_path</dfn>(<em>void</em>);</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_use_compression" title='migrate_use_compression' data-ref="migrate_use_compression">migrate_use_compression</dfn>(<em>void</em>);</td></tr>
+<tr><th id="183">183</th><td><em>int</em> <dfn class="decl" id="migrate_compress_level" title='migrate_compress_level' data-ref="migrate_compress_level">migrate_compress_level</dfn>(<em>void</em>);</td></tr>
+<tr><th id="184">184</th><td><em>int</em> <dfn class="decl" id="migrate_compress_threads" title='migrate_compress_threads' data-ref="migrate_compress_threads">migrate_compress_threads</dfn>(<em>void</em>);</td></tr>
+<tr><th id="185">185</th><td><em>int</em> <dfn class="decl" id="migrate_decompress_threads" title='migrate_decompress_threads' data-ref="migrate_decompress_threads">migrate_decompress_threads</dfn>(<em>void</em>);</td></tr>
+<tr><th id="186">186</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="migrate_use_events" title='migrate_use_events' data-ref="migrate_use_events">migrate_use_events</dfn>(<em>void</em>);</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><i>/* Sending on the return path - generic and then for each message type */</i></td></tr>
+<tr><th id="189">189</th><td><em>void</em> <dfn class="decl" id="migrate_send_rp_shut" title='migrate_send_rp_shut' data-ref="migrate_send_rp_shut">migrate_send_rp_shut</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col4 decl" id="14mis" title='mis' data-type='MigrationIncomingState *' data-ref="14mis">mis</dfn>,</td></tr>
+<tr><th id="190">190</th><td>                          <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="15value" title='value' data-type='uint32_t' data-ref="15value">value</dfn>);</td></tr>
+<tr><th id="191">191</th><td><em>void</em> <dfn class="decl" id="migrate_send_rp_pong" title='migrate_send_rp_pong' data-ref="migrate_send_rp_pong">migrate_send_rp_pong</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col6 decl" id="16mis" title='mis' data-type='MigrationIncomingState *' data-ref="16mis">mis</dfn>,</td></tr>
+<tr><th id="192">192</th><td>                          <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="17value" title='value' data-type='uint32_t' data-ref="17value">value</dfn>);</td></tr>
+<tr><th id="193">193</th><td><em>void</em> <dfn class="decl" id="migrate_send_rp_req_pages" title='migrate_send_rp_req_pages' data-ref="migrate_send_rp_req_pages">migrate_send_rp_req_pages</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#MigrationIncomingState" title='MigrationIncomingState' data-type='struct MigrationIncomingState' data-ref="MigrationIncomingState">MigrationIncomingState</a> *<dfn class="local col8 decl" id="18mis" title='mis' data-type='MigrationIncomingState *' data-ref="18mis">mis</dfn>, <em>const</em> <em>char</em>* <dfn class="local col9 decl" id="19rbname" title='rbname' data-type='const char *' data-ref="19rbname">rbname</dfn>,</td></tr>
+<tr><th id="194">194</th><td>                              <a class="typedef" href="../include/exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col0 decl" id="20start" title='start' data-type='ram_addr_t' data-ref="20start">start</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="21len" title='len' data-type='size_t' data-ref="21len">len</dfn>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../hw/scsi/vhost-scsi-common.c.html'>codebrowser/hw/scsi/vhost-scsi-common.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

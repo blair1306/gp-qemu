@@ -1,0 +1,21 @@
+<dec f='codebrowser/migration/savevm.h' l='50' type='void qemu_savevm_send_postcopy_ram_discard(QEMUFile * f, const char * name, uint16_t len, uint64_t * start_list, uint64_t * length_list)'/>
+<use f='codebrowser/migration/postcopy-ram.c' l='764' u='c' c='postcopy_discard_send_range'/>
+<use f='codebrowser/migration/postcopy-ram.c' l='785' u='c' c='postcopy_discard_send_finish'/>
+<def f='codebrowser/migration/savevm.c' l='889' ll='916' type='void qemu_savevm_send_postcopy_ram_discard(QEMUFile * f, const char * name, uint16_t len, uint64_t * start_list, uint64_t * length_list)'/>
+<doc f='codebrowser/migration/savevm.c' l='872'>/* Sent prior to starting the destination running in postcopy, discard pages
+ * that have already been sent but redirtied on the source.
+ * CMD_POSTCOPY_RAM_DISCARD consist of:
+ *      byte   version (0)
+ *      byte   Length of name field (not including 0)
+ *  n x byte   RAM block name
+ *      byte   0 terminator (just for safety)
+ *  n x        Byte ranges within the named RAMBlock
+ *      be64   Start of the range
+ *      be64   Length
+ *
+ *  name:  RAMBlock name that these entries are part of
+ *  len: Number of page entries
+ *  start_list: &apos;len&apos; addresses
+ *  length_list: &apos;len&apos; addresses
+ *
+ */</doc>

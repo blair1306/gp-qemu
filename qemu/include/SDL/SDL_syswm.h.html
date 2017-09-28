@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SDL_syswm.h source code [include/SDL/SDL_syswm.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="SDL_SysWMinfo,SDL_SysWMmsg "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'include/SDL/SDL_syswm.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>include</a>/<a href='./'>SDL</a>/<a href='SDL_syswm.h.html'>SDL_syswm.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i>    SDL - Simple DirectMedia Layer</i></td></tr>
+<tr><th id="3">3</th><td><i>    Copyright (C) 1997-2012 Sam Lantinga</i></td></tr>
+<tr><th id="4">4</th><td><i></i></td></tr>
+<tr><th id="5">5</th><td><i>    This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="6">6</th><td><i>    modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="7">7</th><td><i>    License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="8">8</th><td><i>    version 2.1 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="9">9</th><td><i></i></td></tr>
+<tr><th id="10">10</th><td><i>    This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="11">11</th><td><i>    but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="12">12</th><td><i>    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="13">13</th><td><i>    Lesser General Public License for more details.</i></td></tr>
+<tr><th id="14">14</th><td><i></i></td></tr>
+<tr><th id="15">15</th><td><i>    You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="16">16</th><td><i>    License along with this library; if not, write to the Free Software</i></td></tr>
+<tr><th id="17">17</th><td><i>    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</i></td></tr>
+<tr><th id="18">18</th><td><i></i></td></tr>
+<tr><th id="19">19</th><td><i>    Sam Lantinga</i></td></tr>
+<tr><th id="20">20</th><td><i>    slouken@libsdl.org</i></td></tr>
+<tr><th id="21">21</th><td><i>*/</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i class="doc">/**<span class="command"> @file</span> SDL_syswm.h</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> *  Include file for SDL custom system window manager hooks</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#<span data-ppcond="27">ifndef</span> <span class="macro" data-ref="_M/_SDL_syswm_h">_SDL_syswm_h</span></u></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/_SDL_syswm_h" data-ref="_M/_SDL_syswm_h">_SDL_syswm_h</dfn></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="SDL_stdinc.h.html">"SDL_stdinc.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="SDL_error.h.html">"SDL_error.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="SDL_version.h.html">"SDL_version.h"</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="begin_code.h.html">"begin_code.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><i>/* Set up for C function definitions, even when using C++ */</i></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="36">ifdef</span> <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="37">37</th><td><b>extern</b> <q>"C"</q> {</td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="36">endif</span></u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><i class="doc">/**<span class="command"> @file</span> SDL_syswm.h</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> *  Your application has access to a special type of event 'SDL_SYSWMEVENT',</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *  which contains window-manager specific information and arrives whenever</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> *  an unhandled window event occurs.  This event is ignored by default, but</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *  you can enable it with SDL_EventState()</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="46">46</th><td><u>#<span data-ppcond="46">ifdef</span> <span class="macro" data-ref="_M/SDL_PROTOTYPES_ONLY">SDL_PROTOTYPES_ONLY</span></u></td></tr>
+<tr><th id="47">47</th><td><b>struct</b> SDL_SysWMinfo;</td></tr>
+<tr><th id="48">48</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo SDL_SysWMinfo;</td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="46">else</span></u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>/* This is the structure for custom window manager events */</i></td></tr>
+<tr><th id="52">52</th><td><u>#<span data-ppcond="52">if</span> defined(<a class="macro" href="SDL_config.h.html#285" data-ref="_M/SDL_VIDEO_DRIVER_X11">SDL_VIDEO_DRIVER_X11</a>)</u></td></tr>
+<tr><th id="53">53</th><td><u>#<span data-ppcond="53">if</span> defined(<span class="macro" data-ref="_M/__APPLE__">__APPLE__</span>) &amp;&amp; defined(<span class="macro" data-ref="_M/__MACH__">__MACH__</span>)</u></td></tr>
+<tr><th id="54">54</th><td><i>/* conflicts with Quickdraw.h */</i></td></tr>
+<tr><th id="55">55</th><td><u>#define Cursor X11Cursor</u></td></tr>
+<tr><th id="56">56</th><td><u>#<span data-ppcond="53">endif</span></u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#include <a href="../X11/Xlib.h.html">&lt;X11/Xlib.h&gt;</a></u></td></tr>
+<tr><th id="59">59</th><td><u>#include <a href="../X11/Xatom.h.html">&lt;X11/Xatom.h&gt;</a></u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="61">if</span> defined(<span class="macro" data-ref="_M/__APPLE__">__APPLE__</span>) &amp;&amp; defined(<span class="macro" data-ref="_M/__MACH__">__MACH__</span>)</u></td></tr>
+<tr><th id="62">62</th><td><i>/* matches the re-define above */</i></td></tr>
+<tr><th id="63">63</th><td><u>#undef Cursor</u></td></tr>
+<tr><th id="64">64</th><td><u>#<span data-ppcond="61">endif</span></u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><i class="doc">/** These are the various supported subsystems under UNIX */</i></td></tr>
+<tr><th id="67">67</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="68">68</th><td>	<dfn class="enum" id="SDL_SYSWM_X11" title='SDL_SYSWM_X11' data-ref="SDL_SYSWM_X11">SDL_SYSWM_X11</dfn></td></tr>
+<tr><th id="69">69</th><td>} <dfn class="typedef" id="SDL_SYSWM_TYPE" title='SDL_SYSWM_TYPE' data-type='enum SDL_SYSWM_TYPE' data-ref="SDL_SYSWM_TYPE">SDL_SYSWM_TYPE</dfn>;</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><i class="doc">/** The UNIX custom event structure */</i></td></tr>
+<tr><th id="72">72</th><td><b>struct</b> <dfn class="type def" id="SDL_SysWMmsg" title='SDL_SysWMmsg' data-ref="SDL_SysWMmsg">SDL_SysWMmsg</dfn> {</td></tr>
+<tr><th id="73">73</th><td>	<a class="typedef" href="SDL_version.h.html#SDL_version" title='SDL_version' data-type='struct SDL_version' data-ref="SDL_version">SDL_version</a> <dfn class="decl" id="SDL_SysWMmsg::version" title='SDL_SysWMmsg::version' data-ref="SDL_SysWMmsg::version">version</dfn>;</td></tr>
+<tr><th id="74">74</th><td>	<a class="typedef" href="#SDL_SYSWM_TYPE" title='SDL_SYSWM_TYPE' data-type='enum SDL_SYSWM_TYPE' data-ref="SDL_SYSWM_TYPE">SDL_SYSWM_TYPE</a> <dfn class="decl" id="SDL_SysWMmsg::subsystem" title='SDL_SysWMmsg::subsystem' data-ref="SDL_SysWMmsg::subsystem">subsystem</dfn>;</td></tr>
+<tr><th id="75">75</th><td>	<b>union</b> {</td></tr>
+<tr><th id="76">76</th><td>	    <a class="typedef" href="../X11/Xlib.h.html#XEvent" title='XEvent' data-type='union _XEvent' data-ref="XEvent">XEvent</a> <dfn class="decl" id="SDL_SysWMmsg::(anonymous)::xevent" title='SDL_SysWMmsg::(anonymous union)::xevent' data-ref="SDL_SysWMmsg::(anonymous)::xevent">xevent</dfn>;</td></tr>
+<tr><th id="77">77</th><td>	} <dfn class="decl" id="SDL_SysWMmsg::event" title='SDL_SysWMmsg::event' data-ref="SDL_SysWMmsg::event">event</dfn>;</td></tr>
+<tr><th id="78">78</th><td>};</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i class="doc">/** The UNIX custom window manager information structure.</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> *  When this structure is returned, it holds information about which</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *  low level system it is using, and will be one of SDL_SYSWM_TYPE.</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="84">84</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="SDL_SysWMinfo" title='SDL_SysWMinfo' data-ref="SDL_SysWMinfo"><a class="type" href="#SDL_SysWMinfo" title='SDL_SysWMinfo' data-ref="SDL_SysWMinfo">SDL_SysWMinfo</a></dfn> {</td></tr>
+<tr><th id="85">85</th><td>	<a class="typedef" href="SDL_version.h.html#SDL_version" title='SDL_version' data-type='struct SDL_version' data-ref="SDL_version">SDL_version</a> <dfn class="decl" id="SDL_SysWMinfo::version" title='SDL_SysWMinfo::version' data-ref="SDL_SysWMinfo::version">version</dfn>;</td></tr>
+<tr><th id="86">86</th><td>	<a class="typedef" href="#SDL_SYSWM_TYPE" title='SDL_SYSWM_TYPE' data-type='enum SDL_SYSWM_TYPE' data-ref="SDL_SYSWM_TYPE">SDL_SYSWM_TYPE</a> <dfn class="decl" id="SDL_SysWMinfo::subsystem" title='SDL_SysWMinfo::subsystem' data-ref="SDL_SysWMinfo::subsystem">subsystem</dfn>;</td></tr>
+<tr><th id="87">87</th><td>	<b>union</b> {</td></tr>
+<tr><th id="88">88</th><td>	    <b>struct</b> {</td></tr>
+<tr><th id="89">89</th><td>	    	<a class="typedef" href="../X11/Xlib.h.html#Display" title='Display' data-type='struct _XDisplay' data-ref="Display">Display</a> *<dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::display" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::display' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::display">display</dfn>;	<i class="doc">/**&lt; The X11 display */</i></td></tr>
+<tr><th id="90">90</th><td>	    	<a class="typedef" href="../X11/X.h.html#Window" title='Window' data-type='XID' data-ref="Window">Window</a> <dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::window" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::window' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::window">window</dfn>;		<i class="doc">/**&lt; The X11 display window */</i></td></tr>
+<tr><th id="91">91</th><td>		<i class="doc">/** These locking functions should be called around</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc">                 *  any X11 functions using the display variable, </i></td></tr>
+<tr><th id="93">93</th><td><i class="doc">                 *  but not the gfxdisplay variable.</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc">                 *  They lock the event thread, so should not be</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc">		 *  called around event functions or from event filters.</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc">		 */</i></td></tr>
+<tr><th id="97">97</th><td>                <i>/*@{*/</i></td></tr>
+<tr><th id="98">98</th><td>		<em>void</em> (*<dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::lock_func" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::lock_func' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::lock_func">lock_func</dfn>)(<em>void</em>);</td></tr>
+<tr><th id="99">99</th><td>		<em>void</em> (*<dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::unlock_func" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::unlock_func' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::unlock_func">unlock_func</dfn>)(<em>void</em>);</td></tr>
+<tr><th id="100">100</th><td>                <i>/*@}*/</i></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>		<i class="doc">/** <span class="command">@name</span> <span class="verb">Introduced in SDL 1.0.2 </span>*/</i></td></tr>
+<tr><th id="103">103</th><td>                <i>/*@{*/</i></td></tr>
+<tr><th id="104">104</th><td>	    	<a class="typedef" href="../X11/X.h.html#Window" title='Window' data-type='XID' data-ref="Window">Window</a> <dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::fswindow" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::fswindow' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::fswindow">fswindow</dfn>;	<i class="doc">/**&lt; The X11 fullscreen window */</i></td></tr>
+<tr><th id="105">105</th><td>	    	<a class="typedef" href="../X11/X.h.html#Window" title='Window' data-type='XID' data-ref="Window">Window</a> <dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::wmwindow" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::wmwindow' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::wmwindow">wmwindow</dfn>;	<i class="doc">/**&lt; The X11 managed input window */</i></td></tr>
+<tr><th id="106">106</th><td>                <i>/*@}*/</i></td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>		<i class="doc">/** <span class="command">@name</span> <span class="verb">Introduced in SDL 1.2.12 </span>*/</i></td></tr>
+<tr><th id="109">109</th><td>                <i>/*@{*/</i></td></tr>
+<tr><th id="110">110</th><td>		<a class="typedef" href="../X11/Xlib.h.html#Display" title='Display' data-type='struct _XDisplay' data-ref="Display">Display</a> *<dfn class="decl" id="SDL_SysWMinfo::(anonymousunion)::(anonymous)::gfxdisplay" title='SDL_SysWMinfo::(anonymous union)::(anonymous struct)::gfxdisplay' data-ref="SDL_SysWMinfo::(anonymousunion)::(anonymous)::gfxdisplay">gfxdisplay</dfn>;	<i class="doc">/**&lt; The X11 display to which rendering is done */</i></td></tr>
+<tr><th id="111">111</th><td>                <i>/*@}*/</i></td></tr>
+<tr><th id="112">112</th><td>	    } <dfn class="decl" id="SDL_SysWMinfo::(anonymous)::x11" title='SDL_SysWMinfo::(anonymous union)::x11' data-ref="SDL_SysWMinfo::(anonymous)::x11">x11</dfn>;</td></tr>
+<tr><th id="113">113</th><td>	} <dfn class="decl" id="SDL_SysWMinfo::info" title='SDL_SysWMinfo::info' data-ref="SDL_SysWMinfo::info">info</dfn>;</td></tr>
+<tr><th id="114">114</th><td>} <dfn class="typedef" id="SDL_SysWMinfo" title='SDL_SysWMinfo' data-type='struct SDL_SysWMinfo' data-ref="SDL_SysWMinfo">SDL_SysWMinfo</dfn>;</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><u>#<span data-ppcond="52">elif</span> defined(SDL_VIDEO_DRIVER_NANOX)</u></td></tr>
+<tr><th id="117">117</th><td><u>#include &lt;microwin/nano-X.h&gt;</u></td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><i class="doc">/** The generic custom event structure */</i></td></tr>
+<tr><th id="120">120</th><td><b>struct</b> SDL_SysWMmsg {</td></tr>
+<tr><th id="121">121</th><td>	SDL_version version;</td></tr>
+<tr><th id="122">122</th><td>	<em>int</em> data;</td></tr>
+<tr><th id="123">123</th><td>};</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><i class="doc">/** The windows custom window manager information structure */</i></td></tr>
+<tr><th id="126">126</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo {</td></tr>
+<tr><th id="127">127</th><td>	SDL_version version ;</td></tr>
+<tr><th id="128">128</th><td>	GR_WINDOW_ID window ;	<i>/* The display window */</i></td></tr>
+<tr><th id="129">129</th><td>} SDL_SysWMinfo;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><u>#elif defined(SDL_VIDEO_DRIVER_WINDIB) || defined(SDL_VIDEO_DRIVER_DDRAW) || defined(SDL_VIDEO_DRIVER_GAPI)</u></td></tr>
+<tr><th id="132">132</th><td><u>#define WIN32_LEAN_AND_MEAN</u></td></tr>
+<tr><th id="133">133</th><td><u>#include &lt;windows.h&gt;</u></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><i class="doc">/** The windows custom event structure */</i></td></tr>
+<tr><th id="136">136</th><td><b>struct</b> SDL_SysWMmsg {</td></tr>
+<tr><th id="137">137</th><td>	SDL_version version;</td></tr>
+<tr><th id="138">138</th><td>	HWND hwnd;			<i class="doc">/**&lt; The window for the message */</i></td></tr>
+<tr><th id="139">139</th><td>	UINT msg;			<i class="doc">/**&lt; The type of message */</i></td></tr>
+<tr><th id="140">140</th><td>	WPARAM wParam;			<i class="doc">/**&lt; WORD message parameter */</i></td></tr>
+<tr><th id="141">141</th><td>	LPARAM lParam;			<i class="doc">/**&lt; LONG message parameter */</i></td></tr>
+<tr><th id="142">142</th><td>};</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><i class="doc">/** The windows custom window manager information structure */</i></td></tr>
+<tr><th id="145">145</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo {</td></tr>
+<tr><th id="146">146</th><td>	SDL_version version;</td></tr>
+<tr><th id="147">147</th><td>	HWND window;			<i class="doc">/**&lt; The Win32 display window */</i></td></tr>
+<tr><th id="148">148</th><td>	HGLRC hglrc;			<i class="doc">/**&lt; The OpenGL context, if any */</i></td></tr>
+<tr><th id="149">149</th><td>} SDL_SysWMinfo;</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><u>#elif defined(SDL_VIDEO_DRIVER_RISCOS)</u></td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i class="doc">/** RISC OS custom event structure */</i></td></tr>
+<tr><th id="154">154</th><td><b>struct</b> SDL_SysWMmsg {</td></tr>
+<tr><th id="155">155</th><td>	SDL_version version;</td></tr>
+<tr><th id="156">156</th><td>	<em>int</em> eventCode;		<i class="doc">/**&lt; The window for the message */</i></td></tr>
+<tr><th id="157">157</th><td>	<em>int</em> pollBlock[<var>64</var>];</td></tr>
+<tr><th id="158">158</th><td>};</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><i class="doc">/** The RISC OS custom window manager information structure */</i></td></tr>
+<tr><th id="161">161</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo {</td></tr>
+<tr><th id="162">162</th><td>	SDL_version version;</td></tr>
+<tr><th id="163">163</th><td>	<em>int</em> wimpVersion;    <i class="doc">/**&lt; Wimp version running under */</i></td></tr>
+<tr><th id="164">164</th><td>	<em>int</em> taskHandle;     <i class="doc">/**&lt; The RISC OS task handle */</i></td></tr>
+<tr><th id="165">165</th><td>	<em>int</em> window;		<i class="doc">/**&lt; The RISC OS display window */</i></td></tr>
+<tr><th id="166">166</th><td>} SDL_SysWMinfo;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><u>#elif defined(SDL_VIDEO_DRIVER_PHOTON)</u></td></tr>
+<tr><th id="169">169</th><td><u>#include &lt;sys/neutrino.h&gt;</u></td></tr>
+<tr><th id="170">170</th><td><u>#include &lt;Ph.h&gt;</u></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i class="doc">/** The QNX custom event structure */</i></td></tr>
+<tr><th id="173">173</th><td><b>struct</b> SDL_SysWMmsg {</td></tr>
+<tr><th id="174">174</th><td>	SDL_version version;</td></tr>
+<tr><th id="175">175</th><td>	<em>int</em> data;</td></tr>
+<tr><th id="176">176</th><td>};</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><i class="doc">/** The QNX custom window manager information structure */</i></td></tr>
+<tr><th id="179">179</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo {</td></tr>
+<tr><th id="180">180</th><td>	SDL_version version;</td></tr>
+<tr><th id="181">181</th><td>	<em>int</em> data;</td></tr>
+<tr><th id="182">182</th><td>} SDL_SysWMinfo;</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><u>#else</u></td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td><i class="doc">/** The generic custom event structure */</i></td></tr>
+<tr><th id="187">187</th><td><b>struct</b> SDL_SysWMmsg {</td></tr>
+<tr><th id="188">188</th><td>	SDL_version version;</td></tr>
+<tr><th id="189">189</th><td>	<em>int</em> data;</td></tr>
+<tr><th id="190">190</th><td>};</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><i class="doc">/** The generic custom window manager information structure */</i></td></tr>
+<tr><th id="193">193</th><td><b>typedef</b> <b>struct</b> SDL_SysWMinfo {</td></tr>
+<tr><th id="194">194</th><td>	SDL_version version;</td></tr>
+<tr><th id="195">195</th><td>	<em>int</em> data;</td></tr>
+<tr><th id="196">196</th><td>} SDL_SysWMinfo;</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><u>#<span data-ppcond="52">endif</span> /* video driver type */</u></td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><u>#<span data-ppcond="46">endif</span> /* SDL_PROTOTYPES_ONLY */</u></td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td><i>/* Function prototypes */</i></td></tr>
+<tr><th id="203">203</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> * This function gives you custom hooks into the window manager information.</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> * It fills the structure pointed to by 'info' with custom information and</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> * returns 0 if the function is not implemented, 1 if the function is </i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> * implemented and no error occurred, and -1 if the version member of</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> * the 'info' structure is not filled in or not supported.</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> * You typically use this function like this:</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> * <span class="command">@code</span></i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> *<span class="verb"> SDL_SysWMinfo info;</span></i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> SDL_VERSION(&amp;info.version);</span></i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> if ( SDL_GetWMInfo(&amp;info) ) { ... }</span></i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"><span class="verb"></span> * @endcode</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="217">217</th><td><b>extern</b> <a class="macro" href="begin_code.h.html#81" title="__attribute__ ((visibility(&quot;default&quot;)))" data-ref="_M/DECLSPEC">DECLSPEC</a> <em>int</em> <a class="macro" href="begin_code.h.html#107" title="" data-ref="_M/SDLCALL">SDLCALL</a> <dfn class="decl" id="SDL_GetWMInfo" title='SDL_GetWMInfo' data-ref="SDL_GetWMInfo">SDL_GetWMInfo</dfn>(<a class="typedef" href="#SDL_SysWMinfo" title='SDL_SysWMinfo' data-type='struct SDL_SysWMinfo' data-ref="SDL_SysWMinfo">SDL_SysWMinfo</a> *<dfn class="local col8 decl" id="48info" title='info' data-type='SDL_SysWMinfo *' data-ref="48info">info</dfn>);</td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><i>/* Ends C function definitions when using C++ */</i></td></tr>
+<tr><th id="221">221</th><td><u>#<span data-ppcond="221">ifdef</span> <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="222">222</th><td>}</td></tr>
+<tr><th id="223">223</th><td><u>#<span data-ppcond="221">endif</span></u></td></tr>
+<tr><th id="224">224</th><td><u>#include <a href="close_code.h.html">"close_code.h"</a></u></td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><u>#<span data-ppcond="27">endif</span> /* _SDL_syswm_h */</u></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../codebrowser/ui/sdl.c.html'>codebrowser/ui/sdl.c</a><br/>Generated on <em>2017-Aug-28</em> from project include<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

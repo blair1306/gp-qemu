@@ -1,0 +1,512 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>rocker_hw.h source code [codebrowser/hw/net/rocker/rocker_hw.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="rocker_desc,rocker_of_dpa_group_type,rocker_of_dpa_overlay_type,rocker_of_dpa_table_id,rocker_tlv "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/net/rocker/rocker_hw.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>hw</a>/<a href='..'>net</a>/<a href='./'>rocker</a>/<a href='rocker_hw.h.html'>rocker_hw.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Rocker switch hardware register and descriptor definitions.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2014 Scott Feldman &lt;sfeldma@gmail.com&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2014 Jiri Pirko &lt;jiri@resnulli.us&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> */</i></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><u>#<span data-ppcond="9">ifndef</span> <span class="macro" data-ref="_M/ROCKER_HW_H">ROCKER_HW_H</span></u></td></tr>
+<tr><th id="10">10</th><td><u>#define <dfn class="macro" id="_M/ROCKER_HW_H" data-ref="_M/ROCKER_HW_H">ROCKER_HW_H</dfn></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/__le16" data-ref="_M/__le16">__le16</dfn> <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/__le32" data-ref="_M/__le32">__le32</dfn> <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/__le64" data-ref="_M/__le64">__le64</dfn> <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i>/*</i></td></tr>
+<tr><th id="17">17</th><td><i> * Return codes</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>enum</b> {</td></tr>
+<tr><th id="21">21</th><td>    <dfn class="enum" id="ROCKER_OK" title='ROCKER_OK' data-ref="ROCKER_OK">ROCKER_OK</dfn> = <var>0</var>,</td></tr>
+<tr><th id="22">22</th><td>    <dfn class="enum" id="ROCKER_ENOENT" title='ROCKER_ENOENT' data-ref="ROCKER_ENOENT">ROCKER_ENOENT</dfn> = <var>2</var>,</td></tr>
+<tr><th id="23">23</th><td>    <dfn class="enum" id="ROCKER_ENXIO" title='ROCKER_ENXIO' data-ref="ROCKER_ENXIO">ROCKER_ENXIO</dfn> = <var>6</var>,</td></tr>
+<tr><th id="24">24</th><td>    <dfn class="enum" id="ROCKER_ENOMEM" title='ROCKER_ENOMEM' data-ref="ROCKER_ENOMEM">ROCKER_ENOMEM</dfn> = <var>12</var>,</td></tr>
+<tr><th id="25">25</th><td>    <dfn class="enum" id="ROCKER_EEXIST" title='ROCKER_EEXIST' data-ref="ROCKER_EEXIST">ROCKER_EEXIST</dfn> = <var>17</var>,</td></tr>
+<tr><th id="26">26</th><td>    <dfn class="enum" id="ROCKER_EINVAL" title='ROCKER_EINVAL' data-ref="ROCKER_EINVAL">ROCKER_EINVAL</dfn> = <var>22</var>,</td></tr>
+<tr><th id="27">27</th><td>    <dfn class="enum" id="ROCKER_EMSGSIZE" title='ROCKER_EMSGSIZE' data-ref="ROCKER_EMSGSIZE">ROCKER_EMSGSIZE</dfn> = <var>90</var>,</td></tr>
+<tr><th id="28">28</th><td>    <dfn class="enum" id="ROCKER_ENOTSUP" title='ROCKER_ENOTSUP' data-ref="ROCKER_ENOTSUP">ROCKER_ENOTSUP</dfn> = <var>95</var>,</td></tr>
+<tr><th id="29">29</th><td>    <dfn class="enum" id="ROCKER_ENOBUFS" title='ROCKER_ENOBUFS' data-ref="ROCKER_ENOBUFS">ROCKER_ENOBUFS</dfn> = <var>105</var>,</td></tr>
+<tr><th id="30">30</th><td>};</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i>/*</i></td></tr>
+<tr><th id="33">33</th><td><i> * PCI configuration space</i></td></tr>
+<tr><th id="34">34</th><td><i> */</i></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_REVISION" data-ref="_M/ROCKER_PCI_REVISION">ROCKER_PCI_REVISION</dfn>             0x1</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_BAR0_IDX" data-ref="_M/ROCKER_PCI_BAR0_IDX">ROCKER_PCI_BAR0_IDX</dfn>             0</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_BAR0_SIZE" data-ref="_M/ROCKER_PCI_BAR0_SIZE">ROCKER_PCI_BAR0_SIZE</dfn>            0x2000</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_MSIX_BAR_IDX" data-ref="_M/ROCKER_PCI_MSIX_BAR_IDX">ROCKER_PCI_MSIX_BAR_IDX</dfn>         1</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_MSIX_BAR_SIZE" data-ref="_M/ROCKER_PCI_MSIX_BAR_SIZE">ROCKER_PCI_MSIX_BAR_SIZE</dfn>        0x2000</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_MSIX_TABLE_OFFSET" data-ref="_M/ROCKER_PCI_MSIX_TABLE_OFFSET">ROCKER_PCI_MSIX_TABLE_OFFSET</dfn>    0x0000</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PCI_MSIX_PBA_OFFSET" data-ref="_M/ROCKER_PCI_MSIX_PBA_OFFSET">ROCKER_PCI_MSIX_PBA_OFFSET</dfn>      0x1000</u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i>/*</i></td></tr>
+<tr><th id="45">45</th><td><i> * MSI-X vectors</i></td></tr>
+<tr><th id="46">46</th><td><i> */</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><b>enum</b> {</td></tr>
+<tr><th id="49">49</th><td>    <dfn class="enum" id="ROCKER_MSIX_VEC_CMD" title='ROCKER_MSIX_VEC_CMD' data-ref="ROCKER_MSIX_VEC_CMD">ROCKER_MSIX_VEC_CMD</dfn>,</td></tr>
+<tr><th id="50">50</th><td>    <dfn class="enum" id="ROCKER_MSIX_VEC_EVENT" title='ROCKER_MSIX_VEC_EVENT' data-ref="ROCKER_MSIX_VEC_EVENT">ROCKER_MSIX_VEC_EVENT</dfn>,</td></tr>
+<tr><th id="51">51</th><td>    <dfn class="enum" id="ROCKER_MSIX_VEC_TEST" title='ROCKER_MSIX_VEC_TEST' data-ref="ROCKER_MSIX_VEC_TEST">ROCKER_MSIX_VEC_TEST</dfn>,</td></tr>
+<tr><th id="52">52</th><td>    <dfn class="enum" id="ROCKER_MSIX_VEC_RESERVED0" title='ROCKER_MSIX_VEC_RESERVED0' data-ref="ROCKER_MSIX_VEC_RESERVED0">ROCKER_MSIX_VEC_RESERVED0</dfn>,</td></tr>
+<tr><th id="53">53</th><td>    <dfn class="enum" id="__ROCKER_MSIX_VEC_TX" title='__ROCKER_MSIX_VEC_TX' data-ref="__ROCKER_MSIX_VEC_TX">__ROCKER_MSIX_VEC_TX</dfn>,</td></tr>
+<tr><th id="54">54</th><td>    <dfn class="enum" id="__ROCKER_MSIX_VEC_RX" title='__ROCKER_MSIX_VEC_RX' data-ref="__ROCKER_MSIX_VEC_RX">__ROCKER_MSIX_VEC_RX</dfn>,</td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/ROCKER_MSIX_VEC_TX" data-ref="_M/ROCKER_MSIX_VEC_TX">ROCKER_MSIX_VEC_TX</dfn>(port) \</u></td></tr>
+<tr><th id="56">56</th><td><u>                (__ROCKER_MSIX_VEC_TX + ((port) * 2))</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/ROCKER_MSIX_VEC_RX" data-ref="_M/ROCKER_MSIX_VEC_RX">ROCKER_MSIX_VEC_RX</dfn>(port) \</u></td></tr>
+<tr><th id="58">58</th><td><u>                (__ROCKER_MSIX_VEC_RX + ((port) * 2))</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/ROCKER_MSIX_VEC_COUNT" data-ref="_M/ROCKER_MSIX_VEC_COUNT">ROCKER_MSIX_VEC_COUNT</dfn>(portcnt) \</u></td></tr>
+<tr><th id="60">60</th><td><u>                (ROCKER_MSIX_VEC_RX((portcnt) - 1) + 1)</u></td></tr>
+<tr><th id="61">61</th><td>};</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><i>/*</i></td></tr>
+<tr><th id="64">64</th><td><i> * Rocker bogus registers</i></td></tr>
+<tr><th id="65">65</th><td><i> */</i></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/ROCKER_BOGUS_REG0" data-ref="_M/ROCKER_BOGUS_REG0">ROCKER_BOGUS_REG0</dfn>               0x0000</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/ROCKER_BOGUS_REG1" data-ref="_M/ROCKER_BOGUS_REG1">ROCKER_BOGUS_REG1</dfn>               0x0004</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/ROCKER_BOGUS_REG2" data-ref="_M/ROCKER_BOGUS_REG2">ROCKER_BOGUS_REG2</dfn>               0x0008</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/ROCKER_BOGUS_REG3" data-ref="_M/ROCKER_BOGUS_REG3">ROCKER_BOGUS_REG3</dfn>               0x000c</u></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><i>/*</i></td></tr>
+<tr><th id="72">72</th><td><i> * Rocker test registers</i></td></tr>
+<tr><th id="73">73</th><td><i> */</i></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_REG" data-ref="_M/ROCKER_TEST_REG">ROCKER_TEST_REG</dfn>                 0x0010</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_REG64" data-ref="_M/ROCKER_TEST_REG64">ROCKER_TEST_REG64</dfn>               0x0018  /* 8-byte */</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_IRQ" data-ref="_M/ROCKER_TEST_IRQ">ROCKER_TEST_IRQ</dfn>                 0x0020</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_ADDR" data-ref="_M/ROCKER_TEST_DMA_ADDR">ROCKER_TEST_DMA_ADDR</dfn>            0x0028  /* 8-byte */</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_SIZE" data-ref="_M/ROCKER_TEST_DMA_SIZE">ROCKER_TEST_DMA_SIZE</dfn>            0x0030</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_CTRL" data-ref="_M/ROCKER_TEST_DMA_CTRL">ROCKER_TEST_DMA_CTRL</dfn>            0x0034</u></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><i>/*</i></td></tr>
+<tr><th id="82">82</th><td><i> * Rocker test register ctrl</i></td></tr>
+<tr><th id="83">83</th><td><i> */</i></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_CTRL_CLEAR" data-ref="_M/ROCKER_TEST_DMA_CTRL_CLEAR">ROCKER_TEST_DMA_CTRL_CLEAR</dfn>      (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_CTRL_FILL" data-ref="_M/ROCKER_TEST_DMA_CTRL_FILL">ROCKER_TEST_DMA_CTRL_FILL</dfn>       (1 &lt;&lt; 1)</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TEST_DMA_CTRL_INVERT" data-ref="_M/ROCKER_TEST_DMA_CTRL_INVERT">ROCKER_TEST_DMA_CTRL_INVERT</dfn>     (1 &lt;&lt; 2)</u></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><i>/*</i></td></tr>
+<tr><th id="89">89</th><td><i> * Rocker DMA ring register offsets</i></td></tr>
+<tr><th id="90">90</th><td><i> */</i></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_BASE" data-ref="_M/ROCKER_DMA_DESC_BASE">ROCKER_DMA_DESC_BASE</dfn>            0x1000</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_SIZE" data-ref="_M/ROCKER_DMA_DESC_SIZE">ROCKER_DMA_DESC_SIZE</dfn>            32</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_MASK" data-ref="_M/ROCKER_DMA_DESC_MASK">ROCKER_DMA_DESC_MASK</dfn>            0x1F</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_TOTAL_SIZE" data-ref="_M/ROCKER_DMA_DESC_TOTAL_SIZE">ROCKER_DMA_DESC_TOTAL_SIZE</dfn> \</u></td></tr>
+<tr><th id="95">95</th><td><u>    (ROCKER_DMA_DESC_SIZE * 64) /* 62 ports + event + cmd */</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_ADDR_OFFSET" data-ref="_M/ROCKER_DMA_DESC_ADDR_OFFSET">ROCKER_DMA_DESC_ADDR_OFFSET</dfn>     0x00     /* 8-byte */</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_SIZE_OFFSET" data-ref="_M/ROCKER_DMA_DESC_SIZE_OFFSET">ROCKER_DMA_DESC_SIZE_OFFSET</dfn>     0x08</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_HEAD_OFFSET" data-ref="_M/ROCKER_DMA_DESC_HEAD_OFFSET">ROCKER_DMA_DESC_HEAD_OFFSET</dfn>     0x0c</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_TAIL_OFFSET" data-ref="_M/ROCKER_DMA_DESC_TAIL_OFFSET">ROCKER_DMA_DESC_TAIL_OFFSET</dfn>     0x10</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_CTRL_OFFSET" data-ref="_M/ROCKER_DMA_DESC_CTRL_OFFSET">ROCKER_DMA_DESC_CTRL_OFFSET</dfn>     0x14</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_CREDITS_OFFSET" data-ref="_M/ROCKER_DMA_DESC_CREDITS_OFFSET">ROCKER_DMA_DESC_CREDITS_OFFSET</dfn>  0x18</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_RSVD_OFFSET" data-ref="_M/ROCKER_DMA_DESC_RSVD_OFFSET">ROCKER_DMA_DESC_RSVD_OFFSET</dfn>     0x1c</u></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><i>/*</i></td></tr>
+<tr><th id="105">105</th><td><i> * Rocker dma ctrl register bits</i></td></tr>
+<tr><th id="106">106</th><td><i> */</i></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/ROCKER_DMA_DESC_CTRL_RESET" data-ref="_M/ROCKER_DMA_DESC_CTRL_RESET">ROCKER_DMA_DESC_CTRL_RESET</dfn>      (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><i>/*</i></td></tr>
+<tr><th id="110">110</th><td><i> * Rocker ring indices</i></td></tr>
+<tr><th id="111">111</th><td><i> */</i></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RING_CMD" data-ref="_M/ROCKER_RING_CMD">ROCKER_RING_CMD</dfn>                 0</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RING_EVENT" data-ref="_M/ROCKER_RING_EVENT">ROCKER_RING_EVENT</dfn>               1</u></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><i>/*</i></td></tr>
+<tr><th id="116">116</th><td><i> * Helper macro to do convert a dma ring register</i></td></tr>
+<tr><th id="117">117</th><td><i> * to its index.  Based on the fact that the register</i></td></tr>
+<tr><th id="118">118</th><td><i> * group stride is 32 bytes.</i></td></tr>
+<tr><th id="119">119</th><td><i> */</i></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RING_INDEX" data-ref="_M/ROCKER_RING_INDEX">ROCKER_RING_INDEX</dfn>(reg) ((reg &gt;&gt; 5) &amp; 0x7F)</u></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><i>/*</i></td></tr>
+<tr><th id="123">123</th><td><i> * Rocker DMA Descriptor</i></td></tr>
+<tr><th id="124">124</th><td><i> */</i></td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="rocker_desc" title='rocker_desc' data-ref="rocker_desc"><a class="type" href="#rocker_desc" title='rocker_desc' data-ref="rocker_desc">rocker_desc</a></dfn> {</td></tr>
+<tr><th id="127">127</th><td>    <a class="macro" href="#14" title="uint64_t" data-ref="_M/__le64">__le64</a> <dfn class="decl" id="rocker_desc::buf_addr" title='rocker_desc::buf_addr' data-ref="rocker_desc::buf_addr">buf_addr</dfn>;</td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="rocker_desc::cookie" title='rocker_desc::cookie' data-ref="rocker_desc::cookie">cookie</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_desc::buf_size" title='rocker_desc::buf_size' data-ref="rocker_desc::buf_size">buf_size</dfn>;</td></tr>
+<tr><th id="130">130</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_desc::tlv_size" title='rocker_desc::tlv_size' data-ref="rocker_desc::tlv_size">tlv_size</dfn>;</td></tr>
+<tr><th id="131">131</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_desc::rsvd" title='rocker_desc::rsvd' data-ref="rocker_desc::rsvd">rsvd</dfn>[<var>5</var>];   <i>/* pad to 32 bytes */</i></td></tr>
+<tr><th id="132">132</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_desc::comp_err" title='rocker_desc::comp_err' data-ref="rocker_desc::comp_err">comp_err</dfn>;</td></tr>
+<tr><th id="133">133</th><td>} <b>__attribute__</b>((packed, aligned(<var>8</var>))) <dfn class="typedef" id="RockerDesc" title='RockerDesc' data-type='struct rocker_desc' data-ref="RockerDesc">RockerDesc</dfn>;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><i>/*</i></td></tr>
+<tr><th id="136">136</th><td><i> * Rocker TLV type fields</i></td></tr>
+<tr><th id="137">137</th><td><i> */</i></td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="rocker_tlv" title='rocker_tlv' data-ref="rocker_tlv"><a class="type" href="#rocker_tlv" title='rocker_tlv' data-ref="rocker_tlv">rocker_tlv</a></dfn> {</td></tr>
+<tr><th id="140">140</th><td>    <a class="macro" href="#13" title="uint32_t" data-ref="_M/__le32">__le32</a> <dfn class="decl" id="rocker_tlv::type" title='rocker_tlv::type' data-ref="rocker_tlv::type">type</dfn>;</td></tr>
+<tr><th id="141">141</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_tlv::len" title='rocker_tlv::len' data-ref="rocker_tlv::len">len</dfn>;</td></tr>
+<tr><th id="142">142</th><td>    <a class="macro" href="#12" title="uint16_t" data-ref="_M/__le16">__le16</a> <dfn class="decl" id="rocker_tlv::rsvd" title='rocker_tlv::rsvd' data-ref="rocker_tlv::rsvd">rsvd</dfn>;</td></tr>
+<tr><th id="143">143</th><td>} <b>__attribute__</b>((packed, aligned(<var>8</var>))) <dfn class="typedef" id="RockerTlv" title='RockerTlv' data-type='struct rocker_tlv' data-ref="RockerTlv">RockerTlv</dfn>;</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/* cmd msg */</i></td></tr>
+<tr><th id="146">146</th><td><b>enum</b> {</td></tr>
+<tr><th id="147">147</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_UNSPEC" title='ROCKER_TLV_CMD_UNSPEC' data-ref="ROCKER_TLV_CMD_UNSPEC">ROCKER_TLV_CMD_UNSPEC</dfn>,</td></tr>
+<tr><th id="148">148</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE" title='ROCKER_TLV_CMD_TYPE' data-ref="ROCKER_TLV_CMD_TYPE">ROCKER_TLV_CMD_TYPE</dfn>,                <i>/* u16 */</i></td></tr>
+<tr><th id="149">149</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_INFO" title='ROCKER_TLV_CMD_INFO' data-ref="ROCKER_TLV_CMD_INFO">ROCKER_TLV_CMD_INFO</dfn>,                <i>/* nest */</i></td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>    <dfn class="enum" id="__ROCKER_TLV_CMD_MAX" title='__ROCKER_TLV_CMD_MAX' data-ref="__ROCKER_TLV_CMD_MAX">__ROCKER_TLV_CMD_MAX</dfn>,</td></tr>
+<tr><th id="152">152</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_MAX" title='ROCKER_TLV_CMD_MAX' data-ref="ROCKER_TLV_CMD_MAX">ROCKER_TLV_CMD_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_CMD_MAX" title='__ROCKER_TLV_CMD_MAX' data-ref="__ROCKER_TLV_CMD_MAX">__ROCKER_TLV_CMD_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="153">153</th><td>};</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><b>enum</b> {</td></tr>
+<tr><th id="156">156</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_UNSPEC" title='ROCKER_TLV_CMD_TYPE_UNSPEC' data-ref="ROCKER_TLV_CMD_TYPE_UNSPEC">ROCKER_TLV_CMD_TYPE_UNSPEC</dfn>,</td></tr>
+<tr><th id="157">157</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_GET_PORT_SETTINGS" title='ROCKER_TLV_CMD_TYPE_GET_PORT_SETTINGS' data-ref="ROCKER_TLV_CMD_TYPE_GET_PORT_SETTINGS">ROCKER_TLV_CMD_TYPE_GET_PORT_SETTINGS</dfn>,</td></tr>
+<tr><th id="158">158</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_SET_PORT_SETTINGS" title='ROCKER_TLV_CMD_TYPE_SET_PORT_SETTINGS' data-ref="ROCKER_TLV_CMD_TYPE_SET_PORT_SETTINGS">ROCKER_TLV_CMD_TYPE_SET_PORT_SETTINGS</dfn>,</td></tr>
+<tr><th id="159">159</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_ADD" title='ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_ADD' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_ADD">ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_ADD</dfn>,</td></tr>
+<tr><th id="160">160</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_MOD" title='ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_MOD' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_MOD">ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_MOD</dfn>,</td></tr>
+<tr><th id="161">161</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_DEL" title='ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_DEL' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_DEL">ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_DEL</dfn>,</td></tr>
+<tr><th id="162">162</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_GET_STATS" title='ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_GET_STATS' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_GET_STATS">ROCKER_TLV_CMD_TYPE_OF_DPA_FLOW_GET_STATS</dfn>,</td></tr>
+<tr><th id="163">163</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_ADD" title='ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_ADD' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_ADD">ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_ADD</dfn>,</td></tr>
+<tr><th id="164">164</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_MOD" title='ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_MOD' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_MOD">ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_MOD</dfn>,</td></tr>
+<tr><th id="165">165</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_DEL" title='ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_DEL' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_DEL">ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_DEL</dfn>,</td></tr>
+<tr><th id="166">166</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_GET_STATS" title='ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_GET_STATS' data-ref="ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_GET_STATS">ROCKER_TLV_CMD_TYPE_OF_DPA_GROUP_GET_STATS</dfn>,</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <dfn class="enum" id="__ROCKER_TLV_CMD_TYPE_MAX" title='__ROCKER_TLV_CMD_TYPE_MAX' data-ref="__ROCKER_TLV_CMD_TYPE_MAX">__ROCKER_TLV_CMD_TYPE_MAX</dfn>,</td></tr>
+<tr><th id="169">169</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_TYPE_MAX" title='ROCKER_TLV_CMD_TYPE_MAX' data-ref="ROCKER_TLV_CMD_TYPE_MAX">ROCKER_TLV_CMD_TYPE_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_CMD_TYPE_MAX" title='__ROCKER_TLV_CMD_TYPE_MAX' data-ref="__ROCKER_TLV_CMD_TYPE_MAX">__ROCKER_TLV_CMD_TYPE_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="170">170</th><td>};</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i>/* cmd info nested for set/get port settings */</i></td></tr>
+<tr><th id="173">173</th><td><b>enum</b> {</td></tr>
+<tr><th id="174">174</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_UNSPEC" title='ROCKER_TLV_CMD_PORT_SETTINGS_UNSPEC' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_UNSPEC">ROCKER_TLV_CMD_PORT_SETTINGS_UNSPEC</dfn>,</td></tr>
+<tr><th id="175">175</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_PPORT" title='ROCKER_TLV_CMD_PORT_SETTINGS_PPORT' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_PPORT">ROCKER_TLV_CMD_PORT_SETTINGS_PPORT</dfn>,         <i>/* u32 */</i></td></tr>
+<tr><th id="176">176</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_SPEED" title='ROCKER_TLV_CMD_PORT_SETTINGS_SPEED' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_SPEED">ROCKER_TLV_CMD_PORT_SETTINGS_SPEED</dfn>,         <i>/* u32 */</i></td></tr>
+<tr><th id="177">177</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_DUPLEX" title='ROCKER_TLV_CMD_PORT_SETTINGS_DUPLEX' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_DUPLEX">ROCKER_TLV_CMD_PORT_SETTINGS_DUPLEX</dfn>,        <i>/* u8 */</i></td></tr>
+<tr><th id="178">178</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_AUTONEG" title='ROCKER_TLV_CMD_PORT_SETTINGS_AUTONEG' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_AUTONEG">ROCKER_TLV_CMD_PORT_SETTINGS_AUTONEG</dfn>,       <i>/* u8 */</i></td></tr>
+<tr><th id="179">179</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_MACADDR" title='ROCKER_TLV_CMD_PORT_SETTINGS_MACADDR' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_MACADDR">ROCKER_TLV_CMD_PORT_SETTINGS_MACADDR</dfn>,       <i>/* binary */</i></td></tr>
+<tr><th id="180">180</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_MODE" title='ROCKER_TLV_CMD_PORT_SETTINGS_MODE' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_MODE">ROCKER_TLV_CMD_PORT_SETTINGS_MODE</dfn>,          <i>/* u8 */</i></td></tr>
+<tr><th id="181">181</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_LEARNING" title='ROCKER_TLV_CMD_PORT_SETTINGS_LEARNING' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_LEARNING">ROCKER_TLV_CMD_PORT_SETTINGS_LEARNING</dfn>,      <i>/* u8 */</i></td></tr>
+<tr><th id="182">182</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_PHYS_NAME" title='ROCKER_TLV_CMD_PORT_SETTINGS_PHYS_NAME' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_PHYS_NAME">ROCKER_TLV_CMD_PORT_SETTINGS_PHYS_NAME</dfn>,     <i>/* binary */</i></td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td>    <dfn class="enum" id="__ROCKER_TLV_CMD_PORT_SETTINGS_MAX" title='__ROCKER_TLV_CMD_PORT_SETTINGS_MAX' data-ref="__ROCKER_TLV_CMD_PORT_SETTINGS_MAX">__ROCKER_TLV_CMD_PORT_SETTINGS_MAX</dfn>,</td></tr>
+<tr><th id="185">185</th><td>    <dfn class="enum" id="ROCKER_TLV_CMD_PORT_SETTINGS_MAX" title='ROCKER_TLV_CMD_PORT_SETTINGS_MAX' data-ref="ROCKER_TLV_CMD_PORT_SETTINGS_MAX">ROCKER_TLV_CMD_PORT_SETTINGS_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_CMD_PORT_SETTINGS_MAX" title='__ROCKER_TLV_CMD_PORT_SETTINGS_MAX' data-ref="__ROCKER_TLV_CMD_PORT_SETTINGS_MAX">__ROCKER_TLV_CMD_PORT_SETTINGS_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="186">186</th><td>};</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><b>enum</b> {</td></tr>
+<tr><th id="189">189</th><td>    <dfn class="enum" id="ROCKER_PORT_MODE_OF_DPA" title='ROCKER_PORT_MODE_OF_DPA' data-ref="ROCKER_PORT_MODE_OF_DPA">ROCKER_PORT_MODE_OF_DPA</dfn>,</td></tr>
+<tr><th id="190">190</th><td>};</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><i>/* event msg */</i></td></tr>
+<tr><th id="193">193</th><td><b>enum</b> {</td></tr>
+<tr><th id="194">194</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_UNSPEC" title='ROCKER_TLV_EVENT_UNSPEC' data-ref="ROCKER_TLV_EVENT_UNSPEC">ROCKER_TLV_EVENT_UNSPEC</dfn>,</td></tr>
+<tr><th id="195">195</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_TYPE" title='ROCKER_TLV_EVENT_TYPE' data-ref="ROCKER_TLV_EVENT_TYPE">ROCKER_TLV_EVENT_TYPE</dfn>,              <i>/* u16 */</i></td></tr>
+<tr><th id="196">196</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_INFO" title='ROCKER_TLV_EVENT_INFO' data-ref="ROCKER_TLV_EVENT_INFO">ROCKER_TLV_EVENT_INFO</dfn>,              <i>/* nest */</i></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <dfn class="enum" id="__ROCKER_TLV_EVENT_MAX" title='__ROCKER_TLV_EVENT_MAX' data-ref="__ROCKER_TLV_EVENT_MAX">__ROCKER_TLV_EVENT_MAX</dfn>,</td></tr>
+<tr><th id="199">199</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAX" title='ROCKER_TLV_EVENT_MAX' data-ref="ROCKER_TLV_EVENT_MAX">ROCKER_TLV_EVENT_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_EVENT_MAX" title='__ROCKER_TLV_EVENT_MAX' data-ref="__ROCKER_TLV_EVENT_MAX">__ROCKER_TLV_EVENT_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="200">200</th><td>};</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td><b>enum</b> {</td></tr>
+<tr><th id="203">203</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_TYPE_UNSPEC" title='ROCKER_TLV_EVENT_TYPE_UNSPEC' data-ref="ROCKER_TLV_EVENT_TYPE_UNSPEC">ROCKER_TLV_EVENT_TYPE_UNSPEC</dfn>,</td></tr>
+<tr><th id="204">204</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_TYPE_LINK_CHANGED" title='ROCKER_TLV_EVENT_TYPE_LINK_CHANGED' data-ref="ROCKER_TLV_EVENT_TYPE_LINK_CHANGED">ROCKER_TLV_EVENT_TYPE_LINK_CHANGED</dfn>,</td></tr>
+<tr><th id="205">205</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_TYPE_MAC_VLAN_SEEN" title='ROCKER_TLV_EVENT_TYPE_MAC_VLAN_SEEN' data-ref="ROCKER_TLV_EVENT_TYPE_MAC_VLAN_SEEN">ROCKER_TLV_EVENT_TYPE_MAC_VLAN_SEEN</dfn>,</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <dfn class="enum" id="__ROCKER_TLV_EVENT_TYPE_MAX" title='__ROCKER_TLV_EVENT_TYPE_MAX' data-ref="__ROCKER_TLV_EVENT_TYPE_MAX">__ROCKER_TLV_EVENT_TYPE_MAX</dfn>,</td></tr>
+<tr><th id="208">208</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_TYPE_MAX" title='ROCKER_TLV_EVENT_TYPE_MAX' data-ref="ROCKER_TLV_EVENT_TYPE_MAX">ROCKER_TLV_EVENT_TYPE_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_EVENT_TYPE_MAX" title='__ROCKER_TLV_EVENT_TYPE_MAX' data-ref="__ROCKER_TLV_EVENT_TYPE_MAX">__ROCKER_TLV_EVENT_TYPE_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="209">209</th><td>};</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><i>/* event info nested for link changed */</i></td></tr>
+<tr><th id="212">212</th><td><b>enum</b> {</td></tr>
+<tr><th id="213">213</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_LINK_CHANGED_UNSPEC" title='ROCKER_TLV_EVENT_LINK_CHANGED_UNSPEC' data-ref="ROCKER_TLV_EVENT_LINK_CHANGED_UNSPEC">ROCKER_TLV_EVENT_LINK_CHANGED_UNSPEC</dfn>,</td></tr>
+<tr><th id="214">214</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_LINK_CHANGED_PPORT" title='ROCKER_TLV_EVENT_LINK_CHANGED_PPORT' data-ref="ROCKER_TLV_EVENT_LINK_CHANGED_PPORT">ROCKER_TLV_EVENT_LINK_CHANGED_PPORT</dfn>,    <i>/* u32 */</i></td></tr>
+<tr><th id="215">215</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_LINK_CHANGED_LINKUP" title='ROCKER_TLV_EVENT_LINK_CHANGED_LINKUP' data-ref="ROCKER_TLV_EVENT_LINK_CHANGED_LINKUP">ROCKER_TLV_EVENT_LINK_CHANGED_LINKUP</dfn>,   <i>/* u8 */</i></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td>    <dfn class="enum" id="__ROCKER_TLV_EVENT_LINK_CHANGED_MAX" title='__ROCKER_TLV_EVENT_LINK_CHANGED_MAX' data-ref="__ROCKER_TLV_EVENT_LINK_CHANGED_MAX">__ROCKER_TLV_EVENT_LINK_CHANGED_MAX</dfn>,</td></tr>
+<tr><th id="218">218</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_LINK_CHANGED_MAX" title='ROCKER_TLV_EVENT_LINK_CHANGED_MAX' data-ref="ROCKER_TLV_EVENT_LINK_CHANGED_MAX">ROCKER_TLV_EVENT_LINK_CHANGED_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_EVENT_LINK_CHANGED_MAX" title='__ROCKER_TLV_EVENT_LINK_CHANGED_MAX' data-ref="__ROCKER_TLV_EVENT_LINK_CHANGED_MAX">__ROCKER_TLV_EVENT_LINK_CHANGED_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="219">219</th><td>};</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><i>/* event info nested for MAC/VLAN */</i></td></tr>
+<tr><th id="222">222</th><td><b>enum</b> {</td></tr>
+<tr><th id="223">223</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAC_VLAN_UNSPEC" title='ROCKER_TLV_EVENT_MAC_VLAN_UNSPEC' data-ref="ROCKER_TLV_EVENT_MAC_VLAN_UNSPEC">ROCKER_TLV_EVENT_MAC_VLAN_UNSPEC</dfn>,</td></tr>
+<tr><th id="224">224</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAC_VLAN_PPORT" title='ROCKER_TLV_EVENT_MAC_VLAN_PPORT' data-ref="ROCKER_TLV_EVENT_MAC_VLAN_PPORT">ROCKER_TLV_EVENT_MAC_VLAN_PPORT</dfn>,        <i>/* u32 */</i></td></tr>
+<tr><th id="225">225</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAC_VLAN_MAC" title='ROCKER_TLV_EVENT_MAC_VLAN_MAC' data-ref="ROCKER_TLV_EVENT_MAC_VLAN_MAC">ROCKER_TLV_EVENT_MAC_VLAN_MAC</dfn>,          <i>/* binary */</i></td></tr>
+<tr><th id="226">226</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAC_VLAN_VLAN_ID" title='ROCKER_TLV_EVENT_MAC_VLAN_VLAN_ID' data-ref="ROCKER_TLV_EVENT_MAC_VLAN_VLAN_ID">ROCKER_TLV_EVENT_MAC_VLAN_VLAN_ID</dfn>,      <i>/* __be16 */</i></td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>    <dfn class="enum" id="__ROCKER_TLV_EVENT_MAC_VLAN_MAX" title='__ROCKER_TLV_EVENT_MAC_VLAN_MAX' data-ref="__ROCKER_TLV_EVENT_MAC_VLAN_MAX">__ROCKER_TLV_EVENT_MAC_VLAN_MAX</dfn>,</td></tr>
+<tr><th id="229">229</th><td>    <dfn class="enum" id="ROCKER_TLV_EVENT_MAC_VLAN_MAX" title='ROCKER_TLV_EVENT_MAC_VLAN_MAX' data-ref="ROCKER_TLV_EVENT_MAC_VLAN_MAX">ROCKER_TLV_EVENT_MAC_VLAN_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_EVENT_MAC_VLAN_MAX" title='__ROCKER_TLV_EVENT_MAC_VLAN_MAX' data-ref="__ROCKER_TLV_EVENT_MAC_VLAN_MAX">__ROCKER_TLV_EVENT_MAC_VLAN_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="230">230</th><td>};</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><i>/* Rx msg */</i></td></tr>
+<tr><th id="233">233</th><td><b>enum</b> {</td></tr>
+<tr><th id="234">234</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_UNSPEC" title='ROCKER_TLV_RX_UNSPEC' data-ref="ROCKER_TLV_RX_UNSPEC">ROCKER_TLV_RX_UNSPEC</dfn>,</td></tr>
+<tr><th id="235">235</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_FLAGS" title='ROCKER_TLV_RX_FLAGS' data-ref="ROCKER_TLV_RX_FLAGS">ROCKER_TLV_RX_FLAGS</dfn>,                <i>/* u16, see RX_FLAGS_ */</i></td></tr>
+<tr><th id="236">236</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_CSUM" title='ROCKER_TLV_RX_CSUM' data-ref="ROCKER_TLV_RX_CSUM">ROCKER_TLV_RX_CSUM</dfn>,                 <i>/* u16 */</i></td></tr>
+<tr><th id="237">237</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_FRAG_ADDR" title='ROCKER_TLV_RX_FRAG_ADDR' data-ref="ROCKER_TLV_RX_FRAG_ADDR">ROCKER_TLV_RX_FRAG_ADDR</dfn>,            <i>/* u64 */</i></td></tr>
+<tr><th id="238">238</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_FRAG_MAX_LEN" title='ROCKER_TLV_RX_FRAG_MAX_LEN' data-ref="ROCKER_TLV_RX_FRAG_MAX_LEN">ROCKER_TLV_RX_FRAG_MAX_LEN</dfn>,         <i>/* u16 */</i></td></tr>
+<tr><th id="239">239</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_FRAG_LEN" title='ROCKER_TLV_RX_FRAG_LEN' data-ref="ROCKER_TLV_RX_FRAG_LEN">ROCKER_TLV_RX_FRAG_LEN</dfn>,             <i>/* u16 */</i></td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <dfn class="enum" id="__ROCKER_TLV_RX_MAX" title='__ROCKER_TLV_RX_MAX' data-ref="__ROCKER_TLV_RX_MAX">__ROCKER_TLV_RX_MAX</dfn>,</td></tr>
+<tr><th id="242">242</th><td>    <dfn class="enum" id="ROCKER_TLV_RX_MAX" title='ROCKER_TLV_RX_MAX' data-ref="ROCKER_TLV_RX_MAX">ROCKER_TLV_RX_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_RX_MAX" title='__ROCKER_TLV_RX_MAX' data-ref="__ROCKER_TLV_RX_MAX">__ROCKER_TLV_RX_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="243">243</th><td>};</td></tr>
+<tr><th id="244">244</th><td></td></tr>
+<tr><th id="245">245</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_IPV4" data-ref="_M/ROCKER_RX_FLAGS_IPV4">ROCKER_RX_FLAGS_IPV4</dfn>                    (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="246">246</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_IPV6" data-ref="_M/ROCKER_RX_FLAGS_IPV6">ROCKER_RX_FLAGS_IPV6</dfn>                    (1 &lt;&lt; 1)</u></td></tr>
+<tr><th id="247">247</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_CSUM_CALC" data-ref="_M/ROCKER_RX_FLAGS_CSUM_CALC">ROCKER_RX_FLAGS_CSUM_CALC</dfn>               (1 &lt;&lt; 2)</u></td></tr>
+<tr><th id="248">248</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_IPV4_CSUM_GOOD" data-ref="_M/ROCKER_RX_FLAGS_IPV4_CSUM_GOOD">ROCKER_RX_FLAGS_IPV4_CSUM_GOOD</dfn>          (1 &lt;&lt; 3)</u></td></tr>
+<tr><th id="249">249</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_IP_FRAG" data-ref="_M/ROCKER_RX_FLAGS_IP_FRAG">ROCKER_RX_FLAGS_IP_FRAG</dfn>                 (1 &lt;&lt; 4)</u></td></tr>
+<tr><th id="250">250</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_TCP" data-ref="_M/ROCKER_RX_FLAGS_TCP">ROCKER_RX_FLAGS_TCP</dfn>                     (1 &lt;&lt; 5)</u></td></tr>
+<tr><th id="251">251</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_UDP" data-ref="_M/ROCKER_RX_FLAGS_UDP">ROCKER_RX_FLAGS_UDP</dfn>                     (1 &lt;&lt; 6)</u></td></tr>
+<tr><th id="252">252</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_TCP_UDP_CSUM_GOOD" data-ref="_M/ROCKER_RX_FLAGS_TCP_UDP_CSUM_GOOD">ROCKER_RX_FLAGS_TCP_UDP_CSUM_GOOD</dfn>       (1 &lt;&lt; 7)</u></td></tr>
+<tr><th id="253">253</th><td><u>#define <dfn class="macro" id="_M/ROCKER_RX_FLAGS_FWD_OFFLOAD" data-ref="_M/ROCKER_RX_FLAGS_FWD_OFFLOAD">ROCKER_RX_FLAGS_FWD_OFFLOAD</dfn>             (1 &lt;&lt; 8)</u></td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><i>/* Tx msg */</i></td></tr>
+<tr><th id="256">256</th><td><b>enum</b> {</td></tr>
+<tr><th id="257">257</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_UNSPEC" title='ROCKER_TLV_TX_UNSPEC' data-ref="ROCKER_TLV_TX_UNSPEC">ROCKER_TLV_TX_UNSPEC</dfn>,</td></tr>
+<tr><th id="258">258</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_OFFLOAD" title='ROCKER_TLV_TX_OFFLOAD' data-ref="ROCKER_TLV_TX_OFFLOAD">ROCKER_TLV_TX_OFFLOAD</dfn>,              <i>/* u8, see TX_OFFLOAD_ */</i></td></tr>
+<tr><th id="259">259</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_L3_CSUM_OFF" title='ROCKER_TLV_TX_L3_CSUM_OFF' data-ref="ROCKER_TLV_TX_L3_CSUM_OFF">ROCKER_TLV_TX_L3_CSUM_OFF</dfn>,          <i>/* u16 */</i></td></tr>
+<tr><th id="260">260</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_TSO_MSS" title='ROCKER_TLV_TX_TSO_MSS' data-ref="ROCKER_TLV_TX_TSO_MSS">ROCKER_TLV_TX_TSO_MSS</dfn>,              <i>/* u16 */</i></td></tr>
+<tr><th id="261">261</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_TSO_HDR_LEN" title='ROCKER_TLV_TX_TSO_HDR_LEN' data-ref="ROCKER_TLV_TX_TSO_HDR_LEN">ROCKER_TLV_TX_TSO_HDR_LEN</dfn>,          <i>/* u16 */</i></td></tr>
+<tr><th id="262">262</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAGS" title='ROCKER_TLV_TX_FRAGS' data-ref="ROCKER_TLV_TX_FRAGS">ROCKER_TLV_TX_FRAGS</dfn>,                <i>/* array */</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>    <dfn class="enum" id="__ROCKER_TLV_TX_MAX" title='__ROCKER_TLV_TX_MAX' data-ref="__ROCKER_TLV_TX_MAX">__ROCKER_TLV_TX_MAX</dfn>,</td></tr>
+<tr><th id="265">265</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_MAX" title='ROCKER_TLV_TX_MAX' data-ref="ROCKER_TLV_TX_MAX">ROCKER_TLV_TX_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_TX_MAX" title='__ROCKER_TLV_TX_MAX' data-ref="__ROCKER_TLV_TX_MAX">__ROCKER_TLV_TX_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="266">266</th><td>};</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_OFFLOAD_NONE" data-ref="_M/ROCKER_TX_OFFLOAD_NONE">ROCKER_TX_OFFLOAD_NONE</dfn>          0</u></td></tr>
+<tr><th id="269">269</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_OFFLOAD_IP_CSUM" data-ref="_M/ROCKER_TX_OFFLOAD_IP_CSUM">ROCKER_TX_OFFLOAD_IP_CSUM</dfn>       1</u></td></tr>
+<tr><th id="270">270</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_OFFLOAD_TCP_UDP_CSUM" data-ref="_M/ROCKER_TX_OFFLOAD_TCP_UDP_CSUM">ROCKER_TX_OFFLOAD_TCP_UDP_CSUM</dfn>  2</u></td></tr>
+<tr><th id="271">271</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_OFFLOAD_L3_CSUM" data-ref="_M/ROCKER_TX_OFFLOAD_L3_CSUM">ROCKER_TX_OFFLOAD_L3_CSUM</dfn>       3</u></td></tr>
+<tr><th id="272">272</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_OFFLOAD_TSO" data-ref="_M/ROCKER_TX_OFFLOAD_TSO">ROCKER_TX_OFFLOAD_TSO</dfn>           4</u></td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td><u>#define <dfn class="macro" id="_M/ROCKER_TX_FRAGS_MAX" data-ref="_M/ROCKER_TX_FRAGS_MAX">ROCKER_TX_FRAGS_MAX</dfn>             16</u></td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><b>enum</b> {</td></tr>
+<tr><th id="277">277</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_UNSPEC" title='ROCKER_TLV_TX_FRAG_UNSPEC' data-ref="ROCKER_TLV_TX_FRAG_UNSPEC">ROCKER_TLV_TX_FRAG_UNSPEC</dfn>,</td></tr>
+<tr><th id="278">278</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG" title='ROCKER_TLV_TX_FRAG' data-ref="ROCKER_TLV_TX_FRAG">ROCKER_TLV_TX_FRAG</dfn>,                 <i>/* nest */</i></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>    <dfn class="enum" id="__ROCKER_TLV_TX_FRAG_MAX" title='__ROCKER_TLV_TX_FRAG_MAX' data-ref="__ROCKER_TLV_TX_FRAG_MAX">__ROCKER_TLV_TX_FRAG_MAX</dfn>,</td></tr>
+<tr><th id="281">281</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_MAX" title='ROCKER_TLV_TX_FRAG_MAX' data-ref="ROCKER_TLV_TX_FRAG_MAX">ROCKER_TLV_TX_FRAG_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_TX_FRAG_MAX" title='__ROCKER_TLV_TX_FRAG_MAX' data-ref="__ROCKER_TLV_TX_FRAG_MAX">__ROCKER_TLV_TX_FRAG_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="282">282</th><td>};</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><b>enum</b> {</td></tr>
+<tr><th id="285">285</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_ATTR_UNSPEC" title='ROCKER_TLV_TX_FRAG_ATTR_UNSPEC' data-ref="ROCKER_TLV_TX_FRAG_ATTR_UNSPEC">ROCKER_TLV_TX_FRAG_ATTR_UNSPEC</dfn>,</td></tr>
+<tr><th id="286">286</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_ATTR_ADDR" title='ROCKER_TLV_TX_FRAG_ATTR_ADDR' data-ref="ROCKER_TLV_TX_FRAG_ATTR_ADDR">ROCKER_TLV_TX_FRAG_ATTR_ADDR</dfn>,       <i>/* u64 */</i></td></tr>
+<tr><th id="287">287</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_ATTR_LEN" title='ROCKER_TLV_TX_FRAG_ATTR_LEN' data-ref="ROCKER_TLV_TX_FRAG_ATTR_LEN">ROCKER_TLV_TX_FRAG_ATTR_LEN</dfn>,        <i>/* u16 */</i></td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td>    <dfn class="enum" id="__ROCKER_TLV_TX_FRAG_ATTR_MAX" title='__ROCKER_TLV_TX_FRAG_ATTR_MAX' data-ref="__ROCKER_TLV_TX_FRAG_ATTR_MAX">__ROCKER_TLV_TX_FRAG_ATTR_MAX</dfn>,</td></tr>
+<tr><th id="290">290</th><td>    <dfn class="enum" id="ROCKER_TLV_TX_FRAG_ATTR_MAX" title='ROCKER_TLV_TX_FRAG_ATTR_MAX' data-ref="ROCKER_TLV_TX_FRAG_ATTR_MAX">ROCKER_TLV_TX_FRAG_ATTR_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_TX_FRAG_ATTR_MAX" title='__ROCKER_TLV_TX_FRAG_ATTR_MAX' data-ref="__ROCKER_TLV_TX_FRAG_ATTR_MAX">__ROCKER_TLV_TX_FRAG_ATTR_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="291">291</th><td>};</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><i>/*</i></td></tr>
+<tr><th id="294">294</th><td><i> * cmd info nested for OF-DPA msgs</i></td></tr>
+<tr><th id="295">295</th><td><i> */</i></td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td><b>enum</b> {</td></tr>
+<tr><th id="298">298</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_UNSPEC" title='ROCKER_TLV_OF_DPA_UNSPEC' data-ref="ROCKER_TLV_OF_DPA_UNSPEC">ROCKER_TLV_OF_DPA_UNSPEC</dfn>,</td></tr>
+<tr><th id="299">299</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_TABLE_ID" title='ROCKER_TLV_OF_DPA_TABLE_ID' data-ref="ROCKER_TLV_OF_DPA_TABLE_ID">ROCKER_TLV_OF_DPA_TABLE_ID</dfn>,            <i>/* u16 */</i></td></tr>
+<tr><th id="300">300</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_PRIORITY" title='ROCKER_TLV_OF_DPA_PRIORITY' data-ref="ROCKER_TLV_OF_DPA_PRIORITY">ROCKER_TLV_OF_DPA_PRIORITY</dfn>,            <i>/* u32 */</i></td></tr>
+<tr><th id="301">301</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_HARDTIME" title='ROCKER_TLV_OF_DPA_HARDTIME' data-ref="ROCKER_TLV_OF_DPA_HARDTIME">ROCKER_TLV_OF_DPA_HARDTIME</dfn>,            <i>/* u32 */</i></td></tr>
+<tr><th id="302">302</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IDLETIME" title='ROCKER_TLV_OF_DPA_IDLETIME' data-ref="ROCKER_TLV_OF_DPA_IDLETIME">ROCKER_TLV_OF_DPA_IDLETIME</dfn>,            <i>/* u32 */</i></td></tr>
+<tr><th id="303">303</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_COOKIE" title='ROCKER_TLV_OF_DPA_COOKIE' data-ref="ROCKER_TLV_OF_DPA_COOKIE">ROCKER_TLV_OF_DPA_COOKIE</dfn>,              <i>/* u64 */</i></td></tr>
+<tr><th id="304">304</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IN_PPORT" title='ROCKER_TLV_OF_DPA_IN_PPORT' data-ref="ROCKER_TLV_OF_DPA_IN_PPORT">ROCKER_TLV_OF_DPA_IN_PPORT</dfn>,            <i>/* u32 */</i></td></tr>
+<tr><th id="305">305</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IN_PPORT_MASK" title='ROCKER_TLV_OF_DPA_IN_PPORT_MASK' data-ref="ROCKER_TLV_OF_DPA_IN_PPORT_MASK">ROCKER_TLV_OF_DPA_IN_PPORT_MASK</dfn>,       <i>/* u32 */</i></td></tr>
+<tr><th id="306">306</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_OUT_PPORT" title='ROCKER_TLV_OF_DPA_OUT_PPORT' data-ref="ROCKER_TLV_OF_DPA_OUT_PPORT">ROCKER_TLV_OF_DPA_OUT_PPORT</dfn>,           <i>/* u32 */</i></td></tr>
+<tr><th id="307">307</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_GOTO_TABLE_ID" title='ROCKER_TLV_OF_DPA_GOTO_TABLE_ID' data-ref="ROCKER_TLV_OF_DPA_GOTO_TABLE_ID">ROCKER_TLV_OF_DPA_GOTO_TABLE_ID</dfn>,       <i>/* u16 */</i></td></tr>
+<tr><th id="308">308</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_GROUP_ID" title='ROCKER_TLV_OF_DPA_GROUP_ID' data-ref="ROCKER_TLV_OF_DPA_GROUP_ID">ROCKER_TLV_OF_DPA_GROUP_ID</dfn>,            <i>/* u32 */</i></td></tr>
+<tr><th id="309">309</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_GROUP_ID_LOWER" title='ROCKER_TLV_OF_DPA_GROUP_ID_LOWER' data-ref="ROCKER_TLV_OF_DPA_GROUP_ID_LOWER">ROCKER_TLV_OF_DPA_GROUP_ID_LOWER</dfn>,      <i>/* u32 */</i></td></tr>
+<tr><th id="310">310</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_GROUP_COUNT" title='ROCKER_TLV_OF_DPA_GROUP_COUNT' data-ref="ROCKER_TLV_OF_DPA_GROUP_COUNT">ROCKER_TLV_OF_DPA_GROUP_COUNT</dfn>,         <i>/* u16 */</i></td></tr>
+<tr><th id="311">311</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_GROUP_IDS" title='ROCKER_TLV_OF_DPA_GROUP_IDS' data-ref="ROCKER_TLV_OF_DPA_GROUP_IDS">ROCKER_TLV_OF_DPA_GROUP_IDS</dfn>,           <i>/* u32 array */</i></td></tr>
+<tr><th id="312">312</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_VLAN_ID" title='ROCKER_TLV_OF_DPA_VLAN_ID' data-ref="ROCKER_TLV_OF_DPA_VLAN_ID">ROCKER_TLV_OF_DPA_VLAN_ID</dfn>,             <i>/* __be16 */</i></td></tr>
+<tr><th id="313">313</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_VLAN_ID_MASK" title='ROCKER_TLV_OF_DPA_VLAN_ID_MASK' data-ref="ROCKER_TLV_OF_DPA_VLAN_ID_MASK">ROCKER_TLV_OF_DPA_VLAN_ID_MASK</dfn>,        <i>/* __be16 */</i></td></tr>
+<tr><th id="314">314</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_VLAN_PCP" title='ROCKER_TLV_OF_DPA_VLAN_PCP' data-ref="ROCKER_TLV_OF_DPA_VLAN_PCP">ROCKER_TLV_OF_DPA_VLAN_PCP</dfn>,            <i>/* __be16 */</i></td></tr>
+<tr><th id="315">315</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_VLAN_PCP_MASK" title='ROCKER_TLV_OF_DPA_VLAN_PCP_MASK' data-ref="ROCKER_TLV_OF_DPA_VLAN_PCP_MASK">ROCKER_TLV_OF_DPA_VLAN_PCP_MASK</dfn>,       <i>/* __be16 */</i></td></tr>
+<tr><th id="316">316</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_VLAN_PCP_ACTION" title='ROCKER_TLV_OF_DPA_VLAN_PCP_ACTION' data-ref="ROCKER_TLV_OF_DPA_VLAN_PCP_ACTION">ROCKER_TLV_OF_DPA_VLAN_PCP_ACTION</dfn>,     <i>/* u8 */</i></td></tr>
+<tr><th id="317">317</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_NEW_VLAN_ID" title='ROCKER_TLV_OF_DPA_NEW_VLAN_ID' data-ref="ROCKER_TLV_OF_DPA_NEW_VLAN_ID">ROCKER_TLV_OF_DPA_NEW_VLAN_ID</dfn>,         <i>/* __be16 */</i></td></tr>
+<tr><th id="318">318</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_NEW_VLAN_PCP" title='ROCKER_TLV_OF_DPA_NEW_VLAN_PCP' data-ref="ROCKER_TLV_OF_DPA_NEW_VLAN_PCP">ROCKER_TLV_OF_DPA_NEW_VLAN_PCP</dfn>,        <i>/* u8 */</i></td></tr>
+<tr><th id="319">319</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_TUNNEL_ID" title='ROCKER_TLV_OF_DPA_TUNNEL_ID' data-ref="ROCKER_TLV_OF_DPA_TUNNEL_ID">ROCKER_TLV_OF_DPA_TUNNEL_ID</dfn>,           <i>/* u32 */</i></td></tr>
+<tr><th id="320">320</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_TUNNEL_LPORT" title='ROCKER_TLV_OF_DPA_TUNNEL_LPORT' data-ref="ROCKER_TLV_OF_DPA_TUNNEL_LPORT">ROCKER_TLV_OF_DPA_TUNNEL_LPORT</dfn>,        <i>/* u32 */</i></td></tr>
+<tr><th id="321">321</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_ETHERTYPE" title='ROCKER_TLV_OF_DPA_ETHERTYPE' data-ref="ROCKER_TLV_OF_DPA_ETHERTYPE">ROCKER_TLV_OF_DPA_ETHERTYPE</dfn>,           <i>/* __be16 */</i></td></tr>
+<tr><th id="322">322</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_MAC" title='ROCKER_TLV_OF_DPA_DST_MAC' data-ref="ROCKER_TLV_OF_DPA_DST_MAC">ROCKER_TLV_OF_DPA_DST_MAC</dfn>,             <i>/* binary */</i></td></tr>
+<tr><th id="323">323</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_MAC_MASK" title='ROCKER_TLV_OF_DPA_DST_MAC_MASK' data-ref="ROCKER_TLV_OF_DPA_DST_MAC_MASK">ROCKER_TLV_OF_DPA_DST_MAC_MASK</dfn>,        <i>/* binary */</i></td></tr>
+<tr><th id="324">324</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_MAC" title='ROCKER_TLV_OF_DPA_SRC_MAC' data-ref="ROCKER_TLV_OF_DPA_SRC_MAC">ROCKER_TLV_OF_DPA_SRC_MAC</dfn>,             <i>/* binary */</i></td></tr>
+<tr><th id="325">325</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_MAC_MASK" title='ROCKER_TLV_OF_DPA_SRC_MAC_MASK' data-ref="ROCKER_TLV_OF_DPA_SRC_MAC_MASK">ROCKER_TLV_OF_DPA_SRC_MAC_MASK</dfn>,        <i>/* binary */</i></td></tr>
+<tr><th id="326">326</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_PROTO" title='ROCKER_TLV_OF_DPA_IP_PROTO' data-ref="ROCKER_TLV_OF_DPA_IP_PROTO">ROCKER_TLV_OF_DPA_IP_PROTO</dfn>,            <i>/* u8 */</i></td></tr>
+<tr><th id="327">327</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_PROTO_MASK" title='ROCKER_TLV_OF_DPA_IP_PROTO_MASK' data-ref="ROCKER_TLV_OF_DPA_IP_PROTO_MASK">ROCKER_TLV_OF_DPA_IP_PROTO_MASK</dfn>,       <i>/* u8 */</i></td></tr>
+<tr><th id="328">328</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_DSCP" title='ROCKER_TLV_OF_DPA_IP_DSCP' data-ref="ROCKER_TLV_OF_DPA_IP_DSCP">ROCKER_TLV_OF_DPA_IP_DSCP</dfn>,             <i>/* u8 */</i></td></tr>
+<tr><th id="329">329</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_DSCP_MASK" title='ROCKER_TLV_OF_DPA_IP_DSCP_MASK' data-ref="ROCKER_TLV_OF_DPA_IP_DSCP_MASK">ROCKER_TLV_OF_DPA_IP_DSCP_MASK</dfn>,        <i>/* u8 */</i></td></tr>
+<tr><th id="330">330</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_DSCP_ACTION" title='ROCKER_TLV_OF_DPA_IP_DSCP_ACTION' data-ref="ROCKER_TLV_OF_DPA_IP_DSCP_ACTION">ROCKER_TLV_OF_DPA_IP_DSCP_ACTION</dfn>,      <i>/* u8 */</i></td></tr>
+<tr><th id="331">331</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_NEW_IP_DSCP" title='ROCKER_TLV_OF_DPA_NEW_IP_DSCP' data-ref="ROCKER_TLV_OF_DPA_NEW_IP_DSCP">ROCKER_TLV_OF_DPA_NEW_IP_DSCP</dfn>,         <i>/* u8 */</i></td></tr>
+<tr><th id="332">332</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_ECN" title='ROCKER_TLV_OF_DPA_IP_ECN' data-ref="ROCKER_TLV_OF_DPA_IP_ECN">ROCKER_TLV_OF_DPA_IP_ECN</dfn>,              <i>/* u8 */</i></td></tr>
+<tr><th id="333">333</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IP_ECN_MASK" title='ROCKER_TLV_OF_DPA_IP_ECN_MASK' data-ref="ROCKER_TLV_OF_DPA_IP_ECN_MASK">ROCKER_TLV_OF_DPA_IP_ECN_MASK</dfn>,         <i>/* u8 */</i></td></tr>
+<tr><th id="334">334</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_IP" title='ROCKER_TLV_OF_DPA_DST_IP' data-ref="ROCKER_TLV_OF_DPA_DST_IP">ROCKER_TLV_OF_DPA_DST_IP</dfn>,              <i>/* __be32 */</i></td></tr>
+<tr><th id="335">335</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_IP_MASK" title='ROCKER_TLV_OF_DPA_DST_IP_MASK' data-ref="ROCKER_TLV_OF_DPA_DST_IP_MASK">ROCKER_TLV_OF_DPA_DST_IP_MASK</dfn>,         <i>/* __be32 */</i></td></tr>
+<tr><th id="336">336</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_IP" title='ROCKER_TLV_OF_DPA_SRC_IP' data-ref="ROCKER_TLV_OF_DPA_SRC_IP">ROCKER_TLV_OF_DPA_SRC_IP</dfn>,              <i>/* __be32 */</i></td></tr>
+<tr><th id="337">337</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_IP_MASK" title='ROCKER_TLV_OF_DPA_SRC_IP_MASK' data-ref="ROCKER_TLV_OF_DPA_SRC_IP_MASK">ROCKER_TLV_OF_DPA_SRC_IP_MASK</dfn>,         <i>/* __be32 */</i></td></tr>
+<tr><th id="338">338</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_IPV6" title='ROCKER_TLV_OF_DPA_DST_IPV6' data-ref="ROCKER_TLV_OF_DPA_DST_IPV6">ROCKER_TLV_OF_DPA_DST_IPV6</dfn>,            <i>/* binary */</i></td></tr>
+<tr><th id="339">339</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_DST_IPV6_MASK" title='ROCKER_TLV_OF_DPA_DST_IPV6_MASK' data-ref="ROCKER_TLV_OF_DPA_DST_IPV6_MASK">ROCKER_TLV_OF_DPA_DST_IPV6_MASK</dfn>,       <i>/* binary */</i></td></tr>
+<tr><th id="340">340</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_IPV6" title='ROCKER_TLV_OF_DPA_SRC_IPV6' data-ref="ROCKER_TLV_OF_DPA_SRC_IPV6">ROCKER_TLV_OF_DPA_SRC_IPV6</dfn>,            <i>/* binary */</i></td></tr>
+<tr><th id="341">341</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_IPV6_MASK" title='ROCKER_TLV_OF_DPA_SRC_IPV6_MASK' data-ref="ROCKER_TLV_OF_DPA_SRC_IPV6_MASK">ROCKER_TLV_OF_DPA_SRC_IPV6_MASK</dfn>,       <i>/* binary */</i></td></tr>
+<tr><th id="342">342</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_ARP_IP" title='ROCKER_TLV_OF_DPA_SRC_ARP_IP' data-ref="ROCKER_TLV_OF_DPA_SRC_ARP_IP">ROCKER_TLV_OF_DPA_SRC_ARP_IP</dfn>,          <i>/* __be32 */</i></td></tr>
+<tr><th id="343">343</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_SRC_ARP_IP_MASK" title='ROCKER_TLV_OF_DPA_SRC_ARP_IP_MASK' data-ref="ROCKER_TLV_OF_DPA_SRC_ARP_IP_MASK">ROCKER_TLV_OF_DPA_SRC_ARP_IP_MASK</dfn>,     <i>/* __be32 */</i></td></tr>
+<tr><th id="344">344</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_L4_DST_PORT" title='ROCKER_TLV_OF_DPA_L4_DST_PORT' data-ref="ROCKER_TLV_OF_DPA_L4_DST_PORT">ROCKER_TLV_OF_DPA_L4_DST_PORT</dfn>,         <i>/* __be16 */</i></td></tr>
+<tr><th id="345">345</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_L4_DST_PORT_MASK" title='ROCKER_TLV_OF_DPA_L4_DST_PORT_MASK' data-ref="ROCKER_TLV_OF_DPA_L4_DST_PORT_MASK">ROCKER_TLV_OF_DPA_L4_DST_PORT_MASK</dfn>,    <i>/* __be16 */</i></td></tr>
+<tr><th id="346">346</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_L4_SRC_PORT" title='ROCKER_TLV_OF_DPA_L4_SRC_PORT' data-ref="ROCKER_TLV_OF_DPA_L4_SRC_PORT">ROCKER_TLV_OF_DPA_L4_SRC_PORT</dfn>,         <i>/* __be16 */</i></td></tr>
+<tr><th id="347">347</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_L4_SRC_PORT_MASK" title='ROCKER_TLV_OF_DPA_L4_SRC_PORT_MASK' data-ref="ROCKER_TLV_OF_DPA_L4_SRC_PORT_MASK">ROCKER_TLV_OF_DPA_L4_SRC_PORT_MASK</dfn>,    <i>/* __be16 */</i></td></tr>
+<tr><th id="348">348</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_ICMP_TYPE" title='ROCKER_TLV_OF_DPA_ICMP_TYPE' data-ref="ROCKER_TLV_OF_DPA_ICMP_TYPE">ROCKER_TLV_OF_DPA_ICMP_TYPE</dfn>,           <i>/* u8 */</i></td></tr>
+<tr><th id="349">349</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_ICMP_TYPE_MASK" title='ROCKER_TLV_OF_DPA_ICMP_TYPE_MASK' data-ref="ROCKER_TLV_OF_DPA_ICMP_TYPE_MASK">ROCKER_TLV_OF_DPA_ICMP_TYPE_MASK</dfn>,      <i>/* u8 */</i></td></tr>
+<tr><th id="350">350</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_ICMP_CODE" title='ROCKER_TLV_OF_DPA_ICMP_CODE' data-ref="ROCKER_TLV_OF_DPA_ICMP_CODE">ROCKER_TLV_OF_DPA_ICMP_CODE</dfn>,           <i>/* u8 */</i></td></tr>
+<tr><th id="351">351</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_ICMP_CODE_MASK" title='ROCKER_TLV_OF_DPA_ICMP_CODE_MASK' data-ref="ROCKER_TLV_OF_DPA_ICMP_CODE_MASK">ROCKER_TLV_OF_DPA_ICMP_CODE_MASK</dfn>,      <i>/* u8 */</i></td></tr>
+<tr><th id="352">352</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IPV6_LABEL" title='ROCKER_TLV_OF_DPA_IPV6_LABEL' data-ref="ROCKER_TLV_OF_DPA_IPV6_LABEL">ROCKER_TLV_OF_DPA_IPV6_LABEL</dfn>,          <i>/* __be32 */</i></td></tr>
+<tr><th id="353">353</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_IPV6_LABEL_MASK" title='ROCKER_TLV_OF_DPA_IPV6_LABEL_MASK' data-ref="ROCKER_TLV_OF_DPA_IPV6_LABEL_MASK">ROCKER_TLV_OF_DPA_IPV6_LABEL_MASK</dfn>,     <i>/* __be32 */</i></td></tr>
+<tr><th id="354">354</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_QUEUE_ID_ACTION" title='ROCKER_TLV_OF_DPA_QUEUE_ID_ACTION' data-ref="ROCKER_TLV_OF_DPA_QUEUE_ID_ACTION">ROCKER_TLV_OF_DPA_QUEUE_ID_ACTION</dfn>,     <i>/* u8 */</i></td></tr>
+<tr><th id="355">355</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_NEW_QUEUE_ID" title='ROCKER_TLV_OF_DPA_NEW_QUEUE_ID' data-ref="ROCKER_TLV_OF_DPA_NEW_QUEUE_ID">ROCKER_TLV_OF_DPA_NEW_QUEUE_ID</dfn>,        <i>/* u8 */</i></td></tr>
+<tr><th id="356">356</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_CLEAR_ACTIONS" title='ROCKER_TLV_OF_DPA_CLEAR_ACTIONS' data-ref="ROCKER_TLV_OF_DPA_CLEAR_ACTIONS">ROCKER_TLV_OF_DPA_CLEAR_ACTIONS</dfn>,       <i>/* u32 */</i></td></tr>
+<tr><th id="357">357</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_POP_VLAN" title='ROCKER_TLV_OF_DPA_POP_VLAN' data-ref="ROCKER_TLV_OF_DPA_POP_VLAN">ROCKER_TLV_OF_DPA_POP_VLAN</dfn>,            <i>/* u8 */</i></td></tr>
+<tr><th id="358">358</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_TTL_CHECK" title='ROCKER_TLV_OF_DPA_TTL_CHECK' data-ref="ROCKER_TLV_OF_DPA_TTL_CHECK">ROCKER_TLV_OF_DPA_TTL_CHECK</dfn>,           <i>/* u8 */</i></td></tr>
+<tr><th id="359">359</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_COPY_CPU_ACTION" title='ROCKER_TLV_OF_DPA_COPY_CPU_ACTION' data-ref="ROCKER_TLV_OF_DPA_COPY_CPU_ACTION">ROCKER_TLV_OF_DPA_COPY_CPU_ACTION</dfn>,     <i>/* u8 */</i></td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>    <dfn class="enum" id="__ROCKER_TLV_OF_DPA_MAX" title='__ROCKER_TLV_OF_DPA_MAX' data-ref="__ROCKER_TLV_OF_DPA_MAX">__ROCKER_TLV_OF_DPA_MAX</dfn>,</td></tr>
+<tr><th id="362">362</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_MAX" title='ROCKER_TLV_OF_DPA_MAX' data-ref="ROCKER_TLV_OF_DPA_MAX">ROCKER_TLV_OF_DPA_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_OF_DPA_MAX" title='__ROCKER_TLV_OF_DPA_MAX' data-ref="__ROCKER_TLV_OF_DPA_MAX">__ROCKER_TLV_OF_DPA_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="363">363</th><td>};</td></tr>
+<tr><th id="364">364</th><td></td></tr>
+<tr><th id="365">365</th><td><i>/*</i></td></tr>
+<tr><th id="366">366</th><td><i> * OF-DPA table IDs</i></td></tr>
+<tr><th id="367">367</th><td><i> */</i></td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td><b>enum</b> <dfn class="type def" id="rocker_of_dpa_table_id" title='rocker_of_dpa_table_id' data-ref="rocker_of_dpa_table_id">rocker_of_dpa_table_id</dfn> {</td></tr>
+<tr><th id="370">370</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_INGRESS_PORT" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_INGRESS_PORT' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_INGRESS_PORT">ROCKER_OF_DPA_TABLE_ID_INGRESS_PORT</dfn> = <var>0</var>,</td></tr>
+<tr><th id="371">371</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_VLAN" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_VLAN' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_VLAN">ROCKER_OF_DPA_TABLE_ID_VLAN</dfn> = <var>10</var>,</td></tr>
+<tr><th id="372">372</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_TERMINATION_MAC" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_TERMINATION_MAC' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_TERMINATION_MAC">ROCKER_OF_DPA_TABLE_ID_TERMINATION_MAC</dfn> = <var>20</var>,</td></tr>
+<tr><th id="373">373</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_UNICAST_ROUTING" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_UNICAST_ROUTING' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_UNICAST_ROUTING">ROCKER_OF_DPA_TABLE_ID_UNICAST_ROUTING</dfn> = <var>30</var>,</td></tr>
+<tr><th id="374">374</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_MULTICAST_ROUTING" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_MULTICAST_ROUTING' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_MULTICAST_ROUTING">ROCKER_OF_DPA_TABLE_ID_MULTICAST_ROUTING</dfn> = <var>40</var>,</td></tr>
+<tr><th id="375">375</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_BRIDGING" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_BRIDGING' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_BRIDGING">ROCKER_OF_DPA_TABLE_ID_BRIDGING</dfn> = <var>50</var>,</td></tr>
+<tr><th id="376">376</th><td>    <dfn class="enum" id="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_ACL_POLICY" title='rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_ACL_POLICY' data-ref="rocker_of_dpa_table_id::ROCKER_OF_DPA_TABLE_ID_ACL_POLICY">ROCKER_OF_DPA_TABLE_ID_ACL_POLICY</dfn> = <var>60</var>,</td></tr>
+<tr><th id="377">377</th><td>};</td></tr>
+<tr><th id="378">378</th><td></td></tr>
+<tr><th id="379">379</th><td><i>/*</i></td></tr>
+<tr><th id="380">380</th><td><i> * OF-DPA flow stats</i></td></tr>
+<tr><th id="381">381</th><td><i> */</i></td></tr>
+<tr><th id="382">382</th><td></td></tr>
+<tr><th id="383">383</th><td><b>enum</b> {</td></tr>
+<tr><th id="384">384</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_FLOW_STAT_UNSPEC" title='ROCKER_TLV_OF_DPA_FLOW_STAT_UNSPEC' data-ref="ROCKER_TLV_OF_DPA_FLOW_STAT_UNSPEC">ROCKER_TLV_OF_DPA_FLOW_STAT_UNSPEC</dfn>,</td></tr>
+<tr><th id="385">385</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_FLOW_STAT_DURATION" title='ROCKER_TLV_OF_DPA_FLOW_STAT_DURATION' data-ref="ROCKER_TLV_OF_DPA_FLOW_STAT_DURATION">ROCKER_TLV_OF_DPA_FLOW_STAT_DURATION</dfn>,    <i>/* u32 */</i></td></tr>
+<tr><th id="386">386</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_FLOW_STAT_RX_PKTS" title='ROCKER_TLV_OF_DPA_FLOW_STAT_RX_PKTS' data-ref="ROCKER_TLV_OF_DPA_FLOW_STAT_RX_PKTS">ROCKER_TLV_OF_DPA_FLOW_STAT_RX_PKTS</dfn>,     <i>/* u64 */</i></td></tr>
+<tr><th id="387">387</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_FLOW_STAT_TX_PKTS" title='ROCKER_TLV_OF_DPA_FLOW_STAT_TX_PKTS' data-ref="ROCKER_TLV_OF_DPA_FLOW_STAT_TX_PKTS">ROCKER_TLV_OF_DPA_FLOW_STAT_TX_PKTS</dfn>,     <i>/* u64 */</i></td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td>    <dfn class="enum" id="__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX" title='__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX' data-ref="__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX">__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX</dfn>,</td></tr>
+<tr><th id="390">390</th><td>    <dfn class="enum" id="ROCKER_TLV_OF_DPA_FLOW_STAT_MAX" title='ROCKER_TLV_OF_DPA_FLOW_STAT_MAX' data-ref="ROCKER_TLV_OF_DPA_FLOW_STAT_MAX">ROCKER_TLV_OF_DPA_FLOW_STAT_MAX</dfn> = <a class="enum" href="#__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX" title='__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX' data-ref="__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX">__ROCKER_TLV_OF_DPA_FLOW_STAT_MAX</a> - <var>1</var>,</td></tr>
+<tr><th id="391">391</th><td>};</td></tr>
+<tr><th id="392">392</th><td></td></tr>
+<tr><th id="393">393</th><td><i>/*</i></td></tr>
+<tr><th id="394">394</th><td><i> * OF-DPA group types</i></td></tr>
+<tr><th id="395">395</th><td><i> */</i></td></tr>
+<tr><th id="396">396</th><td></td></tr>
+<tr><th id="397">397</th><td><b>enum</b> <dfn class="type def" id="rocker_of_dpa_group_type" title='rocker_of_dpa_group_type' data-ref="rocker_of_dpa_group_type">rocker_of_dpa_group_type</dfn> {</td></tr>
+<tr><th id="398">398</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_INTERFACE" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_INTERFACE' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_INTERFACE">ROCKER_OF_DPA_GROUP_TYPE_L2_INTERFACE</dfn> = <var>0</var>,</td></tr>
+<tr><th id="399">399</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_REWRITE" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_REWRITE' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_REWRITE">ROCKER_OF_DPA_GROUP_TYPE_L2_REWRITE</dfn>,</td></tr>
+<tr><th id="400">400</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_UCAST" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_UCAST' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_UCAST">ROCKER_OF_DPA_GROUP_TYPE_L3_UCAST</dfn>,</td></tr>
+<tr><th id="401">401</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST">ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST</dfn>,</td></tr>
+<tr><th id="402">402</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD">ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD</dfn>,</td></tr>
+<tr><th id="403">403</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_INTERFACE" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_INTERFACE' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_INTERFACE">ROCKER_OF_DPA_GROUP_TYPE_L3_INTERFACE</dfn>,</td></tr>
+<tr><th id="404">404</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_MCAST" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_MCAST' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_MCAST">ROCKER_OF_DPA_GROUP_TYPE_L3_MCAST</dfn>,</td></tr>
+<tr><th id="405">405</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_ECMP" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_ECMP' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L3_ECMP">ROCKER_OF_DPA_GROUP_TYPE_L3_ECMP</dfn>,</td></tr>
+<tr><th id="406">406</th><td>    <dfn class="enum" id="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_OVERLAY" title='rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_OVERLAY' data-ref="rocker_of_dpa_group_type::ROCKER_OF_DPA_GROUP_TYPE_L2_OVERLAY">ROCKER_OF_DPA_GROUP_TYPE_L2_OVERLAY</dfn>,</td></tr>
+<tr><th id="407">407</th><td>};</td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><i>/*</i></td></tr>
+<tr><th id="410">410</th><td><i> * OF-DPA group L2 overlay types</i></td></tr>
+<tr><th id="411">411</th><td><i> */</i></td></tr>
+<tr><th id="412">412</th><td></td></tr>
+<tr><th id="413">413</th><td><b>enum</b> <dfn class="type def" id="rocker_of_dpa_overlay_type" title='rocker_of_dpa_overlay_type' data-ref="rocker_of_dpa_overlay_type">rocker_of_dpa_overlay_type</dfn> {</td></tr>
+<tr><th id="414">414</th><td>    <dfn class="enum" id="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_UCAST" title='rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_UCAST' data-ref="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_UCAST">ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_UCAST</dfn> = <var>0</var>,</td></tr>
+<tr><th id="415">415</th><td>    <dfn class="enum" id="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_MCAST" title='rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_MCAST' data-ref="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_MCAST">ROCKER_OF_DPA_OVERLAY_TYPE_FLOOD_MCAST</dfn>,</td></tr>
+<tr><th id="416">416</th><td>    <dfn class="enum" id="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_UCAST" title='rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_UCAST' data-ref="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_UCAST">ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_UCAST</dfn>,</td></tr>
+<tr><th id="417">417</th><td>    <dfn class="enum" id="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_MCAST" title='rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_MCAST' data-ref="rocker_of_dpa_overlay_type::ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_MCAST">ROCKER_OF_DPA_OVERLAY_TYPE_MCAST_MCAST</dfn>,</td></tr>
+<tr><th id="418">418</th><td>};</td></tr>
+<tr><th id="419">419</th><td></td></tr>
+<tr><th id="420">420</th><td><i>/*</i></td></tr>
+<tr><th id="421">421</th><td><i> * OF-DPA group ID encoding</i></td></tr>
+<tr><th id="422">422</th><td><i> */</i></td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TYPE_SHIFT" data-ref="_M/ROCKER_GROUP_TYPE_SHIFT">ROCKER_GROUP_TYPE_SHIFT</dfn> 28</u></td></tr>
+<tr><th id="425">425</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TYPE_MASK" data-ref="_M/ROCKER_GROUP_TYPE_MASK">ROCKER_GROUP_TYPE_MASK</dfn> 0xf0000000</u></td></tr>
+<tr><th id="426">426</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_VLAN_ID_SHIFT" data-ref="_M/ROCKER_GROUP_VLAN_ID_SHIFT">ROCKER_GROUP_VLAN_ID_SHIFT</dfn> 16</u></td></tr>
+<tr><th id="427">427</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_VLAN_ID_MASK" data-ref="_M/ROCKER_GROUP_VLAN_ID_MASK">ROCKER_GROUP_VLAN_ID_MASK</dfn> 0x0fff0000</u></td></tr>
+<tr><th id="428">428</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_PORT_SHIFT" data-ref="_M/ROCKER_GROUP_PORT_SHIFT">ROCKER_GROUP_PORT_SHIFT</dfn> 0</u></td></tr>
+<tr><th id="429">429</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_PORT_MASK" data-ref="_M/ROCKER_GROUP_PORT_MASK">ROCKER_GROUP_PORT_MASK</dfn> 0x0000ffff</u></td></tr>
+<tr><th id="430">430</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TUNNEL_ID_SHIFT" data-ref="_M/ROCKER_GROUP_TUNNEL_ID_SHIFT">ROCKER_GROUP_TUNNEL_ID_SHIFT</dfn> 12</u></td></tr>
+<tr><th id="431">431</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TUNNEL_ID_MASK" data-ref="_M/ROCKER_GROUP_TUNNEL_ID_MASK">ROCKER_GROUP_TUNNEL_ID_MASK</dfn> 0x0ffff000</u></td></tr>
+<tr><th id="432">432</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_SUBTYPE_SHIFT" data-ref="_M/ROCKER_GROUP_SUBTYPE_SHIFT">ROCKER_GROUP_SUBTYPE_SHIFT</dfn> 10</u></td></tr>
+<tr><th id="433">433</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_SUBTYPE_MASK" data-ref="_M/ROCKER_GROUP_SUBTYPE_MASK">ROCKER_GROUP_SUBTYPE_MASK</dfn> 0x00000c00</u></td></tr>
+<tr><th id="434">434</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_SHIFT" data-ref="_M/ROCKER_GROUP_INDEX_SHIFT">ROCKER_GROUP_INDEX_SHIFT</dfn> 0</u></td></tr>
+<tr><th id="435">435</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_MASK" data-ref="_M/ROCKER_GROUP_INDEX_MASK">ROCKER_GROUP_INDEX_MASK</dfn> 0x0000ffff</u></td></tr>
+<tr><th id="436">436</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_LONG_SHIFT" data-ref="_M/ROCKER_GROUP_INDEX_LONG_SHIFT">ROCKER_GROUP_INDEX_LONG_SHIFT</dfn> 0</u></td></tr>
+<tr><th id="437">437</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_LONG_MASK" data-ref="_M/ROCKER_GROUP_INDEX_LONG_MASK">ROCKER_GROUP_INDEX_LONG_MASK</dfn> 0x0fffffff</u></td></tr>
+<tr><th id="438">438</th><td></td></tr>
+<tr><th id="439">439</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TYPE_GET" data-ref="_M/ROCKER_GROUP_TYPE_GET">ROCKER_GROUP_TYPE_GET</dfn>(group_id) \</u></td></tr>
+<tr><th id="440">440</th><td><u>    (((group_id) &amp; ROCKER_GROUP_TYPE_MASK) &gt;&gt; ROCKER_GROUP_TYPE_SHIFT)</u></td></tr>
+<tr><th id="441">441</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_TYPE_SET" data-ref="_M/ROCKER_GROUP_TYPE_SET">ROCKER_GROUP_TYPE_SET</dfn>(type) \</u></td></tr>
+<tr><th id="442">442</th><td><u>    (((type) &lt;&lt; ROCKER_GROUP_TYPE_SHIFT) &amp; ROCKER_GROUP_TYPE_MASK)</u></td></tr>
+<tr><th id="443">443</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_VLAN_GET" data-ref="_M/ROCKER_GROUP_VLAN_GET">ROCKER_GROUP_VLAN_GET</dfn>(group_id) \</u></td></tr>
+<tr><th id="444">444</th><td><u>    (((group_id) &amp; ROCKER_GROUP_VLAN_ID_MASK) &gt;&gt; ROCKER_GROUP_VLAN_ID_SHIFT)</u></td></tr>
+<tr><th id="445">445</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_VLAN_SET" data-ref="_M/ROCKER_GROUP_VLAN_SET">ROCKER_GROUP_VLAN_SET</dfn>(vlan_id) \</u></td></tr>
+<tr><th id="446">446</th><td><u>    (((vlan_id) &lt;&lt; ROCKER_GROUP_VLAN_ID_SHIFT) &amp; ROCKER_GROUP_VLAN_ID_MASK)</u></td></tr>
+<tr><th id="447">447</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_PORT_GET" data-ref="_M/ROCKER_GROUP_PORT_GET">ROCKER_GROUP_PORT_GET</dfn>(group_id) \</u></td></tr>
+<tr><th id="448">448</th><td><u>    (((group_id) &amp; ROCKER_GROUP_PORT_MASK) &gt;&gt; ROCKER_GROUP_PORT_SHIFT)</u></td></tr>
+<tr><th id="449">449</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_PORT_SET" data-ref="_M/ROCKER_GROUP_PORT_SET">ROCKER_GROUP_PORT_SET</dfn>(port) \</u></td></tr>
+<tr><th id="450">450</th><td><u>    (((port) &lt;&lt; ROCKER_GROUP_PORT_SHIFT) &amp; ROCKER_GROUP_PORT_MASK)</u></td></tr>
+<tr><th id="451">451</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_GET" data-ref="_M/ROCKER_GROUP_INDEX_GET">ROCKER_GROUP_INDEX_GET</dfn>(group_id) \</u></td></tr>
+<tr><th id="452">452</th><td><u>    (((group_id) &amp; ROCKER_GROUP_INDEX_MASK) &gt;&gt; ROCKER_GROUP_INDEX_SHIFT)</u></td></tr>
+<tr><th id="453">453</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_SET" data-ref="_M/ROCKER_GROUP_INDEX_SET">ROCKER_GROUP_INDEX_SET</dfn>(index) \</u></td></tr>
+<tr><th id="454">454</th><td><u>    (((index) &lt;&lt; ROCKER_GROUP_INDEX_SHIFT) &amp; ROCKER_GROUP_INDEX_MASK)</u></td></tr>
+<tr><th id="455">455</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_LONG_GET" data-ref="_M/ROCKER_GROUP_INDEX_LONG_GET">ROCKER_GROUP_INDEX_LONG_GET</dfn>(group_id) \</u></td></tr>
+<tr><th id="456">456</th><td><u>    (((group_id) &amp; ROCKER_GROUP_INDEX_LONG_MASK) &gt;&gt; \</u></td></tr>
+<tr><th id="457">457</th><td><u>     ROCKER_GROUP_INDEX_LONG_SHIFT)</u></td></tr>
+<tr><th id="458">458</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_INDEX_LONG_SET" data-ref="_M/ROCKER_GROUP_INDEX_LONG_SET">ROCKER_GROUP_INDEX_LONG_SET</dfn>(index) \</u></td></tr>
+<tr><th id="459">459</th><td><u>    (((index) &lt;&lt; ROCKER_GROUP_INDEX_LONG_SHIFT) &amp; \</u></td></tr>
+<tr><th id="460">460</th><td><u>     ROCKER_GROUP_INDEX_LONG_MASK)</u></td></tr>
+<tr><th id="461">461</th><td></td></tr>
+<tr><th id="462">462</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_NONE" data-ref="_M/ROCKER_GROUP_NONE">ROCKER_GROUP_NONE</dfn> 0</u></td></tr>
+<tr><th id="463">463</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_L2_INTERFACE" data-ref="_M/ROCKER_GROUP_L2_INTERFACE">ROCKER_GROUP_L2_INTERFACE</dfn>(vlan_id, port) \</u></td></tr>
+<tr><th id="464">464</th><td><u>    (ROCKER_GROUP_TYPE_SET(ROCKER_OF_DPA_GROUP_TYPE_L2_INTERFACE) |\</u></td></tr>
+<tr><th id="465">465</th><td><u>     ROCKER_GROUP_VLAN_SET(ntohs(vlan_id)) | ROCKER_GROUP_PORT_SET(port))</u></td></tr>
+<tr><th id="466">466</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_L2_REWRITE" data-ref="_M/ROCKER_GROUP_L2_REWRITE">ROCKER_GROUP_L2_REWRITE</dfn>(index) \</u></td></tr>
+<tr><th id="467">467</th><td><u>    (ROCKER_GROUP_TYPE_SET(ROCKER_OF_DPA_GROUP_TYPE_L2_REWRITE) |\</u></td></tr>
+<tr><th id="468">468</th><td><u>     ROCKER_GROUP_INDEX_LONG_SET(index))</u></td></tr>
+<tr><th id="469">469</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_L2_MCAST" data-ref="_M/ROCKER_GROUP_L2_MCAST">ROCKER_GROUP_L2_MCAST</dfn>(vlan_id, index) \</u></td></tr>
+<tr><th id="470">470</th><td><u>    (ROCKER_GROUP_TYPE_SET(ROCKER_OF_DPA_GROUP_TYPE_L2_MCAST) |\</u></td></tr>
+<tr><th id="471">471</th><td><u>     ROCKER_GROUP_VLAN_SET(ntohs(vlan_id)) | ROCKER_GROUP_INDEX_SET(index))</u></td></tr>
+<tr><th id="472">472</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_L2_FLOOD" data-ref="_M/ROCKER_GROUP_L2_FLOOD">ROCKER_GROUP_L2_FLOOD</dfn>(vlan_id, index) \</u></td></tr>
+<tr><th id="473">473</th><td><u>    (ROCKER_GROUP_TYPE_SET(ROCKER_OF_DPA_GROUP_TYPE_L2_FLOOD) |\</u></td></tr>
+<tr><th id="474">474</th><td><u>     ROCKER_GROUP_VLAN_SET(ntohs(vlan_id)) | ROCKER_GROUP_INDEX_SET(index))</u></td></tr>
+<tr><th id="475">475</th><td><u>#define <dfn class="macro" id="_M/ROCKER_GROUP_L3_UNICAST" data-ref="_M/ROCKER_GROUP_L3_UNICAST">ROCKER_GROUP_L3_UNICAST</dfn>(index) \</u></td></tr>
+<tr><th id="476">476</th><td><u>    (ROCKER_GROUP_TYPE_SET(ROCKER_OF_DPA_GROUP_TYPE_L3_UCAST) |\</u></td></tr>
+<tr><th id="477">477</th><td><u>     ROCKER_GROUP_INDEX_LONG_SET(index))</u></td></tr>
+<tr><th id="478">478</th><td></td></tr>
+<tr><th id="479">479</th><td><i>/*</i></td></tr>
+<tr><th id="480">480</th><td><i> * Rocker general purpose registers</i></td></tr>
+<tr><th id="481">481</th><td><i> */</i></td></tr>
+<tr><th id="482">482</th><td><u>#define <dfn class="macro" id="_M/ROCKER_CONTROL" data-ref="_M/ROCKER_CONTROL">ROCKER_CONTROL</dfn>                  0x0300</u></td></tr>
+<tr><th id="483">483</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PORT_PHYS_COUNT" data-ref="_M/ROCKER_PORT_PHYS_COUNT">ROCKER_PORT_PHYS_COUNT</dfn>          0x0304</u></td></tr>
+<tr><th id="484">484</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PORT_PHYS_LINK_STATUS" data-ref="_M/ROCKER_PORT_PHYS_LINK_STATUS">ROCKER_PORT_PHYS_LINK_STATUS</dfn>    0x0310 /* 8-byte */</u></td></tr>
+<tr><th id="485">485</th><td><u>#define <dfn class="macro" id="_M/ROCKER_PORT_PHYS_ENABLE" data-ref="_M/ROCKER_PORT_PHYS_ENABLE">ROCKER_PORT_PHYS_ENABLE</dfn>         0x0318 /* 8-byte */</u></td></tr>
+<tr><th id="486">486</th><td><u>#define <dfn class="macro" id="_M/ROCKER_SWITCH_ID" data-ref="_M/ROCKER_SWITCH_ID">ROCKER_SWITCH_ID</dfn>                0x0320 /* 8-byte */</u></td></tr>
+<tr><th id="487">487</th><td></td></tr>
+<tr><th id="488">488</th><td><i>/*</i></td></tr>
+<tr><th id="489">489</th><td><i> * Rocker control bits</i></td></tr>
+<tr><th id="490">490</th><td><i> */</i></td></tr>
+<tr><th id="491">491</th><td><u>#define <dfn class="macro" id="_M/ROCKER_CONTROL_RESET" data-ref="_M/ROCKER_CONTROL_RESET">ROCKER_CONTROL_RESET</dfn>            (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="492">492</th><td></td></tr>
+<tr><th id="493">493</th><td><u>#<span data-ppcond="9">endif</span> /* ROCKER_HW_H */</u></td></tr>
+<tr><th id="494">494</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='rocker.c.html'>codebrowser/hw/net/rocker/rocker.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>linuxboot_dma.c source code [codebrowser/pc-bios/optionrom/linuxboot_dma.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="FWCfgDmaAccess "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/pc-bios/optionrom/linuxboot_dma.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>pc-bios</a>/<a href='./'>optionrom</a>/<a href='linuxboot_dma.c.html'>linuxboot_dma.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Linux Boot Option ROM for fw_cfg DMA</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="5">5</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="6">6</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="7">7</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="10">10</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="11">11</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the</i></td></tr>
+<tr><th id="12">12</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="15">15</th><td><i> * along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * Copyright (c) 2015-2016 Red Hat Inc.</i></td></tr>
+<tr><th id="18">18</th><td><i> *   Authors:</i></td></tr>
+<tr><th id="19">19</th><td><i> *     Marc Marí &lt;marc.mari.barcelo@gmail.com&gt;</i></td></tr>
+<tr><th id="20">20</th><td><i> *     Richard W.M. Jones &lt;rjones@redhat.com&gt;</i></td></tr>
+<tr><th id="21">21</th><td><i> */</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><b>asm</b>(</td></tr>
+<tr><th id="24">24</th><td><q>".text\n"</q></td></tr>
+<tr><th id="25">25</th><td><q>".global _start\n"</q></td></tr>
+<tr><th id="26">26</th><td><q>"_start:\n"</q></td></tr>
+<tr><th id="27">27</th><td><q>"   .short 0xaa55\n"</q></td></tr>
+<tr><th id="28">28</th><td><q>"   .byte 3\n"</q> <i>/* desired size in 512 units; signrom.py adds padding */</i></td></tr>
+<tr><th id="29">29</th><td><q>"   .byte 0xcb\n"</q> <i>/* far return without prefix */</i></td></tr>
+<tr><th id="30">30</th><td><q>"   .org 0x18\n"</q></td></tr>
+<tr><th id="31">31</th><td><q>"   .short 0\n"</q></td></tr>
+<tr><th id="32">32</th><td><q>"   .short _pnph\n"</q></td></tr>
+<tr><th id="33">33</th><td><q>"_pnph:\n"</q></td></tr>
+<tr><th id="34">34</th><td><q>"   .ascii \"$PnP\"\n"</q></td></tr>
+<tr><th id="35">35</th><td><q>"   .byte 0x01\n"</q></td></tr>
+<tr><th id="36">36</th><td><q>"   .byte (_pnph_len / 16)\n"</q></td></tr>
+<tr><th id="37">37</th><td><q>"   .short 0x0000\n"</q></td></tr>
+<tr><th id="38">38</th><td><q>"   .byte 0x00\n"</q></td></tr>
+<tr><th id="39">39</th><td><q>"   .byte 0x00\n"</q></td></tr>
+<tr><th id="40">40</th><td><q>"   .long 0x00000000\n"</q></td></tr>
+<tr><th id="41">41</th><td><q>"   .short _manufacturer\n"</q></td></tr>
+<tr><th id="42">42</th><td><q>"   .short _product\n"</q></td></tr>
+<tr><th id="43">43</th><td><q>"   .long 0x00000000\n"</q></td></tr>
+<tr><th id="44">44</th><td><q>"   .short 0x0000\n"</q></td></tr>
+<tr><th id="45">45</th><td><q>"   .short 0x0000\n"</q></td></tr>
+<tr><th id="46">46</th><td><q>"   .short _bev\n"</q></td></tr>
+<tr><th id="47">47</th><td><q>"   .short 0x0000\n"</q></td></tr>
+<tr><th id="48">48</th><td><q>"   .short 0x0000\n"</q></td></tr>
+<tr><th id="49">49</th><td><q>"   .equ _pnph_len, . - _pnph\n"</q></td></tr>
+<tr><th id="50">50</th><td><q>"_manufacturer:\n"</q></td></tr>
+<tr><th id="51">51</th><td><q>"   .asciz \"QEMU\"\n"</q></td></tr>
+<tr><th id="52">52</th><td><q>"_product:\n"</q></td></tr>
+<tr><th id="53">53</th><td><q>"   .asciz \"Linux loader DMA\"\n"</q></td></tr>
+<tr><th id="54">54</th><td><q>"   .align 4, 0\n"</q></td></tr>
+<tr><th id="55">55</th><td><q>"_bev:\n"</q></td></tr>
+<tr><th id="56">56</th><td><q>"   cli\n"</q></td></tr>
+<tr><th id="57">57</th><td><q>"   cld\n"</q></td></tr>
+<tr><th id="58">58</th><td><q>"   jmp load_kernel\n"</q></td></tr>
+<tr><th id="59">59</th><td>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#include <a href="../../include/hw/nvram/fw_cfg_keys.h.html">"../../include/hw/nvram/fw_cfg_keys.h"</a></u></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><i>/* QEMU_CFG_DMA_CONTROL bits */</i></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_CTL_ERROR" data-ref="_M/BIOS_CFG_DMA_CTL_ERROR">BIOS_CFG_DMA_CTL_ERROR</dfn>   0x01</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_CTL_READ" data-ref="_M/BIOS_CFG_DMA_CTL_READ">BIOS_CFG_DMA_CTL_READ</dfn>    0x02</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_CTL_SKIP" data-ref="_M/BIOS_CFG_DMA_CTL_SKIP">BIOS_CFG_DMA_CTL_SKIP</dfn>    0x04</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_CTL_SELECT" data-ref="_M/BIOS_CFG_DMA_CTL_SELECT">BIOS_CFG_DMA_CTL_SELECT</dfn>  0x08</u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_ADDR_HIGH" data-ref="_M/BIOS_CFG_DMA_ADDR_HIGH">BIOS_CFG_DMA_ADDR_HIGH</dfn> 0x514</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/BIOS_CFG_DMA_ADDR_LOW" data-ref="_M/BIOS_CFG_DMA_ADDR_LOW">BIOS_CFG_DMA_ADDR_LOW</dfn>  0x518</u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/uint64_t" data-ref="_M/uint64_t">uint64_t</dfn> unsigned long long</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/uint32_t" data-ref="_M/uint32_t">uint32_t</dfn> unsigned int</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/uint16_t" data-ref="_M/uint16_t">uint16_t</dfn> unsigned short</u></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/barrier" data-ref="_M/barrier">barrier</dfn>() asm("" : : : "memory")</u></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="FWCfgDmaAccess" title='FWCfgDmaAccess' data-ref="FWCfgDmaAccess"><a class="type" href="#FWCfgDmaAccess" title='FWCfgDmaAccess' data-ref="FWCfgDmaAccess">FWCfgDmaAccess</a></dfn> {</td></tr>
+<tr><th id="79">79</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl" id="FWCfgDmaAccess::control" title='FWCfgDmaAccess::control' data-type='unsigned int' data-ref="FWCfgDmaAccess::control">control</dfn>;</td></tr>
+<tr><th id="80">80</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl" id="FWCfgDmaAccess::length" title='FWCfgDmaAccess::length' data-type='unsigned int' data-ref="FWCfgDmaAccess::length">length</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    <a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a> <dfn class="tu decl" id="FWCfgDmaAccess::address" title='FWCfgDmaAccess::address' data-type='unsigned long long' data-ref="FWCfgDmaAccess::address">address</dfn>;</td></tr>
+<tr><th id="82">82</th><td>} <b>__attribute__</b>((packed)) <dfn class="typedef" id="FWCfgDmaAccess" title='FWCfgDmaAccess' data-type='struct FWCfgDmaAccess' data-ref="FWCfgDmaAccess">FWCfgDmaAccess</dfn>;</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="tu decl def" id="outl" title='outl' data-type='void outl(unsigned int value, unsigned short port)' data-ref="outl">outl</dfn>(<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col1 decl" id="1value" title='value' data-type='unsigned int' data-ref="1value">value</dfn>, <a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col2 decl" id="2port" title='port' data-type='unsigned short' data-ref="2port">port</dfn>)</td></tr>
+<tr><th id="85">85</th><td>{</td></tr>
+<tr><th id="86">86</th><td>    <b>asm</b>(<q>"outl %0, %w1"</q> : : <q>"a"</q>(<a class="local col1 ref" href="#1value" title='value' data-ref="1value">value</a>), <q>"Nd"</q>(<a class="local col2 ref" href="#2port" title='port' data-ref="2port">port</a>));</td></tr>
+<tr><th id="87">87</th><td>}</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="tu decl def" id="set_es" title='set_es' data-type='void set_es(void * addr)' data-ref="set_es">set_es</dfn>(<em>void</em> *<dfn class="local col3 decl" id="3addr" title='addr' data-type='void *' data-ref="3addr">addr</dfn>)</td></tr>
+<tr><th id="90">90</th><td>{</td></tr>
+<tr><th id="91">91</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col4 decl" id="4seg" title='seg' data-type='unsigned int' data-ref="4seg">seg</dfn> = (<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col3 ref" href="#3addr" title='addr' data-ref="3addr">addr</a> &gt;&gt; <var>4</var>;</td></tr>
+<tr><th id="92">92</th><td>    <b>asm</b>(<q>"movl %0, %%es"</q> : : <q>"r"</q>(<a class="local col4 ref" href="#4seg" title='seg' data-ref="4seg">seg</a>));</td></tr>
+<tr><th id="93">93</th><td>}</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="95">ifdef</span> <span class="macro" data-ref="_M/__clang__">__clang__</span></u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/ADDR32" data-ref="_M/ADDR32">ADDR32</dfn></u></td></tr>
+<tr><th id="97">97</th><td><u>#<span data-ppcond="95">else</span></u></td></tr>
+<tr><th id="98">98</th><td><u>#define ADDR32 "addr32 "</u></td></tr>
+<tr><th id="99">99</th><td><u>#<span data-ppcond="95">endif</span></u></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>static</em> <b>inline</b> <a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="tu decl def" id="readw_es" title='readw_es' data-type='unsigned short readw_es(unsigned short offset)' data-ref="readw_es">readw_es</dfn>(<a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col5 decl" id="5offset" title='offset' data-type='unsigned short' data-ref="5offset">offset</dfn>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col6 decl" id="6val" title='val' data-type='unsigned short' data-ref="6val">val</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <b>asm</b>(<a class="macro" href="#96" title="" data-ref="_M/ADDR32">ADDR32</a> <q>"movw %%es:(%1), %0"</q> : <q>"=r"</q>(<a class="local col6 ref" href="#6val" title='val' data-ref="6val">val</a>) : <q>"r"</q>((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col5 ref" href="#5offset" title='offset' data-ref="5offset">offset</a>));</td></tr>
+<tr><th id="105">105</th><td>    <a class="macro" href="#76" title="asm(&quot;&quot; : : : &quot;memory&quot;)" data-ref="_M/barrier">barrier</a>();</td></tr>
+<tr><th id="106">106</th><td>    <b>return</b> <a class="local col6 ref" href="#6val" title='val' data-ref="6val">val</a>;</td></tr>
+<tr><th id="107">107</th><td>}</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><em>static</em> <b>inline</b> <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl def" id="readl_es" title='readl_es' data-type='unsigned int readl_es(unsigned short offset)' data-ref="readl_es">readl_es</dfn>(<a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col7 decl" id="7offset" title='offset' data-type='unsigned short' data-ref="7offset">offset</dfn>)</td></tr>
+<tr><th id="110">110</th><td>{</td></tr>
+<tr><th id="111">111</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col8 decl" id="8val" title='val' data-type='unsigned int' data-ref="8val">val</dfn>;</td></tr>
+<tr><th id="112">112</th><td>    <b>asm</b>(<a class="macro" href="#96" title="" data-ref="_M/ADDR32">ADDR32</a> <q>"movl %%es:(%1), %0"</q> : <q>"=r"</q>(<a class="local col8 ref" href="#8val" title='val' data-ref="8val">val</a>) : <q>"r"</q>((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col7 ref" href="#7offset" title='offset' data-ref="7offset">offset</a>));</td></tr>
+<tr><th id="113">113</th><td>    <a class="macro" href="#76" title="asm(&quot;&quot; : : : &quot;memory&quot;)" data-ref="_M/barrier">barrier</a>();</td></tr>
+<tr><th id="114">114</th><td>    <b>return</b> <a class="local col8 ref" href="#8val" title='val' data-ref="8val">val</a>;</td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="tu decl def" id="writel_es" title='writel_es' data-type='void writel_es(unsigned short offset, unsigned int val)' data-ref="writel_es">writel_es</dfn>(<a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col9 decl" id="9offset" title='offset' data-type='unsigned short' data-ref="9offset">offset</dfn>, <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10val" title='val' data-type='unsigned int' data-ref="10val">val</dfn>)</td></tr>
+<tr><th id="118">118</th><td>{</td></tr>
+<tr><th id="119">119</th><td>    <a class="macro" href="#76" title="asm(&quot;&quot; : : : &quot;memory&quot;)" data-ref="_M/barrier">barrier</a>();</td></tr>
+<tr><th id="120">120</th><td>    <b>asm</b>(<a class="macro" href="#96" title="" data-ref="_M/ADDR32">ADDR32</a> <q>"movl %0, %%es:(%1)"</q> : : <q>"r"</q>(<a class="local col0 ref" href="#10val" title='val' data-ref="10val">val</a>), <q>"r"</q>((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col9 ref" href="#9offset" title='offset' data-ref="9offset">offset</a>));</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><em>static</em> <b>inline</b> <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl def" id="bswap32" title='bswap32' data-type='unsigned int bswap32(unsigned int x)' data-ref="bswap32">bswap32</dfn>(<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col1 decl" id="11x" title='x' data-type='unsigned int' data-ref="11x">x</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    <b>asm</b>(<q>"bswapl %0"</q> : <q>"=r"</q> (<a class="local col1 ref" href="#11x" title='x' data-ref="11x">x</a>) : <q>"0"</q> (<a class="local col1 ref" href="#11x" title='x' data-ref="11x">x</a>));</td></tr>
+<tr><th id="126">126</th><td>    <b>return</b> <a class="local col1 ref" href="#11x" title='x' data-ref="11x">x</a>;</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><em>static</em> <b>inline</b> <a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a> <dfn class="tu decl def" id="bswap64" title='bswap64' data-type='unsigned long long bswap64(unsigned long long x)' data-ref="bswap64">bswap64</dfn>(<a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a> <dfn class="local col2 decl" id="12x" title='x' data-type='unsigned long long' data-ref="12x">x</dfn>)</td></tr>
+<tr><th id="130">130</th><td>{</td></tr>
+<tr><th id="131">131</th><td>    <b>asm</b>(<q>"bswapl %%eax; bswapl %%edx; xchg %%eax, %%edx"</q> : <q>"=A"</q> (<a class="local col2 ref" href="#12x" title='x' data-ref="12x">x</a>) : <q>"0"</q> (<a class="local col2 ref" href="#12x" title='x' data-ref="12x">x</a>));</td></tr>
+<tr><th id="132">132</th><td>    <b>return</b> <a class="local col2 ref" href="#12x" title='x' data-ref="12x">x</a>;</td></tr>
+<tr><th id="133">133</th><td>}</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><em>static</em> <b>inline</b> <a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a> <dfn class="tu decl def" id="cpu_to_be64" title='cpu_to_be64' data-type='unsigned long long cpu_to_be64(unsigned long long x)' data-ref="cpu_to_be64">cpu_to_be64</dfn>(<a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a> <dfn class="local col3 decl" id="13x" title='x' data-type='unsigned long long' data-ref="13x">x</dfn>)</td></tr>
+<tr><th id="136">136</th><td>{</td></tr>
+<tr><th id="137">137</th><td>    <b>return</b> <a class="tu ref" href="#bswap64" title='bswap64' data-use='c' data-ref="bswap64">bswap64</a>(<a class="local col3 ref" href="#13x" title='x' data-ref="13x">x</a>);</td></tr>
+<tr><th id="138">138</th><td>}</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><em>static</em> <b>inline</b> <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl def" id="cpu_to_be32" title='cpu_to_be32' data-type='unsigned int cpu_to_be32(unsigned int x)' data-ref="cpu_to_be32">cpu_to_be32</dfn>(<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col4 decl" id="14x" title='x' data-type='unsigned int' data-ref="14x">x</dfn>)</td></tr>
+<tr><th id="141">141</th><td>{</td></tr>
+<tr><th id="142">142</th><td>    <b>return</b> <a class="tu ref" href="#bswap32" title='bswap32' data-use='c' data-ref="bswap32">bswap32</a>(<a class="local col4 ref" href="#14x" title='x' data-ref="14x">x</a>);</td></tr>
+<tr><th id="143">143</th><td>}</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><em>static</em> <b>inline</b> <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl def" id="be32_to_cpu" title='be32_to_cpu' data-type='unsigned int be32_to_cpu(unsigned int x)' data-ref="be32_to_cpu">be32_to_cpu</dfn>(<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col5 decl" id="15x" title='x' data-type='unsigned int' data-ref="15x">x</dfn>)</td></tr>
+<tr><th id="146">146</th><td>{</td></tr>
+<tr><th id="147">147</th><td>    <b>return</b> <a class="tu ref" href="#bswap32" title='bswap32' data-use='c' data-ref="bswap32">bswap32</a>(<a class="local col5 ref" href="#15x" title='x' data-ref="15x">x</a>);</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i  data-doc="bios_cfg_read_entry">/* clang is happy to inline this function, and bloats the</i></td></tr>
+<tr><th id="151">151</th><td><i  data-doc="bios_cfg_read_entry"> * ROM.</i></td></tr>
+<tr><th id="152">152</th><td><i  data-doc="bios_cfg_read_entry"> */</i></td></tr>
+<tr><th id="153">153</th><td><em>static</em> <b>__attribute__</b>((__noinline__))</td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="tu decl def" id="bios_cfg_read_entry" title='bios_cfg_read_entry' data-type='void bios_cfg_read_entry(void * buf, unsigned short entry, unsigned int len)' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</dfn>(<em>void</em> *<dfn class="local col6 decl" id="16buf" title='buf' data-type='void *' data-ref="16buf">buf</dfn>, <a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col7 decl" id="17entry" title='entry' data-type='unsigned short' data-ref="17entry">entry</dfn>, <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col8 decl" id="18len" title='len' data-type='unsigned int' data-ref="18len">len</dfn>)</td></tr>
+<tr><th id="155">155</th><td>{</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="#FWCfgDmaAccess" title='FWCfgDmaAccess' data-type='struct FWCfgDmaAccess' data-ref="FWCfgDmaAccess">FWCfgDmaAccess</a> <dfn class="local col9 decl" id="19access" title='access' data-type='FWCfgDmaAccess' data-ref="19access">access</dfn>;</td></tr>
+<tr><th id="157">157</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col0 decl" id="20control" title='control' data-type='unsigned int' data-ref="20control">control</dfn> = (<a class="local col7 ref" href="#17entry" title='entry' data-ref="17entry">entry</a> &lt;&lt; <var>16</var>) | <a class="macro" href="#67" title="0x08" data-ref="_M/BIOS_CFG_DMA_CTL_SELECT">BIOS_CFG_DMA_CTL_SELECT</a></td></tr>
+<tr><th id="158">158</th><td>                        | <a class="macro" href="#65" title="0x02" data-ref="_M/BIOS_CFG_DMA_CTL_READ">BIOS_CFG_DMA_CTL_READ</a>;</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <a class="local col9 ref" href="#19access" title='access' data-ref="19access">access</a>.<a class="tu ref" href="#FWCfgDmaAccess::address" title='FWCfgDmaAccess::address' data-use='w' data-ref="FWCfgDmaAccess::address">address</a> = <a class="tu ref" href="#cpu_to_be64" title='cpu_to_be64' data-use='c' data-ref="cpu_to_be64">cpu_to_be64</a>((<a class="macro" href="#72" title="unsigned long long" data-ref="_M/uint64_t">uint64_t</a>)(<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col6 ref" href="#16buf" title='buf' data-ref="16buf">buf</a>);</td></tr>
+<tr><th id="161">161</th><td>    <a class="local col9 ref" href="#19access" title='access' data-ref="19access">access</a>.<a class="tu ref" href="#FWCfgDmaAccess::length" title='FWCfgDmaAccess::length' data-use='w' data-ref="FWCfgDmaAccess::length">length</a> = <a class="tu ref" href="#cpu_to_be32" title='cpu_to_be32' data-use='c' data-ref="cpu_to_be32">cpu_to_be32</a>(<a class="local col8 ref" href="#18len" title='len' data-ref="18len">len</a>);</td></tr>
+<tr><th id="162">162</th><td>    <a class="local col9 ref" href="#19access" title='access' data-ref="19access">access</a>.<a class="tu ref" href="#FWCfgDmaAccess::control" title='FWCfgDmaAccess::control' data-use='w' data-ref="FWCfgDmaAccess::control">control</a> = <a class="tu ref" href="#cpu_to_be32" title='cpu_to_be32' data-use='c' data-ref="cpu_to_be32">cpu_to_be32</a>(<a class="local col0 ref" href="#20control" title='control' data-ref="20control">control</a>);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <a class="macro" href="#76" title="asm(&quot;&quot; : : : &quot;memory&quot;)" data-ref="_M/barrier">barrier</a>();</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>    <a class="tu ref" href="#outl" title='outl' data-use='c' data-ref="outl">outl</a>(<a class="tu ref" href="#cpu_to_be32" title='cpu_to_be32' data-use='c' data-ref="cpu_to_be32">cpu_to_be32</a>((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)&amp;<a class="local col9 ref" href="#19access" title='access' data-ref="19access">access</a>), <a class="macro" href="#70" title="0x518" data-ref="_M/BIOS_CFG_DMA_ADDR_LOW">BIOS_CFG_DMA_ADDR_LOW</a>);</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <b>while</b> (<a class="tu ref" href="#be32_to_cpu" title='be32_to_cpu' data-use='c' data-ref="be32_to_cpu">be32_to_cpu</a>(<a class="local col9 ref" href="#19access" title='access' data-ref="19access">access</a>.<a class="tu ref" href="#FWCfgDmaAccess::control" title='FWCfgDmaAccess::control' data-use='r' data-ref="FWCfgDmaAccess::control">control</a>) &amp; ~<a class="macro" href="#64" title="0x01" data-ref="_M/BIOS_CFG_DMA_CTL_ERROR">BIOS_CFG_DMA_CTL_ERROR</a>) {</td></tr>
+<tr><th id="169">169</th><td>        <a class="macro" href="#76" title="asm(&quot;&quot; : : : &quot;memory&quot;)" data-ref="_M/barrier">barrier</a>();</td></tr>
+<tr><th id="170">170</th><td>    }</td></tr>
+<tr><th id="171">171</th><td>}</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i  data-doc="get_e801_addr">/* Return top of memory using BIOS function E801. */</i></td></tr>
+<tr><th id="174">174</th><td><em>static</em> <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="tu decl def" id="get_e801_addr" title='get_e801_addr' data-type='unsigned int get_e801_addr()' data-ref="get_e801_addr">get_e801_addr</dfn>(<em>void</em>)</td></tr>
+<tr><th id="175">175</th><td>{</td></tr>
+<tr><th id="176">176</th><td>    <a class="macro" href="#74" title="unsigned short" data-ref="_M/uint16_t">uint16_t</a> <dfn class="local col1 decl" id="21ax" title='ax' data-type='unsigned short' data-ref="21ax">ax</dfn>, <dfn class="local col2 decl" id="22bx" title='bx' data-type='unsigned short' data-ref="22bx">bx</dfn>, <dfn class="local col3 decl" id="23cx" title='cx' data-type='unsigned short' data-ref="23cx">cx</dfn>, <dfn class="local col4 decl" id="24dx" title='dx' data-type='unsigned short' data-ref="24dx">dx</dfn>;</td></tr>
+<tr><th id="177">177</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col5 decl" id="25ret" title='ret' data-type='unsigned int' data-ref="25ret">ret</dfn>;</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>    <b>asm</b>(<q>"int $0x15\n"</q></td></tr>
+<tr><th id="180">180</th><td>        : <q>"=a"</q>(<a class="local col1 ref" href="#21ax" title='ax' data-ref="21ax">ax</a>), <q>"=b"</q>(<a class="local col2 ref" href="#22bx" title='bx' data-ref="22bx">bx</a>), <q>"=c"</q>(<a class="local col3 ref" href="#23cx" title='cx' data-ref="23cx">cx</a>), <q>"=d"</q>(<a class="local col4 ref" href="#24dx" title='dx' data-ref="24dx">dx</a>)</td></tr>
+<tr><th id="181">181</th><td>        : <q>"a"</q>(<var>0xe801</var>), <q>"b"</q>(<var>0</var>), <q>"c"</q>(<var>0</var>), <q>"d"</q>(<var>0</var>));</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>    <i>/* Not SeaBIOS, but in theory a BIOS could return CX=DX=0 in which</i></td></tr>
+<tr><th id="184">184</th><td><i>     * case we need to use the result from AX &amp; BX instead.</i></td></tr>
+<tr><th id="185">185</th><td><i>     */</i></td></tr>
+<tr><th id="186">186</th><td>    <b>if</b> (<a class="local col3 ref" href="#23cx" title='cx' data-ref="23cx">cx</a> == <var>0</var> &amp;&amp; <a class="local col4 ref" href="#24dx" title='dx' data-ref="24dx">dx</a> == <var>0</var>) {</td></tr>
+<tr><th id="187">187</th><td>        <a class="local col3 ref" href="#23cx" title='cx' data-ref="23cx">cx</a> = <a class="local col1 ref" href="#21ax" title='ax' data-ref="21ax">ax</a>;</td></tr>
+<tr><th id="188">188</th><td>        <a class="local col4 ref" href="#24dx" title='dx' data-ref="24dx">dx</a> = <a class="local col2 ref" href="#22bx" title='bx' data-ref="22bx">bx</a>;</td></tr>
+<tr><th id="189">189</th><td>    }</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>    <b>if</b> (<a class="local col4 ref" href="#24dx" title='dx' data-ref="24dx">dx</a>) {</td></tr>
+<tr><th id="192">192</th><td>        <i>/* DX = extended memory above 16M, in 64K units.</i></td></tr>
+<tr><th id="193">193</th><td><i>         * Convert it to bytes and return.</i></td></tr>
+<tr><th id="194">194</th><td><i>         */</i></td></tr>
+<tr><th id="195">195</th><td>        <a class="local col5 ref" href="#25ret" title='ret' data-ref="25ret">ret</a> = ((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col4 ref" href="#24dx" title='dx' data-ref="24dx">dx</a> + <var>256</var> <i>/* 16M in 64K units */</i>) &lt;&lt; <var>16</var>;</td></tr>
+<tr><th id="196">196</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="197">197</th><td>        <i>/* This is a fallback path for machines with &lt;= 16MB of RAM,</i></td></tr>
+<tr><th id="198">198</th><td><i>         * which probably would never be the case, but deal with it</i></td></tr>
+<tr><th id="199">199</th><td><i>         * anyway.</i></td></tr>
+<tr><th id="200">200</th><td><i>         *</i></td></tr>
+<tr><th id="201">201</th><td><i>         * CX = extended memory between 1M and 16M, in kilobytes</i></td></tr>
+<tr><th id="202">202</th><td><i>         * Convert it to bytes and return.</i></td></tr>
+<tr><th id="203">203</th><td><i>         */</i></td></tr>
+<tr><th id="204">204</th><td>        <a class="local col5 ref" href="#25ret" title='ret' data-ref="25ret">ret</a> = ((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col3 ref" href="#23cx" title='cx' data-ref="23cx">cx</a> + <var>1024</var> <i>/* 1M in K */</i>) &lt;&lt; <var>10</var>;</td></tr>
+<tr><th id="205">205</th><td>    }</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <b>return</b> <a class="local col5 ref" href="#25ret" title='ret' data-ref="25ret">ret</a>;</td></tr>
+<tr><th id="208">208</th><td>}</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><i>/* Force the asm name without leading underscore, even on Win32. */</i></td></tr>
+<tr><th id="211">211</th><td><b>extern</b> <em>void</em> <a class="decl" href="#load_kernel" title='load_kernel' data-ref="load_kernel">load_kernel</a>(<em>void</em>) <b>asm</b>(<q>"load_kernel"</q>);</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><em>void</em> <dfn class="decl def" id="load_kernel" title='load_kernel' data-ref="load_kernel">load_kernel</dfn>(<em>void</em>)</td></tr>
+<tr><th id="214">214</th><td>{</td></tr>
+<tr><th id="215">215</th><td>    <em>void</em> *<dfn class="local col6 decl" id="26setup_addr" title='setup_addr' data-type='void *' data-ref="26setup_addr">setup_addr</dfn>;</td></tr>
+<tr><th id="216">216</th><td>    <em>void</em> *<dfn class="local col7 decl" id="27initrd_addr" title='initrd_addr' data-type='void *' data-ref="27initrd_addr">initrd_addr</dfn>;</td></tr>
+<tr><th id="217">217</th><td>    <em>void</em> *<dfn class="local col8 decl" id="28kernel_addr" title='kernel_addr' data-type='void *' data-ref="28kernel_addr">kernel_addr</dfn>;</td></tr>
+<tr><th id="218">218</th><td>    <em>void</em> *<dfn class="local col9 decl" id="29cmdline_addr" title='cmdline_addr' data-type='void *' data-ref="29cmdline_addr">cmdline_addr</dfn>;</td></tr>
+<tr><th id="219">219</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col0 decl" id="30setup_size" title='setup_size' data-type='unsigned int' data-ref="30setup_size">setup_size</dfn>;</td></tr>
+<tr><th id="220">220</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col1 decl" id="31initrd_size" title='initrd_size' data-type='unsigned int' data-ref="31initrd_size">initrd_size</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col2 decl" id="32kernel_size" title='kernel_size' data-type='unsigned int' data-ref="32kernel_size">kernel_size</dfn>;</td></tr>
+<tr><th id="222">222</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col3 decl" id="33cmdline_size" title='cmdline_size' data-type='unsigned int' data-ref="33cmdline_size">cmdline_size</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col4 decl" id="34initrd_end_page" title='initrd_end_page' data-type='unsigned int' data-ref="34initrd_end_page">initrd_end_page</dfn>, <dfn class="local col5 decl" id="35max_allowed_page" title='max_allowed_page' data-type='unsigned int' data-ref="35max_allowed_page">max_allowed_page</dfn>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a> <dfn class="local col6 decl" id="36segment_addr" title='segment_addr' data-type='unsigned int' data-ref="36segment_addr">segment_addr</dfn>, <dfn class="local col7 decl" id="37stack_addr" title='stack_addr' data-type='unsigned int' data-ref="37stack_addr">stack_addr</dfn>;</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col6 ref" href="#26setup_addr" title='setup_addr' data-ref="26setup_addr">setup_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#26" title="0x16" data-ref="_M/FW_CFG_SETUP_ADDR">FW_CFG_SETUP_ADDR</a>, <var>4</var>);</td></tr>
+<tr><th id="227">227</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col0 ref" href="#30setup_size" title='setup_size' data-ref="30setup_size">setup_size</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#27" title="0x17" data-ref="_M/FW_CFG_SETUP_SIZE">FW_CFG_SETUP_SIZE</a>, <var>4</var>);</td></tr>
+<tr><th id="228">228</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(<a class="local col6 ref" href="#26setup_addr" title='setup_addr' data-ref="26setup_addr">setup_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#28" title="0x18" data-ref="_M/FW_CFG_SETUP_DATA">FW_CFG_SETUP_DATA</a>, <a class="local col0 ref" href="#30setup_size" title='setup_size' data-ref="30setup_size">setup_size</a>);</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>    <a class="tu ref" href="#set_es" title='set_es' data-use='c' data-ref="set_es">set_es</a>(<a class="local col6 ref" href="#26setup_addr" title='setup_addr' data-ref="26setup_addr">setup_addr</a>);</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td>    <i>/* For protocol &lt; 0x203 we don't have initrd_max ... */</i></td></tr>
+<tr><th id="233">233</th><td>    <b>if</b> (<a class="tu ref" href="#readw_es" title='readw_es' data-use='c' data-ref="readw_es">readw_es</a>(<var>0x206</var>) &lt; <var>0x203</var>) {</td></tr>
+<tr><th id="234">234</th><td>        <i>/* ... so we assume initrd_max = 0x37ffffff. */</i></td></tr>
+<tr><th id="235">235</th><td>        <a class="tu ref" href="#writel_es" title='writel_es' data-use='c' data-ref="writel_es">writel_es</a>(<var>0x22c</var>, <var>0x37ffffff</var>);</td></tr>
+<tr><th id="236">236</th><td>    }</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col7 ref" href="#27initrd_addr" title='initrd_addr' data-ref="27initrd_addr">initrd_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#14" title="0x0a" data-ref="_M/FW_CFG_INITRD_ADDR">FW_CFG_INITRD_ADDR</a>, <var>4</var>);</td></tr>
+<tr><th id="239">239</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col1 ref" href="#31initrd_size" title='initrd_size' data-ref="31initrd_size">initrd_size</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#15" title="0x0b" data-ref="_M/FW_CFG_INITRD_SIZE">FW_CFG_INITRD_SIZE</a>, <var>4</var>);</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <a class="local col4 ref" href="#34initrd_end_page" title='initrd_end_page' data-ref="34initrd_end_page">initrd_end_page</a> = ((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)(<a class="local col7 ref" href="#27initrd_addr" title='initrd_addr' data-ref="27initrd_addr">initrd_addr</a> + <a class="local col1 ref" href="#31initrd_size" title='initrd_size' data-ref="31initrd_size">initrd_size</a>) &amp; -<var>4096</var>);</td></tr>
+<tr><th id="242">242</th><td>    <a class="local col5 ref" href="#35max_allowed_page" title='max_allowed_page' data-ref="35max_allowed_page">max_allowed_page</a> = (<a class="tu ref" href="#readl_es" title='readl_es' data-use='c' data-ref="readl_es">readl_es</a>(<var>0x22c</var>) &amp; -<var>4096</var>);</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>    <b>if</b> (<a class="local col4 ref" href="#34initrd_end_page" title='initrd_end_page' data-ref="34initrd_end_page">initrd_end_page</a> != <var>0</var> &amp;&amp; <a class="local col5 ref" href="#35max_allowed_page" title='max_allowed_page' data-ref="35max_allowed_page">max_allowed_page</a> != <var>0</var> &amp;&amp;</td></tr>
+<tr><th id="245">245</th><td>        <a class="local col4 ref" href="#34initrd_end_page" title='initrd_end_page' data-ref="34initrd_end_page">initrd_end_page</a> != <a class="local col5 ref" href="#35max_allowed_page" title='max_allowed_page' data-ref="35max_allowed_page">max_allowed_page</a>) {</td></tr>
+<tr><th id="246">246</th><td>        <i>/* Initrd at the end of memory. Compute better initrd address</i></td></tr>
+<tr><th id="247">247</th><td><i>         * based on e801 data</i></td></tr>
+<tr><th id="248">248</th><td><i>         */</i></td></tr>
+<tr><th id="249">249</th><td>        <a class="local col7 ref" href="#27initrd_addr" title='initrd_addr' data-ref="27initrd_addr">initrd_addr</a> = (<em>void</em> *)((<a class="tu ref" href="#get_e801_addr" title='get_e801_addr' data-use='c' data-ref="get_e801_addr">get_e801_addr</a>() - <a class="local col1 ref" href="#31initrd_size" title='initrd_size' data-ref="31initrd_size">initrd_size</a>) &amp; -<var>4096</var>);</td></tr>
+<tr><th id="250">250</th><td>        <a class="tu ref" href="#writel_es" title='writel_es' data-use='c' data-ref="writel_es">writel_es</a>(<var>0x218</var>, (<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col7 ref" href="#27initrd_addr" title='initrd_addr' data-ref="27initrd_addr">initrd_addr</a>);</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>    }</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(<a class="local col7 ref" href="#27initrd_addr" title='initrd_addr' data-ref="27initrd_addr">initrd_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#22" title="0x12" data-ref="_M/FW_CFG_INITRD_DATA">FW_CFG_INITRD_DATA</a>, <a class="local col1 ref" href="#31initrd_size" title='initrd_size' data-ref="31initrd_size">initrd_size</a>);</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col8 ref" href="#28kernel_addr" title='kernel_addr' data-ref="28kernel_addr">kernel_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#11" title="0x07" data-ref="_M/FW_CFG_KERNEL_ADDR">FW_CFG_KERNEL_ADDR</a>, <var>4</var>);</td></tr>
+<tr><th id="257">257</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col2 ref" href="#32kernel_size" title='kernel_size' data-ref="32kernel_size">kernel_size</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#12" title="0x08" data-ref="_M/FW_CFG_KERNEL_SIZE">FW_CFG_KERNEL_SIZE</a>, <var>4</var>);</td></tr>
+<tr><th id="258">258</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(<a class="local col8 ref" href="#28kernel_addr" title='kernel_addr' data-ref="28kernel_addr">kernel_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#21" title="0x11" data-ref="_M/FW_CFG_KERNEL_DATA">FW_CFG_KERNEL_DATA</a>, <a class="local col2 ref" href="#32kernel_size" title='kernel_size' data-ref="32kernel_size">kernel_size</a>);</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col9 ref" href="#29cmdline_addr" title='cmdline_addr' data-ref="29cmdline_addr">cmdline_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#23" title="0x13" data-ref="_M/FW_CFG_CMDLINE_ADDR">FW_CFG_CMDLINE_ADDR</a>, <var>4</var>);</td></tr>
+<tr><th id="261">261</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(&amp;<a class="local col3 ref" href="#33cmdline_size" title='cmdline_size' data-ref="33cmdline_size">cmdline_size</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#24" title="0x14" data-ref="_M/FW_CFG_CMDLINE_SIZE">FW_CFG_CMDLINE_SIZE</a>, <var>4</var>);</td></tr>
+<tr><th id="262">262</th><td>    <a class="tu ref" href="#bios_cfg_read_entry" title='bios_cfg_read_entry' data-use='c' data-ref="bios_cfg_read_entry">bios_cfg_read_entry</a>(<a class="local col9 ref" href="#29cmdline_addr" title='cmdline_addr' data-ref="29cmdline_addr">cmdline_addr</a>, <a class="macro" href="../../include/hw/nvram/fw_cfg_keys.h.html#25" title="0x15" data-ref="_M/FW_CFG_CMDLINE_DATA">FW_CFG_CMDLINE_DATA</a>, <a class="local col3 ref" href="#33cmdline_size" title='cmdline_size' data-ref="33cmdline_size">cmdline_size</a>);</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>    <i>/* Boot linux */</i></td></tr>
+<tr><th id="265">265</th><td>    <a class="local col6 ref" href="#36segment_addr" title='segment_addr' data-ref="36segment_addr">segment_addr</a> = ((<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)<a class="local col6 ref" href="#26setup_addr" title='setup_addr' data-ref="26setup_addr">setup_addr</a> &gt;&gt; <var>4</var>);</td></tr>
+<tr><th id="266">266</th><td>    <a class="local col7 ref" href="#37stack_addr" title='stack_addr' data-ref="37stack_addr">stack_addr</a> = (<a class="macro" href="#73" title="unsigned int" data-ref="_M/uint32_t">uint32_t</a>)(<a class="local col9 ref" href="#29cmdline_addr" title='cmdline_addr' data-ref="29cmdline_addr">cmdline_addr</a> - <a class="local col6 ref" href="#26setup_addr" title='setup_addr' data-ref="26setup_addr">setup_addr</a> - <var>16</var>);</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td>    <i>/* As we are changing critical registers, we cannot leave freedom to the</i></td></tr>
+<tr><th id="269">269</th><td><i>     * compiler.</i></td></tr>
+<tr><th id="270">270</th><td><i>     */</i></td></tr>
+<tr><th id="271">271</th><td>    <b>asm</b>(<q>"movw %%ax, %%ds\n"</q></td></tr>
+<tr><th id="272">272</th><td>        <q>"movw %%ax, %%es\n"</q></td></tr>
+<tr><th id="273">273</th><td>        <q>"movw %%ax, %%fs\n"</q></td></tr>
+<tr><th id="274">274</th><td>        <q>"movw %%ax, %%gs\n"</q></td></tr>
+<tr><th id="275">275</th><td>        <q>"movw %%ax, %%ss\n"</q></td></tr>
+<tr><th id="276">276</th><td>        <q>"movl %%ebx, %%esp\n"</q></td></tr>
+<tr><th id="277">277</th><td>        <q>"addw $0x20, %%ax\n"</q></td></tr>
+<tr><th id="278">278</th><td>        <q>"pushw %%ax\n"</q> <i>/* CS */</i></td></tr>
+<tr><th id="279">279</th><td>        <q>"pushw $0\n"</q> <i>/* IP */</i></td></tr>
+<tr><th id="280">280</th><td>        <i>/* Clear registers and jump to Linux */</i></td></tr>
+<tr><th id="281">281</th><td>        <q>"xor %%ebx, %%ebx\n"</q></td></tr>
+<tr><th id="282">282</th><td>        <q>"xor %%ecx, %%ecx\n"</q></td></tr>
+<tr><th id="283">283</th><td>        <q>"xor %%edx, %%edx\n"</q></td></tr>
+<tr><th id="284">284</th><td>        <q>"xor %%edi, %%edi\n"</q></td></tr>
+<tr><th id="285">285</th><td>        <q>"xor %%ebp, %%ebp\n"</q></td></tr>
+<tr><th id="286">286</th><td>        <q>"lretw\n"</q></td></tr>
+<tr><th id="287">287</th><td>        : : <q>"a"</q>(<a class="local col6 ref" href="#36segment_addr" title='segment_addr' data-ref="36segment_addr">segment_addr</a>), <q>"b"</q>(<a class="local col7 ref" href="#37stack_addr" title='stack_addr' data-ref="37stack_addr">stack_addr</a>));</td></tr>
+<tr><th id="288">288</th><td>}</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

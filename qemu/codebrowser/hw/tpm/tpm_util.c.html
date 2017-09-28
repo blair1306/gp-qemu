@@ -1,0 +1,145 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tpm_util.c source code [codebrowser/hw/tpm/tpm_util.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/tpm/tpm_util.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>tpm</a>/<a href='tpm_util.c.html'>tpm_util.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * TPM utility functions</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright (c) 2010 - 2015 IBM Corporation</i></td></tr>
+<tr><th id="5">5</th><td><i> *  Authors:</i></td></tr>
+<tr><th id="6">6</th><td><i> *    Stefan Berger &lt;stefanb@us.ibm.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="9">9</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="10">10</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="11">11</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="16">16</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="19">19</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="tpm_util.h.html">"tpm_util.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="tpm_int.h.html">"tpm_int.h"</a></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><i  data-doc="tpm_util_test">/*</i></td></tr>
+<tr><th id="27">27</th><td><i  data-doc="tpm_util_test"> * A basic test of a TPM device. We expect a well formatted response header</i></td></tr>
+<tr><th id="28">28</th><td><i  data-doc="tpm_util_test"> * (error response is fine) within one second.</i></td></tr>
+<tr><th id="29">29</th><td><i  data-doc="tpm_util_test"> */</i></td></tr>
+<tr><th id="30">30</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="tpm_util_test" title='tpm_util_test' data-type='int tpm_util_test(int fd, unsigned char * request, size_t requestlen, uint16_t * return_tag)' data-ref="tpm_util_test">tpm_util_test</dfn>(<em>int</em> <dfn class="local col1 decl" id="1fd" title='fd' data-type='int' data-ref="1fd">fd</dfn>,</td></tr>
+<tr><th id="31">31</th><td>                         <em>unsigned</em> <em>char</em> *<dfn class="local col2 decl" id="2request" title='request' data-type='unsigned char *' data-ref="2request">request</dfn>,</td></tr>
+<tr><th id="32">32</th><td>                         <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col3 decl" id="3requestlen" title='requestlen' data-type='size_t' data-ref="3requestlen">requestlen</dfn>,</td></tr>
+<tr><th id="33">33</th><td>                         <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> *<dfn class="local col4 decl" id="4return_tag" title='return_tag' data-type='uint16_t *' data-ref="4return_tag">return_tag</dfn>)</td></tr>
+<tr><th id="34">34</th><td>{</td></tr>
+<tr><th id="35">35</th><td>    <b>struct</b> <a class="type" href="tpm_int.h.html#tpm_resp_hdr" title='tpm_resp_hdr' data-ref="tpm_resp_hdr">tpm_resp_hdr</a> *<dfn class="local col5 decl" id="5resp" title='resp' data-type='struct tpm_resp_hdr *' data-ref="5resp">resp</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../include/x86_64-linux-gnu/sys/select.h.html#fd_set" title='fd_set' data-type='struct fd_set' data-ref="fd_set">fd_set</a> <dfn class="local col6 decl" id="6readfds" title='readfds' data-type='fd_set' data-ref="6readfds">readfds</dfn>;</td></tr>
+<tr><th id="37">37</th><td>    <em>int</em> <dfn class="local col7 decl" id="7n" title='n' data-type='int' data-ref="7n">n</dfn>;</td></tr>
+<tr><th id="38">38</th><td>    <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval" title='timeval' data-ref="timeval">timeval</a> <dfn class="local col8 decl" id="8tv" title='tv' data-type='struct timeval' data-ref="8tv">tv</dfn> = {</td></tr>
+<tr><th id="39">39</th><td>        .<a class="ref" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval::tv_sec" title='timeval::tv_sec' data-ref="timeval::tv_sec">tv_sec</a> = <var>1</var>,</td></tr>
+<tr><th id="40">40</th><td>        .<a class="ref" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval::tv_usec" title='timeval::tv_usec' data-ref="timeval::tv_usec">tv_usec</a> = <var>0</var>,</td></tr>
+<tr><th id="41">41</th><td>    };</td></tr>
+<tr><th id="42">42</th><td>    <em>unsigned</em> <em>char</em> <dfn class="local col9 decl" id="9buf" title='buf' data-type='unsigned char [1024]' data-ref="9buf">buf</dfn>[<var>1024</var>];</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> = <a class="ref" href="../../../include/unistd.h.html#write" title='write' data-ref="write">write</a>(<a class="local col1 ref" href="#1fd" title='fd' data-ref="1fd">fd</a>, <a class="local col2 ref" href="#2request" title='request' data-ref="2request">request</a>, <a class="local col3 ref" href="#3requestlen" title='requestlen' data-ref="3requestlen">requestlen</a>);</td></tr>
+<tr><th id="45">45</th><td>    <b>if</b> (<a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="46">46</th><td>        <b>return</b> <a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="47">47</th><td>    }</td></tr>
+<tr><th id="48">48</th><td>    <b>if</b> (<a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> != <a class="local col3 ref" href="#3requestlen" title='requestlen' data-ref="3requestlen">requestlen</a>) {</td></tr>
+<tr><th id="49">49</th><td>        <b>return</b> <a class="macro" href="../../../include/asm-generic/errno-base.h.html#17" title="14" data-ref="_M/EFAULT">EFAULT</a>;</td></tr>
+<tr><th id="50">50</th><td>    }</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <a class="macro" href="../../../include/x86_64-linux-gnu/sys/select.h.html#93" title="do { int __d0, __d1; __asm__ __volatile__ (&quot;cld; rep; &quot; &quot;stosq&quot; : &quot;=c&quot; (__d0), &quot;=D&quot; (__d1) : &quot;a&quot; (0), &quot;0&quot; (sizeof (fd_set) / sizeof (__fd_mask)), &quot;1&quot; (&amp;((&amp;readfds)-&gt;fds_bits)[0]) : &quot;memory&quot;); } while (0)" data-ref="_M/FD_ZERO">FD_ZERO</a>(&amp;<a class="local col6 ref" href="#6readfds" title='readfds' data-ref="6readfds">readfds</a>);</td></tr>
+<tr><th id="53">53</th><td>    <a class="macro" href="../../../include/x86_64-linux-gnu/sys/select.h.html#90" title="((void) (((&amp;readfds)-&gt;fds_bits)[((fd) / (8 * (int) sizeof (__fd_mask)))] |= ((__fd_mask) (1UL &lt;&lt; ((fd) % (8 * (int) sizeof (__fd_mask)))))))" data-ref="_M/FD_SET">FD_SET</a>(<a class="local col1 ref" href="#1fd" title='fd' data-ref="1fd">fd</a>, &amp;<a class="local col6 ref" href="#6readfds" title='readfds' data-ref="6readfds">readfds</a>);</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td>    <i>/* wait for a second */</i></td></tr>
+<tr><th id="56">56</th><td>    <a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> = <a class="ref" href="../../../include/x86_64-linux-gnu/sys/select.h.html#select" title='select' data-ref="select">select</a>(<a class="local col1 ref" href="#1fd" title='fd' data-ref="1fd">fd</a> + <var>1</var>, &amp;<a class="local col6 ref" href="#6readfds" title='readfds' data-ref="6readfds">readfds</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, &amp;<a class="local col8 ref" href="#8tv" title='tv' data-ref="8tv">tv</a>);</td></tr>
+<tr><th id="57">57</th><td>    <b>if</b> (<a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> != <var>1</var>) {</td></tr>
+<tr><th id="58">58</th><td>        <b>return</b> <a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="59">59</th><td>    }</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    <a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> = <a class="ref" href="../../../include/unistd.h.html#read" title='read' data-ref="read">read</a>(<a class="local col1 ref" href="#1fd" title='fd' data-ref="1fd">fd</a>, &amp;<a class="local col9 ref" href="#9buf" title='buf' data-ref="9buf">buf</a>, <b>sizeof</b>(<a class="local col9 ref" href="#9buf" title='buf' data-ref="9buf">buf</a>));</td></tr>
+<tr><th id="62">62</th><td>    <b>if</b> (<a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a> &lt; <b>sizeof</b>(<b>struct</b> <a class="type" href="tpm_int.h.html#tpm_resp_hdr" title='tpm_resp_hdr' data-ref="tpm_resp_hdr">tpm_resp_hdr</a>)) {</td></tr>
+<tr><th id="63">63</th><td>        <b>return</b> <a class="macro" href="../../../include/asm-generic/errno-base.h.html#17" title="14" data-ref="_M/EFAULT">EFAULT</a>;</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <a class="local col5 ref" href="#5resp" title='resp' data-ref="5resp">resp</a> = (<b>struct</b> <a class="type" href="tpm_int.h.html#tpm_resp_hdr" title='tpm_resp_hdr' data-ref="tpm_resp_hdr">tpm_resp_hdr</a> *)<a class="local col9 ref" href="#9buf" title='buf' data-ref="9buf">buf</a>;</td></tr>
+<tr><th id="67">67</th><td>    <i>/* check the header */</i></td></tr>
+<tr><th id="68">68</th><td>    <b>if</b> (<a class="ref" href="../../include/qemu/bswap.h.html#163" title='be32_to_cpu' data-ref="be32_to_cpu">be32_to_cpu</a>(<a class="local col5 ref" href="#5resp" title='resp' data-ref="5resp">resp</a>-&gt;<a class="ref" href="tpm_int.h.html#tpm_resp_hdr::len" title='tpm_resp_hdr::len' data-ref="tpm_resp_hdr::len">len</a>) != <a class="local col7 ref" href="#7n" title='n' data-ref="7n">n</a>) {</td></tr>
+<tr><th id="69">69</th><td>        <b>return</b> <a class="macro" href="../../../include/asm-generic/errno.h.html#56" title="74" data-ref="_M/EBADMSG">EBADMSG</a>;</td></tr>
+<tr><th id="70">70</th><td>    }</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    *<a class="local col4 ref" href="#4return_tag" title='return_tag' data-ref="4return_tag">return_tag</a> = <a class="ref" href="../../include/qemu/bswap.h.html#162" title='be16_to_cpu' data-ref="be16_to_cpu">be16_to_cpu</a>(<a class="local col5 ref" href="#5resp" title='resp' data-ref="5resp">resp</a>-&gt;<a class="ref" href="tpm_int.h.html#tpm_resp_hdr::tag" title='tpm_resp_hdr::tag' data-ref="tpm_resp_hdr::tag">tag</a>);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>/*</i></td></tr>
+<tr><th id="78">78</th><td><i> * Probe for the TPM device in the back</i></td></tr>
+<tr><th id="79">79</th><td><i> * Returns 0 on success with the version of the probed TPM set, 1 on failure.</i></td></tr>
+<tr><th id="80">80</th><td><i> */</i></td></tr>
+<tr><th id="81">81</th><td><em>int</em> <dfn class="decl def" id="tpm_util_test_tpmdev" title='tpm_util_test_tpmdev' data-ref="tpm_util_test_tpmdev">tpm_util_test_tpmdev</dfn>(<em>int</em> <dfn class="local col0 decl" id="10tpm_fd" title='tpm_fd' data-type='int' data-ref="10tpm_fd">tpm_fd</dfn>, <a class="typedef" href="../../include/sysemu/tpm.h.html#TPMVersion" title='TPMVersion' data-type='enum TPMVersion' data-ref="TPMVersion">TPMVersion</a> *<dfn class="local col1 decl" id="11tpm_version" title='tpm_version' data-type='TPMVersion *' data-ref="11tpm_version">tpm_version</dfn>)</td></tr>
+<tr><th id="82">82</th><td>{</td></tr>
+<tr><th id="83">83</th><td>    <i>/*</i></td></tr>
+<tr><th id="84">84</th><td><i>     * Sending a TPM1.2 command to a TPM2 should return a TPM1.2</i></td></tr>
+<tr><th id="85">85</th><td><i>     * header (tag = 0xc4) and error code (TPM_BADTAG = 0x1e)</i></td></tr>
+<tr><th id="86">86</th><td><i>     *</i></td></tr>
+<tr><th id="87">87</th><td><i>     * Sending a TPM2 command to a TPM 2 will give a TPM 2 tag in the</i></td></tr>
+<tr><th id="88">88</th><td><i>     * header.</i></td></tr>
+<tr><th id="89">89</th><td><i>     * Sending a TPM2 command to a TPM 1.2 will give a TPM 1.2 tag</i></td></tr>
+<tr><th id="90">90</th><td><i>     * in the header and an error code.</i></td></tr>
+<tr><th id="91">91</th><td><i>     */</i></td></tr>
+<tr><th id="92">92</th><td>    <em>const</em> <b>struct</b> <a class="type" href="tpm_int.h.html#tpm_req_hdr" title='tpm_req_hdr' data-ref="tpm_req_hdr">tpm_req_hdr</a> <dfn class="local col2 decl" id="12test_req" title='test_req' data-type='const struct tpm_req_hdr' data-ref="12test_req">test_req</dfn> = {</td></tr>
+<tr><th id="93">93</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::tag" title='tpm_req_hdr::tag' data-ref="tpm_req_hdr::tag">tag</a> = <a class="ref" href="../../include/qemu/bswap.h.html#162" title='cpu_to_be16' data-ref="cpu_to_be16">cpu_to_be16</a>(<a class="macro" href="tpm_int.h.html#56" title="0xc1" data-ref="_M/TPM_TAG_RQU_COMMAND">TPM_TAG_RQU_COMMAND</a>),</td></tr>
+<tr><th id="94">94</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::len" title='tpm_req_hdr::len' data-ref="tpm_req_hdr::len">len</a> = <a class="ref" href="../../include/qemu/bswap.h.html#163" title='cpu_to_be32' data-ref="cpu_to_be32">cpu_to_be32</a>(<b>sizeof</b>(<a class="local col2 ref" href="#12test_req" title='test_req' data-ref="12test_req">test_req</a>)),</td></tr>
+<tr><th id="95">95</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::ordinal" title='tpm_req_hdr::ordinal' data-ref="tpm_req_hdr::ordinal">ordinal</a> = <a class="ref" href="../../include/qemu/bswap.h.html#163" title='cpu_to_be32' data-ref="cpu_to_be32">cpu_to_be32</a>(<a class="macro" href="tpm_int.h.html#67" title="0xf1" data-ref="_M/TPM_ORD_GetTicks">TPM_ORD_GetTicks</a>),</td></tr>
+<tr><th id="96">96</th><td>    };</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td>    <em>const</em> <b>struct</b> <a class="type" href="tpm_int.h.html#tpm_req_hdr" title='tpm_req_hdr' data-ref="tpm_req_hdr">tpm_req_hdr</a> <dfn class="local col3 decl" id="13test_req_tpm2" title='test_req_tpm2' data-type='const struct tpm_req_hdr' data-ref="13test_req_tpm2">test_req_tpm2</dfn> = {</td></tr>
+<tr><th id="99">99</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::tag" title='tpm_req_hdr::tag' data-ref="tpm_req_hdr::tag">tag</a> = <a class="ref" href="../../include/qemu/bswap.h.html#162" title='cpu_to_be16' data-ref="cpu_to_be16">cpu_to_be16</a>(<a class="macro" href="tpm_int.h.html#71" title="0x8001" data-ref="_M/TPM2_ST_NO_SESSIONS">TPM2_ST_NO_SESSIONS</a>),</td></tr>
+<tr><th id="100">100</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::len" title='tpm_req_hdr::len' data-ref="tpm_req_hdr::len">len</a> = <a class="ref" href="../../include/qemu/bswap.h.html#163" title='cpu_to_be32' data-ref="cpu_to_be32">cpu_to_be32</a>(<b>sizeof</b>(<a class="local col3 ref" href="#13test_req_tpm2" title='test_req_tpm2' data-ref="13test_req_tpm2">test_req_tpm2</a>)),</td></tr>
+<tr><th id="101">101</th><td>        .<a class="ref" href="tpm_int.h.html#tpm_req_hdr::ordinal" title='tpm_req_hdr::ordinal' data-ref="tpm_req_hdr::ordinal">ordinal</a> = <a class="ref" href="../../include/qemu/bswap.h.html#163" title='cpu_to_be32' data-ref="cpu_to_be32">cpu_to_be32</a>(<a class="macro" href="tpm_int.h.html#73" title="0x00000181" data-ref="_M/TPM2_CC_ReadClock">TPM2_CC_ReadClock</a>),</td></tr>
+<tr><th id="102">102</th><td>    };</td></tr>
+<tr><th id="103">103</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col4 decl" id="14return_tag" title='return_tag' data-type='uint16_t' data-ref="14return_tag">return_tag</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <em>int</em> <dfn class="local col5 decl" id="15ret" title='ret' data-type='int' data-ref="15ret">ret</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <i>/* Send TPM 2 command */</i></td></tr>
+<tr><th id="107">107</th><td>    <a class="local col5 ref" href="#15ret" title='ret' data-ref="15ret">ret</a> = <a class="tu ref" href="#tpm_util_test" title='tpm_util_test' data-use='c' data-ref="tpm_util_test">tpm_util_test</a>(<a class="local col0 ref" href="#10tpm_fd" title='tpm_fd' data-ref="10tpm_fd">tpm_fd</a>, (<em>unsigned</em> <em>char</em> *)&amp;<a class="local col3 ref" href="#13test_req_tpm2" title='test_req_tpm2' data-ref="13test_req_tpm2">test_req_tpm2</a>,</td></tr>
+<tr><th id="108">108</th><td>                        <b>sizeof</b>(<a class="local col3 ref" href="#13test_req_tpm2" title='test_req_tpm2' data-ref="13test_req_tpm2">test_req_tpm2</a>), &amp;<a class="local col4 ref" href="#14return_tag" title='return_tag' data-ref="14return_tag">return_tag</a>);</td></tr>
+<tr><th id="109">109</th><td>    <i>/* TPM 2 would respond with a tag of TPM2_ST_NO_SESSIONS */</i></td></tr>
+<tr><th id="110">110</th><td>    <b>if</b> (!<a class="local col5 ref" href="#15ret" title='ret' data-ref="15ret">ret</a> &amp;&amp; <a class="local col4 ref" href="#14return_tag" title='return_tag' data-ref="14return_tag">return_tag</a> == <a class="macro" href="tpm_int.h.html#71" title="0x8001" data-ref="_M/TPM2_ST_NO_SESSIONS">TPM2_ST_NO_SESSIONS</a>) {</td></tr>
+<tr><th id="111">111</th><td>        *<a class="local col1 ref" href="#11tpm_version" title='tpm_version' data-ref="11tpm_version">tpm_version</a> = <a class="enum" href="../../include/sysemu/tpm.h.html#TPMVersion::TPM_VERSION_2_0" title='TPMVersion::TPM_VERSION_2_0' data-ref="TPMVersion::TPM_VERSION_2_0">TPM_VERSION_2_0</a>;</td></tr>
+<tr><th id="112">112</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="113">113</th><td>    }</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <i>/* Send TPM 1.2 command */</i></td></tr>
+<tr><th id="116">116</th><td>    <a class="local col5 ref" href="#15ret" title='ret' data-ref="15ret">ret</a> = <a class="tu ref" href="#tpm_util_test" title='tpm_util_test' data-use='c' data-ref="tpm_util_test">tpm_util_test</a>(<a class="local col0 ref" href="#10tpm_fd" title='tpm_fd' data-ref="10tpm_fd">tpm_fd</a>, (<em>unsigned</em> <em>char</em> *)&amp;<a class="local col2 ref" href="#12test_req" title='test_req' data-ref="12test_req">test_req</a>,</td></tr>
+<tr><th id="117">117</th><td>                        <b>sizeof</b>(<a class="local col2 ref" href="#12test_req" title='test_req' data-ref="12test_req">test_req</a>), &amp;<a class="local col4 ref" href="#14return_tag" title='return_tag' data-ref="14return_tag">return_tag</a>);</td></tr>
+<tr><th id="118">118</th><td>    <b>if</b> (!<a class="local col5 ref" href="#15ret" title='ret' data-ref="15ret">ret</a> &amp;&amp; <a class="local col4 ref" href="#14return_tag" title='return_tag' data-ref="14return_tag">return_tag</a> == <a class="macro" href="tpm_int.h.html#60" title="0xc4" data-ref="_M/TPM_TAG_RSP_COMMAND">TPM_TAG_RSP_COMMAND</a>) {</td></tr>
+<tr><th id="119">119</th><td>        *<a class="local col1 ref" href="#11tpm_version" title='tpm_version' data-ref="11tpm_version">tpm_version</a> = <a class="enum" href="../../include/sysemu/tpm.h.html#TPMVersion::TPM_VERSION_1_2" title='TPMVersion::TPM_VERSION_1_2' data-ref="TPMVersion::TPM_VERSION_1_2">TPM_VERSION_1_2</a>;</td></tr>
+<tr><th id="120">120</th><td>        <i>/* this is a TPM 1.2 */</i></td></tr>
+<tr><th id="121">121</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="122">122</th><td>    }</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td>    *<a class="local col1 ref" href="#11tpm_version" title='tpm_version' data-ref="11tpm_version">tpm_version</a> = <a class="enum" href="../../include/sysemu/tpm.h.html#TPMVersion::TPM_VERSION_UNSPEC" title='TPMVersion::TPM_VERSION_UNSPEC' data-ref="TPMVersion::TPM_VERSION_UNSPEC">TPM_VERSION_UNSPEC</a>;</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="127">127</th><td>}</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>cpu-defs.h source code [codebrowser/include/exec/cpu-defs.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CPUIOTLBEntry,CPUTLBEntry "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/exec/cpu-defs.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>exec</a>/<a href='cpu-defs.h.html'>cpu-defs.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * common defines for all CPUs</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td><u>#<span data-ppcond="19">ifndef</span> <span class="macro" data-ref="_M/CPU_DEFS_H">CPU_DEFS_H</span></u></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/CPU_DEFS_H" data-ref="_M/CPU_DEFS_H">CPU_DEFS_H</dfn></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#<span data-ppcond="22">ifndef</span> <span class="macro" data-ref="_M/NEED_CPU_H">NEED_CPU_H</span></u></td></tr>
+<tr><th id="23">23</th><td><u>#error cpu.h included from common code</u></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="22">endif</span></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../qemu/host-utils.h.html">"qemu/host-utils.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="28">ifdef</span> <a class="macro" href="../../config-host.h.html#66" data-ref="_M/CONFIG_TCG">CONFIG_TCG</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../tcg/i386/tcg-target.h.html">"tcg-target.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#<span data-ppcond="28">endif</span></u></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="31">ifndef</span> <span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="hwaddr.h.html">"exec/hwaddr.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="31">endif</span></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="memattrs.h.html">"exec/memattrs.h"</a></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="36">ifndef</span> <a class="macro" href="../../target/i386/cpu.h.html#28" data-ref="_M/TARGET_LONG_BITS">TARGET_LONG_BITS</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#error TARGET_LONG_BITS must be defined before including this header</u></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="36">endif</span></u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/TARGET_LONG_SIZE" data-ref="_M/TARGET_LONG_SIZE">TARGET_LONG_SIZE</dfn> (TARGET_LONG_BITS / 8)</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* target_ulong is the type of a virtual address */</i></td></tr>
+<tr><th id="43">43</th><td><u>#<span data-ppcond="43">if</span> <a class="macro" href="#40" title="(64 / 8)" data-ref="_M/TARGET_LONG_SIZE">TARGET_LONG_SIZE</a> == 4</u></td></tr>
+<tr><th id="44">44</th><td><b>typedef</b> int32_t target_long;</td></tr>
+<tr><th id="45">45</th><td><b>typedef</b> uint32_t target_ulong;</td></tr>
+<tr><th id="46">46</th><td><u>#define TARGET_FMT_lx "%08x"</u></td></tr>
+<tr><th id="47">47</th><td><u>#define TARGET_FMT_ld "%d"</u></td></tr>
+<tr><th id="48">48</th><td><u>#define TARGET_FMT_lu "%u"</u></td></tr>
+<tr><th id="49">49</th><td><u>#<span data-ppcond="43">elif</span> <a class="macro" href="#40" title="(64 / 8)" data-ref="_M/TARGET_LONG_SIZE">TARGET_LONG_SIZE</a> == 8</u></td></tr>
+<tr><th id="50">50</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="typedef" id="target_long" title='target_long' data-type='int64_t' data-ref="target_long">target_long</dfn>;</td></tr>
+<tr><th id="51">51</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="typedef" id="target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</dfn>;</td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/TARGET_FMT_lx" data-ref="_M/TARGET_FMT_lx">TARGET_FMT_lx</dfn> "%016" PRIx64</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/TARGET_FMT_ld" data-ref="_M/TARGET_FMT_ld">TARGET_FMT_ld</dfn> "%" PRId64</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/TARGET_FMT_lu" data-ref="_M/TARGET_FMT_lu">TARGET_FMT_lu</dfn> "%" PRIu64</u></td></tr>
+<tr><th id="55">55</th><td><u>#<span data-ppcond="43">else</span></u></td></tr>
+<tr><th id="56">56</th><td><u>#error TARGET_LONG_SIZE undefined</u></td></tr>
+<tr><th id="57">57</th><td><u>#<span data-ppcond="43">endif</span></u></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="59">if</span> !defined(<span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span>) &amp;&amp; defined(<a class="macro" href="../../config-host.h.html#66" data-ref="_M/CONFIG_TCG">CONFIG_TCG</a>)</u></td></tr>
+<tr><th id="60">60</th><td><i>/* use a fully associative victim tlb of 8 entries */</i></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/CPU_VTLB_SIZE" data-ref="_M/CPU_VTLB_SIZE">CPU_VTLB_SIZE</dfn> 8</u></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><u>#<span data-ppcond="63">if</span> <a class="macro" href="../qemu/osdep.h.html#142" title="64" data-ref="_M/HOST_LONG_BITS">HOST_LONG_BITS</a> == 32 &amp;&amp; <a class="macro" href="../../target/i386/cpu.h.html#28" title="64" data-ref="_M/TARGET_LONG_BITS">TARGET_LONG_BITS</a> == 32</u></td></tr>
+<tr><th id="64">64</th><td><u>#define CPU_TLB_ENTRY_BITS 4</u></td></tr>
+<tr><th id="65">65</th><td><u>#<span data-ppcond="63">else</span></u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/CPU_TLB_ENTRY_BITS" data-ref="_M/CPU_TLB_ENTRY_BITS">CPU_TLB_ENTRY_BITS</dfn> 5</u></td></tr>
+<tr><th id="67">67</th><td><u>#<span data-ppcond="63">endif</span></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><i>/* TCG_TARGET_TLB_DISPLACEMENT_BITS is used in CPU_TLB_BITS to ensure that</i></td></tr>
+<tr><th id="70">70</th><td><i> * the TLB is not unnecessarily small, but still small enough for the</i></td></tr>
+<tr><th id="71">71</th><td><i> * TLB lookup instruction sequence used by the TCG target.</i></td></tr>
+<tr><th id="72">72</th><td><i> *</i></td></tr>
+<tr><th id="73">73</th><td><i> * TCG will have to generate an operand as large as the distance between</i></td></tr>
+<tr><th id="74">74</th><td><i> * env and the tlb_table[NB_MMU_MODES - 1][0].addend.  For simplicity,</i></td></tr>
+<tr><th id="75">75</th><td><i> * the TCG targets just round everything up to the next power of two, and</i></td></tr>
+<tr><th id="76">76</th><td><i> * count bits.  This works because: 1) the size of each TLB is a largish</i></td></tr>
+<tr><th id="77">77</th><td><i> * power of two, 2) and because the limit of the displacement is really close</i></td></tr>
+<tr><th id="78">78</th><td><i> * to a power of two, 3) the offset of tlb_table[0][0] inside env is smaller</i></td></tr>
+<tr><th id="79">79</th><td><i> * than the size of a TLB.</i></td></tr>
+<tr><th id="80">80</th><td><i> *</i></td></tr>
+<tr><th id="81">81</th><td><i> * For example, the maximum displacement 0xFFF0 on PPC and MIPS, but TCG</i></td></tr>
+<tr><th id="82">82</th><td><i> * just says "the displacement is 16 bits".  TCG_TARGET_TLB_DISPLACEMENT_BITS</i></td></tr>
+<tr><th id="83">83</th><td><i> * then ensures that tlb_table at least 0x8000 bytes large ("not unnecessarily</i></td></tr>
+<tr><th id="84">84</th><td><i> * small": 2^15).  The operand then will come up smaller than 0xFFF0 without</i></td></tr>
+<tr><th id="85">85</th><td><i> * any particular care, because the TLB for a single MMU mode is larger than</i></td></tr>
+<tr><th id="86">86</th><td><i> * 0x10000-0xFFF0=16 bytes.  In the end, the maximum value of the operand</i></td></tr>
+<tr><th id="87">87</th><td><i> * could be something like 0xC000 (the offset of the last TLB table) plus</i></td></tr>
+<tr><th id="88">88</th><td><i> * 0x18 (the offset of the addend field in each TLB entry) plus the offset</i></td></tr>
+<tr><th id="89">89</th><td><i> * of tlb_table inside env (which is non-trivial but not huge).</i></td></tr>
+<tr><th id="90">90</th><td><i> */</i></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/CPU_TLB_BITS" data-ref="_M/CPU_TLB_BITS">CPU_TLB_BITS</dfn>                                             \</u></td></tr>
+<tr><th id="92">92</th><td><u>    MIN(8,                                                       \</u></td></tr>
+<tr><th id="93">93</th><td><u>        TCG_TARGET_TLB_DISPLACEMENT_BITS - CPU_TLB_ENTRY_BITS -  \</u></td></tr>
+<tr><th id="94">94</th><td><u>        (NB_MMU_MODES &lt;= 1 ? 0 :                                 \</u></td></tr>
+<tr><th id="95">95</th><td><u>         NB_MMU_MODES &lt;= 2 ? 1 :                                 \</u></td></tr>
+<tr><th id="96">96</th><td><u>         NB_MMU_MODES &lt;= 4 ? 2 :                                 \</u></td></tr>
+<tr><th id="97">97</th><td><u>         NB_MMU_MODES &lt;= 8 ? 3 : 4))</u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/CPU_TLB_SIZE" data-ref="_M/CPU_TLB_SIZE">CPU_TLB_SIZE</dfn> (1 &lt;&lt; CPU_TLB_BITS)</u></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CPUTLBEntry" title='CPUTLBEntry' data-ref="CPUTLBEntry"><a class="type" href="#CPUTLBEntry" title='CPUTLBEntry' data-ref="CPUTLBEntry">CPUTLBEntry</a></dfn> {</td></tr>
+<tr><th id="102">102</th><td>    <i>/* bit TARGET_LONG_BITS to TARGET_PAGE_BITS : virtual address</i></td></tr>
+<tr><th id="103">103</th><td><i>       bit TARGET_PAGE_BITS-1..4  : Nonzero for accesses that should not</i></td></tr>
+<tr><th id="104">104</th><td><i>                                    go directly to ram.</i></td></tr>
+<tr><th id="105">105</th><td><i>       bit 3                      : indicates that the entry is invalid</i></td></tr>
+<tr><th id="106">106</th><td><i>       bit 2..0                   : zero</i></td></tr>
+<tr><th id="107">107</th><td><i>    */</i></td></tr>
+<tr><th id="108">108</th><td>    <b>union</b> {</td></tr>
+<tr><th id="109">109</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="110">110</th><td>            <a class="typedef" href="#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="decl" id="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_read" title='CPUTLBEntry::(anonymous union)::(anonymous struct)::addr_read' data-ref="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_read">addr_read</dfn>;</td></tr>
+<tr><th id="111">111</th><td>            <a class="typedef" href="#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="decl" id="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_write" title='CPUTLBEntry::(anonymous union)::(anonymous struct)::addr_write' data-ref="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_write">addr_write</dfn>;</td></tr>
+<tr><th id="112">112</th><td>            <a class="typedef" href="#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="decl" id="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_code" title='CPUTLBEntry::(anonymous union)::(anonymous struct)::addr_code' data-ref="CPUTLBEntry::(anonymousunion)::(anonymous)::addr_code">addr_code</dfn>;</td></tr>
+<tr><th id="113">113</th><td>            <i>/* Addend to virtual address to get host address.  IO accesses</i></td></tr>
+<tr><th id="114">114</th><td><i>               use the corresponding iotlb value.  */</i></td></tr>
+<tr><th id="115">115</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="decl" id="CPUTLBEntry::(anonymousunion)::(anonymous)::addend" title='CPUTLBEntry::(anonymous union)::(anonymous struct)::addend' data-ref="CPUTLBEntry::(anonymousunion)::(anonymous)::addend">addend</dfn>;</td></tr>
+<tr><th id="116">116</th><td>        };</td></tr>
+<tr><th id="117">117</th><td>        <i>/* padding to get a power of two size */</i></td></tr>
+<tr><th id="118">118</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="CPUTLBEntry::(anonymous)::dummy" title='CPUTLBEntry::(anonymous union)::dummy' data-ref="CPUTLBEntry::(anonymous)::dummy">dummy</dfn>[<var>1</var> &lt;&lt; <a class="macro" href="#66" title="5" data-ref="_M/CPU_TLB_ENTRY_BITS">CPU_TLB_ENTRY_BITS</a>];</td></tr>
+<tr><th id="119">119</th><td>    };</td></tr>
+<tr><th id="120">120</th><td>} <dfn class="typedef" id="CPUTLBEntry" title='CPUTLBEntry' data-type='struct CPUTLBEntry' data-ref="CPUTLBEntry">CPUTLBEntry</dfn>;</td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><a class="macro" href="../qemu/compiler.h.html#86" title="_Static_assert(!(sizeof(CPUTLBEntry) != (1 &lt;&lt; 5)), &quot;not expecting: &quot; &quot;sizeof(CPUTLBEntry) != (1 &lt;&lt; CPU_TLB_ENTRY_BITS)&quot;)" data-ref="_M/QEMU_BUILD_BUG_ON">QEMU_BUILD_BUG_ON</a>(<b>sizeof</b>(<a class="typedef" href="#CPUTLBEntry" title='CPUTLBEntry' data-type='struct CPUTLBEntry' data-ref="CPUTLBEntry">CPUTLBEntry</a>) != (<var>1</var> &lt;&lt; <a class="macro" href="#66" title="5" data-ref="_M/CPU_TLB_ENTRY_BITS">CPU_TLB_ENTRY_BITS</a>));</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><i>/* The IOTLB is not accessed directly inline by generated TCG code,</i></td></tr>
+<tr><th id="125">125</th><td><i> * so the CPUIOTLBEntry layout is not as critical as that of the</i></td></tr>
+<tr><th id="126">126</th><td><i> * CPUTLBEntry. (This is also why we don't want to combine the two</i></td></tr>
+<tr><th id="127">127</th><td><i> * structs into one.)</i></td></tr>
+<tr><th id="128">128</th><td><i> */</i></td></tr>
+<tr><th id="129">129</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CPUIOTLBEntry" title='CPUIOTLBEntry' data-ref="CPUIOTLBEntry"><a class="type" href="#CPUIOTLBEntry" title='CPUIOTLBEntry' data-ref="CPUIOTLBEntry">CPUIOTLBEntry</a></dfn> {</td></tr>
+<tr><th id="130">130</th><td>    <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="CPUIOTLBEntry::addr" title='CPUIOTLBEntry::addr' data-ref="CPUIOTLBEntry::addr">addr</dfn>;</td></tr>
+<tr><th id="131">131</th><td>    <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="decl" id="CPUIOTLBEntry::attrs" title='CPUIOTLBEntry::attrs' data-ref="CPUIOTLBEntry::attrs">attrs</dfn>;</td></tr>
+<tr><th id="132">132</th><td>} <dfn class="typedef" id="CPUIOTLBEntry" title='CPUIOTLBEntry' data-type='struct CPUIOTLBEntry' data-ref="CPUIOTLBEntry">CPUIOTLBEntry</dfn>;</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/CPU_COMMON_TLB" data-ref="_M/CPU_COMMON_TLB">CPU_COMMON_TLB</dfn> \</u></td></tr>
+<tr><th id="135">135</th><td><u>    /* The meaning of the MMU modes is defined in the target code. */   \</u></td></tr>
+<tr><th id="136">136</th><td><u>    CPUTLBEntry tlb_table[NB_MMU_MODES][CPU_TLB_SIZE];                  \</u></td></tr>
+<tr><th id="137">137</th><td><u>    CPUTLBEntry tlb_v_table[NB_MMU_MODES][CPU_VTLB_SIZE];               \</u></td></tr>
+<tr><th id="138">138</th><td><u>    CPUIOTLBEntry iotlb[NB_MMU_MODES][CPU_TLB_SIZE];                    \</u></td></tr>
+<tr><th id="139">139</th><td><u>    CPUIOTLBEntry iotlb_v[NB_MMU_MODES][CPU_VTLB_SIZE];                 \</u></td></tr>
+<tr><th id="140">140</th><td><u>    target_ulong tlb_flush_addr;                                        \</u></td></tr>
+<tr><th id="141">141</th><td><u>    target_ulong tlb_flush_mask;                                        \</u></td></tr>
+<tr><th id="142">142</th><td><u>    target_ulong vtlb_index;</u>                                            \</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><u>#<span data-ppcond="59">else</span></u></td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td><u>#define CPU_COMMON_TLB</u></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><u>#<span data-ppcond="59">endif</span></u></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/CPU_COMMON" data-ref="_M/CPU_COMMON">CPU_COMMON</dfn>                                                      \</u></td></tr>
+<tr><th id="152">152</th><td><u>    /* soft mmu support */                                              \</u></td></tr>
+<tr><th id="153">153</th><td><u>    CPU_COMMON_TLB</u>                                                      \</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><u>#<span data-ppcond="19">endif</span></u></td></tr>
+<tr><th id="156">156</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

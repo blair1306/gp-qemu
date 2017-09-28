@@ -1,0 +1,29 @@
+<dec f='codebrowser/include/block/blockjob.h' l='157' type='BlockJob * block_job_next(BlockJob * job)'/>
+<doc f='codebrowser/include/block/blockjob.h' l='148'>/**
+ * block_job_next:
+ * @job: A block job, or %NULL.
+ *
+ * Get the next element from the list of block jobs after @job, or the
+ * first one if @job is %NULL.
+ *
+ * Returns the requested job, or %NULL if there are no more jobs left.
+ */</doc>
+<use f='codebrowser/blockdev.c' l='4033' u='c' c='qmp_query_block_jobs'/>
+<use f='codebrowser/blockdev.c' l='4033' u='c' c='qmp_query_block_jobs'/>
+<def f='codebrowser/blockjob.c' l='73' ll='79' type='BlockJob * block_job_next(BlockJob * job)'/>
+<use f='codebrowser/blockjob.c' l='698' u='c' c='block_job_pause_all'/>
+<use f='codebrowser/blockjob.c' l='763' u='c' c='block_job_resume_all'/>
+<doc f='codebrowser/blockjob.c' l='58'>/*
+ * The block job API is composed of two categories of functions.
+ *
+ * The first includes functions used by the monitor.  The monitor is
+ * peculiar in that it accesses the block job list with block_job_get, and
+ * therefore needs consistency across block_job_get and the actual operation
+ * (e.g. block_job_set_speed).  The consistency is achieved with
+ * aio_context_acquire/release.  These functions are declared in blockjob.h.
+ *
+ * The second includes functions used by the block job drivers and sometimes
+ * by the core block layer.  These do not care about locking, because the
+ * whole coroutine runs under the AioContext lock, and are declared in
+ * blockjob_int.h.
+ */</doc>

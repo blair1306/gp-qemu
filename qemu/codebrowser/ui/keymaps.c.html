@@ -1,0 +1,262 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>keymaps.c source code [codebrowser/ui/keymaps.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/ui/keymaps.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>ui</a>/<a href='keymaps.c.html'>keymaps.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU keysym to keycode conversion using rdesktop keymaps</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2004 Johannes Schindelin</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="keymaps.h.html">"keymaps.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="trace.h.html">"trace.h"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="get_keysym" title='get_keysym' data-type='int get_keysym(const name2keysym_t * table, const char * name)' data-ref="get_keysym">get_keysym</dfn>(<em>const</em> <a class="typedef" href="keymaps.h.html#name2keysym_t" title='name2keysym_t' data-type='struct name2keysym_t' data-ref="name2keysym_t">name2keysym_t</a> *<dfn class="local col1 decl" id="1table" title='table' data-type='const name2keysym_t *' data-ref="1table">table</dfn>,</td></tr>
+<tr><th id="31">31</th><td>                      <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="2name" title='name' data-type='const char *' data-ref="2name">name</dfn>)</td></tr>
+<tr><th id="32">32</th><td>{</td></tr>
+<tr><th id="33">33</th><td>    <em>const</em> <a class="typedef" href="keymaps.h.html#name2keysym_t" title='name2keysym_t' data-type='struct name2keysym_t' data-ref="name2keysym_t">name2keysym_t</a> *<dfn class="local col3 decl" id="3p" title='p' data-type='const name2keysym_t *' data-ref="3p">p</dfn>;</td></tr>
+<tr><th id="34">34</th><td>    <b>for</b>(<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a> = <a class="local col1 ref" href="#1table" title='table' data-ref="1table">table</a>; <a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::name" title='(anonymous struct)::name' data-ref="(anonymous)::name">name</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>; <a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>++) {</td></tr>
+<tr><th id="35">35</th><td>        <b>if</b> (!<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::name" title='(anonymous struct)::name' data-ref="(anonymous)::name">name</a>, <a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>)) {</td></tr>
+<tr><th id="36">36</th><td>            <b>return</b> <a class="local col3 ref" href="#3p" title='p' data-ref="3p">p</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym" title='(anonymous struct)::keysym' data-ref="(anonymous)::keysym">keysym</a>;</td></tr>
+<tr><th id="37">37</th><td>        }</td></tr>
+<tr><th id="38">38</th><td>    }</td></tr>
+<tr><th id="39">39</th><td>    <b>if</b> (<a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>[<var>0</var>] == <kbd>'U'</kbd> &amp;&amp; <a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a>) == <var>5</var>) { <i>/* try unicode Uxxxx */</i></td></tr>
+<tr><th id="40">40</th><td>        <em>char</em> *<dfn class="local col4 decl" id="4end" title='end' data-type='char *' data-ref="4end">end</dfn>;</td></tr>
+<tr><th id="41">41</th><td>        <em>int</em> <dfn class="local col5 decl" id="5ret" title='ret' data-type='int' data-ref="5ret">ret</dfn> = (<em>int</em>)<a class="ref" href="../../include/stdlib.h.html#strtoul" title='strtoul' data-ref="strtoul">strtoul</a>(<a class="local col2 ref" href="#2name" title='name' data-ref="2name">name</a> + <var>1</var>, &amp;<a class="local col4 ref" href="#4end" title='end' data-ref="4end">end</a>, <var>16</var>);</td></tr>
+<tr><th id="42">42</th><td>        <b>if</b> (*<a class="local col4 ref" href="#4end" title='end' data-ref="4end">end</a> == <kbd>'\0'</kbd> &amp;&amp; <a class="local col5 ref" href="#5ret" title='ret' data-ref="5ret">ret</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="43">43</th><td>            <b>return</b> <a class="local col5 ref" href="#5ret" title='ret' data-ref="5ret">ret</a>;</td></tr>
+<tr><th id="44">44</th><td>        }</td></tr>
+<tr><th id="45">45</th><td>    }</td></tr>
+<tr><th id="46">46</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="47">47</th><td>}</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="add_to_key_range" title='add_to_key_range' data-type='void add_to_key_range(struct key_range ** krp, int code)' data-ref="add_to_key_range">add_to_key_range</dfn>(<b>struct</b> <a class="type" href="keymaps.h.html#key_range" title='key_range' data-ref="key_range">key_range</a> **<dfn class="local col6 decl" id="6krp" title='krp' data-type='struct key_range **' data-ref="6krp">krp</dfn>, <em>int</em> <dfn class="local col7 decl" id="7code" title='code' data-type='int' data-ref="7code">code</dfn>) {</td></tr>
+<tr><th id="51">51</th><td>    <b>struct</b> <a class="type" href="keymaps.h.html#key_range" title='key_range' data-ref="key_range">key_range</a> *<dfn class="local col8 decl" id="8kr" title='kr' data-type='struct key_range *' data-ref="8kr">kr</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <b>for</b> (<a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a> = *<a class="local col6 ref" href="#6krp" title='krp' data-ref="6krp">krp</a>; <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>; <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a> = <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::next" title='key_range::next' data-ref="key_range::next">next</a>) {</td></tr>
+<tr><th id="53">53</th><td>        <b>if</b> (<a class="local col7 ref" href="#7code" title='code' data-ref="7code">code</a> &gt;= <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a> &amp;&amp; <a class="local col7 ref" href="#7code" title='code' data-ref="7code">code</a> &lt;= <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a>) {</td></tr>
+<tr><th id="54">54</th><td>            <b>break</b>;</td></tr>
+<tr><th id="55">55</th><td>        }</td></tr>
+<tr><th id="56">56</th><td>        <b>if</b> (<a class="local col7 ref" href="#7code" title='code' data-ref="7code">code</a> == <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a> - <var>1</var>) {</td></tr>
+<tr><th id="57">57</th><td>            <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a>--;</td></tr>
+<tr><th id="58">58</th><td>            <b>break</b>;</td></tr>
+<tr><th id="59">59</th><td>        }</td></tr>
+<tr><th id="60">60</th><td>        <b>if</b> (<a class="local col7 ref" href="#7code" title='code' data-ref="7code">code</a> == <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a> + <var>1</var>) {</td></tr>
+<tr><th id="61">61</th><td>            <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a>++;</td></tr>
+<tr><th id="62">62</th><td>            <b>break</b>;</td></tr>
+<tr><th id="63">63</th><td>        }</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td>    <b>if</b> (<a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="66">66</th><td>        <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(*<a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>));</td></tr>
+<tr><th id="67">67</th><td>        <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a> = <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a> = <a class="local col7 ref" href="#7code" title='code' data-ref="7code">code</a>;</td></tr>
+<tr><th id="68">68</th><td>        <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::next" title='key_range::next' data-ref="key_range::next">next</a> = *<a class="local col6 ref" href="#6krp" title='krp' data-ref="6krp">krp</a>;</td></tr>
+<tr><th id="69">69</th><td>        *<a class="local col6 ref" href="#6krp" title='krp' data-ref="6krp">krp</a> = <a class="local col8 ref" href="#8kr" title='kr' data-ref="8kr">kr</a>;</td></tr>
+<tr><th id="70">70</th><td>    }</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="add_keysym" title='add_keysym' data-type='void add_keysym(char * line, int keysym, int keycode, kbd_layout_t * k)' data-ref="add_keysym">add_keysym</dfn>(<em>char</em> *<dfn class="local col9 decl" id="9line" title='line' data-type='char *' data-ref="9line">line</dfn>, <em>int</em> <dfn class="local col0 decl" id="10keysym" title='keysym' data-type='int' data-ref="10keysym">keysym</dfn>, <em>int</em> <dfn class="local col1 decl" id="11keycode" title='keycode' data-type='int' data-ref="11keycode">keycode</dfn>, <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="local col2 decl" id="12k" title='k' data-type='kbd_layout_t *' data-ref="12k">k</dfn>) {</td></tr>
+<tr><th id="74">74</th><td>    <b>if</b> (<a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a> &lt; <a class="macro" href="keymaps.h.html#41" title="512" data-ref="_M/MAX_NORMAL_KEYCODE">MAX_NORMAL_KEYCODE</a>) {</td></tr>
+<tr><th id="75">75</th><td>        <a class="ref" href="trace.h.html#trace_keymap_add" title='trace_keymap_add' data-ref="trace_keymap_add">trace_keymap_add</a>(<q>"normal"</q>, <a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a>, <a class="local col1 ref" href="#11keycode" title='keycode' data-ref="11keycode">keycode</a>, <a class="local col9 ref" href="#9line" title='line' data-ref="9line">line</a>);</td></tr>
+<tr><th id="76">76</th><td>        <a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode" title='(anonymous struct)::keysym2keycode' data-ref="(anonymous)::keysym2keycode">keysym2keycode</a>[<a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a>] = <a class="local col1 ref" href="#11keycode" title='keycode' data-ref="11keycode">keycode</a>;</td></tr>
+<tr><th id="77">77</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="78">78</th><td>        <b>if</b> (<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::extra_count" title='(anonymous struct)::extra_count' data-ref="(anonymous)::extra_count">extra_count</a> &gt;= <a class="macro" href="keymaps.h.html#42" title="256" data-ref="_M/MAX_EXTRA_COUNT">MAX_EXTRA_COUNT</a>) {</td></tr>
+<tr><th id="79">79</th><td>            <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Warning: Could not assign keysym %s (0x%x)"</q></td></tr>
+<tr><th id="80">80</th><td>                    <q>" because of memory constraints.\n"</q>, <a class="local col9 ref" href="#9line" title='line' data-ref="9line">line</a>, <a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a>);</td></tr>
+<tr><th id="81">81</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="82">82</th><td>            <a class="ref" href="trace.h.html#trace_keymap_add" title='trace_keymap_add' data-ref="trace_keymap_add">trace_keymap_add</a>(<q>"extra"</q>, <a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a>, <a class="local col1 ref" href="#11keycode" title='keycode' data-ref="11keycode">keycode</a>, <a class="local col9 ref" href="#9line" title='line' data-ref="9line">line</a>);</td></tr>
+<tr><th id="83">83</th><td>            <a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode_extra" title='(anonymous struct)::keysym2keycode_extra' data-ref="(anonymous)::keysym2keycode_extra">keysym2keycode_extra</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::extra_count" title='(anonymous struct)::extra_count' data-ref="(anonymous)::extra_count">extra_count</a>].</td></tr>
+<tr><th id="84">84</th><td>            <a class="ref" href="keymaps.h.html#(anonymousstruct)::(anonymous)::keysym" title='(anonymous struct)::(anonymous struct)::keysym' data-ref="(anonymousstruct)::(anonymous)::keysym">keysym</a> = <a class="local col0 ref" href="#10keysym" title='keysym' data-ref="10keysym">keysym</a>;</td></tr>
+<tr><th id="85">85</th><td>            <a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode_extra" title='(anonymous struct)::keysym2keycode_extra' data-ref="(anonymous)::keysym2keycode_extra">keysym2keycode_extra</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::extra_count" title='(anonymous struct)::extra_count' data-ref="(anonymous)::extra_count">extra_count</a>].</td></tr>
+<tr><th id="86">86</th><td>            <a class="ref" href="keymaps.h.html#(anonymousstruct)::(anonymous)::keycode" title='(anonymous struct)::(anonymous struct)::keycode' data-ref="(anonymousstruct)::(anonymous)::keycode">keycode</a> = <a class="local col1 ref" href="#11keycode" title='keycode' data-ref="11keycode">keycode</a>;</td></tr>
+<tr><th id="87">87</th><td>            <a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::extra_count" title='(anonymous struct)::extra_count' data-ref="(anonymous)::extra_count">extra_count</a>++;</td></tr>
+<tr><th id="88">88</th><td>        }</td></tr>
+<tr><th id="89">89</th><td>    }</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><em>static</em> <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="tu decl def" id="parse_keyboard_layout" title='parse_keyboard_layout' data-type='kbd_layout_t * parse_keyboard_layout(const name2keysym_t * table, const char * language, kbd_layout_t * k)' data-ref="parse_keyboard_layout">parse_keyboard_layout</dfn>(<em>const</em> <a class="typedef" href="keymaps.h.html#name2keysym_t" title='name2keysym_t' data-type='struct name2keysym_t' data-ref="name2keysym_t">name2keysym_t</a> *<dfn class="local col3 decl" id="13table" title='table' data-type='const name2keysym_t *' data-ref="13table">table</dfn>,</td></tr>
+<tr><th id="93">93</th><td>                                           <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14language" title='language' data-type='const char *' data-ref="14language">language</dfn>,</td></tr>
+<tr><th id="94">94</th><td>                                           <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="local col5 decl" id="15k" title='k' data-type='kbd_layout_t *' data-ref="15k">k</dfn>)</td></tr>
+<tr><th id="95">95</th><td>{</td></tr>
+<tr><th id="96">96</th><td>    <a class="typedef" href="../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col6 decl" id="16f" title='f' data-type='FILE *' data-ref="16f">f</dfn>;</td></tr>
+<tr><th id="97">97</th><td>    <em>char</em> * <dfn class="local col7 decl" id="17filename" title='filename' data-type='char *' data-ref="17filename">filename</dfn>;</td></tr>
+<tr><th id="98">98</th><td>    <em>char</em> <dfn class="local col8 decl" id="18line" title='line' data-type='char [1024]' data-ref="18line">line</dfn>[<var>1024</var>];</td></tr>
+<tr><th id="99">99</th><td>    <em>char</em> <dfn class="local col9 decl" id="19keyname" title='keyname' data-type='char [64]' data-ref="19keyname">keyname</dfn>[<var>64</var>];</td></tr>
+<tr><th id="100">100</th><td>    <em>int</em> <dfn class="local col0 decl" id="20len" title='len' data-type='int' data-ref="20len">len</dfn>;</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>    <a class="local col7 ref" href="#17filename" title='filename' data-ref="17filename">filename</a> = <a class="ref" href="../include/qemu-common.h.html#qemu_find_file" title='qemu_find_file' data-ref="qemu_find_file">qemu_find_file</a>(<a class="macro" href="../include/qemu-common.h.html#131" title="1" data-ref="_M/QEMU_FILE_TYPE_KEYMAP">QEMU_FILE_TYPE_KEYMAP</a>, <a class="local col4 ref" href="#14language" title='language' data-ref="14language">language</a>);</td></tr>
+<tr><th id="103">103</th><td>    <a class="ref" href="trace.h.html#trace_keymap_parse" title='trace_keymap_parse' data-ref="trace_keymap_parse">trace_keymap_parse</a>(<a class="local col7 ref" href="#17filename" title='filename' data-ref="17filename">filename</a>);</td></tr>
+<tr><th id="104">104</th><td>    <a class="local col6 ref" href="#16f" title='f' data-ref="16f">f</a> = <a class="local col7 ref" href="#17filename" title='filename' data-ref="17filename">filename</a> ? <a class="ref" href="../../include/stdio.h.html#283" title='fopen' data-ref="fopen64">fopen</a>(<a class="local col7 ref" href="#17filename" title='filename' data-ref="17filename">filename</a>, <q>"r"</q>) : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col7 ref" href="#17filename" title='filename' data-ref="17filename">filename</a>);</td></tr>
+<tr><th id="106">106</th><td>    <b>if</b> (!<a class="local col6 ref" href="#16f" title='f' data-ref="16f">f</a>) {</td></tr>
+<tr><th id="107">107</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Could not read keymap file: '%s'\n"</q>, <a class="local col4 ref" href="#14language" title='language' data-ref="14language">language</a>);</td></tr>
+<tr><th id="108">108</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="109">109</th><td>    }</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>    <b>if</b> (!<a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>) {</td></tr>
+<tr><th id="112">112</th><td>        <a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((kbd_layout_t *) g_malloc0_n ((1), sizeof (kbd_layout_t)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a>, <var>1</var>);</td></tr>
+<tr><th id="113">113</th><td>    }</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <b>for</b>(;;) {</td></tr>
+<tr><th id="116">116</th><td>        <b>if</b> (<a class="ref" href="../../include/stdio.h.html#fgets" title='fgets' data-ref="fgets">fgets</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>, <var>1024</var>, <a class="local col6 ref" href="#16f" title='f' data-ref="16f">f</a>) == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="117">117</th><td>            <b>break</b>;</td></tr>
+<tr><th id="118">118</th><td>        }</td></tr>
+<tr><th id="119">119</th><td>        <a class="local col0 ref" href="#20len" title='len' data-ref="20len">len</a> = <a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>);</td></tr>
+<tr><th id="120">120</th><td>        <b>if</b> (<a class="local col0 ref" href="#20len" title='len' data-ref="20len">len</a> &gt; <var>0</var> &amp;&amp; <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<a class="local col0 ref" href="#20len" title='len' data-ref="20len">len</a> - <var>1</var>] == <kbd>'\n'</kbd>) {</td></tr>
+<tr><th id="121">121</th><td>            <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<a class="local col0 ref" href="#20len" title='len' data-ref="20len">len</a> - <var>1</var>] = <kbd>'\0'</kbd>;</td></tr>
+<tr><th id="122">122</th><td>        }</td></tr>
+<tr><th id="123">123</th><td>        <b>if</b> (<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<var>0</var>] == <kbd>'#'</kbd>) {</td></tr>
+<tr><th id="124">124</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="125">125</th><td>        }</td></tr>
+<tr><th id="126">126</th><td>        <b>if</b> (!<a class="ref" href="../../include/string.h.html#strncmp" title='strncmp' data-ref="strncmp">strncmp</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>, <q>"map "</q>, <var>4</var>)) {</td></tr>
+<tr><th id="127">127</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="128">128</th><td>        }</td></tr>
+<tr><th id="129">129</th><td>        <b>if</b> (!<a class="ref" href="../../include/string.h.html#strncmp" title='strncmp' data-ref="strncmp">strncmp</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>, <q>"include "</q>, <var>8</var>)) {</td></tr>
+<tr><th id="130">130</th><td>            <a class="tu ref" href="#parse_keyboard_layout" title='parse_keyboard_layout' data-use='c' data-ref="parse_keyboard_layout">parse_keyboard_layout</a>(<a class="local col3 ref" href="#13table" title='table' data-ref="13table">table</a>, <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a> + <var>8</var>, <a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>);</td></tr>
+<tr><th id="131">131</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="132">132</th><td>            <em>int</em> <dfn class="local col1 decl" id="21offset" title='offset' data-type='int' data-ref="21offset">offset</dfn> = <var>0</var>;</td></tr>
+<tr><th id="133">133</th><td>            <b>while</b> (<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>] != <var>0</var> &amp;&amp;</td></tr>
+<tr><th id="134">134</th><td>                   <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>] != <kbd>' '</kbd> &amp;&amp;</td></tr>
+<tr><th id="135">135</th><td>                   <a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a> &lt; <b>sizeof</b>(<a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>) - <var>1</var>) {</td></tr>
+<tr><th id="136">136</th><td>                <a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>[<a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>] = <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>[<a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>];</td></tr>
+<tr><th id="137">137</th><td>                <a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>++;</td></tr>
+<tr><th id="138">138</th><td>            }</td></tr>
+<tr><th id="139">139</th><td>            <a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>[<a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a>] = <var>0</var>;</td></tr>
+<tr><th id="140">140</th><td>            <b>if</b> (<a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>)) {</td></tr>
+<tr><th id="141">141</th><td>                <em>int</em> <dfn class="local col2 decl" id="22keysym" title='keysym' data-type='int' data-ref="22keysym">keysym</dfn>;</td></tr>
+<tr><th id="142">142</th><td>                <a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a> = <a class="tu ref" href="#get_keysym" title='get_keysym' data-use='c' data-ref="get_keysym">get_keysym</a>(<a class="local col3 ref" href="#13table" title='table' data-ref="13table">table</a>, <a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>);</td></tr>
+<tr><th id="143">143</th><td>                <b>if</b> (<a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a> == <var>0</var>) {</td></tr>
+<tr><th id="144">144</th><td>                    <i>/* fprintf(stderr, "Warning: unknown keysym %s\n", line);*/</i></td></tr>
+<tr><th id="145">145</th><td>                } <b>else</b> {</td></tr>
+<tr><th id="146">146</th><td>                    <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="23rest" title='rest' data-type='const char *' data-ref="23rest">rest</dfn> = <a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a> + <a class="local col1 ref" href="#21offset" title='offset' data-ref="21offset">offset</a> + <var>1</var>;</td></tr>
+<tr><th id="147">147</th><td>                    <em>int</em> <dfn class="local col4 decl" id="24keycode" title='keycode' data-type='int' data-ref="24keycode">keycode</dfn> = <a class="ref" href="../../include/stdlib.h.html#strtol" title='strtol' data-ref="strtol">strtol</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>);</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>                    <b>if</b> (<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <q>"numlock"</q>)) {</td></tr>
+<tr><th id="150">150</th><td>                        <a class="tu ref" href="#add_to_key_range" title='add_to_key_range' data-use='c' data-ref="add_to_key_range">add_to_key_range</a>(&amp;<a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keypad_range" title='(anonymous struct)::keypad_range' data-ref="(anonymous)::keypad_range">keypad_range</a>, <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a>);</td></tr>
+<tr><th id="151">151</th><td>                        <a class="tu ref" href="#add_to_key_range" title='add_to_key_range' data-use='c' data-ref="add_to_key_range">add_to_key_range</a>(&amp;<a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::numlock_range" title='(anonymous struct)::numlock_range' data-ref="(anonymous)::numlock_range">numlock_range</a>, <a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a>);</td></tr>
+<tr><th id="152">152</th><td>                        <i>/* fprintf(stderr, "keypad keysym %04x keycode %d\n",</i></td></tr>
+<tr><th id="153">153</th><td><i>                                   keysym, keycode); */</i></td></tr>
+<tr><th id="154">154</th><td>                    }</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>                    <b>if</b> (<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <q>"shift"</q>)) {</td></tr>
+<tr><th id="157">157</th><td>                        <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a> |= <a class="macro" href="keymaps.h.html#66" title="0x100" data-ref="_M/SCANCODE_SHIFT">SCANCODE_SHIFT</a>;</td></tr>
+<tr><th id="158">158</th><td>                    }</td></tr>
+<tr><th id="159">159</th><td>                    <b>if</b> (<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <q>"altgr"</q>)) {</td></tr>
+<tr><th id="160">160</th><td>                        <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a> |= <a class="macro" href="keymaps.h.html#69" title="0x800" data-ref="_M/SCANCODE_ALTGR">SCANCODE_ALTGR</a>;</td></tr>
+<tr><th id="161">161</th><td>                    }</td></tr>
+<tr><th id="162">162</th><td>                    <b>if</b> (<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <q>"ctrl"</q>)) {</td></tr>
+<tr><th id="163">163</th><td>                        <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a> |= <a class="macro" href="keymaps.h.html#67" title="0x200" data-ref="_M/SCANCODE_CTRL">SCANCODE_CTRL</a>;</td></tr>
+<tr><th id="164">164</th><td>                    }</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>                    <a class="tu ref" href="#add_keysym" title='add_keysym' data-use='c' data-ref="add_keysym">add_keysym</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>, <a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a>, <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a>, <a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>);</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>                    <b>if</b> (<a class="ref" href="../../include/string.h.html#strstr" title='strstr' data-ref="strstr">strstr</a>(<a class="local col3 ref" href="#23rest" title='rest' data-ref="23rest">rest</a>, <q>"addupper"</q>)) {</td></tr>
+<tr><th id="169">169</th><td>                        <em>char</em> *<dfn class="local col5 decl" id="25c" title='c' data-type='char *' data-ref="25c">c</dfn>;</td></tr>
+<tr><th id="170">170</th><td>                        <b>for</b> (<a class="local col5 ref" href="#25c" title='c' data-ref="25c">c</a> = <a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>; *<a class="local col5 ref" href="#25c" title='c' data-ref="25c">c</a>; <a class="local col5 ref" href="#25c" title='c' data-ref="25c">c</a>++) {</td></tr>
+<tr><th id="171">171</th><td>                            *<a class="local col5 ref" href="#25c" title='c' data-ref="25c">c</a> = <a class="macro" href="../include/qemu-common.h.html#45" title="toupper((unsigned char)(*c))" data-ref="_M/qemu_toupper">qemu_toupper</a>(*<a class="local col5 ref" href="#25c" title='c' data-ref="25c">c</a>);</td></tr>
+<tr><th id="172">172</th><td>                        }</td></tr>
+<tr><th id="173">173</th><td>                        <a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a> = <a class="tu ref" href="#get_keysym" title='get_keysym' data-use='c' data-ref="get_keysym">get_keysym</a>(<a class="local col3 ref" href="#13table" title='table' data-ref="13table">table</a>, <a class="local col9 ref" href="#19keyname" title='keyname' data-ref="19keyname">keyname</a>);</td></tr>
+<tr><th id="174">174</th><td>                        <b>if</b> (<a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a>) {</td></tr>
+<tr><th id="175">175</th><td>                            <a class="tu ref" href="#add_keysym" title='add_keysym' data-use='c' data-ref="add_keysym">add_keysym</a>(<a class="local col8 ref" href="#18line" title='line' data-ref="18line">line</a>, <a class="local col2 ref" href="#22keysym" title='keysym' data-ref="22keysym">keysym</a>,</td></tr>
+<tr><th id="176">176</th><td>                                       <a class="local col4 ref" href="#24keycode" title='keycode' data-ref="24keycode">keycode</a> | <a class="macro" href="keymaps.h.html#66" title="0x100" data-ref="_M/SCANCODE_SHIFT">SCANCODE_SHIFT</a>, <a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>);</td></tr>
+<tr><th id="177">177</th><td>                        }</td></tr>
+<tr><th id="178">178</th><td>                    }</td></tr>
+<tr><th id="179">179</th><td>                }</td></tr>
+<tr><th id="180">180</th><td>            }</td></tr>
+<tr><th id="181">181</th><td>        }</td></tr>
+<tr><th id="182">182</th><td>    }</td></tr>
+<tr><th id="183">183</th><td>    <a class="ref" href="../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="local col6 ref" href="#16f" title='f' data-ref="16f">f</a>);</td></tr>
+<tr><th id="184">184</th><td>    <b>return</b> <a class="local col5 ref" href="#15k" title='k' data-ref="15k">k</a>;</td></tr>
+<tr><th id="185">185</th><td>}</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><em>void</em> *<dfn class="decl def" id="init_keyboard_layout" title='init_keyboard_layout' data-ref="init_keyboard_layout">init_keyboard_layout</dfn>(<em>const</em> <a class="typedef" href="keymaps.h.html#name2keysym_t" title='name2keysym_t' data-type='struct name2keysym_t' data-ref="name2keysym_t">name2keysym_t</a> *<dfn class="local col6 decl" id="26table" title='table' data-type='const name2keysym_t *' data-ref="26table">table</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="27language" title='language' data-type='const char *' data-ref="27language">language</dfn>)</td></tr>
+<tr><th id="189">189</th><td>{</td></tr>
+<tr><th id="190">190</th><td>    <b>return</b> <a class="tu ref" href="#parse_keyboard_layout" title='parse_keyboard_layout' data-use='c' data-ref="parse_keyboard_layout">parse_keyboard_layout</a>(<a class="local col6 ref" href="#26table" title='table' data-ref="26table">table</a>, <a class="local col7 ref" href="#27language" title='language' data-ref="27language">language</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="191">191</th><td>}</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><em>int</em> <dfn class="decl def" id="keysym2scancode" title='keysym2scancode' data-ref="keysym2scancode">keysym2scancode</dfn>(<em>void</em> *<dfn class="local col8 decl" id="28kbd_layout" title='kbd_layout' data-type='void *' data-ref="28kbd_layout">kbd_layout</dfn>, <em>int</em> <dfn class="local col9 decl" id="29keysym" title='keysym' data-type='int' data-ref="29keysym">keysym</dfn>)</td></tr>
+<tr><th id="195">195</th><td>{</td></tr>
+<tr><th id="196">196</th><td>    <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="local col0 decl" id="30k" title='k' data-type='kbd_layout_t *' data-ref="30k">k</dfn> = <a class="local col8 ref" href="#28kbd_layout" title='kbd_layout' data-ref="28kbd_layout">kbd_layout</a>;</td></tr>
+<tr><th id="197">197</th><td>    <b>if</b> (<a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a> &lt; <a class="macro" href="keymaps.h.html#41" title="512" data-ref="_M/MAX_NORMAL_KEYCODE">MAX_NORMAL_KEYCODE</a>) {</td></tr>
+<tr><th id="198">198</th><td>        <b>if</b> (<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode" title='(anonymous struct)::keysym2keycode' data-ref="(anonymous)::keysym2keycode">keysym2keycode</a>[<a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a>] == <var>0</var>) {</td></tr>
+<tr><th id="199">199</th><td>            <a class="ref" href="trace.h.html#trace_keymap_unmapped" title='trace_keymap_unmapped' data-ref="trace_keymap_unmapped">trace_keymap_unmapped</a>(<a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a>);</td></tr>
+<tr><th id="200">200</th><td>            <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Warning: no scancode found for keysym %d\n"</q>,</td></tr>
+<tr><th id="201">201</th><td>                    <a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a>);</td></tr>
+<tr><th id="202">202</th><td>        }</td></tr>
+<tr><th id="203">203</th><td>        <b>return</b> <a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode" title='(anonymous struct)::keysym2keycode' data-ref="(anonymous)::keysym2keycode">keysym2keycode</a>[<a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a>];</td></tr>
+<tr><th id="204">204</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="205">205</th><td>        <em>int</em> <dfn class="local col1 decl" id="31i" title='i' data-type='int' data-ref="31i">i</dfn>;</td></tr>
+<tr><th id="206">206</th><td><u>#<span data-ppcond="206">ifdef</span> <span class="macro" data-ref="_M/XK_ISO_Left_Tab">XK_ISO_Left_Tab</span></u></td></tr>
+<tr><th id="207">207</th><td>        <b>if</b> (keysym == XK_ISO_Left_Tab) {</td></tr>
+<tr><th id="208">208</th><td>            keysym = XK_Tab;</td></tr>
+<tr><th id="209">209</th><td>        }</td></tr>
+<tr><th id="210">210</th><td><u>#<span data-ppcond="206">endif</span></u></td></tr>
+<tr><th id="211">211</th><td>        <b>for</b> (<a class="local col1 ref" href="#31i" title='i' data-ref="31i">i</a> = <var>0</var>; <a class="local col1 ref" href="#31i" title='i' data-ref="31i">i</a> &lt; <a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::extra_count" title='(anonymous struct)::extra_count' data-ref="(anonymous)::extra_count">extra_count</a>; <a class="local col1 ref" href="#31i" title='i' data-ref="31i">i</a>++) {</td></tr>
+<tr><th id="212">212</th><td>            <b>if</b> (<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode_extra" title='(anonymous struct)::keysym2keycode_extra' data-ref="(anonymous)::keysym2keycode_extra">keysym2keycode_extra</a>[<a class="local col1 ref" href="#31i" title='i' data-ref="31i">i</a>].<a class="ref" href="keymaps.h.html#(anonymousstruct)::(anonymous)::keysym" title='(anonymous struct)::(anonymous struct)::keysym' data-ref="(anonymousstruct)::(anonymous)::keysym">keysym</a> == <a class="local col9 ref" href="#29keysym" title='keysym' data-ref="29keysym">keysym</a>) {</td></tr>
+<tr><th id="213">213</th><td>                <b>return</b> <a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keysym2keycode_extra" title='(anonymous struct)::keysym2keycode_extra' data-ref="(anonymous)::keysym2keycode_extra">keysym2keycode_extra</a>[<a class="local col1 ref" href="#31i" title='i' data-ref="31i">i</a>].<a class="ref" href="keymaps.h.html#(anonymousstruct)::(anonymous)::keycode" title='(anonymous struct)::(anonymous struct)::keycode' data-ref="(anonymousstruct)::(anonymous)::keycode">keycode</a>;</td></tr>
+<tr><th id="214">214</th><td>            }</td></tr>
+<tr><th id="215">215</th><td>        }</td></tr>
+<tr><th id="216">216</th><td>    }</td></tr>
+<tr><th id="217">217</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="218">218</th><td>}</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><em>int</em> <dfn class="decl def" id="keycode_is_keypad" title='keycode_is_keypad' data-ref="keycode_is_keypad">keycode_is_keypad</dfn>(<em>void</em> *<dfn class="local col2 decl" id="32kbd_layout" title='kbd_layout' data-type='void *' data-ref="32kbd_layout">kbd_layout</dfn>, <em>int</em> <dfn class="local col3 decl" id="33keycode" title='keycode' data-type='int' data-ref="33keycode">keycode</dfn>)</td></tr>
+<tr><th id="221">221</th><td>{</td></tr>
+<tr><th id="222">222</th><td>    <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="local col4 decl" id="34k" title='k' data-type='kbd_layout_t *' data-ref="34k">k</dfn> = <a class="local col2 ref" href="#32kbd_layout" title='kbd_layout' data-ref="32kbd_layout">kbd_layout</a>;</td></tr>
+<tr><th id="223">223</th><td>    <b>struct</b> <a class="type" href="keymaps.h.html#key_range" title='key_range' data-ref="key_range">key_range</a> *<dfn class="local col5 decl" id="35kr" title='kr' data-type='struct key_range *' data-ref="35kr">kr</dfn>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>    <b>for</b> (<a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a> = <a class="local col4 ref" href="#34k" title='k' data-ref="34k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::keypad_range" title='(anonymous struct)::keypad_range' data-ref="(anonymous)::keypad_range">keypad_range</a>; <a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a>; <a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a> = <a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::next" title='key_range::next' data-ref="key_range::next">next</a>) {</td></tr>
+<tr><th id="226">226</th><td>        <b>if</b> (<a class="local col3 ref" href="#33keycode" title='keycode' data-ref="33keycode">keycode</a> &gt;= <a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a> &amp;&amp; <a class="local col3 ref" href="#33keycode" title='keycode' data-ref="33keycode">keycode</a> &lt;= <a class="local col5 ref" href="#35kr" title='kr' data-ref="35kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a>) {</td></tr>
+<tr><th id="227">227</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="228">228</th><td>        }</td></tr>
+<tr><th id="229">229</th><td>    }</td></tr>
+<tr><th id="230">230</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="231">231</th><td>}</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td><em>int</em> <dfn class="decl def" id="keysym_is_numlock" title='keysym_is_numlock' data-ref="keysym_is_numlock">keysym_is_numlock</dfn>(<em>void</em> *<dfn class="local col6 decl" id="36kbd_layout" title='kbd_layout' data-type='void *' data-ref="36kbd_layout">kbd_layout</dfn>, <em>int</em> <dfn class="local col7 decl" id="37keysym" title='keysym' data-type='int' data-ref="37keysym">keysym</dfn>)</td></tr>
+<tr><th id="234">234</th><td>{</td></tr>
+<tr><th id="235">235</th><td>    <a class="typedef" href="keymaps.h.html#kbd_layout_t" title='kbd_layout_t' data-type='struct kbd_layout_t' data-ref="kbd_layout_t">kbd_layout_t</a> *<dfn class="local col8 decl" id="38k" title='k' data-type='kbd_layout_t *' data-ref="38k">k</dfn> = <a class="local col6 ref" href="#36kbd_layout" title='kbd_layout' data-ref="36kbd_layout">kbd_layout</a>;</td></tr>
+<tr><th id="236">236</th><td>    <b>struct</b> <a class="type" href="keymaps.h.html#key_range" title='key_range' data-ref="key_range">key_range</a> *<dfn class="local col9 decl" id="39kr" title='kr' data-type='struct key_range *' data-ref="39kr">kr</dfn>;</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>    <b>for</b> (<a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a> = <a class="local col8 ref" href="#38k" title='k' data-ref="38k">k</a>-&gt;<a class="ref" href="keymaps.h.html#(anonymous)::numlock_range" title='(anonymous struct)::numlock_range' data-ref="(anonymous)::numlock_range">numlock_range</a>; <a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a>; <a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a> = <a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::next" title='key_range::next' data-ref="key_range::next">next</a>) {</td></tr>
+<tr><th id="239">239</th><td>        <b>if</b> (<a class="local col7 ref" href="#37keysym" title='keysym' data-ref="37keysym">keysym</a> &gt;= <a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::start" title='key_range::start' data-ref="key_range::start">start</a> &amp;&amp; <a class="local col7 ref" href="#37keysym" title='keysym' data-ref="37keysym">keysym</a> &lt;= <a class="local col9 ref" href="#39kr" title='kr' data-ref="39kr">kr</a>-&gt;<a class="ref" href="keymaps.h.html#key_range::end" title='key_range::end' data-ref="key_range::end">end</a>) {</td></tr>
+<tr><th id="240">240</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="241">241</th><td>        }</td></tr>
+<tr><th id="242">242</th><td>    }</td></tr>
+<tr><th id="243">243</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="244">244</th><td>}</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

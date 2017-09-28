@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>acpi.h source code [codebrowser/include/hw/acpi/acpi.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ACPIGPE,ACPIPM1CNT,ACPIPM1EVT,ACPIPMTimer,ACPIREGS,AcpiSlicOem "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/acpi/acpi.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>acpi</a>/<a href='acpi.h.html'>acpi.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_HW_ACPI_H">QEMU_HW_ACPI_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_HW_ACPI_H" data-ref="_M/QEMU_HW_ACPI_H">QEMU_HW_ACPI_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><i>/*</i></td></tr>
+<tr><th id="5">5</th><td><i> *  Copyright (c) 2009 Isaku Yamahata &lt;yamahata at valinux co jp&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> *                     VA Linux Systems Japan K.K.</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="9">9</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="10">10</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="11">11</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="16">16</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="19">19</th><td><i> * License along with this library; if not, see</i></td></tr>
+<tr><th id="20">20</th><td><i> * &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="21">21</th><td><i> */</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../../qemu/notify.h.html">"qemu/notify.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../qemu/option.h.html">"qemu/option.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../irq.h.html">"hw/irq.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="acpi_dev_interface.h.html">"hw/acpi/acpi_dev_interface.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i>/*</i></td></tr>
+<tr><th id="30">30</th><td><i> * current device naming scheme supports up to 256 memory devices</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/ACPI_MAX_RAM_SLOTS" data-ref="_M/ACPI_MAX_RAM_SLOTS">ACPI_MAX_RAM_SLOTS</dfn> 256</u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i>/* from linux include/acpi/actype.h */</i></td></tr>
+<tr><th id="35">35</th><td><i>/* Default ACPI register widths */</i></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/ACPI_GPE_REGISTER_WIDTH" data-ref="_M/ACPI_GPE_REGISTER_WIDTH">ACPI_GPE_REGISTER_WIDTH</dfn>         8</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM1_REGISTER_WIDTH" data-ref="_M/ACPI_PM1_REGISTER_WIDTH">ACPI_PM1_REGISTER_WIDTH</dfn>         16</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM2_REGISTER_WIDTH" data-ref="_M/ACPI_PM2_REGISTER_WIDTH">ACPI_PM2_REGISTER_WIDTH</dfn>         8</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/ACPI_PM_TIMER_WIDTH" data-ref="_M/ACPI_PM_TIMER_WIDTH">ACPI_PM_TIMER_WIDTH</dfn>             32</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* PM Timer ticks per second (HZ) */</i></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/PM_TIMER_FREQUENCY" data-ref="_M/PM_TIMER_FREQUENCY">PM_TIMER_FREQUENCY</dfn>  3579545</u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i>/* ACPI fixed hardware registers */</i></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><i>/* from linux/drivers/acpi/acpica/aclocal.h */</i></td></tr>
+<tr><th id="49">49</th><td><i>/* Masks used to access the bit_registers */</i></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>/* PM1x_STS */</i></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_TIMER_STATUS" data-ref="_M/ACPI_BITMASK_TIMER_STATUS">ACPI_BITMASK_TIMER_STATUS</dfn>               0x0001</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_BUS_MASTER_STATUS" data-ref="_M/ACPI_BITMASK_BUS_MASTER_STATUS">ACPI_BITMASK_BUS_MASTER_STATUS</dfn>          0x0010</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_GLOBAL_LOCK_STATUS" data-ref="_M/ACPI_BITMASK_GLOBAL_LOCK_STATUS">ACPI_BITMASK_GLOBAL_LOCK_STATUS</dfn>         0x0020</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_POWER_BUTTON_STATUS" data-ref="_M/ACPI_BITMASK_POWER_BUTTON_STATUS">ACPI_BITMASK_POWER_BUTTON_STATUS</dfn>        0x0100</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_SLEEP_BUTTON_STATUS" data-ref="_M/ACPI_BITMASK_SLEEP_BUTTON_STATUS">ACPI_BITMASK_SLEEP_BUTTON_STATUS</dfn>        0x0200</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_RT_CLOCK_STATUS" data-ref="_M/ACPI_BITMASK_RT_CLOCK_STATUS">ACPI_BITMASK_RT_CLOCK_STATUS</dfn>            0x0400</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_PCIEXP_WAKE_STATUS" data-ref="_M/ACPI_BITMASK_PCIEXP_WAKE_STATUS">ACPI_BITMASK_PCIEXP_WAKE_STATUS</dfn>         0x4000	/* ACPI 3.0 */</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_WAKE_STATUS" data-ref="_M/ACPI_BITMASK_WAKE_STATUS">ACPI_BITMASK_WAKE_STATUS</dfn>                0x8000</u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_ALL_FIXED_STATUS" data-ref="_M/ACPI_BITMASK_ALL_FIXED_STATUS">ACPI_BITMASK_ALL_FIXED_STATUS</dfn>           (\</u></td></tr>
+<tr><th id="62">62</th><td><u>	ACPI_BITMASK_TIMER_STATUS          | \</u></td></tr>
+<tr><th id="63">63</th><td><u>	ACPI_BITMASK_BUS_MASTER_STATUS     | \</u></td></tr>
+<tr><th id="64">64</th><td><u>	ACPI_BITMASK_GLOBAL_LOCK_STATUS    | \</u></td></tr>
+<tr><th id="65">65</th><td><u>	ACPI_BITMASK_POWER_BUTTON_STATUS   | \</u></td></tr>
+<tr><th id="66">66</th><td><u>	ACPI_BITMASK_SLEEP_BUTTON_STATUS   | \</u></td></tr>
+<tr><th id="67">67</th><td><u>	ACPI_BITMASK_RT_CLOCK_STATUS       | \</u></td></tr>
+<tr><th id="68">68</th><td><u>	ACPI_BITMASK_WAKE_STATUS)</u></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>/* PM1x_EN */</i></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_TIMER_ENABLE" data-ref="_M/ACPI_BITMASK_TIMER_ENABLE">ACPI_BITMASK_TIMER_ENABLE</dfn>               0x0001</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_GLOBAL_LOCK_ENABLE" data-ref="_M/ACPI_BITMASK_GLOBAL_LOCK_ENABLE">ACPI_BITMASK_GLOBAL_LOCK_ENABLE</dfn>         0x0020</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_POWER_BUTTON_ENABLE" data-ref="_M/ACPI_BITMASK_POWER_BUTTON_ENABLE">ACPI_BITMASK_POWER_BUTTON_ENABLE</dfn>        0x0100</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_SLEEP_BUTTON_ENABLE" data-ref="_M/ACPI_BITMASK_SLEEP_BUTTON_ENABLE">ACPI_BITMASK_SLEEP_BUTTON_ENABLE</dfn>        0x0200</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_RT_CLOCK_ENABLE" data-ref="_M/ACPI_BITMASK_RT_CLOCK_ENABLE">ACPI_BITMASK_RT_CLOCK_ENABLE</dfn>            0x0400</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_PCIEXP_WAKE_DISABLE" data-ref="_M/ACPI_BITMASK_PCIEXP_WAKE_DISABLE">ACPI_BITMASK_PCIEXP_WAKE_DISABLE</dfn>        0x4000	/* ACPI 3.0 */</u></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_PM1_COMMON_ENABLED" data-ref="_M/ACPI_BITMASK_PM1_COMMON_ENABLED">ACPI_BITMASK_PM1_COMMON_ENABLED</dfn>         ( \</u></td></tr>
+<tr><th id="79">79</th><td><u>        ACPI_BITMASK_RT_CLOCK_ENABLE        | \</u></td></tr>
+<tr><th id="80">80</th><td><u>        ACPI_BITMASK_POWER_BUTTON_ENABLE    | \</u></td></tr>
+<tr><th id="81">81</th><td><u>        ACPI_BITMASK_GLOBAL_LOCK_ENABLE     | \</u></td></tr>
+<tr><th id="82">82</th><td><u>        ACPI_BITMASK_TIMER_ENABLE)</u></td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i>/* PM1x_CNT */</i></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_SCI_ENABLE" data-ref="_M/ACPI_BITMASK_SCI_ENABLE">ACPI_BITMASK_SCI_ENABLE</dfn>                 0x0001</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_BUS_MASTER_RLD" data-ref="_M/ACPI_BITMASK_BUS_MASTER_RLD">ACPI_BITMASK_BUS_MASTER_RLD</dfn>             0x0002</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_GLOBAL_LOCK_RELEASE" data-ref="_M/ACPI_BITMASK_GLOBAL_LOCK_RELEASE">ACPI_BITMASK_GLOBAL_LOCK_RELEASE</dfn>        0x0004</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_SLEEP_TYPE" data-ref="_M/ACPI_BITMASK_SLEEP_TYPE">ACPI_BITMASK_SLEEP_TYPE</dfn>                 0x1C00</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_SLEEP_ENABLE" data-ref="_M/ACPI_BITMASK_SLEEP_ENABLE">ACPI_BITMASK_SLEEP_ENABLE</dfn>               0x2000</u></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><i>/* PM2_CNT */</i></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/ACPI_BITMASK_ARB_DISABLE" data-ref="_M/ACPI_BITMASK_ARB_DISABLE">ACPI_BITMASK_ARB_DISABLE</dfn>                0x0001</u></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><i>/* structs */</i></td></tr>
+<tr><th id="95">95</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ACPIPMTimer" title='ACPIPMTimer' data-ref="ACPIPMTimer">ACPIPMTimer</a> <dfn class="typedef" id="ACPIPMTimer" title='ACPIPMTimer' data-type='struct ACPIPMTimer' data-ref="ACPIPMTimer">ACPIPMTimer</dfn>;</td></tr>
+<tr><th id="96">96</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ACPIPM1EVT" title='ACPIPM1EVT' data-ref="ACPIPM1EVT">ACPIPM1EVT</a> <dfn class="typedef" id="ACPIPM1EVT" title='ACPIPM1EVT' data-type='struct ACPIPM1EVT' data-ref="ACPIPM1EVT">ACPIPM1EVT</dfn>;</td></tr>
+<tr><th id="97">97</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ACPIPM1CNT" title='ACPIPM1CNT' data-ref="ACPIPM1CNT">ACPIPM1CNT</a> <dfn class="typedef" id="ACPIPM1CNT" title='ACPIPM1CNT' data-type='struct ACPIPM1CNT' data-ref="ACPIPM1CNT">ACPIPM1CNT</dfn>;</td></tr>
+<tr><th id="98">98</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ACPIGPE" title='ACPIGPE' data-ref="ACPIGPE">ACPIGPE</a> <dfn class="typedef" id="ACPIGPE" title='ACPIGPE' data-type='struct ACPIGPE' data-ref="ACPIGPE">ACPIGPE</dfn>;</td></tr>
+<tr><th id="99">99</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ACPIREGS" title='ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> <dfn class="typedef" id="ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</dfn>;</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="acpi_update_sci_fn" title='acpi_update_sci_fn' data-type='void (*)(ACPIREGS *)' data-ref="acpi_update_sci_fn">acpi_update_sci_fn</dfn>)(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col0 decl" id="20ar" title='ar' data-type='ACPIREGS *' data-ref="20ar">ar</dfn>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><b>struct</b> <dfn class="type def" id="ACPIPMTimer" title='ACPIPMTimer' data-ref="ACPIPMTimer">ACPIPMTimer</dfn> {</td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="ACPIPMTimer::timer" title='ACPIPMTimer::timer' data-ref="ACPIPMTimer::timer">timer</dfn>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="ACPIPMTimer::io" title='ACPIPMTimer::io' data-ref="ACPIPMTimer::io">io</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="ACPIPMTimer::overflow_time" title='ACPIPMTimer::overflow_time' data-ref="ACPIPMTimer::overflow_time">overflow_time</dfn>;</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="#acpi_update_sci_fn" title='acpi_update_sci_fn' data-type='void (*)(ACPIREGS *)' data-ref="acpi_update_sci_fn">acpi_update_sci_fn</a> <dfn class="decl" id="ACPIPMTimer::update_sci" title='ACPIPMTimer::update_sci' data-ref="ACPIPMTimer::update_sci">update_sci</dfn>;</td></tr>
+<tr><th id="109">109</th><td>};</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><b>struct</b> <dfn class="type def" id="ACPIPM1EVT" title='ACPIPM1EVT' data-ref="ACPIPM1EVT">ACPIPM1EVT</dfn> {</td></tr>
+<tr><th id="112">112</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="ACPIPM1EVT::io" title='ACPIPM1EVT::io' data-ref="ACPIPM1EVT::io">io</dfn>;</td></tr>
+<tr><th id="113">113</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="ACPIPM1EVT::sts" title='ACPIPM1EVT::sts' data-ref="ACPIPM1EVT::sts">sts</dfn>;</td></tr>
+<tr><th id="114">114</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="ACPIPM1EVT::en" title='ACPIPM1EVT::en' data-ref="ACPIPM1EVT::en">en</dfn>;</td></tr>
+<tr><th id="115">115</th><td>    <a class="typedef" href="#acpi_update_sci_fn" title='acpi_update_sci_fn' data-type='void (*)(ACPIREGS *)' data-ref="acpi_update_sci_fn">acpi_update_sci_fn</a> <dfn class="decl" id="ACPIPM1EVT::update_sci" title='ACPIPM1EVT::update_sci' data-ref="ACPIPM1EVT::update_sci">update_sci</dfn>;</td></tr>
+<tr><th id="116">116</th><td>};</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><b>struct</b> <dfn class="type def" id="ACPIPM1CNT" title='ACPIPM1CNT' data-ref="ACPIPM1CNT">ACPIPM1CNT</dfn> {</td></tr>
+<tr><th id="119">119</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="ACPIPM1CNT::io" title='ACPIPM1CNT::io' data-ref="ACPIPM1CNT::io">io</dfn>;</td></tr>
+<tr><th id="120">120</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="ACPIPM1CNT::cnt" title='ACPIPM1CNT::cnt' data-ref="ACPIPM1CNT::cnt">cnt</dfn>;</td></tr>
+<tr><th id="121">121</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="ACPIPM1CNT::s4_val" title='ACPIPM1CNT::s4_val' data-ref="ACPIPM1CNT::s4_val">s4_val</dfn>;</td></tr>
+<tr><th id="122">122</th><td>};</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><b>struct</b> <dfn class="type def" id="ACPIGPE" title='ACPIGPE' data-ref="ACPIGPE">ACPIGPE</dfn> {</td></tr>
+<tr><th id="125">125</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="ACPIGPE::len" title='ACPIGPE::len' data-ref="ACPIGPE::len">len</dfn>;</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="ACPIGPE::sts" title='ACPIGPE::sts' data-ref="ACPIGPE::sts">sts</dfn>;</td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="ACPIGPE::en" title='ACPIGPE::en' data-ref="ACPIGPE::en">en</dfn>;</td></tr>
+<tr><th id="129">129</th><td>};</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><b>struct</b> <dfn class="type def" id="ACPIREGS" title='ACPIREGS' data-ref="ACPIREGS">ACPIREGS</dfn> {</td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="#ACPIPMTimer" title='ACPIPMTimer' data-type='struct ACPIPMTimer' data-ref="ACPIPMTimer">ACPIPMTimer</a>     <dfn class="decl" id="ACPIREGS::tmr" title='ACPIREGS::tmr' data-ref="ACPIREGS::tmr">tmr</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="typedef" href="#ACPIGPE" title='ACPIGPE' data-type='struct ACPIGPE' data-ref="ACPIGPE">ACPIGPE</a>         <dfn class="decl" id="ACPIREGS::gpe" title='ACPIREGS::gpe' data-ref="ACPIREGS::gpe">gpe</dfn>;</td></tr>
+<tr><th id="134">134</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="135">135</th><td>        <a class="typedef" href="#ACPIPM1EVT" title='ACPIPM1EVT' data-type='struct ACPIPM1EVT' data-ref="ACPIPM1EVT">ACPIPM1EVT</a>  <dfn class="decl" id="ACPIREGS::(anonymous)::evt" title='ACPIREGS::(anonymous struct)::evt' data-ref="ACPIREGS::(anonymous)::evt">evt</dfn>;</td></tr>
+<tr><th id="136">136</th><td>        <a class="typedef" href="#ACPIPM1CNT" title='ACPIPM1CNT' data-type='struct ACPIPM1CNT' data-ref="ACPIPM1CNT">ACPIPM1CNT</a>  <dfn class="decl" id="ACPIREGS::(anonymous)::cnt" title='ACPIREGS::(anonymous struct)::cnt' data-ref="ACPIREGS::(anonymous)::cnt">cnt</dfn>;</td></tr>
+<tr><th id="137">137</th><td>    } <dfn class="decl" id="ACPIREGS::pm1" title='ACPIREGS::pm1' data-ref="ACPIREGS::pm1">pm1</dfn>;</td></tr>
+<tr><th id="138">138</th><td>    <a class="typedef" href="../../qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> <dfn class="decl" id="ACPIREGS::wakeup" title='ACPIREGS::wakeup' data-ref="ACPIREGS::wakeup">wakeup</dfn>;</td></tr>
+<tr><th id="139">139</th><td>};</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><i>/* PM_TMR */</i></td></tr>
+<tr><th id="142">142</th><td><em>void</em> <dfn class="decl" id="acpi_pm_tmr_update" title='acpi_pm_tmr_update' data-ref="acpi_pm_tmr_update">acpi_pm_tmr_update</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col1 decl" id="21ar" title='ar' data-type='ACPIREGS *' data-ref="21ar">ar</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="22enable" title='enable' data-type='_Bool' data-ref="22enable">enable</dfn>);</td></tr>
+<tr><th id="143">143</th><td><em>void</em> <dfn class="decl" id="acpi_pm_tmr_calc_overflow_time" title='acpi_pm_tmr_calc_overflow_time' data-ref="acpi_pm_tmr_calc_overflow_time">acpi_pm_tmr_calc_overflow_time</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col3 decl" id="23ar" title='ar' data-type='ACPIREGS *' data-ref="23ar">ar</dfn>);</td></tr>
+<tr><th id="144">144</th><td><em>void</em> <dfn class="decl" id="acpi_pm_tmr_init" title='acpi_pm_tmr_init' data-ref="acpi_pm_tmr_init">acpi_pm_tmr_init</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col4 decl" id="24ar" title='ar' data-type='ACPIREGS *' data-ref="24ar">ar</dfn>, <a class="typedef" href="#acpi_update_sci_fn" title='acpi_update_sci_fn' data-type='void (*)(ACPIREGS *)' data-ref="acpi_update_sci_fn">acpi_update_sci_fn</a> <dfn class="local col5 decl" id="25update_sci" title='update_sci' data-type='acpi_update_sci_fn' data-ref="25update_sci">update_sci</dfn>,</td></tr>
+<tr><th id="145">145</th><td>                      <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col6 decl" id="26parent" title='parent' data-type='MemoryRegion *' data-ref="26parent">parent</dfn>);</td></tr>
+<tr><th id="146">146</th><td><em>void</em> <dfn class="decl" id="acpi_pm_tmr_reset" title='acpi_pm_tmr_reset' data-ref="acpi_pm_tmr_reset">acpi_pm_tmr_reset</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col7 decl" id="27ar" title='ar' data-type='ACPIREGS *' data-ref="27ar">ar</dfn>);</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i>/* PM1a_EVT: piix and ich9 don't implement PM1b. */</i></td></tr>
+<tr><th id="149">149</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="acpi_pm1_evt_get_sts" title='acpi_pm1_evt_get_sts' data-ref="acpi_pm1_evt_get_sts">acpi_pm1_evt_get_sts</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col8 decl" id="28ar" title='ar' data-type='ACPIREGS *' data-ref="28ar">ar</dfn>);</td></tr>
+<tr><th id="150">150</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_evt_power_down" title='acpi_pm1_evt_power_down' data-ref="acpi_pm1_evt_power_down">acpi_pm1_evt_power_down</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col9 decl" id="29ar" title='ar' data-type='ACPIREGS *' data-ref="29ar">ar</dfn>);</td></tr>
+<tr><th id="151">151</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_evt_reset" title='acpi_pm1_evt_reset' data-ref="acpi_pm1_evt_reset">acpi_pm1_evt_reset</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col0 decl" id="30ar" title='ar' data-type='ACPIREGS *' data-ref="30ar">ar</dfn>);</td></tr>
+<tr><th id="152">152</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_evt_init" title='acpi_pm1_evt_init' data-ref="acpi_pm1_evt_init">acpi_pm1_evt_init</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col1 decl" id="31ar" title='ar' data-type='ACPIREGS *' data-ref="31ar">ar</dfn>, <a class="typedef" href="#acpi_update_sci_fn" title='acpi_update_sci_fn' data-type='void (*)(ACPIREGS *)' data-ref="acpi_update_sci_fn">acpi_update_sci_fn</a> <dfn class="local col2 decl" id="32update_sci" title='update_sci' data-type='acpi_update_sci_fn' data-ref="32update_sci">update_sci</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                       <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col3 decl" id="33parent" title='parent' data-type='MemoryRegion *' data-ref="33parent">parent</dfn>);</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><i>/* PM1a_CNT: piix and ich9 don't implement PM1b CNT. */</i></td></tr>
+<tr><th id="156">156</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_cnt_init" title='acpi_pm1_cnt_init' data-ref="acpi_pm1_cnt_init">acpi_pm1_cnt_init</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col4 decl" id="34ar" title='ar' data-type='ACPIREGS *' data-ref="34ar">ar</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col5 decl" id="35parent" title='parent' data-type='MemoryRegion *' data-ref="35parent">parent</dfn>,</td></tr>
+<tr><th id="157">157</th><td>                       <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="36disable_s3" title='disable_s3' data-type='_Bool' data-ref="36disable_s3">disable_s3</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="37disable_s4" title='disable_s4' data-type='_Bool' data-ref="37disable_s4">disable_s4</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col8 decl" id="38s4_val" title='s4_val' data-type='uint8_t' data-ref="38s4_val">s4_val</dfn>);</td></tr>
+<tr><th id="158">158</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_cnt_update" title='acpi_pm1_cnt_update' data-ref="acpi_pm1_cnt_update">acpi_pm1_cnt_update</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col9 decl" id="39ar" title='ar' data-type='ACPIREGS *' data-ref="39ar">ar</dfn>,</td></tr>
+<tr><th id="159">159</th><td>                         <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="40sci_enable" title='sci_enable' data-type='_Bool' data-ref="40sci_enable">sci_enable</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="41sci_disable" title='sci_disable' data-type='_Bool' data-ref="41sci_disable">sci_disable</dfn>);</td></tr>
+<tr><th id="160">160</th><td><em>void</em> <dfn class="decl" id="acpi_pm1_cnt_reset" title='acpi_pm1_cnt_reset' data-ref="acpi_pm1_cnt_reset">acpi_pm1_cnt_reset</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col2 decl" id="42ar" title='ar' data-type='ACPIREGS *' data-ref="42ar">ar</dfn>);</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><i>/* GPE0 */</i></td></tr>
+<tr><th id="163">163</th><td><em>void</em> <dfn class="decl" id="acpi_gpe_init" title='acpi_gpe_init' data-ref="acpi_gpe_init">acpi_gpe_init</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col3 decl" id="43ar" title='ar' data-type='ACPIREGS *' data-ref="43ar">ar</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="44len" title='len' data-type='uint8_t' data-ref="44len">len</dfn>);</td></tr>
+<tr><th id="164">164</th><td><em>void</em> <dfn class="decl" id="acpi_gpe_reset" title='acpi_gpe_reset' data-ref="acpi_gpe_reset">acpi_gpe_reset</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col5 decl" id="45ar" title='ar' data-type='ACPIREGS *' data-ref="45ar">ar</dfn>);</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td><em>void</em> <dfn class="decl" id="acpi_gpe_ioport_writeb" title='acpi_gpe_ioport_writeb' data-ref="acpi_gpe_ioport_writeb">acpi_gpe_ioport_writeb</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col6 decl" id="46ar" title='ar' data-type='ACPIREGS *' data-ref="46ar">ar</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="47addr" title='addr' data-type='uint32_t' data-ref="47addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="48val" title='val' data-type='uint32_t' data-ref="48val">val</dfn>);</td></tr>
+<tr><th id="167">167</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="acpi_gpe_ioport_readb" title='acpi_gpe_ioport_readb' data-ref="acpi_gpe_ioport_readb">acpi_gpe_ioport_readb</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col9 decl" id="49ar" title='ar' data-type='ACPIREGS *' data-ref="49ar">ar</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="50addr" title='addr' data-type='uint32_t' data-ref="50addr">addr</dfn>);</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><em>void</em> <dfn class="decl" id="acpi_send_gpe_event" title='acpi_send_gpe_event' data-ref="acpi_send_gpe_event">acpi_send_gpe_event</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col1 decl" id="51ar" title='ar' data-type='ACPIREGS *' data-ref="51ar">ar</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col2 decl" id="52irq" title='irq' data-type='qemu_irq' data-ref="52irq">irq</dfn>,</td></tr>
+<tr><th id="170">170</th><td>                         <a class="typedef" href="acpi_dev_interface.h.html#AcpiEventStatusBits" title='AcpiEventStatusBits' data-type='enum AcpiEventStatusBits' data-ref="AcpiEventStatusBits">AcpiEventStatusBits</a> <dfn class="local col3 decl" id="53status" title='status' data-type='AcpiEventStatusBits' data-ref="53status">status</dfn>);</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><em>void</em> <dfn class="decl" id="acpi_update_sci" title='acpi_update_sci' data-ref="acpi_update_sci">acpi_update_sci</dfn>(<a class="typedef" href="#ACPIREGS" title='ACPIREGS' data-type='struct ACPIREGS' data-ref="ACPIREGS">ACPIREGS</a> *<dfn class="local col4 decl" id="54acpi_regs" title='acpi_regs' data-type='ACPIREGS *' data-ref="54acpi_regs">acpi_regs</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col5 decl" id="55irq" title='irq' data-type='qemu_irq' data-ref="55irq">irq</dfn>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><i>/* acpi.c */</i></td></tr>
+<tr><th id="175">175</th><td><b>extern</b> <em>int</em> <dfn class="decl" id="acpi_enabled" title='acpi_enabled' data-ref="acpi_enabled">acpi_enabled</dfn>;</td></tr>
+<tr><th id="176">176</th><td><b>extern</b> <em>char</em> <em>unsigned</em> *<dfn class="decl" id="acpi_tables" title='acpi_tables' data-ref="acpi_tables">acpi_tables</dfn>;</td></tr>
+<tr><th id="177">177</th><td><b>extern</b> <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="acpi_tables_len" title='acpi_tables_len' data-ref="acpi_tables_len">acpi_tables_len</dfn>;</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="acpi_table_first" title='acpi_table_first' data-ref="acpi_table_first">acpi_table_first</dfn>(<em>void</em>);</td></tr>
+<tr><th id="180">180</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="acpi_table_next" title='acpi_table_next' data-ref="acpi_table_next">acpi_table_next</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col6 decl" id="56current" title='current' data-type='uint8_t *' data-ref="56current">current</dfn>);</td></tr>
+<tr><th id="181">181</th><td><em>unsigned</em> <dfn class="decl" id="acpi_table_len" title='acpi_table_len' data-ref="acpi_table_len">acpi_table_len</dfn>(<em>void</em> *<dfn class="local col7 decl" id="57current" title='current' data-type='void *' data-ref="57current">current</dfn>);</td></tr>
+<tr><th id="182">182</th><td><em>void</em> <dfn class="decl" id="acpi_table_add" title='acpi_table_add' data-ref="acpi_table_add">acpi_table_add</dfn>(<em>const</em> <a class="typedef" href="../../qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col8 decl" id="58opts" title='opts' data-type='const QemuOpts *' data-ref="58opts">opts</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="59errp" title='errp' data-type='Error **' data-ref="59errp">errp</dfn>);</td></tr>
+<tr><th id="183">183</th><td><em>void</em> <dfn class="decl" id="acpi_table_add_builtin" title='acpi_table_add_builtin' data-ref="acpi_table_add_builtin">acpi_table_add_builtin</dfn>(<em>const</em> <a class="typedef" href="../../qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col0 decl" id="60opts" title='opts' data-type='const QemuOpts *' data-ref="60opts">opts</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="61errp" title='errp' data-type='Error **' data-ref="61errp">errp</dfn>);</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#AcpiSlicOem" title='AcpiSlicOem' data-ref="AcpiSlicOem">AcpiSlicOem</a> <dfn class="typedef" id="AcpiSlicOem" title='AcpiSlicOem' data-type='struct AcpiSlicOem' data-ref="AcpiSlicOem">AcpiSlicOem</dfn>;</td></tr>
+<tr><th id="186">186</th><td><b>struct</b> <dfn class="type def" id="AcpiSlicOem" title='AcpiSlicOem' data-ref="AcpiSlicOem">AcpiSlicOem</dfn> {</td></tr>
+<tr><th id="187">187</th><td>  <em>char</em> *<dfn class="decl" id="AcpiSlicOem::id" title='AcpiSlicOem::id' data-ref="AcpiSlicOem::id">id</dfn>;</td></tr>
+<tr><th id="188">188</th><td>  <em>char</em> *<dfn class="decl" id="AcpiSlicOem::table_id" title='AcpiSlicOem::table_id' data-ref="AcpiSlicOem::table_id">table_id</dfn>;</td></tr>
+<tr><th id="189">189</th><td>};</td></tr>
+<tr><th id="190">190</th><td><em>int</em> <dfn class="decl" id="acpi_get_slic_oem" title='acpi_get_slic_oem' data-ref="acpi_get_slic_oem">acpi_get_slic_oem</dfn>(<a class="typedef" href="#AcpiSlicOem" title='AcpiSlicOem' data-type='struct AcpiSlicOem' data-ref="AcpiSlicOem">AcpiSlicOem</a> *<dfn class="local col2 decl" id="62oem" title='oem' data-type='AcpiSlicOem *' data-ref="62oem">oem</dfn>);</td></tr>
+<tr><th id="191">191</th><td></td></tr>
+<tr><th id="192">192</th><td><u>#<span data-ppcond="1">endif</span> /* QEMU_HW_ACPI_H */</u></td></tr>
+<tr><th id="193">193</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../arch_init.c.html'>codebrowser/arch_init.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

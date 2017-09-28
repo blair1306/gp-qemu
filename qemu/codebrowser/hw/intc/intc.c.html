@@ -1,0 +1,59 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>intc.c source code [codebrowser/hw/intc/intc.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/intc/intc.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>intc</a>/<a href='intc.c.html'>intc.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Generic Interrupt Controller</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 Hervé Poussineau</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/hw/intc/intc.h.html">"hw/intc/intc.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/qemu/module.h.html">"qemu/module.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="intctrl_info" title='intctrl_info' data-type='const TypeInfo' data-ref="intctrl_info">intctrl_info</dfn> = {</td></tr>
+<tr><th id="30">30</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../../include/hw/intc/intc.h.html#6" title="&quot;intctrl&quot;" data-ref="_M/TYPE_INTERRUPT_STATS_PROVIDER">TYPE_INTERRUPT_STATS_PROVIDER</a>,</td></tr>
+<tr><th id="31">31</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../../include/qom/object.h.html#555" title="&quot;interface&quot;" data-ref="_M/TYPE_INTERFACE">TYPE_INTERFACE</a>,</td></tr>
+<tr><th id="32">32</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::class_size" title='TypeInfo::class_size' data-ref="TypeInfo::class_size">class_size</a> = <b>sizeof</b>(<a class="typedef" href="../../include/hw/intc/intc.h.html#InterruptStatsProviderClass" title='InterruptStatsProviderClass' data-type='struct InterruptStatsProviderClass' data-ref="InterruptStatsProviderClass">InterruptStatsProviderClass</a>),</td></tr>
+<tr><th id="33">33</th><td>};</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="intc_register_types" title='intc_register_types' data-type='void intc_register_types()' data-ref="intc_register_types">intc_register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <a class="ref" href="../../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#intctrl_info" title='intctrl_info' data-use='a' data-ref="intctrl_info">intctrl_info</a>);</td></tr>
+<tr><th id="38">38</th><td>}</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><a class="macro" href="../../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_intc_register_types(void) { register_module_init(intc_register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#intc_register_types" title='intc_register_types' data-use='r' data-ref="intc_register_types">intc_register_types</a>)</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

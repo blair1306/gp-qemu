@@ -1,0 +1,24 @@
+<dec f='codebrowser/include/exec/memory.h' l='730' type='void memory_region_init_rom(MemoryRegion * mr, struct Object * owner, const char * name, uint64_t size, Error ** errp)'/>
+<doc f='codebrowser/include/exec/memory.h' l='709'>/**
+ * memory_region_init_rom: Initialize a ROM memory region.
+ *
+ * This has the same effect as calling memory_region_init_ram()
+ * and then marking the resulting region read-only with
+ * memory_region_set_readonly(). This includes arranging for the
+ * contents to be migrated.
+ *
+ * TODO: Currently we restrict @owner to being either NULL (for
+ * global RAM regions with no owner) or devices, so that we can
+ * give the RAM block a unique name for migration purposes.
+ * We should lift this restriction and allow arbitrary Objects.
+ * If you pass a non-NULL non-device @owner then we will assert.
+ *
+ * @mr: the #MemoryRegion to be initialized.
+ * @owner: the object that tracks the region&apos;s reference count
+ * @name: Region name, becomes part of RAMBlock name used in migration stream
+ *        must be unique within any device
+ * @size: size of the region.
+ * @errp: pointer to Error*, to store an error if it happens.
+ */</doc>
+<use f='codebrowser/hw/pci/pci.c' l='2238' u='c' c='pci_add_option_rom'/>
+<def f='codebrowser/memory.c' l='2876' ll='2898' type='void memory_region_init_rom(MemoryRegion * mr, struct Object * owner, const char * name, uint64_t size, Error ** errp)'/>

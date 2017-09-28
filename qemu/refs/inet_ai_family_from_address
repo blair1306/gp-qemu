@@ -1,0 +1,29 @@
+<dec f='codebrowser/include/qemu/sockets.h' l='35' type='int inet_ai_family_from_address(InetSocketAddress * addr, Error ** errp)'/>
+<use f='codebrowser/io/dns-resolver.c' l='70' u='c' c='qio_dns_resolver_lookup_sync_inet'/>
+<def f='codebrowser/util/qemu-sockets.c' l='118' ll='150' type='int inet_ai_family_from_address(InetSocketAddress * addr, Error ** errp)'/>
+<use f='codebrowser/util/qemu-sockets.c' l='169' u='c' c='inet_listen_saddr'/>
+<use f='codebrowser/util/qemu-sockets.c' l='419' u='c' c='inet_parse_connect_saddr'/>
+<use f='codebrowser/util/qemu-sockets.c' l='530' u='c' c='inet_dgram_saddr'/>
+<doc f='codebrowser/util/qemu-sockets.c' l='95'>/*
+ * Matrix we&apos;re trying to apply
+ *
+ *  ipv4  ipv6   family
+ *   -     -       PF_UNSPEC
+ *   -     f       PF_INET
+ *   -     t       PF_INET6
+ *   f     -       PF_INET6
+ *   f     f       &lt;error&gt;
+ *   f     t       PF_INET6
+ *   t     -       PF_INET
+ *   t     f       PF_INET
+ *   t     t       PF_INET6/PF_UNSPEC
+ *
+ * NB, this matrix is only about getting the necessary results
+ * from getaddrinfo(). Some of the cases require further work
+ * after reading results from getaddrinfo in order to fully
+ * apply the logic the end user wants.
+ *
+ * In the first and last cases, we must set IPV6_V6ONLY=0
+ * when binding, to allow a single listener to potentially
+ * accept both IPv4+6 addresses.
+ */</doc>

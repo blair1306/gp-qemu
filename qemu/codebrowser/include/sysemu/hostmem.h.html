@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hostmem.h source code [codebrowser/include/sysemu/hostmem.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="HostMemoryBackend,HostMemoryBackendClass "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/sysemu/hostmem.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>sysemu</a>/<a href='hostmem.h.html'>hostmem.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Host Memory Backend</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2013-2014 Red Hat Inc</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *   Igor Mammedov &lt;imammedo@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#<span data-ppcond="13">ifndef</span> <span class="macro" data-ref="_M/SYSEMU_HOSTMEM_H">SYSEMU_HOSTMEM_H</span></u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/SYSEMU_HOSTMEM_H" data-ref="_M/SYSEMU_HOSTMEM_H">SYSEMU_HOSTMEM_H</dfn></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="sysemu.h.html">"sysemu/sysemu.h"</a> /* for MAX_NODES */</u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../qom/object.h.html">"qom/object.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../qemu/option.h.html">"qemu/option.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../qemu/bitmap.h.html">"qemu/bitmap.h"</a></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/TYPE_MEMORY_BACKEND" data-ref="_M/TYPE_MEMORY_BACKEND">TYPE_MEMORY_BACKEND</dfn> "memory-backend"</u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/MEMORY_BACKEND" data-ref="_M/MEMORY_BACKEND">MEMORY_BACKEND</dfn>(obj) \</u></td></tr>
+<tr><th id="24">24</th><td><u>    OBJECT_CHECK(HostMemoryBackend, (obj), TYPE_MEMORY_BACKEND)</u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/MEMORY_BACKEND_GET_CLASS" data-ref="_M/MEMORY_BACKEND_GET_CLASS">MEMORY_BACKEND_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="26">26</th><td><u>    OBJECT_GET_CLASS(HostMemoryBackendClass, (obj), TYPE_MEMORY_BACKEND)</u></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/MEMORY_BACKEND_CLASS" data-ref="_M/MEMORY_BACKEND_CLASS">MEMORY_BACKEND_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="28">28</th><td><u>    OBJECT_CLASS_CHECK(HostMemoryBackendClass, (klass), TYPE_MEMORY_BACKEND)</u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#HostMemoryBackend" title='HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> <dfn class="typedef" id="HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</dfn>;</td></tr>
+<tr><th id="31">31</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#HostMemoryBackendClass" title='HostMemoryBackendClass' data-ref="HostMemoryBackendClass">HostMemoryBackendClass</a> <dfn class="typedef" id="HostMemoryBackendClass" title='HostMemoryBackendClass' data-type='struct HostMemoryBackendClass' data-ref="HostMemoryBackendClass">HostMemoryBackendClass</dfn>;</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * HostMemoryBackendClass:</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> *<span class="command"> @parent</span>_class: opaque parent class container</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="37">37</th><td><b>struct</b> <dfn class="type def" id="HostMemoryBackendClass" title='HostMemoryBackendClass' data-ref="HostMemoryBackendClass">HostMemoryBackendClass</dfn> {</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> <dfn class="decl" id="HostMemoryBackendClass::parent_class" title='HostMemoryBackendClass::parent_class' data-ref="HostMemoryBackendClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>    <em>void</em> (*<dfn class="decl" id="HostMemoryBackendClass::alloc" title='HostMemoryBackendClass::alloc' data-ref="HostMemoryBackendClass::alloc">alloc</dfn>)(<a class="typedef" href="#HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> *<dfn class="local col1 decl" id="1backend" title='backend' data-type='HostMemoryBackend *' data-ref="1backend">backend</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="2errp" title='errp' data-type='Error **' data-ref="2errp">errp</dfn>);</td></tr>
+<tr><th id="41">41</th><td>};</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *<span class="command"> @HostMemoryBackend</span></i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> *<span class="command"> @parent</span>: opaque parent object container</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> *<span class="command"> @size</span>: amount of memory backend provides</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> *<span class="command"> @mr</span>: MemoryRegion representing host memory belonging to backend</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="50">50</th><td><b>struct</b> <dfn class="type def" id="HostMemoryBackend" title='HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <i>/* private */</i></td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> <dfn class="decl" id="HostMemoryBackend::parent" title='HostMemoryBackend::parent' data-ref="HostMemoryBackend::parent">parent</dfn>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>    <i>/* protected */</i></td></tr>
+<tr><th id="55">55</th><td>    <em>char</em> *<dfn class="decl" id="HostMemoryBackend::id" title='HostMemoryBackend::id' data-ref="HostMemoryBackend::id">id</dfn>;</td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="HostMemoryBackend::size" title='HostMemoryBackend::size' data-ref="HostMemoryBackend::size">size</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="HostMemoryBackend::merge" title='HostMemoryBackend::merge' data-ref="HostMemoryBackend::merge">merge</dfn>, <dfn class="decl" id="HostMemoryBackend::dump" title='HostMemoryBackend::dump' data-ref="HostMemoryBackend::dump">dump</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="HostMemoryBackend::prealloc" title='HostMemoryBackend::prealloc' data-ref="HostMemoryBackend::prealloc">prealloc</dfn>, <dfn class="decl" id="HostMemoryBackend::force_prealloc" title='HostMemoryBackend::force_prealloc' data-ref="HostMemoryBackend::force_prealloc">force_prealloc</dfn>, <dfn class="decl" id="HostMemoryBackend::is_mapped" title='HostMemoryBackend::is_mapped' data-ref="HostMemoryBackend::is_mapped">is_mapped</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <a class="macro" href="../qemu/bitmap.h.html#63" title="unsigned long host_nodes[(((128 + 1) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))]" data-ref="_M/DECLARE_BITMAP">DECLARE_BITMAP</a>(<dfn class="decl" id="HostMemoryBackend::host_nodes" title='HostMemoryBackend::host_nodes' data-ref="HostMemoryBackend::host_nodes">host_nodes</dfn>, <a class="macro" href="sysemu.h.html#132" title="128" data-ref="_M/MAX_NODES">MAX_NODES</a> + <var>1</var>);</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../qapi-types.h.html#HostMemPolicy" title='HostMemPolicy' data-type='enum HostMemPolicy' data-ref="HostMemPolicy">HostMemPolicy</a> <dfn class="decl" id="HostMemoryBackend::policy" title='HostMemoryBackend::policy' data-ref="HostMemoryBackend::policy">policy</dfn>;</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="HostMemoryBackend::mr" title='HostMemoryBackend::mr' data-ref="HostMemoryBackend::mr">mr</dfn>;</td></tr>
+<tr><th id="63">63</th><td>};</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="host_memory_backend_mr_inited" title='host_memory_backend_mr_inited' data-ref="host_memory_backend_mr_inited">host_memory_backend_mr_inited</dfn>(<a class="typedef" href="#HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> *<dfn class="local col3 decl" id="3backend" title='backend' data-type='HostMemoryBackend *' data-ref="3backend">backend</dfn>);</td></tr>
+<tr><th id="66">66</th><td><a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="host_memory_backend_get_memory" title='host_memory_backend_get_memory' data-ref="host_memory_backend_get_memory">host_memory_backend_get_memory</dfn>(<a class="typedef" href="#HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> *<dfn class="local col4 decl" id="4backend" title='backend' data-type='HostMemoryBackend *' data-ref="4backend">backend</dfn>,</td></tr>
+<tr><th id="67">67</th><td>                                             <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="5errp" title='errp' data-type='Error **' data-ref="5errp">errp</dfn>);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><em>void</em> <dfn class="decl" id="host_memory_backend_set_mapped" title='host_memory_backend_set_mapped' data-ref="host_memory_backend_set_mapped">host_memory_backend_set_mapped</dfn>(<a class="typedef" href="#HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> *<dfn class="local col6 decl" id="6backend" title='backend' data-type='HostMemoryBackend *' data-ref="6backend">backend</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="7mapped" title='mapped' data-type='_Bool' data-ref="7mapped">mapped</dfn>);</td></tr>
+<tr><th id="70">70</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="host_memory_backend_is_mapped" title='host_memory_backend_is_mapped' data-ref="host_memory_backend_is_mapped">host_memory_backend_is_mapped</dfn>(<a class="typedef" href="#HostMemoryBackend" title='HostMemoryBackend' data-type='struct HostMemoryBackend' data-ref="HostMemoryBackend">HostMemoryBackend</a> *<dfn class="local col8 decl" id="8backend" title='backend' data-type='HostMemoryBackend *' data-ref="8backend">backend</dfn>);</td></tr>
+<tr><th id="71">71</th><td><u>#<span data-ppcond="13">endif</span></u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../backends/hostmem-file.c.html'>codebrowser/backends/hostmem-file.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>control-target.c source code [codebrowser/trace/control-target.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/trace/control-target.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>trace</a>/<a href='control-target.c.html'>control-target.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Interface for configuring and controlling the state of tracing events.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2014-2017 Lluís Vilanova &lt;vilanova@ac.upc.edu&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="7">7</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="8">8</th><td><i> */</i></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="../target/i386/cpu.h.html">"cpu.h"</a></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../trace-root.h.html">"trace-root.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="control.h.html">"trace/control.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../accel/tcg/translate-all.h.html">"translate-all.h"</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><em>void</em> <dfn class="decl def" id="trace_event_set_state_dynamic_init" title='trace_event_set_state_dynamic_init' data-ref="trace_event_set_state_dynamic_init">trace_event_set_state_dynamic_init</dfn>(<a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col1 decl" id="1ev" title='ev' data-type='TraceEvent *' data-ref="1ev">ev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="2state" title='state' data-type='_Bool' data-ref="2state">state</dfn>)</td></tr>
+<tr><th id="18">18</th><td>{</td></tr>
+<tr><th id="19">19</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="3state_pre" title='state_pre' data-type='_Bool' data-ref="3state_pre">state_pre</dfn>;</td></tr>
+<tr><th id="20">20</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((trace_event_get_state_static(ev)) ? (void) (0) : __assert_fail (&quot;trace_event_get_state_static(ev)&quot;, &quot;/home/jon/workspace/qemu/trace/control-target.c&quot;, 20, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col1 ref" href="#1ev" title='ev' data-ref="1ev">ev</a>));</td></tr>
+<tr><th id="21">21</th><td>    <i>/*</i></td></tr>
+<tr><th id="22">22</th><td><i>     * We ignore the "vcpu" property here, since no vCPUs have been created</i></td></tr>
+<tr><th id="23">23</th><td><i>     * yet. Then dstate can only be 1 or 0.</i></td></tr>
+<tr><th id="24">24</th><td><i>     */</i></td></tr>
+<tr><th id="25">25</th><td>    <a class="local col3 ref" href="#3state_pre" title='state_pre' data-ref="3state_pre">state_pre</a> = *<a class="local col1 ref" href="#1ev" title='ev' data-ref="1ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a>;</td></tr>
+<tr><th id="26">26</th><td>    <b>if</b> (<a class="local col3 ref" href="#3state_pre" title='state_pre' data-ref="3state_pre">state_pre</a> != <a class="local col2 ref" href="#2state" title='state' data-ref="2state">state</a>) {</td></tr>
+<tr><th id="27">27</th><td>        <b>if</b> (<a class="local col2 ref" href="#2state" title='state' data-ref="2state">state</a>) {</td></tr>
+<tr><th id="28">28</th><td>            <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>++;</td></tr>
+<tr><th id="29">29</th><td>            *<a class="local col1 ref" href="#1ev" title='ev' data-ref="1ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> = <var>1</var>;</td></tr>
+<tr><th id="30">30</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="31">31</th><td>            <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>--;</td></tr>
+<tr><th id="32">32</th><td>            *<a class="local col1 ref" href="#1ev" title='ev' data-ref="1ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> = <var>0</var>;</td></tr>
+<tr><th id="33">33</th><td>        }</td></tr>
+<tr><th id="34">34</th><td>    }</td></tr>
+<tr><th id="35">35</th><td>}</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><em>void</em> <dfn class="decl def" id="trace_event_set_state_dynamic" title='trace_event_set_state_dynamic' data-ref="trace_event_set_state_dynamic">trace_event_set_state_dynamic</dfn>(<a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col4 decl" id="4ev" title='ev' data-type='TraceEvent *' data-ref="4ev">ev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="5state" title='state' data-type='_Bool' data-ref="5state">state</dfn>)</td></tr>
+<tr><th id="38">38</th><td>{</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="6vcpu" title='vcpu' data-type='CPUState *' data-ref="6vcpu">vcpu</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((trace_event_get_state_static(ev)) ? (void) (0) : __assert_fail (&quot;trace_event_get_state_static(ev)&quot;, &quot;/home/jon/workspace/qemu/trace/control-target.c&quot;, 40, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>));</td></tr>
+<tr><th id="41">41</th><td>    <b>if</b> (<a class="ref" href="control.h.html#trace_event_is_vcpu" title='trace_event_is_vcpu' data-ref="trace_event_is_vcpu">trace_event_is_vcpu</a>(<a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>) &amp;&amp; <a class="macro" href="../include/qemu/compiler.h.html#57" title="__builtin_expect(!!(((&amp;cpus)-&gt;tqh_first) != ((void*)0)), 1)" data-ref="_M/likely">likely</a>(<a class="macro" href="../include/qom/cpu.h.html#420" title="((&amp;cpus)-&gt;tqh_first)" data-ref="_M/first_cpu">first_cpu</a> != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)) {</td></tr>
+<tr><th id="42">42</th><td>        <a class="macro" href="../include/qom/cpu.h.html#415" title="for ((vcpu) = ((&amp;cpus)-&gt;tqh_first); (vcpu); (vcpu) = ((vcpu)-&gt;node.tqe_next))" data-ref="_M/CPU_FOREACH">CPU_FOREACH</a>(<a class="local col6 ref" href="#6vcpu" title='vcpu' data-ref="6vcpu">vcpu</a>) {</td></tr>
+<tr><th id="43">43</th><td>            <a class="ref" href="#trace_event_set_vcpu_state_dynamic" title='trace_event_set_vcpu_state_dynamic' data-ref="trace_event_set_vcpu_state_dynamic">trace_event_set_vcpu_state_dynamic</a>(<a class="local col6 ref" href="#6vcpu" title='vcpu' data-ref="6vcpu">vcpu</a>, <a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>, <a class="local col5 ref" href="#5state" title='state' data-ref="5state">state</a>);</td></tr>
+<tr><th id="44">44</th><td>        }</td></tr>
+<tr><th id="45">45</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="46">46</th><td>        <i>/*</i></td></tr>
+<tr><th id="47">47</th><td><i>         * Without the "vcpu" property, dstate can only be 1 or 0. With it, we</i></td></tr>
+<tr><th id="48">48</th><td><i>         * haven't instantiated any vCPU yet, so we will set a global state</i></td></tr>
+<tr><th id="49">49</th><td><i>         * instead, and trace_init_vcpu will reconcile it afterwards.</i></td></tr>
+<tr><th id="50">50</th><td><i>         */</i></td></tr>
+<tr><th id="51">51</th><td>        <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="7state_pre" title='state_pre' data-type='_Bool' data-ref="7state_pre">state_pre</dfn> = *<a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a>;</td></tr>
+<tr><th id="52">52</th><td>        <b>if</b> (<a class="local col7 ref" href="#7state_pre" title='state_pre' data-ref="7state_pre">state_pre</a> != <a class="local col5 ref" href="#5state" title='state' data-ref="5state">state</a>) {</td></tr>
+<tr><th id="53">53</th><td>            <b>if</b> (<a class="local col5 ref" href="#5state" title='state' data-ref="5state">state</a>) {</td></tr>
+<tr><th id="54">54</th><td>                <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>++;</td></tr>
+<tr><th id="55">55</th><td>                *<a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> = <var>1</var>;</td></tr>
+<tr><th id="56">56</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="57">57</th><td>                <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>--;</td></tr>
+<tr><th id="58">58</th><td>                *<a class="local col4 ref" href="#4ev" title='ev' data-ref="4ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> = <var>0</var>;</td></tr>
+<tr><th id="59">59</th><td>            }</td></tr>
+<tr><th id="60">60</th><td>        }</td></tr>
+<tr><th id="61">61</th><td>    }</td></tr>
+<tr><th id="62">62</th><td>}</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="trace_event_synchronize_vcpu_state_dynamic" title='trace_event_synchronize_vcpu_state_dynamic' data-type='void trace_event_synchronize_vcpu_state_dynamic(CPUState * vcpu, run_on_cpu_data ignored)' data-ref="trace_event_synchronize_vcpu_state_dynamic">trace_event_synchronize_vcpu_state_dynamic</dfn>(</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="8vcpu" title='vcpu' data-type='CPUState *' data-ref="8vcpu">vcpu</dfn>, <a class="typedef" href="../include/qom/cpu.h.html#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col9 decl" id="9ignored" title='ignored' data-type='run_on_cpu_data' data-ref="9ignored">ignored</dfn>)</td></tr>
+<tr><th id="66">66</th><td>{</td></tr>
+<tr><th id="67">67</th><td>    <a class="ref" href="../include/qemu/bitmap.h.html#bitmap_copy" title='bitmap_copy' data-ref="bitmap_copy">bitmap_copy</a>(<a class="local col8 ref" href="#8vcpu" title='vcpu' data-ref="8vcpu">vcpu</a>-&gt;<a class="ref" href="../include/qom/cpu.h.html#378" title='CPUState::trace_dstate' data-ref="CPUState::trace_dstate">trace_dstate</a>, <a class="local col8 ref" href="#8vcpu" title='vcpu' data-ref="8vcpu">vcpu</a>-&gt;<a class="ref" href="../include/qom/cpu.h.html#377" title='CPUState::trace_dstate_delayed' data-ref="CPUState::trace_dstate_delayed">trace_dstate_delayed</a>,</td></tr>
+<tr><th id="68">68</th><td>                <a class="macro" href="../include/qom/cpu.h.html#262" title="32" data-ref="_M/CPU_TRACE_DSTATE_MAX_EVENTS">CPU_TRACE_DSTATE_MAX_EVENTS</a>);</td></tr>
+<tr><th id="69">69</th><td>    <a class="ref" href="../include/qom/cpu.h.html#cpu_tb_jmp_cache_clear" title='cpu_tb_jmp_cache_clear' data-ref="cpu_tb_jmp_cache_clear">cpu_tb_jmp_cache_clear</a>(<a class="local col8 ref" href="#8vcpu" title='vcpu' data-ref="8vcpu">vcpu</a>);</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><em>void</em> <dfn class="decl def" id="trace_event_set_vcpu_state_dynamic" title='trace_event_set_vcpu_state_dynamic' data-ref="trace_event_set_vcpu_state_dynamic">trace_event_set_vcpu_state_dynamic</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="10vcpu" title='vcpu' data-type='CPUState *' data-ref="10vcpu">vcpu</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                                        <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col1 decl" id="11ev" title='ev' data-type='TraceEvent *' data-ref="11ev">ev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="12state" title='state' data-type='_Bool' data-ref="12state">state</dfn>)</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="13vcpu_id" title='vcpu_id' data-type='uint32_t' data-ref="13vcpu_id">vcpu_id</dfn>;</td></tr>
+<tr><th id="76">76</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="14state_pre" title='state_pre' data-type='_Bool' data-ref="14state_pre">state_pre</dfn>;</td></tr>
+<tr><th id="77">77</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((trace_event_get_state_static(ev)) ? (void) (0) : __assert_fail (&quot;trace_event_get_state_static(ev)&quot;, &quot;/home/jon/workspace/qemu/trace/control-target.c&quot;, 77, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>));</td></tr>
+<tr><th id="78">78</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((trace_event_is_vcpu(ev)) ? (void) (0) : __assert_fail (&quot;trace_event_is_vcpu(ev)&quot;, &quot;/home/jon/workspace/qemu/trace/control-target.c&quot;, 78, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="control.h.html#trace_event_is_vcpu" title='trace_event_is_vcpu' data-ref="trace_event_is_vcpu">trace_event_is_vcpu</a>(<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>));</td></tr>
+<tr><th id="79">79</th><td>    <a class="local col3 ref" href="#13vcpu_id" title='vcpu_id' data-ref="13vcpu_id">vcpu_id</a> = <a class="ref" href="control.h.html#trace_event_get_vcpu_id" title='trace_event_get_vcpu_id' data-ref="trace_event_get_vcpu_id">trace_event_get_vcpu_id</a>(<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>);</td></tr>
+<tr><th id="80">80</th><td>    <a class="local col4 ref" href="#14state_pre" title='state_pre' data-ref="14state_pre">state_pre</a> = <a class="ref" href="../include/qemu/bitops.h.html#test_bit" title='test_bit' data-ref="test_bit">test_bit</a>(<a class="local col3 ref" href="#13vcpu_id" title='vcpu_id' data-ref="13vcpu_id">vcpu_id</a>, <a class="local col0 ref" href="#10vcpu" title='vcpu' data-ref="10vcpu">vcpu</a>-&gt;<a class="ref" href="../include/qom/cpu.h.html#378" title='CPUState::trace_dstate' data-ref="CPUState::trace_dstate">trace_dstate</a>);</td></tr>
+<tr><th id="81">81</th><td>    <b>if</b> (<a class="local col4 ref" href="#14state_pre" title='state_pre' data-ref="14state_pre">state_pre</a> != <a class="local col2 ref" href="#12state" title='state' data-ref="12state">state</a>) {</td></tr>
+<tr><th id="82">82</th><td>        <b>if</b> (<a class="local col2 ref" href="#12state" title='state' data-ref="12state">state</a>) {</td></tr>
+<tr><th id="83">83</th><td>            <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>++;</td></tr>
+<tr><th id="84">84</th><td>            <a class="ref" href="../include/qemu/bitops.h.html#set_bit" title='set_bit' data-ref="set_bit">set_bit</a>(<a class="local col3 ref" href="#13vcpu_id" title='vcpu_id' data-ref="13vcpu_id">vcpu_id</a>, <a class="local col0 ref" href="#10vcpu" title='vcpu' data-ref="10vcpu">vcpu</a>-&gt;<a class="ref" href="../include/qom/cpu.h.html#377" title='CPUState::trace_dstate_delayed' data-ref="CPUState::trace_dstate_delayed">trace_dstate_delayed</a>);</td></tr>
+<tr><th id="85">85</th><td>            (*<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a>)++;</td></tr>
+<tr><th id="86">86</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="87">87</th><td>            <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>--;</td></tr>
+<tr><th id="88">88</th><td>            <a class="ref" href="../include/qemu/bitops.h.html#clear_bit" title='clear_bit' data-ref="clear_bit">clear_bit</a>(<a class="local col3 ref" href="#13vcpu_id" title='vcpu_id' data-ref="13vcpu_id">vcpu_id</a>, <a class="local col0 ref" href="#10vcpu" title='vcpu' data-ref="10vcpu">vcpu</a>-&gt;<a class="ref" href="../include/qom/cpu.h.html#377" title='CPUState::trace_dstate_delayed' data-ref="CPUState::trace_dstate_delayed">trace_dstate_delayed</a>);</td></tr>
+<tr><th id="89">89</th><td>            (*<a class="local col1 ref" href="#11ev" title='ev' data-ref="11ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a>)--;</td></tr>
+<tr><th id="90">90</th><td>        }</td></tr>
+<tr><th id="91">91</th><td>        <i>/*</i></td></tr>
+<tr><th id="92">92</th><td><i>         * Delay changes until next TB; we want all TBs to be built from a</i></td></tr>
+<tr><th id="93">93</th><td><i>         * single set of dstate values to ensure consistency of generated</i></td></tr>
+<tr><th id="94">94</th><td><i>         * tracing code.</i></td></tr>
+<tr><th id="95">95</th><td><i>         */</i></td></tr>
+<tr><th id="96">96</th><td>        <a class="ref" href="../include/qom/cpu.h.html#async_run_on_cpu" title='async_run_on_cpu' data-ref="async_run_on_cpu">async_run_on_cpu</a>(<a class="local col0 ref" href="#10vcpu" title='vcpu' data-ref="10vcpu">vcpu</a>, <a class="tu ref" href="#trace_event_synchronize_vcpu_state_dynamic" title='trace_event_synchronize_vcpu_state_dynamic' data-use='r' data-ref="trace_event_synchronize_vcpu_state_dynamic">trace_event_synchronize_vcpu_state_dynamic</a>,</td></tr>
+<tr><th id="97">97</th><td>                         <a class="macro" href="../include/qom/cpu.h.html#255" title="((run_on_cpu_data){.host_ptr = (((void*)0))})" data-ref="_M/RUN_ON_CPU_NULL">RUN_ON_CPU_NULL</a>);</td></tr>
+<tr><th id="98">98</th><td>    }</td></tr>
+<tr><th id="99">99</th><td>}</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="adding_first_cpu1" title='adding_first_cpu1' data-type='_Bool adding_first_cpu1()' data-ref="adding_first_cpu1">adding_first_cpu1</dfn>(<em>void</em>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="15cpu" title='cpu' data-type='CPUState *' data-ref="15cpu">cpu</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="16count" title='count' data-type='size_t' data-ref="16count">count</dfn> = <var>0</var>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="macro" href="../include/qom/cpu.h.html#415" title="for ((cpu) = ((&amp;cpus)-&gt;tqh_first); (cpu); (cpu) = ((cpu)-&gt;node.tqe_next))" data-ref="_M/CPU_FOREACH">CPU_FOREACH</a>(<a class="local col5 ref" href="#15cpu" title='cpu' data-ref="15cpu">cpu</a>) {</td></tr>
+<tr><th id="106">106</th><td>        <a class="local col6 ref" href="#16count" title='count' data-ref="16count">count</a>++;</td></tr>
+<tr><th id="107">107</th><td>        <b>if</b> (<a class="local col6 ref" href="#16count" title='count' data-ref="16count">count</a> &gt; <var>1</var>) {</td></tr>
+<tr><th id="108">108</th><td>            <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="109">109</th><td>        }</td></tr>
+<tr><th id="110">110</th><td>    }</td></tr>
+<tr><th id="111">111</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="112">112</th><td>}</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="adding_first_cpu" title='adding_first_cpu' data-type='_Bool adding_first_cpu()' data-ref="adding_first_cpu">adding_first_cpu</dfn>(<em>void</em>)</td></tr>
+<tr><th id="115">115</th><td>{</td></tr>
+<tr><th id="116">116</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="17res" title='res' data-type='_Bool' data-ref="17res">res</dfn>;</td></tr>
+<tr><th id="117">117</th><td>    <a class="ref" href="../include/exec/cpu-common.h.html#cpu_list_lock" title='cpu_list_lock' data-ref="cpu_list_lock">cpu_list_lock</a>();</td></tr>
+<tr><th id="118">118</th><td>    <a class="local col7 ref" href="#17res" title='res' data-ref="17res">res</a> = <a class="tu ref" href="#adding_first_cpu1" title='adding_first_cpu1' data-use='c' data-ref="adding_first_cpu1">adding_first_cpu1</a>();</td></tr>
+<tr><th id="119">119</th><td>    <a class="ref" href="../include/exec/cpu-common.h.html#cpu_list_unlock" title='cpu_list_unlock' data-ref="cpu_list_unlock">cpu_list_unlock</a>();</td></tr>
+<tr><th id="120">120</th><td>    <b>return</b> <a class="local col7 ref" href="#17res" title='res' data-ref="17res">res</a>;</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><em>void</em> <dfn class="decl def" id="trace_init_vcpu" title='trace_init_vcpu' data-ref="trace_init_vcpu">trace_init_vcpu</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="18vcpu" title='vcpu' data-type='CPUState *' data-ref="18vcpu">vcpu</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    <a class="typedef" href="control.h.html#TraceEventIter" title='TraceEventIter' data-type='struct TraceEventIter' data-ref="TraceEventIter">TraceEventIter</a> <dfn class="local col9 decl" id="19iter" title='iter' data-type='TraceEventIter' data-ref="19iter">iter</dfn>;</td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="event-internal.h.html#TraceEvent" title='TraceEvent' data-type='struct TraceEvent' data-ref="TraceEvent">TraceEvent</a> *<dfn class="local col0 decl" id="20ev" title='ev' data-type='TraceEvent *' data-ref="20ev">ev</dfn>;</td></tr>
+<tr><th id="127">127</th><td>    <a class="ref" href="control.h.html#trace_event_iter_init" title='trace_event_iter_init' data-ref="trace_event_iter_init">trace_event_iter_init</a>(&amp;<a class="local col9 ref" href="#19iter" title='iter' data-ref="19iter">iter</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="128">128</th><td>    <b>while</b> ((<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a> = <a class="ref" href="control.h.html#trace_event_iter_next" title='trace_event_iter_next' data-ref="trace_event_iter_next">trace_event_iter_next</a>(&amp;<a class="local col9 ref" href="#19iter" title='iter' data-ref="19iter">iter</a>)) != <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="129">129</th><td>        <b>if</b> (<a class="ref" href="control.h.html#trace_event_is_vcpu" title='trace_event_is_vcpu' data-ref="trace_event_is_vcpu">trace_event_is_vcpu</a>(<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>) &amp;&amp;</td></tr>
+<tr><th id="130">130</th><td>            <a class="ref" href="control.h.html#trace_event_get_state_static" title='trace_event_get_state_static' data-ref="trace_event_get_state_static">trace_event_get_state_static</a>(<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>) &amp;&amp;</td></tr>
+<tr><th id="131">131</th><td>            <a class="ref" href="control.h.html#trace_event_get_state_dynamic" title='trace_event_get_state_dynamic' data-ref="trace_event_get_state_dynamic">trace_event_get_state_dynamic</a>(<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>)) {</td></tr>
+<tr><th id="132">132</th><td>            <b>if</b> (<a class="tu ref" href="#adding_first_cpu" title='adding_first_cpu' data-use='c' data-ref="adding_first_cpu">adding_first_cpu</a>()) {</td></tr>
+<tr><th id="133">133</th><td>                <i>/* check preconditions */</i></td></tr>
+<tr><th id="134">134</th><td>                <a class="macro" href="../../include/assert.h.html#88" title="((*ev-&gt;dstate == 1) ? (void) (0) : __assert_fail (&quot;*ev-&gt;dstate == 1&quot;, &quot;/home/jon/workspace/qemu/trace/control-target.c&quot;, 134, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(*<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> == <var>1</var>);</td></tr>
+<tr><th id="135">135</th><td>                <i>/* disable early-init state ... */</i></td></tr>
+<tr><th id="136">136</th><td>                *<a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>-&gt;<a class="ref" href="event-internal.h.html#TraceEvent::dstate" title='TraceEvent::dstate' data-ref="TraceEvent::dstate">dstate</a> = <var>0</var>;</td></tr>
+<tr><th id="137">137</th><td>                <a class="ref" href="control-internal.h.html#trace_events_enabled_count" title='trace_events_enabled_count' data-ref="trace_events_enabled_count">trace_events_enabled_count</a>--;</td></tr>
+<tr><th id="138">138</th><td>                <i>/* ... and properly re-enable */</i></td></tr>
+<tr><th id="139">139</th><td>                <a class="ref" href="#trace_event_set_vcpu_state_dynamic" title='trace_event_set_vcpu_state_dynamic' data-ref="trace_event_set_vcpu_state_dynamic">trace_event_set_vcpu_state_dynamic</a>(<a class="local col8 ref" href="#18vcpu" title='vcpu' data-ref="18vcpu">vcpu</a>, <a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="140">140</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="141">141</th><td>                <a class="ref" href="#trace_event_set_vcpu_state_dynamic" title='trace_event_set_vcpu_state_dynamic' data-ref="trace_event_set_vcpu_state_dynamic">trace_event_set_vcpu_state_dynamic</a>(<a class="local col8 ref" href="#18vcpu" title='vcpu' data-ref="18vcpu">vcpu</a>, <a class="local col0 ref" href="#20ev" title='ev' data-ref="20ev">ev</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="142">142</th><td>            }</td></tr>
+<tr><th id="143">143</th><td>        }</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td>    <a class="ref" href="../trace-root.h.html#trace_guest_cpu_enter" title='trace_guest_cpu_enter' data-ref="trace_guest_cpu_enter">trace_guest_cpu_enter</a>(<a class="local col8 ref" href="#18vcpu" title='vcpu' data-ref="18vcpu">vcpu</a>);</td></tr>
+<tr><th id="146">146</th><td>}</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

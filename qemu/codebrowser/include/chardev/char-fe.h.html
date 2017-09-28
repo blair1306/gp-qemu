@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>char-fe.h source code [codebrowser/include/chardev/char-fe.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CharBackend "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/chardev/char-fe.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>chardev</a>/<a href='char-fe.h.html'>char-fe.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_CHAR_FE_H">QEMU_CHAR_FE_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_CHAR_FE_H" data-ref="_M/QEMU_CHAR_FE_H">QEMU_CHAR_FE_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="char.h.html">"chardev/char.h"</a></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="IOEventHandler" title='IOEventHandler' data-type='void (void *, int)' data-ref="IOEventHandler">IOEventHandler</dfn>(<em>void</em> *<dfn class="local col3 decl" id="93opaque" title='opaque' data-type='void *' data-ref="93opaque">opaque</dfn>, <em>int</em> <dfn class="local col4 decl" id="94event" title='event' data-type='int' data-ref="94event">event</dfn>);</td></tr>
+<tr><th id="7">7</th><td><b>typedef</b> <em>int</em> <dfn class="typedef" id="BackendChangeHandler" title='BackendChangeHandler' data-type='int (void *)' data-ref="BackendChangeHandler">BackendChangeHandler</dfn>(<em>void</em> *<dfn class="local col5 decl" id="95opaque" title='opaque' data-type='void *' data-ref="95opaque">opaque</dfn>);</td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><i>/* This is the backend as seen by frontend, the actual backend is</i></td></tr>
+<tr><th id="10">10</th><td><i> * Chardev */</i></td></tr>
+<tr><th id="11">11</th><td><b>struct</b> <dfn class="type def" id="CharBackend" title='CharBackend' data-ref="CharBackend">CharBackend</dfn> {</td></tr>
+<tr><th id="12">12</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="decl" id="CharBackend::chr" title='CharBackend::chr' data-ref="CharBackend::chr">chr</dfn>;</td></tr>
+<tr><th id="13">13</th><td>    <a class="typedef" href="#IOEventHandler" title='IOEventHandler' data-type='void (void *, int)' data-ref="IOEventHandler">IOEventHandler</a> *<dfn class="decl" id="CharBackend::chr_event" title='CharBackend::chr_event' data-ref="CharBackend::chr_event">chr_event</dfn>;</td></tr>
+<tr><th id="14">14</th><td>    <a class="typedef" href="../qemu/main-loop.h.html#IOCanReadHandler" title='IOCanReadHandler' data-type='int (void *)' data-ref="IOCanReadHandler">IOCanReadHandler</a> *<dfn class="decl" id="CharBackend::chr_can_read" title='CharBackend::chr_can_read' data-ref="CharBackend::chr_can_read">chr_can_read</dfn>;</td></tr>
+<tr><th id="15">15</th><td>    <a class="typedef" href="../qemu/main-loop.h.html#IOReadHandler" title='IOReadHandler' data-type='void (void *, const uint8_t *, int)' data-ref="IOReadHandler">IOReadHandler</a> *<dfn class="decl" id="CharBackend::chr_read" title='CharBackend::chr_read' data-ref="CharBackend::chr_read">chr_read</dfn>;</td></tr>
+<tr><th id="16">16</th><td>    <a class="typedef" href="#BackendChangeHandler" title='BackendChangeHandler' data-type='int (void *)' data-ref="BackendChangeHandler">BackendChangeHandler</a> *<dfn class="decl" id="CharBackend::chr_be_change" title='CharBackend::chr_be_change' data-ref="CharBackend::chr_be_change">chr_be_change</dfn>;</td></tr>
+<tr><th id="17">17</th><td>    <em>void</em> *<dfn class="decl" id="CharBackend::opaque" title='CharBackend::opaque' data-ref="CharBackend::opaque">opaque</dfn>;</td></tr>
+<tr><th id="18">18</th><td>    <em>int</em> <dfn class="decl" id="CharBackend::tag" title='CharBackend::tag' data-ref="CharBackend::tag">tag</dfn>;</td></tr>
+<tr><th id="19">19</th><td>    <em>int</em> <dfn class="decl" id="CharBackend::fe_open" title='CharBackend::fe_open' data-ref="CharBackend::fe_open">fe_open</dfn>;</td></tr>
+<tr><th id="20">20</th><td>};</td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_init:</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * Initializes a front end for the given CharBackend and</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * Chardev. Call qemu_chr_fe_deinit() to remove the association and</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> * release the driver.</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> * Returns: false on error.</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="31">31</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_chr_fe_init" title='qemu_chr_fe_init' data-ref="qemu_chr_fe_init">qemu_chr_fe_init</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col6 decl" id="96b" title='b' data-type='CharBackend *' data-ref="96b">b</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col7 decl" id="97s" title='s' data-type='Chardev *' data-ref="97s">s</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="98errp" title='errp' data-type='Error **' data-ref="98errp">errp</dfn>);</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_deinit:</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> *<span class="command"> @b</span><span class="arg">:</span> a CharBackend</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * <span class="command">@del</span>:<span class="verb"> if true, delete the chardev backend</span></i></td></tr>
+<tr><th id="37">37</th><td><i class="doc">*</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> * Dissociate the CharBackend from the Chardev.</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * Safe to call without associated Chardev.</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="42">42</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_deinit" title='qemu_chr_fe_deinit' data-ref="qemu_chr_fe_deinit">qemu_chr_fe_deinit</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col9 decl" id="99b" title='b' data-type='CharBackend *' data-ref="99b">b</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="100del" title='del' data-type='_Bool' data-ref="100del">del</dfn>);</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_get_driver:</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> * Returns the driver associated with a CharBackend or NULL if no</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> * associated Chardev.</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> * Note: avoid this function as the driver should never be accessed directly,</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> *       especially by the frontends that support chardevice hotswap.</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> *       Consider qemu_chr_fe_backend_connected() to check for driver existence</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="53">53</th><td><a class="typedef" href="../qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="decl" id="qemu_chr_fe_get_driver" title='qemu_chr_fe_get_driver' data-ref="qemu_chr_fe_get_driver">qemu_chr_fe_get_driver</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col1 decl" id="101be" title='be' data-type='CharBackend *' data-ref="101be">be</dfn>);</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_backend_connected:</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> * Returns true if there is a chardevice associated with<span class="command"> @be</span>.</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="60">60</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_chr_fe_backend_connected" title='qemu_chr_fe_backend_connected' data-ref="qemu_chr_fe_backend_connected">qemu_chr_fe_backend_connected</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col2 decl" id="102be" title='be' data-type='CharBackend *' data-ref="102be">be</dfn>);</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_backend_open:</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * Returns true if chardevice associated with<span class="command"> @be</span> is open.</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="67">67</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_chr_fe_backend_open" title='qemu_chr_fe_backend_open' data-ref="qemu_chr_fe_backend_open">qemu_chr_fe_backend_open</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col3 decl" id="103be" title='be' data-type='CharBackend *' data-ref="103be">be</dfn>);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_set_handlers:</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *<span class="command"> @b</span><span class="arg">:</span> a CharBackend</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *<span class="command"> @fd</span>_can_read: callback to get the amount of data the frontend may</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> *               receive</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> *<span class="command"> @fd</span>_read: callback to receive data from char</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> *<span class="command"> @fd</span>_event: event callback</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> *<span class="command"> @be</span>_change: backend change callback; passing NULL means hot backend change</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> *             is not supported and will not be attempted</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> *<span class="command"> @opaque</span>: an opaque pointer for the callbacks</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> *<span class="command"> @context</span>: a main loop context or NULL for the default</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * <span class="command">@set</span>_open: whether to call qemu_chr_fe_set_open() implicitely when</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * any of the handler is non-NULL</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> * Set the front end char handlers. The front end takes the focus if</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> * any of the handler is non-NULL.</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> * Without associated Chardev, nothing is changed.</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="88">88</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_set_handlers" title='qemu_chr_fe_set_handlers' data-ref="qemu_chr_fe_set_handlers">qemu_chr_fe_set_handlers</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col4 decl" id="104b" title='b' data-type='CharBackend *' data-ref="104b">b</dfn>,</td></tr>
+<tr><th id="89">89</th><td>                              <a class="typedef" href="../qemu/main-loop.h.html#IOCanReadHandler" title='IOCanReadHandler' data-type='int (void *)' data-ref="IOCanReadHandler">IOCanReadHandler</a> *<dfn class="local col5 decl" id="105fd_can_read" title='fd_can_read' data-type='IOCanReadHandler *' data-ref="105fd_can_read">fd_can_read</dfn>,</td></tr>
+<tr><th id="90">90</th><td>                              <a class="typedef" href="../qemu/main-loop.h.html#IOReadHandler" title='IOReadHandler' data-type='void (void *, const uint8_t *, int)' data-ref="IOReadHandler">IOReadHandler</a> *<dfn class="local col6 decl" id="106fd_read" title='fd_read' data-type='IOReadHandler *' data-ref="106fd_read">fd_read</dfn>,</td></tr>
+<tr><th id="91">91</th><td>                              <a class="typedef" href="#IOEventHandler" title='IOEventHandler' data-type='void (void *, int)' data-ref="IOEventHandler">IOEventHandler</a> *<dfn class="local col7 decl" id="107fd_event" title='fd_event' data-type='IOEventHandler *' data-ref="107fd_event">fd_event</dfn>,</td></tr>
+<tr><th id="92">92</th><td>                              <a class="typedef" href="#BackendChangeHandler" title='BackendChangeHandler' data-type='int (void *)' data-ref="BackendChangeHandler">BackendChangeHandler</a> *<dfn class="local col8 decl" id="108be_change" title='be_change' data-type='BackendChangeHandler *' data-ref="108be_change">be_change</dfn>,</td></tr>
+<tr><th id="93">93</th><td>                              <em>void</em> *<dfn class="local col9 decl" id="109opaque" title='opaque' data-type='void *' data-ref="109opaque">opaque</dfn>,</td></tr>
+<tr><th id="94">94</th><td>                              <a class="typedef" href="../../../include/glib-2.0/glib/gmain.h.html#GMainContext" title='GMainContext' data-type='struct _GMainContext' data-ref="GMainContext">GMainContext</a> *<dfn class="local col0 decl" id="110context" title='context' data-type='GMainContext *' data-ref="110context">context</dfn>,</td></tr>
+<tr><th id="95">95</th><td>                              <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="111set_open" title='set_open' data-type='_Bool' data-ref="111set_open">set_open</dfn>);</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_take_focus:</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> * Take the focus (if the front end is muxed).</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> * Without associated Chardev, nothing is changed.</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="104">104</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_take_focus" title='qemu_chr_fe_take_focus' data-ref="qemu_chr_fe_take_focus">qemu_chr_fe_take_focus</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col2 decl" id="112b" title='b' data-type='CharBackend *' data-ref="112b">b</dfn>);</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_accept_input:</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> * Notify that the frontend is ready to receive data</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="111">111</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_accept_input" title='qemu_chr_fe_accept_input' data-ref="qemu_chr_fe_accept_input">qemu_chr_fe_accept_input</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col3 decl" id="113be" title='be' data-type='CharBackend *' data-ref="113be">be</dfn>);</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_disconnect:</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> * Close a fd accpeted by character backend.</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> * Without associated Chardev, do nothing.</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="119">119</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_disconnect" title='qemu_chr_fe_disconnect' data-ref="qemu_chr_fe_disconnect">qemu_chr_fe_disconnect</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col4 decl" id="114be" title='be' data-type='CharBackend *' data-ref="114be">be</dfn>);</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_wait_connected:</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> * Wait for characted backend to be connected, return &lt; 0 on error or</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> * if no assicated Chardev.</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="127">127</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_wait_connected" title='qemu_chr_fe_wait_connected' data-ref="qemu_chr_fe_wait_connected">qemu_chr_fe_wait_connected</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col5 decl" id="115be" title='be' data-type='CharBackend *' data-ref="115be">be</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="116errp" title='errp' data-type='Error **' data-ref="116errp">errp</dfn>);</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_set_echo:</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * Ask the backend to override its normal echo setting.  This only really</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> * applies to the stdio backend and is used by the QMP server such that you</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> * can see what you type if you try to type QMP commands.</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> * Without associated Chardev, do nothing.</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"> *<span class="command"> @echo</span> true to enable echo, false to disable echo</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="139">139</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_set_echo" title='qemu_chr_fe_set_echo' data-ref="qemu_chr_fe_set_echo">qemu_chr_fe_set_echo</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col7 decl" id="117be" title='be' data-type='CharBackend *' data-ref="117be">be</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="118echo" title='echo' data-type='_Bool' data-ref="118echo">echo</dfn>);</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_set_open:</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> * Set character frontend open status.  This is an indication that the</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> * front end is ready (or not) to begin doing I/O.</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> * Without associated Chardev, do nothing.</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="148">148</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_set_open" title='qemu_chr_fe_set_open' data-ref="qemu_chr_fe_set_open">qemu_chr_fe_set_open</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col9 decl" id="119be" title='be' data-type='CharBackend *' data-ref="119be">be</dfn>, <em>int</em> <dfn class="local col0 decl" id="120fe_open" title='fe_open' data-type='int' data-ref="120fe_open">fe_open</dfn>);</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_printf:</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * Write to a character backend using a printf style interface.  This</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * function is thread-safe. It does nothing without associated</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * Chardev.</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> *<span class="command"> @fmt</span> see #printf</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <dfn class="decl" id="qemu_chr_fe_printf" title='qemu_chr_fe_printf' data-ref="qemu_chr_fe_printf">qemu_chr_fe_printf</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col1 decl" id="121be" title='be' data-type='CharBackend *' data-ref="121be">be</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="122fmt" title='fmt' data-type='const char *' data-ref="122fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="160">160</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_add_watch:</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * If the backend is connected, create and add a #GSource that fires</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> * when the given condition (typically G_IO_OUT|G_IO_HUP or G_IO_HUP)</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> * is active; return the #GSource's tag.  If it is disconnected,</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> * or without associated Chardev, return 0.</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> *<span class="command"> @cond</span> the condition to poll for</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> *<span class="command"> @func</span> the function to call when the condition happens</i></td></tr>
+<tr><th id="172">172</th><td><i class="doc"> *<span class="command"> @user</span>_data the opaque pointer to pass to<span class="command"> @func</span></i></td></tr>
+<tr><th id="173">173</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * Returns: the source tag</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="176">176</th><td><a class="typedef" href="../../../include/glib-2.0/glib/gtypes.h.html#guint" title='guint' data-type='unsigned int' data-ref="guint">guint</a> <dfn class="decl" id="qemu_chr_fe_add_watch" title='qemu_chr_fe_add_watch' data-ref="qemu_chr_fe_add_watch">qemu_chr_fe_add_watch</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col3 decl" id="123be" title='be' data-type='CharBackend *' data-ref="123be">be</dfn>, <a class="typedef" href="../../../include/glib-2.0/glib/gmain.h.html#GIOCondition" title='GIOCondition' data-type='enum GIOCondition' data-ref="GIOCondition">GIOCondition</a> <dfn class="local col4 decl" id="124cond" title='cond' data-type='GIOCondition' data-ref="124cond">cond</dfn>,</td></tr>
+<tr><th id="177">177</th><td>                            <a class="typedef" href="../../../include/glib-2.0/glib/giochannel.h.html#GIOFunc" title='GIOFunc' data-type='gboolean (*)(GIOChannel *, GIOCondition, gpointer)' data-ref="GIOFunc">GIOFunc</a> <dfn class="local col5 decl" id="125func" title='func' data-type='GIOFunc' data-ref="125func">func</dfn>, <em>void</em> *<dfn class="local col6 decl" id="126user_data" title='user_data' data-type='void *' data-ref="126user_data">user_data</dfn>);</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="180">180</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_write:</i></td></tr>
+<tr><th id="181">181</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="182">182</th><td><i class="doc"> * Write data to a character backend from the front end.  This function</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc"> * will send data from the front end to the back end.  This function</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * is thread-safe.</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> * <span class="command">@buf</span> the data</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> *<span class="command"> @len</span> the number of bytes to send</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> * Returns: the number of bytes consumed (0 if no assicated Chardev)</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="191">191</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_write" title='qemu_chr_fe_write' data-ref="qemu_chr_fe_write">qemu_chr_fe_write</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col7 decl" id="127be" title='be' data-type='CharBackend *' data-ref="127be">be</dfn>, <em>const</em> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col8 decl" id="128buf" title='buf' data-type='const uint8_t *' data-ref="128buf">buf</dfn>, <em>int</em> <dfn class="local col9 decl" id="129len" title='len' data-type='int' data-ref="129len">len</dfn>);</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_write_all:</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> * Write data to a character backend from the front end.  This function will</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> * send data from the front end to the back end.  Unlike<span class="command"> @qemu</span>_chr_fe_write,</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> * this function will block if the back end cannot consume all of the data</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> * attempted to be written.  This function is thread-safe.</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> * <span class="command">@buf</span> the data</i></td></tr>
+<tr><th id="202">202</th><td><i class="doc"> *<span class="command"> @len</span> the number of bytes to send</i></td></tr>
+<tr><th id="203">203</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> * Returns: the number of bytes consumed (0 if no assicated Chardev)</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="206">206</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_write_all" title='qemu_chr_fe_write_all' data-ref="qemu_chr_fe_write_all">qemu_chr_fe_write_all</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col0 decl" id="130be" title='be' data-type='CharBackend *' data-ref="130be">be</dfn>, <em>const</em> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="131buf" title='buf' data-type='const uint8_t *' data-ref="131buf">buf</dfn>, <em>int</em> <dfn class="local col2 decl" id="132len" title='len' data-type='int' data-ref="132len">len</dfn>);</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_read_all:</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> * Read data to a buffer from the back end.</i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> * <span class="command">@buf</span> the data buffer</i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"> *<span class="command"> @len</span> the number of bytes to read</i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> * Returns: the number of bytes read (0 if no assicated Chardev)</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="218">218</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_read_all" title='qemu_chr_fe_read_all' data-ref="qemu_chr_fe_read_all">qemu_chr_fe_read_all</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col3 decl" id="133be" title='be' data-type='CharBackend *' data-ref="133be">be</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col4 decl" id="134buf" title='buf' data-type='uint8_t *' data-ref="134buf">buf</dfn>, <em>int</em> <dfn class="local col5 decl" id="135len" title='len' data-type='int' data-ref="135len">len</dfn>);</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="221">221</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_ioctl:</i></td></tr>
+<tr><th id="222">222</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="223">223</th><td><i class="doc"> * Issue a device specific ioctl to a backend.  This function is thread-safe.</i></td></tr>
+<tr><th id="224">224</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> *<span class="command"> @cmd</span> see CHR_IOCTL_*</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> * <span class="command">@arg</span> the data associated with<span class="command"> @cmd</span></i></td></tr>
+<tr><th id="227">227</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="228">228</th><td><i class="doc"> * Returns: if<span class="command"> @cmd</span> is not supported by the backend or there is no</i></td></tr>
+<tr><th id="229">229</th><td><i class="doc"> *          associated Chardev, -ENOTSUP, otherwise the return</i></td></tr>
+<tr><th id="230">230</th><td><i class="doc"> *          value depends on the semantics of<span class="command"> @cmd</span></i></td></tr>
+<tr><th id="231">231</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="232">232</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_ioctl" title='qemu_chr_fe_ioctl' data-ref="qemu_chr_fe_ioctl">qemu_chr_fe_ioctl</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col6 decl" id="136be" title='be' data-type='CharBackend *' data-ref="136be">be</dfn>, <em>int</em> <dfn class="local col7 decl" id="137cmd" title='cmd' data-type='int' data-ref="137cmd">cmd</dfn>, <em>void</em> *<dfn class="local col8 decl" id="138arg" title='arg' data-type='void *' data-ref="138arg">arg</dfn>);</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="235">235</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_get_msgfd:</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="237">237</th><td><i class="doc"> * For backends capable of fd passing, return the latest file descriptor passed</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> * by a client.</i></td></tr>
+<tr><th id="239">239</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="240">240</th><td><i class="doc"> * Returns: -1 if fd passing isn't supported or there is no pending file</i></td></tr>
+<tr><th id="241">241</th><td><i class="doc"> *          descriptor.  If a file descriptor is returned, subsequent calls to</i></td></tr>
+<tr><th id="242">242</th><td><i class="doc"> *          this function will return -1 until a client sends a new file</i></td></tr>
+<tr><th id="243">243</th><td><i class="doc"> *          descriptor.</i></td></tr>
+<tr><th id="244">244</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="245">245</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_get_msgfd" title='qemu_chr_fe_get_msgfd' data-ref="qemu_chr_fe_get_msgfd">qemu_chr_fe_get_msgfd</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col9 decl" id="139be" title='be' data-type='CharBackend *' data-ref="139be">be</dfn>);</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="248">248</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_get_msgfds:</i></td></tr>
+<tr><th id="249">249</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc"> * For backends capable of fd passing, return the number of file received</i></td></tr>
+<tr><th id="251">251</th><td><i class="doc"> * descriptors and fills the fds array up to num elements</i></td></tr>
+<tr><th id="252">252</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="253">253</th><td><i class="doc"> * Returns: -1 if fd passing isn't supported or there are no pending file</i></td></tr>
+<tr><th id="254">254</th><td><i class="doc"> *          descriptors.  If file descriptors are returned, subsequent calls to</i></td></tr>
+<tr><th id="255">255</th><td><i class="doc"> *          this function will return -1 until a client sends a new set of file</i></td></tr>
+<tr><th id="256">256</th><td><i class="doc"> *          descriptors.</i></td></tr>
+<tr><th id="257">257</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="258">258</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_get_msgfds" title='qemu_chr_fe_get_msgfds' data-ref="qemu_chr_fe_get_msgfds">qemu_chr_fe_get_msgfds</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col0 decl" id="140be" title='be' data-type='CharBackend *' data-ref="140be">be</dfn>, <em>int</em> *<dfn class="local col1 decl" id="141fds" title='fds' data-type='int *' data-ref="141fds">fds</dfn>, <em>int</em> <dfn class="local col2 decl" id="142num" title='num' data-type='int' data-ref="142num">num</dfn>);</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="261">261</th><td><i class="doc"> *<span class="command"> @qemu</span>_chr_fe_set_msgfds:</i></td></tr>
+<tr><th id="262">262</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="263">263</th><td><i class="doc"> * For backends capable of fd passing, set an array of fds to be passed with</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> * the next send operation.</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> * A subsequent call to this function before calling a write function will</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> * result in overwriting the fd array with the new value without being send.</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> * Upon writing the message the fd array is freed.</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="269">269</th><td><i class="doc"> * Returns: -1 if fd passing isn't supported or no associated Chardev.</i></td></tr>
+<tr><th id="270">270</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="271">271</th><td><em>int</em> <dfn class="decl" id="qemu_chr_fe_set_msgfds" title='qemu_chr_fe_set_msgfds' data-ref="qemu_chr_fe_set_msgfds">qemu_chr_fe_set_msgfds</dfn>(<a class="typedef" href="char.h.html#CharBackend" title='CharBackend' data-type='struct CharBackend' data-ref="CharBackend">CharBackend</a> *<dfn class="local col3 decl" id="143be" title='be' data-type='CharBackend *' data-ref="143be">be</dfn>, <em>int</em> *<dfn class="local col4 decl" id="144fds" title='fds' data-type='int *' data-ref="144fds">fds</dfn>, <em>int</em> <dfn class="local col5 decl" id="145num" title='num' data-type='int' data-ref="145num">num</dfn>);</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td><u>#<span data-ppcond="1">endif</span> /* QEMU_CHAR_FE_H */</u></td></tr>
+<tr><th id="274">274</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../backends/rng-egd.c.html'>codebrowser/backends/rng-egd.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

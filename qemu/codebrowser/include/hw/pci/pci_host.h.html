@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>pci_host.h source code [codebrowser/include/hw/pci/pci_host.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="PCIHostBridgeClass,PCIHostState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/pci/pci_host.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>pci</a>/<a href='pci_host.h.html'>pci_host.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Common PCI Host bridge configuration data space access routines.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2006 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><i>/* Worker routines for a PCI host controller that uses an {address,data}</i></td></tr>
+<tr><th id="26">26</th><td><i>   register pair to access PCI configuration space.  */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="28">ifndef</span> <span class="macro" data-ref="_M/PCI_HOST_H">PCI_HOST_H</span></u></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_H" data-ref="_M/PCI_HOST_H">PCI_HOST_H</dfn></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/TYPE_PCI_HOST_BRIDGE" data-ref="_M/TYPE_PCI_HOST_BRIDGE">TYPE_PCI_HOST_BRIDGE</dfn> "pci-host-bridge"</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_BRIDGE" data-ref="_M/PCI_HOST_BRIDGE">PCI_HOST_BRIDGE</dfn>(obj) \</u></td></tr>
+<tr><th id="35">35</th><td><u>    OBJECT_CHECK(PCIHostState, (obj), TYPE_PCI_HOST_BRIDGE)</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_BRIDGE_CLASS" data-ref="_M/PCI_HOST_BRIDGE_CLASS">PCI_HOST_BRIDGE_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="37">37</th><td><u>     OBJECT_CLASS_CHECK(PCIHostBridgeClass, (klass), TYPE_PCI_HOST_BRIDGE)</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/PCI_HOST_BRIDGE_GET_CLASS" data-ref="_M/PCI_HOST_BRIDGE_GET_CLASS">PCI_HOST_BRIDGE_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="39">39</th><td><u>     OBJECT_GET_CLASS(PCIHostBridgeClass, (obj), TYPE_PCI_HOST_BRIDGE)</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><b>struct</b> <dfn class="type def" id="PCIHostState" title='PCIHostState' data-ref="PCIHostState">PCIHostState</dfn> {</td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="../sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="decl" id="PCIHostState::busdev" title='PCIHostState::busdev' data-ref="PCIHostState::busdev">busdev</dfn>;</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="PCIHostState::conf_mem" title='PCIHostState::conf_mem' data-ref="PCIHostState::conf_mem">conf_mem</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="PCIHostState::data_mem" title='PCIHostState::data_mem' data-ref="PCIHostState::data_mem">data_mem</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="PCIHostState::mmcfg" title='PCIHostState::mmcfg' data-ref="PCIHostState::mmcfg">mmcfg</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PCIHostState::config_reg" title='PCIHostState::config_reg' data-ref="PCIHostState::config_reg">config_reg</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="decl" id="PCIHostState::bus" title='PCIHostState::bus' data-ref="PCIHostState::bus">bus</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <a class="macro" href="../../qemu/queue.h.html#94" title="struct { struct PCIHostState *le_next; struct PCIHostState **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#PCIHostState" title='PCIHostState' data-ref="PCIHostState">PCIHostState</a>) <dfn class="decl" id="PCIHostState::next" title='PCIHostState::next' data-ref="PCIHostState::next">next</dfn>;</td></tr>
+<tr><th id="51">51</th><td>};</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="PCIHostBridgeClass" title='PCIHostBridgeClass' data-ref="PCIHostBridgeClass"><a class="type" href="#PCIHostBridgeClass" title='PCIHostBridgeClass' data-ref="PCIHostBridgeClass">PCIHostBridgeClass</a></dfn> {</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../sysbus.h.html#SysBusDeviceClass" title='SysBusDeviceClass' data-type='struct SysBusDeviceClass' data-ref="SysBusDeviceClass">SysBusDeviceClass</a> <dfn class="decl" id="PCIHostBridgeClass::parent_class" title='PCIHostBridgeClass::parent_class' data-ref="PCIHostBridgeClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <em>const</em> <em>char</em> *(*<dfn class="decl" id="PCIHostBridgeClass::root_bus_path" title='PCIHostBridgeClass::root_bus_path' data-ref="PCIHostBridgeClass::root_bus_path">root_bus_path</dfn>)(<a class="typedef" href="../../qemu/typedefs.h.html#PCIHostState" title='PCIHostState' data-type='struct PCIHostState' data-ref="PCIHostState">PCIHostState</a> *, <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *);</td></tr>
+<tr><th id="57">57</th><td>} <dfn class="typedef" id="PCIHostBridgeClass" title='PCIHostBridgeClass' data-type='struct PCIHostBridgeClass' data-ref="PCIHostBridgeClass">PCIHostBridgeClass</dfn>;</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><i>/* common internal helpers for PCI/PCIe hosts, cut off overflows */</i></td></tr>
+<tr><th id="60">60</th><td><em>void</em> <dfn class="decl" id="pci_host_config_write_common" title='pci_host_config_write_common' data-ref="pci_host_config_write_common">pci_host_config_write_common</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col9 decl" id="9pci_dev" title='pci_dev' data-type='PCIDevice *' data-ref="9pci_dev">pci_dev</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10addr" title='addr' data-type='uint32_t' data-ref="10addr">addr</dfn>,</td></tr>
+<tr><th id="61">61</th><td>                                  <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="11limit" title='limit' data-type='uint32_t' data-ref="11limit">limit</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="12val" title='val' data-type='uint32_t' data-ref="12val">val</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="13len" title='len' data-type='uint32_t' data-ref="13len">len</dfn>);</td></tr>
+<tr><th id="62">62</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="pci_host_config_read_common" title='pci_host_config_read_common' data-ref="pci_host_config_read_common">pci_host_config_read_common</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col4 decl" id="14pci_dev" title='pci_dev' data-type='PCIDevice *' data-ref="14pci_dev">pci_dev</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="15addr" title='addr' data-type='uint32_t' data-ref="15addr">addr</dfn>,</td></tr>
+<tr><th id="63">63</th><td>                                     <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="16limit" title='limit' data-type='uint32_t' data-ref="16limit">limit</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="17len" title='len' data-type='uint32_t' data-ref="17len">len</dfn>);</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><em>void</em> <dfn class="decl" id="pci_data_write" title='pci_data_write' data-ref="pci_data_write">pci_data_write</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col8 decl" id="18s" title='s' data-type='PCIBus *' data-ref="18s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="19addr" title='addr' data-type='uint32_t' data-ref="19addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="20val" title='val' data-type='uint32_t' data-ref="20val">val</dfn>, <em>int</em> <dfn class="local col1 decl" id="21len" title='len' data-type='int' data-ref="21len">len</dfn>);</td></tr>
+<tr><th id="66">66</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="pci_data_read" title='pci_data_read' data-ref="pci_data_read">pci_data_read</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col2 decl" id="22s" title='s' data-type='PCIBus *' data-ref="22s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="23addr" title='addr' data-type='uint32_t' data-ref="23addr">addr</dfn>, <em>int</em> <dfn class="local col4 decl" id="24len" title='len' data-type='int' data-ref="24len">len</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../exec/memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> <dfn class="decl" id="pci_host_conf_le_ops" title='pci_host_conf_le_ops' data-ref="pci_host_conf_le_ops">pci_host_conf_le_ops</dfn>;</td></tr>
+<tr><th id="69">69</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../exec/memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> <dfn class="decl" id="pci_host_conf_be_ops" title='pci_host_conf_be_ops' data-ref="pci_host_conf_be_ops">pci_host_conf_be_ops</dfn>;</td></tr>
+<tr><th id="70">70</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../exec/memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> <dfn class="decl" id="pci_host_data_le_ops" title='pci_host_data_le_ops' data-ref="pci_host_data_le_ops">pci_host_data_le_ops</dfn>;</td></tr>
+<tr><th id="71">71</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../exec/memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> <dfn class="decl" id="pci_host_data_be_ops" title='pci_host_data_be_ops' data-ref="pci_host_data_be_ops">pci_host_data_be_ops</dfn>;</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#<span data-ppcond="28">endif</span> /* PCI_HOST_H */</u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/acpi/ich9.c.html'>codebrowser/hw/acpi/ich9.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

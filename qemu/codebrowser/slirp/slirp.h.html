@@ -1,0 +1,317 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>slirp.h source code [codebrowser/slirp/slirp.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ArpTable,NdpTable,Slirp,ethhdr,ndpentry,slirp_arphdr "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/slirp.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='slirp.h.html'>slirp.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/SLIRP_H">SLIRP_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/SLIRP_H" data-ref="_M/SLIRP_H">SLIRP_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../include/qemu/host-utils.h.html">"qemu/host-utils.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="slirp_config.h.html">"slirp_config.h"</a></u></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><u>#<span data-ppcond="7">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><b>typedef</b> <em>char</em> *caddr_t;</td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u># include &lt;windows.h&gt;</u></td></tr>
+<tr><th id="12">12</th><td><u># include &lt;winsock2.h&gt;</u></td></tr>
+<tr><th id="13">13</th><td><u># include &lt;ws2tcpip.h&gt;</u></td></tr>
+<tr><th id="14">14</th><td><u># include &lt;sys/timeb.h&gt;</u></td></tr>
+<tr><th id="15">15</th><td><u># include &lt;iphlpapi.h&gt;</u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#<span data-ppcond="7">else</span></u></td></tr>
+<tr><th id="18">18</th><td><u># <span data-ppcond="18">if</span> !defined(<span class="macro" data-ref="_M/__HAIKU__">__HAIKU__</span>)</u></td></tr>
+<tr><th id="19">19</th><td><u>#  define <dfn class="macro" id="_M/O_BINARY" data-ref="_M/O_BINARY">O_BINARY</dfn> 0</u></td></tr>
+<tr><th id="20">20</th><td><u># <span data-ppcond="18">endif</span></u></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="7">endif</span></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#<span data-ppcond="23">ifdef</span> <span class="macro" data-ref="_M/HAVE_SYS_BITYPES_H">HAVE_SYS_BITYPES_H</span></u></td></tr>
+<tr><th id="24">24</th><td><u># include &lt;sys/bitypes.h&gt;</u></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="23">endif</span></u></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#<span data-ppcond="27">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/uio.h.html">&lt;sys/uio.h&gt;</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="27">endif</span></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="31">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../include/netinet/in.h.html">&lt;netinet/in.h&gt;</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../include/arpa/inet.h.html">&lt;arpa/inet.h&gt;</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#<span data-ppcond="31">endif</span></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="36">ifndef</span> <span class="macro" data-ref="_M/NO_UNIX_SOCKETS">NO_UNIX_SOCKETS</span></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/un.h.html">&lt;sys/un.h&gt;</a></u></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="36">endif</span></u></td></tr>
+<tr><th id="39">39</th><td><u>#<span data-ppcond="39">ifdef</span> <span class="macro" data-ref="_M/HAVE_SYS_SIGNAL_H">HAVE_SYS_SIGNAL_H</span></u></td></tr>
+<tr><th id="40">40</th><td><u># include &lt;sys/signal.h&gt;</u></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="39">endif</span></u></td></tr>
+<tr><th id="42">42</th><td><u>#<span data-ppcond="42">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="43">43</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/socket.h.html">&lt;sys/socket.h&gt;</a></u></td></tr>
+<tr><th id="44">44</th><td><u>#<span data-ppcond="42">endif</span></u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><u>#<span data-ppcond="46">if</span> defined(<a class="macro" href="slirp_config.h.html#28" data-ref="_M/HAVE_SYS_IOCTL_H">HAVE_SYS_IOCTL_H</a>)</u></td></tr>
+<tr><th id="47">47</th><td><u># include <a href="../../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="48">48</th><td><u>#<span data-ppcond="46">endif</span></u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><u>#<span data-ppcond="50">ifdef</span> <a class="macro" href="slirp_config.h.html#58" data-ref="_M/HAVE_SYS_SELECT_H">HAVE_SYS_SELECT_H</a></u></td></tr>
+<tr><th id="51">51</th><td><u># include <a href="../../include/x86_64-linux-gnu/sys/select.h.html">&lt;sys/select.h&gt;</a></u></td></tr>
+<tr><th id="52">52</th><td><u>#<span data-ppcond="50">endif</span></u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><u>#<span data-ppcond="54">ifdef</span> <span class="macro" data-ref="_M/HAVE_SYS_WAIT_H">HAVE_SYS_WAIT_H</span></u></td></tr>
+<tr><th id="55">55</th><td><u># include &lt;sys/wait.h&gt;</u></td></tr>
+<tr><th id="56">56</th><td><u>#<span data-ppcond="54">endif</span></u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><u>#<span data-ppcond="58">ifdef</span> <span class="macro" data-ref="_M/HAVE_SYS_FILIO_H">HAVE_SYS_FILIO_H</span></u></td></tr>
+<tr><th id="59">59</th><td><u># include &lt;sys/filio.h&gt;</u></td></tr>
+<tr><th id="60">60</th><td><u>#<span data-ppcond="58">endif</span></u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><i>/* Avoid conflicting with the libc insque() and remque(), which</i></td></tr>
+<tr><th id="63">63</th><td><i>   have different prototypes. */</i></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/insque" data-ref="_M/insque">insque</dfn> slirp_insque</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/remque" data-ref="_M/remque">remque</dfn> slirp_remque</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/quehead" data-ref="_M/quehead">quehead</dfn> <a class="type" href="misc.h.html#slirp_quehead" title='slirp_quehead' data-ref="slirp_quehead">slirp_quehead</a></u></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><u>#<span data-ppcond="68">ifdef</span> <span class="macro" data-ref="_M/HAVE_SYS_STROPTS_H">HAVE_SYS_STROPTS_H</span></u></td></tr>
+<tr><th id="69">69</th><td><u>#include &lt;sys/stropts.h&gt;</u></td></tr>
+<tr><th id="70">70</th><td><u>#<span data-ppcond="68">endif</span></u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#include <a href="debug.h.html">"debug.h"</a></u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#include <a href="../include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="76">76</th><td><u>#include <a href="../include/qemu/sockets.h.html">"qemu/sockets.h"</a></u></td></tr>
+<tr><th id="77">77</th><td><u>#include <a href="../include/net/eth.h.html">"net/eth.h"</a></u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><u>#include <a href="libslirp.h.html">"libslirp.h"</a></u></td></tr>
+<tr><th id="80">80</th><td><u>#include <a href="ip.h.html">"ip.h"</a></u></td></tr>
+<tr><th id="81">81</th><td><u>#include <a href="ip6.h.html">"ip6.h"</a></u></td></tr>
+<tr><th id="82">82</th><td><u>#include <a href="tcp.h.html">"tcp.h"</a></u></td></tr>
+<tr><th id="83">83</th><td><u>#include <a href="tcp_timer.h.html">"tcp_timer.h"</a></u></td></tr>
+<tr><th id="84">84</th><td><u>#include <a href="tcp_var.h.html">"tcp_var.h"</a></u></td></tr>
+<tr><th id="85">85</th><td><u>#include <a href="tcpip.h.html">"tcpip.h"</a></u></td></tr>
+<tr><th id="86">86</th><td><u>#include <a href="udp.h.html">"udp.h"</a></u></td></tr>
+<tr><th id="87">87</th><td><u>#include <a href="ip_icmp.h.html">"ip_icmp.h"</a></u></td></tr>
+<tr><th id="88">88</th><td><u>#include <a href="ip6_icmp.h.html">"ip6_icmp.h"</a></u></td></tr>
+<tr><th id="89">89</th><td><u>#include <a href="mbuf.h.html">"mbuf.h"</a></u></td></tr>
+<tr><th id="90">90</th><td><u>#include <a href="sbuf.h.html">"sbuf.h"</a></u></td></tr>
+<tr><th id="91">91</th><td><u>#include <a href="socket.h.html">"socket.h"</a></u></td></tr>
+<tr><th id="92">92</th><td><u>#include <a href="if.h.html">"if.h"</a></u></td></tr>
+<tr><th id="93">93</th><td><u>#include <a href="main.h.html">"main.h"</a></u></td></tr>
+<tr><th id="94">94</th><td><u>#include <a href="misc.h.html">"misc.h"</a></u></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><u>#include <a href="bootp.h.html">"bootp.h"</a></u></td></tr>
+<tr><th id="97">97</th><td><u>#include <a href="tftp.h.html">"tftp.h"</a></u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/ARPOP_REQUEST" data-ref="_M/ARPOP_REQUEST">ARPOP_REQUEST</dfn> 1         /* ARP request */</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/ARPOP_REPLY" data-ref="_M/ARPOP_REPLY">ARPOP_REPLY</dfn>   2         /* ARP reply   */</u></td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><b>struct</b> <dfn class="type def" id="ethhdr" title='ethhdr' data-ref="ethhdr">ethhdr</dfn> {</td></tr>
+<tr><th id="103">103</th><td>    <em>unsigned</em> <em>char</em>  <dfn class="decl" id="ethhdr::h_dest" title='ethhdr::h_dest' data-ref="ethhdr::h_dest">h_dest</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>];   <i>/* destination eth addr */</i></td></tr>
+<tr><th id="104">104</th><td>    <em>unsigned</em> <em>char</em>  <dfn class="decl" id="ethhdr::h_source" title='ethhdr::h_source' data-ref="ethhdr::h_source">h_source</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]; <i>/* source ether addr    */</i></td></tr>
+<tr><th id="105">105</th><td>    <em>unsigned</em> <em>short</em> <dfn class="decl" id="ethhdr::h_proto" title='ethhdr::h_proto' data-ref="ethhdr::h_proto">h_proto</dfn>;            <i>/* packet type ID field */</i></td></tr>
+<tr><th id="106">106</th><td>};</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><b>struct</b> <dfn class="type def" id="slirp_arphdr" title='slirp_arphdr' data-ref="slirp_arphdr">slirp_arphdr</dfn> {</td></tr>
+<tr><th id="109">109</th><td>    <em>unsigned</em> <em>short</em> <dfn class="decl" id="slirp_arphdr::ar_hrd" title='slirp_arphdr::ar_hrd' data-ref="slirp_arphdr::ar_hrd">ar_hrd</dfn>;      <i>/* format of hardware address */</i></td></tr>
+<tr><th id="110">110</th><td>    <em>unsigned</em> <em>short</em> <dfn class="decl" id="slirp_arphdr::ar_pro" title='slirp_arphdr::ar_pro' data-ref="slirp_arphdr::ar_pro">ar_pro</dfn>;      <i>/* format of protocol address */</i></td></tr>
+<tr><th id="111">111</th><td>    <em>unsigned</em> <em>char</em>  <dfn class="decl" id="slirp_arphdr::ar_hln" title='slirp_arphdr::ar_hln' data-ref="slirp_arphdr::ar_hln">ar_hln</dfn>;      <i>/* length of hardware address */</i></td></tr>
+<tr><th id="112">112</th><td>    <em>unsigned</em> <em>char</em>  <dfn class="decl" id="slirp_arphdr::ar_pln" title='slirp_arphdr::ar_pln' data-ref="slirp_arphdr::ar_pln">ar_pln</dfn>;      <i>/* length of protocol address */</i></td></tr>
+<tr><th id="113">113</th><td>    <em>unsigned</em> <em>short</em> <dfn class="decl" id="slirp_arphdr::ar_op" title='slirp_arphdr::ar_op' data-ref="slirp_arphdr::ar_op">ar_op</dfn>;       <i>/* ARP opcode (command)       */</i></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <i>/*</i></td></tr>
+<tr><th id="116">116</th><td><i>     *  Ethernet looks like this : This bit is variable sized however...</i></td></tr>
+<tr><th id="117">117</th><td><i>     */</i></td></tr>
+<tr><th id="118">118</th><td>    <em>unsigned</em> <em>char</em> <dfn class="decl" id="slirp_arphdr::ar_sha" title='slirp_arphdr::ar_sha' data-ref="slirp_arphdr::ar_sha">ar_sha</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]; <i>/* sender hardware address */</i></td></tr>
+<tr><th id="119">119</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>      <dfn class="decl" id="slirp_arphdr::ar_sip" title='slirp_arphdr::ar_sip' data-ref="slirp_arphdr::ar_sip">ar_sip</dfn>;           <i>/* sender IP address       */</i></td></tr>
+<tr><th id="120">120</th><td>    <em>unsigned</em> <em>char</em> <dfn class="decl" id="slirp_arphdr::ar_tha" title='slirp_arphdr::ar_tha' data-ref="slirp_arphdr::ar_tha">ar_tha</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]; <i>/* target hardware address */</i></td></tr>
+<tr><th id="121">121</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>      <dfn class="decl" id="slirp_arphdr::ar_tip" title='slirp_arphdr::ar_tip' data-ref="slirp_arphdr::ar_tip">ar_tip</dfn>;           <i>/* target IP address       */</i></td></tr>
+<tr><th id="122">122</th><td>} <a class="macro" href="../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/ARP_TABLE_SIZE" data-ref="_M/ARP_TABLE_SIZE">ARP_TABLE_SIZE</dfn> 16</u></td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="ArpTable" title='ArpTable' data-ref="ArpTable"><a class="type" href="#ArpTable" title='ArpTable' data-ref="ArpTable">ArpTable</a></dfn> {</td></tr>
+<tr><th id="127">127</th><td>    <b>struct</b> <a class="type" href="#slirp_arphdr" title='slirp_arphdr' data-ref="slirp_arphdr">slirp_arphdr</a> <dfn class="decl" id="ArpTable::table" title='ArpTable::table' data-ref="ArpTable::table">table</dfn>[<a class="macro" href="#124" title="16" data-ref="_M/ARP_TABLE_SIZE">ARP_TABLE_SIZE</a>];</td></tr>
+<tr><th id="128">128</th><td>    <em>int</em> <dfn class="decl" id="ArpTable::next_victim" title='ArpTable::next_victim' data-ref="ArpTable::next_victim">next_victim</dfn>;</td></tr>
+<tr><th id="129">129</th><td>} <dfn class="typedef" id="ArpTable" title='ArpTable' data-type='struct ArpTable' data-ref="ArpTable">ArpTable</dfn>;</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><em>void</em> <dfn class="decl" id="arp_table_add" title='arp_table_add' data-ref="arp_table_add">arp_table_add</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col9 decl" id="189slirp" title='slirp' data-type='Slirp *' data-ref="189slirp">slirp</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="190ip_addr" title='ip_addr' data-type='uint32_t' data-ref="190ip_addr">ip_addr</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col1 decl" id="191ethaddr" title='ethaddr' data-type='uint8_t *' data-ref="191ethaddr">ethaddr</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]);</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="arp_table_search" title='arp_table_search' data-ref="arp_table_search">arp_table_search</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col2 decl" id="192slirp" title='slirp' data-type='Slirp *' data-ref="192slirp">slirp</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="193ip_addr" title='ip_addr' data-type='uint32_t' data-ref="193ip_addr">ip_addr</dfn>,</td></tr>
+<tr><th id="134">134</th><td>                      <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="194out_ethaddr" title='out_ethaddr' data-type='uint8_t *' data-ref="194out_ethaddr">out_ethaddr</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]);</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><b>struct</b> <dfn class="type def" id="ndpentry" title='ndpentry' data-ref="ndpentry">ndpentry</dfn> {</td></tr>
+<tr><th id="137">137</th><td>    <em>unsigned</em> <em>char</em>   <dfn class="decl" id="ndpentry::eth_addr" title='ndpentry::eth_addr' data-ref="ndpentry::eth_addr">eth_addr</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>];     <i>/* sender hardware address */</i></td></tr>
+<tr><th id="138">138</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="ndpentry::ip_addr" title='ndpentry::ip_addr' data-ref="ndpentry::ip_addr">ip_addr</dfn>;                <i>/* sender IP address       */</i></td></tr>
+<tr><th id="139">139</th><td>} <a class="macro" href="../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/NDP_TABLE_SIZE" data-ref="_M/NDP_TABLE_SIZE">NDP_TABLE_SIZE</dfn> 16</u></td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="NdpTable" title='NdpTable' data-ref="NdpTable"><a class="type" href="#NdpTable" title='NdpTable' data-ref="NdpTable">NdpTable</a></dfn> {</td></tr>
+<tr><th id="144">144</th><td>    <b>struct</b> <a class="type" href="#ndpentry" title='ndpentry' data-ref="ndpentry">ndpentry</a> <dfn class="decl" id="NdpTable::table" title='NdpTable::table' data-ref="NdpTable::table">table</dfn>[<a class="macro" href="#141" title="16" data-ref="_M/NDP_TABLE_SIZE">NDP_TABLE_SIZE</a>];</td></tr>
+<tr><th id="145">145</th><td>    <em>int</em> <dfn class="decl" id="NdpTable::next_victim" title='NdpTable::next_victim' data-ref="NdpTable::next_victim">next_victim</dfn>;</td></tr>
+<tr><th id="146">146</th><td>} <dfn class="typedef" id="NdpTable" title='NdpTable' data-type='struct NdpTable' data-ref="NdpTable">NdpTable</dfn>;</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><em>void</em> <dfn class="decl" id="ndp_table_add" title='ndp_table_add' data-ref="ndp_table_add">ndp_table_add</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col5 decl" id="195slirp" title='slirp' data-type='Slirp *' data-ref="195slirp">slirp</dfn>, <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="local col6 decl" id="196ip_addr" title='ip_addr' data-type='struct in6_addr' data-ref="196ip_addr">ip_addr</dfn>,</td></tr>
+<tr><th id="149">149</th><td>                   <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col7 decl" id="197ethaddr" title='ethaddr' data-type='uint8_t *' data-ref="197ethaddr">ethaddr</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]);</td></tr>
+<tr><th id="150">150</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="ndp_table_search" title='ndp_table_search' data-ref="ndp_table_search">ndp_table_search</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col8 decl" id="198slirp" title='slirp' data-type='Slirp *' data-ref="198slirp">slirp</dfn>, <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="local col9 decl" id="199ip_addr" title='ip_addr' data-type='struct in6_addr' data-ref="199ip_addr">ip_addr</dfn>,</td></tr>
+<tr><th id="151">151</th><td>                      <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col0 decl" id="200out_ethaddr" title='out_ethaddr' data-type='uint8_t *' data-ref="200out_ethaddr">out_ethaddr</dfn>[<a class="macro" href="../include/net/eth.h.html#32" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>]);</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><b>struct</b> <dfn class="type def" id="Slirp" title='Slirp' data-ref="Slirp">Slirp</dfn> {</td></tr>
+<tr><th id="154">154</th><td>    <a class="macro" href="../include/qemu/queue.h.html#359" title="struct { struct Slirp *tqe_next; struct Slirp * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#Slirp" title='Slirp' data-ref="Slirp">Slirp</a>) <dfn class="decl" id="Slirp::entry" title='Slirp::entry' data-ref="Slirp::entry">entry</dfn>;</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a> <dfn class="decl" id="Slirp::time_fasttimo" title='Slirp::time_fasttimo' data-ref="Slirp::time_fasttimo">time_fasttimo</dfn>;</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a> <dfn class="decl" id="Slirp::last_slowtimo" title='Slirp::last_slowtimo' data-ref="Slirp::last_slowtimo">last_slowtimo</dfn>;</td></tr>
+<tr><th id="157">157</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="Slirp::do_slowtimo" title='Slirp::do_slowtimo' data-ref="Slirp::do_slowtimo">do_slowtimo</dfn>;</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="Slirp::in_enabled" title='Slirp::in_enabled' data-ref="Slirp::in_enabled">in_enabled</dfn>, <dfn class="decl" id="Slirp::in6_enabled" title='Slirp::in6_enabled' data-ref="Slirp::in6_enabled">in6_enabled</dfn>;</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td>    <i>/* virtual network configuration */</i></td></tr>
+<tr><th id="162">162</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::vnetwork_addr" title='Slirp::vnetwork_addr' data-ref="Slirp::vnetwork_addr">vnetwork_addr</dfn>;</td></tr>
+<tr><th id="163">163</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::vnetwork_mask" title='Slirp::vnetwork_mask' data-ref="Slirp::vnetwork_mask">vnetwork_mask</dfn>;</td></tr>
+<tr><th id="164">164</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::vhost_addr" title='Slirp::vhost_addr' data-ref="Slirp::vhost_addr">vhost_addr</dfn>;</td></tr>
+<tr><th id="165">165</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="Slirp::vprefix_addr6" title='Slirp::vprefix_addr6' data-ref="Slirp::vprefix_addr6">vprefix_addr6</dfn>;</td></tr>
+<tr><th id="166">166</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="Slirp::vprefix_len" title='Slirp::vprefix_len' data-ref="Slirp::vprefix_len">vprefix_len</dfn>;</td></tr>
+<tr><th id="167">167</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="Slirp::vhost_addr6" title='Slirp::vhost_addr6' data-ref="Slirp::vhost_addr6">vhost_addr6</dfn>;</td></tr>
+<tr><th id="168">168</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::vdhcp_startaddr" title='Slirp::vdhcp_startaddr' data-ref="Slirp::vdhcp_startaddr">vdhcp_startaddr</dfn>;</td></tr>
+<tr><th id="169">169</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::vnameserver_addr" title='Slirp::vnameserver_addr' data-ref="Slirp::vnameserver_addr">vnameserver_addr</dfn>;</td></tr>
+<tr><th id="170">170</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in6_addr" title='in6_addr' data-ref="in6_addr">in6_addr</a> <dfn class="decl" id="Slirp::vnameserver_addr6" title='Slirp::vnameserver_addr6' data-ref="Slirp::vnameserver_addr6">vnameserver_addr6</dfn>;</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#in_addr" title='in_addr' data-ref="in_addr">in_addr</a> <dfn class="decl" id="Slirp::client_ipaddr" title='Slirp::client_ipaddr' data-ref="Slirp::client_ipaddr">client_ipaddr</dfn>;</td></tr>
+<tr><th id="173">173</th><td>    <em>char</em> <dfn class="decl" id="Slirp::client_hostname" title='Slirp::client_hostname' data-ref="Slirp::client_hostname">client_hostname</dfn>[<var>33</var>];</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td>    <em>int</em> <dfn class="decl" id="Slirp::restricted" title='Slirp::restricted' data-ref="Slirp::restricted">restricted</dfn>;</td></tr>
+<tr><th id="176">176</th><td>    <b>struct</b> <a class="type" href="misc.h.html#ex_list" title='ex_list' data-ref="ex_list">ex_list</a> *<dfn class="decl" id="Slirp::exec_list" title='Slirp::exec_list' data-ref="Slirp::exec_list">exec_list</dfn>;</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <i>/* mbuf states */</i></td></tr>
+<tr><th id="179">179</th><td>    <b>struct</b> <a class="macro" href="#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> <dfn class="decl" id="Slirp::m_freelist" title='Slirp::m_freelist' data-ref="Slirp::m_freelist">m_freelist</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    <b>struct</b> <a class="macro" href="#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> <dfn class="decl" id="Slirp::m_usedlist" title='Slirp::m_usedlist' data-ref="Slirp::m_usedlist">m_usedlist</dfn>;</td></tr>
+<tr><th id="181">181</th><td>    <em>int</em> <dfn class="decl" id="Slirp::mbuf_alloced" title='Slirp::mbuf_alloced' data-ref="Slirp::mbuf_alloced">mbuf_alloced</dfn>;</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td>    <i>/* if states */</i></td></tr>
+<tr><th id="184">184</th><td>    <b>struct</b> <a class="macro" href="#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> <dfn class="decl" id="Slirp::if_fastq" title='Slirp::if_fastq' data-ref="Slirp::if_fastq">if_fastq</dfn>;   <i>/* fast queue (for interactive data) */</i></td></tr>
+<tr><th id="185">185</th><td>    <b>struct</b> <a class="macro" href="#66" title="slirp_quehead" data-ref="_M/quehead">quehead</a> <dfn class="decl" id="Slirp::if_batchq" title='Slirp::if_batchq' data-ref="Slirp::if_batchq">if_batchq</dfn>;  <i>/* queue for non-interactive data */</i></td></tr>
+<tr><th id="186">186</th><td>    <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="decl" id="Slirp::next_m" title='Slirp::next_m' data-ref="Slirp::next_m">next_m</dfn>;    <i>/* pointer to next mbuf to output */</i></td></tr>
+<tr><th id="187">187</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="Slirp::if_start_busy" title='Slirp::if_start_busy' data-ref="Slirp::if_start_busy">if_start_busy</dfn>;     <i>/* avoid if_start recursion */</i></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <i>/* ip states */</i></td></tr>
+<tr><th id="190">190</th><td>    <b>struct</b> <a class="type" href="ip.h.html#ipq" title='ipq' data-ref="ipq">ipq</a> <dfn class="decl" id="Slirp::ipq" title='Slirp::ipq' data-ref="Slirp::ipq">ipq</dfn>;         <i>/* ip reass. queue */</i></td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="Slirp::ip_id" title='Slirp::ip_id' data-ref="Slirp::ip_id">ip_id</dfn>;         <i>/* ip packet ctr, for ids */</i></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <i>/* bootp/dhcp states */</i></td></tr>
+<tr><th id="194">194</th><td>    <a class="typedef" href="bootp.h.html#BOOTPClient" title='BOOTPClient' data-type='struct BOOTPClient' data-ref="BOOTPClient">BOOTPClient</a> <dfn class="decl" id="Slirp::bootp_clients" title='Slirp::bootp_clients' data-ref="Slirp::bootp_clients">bootp_clients</dfn>[<a class="macro" href="bootp.h.html#123" title="16" data-ref="_M/NB_BOOTP_CLIENTS">NB_BOOTP_CLIENTS</a>];</td></tr>
+<tr><th id="195">195</th><td>    <em>char</em> *<dfn class="decl" id="Slirp::bootp_filename" title='Slirp::bootp_filename' data-ref="Slirp::bootp_filename">bootp_filename</dfn>;</td></tr>
+<tr><th id="196">196</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="Slirp::vdnssearch_len" title='Slirp::vdnssearch_len' data-ref="Slirp::vdnssearch_len">vdnssearch_len</dfn>;</td></tr>
+<tr><th id="197">197</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="Slirp::vdnssearch" title='Slirp::vdnssearch' data-ref="Slirp::vdnssearch">vdnssearch</dfn>;</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>    <i>/* tcp states */</i></td></tr>
+<tr><th id="200">200</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> <dfn class="decl" id="Slirp::tcb" title='Slirp::tcb' data-ref="Slirp::tcb">tcb</dfn>;</td></tr>
+<tr><th id="201">201</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="Slirp::tcp_last_so" title='Slirp::tcp_last_so' data-ref="Slirp::tcp_last_so">tcp_last_so</dfn>;</td></tr>
+<tr><th id="202">202</th><td>    <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a> <dfn class="decl" id="Slirp::tcp_iss" title='Slirp::tcp_iss' data-ref="Slirp::tcp_iss">tcp_iss</dfn>;        <i>/* tcp initial send seq # */</i></td></tr>
+<tr><th id="203">203</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="Slirp::tcp_now" title='Slirp::tcp_now' data-ref="Slirp::tcp_now">tcp_now</dfn>;       <i>/* for RFC 1323 timestamps */</i></td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td>    <i>/* udp states */</i></td></tr>
+<tr><th id="206">206</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> <dfn class="decl" id="Slirp::udb" title='Slirp::udb' data-ref="Slirp::udb">udb</dfn>;</td></tr>
+<tr><th id="207">207</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="Slirp::udp_last_so" title='Slirp::udp_last_so' data-ref="Slirp::udp_last_so">udp_last_so</dfn>;</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>    <i>/* icmp states */</i></td></tr>
+<tr><th id="210">210</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> <dfn class="decl" id="Slirp::icmp" title='Slirp::icmp' data-ref="Slirp::icmp">icmp</dfn>;</td></tr>
+<tr><th id="211">211</th><td>    <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="Slirp::icmp_last_so" title='Slirp::icmp_last_so' data-ref="Slirp::icmp_last_so">icmp_last_so</dfn>;</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>    <i>/* tftp states */</i></td></tr>
+<tr><th id="214">214</th><td>    <em>char</em> *<dfn class="decl" id="Slirp::tftp_prefix" title='Slirp::tftp_prefix' data-ref="Slirp::tftp_prefix">tftp_prefix</dfn>;</td></tr>
+<tr><th id="215">215</th><td>    <b>struct</b> <a class="type" href="tftp.h.html#tftp_session" title='tftp_session' data-ref="tftp_session">tftp_session</a> <dfn class="decl" id="Slirp::tftp_sessions" title='Slirp::tftp_sessions' data-ref="Slirp::tftp_sessions">tftp_sessions</dfn>[<a class="macro" href="tftp.h.html#6" title="20" data-ref="_M/TFTP_SESSIONS_MAX">TFTP_SESSIONS_MAX</a>];</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td>    <a class="typedef" href="#ArpTable" title='ArpTable' data-type='struct ArpTable' data-ref="ArpTable">ArpTable</a> <dfn class="decl" id="Slirp::arp_table" title='Slirp::arp_table' data-ref="Slirp::arp_table">arp_table</dfn>;</td></tr>
+<tr><th id="218">218</th><td>    <a class="typedef" href="#NdpTable" title='NdpTable' data-type='struct NdpTable' data-ref="NdpTable">NdpTable</a> <dfn class="decl" id="Slirp::ndp_table" title='Slirp::ndp_table' data-ref="Slirp::ndp_table">ndp_table</dfn>;</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/grand.h.html#GRand" title='GRand' data-type='struct _GRand' data-ref="GRand">GRand</a> *<dfn class="decl" id="Slirp::grand" title='Slirp::grand' data-ref="Slirp::grand">grand</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="Slirp::ra_timer" title='Slirp::ra_timer' data-ref="Slirp::ra_timer">ra_timer</dfn>;</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>    <em>void</em> *<dfn class="decl" id="Slirp::opaque" title='Slirp::opaque' data-ref="Slirp::opaque">opaque</dfn>;</td></tr>
+<tr><th id="224">224</th><td>};</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><b>extern</b> <a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="decl" id="slirp_instance" title='slirp_instance' data-ref="slirp_instance">slirp_instance</dfn>;</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><u>#<span data-ppcond="228">ifndef</span> <span class="macro" data-ref="_M/NULL">NULL</span></u></td></tr>
+<tr><th id="229">229</th><td><u>#define NULL (void *)0</u></td></tr>
+<tr><th id="230">230</th><td><u>#<span data-ppcond="228">endif</span></u></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><em>void</em> <dfn class="decl" id="if_start" title='if_start' data-ref="if_start">if_start</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><i>/* ncsi.c */</i></td></tr>
+<tr><th id="235">235</th><td><em>void</em> <dfn class="decl" id="ncsi_input" title='ncsi_input' data-ref="ncsi_input">ncsi_input</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col1 decl" id="201slirp" title='slirp' data-type='Slirp *' data-ref="201slirp">slirp</dfn>, <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="202pkt" title='pkt' data-type='const uint8_t *' data-ref="202pkt">pkt</dfn>, <em>int</em> <dfn class="local col3 decl" id="203pkt_len" title='pkt_len' data-type='int' data-ref="203pkt_len">pkt_len</dfn>);</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td><u>#<span data-ppcond="237">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="238">238</th><td><u>#include <a href="../../include/netdb.h.html">&lt;netdb.h&gt;</a></u></td></tr>
+<tr><th id="239">239</th><td><u>#<span data-ppcond="237">endif</span></u></td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><u>#define <dfn class="macro" id="_M/SO_OPTIONS" data-ref="_M/SO_OPTIONS">SO_OPTIONS</dfn> DO_KEEPALIVE</u></td></tr>
+<tr><th id="242">242</th><td><u>#define <dfn class="macro" id="_M/TCP_MAXIDLE" data-ref="_M/TCP_MAXIDLE">TCP_MAXIDLE</dfn> (TCPTV_KEEPCNT * TCPTV_KEEPINTVL)</u></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><i>/* dnssearch.c */</i></td></tr>
+<tr><th id="245">245</th><td><em>int</em> <dfn class="decl" id="translate_dnssearch" title='translate_dnssearch' data-ref="translate_dnssearch">translate_dnssearch</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="local col4 decl" id="204s" title='s' data-type='Slirp *' data-ref="204s">s</dfn>, <em>const</em> <em>char</em> ** <dfn class="local col5 decl" id="205names" title='names' data-type='const char **' data-ref="205names">names</dfn>);</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><i>/* cksum.c */</i></td></tr>
+<tr><th id="248">248</th><td><em>int</em> <dfn class="decl" id="cksum" title='cksum' data-ref="cksum">cksum</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col6 decl" id="206m" title='m' data-type='struct mbuf *' data-ref="206m">m</dfn>, <em>int</em> <dfn class="local col7 decl" id="207len" title='len' data-type='int' data-ref="207len">len</dfn>);</td></tr>
+<tr><th id="249">249</th><td><em>int</em> <dfn class="decl" id="ip6_cksum" title='ip6_cksum' data-ref="ip6_cksum">ip6_cksum</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col8 decl" id="208m" title='m' data-type='struct mbuf *' data-ref="208m">m</dfn>);</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><i>/* if.c */</i></td></tr>
+<tr><th id="252">252</th><td><em>void</em> <dfn class="decl" id="if_init" title='if_init' data-ref="if_init">if_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="253">253</th><td><em>void</em> <dfn class="decl" id="if_output" title='if_output' data-ref="if_output">if_output</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><i>/* ip_input.c */</i></td></tr>
+<tr><th id="256">256</th><td><em>void</em> <dfn class="decl" id="ip_init" title='ip_init' data-ref="ip_init">ip_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="257">257</th><td><em>void</em> <dfn class="decl" id="ip_cleanup" title='ip_cleanup' data-ref="ip_cleanup">ip_cleanup</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="258">258</th><td><em>void</em> <dfn class="decl" id="ip_input" title='ip_input' data-ref="ip_input">ip_input</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="259">259</th><td><em>void</em> <dfn class="decl" id="ip_slowtimo" title='ip_slowtimo' data-ref="ip_slowtimo">ip_slowtimo</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="260">260</th><td><em>void</em> <dfn class="decl" id="ip_stripoptions" title='ip_stripoptions' data-ref="ip_stripoptions">ip_stripoptions</dfn>(<em>register</em> <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><i>/* ip_output.c */</i></td></tr>
+<tr><th id="263">263</th><td><em>int</em> <dfn class="decl" id="ip_output" title='ip_output' data-ref="ip_output">ip_output</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td><i>/* ip6_input.c */</i></td></tr>
+<tr><th id="266">266</th><td><em>void</em> <dfn class="decl" id="ip6_init" title='ip6_init' data-ref="ip6_init">ip6_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="267">267</th><td><em>void</em> <dfn class="decl" id="ip6_cleanup" title='ip6_cleanup' data-ref="ip6_cleanup">ip6_cleanup</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="268">268</th><td><em>void</em> <dfn class="decl" id="ip6_input" title='ip6_input' data-ref="ip6_input">ip6_input</dfn>(<b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td><i>/* ip6_output */</i></td></tr>
+<tr><th id="271">271</th><td><em>int</em> <dfn class="decl" id="ip6_output" title='ip6_output' data-ref="ip6_output">ip6_output</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *, <em>int</em> <dfn class="local col9 decl" id="209fast" title='fast' data-type='int' data-ref="209fast">fast</dfn>);</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td><i>/* tcp_input.c */</i></td></tr>
+<tr><th id="274">274</th><td><em>void</em> <dfn class="decl" id="tcp_input" title='tcp_input' data-ref="tcp_input">tcp_input</dfn>(<em>register</em> <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *, <em>int</em>, <b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <em>unsigned</em> <em>short</em> <dfn class="local col0 decl" id="210af" title='af' data-type='unsigned short' data-ref="210af">af</dfn>);</td></tr>
+<tr><th id="275">275</th><td><em>int</em> <dfn class="decl" id="tcp_mss" title='tcp_mss' data-ref="tcp_mss">tcp_mss</dfn>(<em>register</em> <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a>);</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td><i>/* tcp_output.c */</i></td></tr>
+<tr><th id="278">278</th><td><em>int</em> <dfn class="decl" id="tcp_output" title='tcp_output' data-ref="tcp_output">tcp_output</dfn>(<em>register</em> <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *);</td></tr>
+<tr><th id="279">279</th><td><em>void</em> <dfn class="decl" id="tcp_setpersist" title='tcp_setpersist' data-ref="tcp_setpersist">tcp_setpersist</dfn>(<em>register</em> <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *);</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td><i>/* tcp_subr.c */</i></td></tr>
+<tr><th id="282">282</th><td><em>void</em> <dfn class="decl" id="tcp_init" title='tcp_init' data-ref="tcp_init">tcp_init</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="283">283</th><td><em>void</em> <dfn class="decl" id="tcp_cleanup" title='tcp_cleanup' data-ref="tcp_cleanup">tcp_cleanup</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="284">284</th><td><em>void</em> <dfn class="decl" id="tcp_template" title='tcp_template' data-ref="tcp_template">tcp_template</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *);</td></tr>
+<tr><th id="285">285</th><td><em>void</em> <dfn class="decl" id="tcp_respond" title='tcp_respond' data-ref="tcp_respond">tcp_respond</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *, <em>register</em> <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *,</td></tr>
+<tr><th id="286">286</th><td>        <em>register</em> <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *, <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>, <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>, <em>int</em>, <em>unsigned</em> <em>short</em>);</td></tr>
+<tr><th id="287">287</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> * <dfn class="decl" id="tcp_newtcpcb" title='tcp_newtcpcb' data-ref="tcp_newtcpcb">tcp_newtcpcb</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="288">288</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> * <dfn class="decl" id="tcp_close" title='tcp_close' data-ref="tcp_close">tcp_close</dfn>(<em>register</em> <b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *);</td></tr>
+<tr><th id="289">289</th><td><em>void</em> <dfn class="decl" id="tcp_sockclosed" title='tcp_sockclosed' data-ref="tcp_sockclosed">tcp_sockclosed</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *);</td></tr>
+<tr><th id="290">290</th><td><em>int</em> <dfn class="decl" id="tcp_fconnect" title='tcp_fconnect' data-ref="tcp_fconnect">tcp_fconnect</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <em>unsigned</em> <em>short</em> <dfn class="local col1 decl" id="211af" title='af' data-type='unsigned short' data-ref="211af">af</dfn>);</td></tr>
+<tr><th id="291">291</th><td><em>void</em> <dfn class="decl" id="tcp_connect" title='tcp_connect' data-ref="tcp_connect">tcp_connect</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="292">292</th><td><em>int</em> <dfn class="decl" id="tcp_attach" title='tcp_attach' data-ref="tcp_attach">tcp_attach</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="293">293</th><td><a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="tcp_tos" title='tcp_tos' data-ref="tcp_tos">tcp_tos</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="294">294</th><td><em>int</em> <dfn class="decl" id="tcp_emu" title='tcp_emu' data-ref="tcp_emu">tcp_emu</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="295">295</th><td><em>int</em> <dfn class="decl" id="tcp_ctl" title='tcp_ctl' data-ref="tcp_ctl">tcp_ctl</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="296">296</th><td><b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="decl" id="tcp_drop" title='tcp_drop' data-ref="tcp_drop">tcp_drop</dfn>(<b>struct</b> <a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="local col2 decl" id="212tp" title='tp' data-type='struct tcpcb *' data-ref="212tp">tp</dfn>, <em>int</em> <dfn class="local col3 decl" id="213err" title='err' data-type='int' data-ref="213err">err</dfn>);</td></tr>
+<tr><th id="297">297</th><td></td></tr>
+<tr><th id="298">298</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="299">299</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../net/colo-compare.c.html'>codebrowser/net/colo-compare.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

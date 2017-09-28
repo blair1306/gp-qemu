@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>char-stdio.c source code [codebrowser/chardev/char-stdio.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/chardev/char-stdio.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>chardev</a>/<a href='char-stdio.c.html'>char-stdio.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/sockets.h.html">"qemu/sockets.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/chardev/char.h.html">"chardev/char.h"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#<span data-ppcond="30">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="31">31</th><td><u>#include "chardev/char-win.h"</u></td></tr>
+<tr><th id="32">32</th><td><u>#include "chardev/char-win-stdio.h"</u></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="30">else</span></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../../include/termios.h.html">&lt;termios.h&gt;</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/chardev/char-fd.h.html">"chardev/char-fd.h"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="30">endif</span></u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="38">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="39">39</th><td><i  data-doc="oldtty">/* init terminal so that we can grab keys */</i></td></tr>
+<tr><th id="40">40</th><td><em>static</em> <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios" title='termios' data-ref="termios">termios</a> <dfn class="tu decl def" id="oldtty" title='oldtty' data-type='struct termios' data-ref="oldtty">oldtty</dfn>;</td></tr>
+<tr><th id="41">41</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="old_fd0_flags" title='old_fd0_flags' data-type='int' data-ref="old_fd0_flags">old_fd0_flags</dfn>;</td></tr>
+<tr><th id="42">42</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="stdio_in_use" title='stdio_in_use' data-type='_Bool' data-ref="stdio_in_use">stdio_in_use</dfn>;</td></tr>
+<tr><th id="43">43</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="stdio_allow_signal" title='stdio_allow_signal' data-type='_Bool' data-ref="stdio_allow_signal">stdio_allow_signal</dfn>;</td></tr>
+<tr><th id="44">44</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="stdio_echo_state" title='stdio_echo_state' data-type='_Bool' data-ref="stdio_echo_state">stdio_echo_state</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="term_exit" title='term_exit' data-type='void term_exit()' data-ref="term_exit">term_exit</dfn>(<em>void</em>)</td></tr>
+<tr><th id="47">47</th><td>{</td></tr>
+<tr><th id="48">48</th><td>    <a class="ref" href="../../include/termios.h.html#tcsetattr" title='tcsetattr' data-ref="tcsetattr">tcsetattr</a>(<var>0</var>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#213" title="0" data-ref="_M/TCSANOW">TCSANOW</a>, &amp;<a class="tu ref" href="#oldtty" title='oldtty' data-use='a' data-ref="oldtty">oldtty</a>);</td></tr>
+<tr><th id="49">49</th><td>    <a class="ref" href="../../include/fcntl.h.html#fcntl" title='fcntl' data-ref="fcntl">fcntl</a>(<var>0</var>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#171" title="4" data-ref="_M/F_SETFL">F_SETFL</a>, <a class="tu ref" href="#old_fd0_flags" title='old_fd0_flags' data-use='r' data-ref="old_fd0_flags">old_fd0_flags</a>);</td></tr>
+<tr><th id="50">50</th><td>}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_set_echo_stdio" title='qemu_chr_set_echo_stdio' data-type='void qemu_chr_set_echo_stdio(Chardev * chr, _Bool echo)' data-ref="qemu_chr_set_echo_stdio">qemu_chr_set_echo_stdio</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col1 decl" id="1chr" title='chr' data-type='Chardev *' data-ref="1chr">chr</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="2echo" title='echo' data-type='_Bool' data-ref="2echo">echo</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios" title='termios' data-ref="termios">termios</a> <dfn class="local col3 decl" id="3tty" title='tty' data-type='struct termios' data-ref="3tty">tty</dfn>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <a class="tu ref" href="#stdio_echo_state" title='stdio_echo_state' data-use='w' data-ref="stdio_echo_state">stdio_echo_state</a> = <a class="local col2 ref" href="#2echo" title='echo' data-ref="2echo">echo</a>;</td></tr>
+<tr><th id="57">57</th><td>    <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a> = <a class="tu ref" href="#oldtty" title='oldtty' data-use='r' data-ref="oldtty">oldtty</a>;</td></tr>
+<tr><th id="58">58</th><td>    <b>if</b> (!<a class="local col2 ref" href="#2echo" title='echo' data-ref="2echo">echo</a>) {</td></tr>
+<tr><th id="59">59</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_iflag" title='termios::c_iflag' data-ref="termios::c_iflag">c_iflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#62" title="0000001" data-ref="_M/IGNBRK">IGNBRK</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#63" title="0000002" data-ref="_M/BRKINT">BRKINT</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#65" title="0000010" data-ref="_M/PARMRK">PARMRK</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#67" title="0000040" data-ref="_M/ISTRIP">ISTRIP</a></td></tr>
+<tr><th id="60">60</th><td>                         | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#68" title="0000100" data-ref="_M/INLCR">INLCR</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#69" title="0000200" data-ref="_M/IGNCR">IGNCR</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#70" title="0000400" data-ref="_M/ICRNL">ICRNL</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#72" title="0002000" data-ref="_M/IXON">IXON</a>);</td></tr>
+<tr><th id="61">61</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_oflag" title='termios::c_oflag' data-ref="termios::c_oflag">c_oflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#79" title="0000001" data-ref="_M/OPOST">OPOST</a>;</td></tr>
+<tr><th id="62">62</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_lflag" title='termios::c_lflag' data-ref="termios::c_lflag">c_lflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#183" title="0000010" data-ref="_M/ECHO">ECHO</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#186" title="0000100" data-ref="_M/ECHONL">ECHONL</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#179" title="0000002" data-ref="_M/ICANON">ICANON</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#196" title="0100000" data-ref="_M/IEXTEN">IEXTEN</a>);</td></tr>
+<tr><th id="63">63</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#141" title="0000060" data-ref="_M/CSIZE">CSIZE</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#148" title="0000400" data-ref="_M/PARENB">PARENB</a>);</td></tr>
+<tr><th id="64">64</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#145" title="0000060" data-ref="_M/CS8">CS8</a>;</td></tr>
+<tr><th id="65">65</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cc" title='termios::c_cc' data-ref="termios::c_cc">c_cc</a>[<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#49" title="6" data-ref="_M/VMIN">VMIN</a>] = <var>1</var>;</td></tr>
+<tr><th id="66">66</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cc" title='termios::c_cc' data-ref="termios::c_cc">c_cc</a>[<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#48" title="5" data-ref="_M/VTIME">VTIME</a>] = <var>0</var>;</td></tr>
+<tr><th id="67">67</th><td>    }</td></tr>
+<tr><th id="68">68</th><td>    <b>if</b> (!<a class="tu ref" href="#stdio_allow_signal" title='stdio_allow_signal' data-use='r' data-ref="stdio_allow_signal">stdio_allow_signal</a>) {</td></tr>
+<tr><th id="69">69</th><td>        <a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_lflag" title='termios::c_lflag' data-ref="termios::c_lflag">c_lflag</a> &amp;= ~<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#178" title="0000001" data-ref="_M/ISIG">ISIG</a>;</td></tr>
+<tr><th id="70">70</th><td>    }</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <a class="ref" href="../../include/termios.h.html#tcsetattr" title='tcsetattr' data-ref="tcsetattr">tcsetattr</a>(<var>0</var>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#213" title="0" data-ref="_M/TCSANOW">TCSANOW</a>, &amp;<a class="local col3 ref" href="#3tty" title='tty' data-ref="3tty">tty</a>);</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="term_stdio_handler" title='term_stdio_handler' data-type='void term_stdio_handler(int sig)' data-ref="term_stdio_handler">term_stdio_handler</dfn>(<em>int</em> <dfn class="local col4 decl" id="4sig" title='sig' data-type='int' data-ref="4sig">sig</dfn>)</td></tr>
+<tr><th id="76">76</th><td>{</td></tr>
+<tr><th id="77">77</th><td>    <i>/* restore echo after resume from suspend. */</i></td></tr>
+<tr><th id="78">78</th><td>    <a class="tu ref" href="#qemu_chr_set_echo_stdio" title='qemu_chr_set_echo_stdio' data-use='c' data-ref="qemu_chr_set_echo_stdio">qemu_chr_set_echo_stdio</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="tu ref" href="#stdio_echo_state" title='stdio_echo_state' data-use='r' data-ref="stdio_echo_state">stdio_echo_state</a>);</td></tr>
+<tr><th id="79">79</th><td>}</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_open_stdio" title='qemu_chr_open_stdio' data-type='void qemu_chr_open_stdio(Chardev * chr, ChardevBackend * backend, _Bool * be_opened, Error ** errp)' data-ref="qemu_chr_open_stdio">qemu_chr_open_stdio</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col5 decl" id="5chr" title='chr' data-type='Chardev *' data-ref="5chr">chr</dfn>,</td></tr>
+<tr><th id="82">82</th><td>                                <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col6 decl" id="6backend" title='backend' data-type='ChardevBackend *' data-ref="6backend">backend</dfn>,</td></tr>
+<tr><th id="83">83</th><td>                                <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col7 decl" id="7be_opened" title='be_opened' data-type='_Bool *' data-ref="7be_opened">be_opened</dfn>,</td></tr>
+<tr><th id="84">84</th><td>                                <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="8errp" title='errp' data-type='Error **' data-ref="8errp">errp</dfn>)</td></tr>
+<tr><th id="85">85</th><td>{</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevStdio" title='ChardevStdio' data-type='struct ChardevStdio' data-ref="ChardevStdio">ChardevStdio</a> *<dfn class="local col9 decl" id="9opts" title='opts' data-type='ChardevStdio *' data-ref="9opts">opts</dfn> = <a class="local col6 ref" href="#6backend" title='backend' data-ref="6backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::stdio" title='ChardevBackend::(anonymous union)::stdio' data-ref="ChardevBackend::(anonymous)::stdio">stdio</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevStdio_wrapper::data" title='q_obj_ChardevStdio_wrapper::data' data-ref="q_obj_ChardevStdio_wrapper::data">data</a>;</td></tr>
+<tr><th id="87">87</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a> <dfn class="local col0 decl" id="10act" title='act' data-type='struct sigaction' data-ref="10act">act</dfn>;</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/os-posix.h.html#is_daemonized" title='is_daemonized' data-ref="is_daemonized">is_daemonized</a>()) {</td></tr>
+<tr><th id="90">90</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-stdio.c&quot;, 90, __func__, (&quot;cannot use stdio with -daemonize&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#8errp" title='errp' data-ref="8errp">errp</a>, <q>"cannot use stdio with -daemonize"</q>);</td></tr>
+<tr><th id="91">91</th><td>        <b>return</b>;</td></tr>
+<tr><th id="92">92</th><td>    }</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <b>if</b> (<a class="tu ref" href="#stdio_in_use" title='stdio_in_use' data-use='r' data-ref="stdio_in_use">stdio_in_use</a>) {</td></tr>
+<tr><th id="95">95</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-stdio.c&quot;, 95, __func__, (&quot;cannot use stdio by multiple character devices&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#8errp" title='errp' data-ref="8errp">errp</a>, <q>"cannot use stdio by multiple character devices"</q>);</td></tr>
+<tr><th id="96">96</th><td>        <b>return</b>;</td></tr>
+<tr><th id="97">97</th><td>    }</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>    <a class="tu ref" href="#stdio_in_use" title='stdio_in_use' data-use='w' data-ref="stdio_in_use">stdio_in_use</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="100">100</th><td>    <a class="tu ref" href="#old_fd0_flags" title='old_fd0_flags' data-use='w' data-ref="old_fd0_flags">old_fd0_flags</a> = <a class="ref" href="../../include/fcntl.h.html#fcntl" title='fcntl' data-ref="fcntl">fcntl</a>(<var>0</var>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#170" title="3" data-ref="_M/F_GETFL">F_GETFL</a>);</td></tr>
+<tr><th id="101">101</th><td>    <a class="ref" href="../../include/termios.h.html#tcgetattr" title='tcgetattr' data-ref="tcgetattr">tcgetattr</a>(<var>0</var>, &amp;<a class="tu ref" href="#oldtty" title='oldtty' data-use='a' data-ref="oldtty">oldtty</a>);</td></tr>
+<tr><th id="102">102</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#qemu_set_nonblock" title='qemu_set_nonblock' data-ref="qemu_set_nonblock">qemu_set_nonblock</a>(<var>0</var>);</td></tr>
+<tr><th id="103">103</th><td>    <a class="ref" href="../../include/stdlib.h.html#atexit" title='atexit' data-ref="atexit">atexit</a>(<a class="tu ref" href="#term_exit" title='term_exit' data-use='r' data-ref="term_exit">term_exit</a>);</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col0 ref" href="#10act" title='act' data-ref="10act">act</a>, <var>0</var>, <b>sizeof</b>(<a class="local col0 ref" href="#10act" title='act' data-ref="10act">act</a>));</td></tr>
+<tr><th id="106">106</th><td>    <a class="local col0 ref" href="#10act" title='act' data-ref="10act">act</a>.<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a> = <a class="tu ref" href="#term_stdio_handler" title='term_stdio_handler' data-use='r' data-ref="term_stdio_handler">term_stdio_handler</a>;</td></tr>
+<tr><th id="107">107</th><td>    <a class="ref" href="../../include/signal.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/signum.h.html#51" title="18" data-ref="_M/SIGCONT">SIGCONT</a>, &amp;<a class="local col0 ref" href="#10act" title='act' data-ref="10act">act</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <a class="ref" href="../include/chardev/char-fd.h.html#qemu_chr_open_fd" title='qemu_chr_open_fd' data-ref="qemu_chr_open_fd">qemu_chr_open_fd</a>(<a class="local col5 ref" href="#5chr" title='chr' data-ref="5chr">chr</a>, <var>0</var>, <var>1</var>);</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td>    <b>if</b> (<a class="local col9 ref" href="#9opts" title='opts' data-ref="9opts">opts</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevStdio::has_signal" title='ChardevStdio::has_signal' data-ref="ChardevStdio::has_signal">has_signal</a>) {</td></tr>
+<tr><th id="112">112</th><td>        <a class="tu ref" href="#stdio_allow_signal" title='stdio_allow_signal' data-use='w' data-ref="stdio_allow_signal">stdio_allow_signal</a> = <a class="local col9 ref" href="#9opts" title='opts' data-ref="9opts">opts</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevStdio::signal" title='ChardevStdio::signal' data-ref="ChardevStdio::signal">signal</a>;</td></tr>
+<tr><th id="113">113</th><td>    }</td></tr>
+<tr><th id="114">114</th><td>    <a class="tu ref" href="#qemu_chr_set_echo_stdio" title='qemu_chr_set_echo_stdio' data-use='c' data-ref="qemu_chr_set_echo_stdio">qemu_chr_set_echo_stdio</a>(<a class="local col5 ref" href="#5chr" title='chr' data-ref="5chr">chr</a>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="115">115</th><td>}</td></tr>
+<tr><th id="116">116</th><td><u>#<span data-ppcond="38">endif</span></u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_parse_stdio" title='qemu_chr_parse_stdio' data-type='void qemu_chr_parse_stdio(QemuOpts * opts, ChardevBackend * backend, Error ** errp)' data-ref="qemu_chr_parse_stdio">qemu_chr_parse_stdio</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col1 decl" id="11opts" title='opts' data-type='QemuOpts *' data-ref="11opts">opts</dfn>, <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col2 decl" id="12backend" title='backend' data-type='ChardevBackend *' data-ref="12backend">backend</dfn>,</td></tr>
+<tr><th id="119">119</th><td>                                 <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="13errp" title='errp' data-type='Error **' data-ref="13errp">errp</dfn>)</td></tr>
+<tr><th id="120">120</th><td>{</td></tr>
+<tr><th id="121">121</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevStdio" title='ChardevStdio' data-type='struct ChardevStdio' data-ref="ChardevStdio">ChardevStdio</a> *<dfn class="local col4 decl" id="14stdio" title='stdio' data-type='ChardevStdio *' data-ref="14stdio">stdio</dfn>;</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>    <a class="local col2 ref" href="#12backend" title='backend' data-ref="12backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::type" title='ChardevBackend::type' data-ref="ChardevBackend::type">type</a> = <a class="enum" href="../qapi-types.h.html#ChardevBackendKind::CHARDEV_BACKEND_KIND_STDIO" title='ChardevBackendKind::CHARDEV_BACKEND_KIND_STDIO' data-ref="ChardevBackendKind::CHARDEV_BACKEND_KIND_STDIO">CHARDEV_BACKEND_KIND_STDIO</a>;</td></tr>
+<tr><th id="124">124</th><td>    <a class="local col4 ref" href="#14stdio" title='stdio' data-ref="14stdio">stdio</a> = <a class="local col2 ref" href="#12backend" title='backend' data-ref="12backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::stdio" title='ChardevBackend::(anonymous union)::stdio' data-ref="ChardevBackend::(anonymous)::stdio">stdio</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevStdio_wrapper::data" title='q_obj_ChardevStdio_wrapper::data' data-ref="q_obj_ChardevStdio_wrapper::data">data</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((ChardevStdio *) g_malloc0_n ((1), sizeof (ChardevStdio)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../qapi-types.h.html#ChardevStdio" title='ChardevStdio' data-type='struct ChardevStdio' data-ref="ChardevStdio">ChardevStdio</a>, <var>1</var>);</td></tr>
+<tr><th id="125">125</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_parse_common" title='qemu_chr_parse_common' data-ref="qemu_chr_parse_common">qemu_chr_parse_common</a>(<a class="local col1 ref" href="#11opts" title='opts' data-ref="11opts">opts</a>, <a class="ref" href="../qapi-types.h.html#qapi_ChardevStdio_base" title='qapi_ChardevStdio_base' data-ref="qapi_ChardevStdio_base">qapi_ChardevStdio_base</a>(<a class="local col4 ref" href="#14stdio" title='stdio' data-ref="14stdio">stdio</a>));</td></tr>
+<tr><th id="126">126</th><td>    <a class="local col4 ref" href="#14stdio" title='stdio' data-ref="14stdio">stdio</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevStdio::has_signal" title='ChardevStdio::has_signal' data-ref="ChardevStdio::has_signal">has_signal</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="127">127</th><td>    <a class="local col4 ref" href="#14stdio" title='stdio' data-ref="14stdio">stdio</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevStdio::signal" title='ChardevStdio::signal' data-ref="ChardevStdio::signal">signal</a> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get_bool" title='qemu_opt_get_bool' data-ref="qemu_opt_get_bool">qemu_opt_get_bool</a>(<a class="local col1 ref" href="#11opts" title='opts' data-ref="11opts">opts</a>, <q>"signal"</q>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="128">128</th><td>}</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_stdio_class_init" title='char_stdio_class_init' data-type='void char_stdio_class_init(ObjectClass * oc, void * data)' data-ref="char_stdio_class_init">char_stdio_class_init</dfn>(<a class="typedef" href="../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col5 decl" id="15oc" title='oc' data-type='ObjectClass *' data-ref="15oc">oc</dfn>, <em>void</em> *<dfn class="local col6 decl" id="16data" title='data' data-type='void *' data-ref="16data">data</dfn>)</td></tr>
+<tr><th id="131">131</th><td>{</td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../include/chardev/char.h.html#ChardevClass" title='ChardevClass' data-type='struct ChardevClass' data-ref="ChardevClass">ChardevClass</a> *<dfn class="local col7 decl" id="17cc" title='cc' data-type='ChardevClass *' data-ref="17cc">cc</dfn> = <a class="macro" href="../include/chardev/char.h.html#192" title="((ChardevClass *)object_class_dynamic_cast_assert(((ObjectClass *)((oc))), (&quot;chardev&quot;), &quot;/home/jon/workspace/qemu/chardev/char-stdio.c&quot;, 132, __func__))" data-ref="_M/CHARDEV_CLASS">CHARDEV_CLASS</a>(<a class="local col5 ref" href="#15oc" title='oc' data-ref="15oc">oc</a>);</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <a class="local col7 ref" href="#17cc" title='cc' data-ref="17cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::parse" title='ChardevClass::parse' data-ref="ChardevClass::parse">parse</a> = <a class="tu ref" href="#qemu_chr_parse_stdio" title='qemu_chr_parse_stdio' data-use='r' data-ref="qemu_chr_parse_stdio">qemu_chr_parse_stdio</a>;</td></tr>
+<tr><th id="135">135</th><td><u>#<span data-ppcond="135">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="136">136</th><td>    <a class="local col7 ref" href="#17cc" title='cc' data-ref="17cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::open" title='ChardevClass::open' data-ref="ChardevClass::open">open</a> = <a class="tu ref" href="#qemu_chr_open_stdio" title='qemu_chr_open_stdio' data-use='r' data-ref="qemu_chr_open_stdio">qemu_chr_open_stdio</a>;</td></tr>
+<tr><th id="137">137</th><td>    <a class="local col7 ref" href="#17cc" title='cc' data-ref="17cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::chr_set_echo" title='ChardevClass::chr_set_echo' data-ref="ChardevClass::chr_set_echo">chr_set_echo</a> = <a class="tu ref" href="#qemu_chr_set_echo_stdio" title='qemu_chr_set_echo_stdio' data-use='r' data-ref="qemu_chr_set_echo_stdio">qemu_chr_set_echo_stdio</a>;</td></tr>
+<tr><th id="138">138</th><td><u>#<span data-ppcond="135">endif</span></u></td></tr>
+<tr><th id="139">139</th><td>}</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_stdio_finalize" title='char_stdio_finalize' data-type='void char_stdio_finalize(Object * obj)' data-ref="char_stdio_finalize">char_stdio_finalize</dfn>(<a class="typedef" href="../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col8 decl" id="18obj" title='obj' data-type='Object *' data-ref="18obj">obj</dfn>)</td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td><u>#<span data-ppcond="143">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="144">144</th><td>    <a class="tu ref" href="#term_exit" title='term_exit' data-use='c' data-ref="term_exit">term_exit</a>();</td></tr>
+<tr><th id="145">145</th><td><u>#<span data-ppcond="143">endif</span></u></td></tr>
+<tr><th id="146">146</th><td>}</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><em>static</em> <em>const</em> <a class="typedef" href="../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="char_stdio_type_info" title='char_stdio_type_info' data-type='const TypeInfo' data-ref="char_stdio_type_info">char_stdio_type_info</dfn> = {</td></tr>
+<tr><th id="149">149</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../include/chardev/char.h.html#202" title="&quot;chardev-stdio&quot;" data-ref="_M/TYPE_CHARDEV_STDIO">TYPE_CHARDEV_STDIO</a>,</td></tr>
+<tr><th id="150">150</th><td><u>#<span data-ppcond="150">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="151">151</th><td>    .parent = TYPE_CHARDEV_WIN_STDIO,</td></tr>
+<tr><th id="152">152</th><td><u>#<span data-ppcond="150">else</span></u></td></tr>
+<tr><th id="153">153</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../include/chardev/char-fd.h.html#37" title="&quot;chardev-fd&quot;" data-ref="_M/TYPE_CHARDEV_FD">TYPE_CHARDEV_FD</a>,</td></tr>
+<tr><th id="154">154</th><td><u>#<span data-ppcond="150">endif</span></u></td></tr>
+<tr><th id="155">155</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::instance_finalize" title='TypeInfo::instance_finalize' data-ref="TypeInfo::instance_finalize">instance_finalize</a> = <a class="tu ref" href="#char_stdio_finalize" title='char_stdio_finalize' data-use='r' data-ref="char_stdio_finalize">char_stdio_finalize</a>,</td></tr>
+<tr><th id="156">156</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a> = <a class="tu ref" href="#char_stdio_class_init" title='char_stdio_class_init' data-use='r' data-ref="char_stdio_class_init">char_stdio_class_init</a>,</td></tr>
+<tr><th id="157">157</th><td>};</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="register_types" title='register_types' data-type='void register_types()' data-ref="register_types">register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="160">160</th><td>{</td></tr>
+<tr><th id="161">161</th><td>    <a class="ref" href="../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#char_stdio_type_info" title='char_stdio_type_info' data-use='a' data-ref="char_stdio_type_info">char_stdio_type_info</a>);</td></tr>
+<tr><th id="162">162</th><td>}</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><a class="macro" href="../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_register_types(void) { register_module_init(register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#register_types" title='register_types' data-use='r' data-ref="register_types">register_types</a>);</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

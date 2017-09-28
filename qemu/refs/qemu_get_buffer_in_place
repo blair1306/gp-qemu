@@ -1,0 +1,23 @@
+<dec f='codebrowser/migration/qemu-file.h' l='134' type='size_t qemu_get_buffer_in_place(QEMUFile * f, uint8_t ** buf, size_t size)'/>
+<def f='codebrowser/migration/qemu-file.c' l='523' ll='539' type='size_t qemu_get_buffer_in_place(QEMUFile * f, uint8_t ** buf, size_t size)'/>
+<doc f='codebrowser/migration/qemu-file.c' l='504'>/*
+ * Read &apos;size&apos; bytes of data from the file.
+ * &apos;size&apos; can be larger than the internal buffer.
+ *
+ * The data:
+ *   may be held on an internal buffer (in which case *buf is updated
+ *     to point to it) that is valid until the next qemu_file operation.
+ * OR
+ *   will be copied to the *buf that was passed in.
+ *
+ * The code tries to avoid the copy if possible.
+ *
+ * It will return size bytes unless there was an error, in which case it will
+ * return as many as it managed to read (assuming blocking fd&apos;s which
+ * all current QEMUFile are)
+ *
+ * Note: Since **buf may get changed, the caller should take care to
+ *       keep a pointer to the original buffer if it needs to deallocate it.
+ */</doc>
+<use f='codebrowser/migration/ram.c' l='2103' u='c' c='load_xbzrle'/>
+<use f='codebrowser/migration/ram.c' l='2454' u='c' c='ram_load_postcopy'/>

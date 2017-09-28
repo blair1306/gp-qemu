@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hid.h source code [codebrowser/include/hw/input/hid.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="HIDKeyboardState,HIDMouseState,HIDPointerEvent,HIDState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/input/hid.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>input</a>/<a href='hid.h.html'>hid.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_HID_H">QEMU_HID_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_HID_H" data-ref="_M/QEMU_HID_H">QEMU_HID_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../../migration/vmstate.h.html">"migration/vmstate.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="../../ui/input.h.html">"ui/input.h"</a></u></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><u>#define <dfn class="macro" id="_M/HID_MOUSE" data-ref="_M/HID_MOUSE">HID_MOUSE</dfn>     1</u></td></tr>
+<tr><th id="8">8</th><td><u>#define <dfn class="macro" id="_M/HID_TABLET" data-ref="_M/HID_TABLET">HID_TABLET</dfn>    2</u></td></tr>
+<tr><th id="9">9</th><td><u>#define <dfn class="macro" id="_M/HID_KEYBOARD" data-ref="_M/HID_KEYBOARD">HID_KEYBOARD</dfn>  3</u></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="HIDPointerEvent" title='HIDPointerEvent' data-ref="HIDPointerEvent"><a class="type" href="#HIDPointerEvent" title='HIDPointerEvent' data-ref="HIDPointerEvent">HIDPointerEvent</a></dfn> {</td></tr>
+<tr><th id="12">12</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="HIDPointerEvent::xdx" title='HIDPointerEvent::xdx' data-ref="HIDPointerEvent::xdx">xdx</dfn>, <dfn class="decl" id="HIDPointerEvent::ydy" title='HIDPointerEvent::ydy' data-ref="HIDPointerEvent::ydy">ydy</dfn>; <i>/* relative iff it's a mouse, otherwise absolute */</i></td></tr>
+<tr><th id="13">13</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="HIDPointerEvent::dz" title='HIDPointerEvent::dz' data-ref="HIDPointerEvent::dz">dz</dfn>, <dfn class="decl" id="HIDPointerEvent::buttons_state" title='HIDPointerEvent::buttons_state' data-ref="HIDPointerEvent::buttons_state">buttons_state</dfn>;</td></tr>
+<tr><th id="14">14</th><td>} <dfn class="typedef" id="HIDPointerEvent" title='HIDPointerEvent' data-type='struct HIDPointerEvent' data-ref="HIDPointerEvent">HIDPointerEvent</dfn>;</td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/QUEUE_LENGTH" data-ref="_M/QUEUE_LENGTH">QUEUE_LENGTH</dfn>    16 /* should be enough for a triple-click */</u></td></tr>
+<tr><th id="17">17</th><td><u>#define <dfn class="macro" id="_M/QUEUE_MASK" data-ref="_M/QUEUE_MASK">QUEUE_MASK</dfn>      (QUEUE_LENGTH-1u)</u></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/QUEUE_INCR" data-ref="_M/QUEUE_INCR">QUEUE_INCR</dfn>(v)   ((v)++, (v) &amp;= QUEUE_MASK)</u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#HIDState" title='HIDState' data-ref="HIDState">HIDState</a> <dfn class="typedef" id="HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</dfn>;</td></tr>
+<tr><th id="21">21</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="HIDEventFunc" title='HIDEventFunc' data-type='void (*)(HIDState *)' data-ref="HIDEventFunc">HIDEventFunc</dfn>)(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='HIDState *' data-ref="1s">s</dfn>);</td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="HIDMouseState" title='HIDMouseState' data-ref="HIDMouseState"><a class="type" href="#HIDMouseState" title='HIDMouseState' data-ref="HIDMouseState">HIDMouseState</a></dfn> {</td></tr>
+<tr><th id="24">24</th><td>    <a class="typedef" href="#HIDPointerEvent" title='HIDPointerEvent' data-type='struct HIDPointerEvent' data-ref="HIDPointerEvent">HIDPointerEvent</a> <dfn class="decl" id="HIDMouseState::queue" title='HIDMouseState::queue' data-ref="HIDMouseState::queue">queue</dfn>[<a class="macro" href="#16" title="16" data-ref="_M/QUEUE_LENGTH">QUEUE_LENGTH</a>];</td></tr>
+<tr><th id="25">25</th><td>    <em>int</em> <dfn class="decl" id="HIDMouseState::mouse_grabbed" title='HIDMouseState::mouse_grabbed' data-ref="HIDMouseState::mouse_grabbed">mouse_grabbed</dfn>;</td></tr>
+<tr><th id="26">26</th><td>} <dfn class="typedef" id="HIDMouseState" title='HIDMouseState' data-type='struct HIDMouseState' data-ref="HIDMouseState">HIDMouseState</dfn>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="HIDKeyboardState" title='HIDKeyboardState' data-ref="HIDKeyboardState"><a class="type" href="#HIDKeyboardState" title='HIDKeyboardState' data-ref="HIDKeyboardState">HIDKeyboardState</a></dfn> {</td></tr>
+<tr><th id="29">29</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="HIDKeyboardState::keycodes" title='HIDKeyboardState::keycodes' data-ref="HIDKeyboardState::keycodes">keycodes</dfn>[<a class="macro" href="#16" title="16" data-ref="_M/QUEUE_LENGTH">QUEUE_LENGTH</a>];</td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="HIDKeyboardState::modifiers" title='HIDKeyboardState::modifiers' data-ref="HIDKeyboardState::modifiers">modifiers</dfn>;</td></tr>
+<tr><th id="31">31</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="HIDKeyboardState::leds" title='HIDKeyboardState::leds' data-ref="HIDKeyboardState::leds">leds</dfn>;</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="HIDKeyboardState::key" title='HIDKeyboardState::key' data-ref="HIDKeyboardState::key">key</dfn>[<var>16</var>];</td></tr>
+<tr><th id="33">33</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="HIDKeyboardState::keys" title='HIDKeyboardState::keys' data-ref="HIDKeyboardState::keys">keys</dfn>;</td></tr>
+<tr><th id="34">34</th><td>} <dfn class="typedef" id="HIDKeyboardState" title='HIDKeyboardState' data-type='struct HIDKeyboardState' data-ref="HIDKeyboardState">HIDKeyboardState</dfn>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><b>struct</b> <dfn class="type def" id="HIDState" title='HIDState' data-ref="HIDState">HIDState</dfn> {</td></tr>
+<tr><th id="37">37</th><td>    <b>union</b> {</td></tr>
+<tr><th id="38">38</th><td>        <a class="typedef" href="#HIDMouseState" title='HIDMouseState' data-type='struct HIDMouseState' data-ref="HIDMouseState">HIDMouseState</a> <dfn class="decl" id="HIDState::(anonymous)::ptr" title='HIDState::(anonymous union)::ptr' data-ref="HIDState::(anonymous)::ptr">ptr</dfn>;</td></tr>
+<tr><th id="39">39</th><td>        <a class="typedef" href="#HIDKeyboardState" title='HIDKeyboardState' data-type='struct HIDKeyboardState' data-ref="HIDKeyboardState">HIDKeyboardState</a> <dfn class="decl" id="HIDState::(anonymous)::kbd" title='HIDState::(anonymous union)::kbd' data-ref="HIDState::(anonymous)::kbd">kbd</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    };</td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="HIDState::head" title='HIDState::head' data-ref="HIDState::head">head</dfn>; <i>/* index into circular queue */</i></td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="HIDState::n" title='HIDState::n' data-ref="HIDState::n">n</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <em>int</em> <dfn class="decl" id="HIDState::kind" title='HIDState::kind' data-ref="HIDState::kind">kind</dfn>;</td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="HIDState::protocol" title='HIDState::protocol' data-ref="HIDState::protocol">protocol</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="HIDState::idle" title='HIDState::idle' data-ref="HIDState::idle">idle</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="HIDState::idle_pending" title='HIDState::idle_pending' data-ref="HIDState::idle_pending">idle_pending</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="HIDState::idle_timer" title='HIDState::idle_timer' data-ref="HIDState::idle_timer">idle_timer</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="#HIDEventFunc" title='HIDEventFunc' data-type='void (*)(HIDState *)' data-ref="HIDEventFunc">HIDEventFunc</a> <dfn class="decl" id="HIDState::event" title='HIDState::event' data-ref="HIDState::event">event</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../ui/input.h.html#QemuInputHandlerState" title='QemuInputHandlerState' data-type='struct QemuInputHandlerState' data-ref="QemuInputHandlerState">QemuInputHandlerState</a> *<dfn class="decl" id="HIDState::s" title='HIDState::s' data-ref="HIDState::s">s</dfn>;</td></tr>
+<tr><th id="50">50</th><td>};</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><em>void</em> <dfn class="decl" id="hid_init" title='hid_init' data-ref="hid_init">hid_init</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col2 decl" id="2hs" title='hs' data-type='HIDState *' data-ref="2hs">hs</dfn>, <em>int</em> <dfn class="local col3 decl" id="3kind" title='kind' data-type='int' data-ref="3kind">kind</dfn>, <a class="typedef" href="#HIDEventFunc" title='HIDEventFunc' data-type='void (*)(HIDState *)' data-ref="HIDEventFunc">HIDEventFunc</a> <dfn class="local col4 decl" id="4event" title='event' data-type='HIDEventFunc' data-ref="4event">event</dfn>);</td></tr>
+<tr><th id="53">53</th><td><em>void</em> <dfn class="decl" id="hid_reset" title='hid_reset' data-ref="hid_reset">hid_reset</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col5 decl" id="5hs" title='hs' data-type='HIDState *' data-ref="5hs">hs</dfn>);</td></tr>
+<tr><th id="54">54</th><td><em>void</em> <dfn class="decl" id="hid_free" title='hid_free' data-ref="hid_free">hid_free</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col6 decl" id="6hs" title='hs' data-type='HIDState *' data-ref="6hs">hs</dfn>);</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="hid_has_events" title='hid_has_events' data-ref="hid_has_events">hid_has_events</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col7 decl" id="7hs" title='hs' data-type='HIDState *' data-ref="7hs">hs</dfn>);</td></tr>
+<tr><th id="57">57</th><td><em>void</em> <dfn class="decl" id="hid_set_next_idle" title='hid_set_next_idle' data-ref="hid_set_next_idle">hid_set_next_idle</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col8 decl" id="8hs" title='hs' data-type='HIDState *' data-ref="8hs">hs</dfn>);</td></tr>
+<tr><th id="58">58</th><td><em>void</em> <dfn class="decl" id="hid_pointer_activate" title='hid_pointer_activate' data-ref="hid_pointer_activate">hid_pointer_activate</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col9 decl" id="9hs" title='hs' data-type='HIDState *' data-ref="9hs">hs</dfn>);</td></tr>
+<tr><th id="59">59</th><td><em>int</em> <dfn class="decl" id="hid_pointer_poll" title='hid_pointer_poll' data-ref="hid_pointer_poll">hid_pointer_poll</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col0 decl" id="10hs" title='hs' data-type='HIDState *' data-ref="10hs">hs</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="11buf" title='buf' data-type='uint8_t *' data-ref="11buf">buf</dfn>, <em>int</em> <dfn class="local col2 decl" id="12len" title='len' data-type='int' data-ref="12len">len</dfn>);</td></tr>
+<tr><th id="60">60</th><td><em>int</em> <dfn class="decl" id="hid_keyboard_poll" title='hid_keyboard_poll' data-ref="hid_keyboard_poll">hid_keyboard_poll</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col3 decl" id="13hs" title='hs' data-type='HIDState *' data-ref="13hs">hs</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col4 decl" id="14buf" title='buf' data-type='uint8_t *' data-ref="14buf">buf</dfn>, <em>int</em> <dfn class="local col5 decl" id="15len" title='len' data-type='int' data-ref="15len">len</dfn>);</td></tr>
+<tr><th id="61">61</th><td><em>int</em> <dfn class="decl" id="hid_keyboard_write" title='hid_keyboard_write' data-ref="hid_keyboard_write">hid_keyboard_write</dfn>(<a class="typedef" href="#HIDState" title='HIDState' data-type='struct HIDState' data-ref="HIDState">HIDState</a> *<dfn class="local col6 decl" id="16hs" title='hs' data-type='HIDState *' data-ref="16hs">hs</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="17buf" title='buf' data-type='uint8_t *' data-ref="17buf">buf</dfn>, <em>int</em> <dfn class="local col8 decl" id="18len" title='len' data-type='int' data-ref="18len">len</dfn>);</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_hid_keyboard_device" title='vmstate_hid_keyboard_device' data-ref="vmstate_hid_keyboard_device">vmstate_hid_keyboard_device</dfn>;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_HID_KEYBOARD_DEVICE" data-ref="_M/VMSTATE_HID_KEYBOARD_DEVICE">VMSTATE_HID_KEYBOARD_DEVICE</dfn>(_field, _state) {                \</u></td></tr>
+<tr><th id="66">66</th><td><u>    .name       = (stringify(_field)),                               \</u></td></tr>
+<tr><th id="67">67</th><td><u>    .size       = sizeof(HIDState),                                  \</u></td></tr>
+<tr><th id="68">68</th><td><u>    .vmsd       = &amp;vmstate_hid_keyboard_device,                      \</u></td></tr>
+<tr><th id="69">69</th><td><u>    .flags      = VMS_STRUCT,                                        \</u></td></tr>
+<tr><th id="70">70</th><td><u>    .offset     = vmstate_offset_value(_state, _field, HIDState),    \</u></td></tr>
+<tr><th id="71">71</th><td><u>}</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_hid_ptr_device" title='vmstate_hid_ptr_device' data-ref="vmstate_hid_ptr_device">vmstate_hid_ptr_device</dfn>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_HID_POINTER_DEVICE" data-ref="_M/VMSTATE_HID_POINTER_DEVICE">VMSTATE_HID_POINTER_DEVICE</dfn>(_field, _state) {                 \</u></td></tr>
+<tr><th id="76">76</th><td><u>    .name       = (stringify(_field)),                               \</u></td></tr>
+<tr><th id="77">77</th><td><u>    .size       = sizeof(HIDState),                                  \</u></td></tr>
+<tr><th id="78">78</th><td><u>    .vmsd       = &amp;vmstate_hid_ptr_device,                           \</u></td></tr>
+<tr><th id="79">79</th><td><u>    .flags      = VMS_STRUCT,                                        \</u></td></tr>
+<tr><th id="80">80</th><td><u>    .offset     = vmstate_offset_value(_state, _field, HIDState),    \</u></td></tr>
+<tr><th id="81">81</th><td><u>}</u></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><u>#<span data-ppcond="1">endif</span> /* QEMU_HID_H */</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/bt/hid.c.html'>codebrowser/hw/bt/hid.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

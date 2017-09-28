@@ -1,0 +1,23 @@
+<def f='codebrowser/util/qemu-coroutine-lock.c' l='171' ll='174'/>
+<size>16</size>
+<doc f='codebrowser/util/qemu-coroutine-lock.c' l='152'>/* The wait records are handled with a multiple-producer, single-consumer
+ * lock-free queue.  There cannot be two concurrent pop_waiter() calls
+ * because pop_waiter() can only be called while mutex-&gt;handoff is zero.
+ * This can happen in three cases:
+ * - in qemu_co_mutex_unlock, before the hand-off protocol has started.
+ *   In this case, qemu_co_mutex_lock will see mutex-&gt;handoff == 0 and
+ *   not take part in the handoff.
+ * - in qemu_co_mutex_lock, if it steals the hand-off responsibility from
+ *   qemu_co_mutex_unlock.  In this case, qemu_co_mutex_unlock will fail
+ *   the cmpxchg (it will see either 0 or the next sequence value) and
+ *   exit.  The next hand-off cannot begin until qemu_co_mutex_lock has
+ *   woken up someone.
+ * - in qemu_co_mutex_unlock, if it takes the hand-off token itself.
+ *   In this case another iteration starts with mutex-&gt;handoff == 0;
+ *   a concurrent qemu_co_mutex_lock will fail the cmpxchg, and
+ *   qemu_co_mutex_unlock will go back to case (1).
+ *
+ * The following functions manage this queue.
+ */</doc>
+<mbr r='CoWaitRecord::co' o='0' t='Coroutine *'/>
+<mbr r='CoWaitRecord::next' o='64' t='struct (anonymous struct at /home/jon/workspace/qemu/util/qemu-coroutine-lock.c:173:5)'/>

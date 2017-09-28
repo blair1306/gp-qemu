@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>event_notifier.h source code [codebrowser/include/qemu/event_notifier.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="EventNotifier "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/event_notifier.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='event_notifier.h.html'>event_notifier.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * event notifier support</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Red Hat, Inc. 2010</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Michael S. Tsirkin &lt;mst@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#<span data-ppcond="13">ifndef</span> <span class="macro" data-ref="_M/QEMU_EVENT_NOTIFIER_H">QEMU_EVENT_NOTIFIER_H</span></u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/QEMU_EVENT_NOTIFIER_H" data-ref="_M/QEMU_EVENT_NOTIFIER_H">QEMU_EVENT_NOTIFIER_H</dfn></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="18">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="19">19</th><td><u>#include &lt;windows.h&gt;</u></td></tr>
+<tr><th id="20">20</th><td><u>#<span data-ppcond="18">endif</span></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>struct</b> <dfn class="type def" id="EventNotifier" title='EventNotifier' data-ref="EventNotifier">EventNotifier</dfn> {</td></tr>
+<tr><th id="23">23</th><td><u>#<span data-ppcond="23">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="24">24</th><td>    HANDLE event;</td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="23">else</span></u></td></tr>
+<tr><th id="26">26</th><td>    <em>int</em> <dfn class="decl" id="EventNotifier::rfd" title='EventNotifier::rfd' data-ref="EventNotifier::rfd">rfd</dfn>;</td></tr>
+<tr><th id="27">27</th><td>    <em>int</em> <dfn class="decl" id="EventNotifier::wfd" title='EventNotifier::wfd' data-ref="EventNotifier::wfd">wfd</dfn>;</td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="23">endif</span></u></td></tr>
+<tr><th id="29">29</th><td>};</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="EventNotifierHandler" title='EventNotifierHandler' data-type='void (EventNotifier *)' data-ref="EventNotifierHandler">EventNotifierHandler</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *);</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><em>int</em> <dfn class="decl" id="event_notifier_init" title='event_notifier_init' data-ref="event_notifier_init">event_notifier_init</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *, <em>int</em> <dfn class="local col5 decl" id="7095active" title='active' data-type='int' data-ref="7095active">active</dfn>);</td></tr>
+<tr><th id="34">34</th><td><em>void</em> <dfn class="decl" id="event_notifier_cleanup" title='event_notifier_cleanup' data-ref="event_notifier_cleanup">event_notifier_cleanup</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *);</td></tr>
+<tr><th id="35">35</th><td><em>int</em> <dfn class="decl" id="event_notifier_set" title='event_notifier_set' data-ref="event_notifier_set">event_notifier_set</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *);</td></tr>
+<tr><th id="36">36</th><td><em>int</em> <dfn class="decl" id="event_notifier_test_and_clear" title='event_notifier_test_and_clear' data-ref="event_notifier_test_and_clear">event_notifier_test_and_clear</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *);</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="38">ifdef</span> <a class="macro" href="../../config-host.h.html#11" data-ref="_M/CONFIG_POSIX">CONFIG_POSIX</a></u></td></tr>
+<tr><th id="39">39</th><td><em>void</em> <dfn class="decl" id="event_notifier_init_fd" title='event_notifier_init_fd' data-ref="event_notifier_init_fd">event_notifier_init_fd</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *, <em>int</em> <dfn class="local col6 decl" id="7096fd" title='fd' data-type='int' data-ref="7096fd">fd</dfn>);</td></tr>
+<tr><th id="40">40</th><td><em>int</em> <dfn class="decl" id="event_notifier_get_fd" title='event_notifier_get_fd' data-ref="event_notifier_get_fd">event_notifier_get_fd</dfn>(<em>const</em> <a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *);</td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="38">else</span></u></td></tr>
+<tr><th id="42">42</th><td>HANDLE event_notifier_get_handle(EventNotifier *);</td></tr>
+<tr><th id="43">43</th><td><u>#<span data-ppcond="38">endif</span></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="13">endif</span></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

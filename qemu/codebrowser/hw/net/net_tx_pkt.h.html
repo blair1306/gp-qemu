@@ -1,0 +1,208 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>net_tx_pkt.h source code [codebrowser/hw/net/net_tx_pkt.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/net/net_tx_pkt.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>net</a>/<a href='net_tx_pkt.h.html'>net_tx_pkt.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU TX packets abstraction</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2012 Ravello Systems LTD (<a href="http://ravellosystems.com">http://ravellosystems.com</a>)</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Developed by Daynix Computing LTD (<a href="http://www.daynix.com">http://www.daynix.com</a>)</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Authors:</i></td></tr>
+<tr><th id="9">9</th><td><i> * Dmitry Fleytman &lt;dmitry@daynix.com&gt;</i></td></tr>
+<tr><th id="10">10</th><td><i> * Tamir Shomer &lt;tamirs@daynix.com&gt;</i></td></tr>
+<tr><th id="11">11</th><td><i> * Yan Vugenfirer &lt;yan@daynix.com&gt;</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="14">14</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="18">ifndef</span> <span class="macro" data-ref="_M/NET_TX_PKT_H">NET_TX_PKT_H</span></u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/NET_TX_PKT_H" data-ref="_M/NET_TX_PKT_H">NET_TX_PKT_H</dfn></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../../include/net/eth.h.html">"net/eth.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../include/exec/hwaddr.h.html">"exec/hwaddr.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><i>/* define to enable packet dump functions */</i></td></tr>
+<tr><th id="25">25</th><td><i>/*#define NET_TX_PKT_DEBUG*/</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><b>struct</b> <dfn class="type" id="NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</dfn>;</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * Init function for tx packet functionality</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet pointer</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> *<span class="command"> @pci</span>_dev:        PCI device processing this packet</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> *<span class="command"> @max</span>_frags:      max tx ip fragments</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> *<span class="command"> @has</span>_virt_hdr:   device uses virtio header.</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="37">37</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_init" title='net_tx_pkt_init' data-ref="net_tx_pkt_init">net_tx_pkt_init</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> **<dfn class="local col1 decl" id="1pkt" title='pkt' data-type='struct NetTxPkt **' data-ref="1pkt">pkt</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col2 decl" id="2pci_dev" title='pci_dev' data-type='PCIDevice *' data-ref="2pci_dev">pci_dev</dfn>,</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="3max_frags" title='max_frags' data-type='uint32_t' data-ref="3max_frags">max_frags</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="4has_virt_hdr" title='has_virt_hdr' data-type='_Bool' data-ref="4has_virt_hdr">has_virt_hdr</dfn>);</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * Clean all tx packet resources.</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet.</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="45">45</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_uninit" title='net_tx_pkt_uninit' data-ref="net_tx_pkt_uninit">net_tx_pkt_uninit</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col5 decl" id="5pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="5pkt">pkt</dfn>);</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> * get virtio header</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> * <span class="command">@ret</span>:<span class="verb">            virtio header</span></i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="53">53</th><td><b>struct</b> <a class="type" href="../../include/standard-headers/linux/virtio_net.h.html#virtio_net_hdr" title='virtio_net_hdr' data-ref="virtio_net_hdr">virtio_net_hdr</a> *<dfn class="decl" id="net_tx_pkt_get_vhdr" title='net_tx_pkt_get_vhdr' data-ref="net_tx_pkt_get_vhdr">net_tx_pkt_get_vhdr</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col6 decl" id="6pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="6pkt">pkt</dfn>);</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * build virtio header (will be stored in module context)</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> *<span class="command"> @tso</span>_enable:     TSO enabled</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> *<span class="command"> @csum</span>_enable:    CSO enabled</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> *<span class="command"> @gso</span>_size:       MSS size for TSO</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="64">64</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_build_vheader" title='net_tx_pkt_build_vheader' data-ref="net_tx_pkt_build_vheader">net_tx_pkt_build_vheader</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col7 decl" id="7pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="7pkt">pkt</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="8tso_enable" title='tso_enable' data-type='_Bool' data-ref="8tso_enable">tso_enable</dfn>,</td></tr>
+<tr><th id="65">65</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="9csum_enable" title='csum_enable' data-type='_Bool' data-ref="9csum_enable">csum_enable</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10gso_size" title='gso_size' data-type='uint32_t' data-ref="10gso_size">gso_size</dfn>);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc">* updates vlan tag, and adds vlan header with custom ethernet type</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc">* in case it is missing.</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc">*</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc">*<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc">*<span class="command"> @vlan</span>:           VLAN tag</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc">*<span class="command"> @vlan</span>_ethtype:   VLAN header Ethernet type</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc">*</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc">*/</i></td></tr>
+<tr><th id="76">76</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_setup_vlan_header_ex" title='net_tx_pkt_setup_vlan_header_ex' data-ref="net_tx_pkt_setup_vlan_header_ex">net_tx_pkt_setup_vlan_header_ex</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col1 decl" id="11pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="11pkt">pkt</dfn>,</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col2 decl" id="12vlan" title='vlan' data-type='uint16_t' data-ref="12vlan">vlan</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col3 decl" id="13vlan_ethtype" title='vlan_ethtype' data-type='uint16_t' data-ref="13vlan_ethtype">vlan_ethtype</dfn>);</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc">* updates vlan tag, and adds vlan header in case it is missing</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc">*</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc">*<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc">*<span class="command"> @vlan</span>:           VLAN tag</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc">*</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc">*/</i></td></tr>
+<tr><th id="86">86</th><td><em>static</em> <b>inline</b> <em>void</em></td></tr>
+<tr><th id="87">87</th><td><dfn class="decl def" id="net_tx_pkt_setup_vlan_header" title='net_tx_pkt_setup_vlan_header' data-ref="net_tx_pkt_setup_vlan_header">net_tx_pkt_setup_vlan_header</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col4 decl" id="14pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="14pkt">pkt</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col5 decl" id="15vlan" title='vlan' data-type='uint16_t' data-ref="15vlan">vlan</dfn>)</td></tr>
+<tr><th id="88">88</th><td>{</td></tr>
+<tr><th id="89">89</th><td>    <a class="ref" href="#net_tx_pkt_setup_vlan_header_ex" title='net_tx_pkt_setup_vlan_header_ex' data-ref="net_tx_pkt_setup_vlan_header_ex">net_tx_pkt_setup_vlan_header_ex</a>(<a class="local col4 ref" href="#14pkt" title='pkt' data-ref="14pkt">pkt</a>, <a class="local col5 ref" href="#15vlan" title='vlan' data-ref="15vlan">vlan</a>, <a class="macro" href="../../include/net/eth.h.html#210" title="(0x8100)" data-ref="_M/ETH_P_VLAN">ETH_P_VLAN</a>);</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * populate data fragment into pkt context.</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @pa</span>:             physical address of fragment</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *<span class="command"> @len</span>:            length of fragment</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="100">100</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="net_tx_pkt_add_raw_fragment" title='net_tx_pkt_add_raw_fragment' data-ref="net_tx_pkt_add_raw_fragment">net_tx_pkt_add_raw_fragment</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col6 decl" id="16pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="16pkt">pkt</dfn>, <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col7 decl" id="17pa" title='pa' data-type='hwaddr' data-ref="17pa">pa</dfn>,</td></tr>
+<tr><th id="101">101</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col8 decl" id="18len" title='len' data-type='size_t' data-ref="18len">len</dfn>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * Fix ip header fields and calculate IP header and pseudo header checksums.</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="109">109</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_update_ip_checksums" title='net_tx_pkt_update_ip_checksums' data-ref="net_tx_pkt_update_ip_checksums">net_tx_pkt_update_ip_checksums</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col9 decl" id="19pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="19pkt">pkt</dfn>);</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> * Calculate the IP header checksum.</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="117">117</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_update_ip_hdr_checksum" title='net_tx_pkt_update_ip_hdr_checksum' data-ref="net_tx_pkt_update_ip_hdr_checksum">net_tx_pkt_update_ip_hdr_checksum</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col0 decl" id="20pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="20pkt">pkt</dfn>);</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> * get length of all populated data.</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> * <span class="command">@ret</span>:<span class="verb">            total data length</span></i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="126">126</th><td><span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="net_tx_pkt_get_total_len" title='net_tx_pkt_get_total_len' data-ref="net_tx_pkt_get_total_len">net_tx_pkt_get_total_len</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col1 decl" id="21pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="21pkt">pkt</dfn>);</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> * get packet type</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * <span class="command">@ret</span>:<span class="verb">            packet type</span></i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="135">135</th><td><a class="typedef" href="../../include/net/eth.h.html#eth_pkt_types_e" title='eth_pkt_types_e' data-type='enum eth_pkt_types_e' data-ref="eth_pkt_types_e">eth_pkt_types_e</a> <dfn class="decl" id="net_tx_pkt_get_packet_type" title='net_tx_pkt_get_packet_type' data-ref="net_tx_pkt_get_packet_type">net_tx_pkt_get_packet_type</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col2 decl" id="22pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="22pkt">pkt</dfn>);</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> * prints packet data if debug is enabled</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="140">140</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="141">141</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="143">143</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_dump" title='net_tx_pkt_dump' data-ref="net_tx_pkt_dump">net_tx_pkt_dump</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col3 decl" id="23pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="23pkt">pkt</dfn>);</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> * reset tx packet private context (needed to be called between packets)</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="151">151</th><td><em>void</em> <dfn class="decl" id="net_tx_pkt_reset" title='net_tx_pkt_reset' data-ref="net_tx_pkt_reset">net_tx_pkt_reset</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col4 decl" id="24pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="24pkt">pkt</dfn>);</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * Send packet to qemu. handles sw offloads if vhdr is not supported.</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> *<span class="command"> @nc</span><span class="arg">:</span>             NetClientState</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> * <span class="command">@ret</span>:<span class="verb">            operation result</span></i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="161">161</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="net_tx_pkt_send" title='net_tx_pkt_send' data-ref="net_tx_pkt_send">net_tx_pkt_send</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col5 decl" id="25pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="25pkt">pkt</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#NetClientState" title='NetClientState' data-type='struct NetClientState' data-ref="NetClientState">NetClientState</a> *<dfn class="local col6 decl" id="26nc" title='nc' data-type='NetClientState *' data-ref="26nc">nc</dfn>);</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc">* Redirect packet directly to receive path (emulate loopback phy).</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc">* Handles sw offloads if vhdr is not supported.</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc">*</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc">*<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc">*<span class="command"> @nc</span><span class="arg">:</span>             NetClientState</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc">* <span class="command">@ret</span>:<span class="verb">            operation result</span></i></td></tr>
+<tr><th id="170">170</th><td><i class="doc">*</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc">*/</i></td></tr>
+<tr><th id="172">172</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="net_tx_pkt_send_loopback" title='net_tx_pkt_send_loopback' data-ref="net_tx_pkt_send_loopback">net_tx_pkt_send_loopback</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col7 decl" id="27pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="27pkt">pkt</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#NetClientState" title='NetClientState' data-type='struct NetClientState' data-ref="NetClientState">NetClientState</a> *<dfn class="local col8 decl" id="28nc" title='nc' data-type='NetClientState *' data-ref="28nc">nc</dfn>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> * parse raw packet data and analyze offload requirements.</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> *<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="180">180</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="net_tx_pkt_parse" title='net_tx_pkt_parse' data-ref="net_tx_pkt_parse">net_tx_pkt_parse</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col9 decl" id="29pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="29pkt">pkt</dfn>);</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc">* indicates if there are data fragments held by this packet object.</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc">*</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc">*<span class="command"> @pkt</span>:            packet</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc">*</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc">*/</i></td></tr>
+<tr><th id="188">188</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="net_tx_pkt_has_fragments" title='net_tx_pkt_has_fragments' data-ref="net_tx_pkt_has_fragments">net_tx_pkt_has_fragments</dfn>(<b>struct</b> <a class="type" href="#NetTxPkt" title='NetTxPkt' data-ref="NetTxPkt">NetTxPkt</a> *<dfn class="local col0 decl" id="30pkt" title='pkt' data-type='struct NetTxPkt *' data-ref="30pkt">pkt</dfn>);</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><u>#<span data-ppcond="18">endif</span></u></td></tr>
+<tr><th id="191">191</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='e1000e_core.c.html'>codebrowser/hw/net/e1000e_core.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

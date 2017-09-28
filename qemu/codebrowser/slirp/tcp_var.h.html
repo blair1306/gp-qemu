@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tcp_var.h source code [codebrowser/slirp/tcp_var.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="tcpcb "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/tcp_var.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='tcp_var.h.html'>tcp_var.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1982, 1986, 1993, 1994</i></td></tr>
+<tr><th id="3">3</th><td><i> *	The Regents of the University of California.  All rights reserved.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="6">6</th><td><i> * modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="7">7</th><td><i> * are met:</i></td></tr>
+<tr><th id="8">8</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="9">9</th><td><i> *    notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="10">10</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="11">11</th><td><i> *    notice, this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="12">12</th><td><i> *    documentation and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="13">13</th><td><i> * 3. Neither the name of the University nor the names of its contributors</i></td></tr>
+<tr><th id="14">14</th><td><i> *    may be used to endorse or promote products derived from this software</i></td></tr>
+<tr><th id="15">15</th><td><i> *    without specific prior written permission.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND</i></td></tr>
+<tr><th id="18">18</th><td><i> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</i></td></tr>
+<tr><th id="19">19</th><td><i> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</i></td></tr>
+<tr><th id="20">20</th><td><i> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE</i></td></tr>
+<tr><th id="21">21</th><td><i> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</i></td></tr>
+<tr><th id="22">22</th><td><i> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</i></td></tr>
+<tr><th id="23">23</th><td><i> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</i></td></tr>
+<tr><th id="24">24</th><td><i> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</i></td></tr>
+<tr><th id="25">25</th><td><i> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</i></td></tr>
+<tr><th id="26">26</th><td><i> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</i></td></tr>
+<tr><th id="27">27</th><td><i> * SUCH DAMAGE.</i></td></tr>
+<tr><th id="28">28</th><td><i> *</i></td></tr>
+<tr><th id="29">29</th><td><i> *	@(#)tcp_var.h	8.3 (Berkeley) 4/10/94</i></td></tr>
+<tr><th id="30">30</th><td><i> * tcp_var.h,v 1.3 1994/08/21 05:27:39 paul Exp</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="33">ifndef</span> <span class="macro" data-ref="_M/TCP_VAR_H">TCP_VAR_H</span></u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/TCP_VAR_H" data-ref="_M/TCP_VAR_H">TCP_VAR_H</dfn></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="tcpip.h.html">"tcpip.h"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="tcp_timer.h.html">"tcp_timer.h"</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><i>/*</i></td></tr>
+<tr><th id="40">40</th><td><i> * Tcp control block, one per tcp; fields:</i></td></tr>
+<tr><th id="41">41</th><td><i> */</i></td></tr>
+<tr><th id="42">42</th><td><b>struct</b> <dfn class="type def" id="tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</dfn> {</td></tr>
+<tr><th id="43">43</th><td>	<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="decl" id="tcpcb::seg_next" title='tcpcb::seg_next' data-ref="tcpcb::seg_next">seg_next</dfn>;	<i>/* sequencing queue */</i></td></tr>
+<tr><th id="44">44</th><td>	<b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="decl" id="tcpcb::seg_prev" title='tcpcb::seg_prev' data-ref="tcpcb::seg_prev">seg_prev</dfn>;</td></tr>
+<tr><th id="45">45</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_state" title='tcpcb::t_state' data-ref="tcpcb::t_state">t_state</dfn>;		<i>/* state of this connection */</i></td></tr>
+<tr><th id="46">46</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_timer" title='tcpcb::t_timer' data-ref="tcpcb::t_timer">t_timer</dfn>[<a class="macro" href="tcp_timer.h.html#40" title="4" data-ref="_M/TCPT_NTIMERS">TCPT_NTIMERS</a>];	<i>/* tcp timers */</i></td></tr>
+<tr><th id="47">47</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_rxtshift" title='tcpcb::t_rxtshift' data-ref="tcpcb::t_rxtshift">t_rxtshift</dfn>;		<i>/* log(2) of rexmt exp. backoff */</i></td></tr>
+<tr><th id="48">48</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_rxtcur" title='tcpcb::t_rxtcur' data-ref="tcpcb::t_rxtcur">t_rxtcur</dfn>;		<i>/* current retransmit value */</i></td></tr>
+<tr><th id="49">49</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_dupacks" title='tcpcb::t_dupacks' data-ref="tcpcb::t_dupacks">t_dupacks</dfn>;		<i>/* consecutive dup acks recd */</i></td></tr>
+<tr><th id="50">50</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_short" title='u_short' data-type='__u_short' data-ref="u_short">u_short</a>	<dfn class="decl" id="tcpcb::t_maxseg" title='tcpcb::t_maxseg' data-ref="tcpcb::t_maxseg">t_maxseg</dfn>;		<i>/* maximum segment size */</i></td></tr>
+<tr><th id="51">51</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="tcpcb::t_force" title='tcpcb::t_force' data-ref="tcpcb::t_force">t_force</dfn>;		<i>/* 1 if forcing out a byte */</i></td></tr>
+<tr><th id="52">52</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_short" title='u_short' data-type='__u_short' data-ref="u_short">u_short</a>	<dfn class="decl" id="tcpcb::t_flags" title='tcpcb::t_flags' data-ref="tcpcb::t_flags">t_flags</dfn>;</td></tr>
+<tr><th id="53">53</th><td><u>#define	<dfn class="macro" id="_M/TF_ACKNOW" data-ref="_M/TF_ACKNOW">TF_ACKNOW</dfn>	0x0001		/* ack peer immediately */</u></td></tr>
+<tr><th id="54">54</th><td><u>#define	<dfn class="macro" id="_M/TF_DELACK" data-ref="_M/TF_DELACK">TF_DELACK</dfn>	0x0002		/* ack, but try to delay it */</u></td></tr>
+<tr><th id="55">55</th><td><u>#define	<dfn class="macro" id="_M/TF_NODELAY" data-ref="_M/TF_NODELAY">TF_NODELAY</dfn>	0x0004		/* don't delay packets to coalesce */</u></td></tr>
+<tr><th id="56">56</th><td><u>#define	<dfn class="macro" id="_M/TF_NOOPT" data-ref="_M/TF_NOOPT">TF_NOOPT</dfn>	0x0008		/* don't use tcp options */</u></td></tr>
+<tr><th id="57">57</th><td><u>#define	<dfn class="macro" id="_M/TF_SENTFIN" data-ref="_M/TF_SENTFIN">TF_SENTFIN</dfn>	0x0010		/* have sent FIN */</u></td></tr>
+<tr><th id="58">58</th><td><u>#define	<dfn class="macro" id="_M/TF_REQ_SCALE" data-ref="_M/TF_REQ_SCALE">TF_REQ_SCALE</dfn>	0x0020		/* have/will request window scaling */</u></td></tr>
+<tr><th id="59">59</th><td><u>#define	<dfn class="macro" id="_M/TF_RCVD_SCALE" data-ref="_M/TF_RCVD_SCALE">TF_RCVD_SCALE</dfn>	0x0040		/* other side has requested scaling */</u></td></tr>
+<tr><th id="60">60</th><td><u>#define	<dfn class="macro" id="_M/TF_REQ_TSTMP" data-ref="_M/TF_REQ_TSTMP">TF_REQ_TSTMP</dfn>	0x0080		/* have/will request timestamps */</u></td></tr>
+<tr><th id="61">61</th><td><u>#define	<dfn class="macro" id="_M/TF_RCVD_TSTMP" data-ref="_M/TF_RCVD_TSTMP">TF_RCVD_TSTMP</dfn>	0x0100		/* a timestamp was received in SYN */</u></td></tr>
+<tr><th id="62">62</th><td><u>#define	<dfn class="macro" id="_M/TF_SACK_PERMIT" data-ref="_M/TF_SACK_PERMIT">TF_SACK_PERMIT</dfn>	0x0200		/* other side said I could SACK */</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td>	<b>struct</b>	<a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> <dfn class="decl" id="tcpcb::t_template" title='tcpcb::t_template' data-ref="tcpcb::t_template">t_template</dfn>;    <i>/* static skeletal packet for xmit */</i></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>	<b>struct</b>	<a class="type" href="socket.h.html#socket" title='socket' data-ref="socket" id="socket"><a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a></a> *<dfn class="decl" id="tcpcb::t_socket" title='tcpcb::t_socket' data-ref="tcpcb::t_socket">t_socket</dfn>;		<i>/* back pointer to socket */</i></td></tr>
+<tr><th id="67">67</th><td><i>/*</i></td></tr>
+<tr><th id="68">68</th><td><i> * The following fields are used as in the protocol specification.</i></td></tr>
+<tr><th id="69">69</th><td><i> * See RFC783, Dec. 1981, page 21.</i></td></tr>
+<tr><th id="70">70</th><td><i> */</i></td></tr>
+<tr><th id="71">71</th><td><i>/* send sequence variables */</i></td></tr>
+<tr><th id="72">72</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_una" title='tcpcb::snd_una' data-ref="tcpcb::snd_una">snd_una</dfn>;		<i>/* send unacknowledged */</i></td></tr>
+<tr><th id="73">73</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_nxt" title='tcpcb::snd_nxt' data-ref="tcpcb::snd_nxt">snd_nxt</dfn>;		<i>/* send next */</i></td></tr>
+<tr><th id="74">74</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_up" title='tcpcb::snd_up' data-ref="tcpcb::snd_up">snd_up</dfn>;			<i>/* send urgent pointer */</i></td></tr>
+<tr><th id="75">75</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_wl1" title='tcpcb::snd_wl1' data-ref="tcpcb::snd_wl1">snd_wl1</dfn>;		<i>/* window update seg seq number */</i></td></tr>
+<tr><th id="76">76</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_wl2" title='tcpcb::snd_wl2' data-ref="tcpcb::snd_wl2">snd_wl2</dfn>;		<i>/* window update seg ack number */</i></td></tr>
+<tr><th id="77">77</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::iss" title='tcpcb::iss' data-ref="tcpcb::iss">iss</dfn>;			<i>/* initial send sequence number */</i></td></tr>
+<tr><th id="78">78</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tcpcb::snd_wnd" title='tcpcb::snd_wnd' data-ref="tcpcb::snd_wnd">snd_wnd</dfn>;		<i>/* send window */</i></td></tr>
+<tr><th id="79">79</th><td><i>/* receive sequence variables */</i></td></tr>
+<tr><th id="80">80</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tcpcb::rcv_wnd" title='tcpcb::rcv_wnd' data-ref="tcpcb::rcv_wnd">rcv_wnd</dfn>;		<i>/* receive window */</i></td></tr>
+<tr><th id="81">81</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::rcv_nxt" title='tcpcb::rcv_nxt' data-ref="tcpcb::rcv_nxt">rcv_nxt</dfn>;		<i>/* receive next */</i></td></tr>
+<tr><th id="82">82</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::rcv_up" title='tcpcb::rcv_up' data-ref="tcpcb::rcv_up">rcv_up</dfn>;			<i>/* receive urgent pointer */</i></td></tr>
+<tr><th id="83">83</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::irs" title='tcpcb::irs' data-ref="tcpcb::irs">irs</dfn>;			<i>/* initial receive sequence number */</i></td></tr>
+<tr><th id="84">84</th><td><i>/*</i></td></tr>
+<tr><th id="85">85</th><td><i> * Additional variables for this implementation.</i></td></tr>
+<tr><th id="86">86</th><td><i> */</i></td></tr>
+<tr><th id="87">87</th><td><i>/* receive variables */</i></td></tr>
+<tr><th id="88">88</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::rcv_adv" title='tcpcb::rcv_adv' data-ref="tcpcb::rcv_adv">rcv_adv</dfn>;		<i>/* advertised window */</i></td></tr>
+<tr><th id="89">89</th><td><i>/* retransmit variables */</i></td></tr>
+<tr><th id="90">90</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::snd_max" title='tcpcb::snd_max' data-ref="tcpcb::snd_max">snd_max</dfn>;		<i>/* highest sequence number sent;</i></td></tr>
+<tr><th id="91">91</th><td><i>					 * used to recognize retransmits</i></td></tr>
+<tr><th id="92">92</th><td><i>					 */</i></td></tr>
+<tr><th id="93">93</th><td><i>/* congestion control (for slow start, source quench, retransmit after loss) */</i></td></tr>
+<tr><th id="94">94</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tcpcb::snd_cwnd" title='tcpcb::snd_cwnd' data-ref="tcpcb::snd_cwnd">snd_cwnd</dfn>;		<i>/* congestion-controlled window */</i></td></tr>
+<tr><th id="95">95</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tcpcb::snd_ssthresh" title='tcpcb::snd_ssthresh' data-ref="tcpcb::snd_ssthresh">snd_ssthresh</dfn>;		<i>/* snd_cwnd size threshold for</i></td></tr>
+<tr><th id="96">96</th><td><i>					 * for slow start exponential to</i></td></tr>
+<tr><th id="97">97</th><td><i>					 * linear switch</i></td></tr>
+<tr><th id="98">98</th><td><i>					 */</i></td></tr>
+<tr><th id="99">99</th><td><i>/*</i></td></tr>
+<tr><th id="100">100</th><td><i> * transmit timing stuff.  See below for scale of srtt and rttvar.</i></td></tr>
+<tr><th id="101">101</th><td><i> * "Variance" is actually smoothed difference.</i></td></tr>
+<tr><th id="102">102</th><td><i> */</i></td></tr>
+<tr><th id="103">103</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_idle" title='tcpcb::t_idle' data-ref="tcpcb::t_idle">t_idle</dfn>;			<i>/* inactivity time */</i></td></tr>
+<tr><th id="104">104</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_rtt" title='tcpcb::t_rtt' data-ref="tcpcb::t_rtt">t_rtt</dfn>;			<i>/* round trip time */</i></td></tr>
+<tr><th id="105">105</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::t_rtseq" title='tcpcb::t_rtseq' data-ref="tcpcb::t_rtseq">t_rtseq</dfn>;		<i>/* sequence number being timed */</i></td></tr>
+<tr><th id="106">106</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_srtt" title='tcpcb::t_srtt' data-ref="tcpcb::t_srtt">t_srtt</dfn>;			<i>/* smoothed round-trip time */</i></td></tr>
+<tr><th id="107">107</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_rttvar" title='tcpcb::t_rttvar' data-ref="tcpcb::t_rttvar">t_rttvar</dfn>;		<i>/* variance in round-trip time */</i></td></tr>
+<tr><th id="108">108</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_short" title='u_short' data-type='__u_short' data-ref="u_short">u_short</a>	<dfn class="decl" id="tcpcb::t_rttmin" title='tcpcb::t_rttmin' data-ref="tcpcb::t_rttmin">t_rttmin</dfn>;		<i>/* minimum rtt allowed */</i></td></tr>
+<tr><th id="109">109</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tcpcb::max_sndwnd" title='tcpcb::max_sndwnd' data-ref="tcpcb::max_sndwnd">max_sndwnd</dfn>;		<i>/* largest window peer has offered */</i></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><i>/* out-of-band data */</i></td></tr>
+<tr><th id="112">112</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>	<dfn class="decl" id="tcpcb::t_oobflags" title='tcpcb::t_oobflags' data-ref="tcpcb::t_oobflags">t_oobflags</dfn>;		<i>/* have some */</i></td></tr>
+<tr><th id="113">113</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>	<dfn class="decl" id="tcpcb::t_iobc" title='tcpcb::t_iobc' data-ref="tcpcb::t_iobc">t_iobc</dfn>;			<i>/* input character */</i></td></tr>
+<tr><th id="114">114</th><td><u>#define	<dfn class="macro" id="_M/TCPOOB_HAVEDATA" data-ref="_M/TCPOOB_HAVEDATA">TCPOOB_HAVEDATA</dfn>	0x01</u></td></tr>
+<tr><th id="115">115</th><td><u>#define	<dfn class="macro" id="_M/TCPOOB_HADDATA" data-ref="_M/TCPOOB_HADDATA">TCPOOB_HADDATA</dfn>	0x02</u></td></tr>
+<tr><th id="116">116</th><td>	<em>short</em>	<dfn class="decl" id="tcpcb::t_softerror" title='tcpcb::t_softerror' data-ref="tcpcb::t_softerror">t_softerror</dfn>;		<i>/* possible error not yet reported */</i></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><i>/* RFC 1323 variables */</i></td></tr>
+<tr><th id="119">119</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a>	<dfn class="decl" id="tcpcb::snd_scale" title='tcpcb::snd_scale' data-ref="tcpcb::snd_scale">snd_scale</dfn>;		<i>/* window scaling for send window */</i></td></tr>
+<tr><th id="120">120</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a>	<dfn class="decl" id="tcpcb::rcv_scale" title='tcpcb::rcv_scale' data-ref="tcpcb::rcv_scale">rcv_scale</dfn>;		<i>/* window scaling for recv window */</i></td></tr>
+<tr><th id="121">121</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a>	<dfn class="decl" id="tcpcb::request_r_scale" title='tcpcb::request_r_scale' data-ref="tcpcb::request_r_scale">request_r_scale</dfn>;	<i>/* pending window scaling */</i></td></tr>
+<tr><th id="122">122</th><td>	<a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_char" title='u_char' data-type='__u_char' data-ref="u_char">u_char</a>	<dfn class="decl" id="tcpcb::requested_s_scale" title='tcpcb::requested_s_scale' data-ref="tcpcb::requested_s_scale">requested_s_scale</dfn>;</td></tr>
+<tr><th id="123">123</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="tcpcb::ts_recent" title='tcpcb::ts_recent' data-ref="tcpcb::ts_recent">ts_recent</dfn>;		<i>/* timestamp echo data */</i></td></tr>
+<tr><th id="124">124</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>	<dfn class="decl" id="tcpcb::ts_recent_age" title='tcpcb::ts_recent_age' data-ref="tcpcb::ts_recent_age">ts_recent_age</dfn>;		<i>/* when last updated */</i></td></tr>
+<tr><th id="125">125</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="tcpcb::last_ack_sent" title='tcpcb::last_ack_sent' data-ref="tcpcb::last_ack_sent">last_ack_sent</dfn>;</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>};</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><u>#define	<dfn class="macro" id="_M/sototcpcb" data-ref="_M/sototcpcb">sototcpcb</dfn>(so)	((so)-&gt;so_tcpcb)</u></td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><i>/*</i></td></tr>
+<tr><th id="132">132</th><td><i> * The smoothed round-trip time and estimated variance</i></td></tr>
+<tr><th id="133">133</th><td><i> * are stored as fixed point numbers scaled by the values below.</i></td></tr>
+<tr><th id="134">134</th><td><i> * For convenience, these scales are also used in smoothing the average</i></td></tr>
+<tr><th id="135">135</th><td><i> * (smoothed = (1/scale)sample + ((scale-1)/scale)smoothed).</i></td></tr>
+<tr><th id="136">136</th><td><i> * With these scales, srtt has 3 bits to the right of the binary point,</i></td></tr>
+<tr><th id="137">137</th><td><i> * and thus an "ALPHA" of 0.875.  rttvar has 2 bits to the right of the</i></td></tr>
+<tr><th id="138">138</th><td><i> * binary point, and is smoothed with an ALPHA of 0.75.</i></td></tr>
+<tr><th id="139">139</th><td><i> */</i></td></tr>
+<tr><th id="140">140</th><td><u>#define	<dfn class="macro" id="_M/TCP_RTT_SCALE" data-ref="_M/TCP_RTT_SCALE">TCP_RTT_SCALE</dfn>		8	/* multiplier for srtt; 3 bits frac. */</u></td></tr>
+<tr><th id="141">141</th><td><u>#define	<dfn class="macro" id="_M/TCP_RTT_SHIFT" data-ref="_M/TCP_RTT_SHIFT">TCP_RTT_SHIFT</dfn>		3	/* shift for srtt; 3 bits frac. */</u></td></tr>
+<tr><th id="142">142</th><td><u>#define	<dfn class="macro" id="_M/TCP_RTTVAR_SCALE" data-ref="_M/TCP_RTTVAR_SCALE">TCP_RTTVAR_SCALE</dfn>	4	/* multiplier for rttvar; 2 bits */</u></td></tr>
+<tr><th id="143">143</th><td><u>#define	<dfn class="macro" id="_M/TCP_RTTVAR_SHIFT" data-ref="_M/TCP_RTTVAR_SHIFT">TCP_RTTVAR_SHIFT</dfn>	2	/* multiplier for rttvar; 2 bits */</u></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/*</i></td></tr>
+<tr><th id="146">146</th><td><i> * The initial retransmission should happen at rtt + 4 * rttvar.</i></td></tr>
+<tr><th id="147">147</th><td><i> * Because of the way we do the smoothing, srtt and rttvar</i></td></tr>
+<tr><th id="148">148</th><td><i> * will each average +1/2 tick of bias.  When we compute</i></td></tr>
+<tr><th id="149">149</th><td><i> * the retransmit timer, we want 1/2 tick of rounding and</i></td></tr>
+<tr><th id="150">150</th><td><i> * 1 extra tick because of +-1/2 tick uncertainty in the</i></td></tr>
+<tr><th id="151">151</th><td><i> * firing of the timer.  The bias will give us exactly the</i></td></tr>
+<tr><th id="152">152</th><td><i> * 1.5 tick we need.  But, because the bias is</i></td></tr>
+<tr><th id="153">153</th><td><i> * statistical, we have to test that we don't drop below</i></td></tr>
+<tr><th id="154">154</th><td><i> * the minimum feasible timer (which is 2 ticks).</i></td></tr>
+<tr><th id="155">155</th><td><i> * This macro assumes that the value of TCP_RTTVAR_SCALE</i></td></tr>
+<tr><th id="156">156</th><td><i> * is the same as the multiplier for rttvar.</i></td></tr>
+<tr><th id="157">157</th><td><i> */</i></td></tr>
+<tr><th id="158">158</th><td><u>#define	<dfn class="macro" id="_M/TCP_REXMTVAL" data-ref="_M/TCP_REXMTVAL">TCP_REXMTVAL</dfn>(tp) \</u></td></tr>
+<tr><th id="159">159</th><td><u>	(((tp)-&gt;t_srtt &gt;&gt; TCP_RTT_SHIFT) + (tp)-&gt;t_rttvar)</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><u>#<span data-ppcond="33">endif</span></u></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../net/colo-compare.c.html'>codebrowser/net/colo-compare.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

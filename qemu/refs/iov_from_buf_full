@@ -1,0 +1,20 @@
+<dec f='codebrowser/include/qemu/iov.h' l='40' type='size_t iov_from_buf_full(const struct iovec * iov, unsigned int iov_cnt, size_t offset, const void * buf, size_t bytes)'/>
+<use f='codebrowser/include/qemu/iov.h' l='54' u='c' c='iov_from_buf'/>
+<doc f='codebrowser/include/qemu/iov.h' l='23'>/**
+ * Copy from single continuous buffer to scatter-gather vector of buffers
+ * (iovec) and back like memcpy() between two continuous memory regions.
+ * Data in single continuous buffer starting at address `buf&apos; and
+ * `bytes&apos; bytes long will be copied to/from an iovec `iov&apos; with
+ * `iov_cnt&apos; number of elements, starting at byte position `offset&apos;
+ * within the iovec.  If the iovec does not contain enough space,
+ * only part of data will be copied, up to the end of the iovec.
+ * Number of bytes actually copied will be returned, which is
+ *  min(bytes, iov_size(iov)-offset)
+ * `Offset&apos; must point to the inside of iovec.
+ * It is okay to use very large value for `bytes&apos; since we&apos;re
+ * limited by the size of the iovec anyway, provided that the
+ * buffer pointed to by buf has enough space.  One possible
+ * such &quot;large&quot; value is -1 (sinice size_t is unsigned),
+ * so specifying `-1&apos; as `bytes&apos; means &apos;up to the end of iovec&apos;.
+ */</doc>
+<def f='codebrowser/util/iov.c' l='25' ll='42' type='size_t iov_from_buf_full(const struct iovec * iov, unsigned int iov_cnt, size_t offset, const void * buf, size_t bytes)'/>

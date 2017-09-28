@@ -1,0 +1,547 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>main-loop.c source code [codebrowser/util/main-loop.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/main-loop.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='main-loop.c.html'>main-loop.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qemu/cutils.h.html">"qemu/cutils.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../include/qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/qemu/sockets.h.html">"qemu/sockets.h"</a>	// struct in_addr needed for libslirp.h</u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/sysemu/qtest.h.html">"sysemu/qtest.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/sysemu/cpus.h.html">"sysemu/cpus.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../slirp/libslirp.h.html">"slirp/libslirp.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><u>#<span data-ppcond="36">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><i  data-doc="sigfd_handler">/* If we have signalfd, we mask out the signals we want to handle and then</i></td></tr>
+<tr><th id="39">39</th><td><i  data-doc="sigfd_handler"> * use signalfd to listen for them.  We rely on whatever the current signal</i></td></tr>
+<tr><th id="40">40</th><td><i  data-doc="sigfd_handler"> * handler is to dispatch the signals when we receive them.</i></td></tr>
+<tr><th id="41">41</th><td><i  data-doc="sigfd_handler"> */</i></td></tr>
+<tr><th id="42">42</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="sigfd_handler" title='sigfd_handler' data-type='void sigfd_handler(void * opaque)' data-ref="sigfd_handler">sigfd_handler</dfn>(<em>void</em> *<dfn class="local col1 decl" id="1opaque" title='opaque' data-type='void *' data-ref="1opaque">opaque</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <em>int</em> <dfn class="local col2 decl" id="2fd" title='fd' data-type='int' data-ref="2fd">fd</dfn> = (<a class="typedef" href="../../include/stdint.h.html#intptr_t" title='intptr_t' data-type='long' data-ref="intptr_t">intptr_t</a>)<a class="local col1 ref" href="#1opaque" title='opaque' data-ref="1opaque">opaque</a>;</td></tr>
+<tr><th id="45">45</th><td>    <b>struct</b> <a class="type" href="../include/qemu/osdep.h.html#qemu_signalfd_siginfo" title='qemu_signalfd_siginfo' data-ref="qemu_signalfd_siginfo">qemu_signalfd_siginfo</a> <dfn class="local col3 decl" id="3info" title='info' data-type='struct qemu_signalfd_siginfo' data-ref="3info">info</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a> <dfn class="local col4 decl" id="4action" title='action' data-type='struct sigaction' data-ref="4action">action</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col5 decl" id="5len" title='len' data-type='ssize_t' data-ref="5len">len</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <b>while</b> (<var>1</var>) {</td></tr>
+<tr><th id="50">50</th><td>        <b>do</b> {</td></tr>
+<tr><th id="51">51</th><td>            <a class="local col5 ref" href="#5len" title='len' data-ref="5len">len</a> = <a class="ref" href="../../include/unistd.h.html#read" title='read' data-ref="read">read</a>(<a class="local col2 ref" href="#2fd" title='fd' data-ref="2fd">fd</a>, &amp;<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>, <b>sizeof</b>(<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>));</td></tr>
+<tr><th id="52">52</th><td>        } <b>while</b> (<a class="local col5 ref" href="#5len" title='len' data-ref="5len">len</a> == -<var>1</var> &amp;&amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno-base.h.html#7" title="4" data-ref="_M/EINTR">EINTR</a>);</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>        <b>if</b> (<a class="local col5 ref" href="#5len" title='len' data-ref="5len">len</a> == -<var>1</var> &amp;&amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno-base.h.html#14" title="11" data-ref="_M/EAGAIN">EAGAIN</a>) {</td></tr>
+<tr><th id="55">55</th><td>            <b>break</b>;</td></tr>
+<tr><th id="56">56</th><td>        }</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>        <b>if</b> (<a class="local col5 ref" href="#5len" title='len' data-ref="5len">len</a> != <b>sizeof</b>(<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>)) {</td></tr>
+<tr><th id="59">59</th><td>            <a class="ref" href="../../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"read from sigfd returned %zd: %m\n"</q>, <a class="local col5 ref" href="#5len" title='len' data-ref="5len">len</a>);</td></tr>
+<tr><th id="60">60</th><td>            <b>return</b>;</td></tr>
+<tr><th id="61">61</th><td>        }</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>        <a class="ref" href="../../include/signal.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a>(<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>.<a class="ref" href="../include/qemu/osdep.h.html#qemu_signalfd_siginfo::ssi_signo" title='qemu_signalfd_siginfo::ssi_signo' data-ref="qemu_signalfd_siginfo::ssi_signo">ssi_signo</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, &amp;<a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>);</td></tr>
+<tr><th id="64">64</th><td>        <b>if</b> ((<a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_flags" title='sigaction::sa_flags' data-ref="sigaction::sa_flags">sa_flags</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#55" title="4" data-ref="_M/SA_SIGINFO">SA_SIGINFO</a>) &amp;&amp; <a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>.<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#37" title="__sigaction_handler.sa_sigaction" data-ref="_M/sa_sigaction">sa_sigaction</a>) {</td></tr>
+<tr><th id="65">65</th><td>            <a class="ref" href="../include/qemu/osdep.h.html#sigaction_invoke" title='sigaction_invoke' data-ref="sigaction_invoke">sigaction_invoke</a>(&amp;<a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>, &amp;<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>);</td></tr>
+<tr><th id="66">66</th><td>        } <b>else</b> <b>if</b> (<a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>.<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a>) {</td></tr>
+<tr><th id="67">67</th><td>            <a class="local col4 ref" href="#4action" title='action' data-ref="4action">action</a>.<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a>(<a class="local col3 ref" href="#3info" title='info' data-ref="3info">info</a>.<a class="ref" href="../include/qemu/osdep.h.html#qemu_signalfd_siginfo::ssi_signo" title='qemu_signalfd_siginfo::ssi_signo' data-ref="qemu_signalfd_siginfo::ssi_signo">ssi_signo</a>);</td></tr>
+<tr><th id="68">68</th><td>        }</td></tr>
+<tr><th id="69">69</th><td>    }</td></tr>
+<tr><th id="70">70</th><td>}</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="qemu_signal_init" title='qemu_signal_init' data-type='int qemu_signal_init()' data-ref="qemu_signal_init">qemu_signal_init</dfn>(<em>void</em>)</td></tr>
+<tr><th id="73">73</th><td>{</td></tr>
+<tr><th id="74">74</th><td>    <em>int</em> <dfn class="local col6 decl" id="6sigfd" title='sigfd' data-type='int' data-ref="6sigfd">sigfd</dfn>;</td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/select.h.html#sigset_t" title='sigset_t' data-type='__sigset_t' data-ref="sigset_t">sigset_t</a> <dfn class="local col7 decl" id="7set" title='set' data-type='sigset_t' data-ref="7set">set</dfn>;</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>    <i>/*</i></td></tr>
+<tr><th id="78">78</th><td><i>     * SIG_IPI must be blocked in the main thread and must not be caught</i></td></tr>
+<tr><th id="79">79</th><td><i>     * by sigwait() in the signal thread. Otherwise, the cpu thread will</i></td></tr>
+<tr><th id="80">80</th><td><i>     * not catch it reliably.</i></td></tr>
+<tr><th id="81">81</th><td><i>     */</i></td></tr>
+<tr><th id="82">82</th><td>    <a class="ref" href="../../include/signal.h.html#sigemptyset" title='sigemptyset' data-ref="sigemptyset">sigemptyset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>);</td></tr>
+<tr><th id="83">83</th><td>    <a class="ref" href="../../include/signal.h.html#sigaddset" title='sigaddset' data-ref="sigaddset">sigaddset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <a class="macro" href="../include/qemu/main-loop.h.html#30" title="10" data-ref="_M/SIG_IPI">SIG_IPI</a>);</td></tr>
+<tr><th id="84">84</th><td>    <a class="ref" href="../../include/signal.h.html#sigaddset" title='sigaddset' data-ref="sigaddset">sigaddset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/signum.h.html#63" title="29" data-ref="_M/SIGIO">SIGIO</a>);</td></tr>
+<tr><th id="85">85</th><td>    <a class="ref" href="../../include/signal.h.html#sigaddset" title='sigaddset' data-ref="sigaddset">sigaddset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/signum.h.html#46" title="14" data-ref="_M/SIGALRM">SIGALRM</a>);</td></tr>
+<tr><th id="86">86</th><td>    <a class="ref" href="../../include/signal.h.html#sigaddset" title='sigaddset' data-ref="sigaddset">sigaddset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/signum.h.html#39" title="7" data-ref="_M/SIGBUS">SIGBUS</a>);</td></tr>
+<tr><th id="87">87</th><td>    <i>/* SIGINT cannot be handled via signalfd, so that ^C can be used</i></td></tr>
+<tr><th id="88">88</th><td><i>     * to interrupt QEMU when it is being run under gdb.  SIGHUP and</i></td></tr>
+<tr><th id="89">89</th><td><i>     * SIGTERM are also handled asynchronously, even though it is not</i></td></tr>
+<tr><th id="90">90</th><td><i>     * strictly necessary, because they use the same handler as SIGINT.</i></td></tr>
+<tr><th id="91">91</th><td><i>     */</i></td></tr>
+<tr><th id="92">92</th><td>    <a class="ref" href="../../include/x86_64-linux-gnu/bits/sigthread.h.html#pthread_sigmask" title='pthread_sigmask' data-ref="pthread_sigmask">pthread_sigmask</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/sigaction.h.html#76" title="0" data-ref="_M/SIG_BLOCK">SIG_BLOCK</a>, &amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <a class="ref" href="../../include/signal.h.html#sigdelset" title='sigdelset' data-ref="sigdelset">sigdelset</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>, <a class="macro" href="../include/qemu/main-loop.h.html#30" title="10" data-ref="_M/SIG_IPI">SIG_IPI</a>);</td></tr>
+<tr><th id="95">95</th><td>    <a class="local col6 ref" href="#6sigfd" title='sigfd' data-ref="6sigfd">sigfd</a> = <a class="ref" href="../include/qemu/osdep.h.html#qemu_signalfd" title='qemu_signalfd' data-ref="qemu_signalfd">qemu_signalfd</a>(&amp;<a class="local col7 ref" href="#7set" title='set' data-ref="7set">set</a>);</td></tr>
+<tr><th id="96">96</th><td>    <b>if</b> (<a class="local col6 ref" href="#6sigfd" title='sigfd' data-ref="6sigfd">sigfd</a> == -<var>1</var>) {</td></tr>
+<tr><th id="97">97</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"failed to create signalfd\n"</q>);</td></tr>
+<tr><th id="98">98</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="99">99</th><td>    }</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <a class="ref" href="../include/qemu/cutils.h.html#fcntl_setfl" title='fcntl_setfl' data-ref="fcntl_setfl">fcntl_setfl</a>(<a class="local col6 ref" href="#6sigfd" title='sigfd' data-ref="6sigfd">sigfd</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#62" title="04000" data-ref="_M/O_NONBLOCK">O_NONBLOCK</a>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>    <a class="ref" href="../include/qemu/main-loop.h.html#qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</a>(<a class="local col6 ref" href="#6sigfd" title='sigfd' data-ref="6sigfd">sigfd</a>, <a class="tu ref" href="#sigfd_handler" title='sigfd_handler' data-use='r' data-ref="sigfd_handler">sigfd_handler</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, (<em>void</em> *)(<a class="typedef" href="../../include/stdint.h.html#intptr_t" title='intptr_t' data-type='long' data-ref="intptr_t">intptr_t</a>)<a class="local col6 ref" href="#6sigfd" title='sigfd' data-ref="6sigfd">sigfd</a>);</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="106">106</th><td>}</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><u>#<span data-ppcond="36">else</span> /* _WIN32 */</u></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><em>static</em> <em>int</em> qemu_signal_init(<em>void</em>)</td></tr>
+<tr><th id="111">111</th><td>{</td></tr>
+<tr><th id="112">112</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="113">113</th><td>}</td></tr>
+<tr><th id="114">114</th><td><u>#<span data-ppcond="36">endif</span></u></td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="tu decl def" id="qemu_aio_context" title='qemu_aio_context' data-type='AioContext *' data-ref="qemu_aio_context">qemu_aio_context</dfn>;</td></tr>
+<tr><th id="117">117</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="tu decl def" id="qemu_notify_bh" title='qemu_notify_bh' data-type='QEMUBH *' data-ref="qemu_notify_bh">qemu_notify_bh</dfn>;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="notify_event_cb" title='notify_event_cb' data-type='void notify_event_cb(void * opaque)' data-ref="notify_event_cb">notify_event_cb</dfn>(<em>void</em> *<dfn class="local col8 decl" id="8opaque" title='opaque' data-type='void *' data-ref="8opaque">opaque</dfn>)</td></tr>
+<tr><th id="120">120</th><td>{</td></tr>
+<tr><th id="121">121</th><td>    <i>/* No need to do anything; this bottom half is only used to</i></td></tr>
+<tr><th id="122">122</th><td><i>     * kick the kernel out of ppoll/poll/WaitForMultipleObjects.</i></td></tr>
+<tr><th id="123">123</th><td><i>     */</i></td></tr>
+<tr><th id="124">124</th><td>}</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl def" id="qemu_get_aio_context" title='qemu_get_aio_context' data-ref="qemu_get_aio_context">qemu_get_aio_context</dfn>(<em>void</em>)</td></tr>
+<tr><th id="127">127</th><td>{</td></tr>
+<tr><th id="128">128</th><td>    <b>return</b> <a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='r' data-ref="qemu_aio_context">qemu_aio_context</a>;</td></tr>
+<tr><th id="129">129</th><td>}</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><em>void</em> <dfn class="decl def" id="qemu_notify_event" title='qemu_notify_event' data-ref="qemu_notify_event">qemu_notify_event</dfn>(<em>void</em>)</td></tr>
+<tr><th id="132">132</th><td>{</td></tr>
+<tr><th id="133">133</th><td>    <b>if</b> (!<a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='r' data-ref="qemu_aio_context">qemu_aio_context</a>) {</td></tr>
+<tr><th id="134">134</th><td>        <b>return</b>;</td></tr>
+<tr><th id="135">135</th><td>    }</td></tr>
+<tr><th id="136">136</th><td>    <a class="ref" href="../include/block/aio.h.html#qemu_bh_schedule" title='qemu_bh_schedule' data-ref="qemu_bh_schedule">qemu_bh_schedule</a>(<a class="tu ref" href="#qemu_notify_bh" title='qemu_notify_bh' data-use='r' data-ref="qemu_notify_bh">qemu_notify_bh</a>);</td></tr>
+<tr><th id="137">137</th><td>}</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/garray.h.html#GArray" title='GArray' data-type='struct _GArray' data-ref="GArray">GArray</a> *<dfn class="tu decl def" id="gpollfds" title='gpollfds' data-type='GArray *' data-ref="gpollfds">gpollfds</dfn>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><em>int</em> <dfn class="decl def" id="qemu_init_main_loop" title='qemu_init_main_loop' data-ref="qemu_init_main_loop">qemu_init_main_loop</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="9errp" title='errp' data-type='Error **' data-ref="9errp">errp</dfn>)</td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td>    <em>int</em> <dfn class="local col0 decl" id="10ret" title='ret' data-type='int' data-ref="10ret">ret</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="local col1 decl" id="11src" title='src' data-type='GSource *' data-ref="11src">src</dfn>;</td></tr>
+<tr><th id="145">145</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col2 decl" id="12local_error" title='local_error' data-type='Error *' data-ref="12local_error">local_error</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>    <a class="ref" href="../include/qemu/timer.h.html#init_clocks" title='init_clocks' data-ref="init_clocks">init_clocks</a>(<a class="ref" href="../include/sysemu/cpus.h.html#qemu_timer_notify_cb" title='qemu_timer_notify_cb' data-ref="qemu_timer_notify_cb">qemu_timer_notify_cb</a>);</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td>    <a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a> = <a class="tu ref" href="#qemu_signal_init" title='qemu_signal_init' data-use='c' data-ref="qemu_signal_init">qemu_signal_init</a>();</td></tr>
+<tr><th id="150">150</th><td>    <b>if</b> (<a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a>) {</td></tr>
+<tr><th id="151">151</th><td>        <b>return</b> <a class="local col0 ref" href="#10ret" title='ret' data-ref="10ret">ret</a>;</td></tr>
+<tr><th id="152">152</th><td>    }</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='w' data-ref="qemu_aio_context">qemu_aio_context</a> = <a class="ref" href="../include/block/aio.h.html#aio_context_new" title='aio_context_new' data-ref="aio_context_new">aio_context_new</a>(&amp;<a class="local col2 ref" href="#12local_error" title='local_error' data-ref="12local_error">local_error</a>);</td></tr>
+<tr><th id="155">155</th><td>    <b>if</b> (!<a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='r' data-ref="qemu_aio_context">qemu_aio_context</a>) {</td></tr>
+<tr><th id="156">156</th><td>        <a class="ref" href="../include/qapi/error.h.html#error_propagate" title='error_propagate' data-ref="error_propagate">error_propagate</a>(<a class="local col9 ref" href="#9errp" title='errp' data-ref="9errp">errp</a>, <a class="local col2 ref" href="#12local_error" title='local_error' data-ref="12local_error">local_error</a>);</td></tr>
+<tr><th id="157">157</th><td>        <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#27" title="24" data-ref="_M/EMFILE">EMFILE</a>;</td></tr>
+<tr><th id="158">158</th><td>    }</td></tr>
+<tr><th id="159">159</th><td>    <a class="tu ref" href="#qemu_notify_bh" title='qemu_notify_bh' data-use='w' data-ref="qemu_notify_bh">qemu_notify_bh</a> = <a class="ref" href="#qemu_bh_new" title='qemu_bh_new' data-ref="qemu_bh_new">qemu_bh_new</a>(<a class="tu ref" href="#notify_event_cb" title='notify_event_cb' data-use='r' data-ref="notify_event_cb">notify_event_cb</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="160">160</th><td>    <a class="tu ref" href="#gpollfds" title='gpollfds' data-use='w' data-ref="gpollfds">gpollfds</a> = <a class="ref" href="../../include/glib-2.0/glib/garray.h.html#g_array_new" title='g_array_new' data-ref="g_array_new">g_array_new</a>(<a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>, <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>, <b>sizeof</b>(<a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a>));</td></tr>
+<tr><th id="161">161</th><td>    <a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a> = <a class="ref" href="../include/block/aio.h.html#aio_get_g_source" title='aio_get_g_source' data-ref="aio_get_g_source">aio_get_g_source</a>(<a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='r' data-ref="qemu_aio_context">qemu_aio_context</a>);</td></tr>
+<tr><th id="162">162</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_set_name" title='g_source_set_name' data-ref="g_source_set_name">g_source_set_name</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>, <q>"aio-context"</q>);</td></tr>
+<tr><th id="163">163</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_attach" title='g_source_attach' data-ref="g_source_attach">g_source_attach</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="164">164</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_unref" title='g_source_unref' data-ref="g_source_unref">g_source_unref</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>);</td></tr>
+<tr><th id="165">165</th><td>    <a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a> = <a class="ref" href="../include/qemu/main-loop.h.html#iohandler_get_g_source" title='iohandler_get_g_source' data-ref="iohandler_get_g_source">iohandler_get_g_source</a>();</td></tr>
+<tr><th id="166">166</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_set_name" title='g_source_set_name' data-ref="g_source_set_name">g_source_set_name</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>, <q>"io-handler"</q>);</td></tr>
+<tr><th id="167">167</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_attach" title='g_source_attach' data-ref="g_source_attach">g_source_attach</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="168">168</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_source_unref" title='g_source_unref' data-ref="g_source_unref">g_source_unref</a>(<a class="local col1 ref" href="#11src" title='src' data-ref="11src">src</a>);</td></tr>
+<tr><th id="169">169</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="170">170</th><td>}</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="max_priority" title='max_priority' data-type='int' data-ref="max_priority">max_priority</dfn>;</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><u>#<span data-ppcond="174">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="175">175</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="glib_pollfds_idx" title='glib_pollfds_idx' data-type='int' data-ref="glib_pollfds_idx">glib_pollfds_idx</dfn>;</td></tr>
+<tr><th id="176">176</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="glib_n_poll_fds" title='glib_n_poll_fds' data-type='int' data-ref="glib_n_poll_fds">glib_n_poll_fds</dfn>;</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="glib_pollfds_fill" title='glib_pollfds_fill' data-type='void glib_pollfds_fill(int64_t * cur_timeout)' data-ref="glib_pollfds_fill">glib_pollfds_fill</dfn>(<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> *<dfn class="local col3 decl" id="13cur_timeout" title='cur_timeout' data-type='int64_t *' data-ref="13cur_timeout">cur_timeout</dfn>)</td></tr>
+<tr><th id="179">179</th><td>{</td></tr>
+<tr><th id="180">180</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GMainContext" title='GMainContext' data-type='struct _GMainContext' data-ref="GMainContext">GMainContext</a> *<dfn class="local col4 decl" id="14context" title='context' data-type='GMainContext *' data-ref="14context">context</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_default" title='g_main_context_default' data-ref="g_main_context_default">g_main_context_default</a>();</td></tr>
+<tr><th id="181">181</th><td>    <em>int</em> <dfn class="local col5 decl" id="15timeout" title='timeout' data-type='int' data-ref="15timeout">timeout</dfn> = <var>0</var>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col6 decl" id="16timeout_ns" title='timeout_ns' data-type='int64_t' data-ref="16timeout_ns">timeout_ns</dfn>;</td></tr>
+<tr><th id="183">183</th><td>    <em>int</em> <dfn class="local col7 decl" id="17n" title='n' data-type='int' data-ref="17n">n</dfn>;</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_prepare" title='g_main_context_prepare' data-ref="g_main_context_prepare">g_main_context_prepare</a>(<a class="local col4 ref" href="#14context" title='context' data-ref="14context">context</a>, &amp;<a class="tu ref" href="#max_priority" title='max_priority' data-use='a' data-ref="max_priority">max_priority</a>);</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td>    <a class="tu ref" href="#glib_pollfds_idx" title='glib_pollfds_idx' data-use='w' data-ref="glib_pollfds_idx">glib_pollfds_idx</a> = <a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/garray.h.html#_GArray::len" title='_GArray::len' data-ref="_GArray::len">len</a>;</td></tr>
+<tr><th id="188">188</th><td>    <a class="local col7 ref" href="#17n" title='n' data-ref="17n">n</a> = <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='r' data-ref="glib_n_poll_fds">glib_n_poll_fds</a>;</td></tr>
+<tr><th id="189">189</th><td>    <b>do</b> {</td></tr>
+<tr><th id="190">190</th><td>        <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> *<dfn class="local col8 decl" id="18pfds" title='pfds' data-type='GPollFD *' data-ref="18pfds">pfds</dfn>;</td></tr>
+<tr><th id="191">191</th><td>        <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='w' data-ref="glib_n_poll_fds">glib_n_poll_fds</a> = <a class="local col7 ref" href="#17n" title='n' data-ref="17n">n</a>;</td></tr>
+<tr><th id="192">192</th><td>        <a class="ref" href="../../include/glib-2.0/glib/garray.h.html#g_array_set_size" title='g_array_set_size' data-ref="g_array_set_size">g_array_set_size</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, <a class="tu ref" href="#glib_pollfds_idx" title='glib_pollfds_idx' data-use='r' data-ref="glib_pollfds_idx">glib_pollfds_idx</a> + <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='r' data-ref="glib_n_poll_fds">glib_n_poll_fds</a>);</td></tr>
+<tr><th id="193">193</th><td>        <a class="local col8 ref" href="#18pfds" title='pfds' data-ref="18pfds">pfds</a> = &amp;<a class="macro" href="../../include/glib-2.0/glib/garray.h.html#67" title="(((GPollFD*) (void *) (gpollfds)-&gt;data) [(glib_pollfds_idx)])" data-ref="_M/g_array_index">g_array_index</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a>, <a class="tu ref" href="#glib_pollfds_idx" title='glib_pollfds_idx' data-use='r' data-ref="glib_pollfds_idx">glib_pollfds_idx</a>);</td></tr>
+<tr><th id="194">194</th><td>        <a class="local col7 ref" href="#17n" title='n' data-ref="17n">n</a> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_query" title='g_main_context_query' data-ref="g_main_context_query">g_main_context_query</a>(<a class="local col4 ref" href="#14context" title='context' data-ref="14context">context</a>, <a class="tu ref" href="#max_priority" title='max_priority' data-use='r' data-ref="max_priority">max_priority</a>, &amp;<a class="local col5 ref" href="#15timeout" title='timeout' data-ref="15timeout">timeout</a>, <a class="local col8 ref" href="#18pfds" title='pfds' data-ref="18pfds">pfds</a>,</td></tr>
+<tr><th id="195">195</th><td>                                 <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='r' data-ref="glib_n_poll_fds">glib_n_poll_fds</a>);</td></tr>
+<tr><th id="196">196</th><td>    } <b>while</b> (<a class="local col7 ref" href="#17n" title='n' data-ref="17n">n</a> != <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='r' data-ref="glib_n_poll_fds">glib_n_poll_fds</a>);</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td>    <b>if</b> (<a class="local col5 ref" href="#15timeout" title='timeout' data-ref="15timeout">timeout</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="199">199</th><td>        <a class="local col6 ref" href="#16timeout_ns" title='timeout_ns' data-ref="16timeout_ns">timeout_ns</a> = -<var>1</var>;</td></tr>
+<tr><th id="200">200</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="201">201</th><td>        <a class="local col6 ref" href="#16timeout_ns" title='timeout_ns' data-ref="16timeout_ns">timeout_ns</a> = (<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a>)<a class="local col5 ref" href="#15timeout" title='timeout' data-ref="15timeout">timeout</a> * (<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a>)<a class="macro" href="../include/qemu/timer.h.html#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>;</td></tr>
+<tr><th id="202">202</th><td>    }</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>    *<a class="local col3 ref" href="#13cur_timeout" title='cur_timeout' data-ref="13cur_timeout">cur_timeout</a> = <a class="ref" href="../include/qemu/timer.h.html#qemu_soonest_timeout" title='qemu_soonest_timeout' data-ref="qemu_soonest_timeout">qemu_soonest_timeout</a>(<a class="local col6 ref" href="#16timeout_ns" title='timeout_ns' data-ref="16timeout_ns">timeout_ns</a>, *<a class="local col3 ref" href="#13cur_timeout" title='cur_timeout' data-ref="13cur_timeout">cur_timeout</a>);</td></tr>
+<tr><th id="205">205</th><td>}</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="glib_pollfds_poll" title='glib_pollfds_poll' data-type='void glib_pollfds_poll()' data-ref="glib_pollfds_poll">glib_pollfds_poll</dfn>(<em>void</em>)</td></tr>
+<tr><th id="208">208</th><td>{</td></tr>
+<tr><th id="209">209</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GMainContext" title='GMainContext' data-type='struct _GMainContext' data-ref="GMainContext">GMainContext</a> *<dfn class="local col9 decl" id="19context" title='context' data-type='GMainContext *' data-ref="19context">context</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_default" title='g_main_context_default' data-ref="g_main_context_default">g_main_context_default</a>();</td></tr>
+<tr><th id="210">210</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> *<dfn class="local col0 decl" id="20pfds" title='pfds' data-type='GPollFD *' data-ref="20pfds">pfds</dfn> = &amp;<a class="macro" href="../../include/glib-2.0/glib/garray.h.html#67" title="(((GPollFD*) (void *) (gpollfds)-&gt;data) [(glib_pollfds_idx)])" data-ref="_M/g_array_index">g_array_index</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, <a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a>, <a class="tu ref" href="#glib_pollfds_idx" title='glib_pollfds_idx' data-use='r' data-ref="glib_pollfds_idx">glib_pollfds_idx</a>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>    <b>if</b> (<a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_check" title='g_main_context_check' data-ref="g_main_context_check">g_main_context_check</a>(<a class="local col9 ref" href="#19context" title='context' data-ref="19context">context</a>, <a class="tu ref" href="#max_priority" title='max_priority' data-use='r' data-ref="max_priority">max_priority</a>, <a class="local col0 ref" href="#20pfds" title='pfds' data-ref="20pfds">pfds</a>, <a class="tu ref" href="#glib_n_poll_fds" title='glib_n_poll_fds' data-use='r' data-ref="glib_n_poll_fds">glib_n_poll_fds</a>)) {</td></tr>
+<tr><th id="213">213</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_dispatch" title='g_main_context_dispatch' data-ref="g_main_context_dispatch">g_main_context_dispatch</a>(<a class="local col9 ref" href="#19context" title='context' data-ref="19context">context</a>);</td></tr>
+<tr><th id="214">214</th><td>    }</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><u>#define <dfn class="macro" id="_M/MAX_MAIN_LOOP_SPIN" data-ref="_M/MAX_MAIN_LOOP_SPIN">MAX_MAIN_LOOP_SPIN</dfn> (1000)</u></td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="os_host_main_loop_wait" title='os_host_main_loop_wait' data-type='int os_host_main_loop_wait(int64_t timeout)' data-ref="os_host_main_loop_wait">os_host_main_loop_wait</dfn>(<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="21timeout" title='timeout' data-type='int64_t' data-ref="21timeout">timeout</dfn>)</td></tr>
+<tr><th id="220">220</th><td>{</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GMainContext" title='GMainContext' data-type='struct _GMainContext' data-ref="GMainContext">GMainContext</a> *<dfn class="local col2 decl" id="22context" title='context' data-type='GMainContext *' data-ref="22context">context</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_default" title='g_main_context_default' data-ref="g_main_context_default">g_main_context_default</a>();</td></tr>
+<tr><th id="222">222</th><td>    <em>int</em> <dfn class="local col3 decl" id="23ret" title='ret' data-type='int' data-ref="23ret">ret</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <em>static</em> <em>int</em> <dfn class="local col4 decl" id="24spin_counter" title='spin_counter' data-type='int' data-ref="24spin_counter">spin_counter</dfn>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_acquire" title='g_main_context_acquire' data-ref="g_main_context_acquire">g_main_context_acquire</a>(<a class="local col2 ref" href="#22context" title='context' data-ref="22context">context</a>);</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>    <a class="tu ref" href="#glib_pollfds_fill" title='glib_pollfds_fill' data-use='c' data-ref="glib_pollfds_fill">glib_pollfds_fill</a>(&amp;<a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a>);</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>    <i>/* If the I/O thread is very busy or we are incorrectly busy waiting in</i></td></tr>
+<tr><th id="230">230</th><td><i>     * the I/O thread, this can lead to starvation of the BQL such that the</i></td></tr>
+<tr><th id="231">231</th><td><i>     * VCPU threads never run.  To make sure we can detect the later case,</i></td></tr>
+<tr><th id="232">232</th><td><i>     * print a message to the screen.  If we run into this condition, create</i></td></tr>
+<tr><th id="233">233</th><td><i>     * a fake timeout in order to give the VCPU threads a chance to run.</i></td></tr>
+<tr><th id="234">234</th><td><i>     */</i></td></tr>
+<tr><th id="235">235</th><td>    <b>if</b> (!<a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a> &amp;&amp; (<a class="local col4 ref" href="#24spin_counter" title='spin_counter' data-ref="24spin_counter">spin_counter</a> &gt; <a class="macro" href="#217" title="(1000)" data-ref="_M/MAX_MAIN_LOOP_SPIN">MAX_MAIN_LOOP_SPIN</a>)) {</td></tr>
+<tr><th id="236">236</th><td>        <em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="25notified" title='notified' data-type='_Bool' data-ref="25notified">notified</dfn>;</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>        <b>if</b> (!<a class="local col5 ref" href="#25notified" title='notified' data-ref="25notified">notified</a> &amp;&amp; !<a class="ref" href="../include/sysemu/qtest.h.html#qtest_enabled" title='qtest_enabled' data-ref="qtest_enabled">qtest_enabled</a>() &amp;&amp; !<a class="ref" href="../include/sysemu/qtest.h.html#qtest_driver" title='qtest_driver' data-ref="qtest_driver">qtest_driver</a>()) {</td></tr>
+<tr><th id="239">239</th><td>            <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>,</td></tr>
+<tr><th id="240">240</th><td>                    <q>"main-loop: WARNING: I/O thread spun for %d iterations\n"</q>,</td></tr>
+<tr><th id="241">241</th><td>                    <a class="macro" href="#217" title="(1000)" data-ref="_M/MAX_MAIN_LOOP_SPIN">MAX_MAIN_LOOP_SPIN</a>);</td></tr>
+<tr><th id="242">242</th><td>            <a class="local col5 ref" href="#25notified" title='notified' data-ref="25notified">notified</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="243">243</th><td>        }</td></tr>
+<tr><th id="244">244</th><td></td></tr>
+<tr><th id="245">245</th><td>        <a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a> = <a class="macro" href="../include/qemu/timer.h.html#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>;</td></tr>
+<tr><th id="246">246</th><td>    }</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td>    <b>if</b> (<a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a>) {</td></tr>
+<tr><th id="249">249</th><td>        <a class="local col4 ref" href="#24spin_counter" title='spin_counter' data-ref="24spin_counter">spin_counter</a> = <var>0</var>;</td></tr>
+<tr><th id="250">250</th><td>        <a class="ref" href="../include/qemu/main-loop.h.html#qemu_mutex_unlock_iothread" title='qemu_mutex_unlock_iothread' data-ref="qemu_mutex_unlock_iothread">qemu_mutex_unlock_iothread</a>();</td></tr>
+<tr><th id="251">251</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="252">252</th><td>        <a class="local col4 ref" href="#24spin_counter" title='spin_counter' data-ref="24spin_counter">spin_counter</a>++;</td></tr>
+<tr><th id="253">253</th><td>    }</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td>    <a class="local col3 ref" href="#23ret" title='ret' data-ref="23ret">ret</a> = <a class="ref" href="../include/qemu/timer.h.html#qemu_poll_ns" title='qemu_poll_ns' data-ref="qemu_poll_ns">qemu_poll_ns</a>((<a class="typedef" href="../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> *)<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/garray.h.html#_GArray::data" title='_GArray::data' data-ref="_GArray::data">data</a>, <a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/garray.h.html#_GArray::len" title='_GArray::len' data-ref="_GArray::len">len</a>, <a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a>);</td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td>    <b>if</b> (<a class="local col1 ref" href="#21timeout" title='timeout' data-ref="21timeout">timeout</a>) {</td></tr>
+<tr><th id="258">258</th><td>        <a class="ref" href="../include/qemu/main-loop.h.html#qemu_mutex_lock_iothread" title='qemu_mutex_lock_iothread' data-ref="qemu_mutex_lock_iothread">qemu_mutex_lock_iothread</a>();</td></tr>
+<tr><th id="259">259</th><td>    }</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>    <a class="tu ref" href="#glib_pollfds_poll" title='glib_pollfds_poll' data-use='c' data-ref="glib_pollfds_poll">glib_pollfds_poll</a>();</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmain.h.html#g_main_context_release" title='g_main_context_release' data-ref="g_main_context_release">g_main_context_release</a>(<a class="local col2 ref" href="#22context" title='context' data-ref="22context">context</a>);</td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td>    <b>return</b> <a class="local col3 ref" href="#23ret" title='ret' data-ref="23ret">ret</a>;</td></tr>
+<tr><th id="266">266</th><td>}</td></tr>
+<tr><th id="267">267</th><td><u>#<span data-ppcond="174">else</span></u></td></tr>
+<tr><th id="268">268</th><td><i>/***********************************************************/</i></td></tr>
+<tr><th id="269">269</th><td><i>/* Polling handling */</i></td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><b>typedef</b> <b>struct</b> PollingEntry {</td></tr>
+<tr><th id="272">272</th><td>    PollingFunc *func;</td></tr>
+<tr><th id="273">273</th><td>    <em>void</em> *opaque;</td></tr>
+<tr><th id="274">274</th><td>    <b>struct</b> PollingEntry *next;</td></tr>
+<tr><th id="275">275</th><td>} PollingEntry;</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td><em>static</em> PollingEntry *first_polling_entry;</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td><em>int</em> qemu_add_polling_cb(PollingFunc *func, <em>void</em> *opaque)</td></tr>
+<tr><th id="280">280</th><td>{</td></tr>
+<tr><th id="281">281</th><td>    PollingEntry **ppe, *pe;</td></tr>
+<tr><th id="282">282</th><td>    pe = g_malloc0(<b>sizeof</b>(PollingEntry));</td></tr>
+<tr><th id="283">283</th><td>    pe-&gt;func = func;</td></tr>
+<tr><th id="284">284</th><td>    pe-&gt;opaque = opaque;</td></tr>
+<tr><th id="285">285</th><td>    <b>for</b>(ppe = &amp;first_polling_entry; *ppe != NULL; ppe = &amp;(*ppe)-&gt;next);</td></tr>
+<tr><th id="286">286</th><td>    *ppe = pe;</td></tr>
+<tr><th id="287">287</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="288">288</th><td>}</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><em>void</em> qemu_del_polling_cb(PollingFunc *func, <em>void</em> *opaque)</td></tr>
+<tr><th id="291">291</th><td>{</td></tr>
+<tr><th id="292">292</th><td>    PollingEntry **ppe, *pe;</td></tr>
+<tr><th id="293">293</th><td>    <b>for</b>(ppe = &amp;first_polling_entry; *ppe != NULL; ppe = &amp;(*ppe)-&gt;next) {</td></tr>
+<tr><th id="294">294</th><td>        pe = *ppe;</td></tr>
+<tr><th id="295">295</th><td>        <b>if</b> (pe-&gt;func == func &amp;&amp; pe-&gt;opaque == opaque) {</td></tr>
+<tr><th id="296">296</th><td>            *ppe = pe-&gt;next;</td></tr>
+<tr><th id="297">297</th><td>            g_free(pe);</td></tr>
+<tr><th id="298">298</th><td>            <b>break</b>;</td></tr>
+<tr><th id="299">299</th><td>        }</td></tr>
+<tr><th id="300">300</th><td>    }</td></tr>
+<tr><th id="301">301</th><td>}</td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><i>/***********************************************************/</i></td></tr>
+<tr><th id="304">304</th><td><i>/* Wait objects support */</i></td></tr>
+<tr><th id="305">305</th><td><b>typedef</b> <b>struct</b> WaitObjects {</td></tr>
+<tr><th id="306">306</th><td>    <em>int</em> num;</td></tr>
+<tr><th id="307">307</th><td>    <em>int</em> revents[MAXIMUM_WAIT_OBJECTS + <var>1</var>];</td></tr>
+<tr><th id="308">308</th><td>    HANDLE events[MAXIMUM_WAIT_OBJECTS + <var>1</var>];</td></tr>
+<tr><th id="309">309</th><td>    WaitObjectFunc *func[MAXIMUM_WAIT_OBJECTS + <var>1</var>];</td></tr>
+<tr><th id="310">310</th><td>    <em>void</em> *opaque[MAXIMUM_WAIT_OBJECTS + <var>1</var>];</td></tr>
+<tr><th id="311">311</th><td>} WaitObjects;</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><em>static</em> WaitObjects wait_objects = {<var>0</var>};</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td><em>int</em> qemu_add_wait_object(HANDLE handle, WaitObjectFunc *func, <em>void</em> *opaque)</td></tr>
+<tr><th id="316">316</th><td>{</td></tr>
+<tr><th id="317">317</th><td>    WaitObjects *w = &amp;wait_objects;</td></tr>
+<tr><th id="318">318</th><td>    <b>if</b> (w-&gt;num &gt;= MAXIMUM_WAIT_OBJECTS) {</td></tr>
+<tr><th id="319">319</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="320">320</th><td>    }</td></tr>
+<tr><th id="321">321</th><td>    w-&gt;events[w-&gt;num] = handle;</td></tr>
+<tr><th id="322">322</th><td>    w-&gt;func[w-&gt;num] = func;</td></tr>
+<tr><th id="323">323</th><td>    w-&gt;opaque[w-&gt;num] = opaque;</td></tr>
+<tr><th id="324">324</th><td>    w-&gt;revents[w-&gt;num] = <var>0</var>;</td></tr>
+<tr><th id="325">325</th><td>    w-&gt;num++;</td></tr>
+<tr><th id="326">326</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="327">327</th><td>}</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><em>void</em> qemu_del_wait_object(HANDLE handle, WaitObjectFunc *func, <em>void</em> *opaque)</td></tr>
+<tr><th id="330">330</th><td>{</td></tr>
+<tr><th id="331">331</th><td>    <em>int</em> i, found;</td></tr>
+<tr><th id="332">332</th><td>    WaitObjects *w = &amp;wait_objects;</td></tr>
+<tr><th id="333">333</th><td></td></tr>
+<tr><th id="334">334</th><td>    found = <var>0</var>;</td></tr>
+<tr><th id="335">335</th><td>    <b>for</b> (i = <var>0</var>; i &lt; w-&gt;num; i++) {</td></tr>
+<tr><th id="336">336</th><td>        <b>if</b> (w-&gt;events[i] == handle) {</td></tr>
+<tr><th id="337">337</th><td>            found = <var>1</var>;</td></tr>
+<tr><th id="338">338</th><td>        }</td></tr>
+<tr><th id="339">339</th><td>        <b>if</b> (found) {</td></tr>
+<tr><th id="340">340</th><td>            w-&gt;events[i] = w-&gt;events[i + <var>1</var>];</td></tr>
+<tr><th id="341">341</th><td>            w-&gt;func[i] = w-&gt;func[i + <var>1</var>];</td></tr>
+<tr><th id="342">342</th><td>            w-&gt;opaque[i] = w-&gt;opaque[i + <var>1</var>];</td></tr>
+<tr><th id="343">343</th><td>            w-&gt;revents[i] = w-&gt;revents[i + <var>1</var>];</td></tr>
+<tr><th id="344">344</th><td>        }</td></tr>
+<tr><th id="345">345</th><td>    }</td></tr>
+<tr><th id="346">346</th><td>    <b>if</b> (found) {</td></tr>
+<tr><th id="347">347</th><td>        w-&gt;num--;</td></tr>
+<tr><th id="348">348</th><td>    }</td></tr>
+<tr><th id="349">349</th><td>}</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td><em>void</em> qemu_fd_register(<em>int</em> fd)</td></tr>
+<tr><th id="352">352</th><td>{</td></tr>
+<tr><th id="353">353</th><td>    WSAEventSelect(fd, event_notifier_get_handle(&amp;qemu_aio_context-&gt;notifier),</td></tr>
+<tr><th id="354">354</th><td>                   FD_READ | FD_ACCEPT | FD_CLOSE |</td></tr>
+<tr><th id="355">355</th><td>                   FD_CONNECT | FD_WRITE | FD_OOB);</td></tr>
+<tr><th id="356">356</th><td>}</td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td><em>static</em> <em>int</em> pollfds_fill(GArray *pollfds, fd_set *rfds, fd_set *wfds,</td></tr>
+<tr><th id="359">359</th><td>                        fd_set *xfds)</td></tr>
+<tr><th id="360">360</th><td>{</td></tr>
+<tr><th id="361">361</th><td>    <em>int</em> nfds = -<var>1</var>;</td></tr>
+<tr><th id="362">362</th><td>    <em>int</em> i;</td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td>    <b>for</b> (i = <var>0</var>; i &lt; pollfds-&gt;len; i++) {</td></tr>
+<tr><th id="365">365</th><td>        GPollFD *pfd = &amp;g_array_index(pollfds, GPollFD, i);</td></tr>
+<tr><th id="366">366</th><td>        <em>int</em> fd = pfd-&gt;fd;</td></tr>
+<tr><th id="367">367</th><td>        <em>int</em> events = pfd-&gt;events;</td></tr>
+<tr><th id="368">368</th><td>        <b>if</b> (events &amp; G_IO_IN) {</td></tr>
+<tr><th id="369">369</th><td>            FD_SET(fd, rfds);</td></tr>
+<tr><th id="370">370</th><td>            nfds = MAX(nfds, fd);</td></tr>
+<tr><th id="371">371</th><td>        }</td></tr>
+<tr><th id="372">372</th><td>        <b>if</b> (events &amp; G_IO_OUT) {</td></tr>
+<tr><th id="373">373</th><td>            FD_SET(fd, wfds);</td></tr>
+<tr><th id="374">374</th><td>            nfds = MAX(nfds, fd);</td></tr>
+<tr><th id="375">375</th><td>        }</td></tr>
+<tr><th id="376">376</th><td>        <b>if</b> (events &amp; G_IO_PRI) {</td></tr>
+<tr><th id="377">377</th><td>            FD_SET(fd, xfds);</td></tr>
+<tr><th id="378">378</th><td>            nfds = MAX(nfds, fd);</td></tr>
+<tr><th id="379">379</th><td>        }</td></tr>
+<tr><th id="380">380</th><td>    }</td></tr>
+<tr><th id="381">381</th><td>    <b>return</b> nfds;</td></tr>
+<tr><th id="382">382</th><td>}</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td><em>static</em> <em>void</em> pollfds_poll(GArray *pollfds, <em>int</em> nfds, fd_set *rfds,</td></tr>
+<tr><th id="385">385</th><td>                         fd_set *wfds, fd_set *xfds)</td></tr>
+<tr><th id="386">386</th><td>{</td></tr>
+<tr><th id="387">387</th><td>    <em>int</em> i;</td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td>    <b>for</b> (i = <var>0</var>; i &lt; pollfds-&gt;len; i++) {</td></tr>
+<tr><th id="390">390</th><td>        GPollFD *pfd = &amp;g_array_index(pollfds, GPollFD, i);</td></tr>
+<tr><th id="391">391</th><td>        <em>int</em> fd = pfd-&gt;fd;</td></tr>
+<tr><th id="392">392</th><td>        <em>int</em> revents = <var>0</var>;</td></tr>
+<tr><th id="393">393</th><td></td></tr>
+<tr><th id="394">394</th><td>        <b>if</b> (FD_ISSET(fd, rfds)) {</td></tr>
+<tr><th id="395">395</th><td>            revents |= G_IO_IN;</td></tr>
+<tr><th id="396">396</th><td>        }</td></tr>
+<tr><th id="397">397</th><td>        <b>if</b> (FD_ISSET(fd, wfds)) {</td></tr>
+<tr><th id="398">398</th><td>            revents |= G_IO_OUT;</td></tr>
+<tr><th id="399">399</th><td>        }</td></tr>
+<tr><th id="400">400</th><td>        <b>if</b> (FD_ISSET(fd, xfds)) {</td></tr>
+<tr><th id="401">401</th><td>            revents |= G_IO_PRI;</td></tr>
+<tr><th id="402">402</th><td>        }</td></tr>
+<tr><th id="403">403</th><td>        pfd-&gt;revents = revents &amp; pfd-&gt;events;</td></tr>
+<tr><th id="404">404</th><td>    }</td></tr>
+<tr><th id="405">405</th><td>}</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td><em>static</em> <em>int</em> os_host_main_loop_wait(int64_t timeout)</td></tr>
+<tr><th id="408">408</th><td>{</td></tr>
+<tr><th id="409">409</th><td>    GMainContext *context = g_main_context_default();</td></tr>
+<tr><th id="410">410</th><td>    GPollFD poll_fds[<var>1024</var> * <var>2</var>]; <i>/* this is probably overkill */</i></td></tr>
+<tr><th id="411">411</th><td>    <em>int</em> select_ret = <var>0</var>;</td></tr>
+<tr><th id="412">412</th><td>    <em>int</em> g_poll_ret, ret, i, n_poll_fds;</td></tr>
+<tr><th id="413">413</th><td>    PollingEntry *pe;</td></tr>
+<tr><th id="414">414</th><td>    WaitObjects *w = &amp;wait_objects;</td></tr>
+<tr><th id="415">415</th><td>    gint poll_timeout;</td></tr>
+<tr><th id="416">416</th><td>    int64_t poll_timeout_ns;</td></tr>
+<tr><th id="417">417</th><td>    <em>static</em> <b>struct</b> timeval tv0;</td></tr>
+<tr><th id="418">418</th><td>    fd_set rfds, wfds, xfds;</td></tr>
+<tr><th id="419">419</th><td>    <em>int</em> nfds;</td></tr>
+<tr><th id="420">420</th><td></td></tr>
+<tr><th id="421">421</th><td>    g_main_context_acquire(context);</td></tr>
+<tr><th id="422">422</th><td></td></tr>
+<tr><th id="423">423</th><td>    <i>/* XXX: need to suppress polling by better using win32 events */</i></td></tr>
+<tr><th id="424">424</th><td>    ret = <var>0</var>;</td></tr>
+<tr><th id="425">425</th><td>    <b>for</b> (pe = first_polling_entry; pe != NULL; pe = pe-&gt;next) {</td></tr>
+<tr><th id="426">426</th><td>        ret |= pe-&gt;func(pe-&gt;opaque);</td></tr>
+<tr><th id="427">427</th><td>    }</td></tr>
+<tr><th id="428">428</th><td>    <b>if</b> (ret != <var>0</var>) {</td></tr>
+<tr><th id="429">429</th><td>        g_main_context_release(context);</td></tr>
+<tr><th id="430">430</th><td>        <b>return</b> ret;</td></tr>
+<tr><th id="431">431</th><td>    }</td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td>    FD_ZERO(&amp;rfds);</td></tr>
+<tr><th id="434">434</th><td>    FD_ZERO(&amp;wfds);</td></tr>
+<tr><th id="435">435</th><td>    FD_ZERO(&amp;xfds);</td></tr>
+<tr><th id="436">436</th><td>    nfds = pollfds_fill(gpollfds, &amp;rfds, &amp;wfds, &amp;xfds);</td></tr>
+<tr><th id="437">437</th><td>    <b>if</b> (nfds &gt;= <var>0</var>) {</td></tr>
+<tr><th id="438">438</th><td>        select_ret = select(nfds + <var>1</var>, &amp;rfds, &amp;wfds, &amp;xfds, &amp;tv0);</td></tr>
+<tr><th id="439">439</th><td>        <b>if</b> (select_ret != <var>0</var>) {</td></tr>
+<tr><th id="440">440</th><td>            timeout = <var>0</var>;</td></tr>
+<tr><th id="441">441</th><td>        }</td></tr>
+<tr><th id="442">442</th><td>        <b>if</b> (select_ret &gt; <var>0</var>) {</td></tr>
+<tr><th id="443">443</th><td>            pollfds_poll(gpollfds, nfds, &amp;rfds, &amp;wfds, &amp;xfds);</td></tr>
+<tr><th id="444">444</th><td>        }</td></tr>
+<tr><th id="445">445</th><td>    }</td></tr>
+<tr><th id="446">446</th><td></td></tr>
+<tr><th id="447">447</th><td>    g_main_context_prepare(context, &amp;max_priority);</td></tr>
+<tr><th id="448">448</th><td>    n_poll_fds = g_main_context_query(context, max_priority, &amp;poll_timeout,</td></tr>
+<tr><th id="449">449</th><td>                                      poll_fds, ARRAY_SIZE(poll_fds));</td></tr>
+<tr><th id="450">450</th><td>    g_assert(n_poll_fds &lt;= ARRAY_SIZE(poll_fds));</td></tr>
+<tr><th id="451">451</th><td></td></tr>
+<tr><th id="452">452</th><td>    <b>for</b> (i = <var>0</var>; i &lt; w-&gt;num; i++) {</td></tr>
+<tr><th id="453">453</th><td>        poll_fds[n_poll_fds + i].fd = (DWORD_PTR)w-&gt;events[i];</td></tr>
+<tr><th id="454">454</th><td>        poll_fds[n_poll_fds + i].events = G_IO_IN;</td></tr>
+<tr><th id="455">455</th><td>    }</td></tr>
+<tr><th id="456">456</th><td></td></tr>
+<tr><th id="457">457</th><td>    <b>if</b> (poll_timeout &lt; <var>0</var>) {</td></tr>
+<tr><th id="458">458</th><td>        poll_timeout_ns = -<var>1</var>;</td></tr>
+<tr><th id="459">459</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="460">460</th><td>        poll_timeout_ns = (int64_t)poll_timeout * (int64_t)SCALE_MS;</td></tr>
+<tr><th id="461">461</th><td>    }</td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td>    poll_timeout_ns = qemu_soonest_timeout(poll_timeout_ns, timeout);</td></tr>
+<tr><th id="464">464</th><td></td></tr>
+<tr><th id="465">465</th><td>    qemu_mutex_unlock_iothread();</td></tr>
+<tr><th id="466">466</th><td>    g_poll_ret = qemu_poll_ns(poll_fds, n_poll_fds + w-&gt;num, poll_timeout_ns);</td></tr>
+<tr><th id="467">467</th><td></td></tr>
+<tr><th id="468">468</th><td>    qemu_mutex_lock_iothread();</td></tr>
+<tr><th id="469">469</th><td>    <b>if</b> (g_poll_ret &gt; <var>0</var>) {</td></tr>
+<tr><th id="470">470</th><td>        <b>for</b> (i = <var>0</var>; i &lt; w-&gt;num; i++) {</td></tr>
+<tr><th id="471">471</th><td>            w-&gt;revents[i] = poll_fds[n_poll_fds + i].revents;</td></tr>
+<tr><th id="472">472</th><td>        }</td></tr>
+<tr><th id="473">473</th><td>        <b>for</b> (i = <var>0</var>; i &lt; w-&gt;num; i++) {</td></tr>
+<tr><th id="474">474</th><td>            <b>if</b> (w-&gt;revents[i] &amp;&amp; w-&gt;func[i]) {</td></tr>
+<tr><th id="475">475</th><td>                w-&gt;func[i](w-&gt;opaque[i]);</td></tr>
+<tr><th id="476">476</th><td>            }</td></tr>
+<tr><th id="477">477</th><td>        }</td></tr>
+<tr><th id="478">478</th><td>    }</td></tr>
+<tr><th id="479">479</th><td></td></tr>
+<tr><th id="480">480</th><td>    <b>if</b> (g_main_context_check(context, max_priority, poll_fds, n_poll_fds)) {</td></tr>
+<tr><th id="481">481</th><td>        g_main_context_dispatch(context);</td></tr>
+<tr><th id="482">482</th><td>    }</td></tr>
+<tr><th id="483">483</th><td></td></tr>
+<tr><th id="484">484</th><td>    g_main_context_release(context);</td></tr>
+<tr><th id="485">485</th><td></td></tr>
+<tr><th id="486">486</th><td>    <b>return</b> select_ret || g_poll_ret;</td></tr>
+<tr><th id="487">487</th><td>}</td></tr>
+<tr><th id="488">488</th><td><u>#<span data-ppcond="174">endif</span></u></td></tr>
+<tr><th id="489">489</th><td></td></tr>
+<tr><th id="490">490</th><td><em>void</em> <dfn class="decl def" id="main_loop_wait" title='main_loop_wait' data-ref="main_loop_wait">main_loop_wait</dfn>(<em>int</em> <dfn class="local col6 decl" id="26nonblocking" title='nonblocking' data-type='int' data-ref="26nonblocking">nonblocking</dfn>)</td></tr>
+<tr><th id="491">491</th><td>{</td></tr>
+<tr><th id="492">492</th><td>    <em>int</em> <dfn class="local col7 decl" id="27ret" title='ret' data-type='int' data-ref="27ret">ret</dfn>;</td></tr>
+<tr><th id="493">493</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="28timeout" title='timeout' data-type='uint32_t' data-ref="28timeout">timeout</dfn> = <a class="macro" href="../../include/stdint.h.html#168" title="(4294967295U)" data-ref="_M/UINT32_MAX">UINT32_MAX</a>;</td></tr>
+<tr><th id="494">494</th><td>    <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col9 decl" id="29timeout_ns" title='timeout_ns' data-type='int64_t' data-ref="29timeout_ns">timeout_ns</dfn>;</td></tr>
+<tr><th id="495">495</th><td></td></tr>
+<tr><th id="496">496</th><td>    <b>if</b> (<a class="local col6 ref" href="#26nonblocking" title='nonblocking' data-ref="26nonblocking">nonblocking</a>) {</td></tr>
+<tr><th id="497">497</th><td>        <a class="local col8 ref" href="#28timeout" title='timeout' data-ref="28timeout">timeout</a> = <var>0</var>;</td></tr>
+<tr><th id="498">498</th><td>    }</td></tr>
+<tr><th id="499">499</th><td></td></tr>
+<tr><th id="500">500</th><td>    <i>/* poll any events */</i></td></tr>
+<tr><th id="501">501</th><td>    <a class="ref" href="../../include/glib-2.0/glib/garray.h.html#g_array_set_size" title='g_array_set_size' data-ref="g_array_set_size">g_array_set_size</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, <var>0</var>); <i>/* reset for new iteration */</i></td></tr>
+<tr><th id="502">502</th><td>    <i>/* XXX: separate device handlers from system ones */</i></td></tr>
+<tr><th id="503">503</th><td>    <a class="ref" href="../slirp/libslirp.h.html#slirp_pollfds_fill" title='slirp_pollfds_fill' data-ref="slirp_pollfds_fill">slirp_pollfds_fill</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, &amp;<a class="local col8 ref" href="#28timeout" title='timeout' data-ref="28timeout">timeout</a>);</td></tr>
+<tr><th id="504">504</th><td></td></tr>
+<tr><th id="505">505</th><td>    <b>if</b> (<a class="local col8 ref" href="#28timeout" title='timeout' data-ref="28timeout">timeout</a> == <a class="macro" href="../../include/stdint.h.html#168" title="(4294967295U)" data-ref="_M/UINT32_MAX">UINT32_MAX</a>) {</td></tr>
+<tr><th id="506">506</th><td>        <a class="local col9 ref" href="#29timeout_ns" title='timeout_ns' data-ref="29timeout_ns">timeout_ns</a> = -<var>1</var>;</td></tr>
+<tr><th id="507">507</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="508">508</th><td>        <a class="local col9 ref" href="#29timeout_ns" title='timeout_ns' data-ref="29timeout_ns">timeout_ns</a> = (<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>)<a class="local col8 ref" href="#28timeout" title='timeout' data-ref="28timeout">timeout</a> * (<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a>)(<a class="macro" href="../include/qemu/timer.h.html#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>);</td></tr>
+<tr><th id="509">509</th><td>    }</td></tr>
+<tr><th id="510">510</th><td></td></tr>
+<tr><th id="511">511</th><td>    <a class="local col9 ref" href="#29timeout_ns" title='timeout_ns' data-ref="29timeout_ns">timeout_ns</a> = <a class="ref" href="../include/qemu/timer.h.html#qemu_soonest_timeout" title='qemu_soonest_timeout' data-ref="qemu_soonest_timeout">qemu_soonest_timeout</a>(<a class="local col9 ref" href="#29timeout_ns" title='timeout_ns' data-ref="29timeout_ns">timeout_ns</a>,</td></tr>
+<tr><th id="512">512</th><td>                                      <a class="ref" href="../include/qemu/timer.h.html#timerlistgroup_deadline_ns" title='timerlistgroup_deadline_ns' data-ref="timerlistgroup_deadline_ns">timerlistgroup_deadline_ns</a>(</td></tr>
+<tr><th id="513">513</th><td>                                          &amp;<a class="ref" href="../include/qemu/timer.h.html#main_loop_tlg" title='main_loop_tlg' data-ref="main_loop_tlg">main_loop_tlg</a>));</td></tr>
+<tr><th id="514">514</th><td></td></tr>
+<tr><th id="515">515</th><td>    <a class="local col7 ref" href="#27ret" title='ret' data-ref="27ret">ret</a> = <a class="tu ref" href="#os_host_main_loop_wait" title='os_host_main_loop_wait' data-use='c' data-ref="os_host_main_loop_wait">os_host_main_loop_wait</a>(<a class="local col9 ref" href="#29timeout_ns" title='timeout_ns' data-ref="29timeout_ns">timeout_ns</a>);</td></tr>
+<tr><th id="516">516</th><td>    <a class="ref" href="../slirp/libslirp.h.html#slirp_pollfds_poll" title='slirp_pollfds_poll' data-ref="slirp_pollfds_poll">slirp_pollfds_poll</a>(<a class="tu ref" href="#gpollfds" title='gpollfds' data-use='r' data-ref="gpollfds">gpollfds</a>, (<a class="local col7 ref" href="#27ret" title='ret' data-ref="27ret">ret</a> &lt; <var>0</var>));</td></tr>
+<tr><th id="517">517</th><td></td></tr>
+<tr><th id="518">518</th><td>    <i>/* CPU thread can infinitely wait for event after</i></td></tr>
+<tr><th id="519">519</th><td><i>       missing the warp */</i></td></tr>
+<tr><th id="520">520</th><td>    <a class="ref" href="../include/qemu/timer.h.html#qemu_start_warp_timer" title='qemu_start_warp_timer' data-ref="qemu_start_warp_timer">qemu_start_warp_timer</a>();</td></tr>
+<tr><th id="521">521</th><td>    <a class="ref" href="../include/qemu/timer.h.html#qemu_clock_run_all_timers" title='qemu_clock_run_all_timers' data-ref="qemu_clock_run_all_timers">qemu_clock_run_all_timers</a>();</td></tr>
+<tr><th id="522">522</th><td>}</td></tr>
+<tr><th id="523">523</th><td></td></tr>
+<tr><th id="524">524</th><td><i>/* Functions to operate on the main QEMU AioContext.  */</i></td></tr>
+<tr><th id="525">525</th><td></td></tr>
+<tr><th id="526">526</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl def" id="qemu_bh_new" title='qemu_bh_new' data-ref="qemu_bh_new">qemu_bh_new</dfn>(<a class="typedef" href="../include/block/aio.h.html#QEMUBHFunc" title='QEMUBHFunc' data-type='void (void *)' data-ref="QEMUBHFunc">QEMUBHFunc</a> *<dfn class="local col0 decl" id="30cb" title='cb' data-type='QEMUBHFunc *' data-ref="30cb">cb</dfn>, <em>void</em> *<dfn class="local col1 decl" id="31opaque" title='opaque' data-type='void *' data-ref="31opaque">opaque</dfn>)</td></tr>
+<tr><th id="527">527</th><td>{</td></tr>
+<tr><th id="528">528</th><td>    <b>return</b> <a class="ref" href="../include/block/aio.h.html#aio_bh_new" title='aio_bh_new' data-ref="aio_bh_new">aio_bh_new</a>(<a class="tu ref" href="#qemu_aio_context" title='qemu_aio_context' data-use='r' data-ref="qemu_aio_context">qemu_aio_context</a>, <a class="local col0 ref" href="#30cb" title='cb' data-ref="30cb">cb</a>, <a class="local col1 ref" href="#31opaque" title='opaque' data-ref="31opaque">opaque</a>);</td></tr>
+<tr><th id="529">529</th><td>}</td></tr>
+<tr><th id="530">530</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

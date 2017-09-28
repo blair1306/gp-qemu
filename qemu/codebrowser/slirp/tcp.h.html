@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tcp.h source code [codebrowser/slirp/tcp.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/tcp.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='tcp.h.html'>tcp.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1982, 1986, 1993</i></td></tr>
+<tr><th id="3">3</th><td><i> *	The Regents of the University of California.  All rights reserved.</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="6">6</th><td><i> * modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="7">7</th><td><i> * are met:</i></td></tr>
+<tr><th id="8">8</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="9">9</th><td><i> *    notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="10">10</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="11">11</th><td><i> *    notice, this list of conditions and the following disclaimer in the</i></td></tr>
+<tr><th id="12">12</th><td><i> *    documentation and/or other materials provided with the distribution.</i></td></tr>
+<tr><th id="13">13</th><td><i> * 3. Neither the name of the University nor the names of its contributors</i></td></tr>
+<tr><th id="14">14</th><td><i> *    may be used to endorse or promote products derived from this software</i></td></tr>
+<tr><th id="15">15</th><td><i> *    without specific prior written permission.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND</i></td></tr>
+<tr><th id="18">18</th><td><i> * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE</i></td></tr>
+<tr><th id="19">19</th><td><i> * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE</i></td></tr>
+<tr><th id="20">20</th><td><i> * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE</i></td></tr>
+<tr><th id="21">21</th><td><i> * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL</i></td></tr>
+<tr><th id="22">22</th><td><i> * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS</i></td></tr>
+<tr><th id="23">23</th><td><i> * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)</i></td></tr>
+<tr><th id="24">24</th><td><i> * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT</i></td></tr>
+<tr><th id="25">25</th><td><i> * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY</i></td></tr>
+<tr><th id="26">26</th><td><i> * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF</i></td></tr>
+<tr><th id="27">27</th><td><i> * SUCH DAMAGE.</i></td></tr>
+<tr><th id="28">28</th><td><i> *</i></td></tr>
+<tr><th id="29">29</th><td><i> *	@(#)tcp.h	8.1 (Berkeley) 6/10/93</i></td></tr>
+<tr><th id="30">30</th><td><i> * tcp.h,v 1.3 1994/08/21 05:27:34 paul Exp</i></td></tr>
+<tr><th id="31">31</th><td><i> */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="33">ifndef</span> <span class="macro" data-ref="_M/TCP_H">TCP_H</span></u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/TCP_H" data-ref="_M/TCP_H">TCP_H</dfn></u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><b>typedef</b>	<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq" id="tcp_seq">tcp_seq</a>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#define      <dfn class="macro" id="_M/PR_SLOWHZ" data-ref="_M/PR_SLOWHZ">PR_SLOWHZ</dfn>       2               /* 2 slow timeouts per second (approx) */</u></td></tr>
+<tr><th id="39">39</th><td><u>#define      <dfn class="macro" id="_M/PR_FASTHZ" data-ref="_M/PR_FASTHZ">PR_FASTHZ</dfn>       5               /* 5 fast timeouts per second (not important) */</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/TCP_SNDSPACE" data-ref="_M/TCP_SNDSPACE">TCP_SNDSPACE</dfn> 8192</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/TCP_RCVSPACE" data-ref="_M/TCP_RCVSPACE">TCP_RCVSPACE</dfn> 8192</u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i>/*</i></td></tr>
+<tr><th id="45">45</th><td><i> * TCP header.</i></td></tr>
+<tr><th id="46">46</th><td><i> * Per RFC 793, September, 1981.</i></td></tr>
+<tr><th id="47">47</th><td><i> */</i></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/tcphdr" data-ref="_M/tcphdr">tcphdr</dfn> <dfn class="type def" id="slirp_tcphdr" title='slirp_tcphdr' data-ref="slirp_tcphdr">slirp_tcphdr</dfn></u></td></tr>
+<tr><th id="49">49</th><td><b>struct</b> <a class="macro" href="#48" title="slirp_tcphdr" data-ref="_M/tcphdr">tcphdr</a> {</td></tr>
+<tr><th id="50">50</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="slirp_tcphdr::th_sport" title='slirp_tcphdr::th_sport' data-ref="slirp_tcphdr::th_sport">th_sport</dfn>;              <i>/* source port */</i></td></tr>
+<tr><th id="51">51</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="slirp_tcphdr::th_dport" title='slirp_tcphdr::th_dport' data-ref="slirp_tcphdr::th_dport">th_dport</dfn>;              <i>/* destination port */</i></td></tr>
+<tr><th id="52">52</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="slirp_tcphdr::th_seq" title='slirp_tcphdr::th_seq' data-ref="slirp_tcphdr::th_seq">th_seq</dfn>;			<i>/* sequence number */</i></td></tr>
+<tr><th id="53">53</th><td>	<a class="typedef" href="../../include/netinet/tcp.h.html#tcp_seq" title='tcp_seq' data-type='uint32_t' data-ref="tcp_seq">tcp_seq</a>	<dfn class="decl" id="slirp_tcphdr::th_ack" title='slirp_tcphdr::th_ack' data-ref="slirp_tcphdr::th_ack">th_ack</dfn>;			<i>/* acknowledgement number */</i></td></tr>
+<tr><th id="54">54</th><td><u>#<span data-ppcond="54">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="55">55</th><td>	uint8_t	th_off:<var>4</var>,		<i>/* data offset */</i></td></tr>
+<tr><th id="56">56</th><td>		th_x2:<var>4</var>;		<i>/* (unused) */</i></td></tr>
+<tr><th id="57">57</th><td><u>#<span data-ppcond="54">else</span></u></td></tr>
+<tr><th id="58">58</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>	<dfn class="decl" id="slirp_tcphdr::th_x2" title='slirp_tcphdr::th_x2' data-ref="slirp_tcphdr::th_x2">th_x2</dfn>:<var>4</var>,		<i>/* (unused) */</i></td></tr>
+<tr><th id="59">59</th><td>		<dfn class="decl" id="slirp_tcphdr::th_off" title='slirp_tcphdr::th_off' data-ref="slirp_tcphdr::th_off">th_off</dfn>:<var>4</var>;		<i>/* data offset */</i></td></tr>
+<tr><th id="60">60</th><td><u>#<span data-ppcond="54">endif</span></u></td></tr>
+<tr><th id="61">61</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="slirp_tcphdr::th_flags" title='slirp_tcphdr::th_flags' data-ref="slirp_tcphdr::th_flags">th_flags</dfn>;</td></tr>
+<tr><th id="62">62</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="slirp_tcphdr::th_win" title='slirp_tcphdr::th_win' data-ref="slirp_tcphdr::th_win">th_win</dfn>;                <i>/* window */</i></td></tr>
+<tr><th id="63">63</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="slirp_tcphdr::th_sum" title='slirp_tcphdr::th_sum' data-ref="slirp_tcphdr::th_sum">th_sum</dfn>;                <i>/* checksum */</i></td></tr>
+<tr><th id="64">64</th><td>	<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="slirp_tcphdr::th_urp" title='slirp_tcphdr::th_urp' data-ref="slirp_tcphdr::th_urp">th_urp</dfn>;                <i>/* urgent pointer */</i></td></tr>
+<tr><th id="65">65</th><td>};</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><u>#include <a href="tcp_var.h.html">"tcp_var.h"</a></u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><u>#<span data-ppcond="69">ifndef</span> <a class="macro" href="../include/net/eth.h.html#174" data-ref="_M/TH_FIN">TH_FIN</a></u></td></tr>
+<tr><th id="70">70</th><td><u>#define	TH_FIN	0x01</u></td></tr>
+<tr><th id="71">71</th><td><u>#define	TH_SYN	0x02</u></td></tr>
+<tr><th id="72">72</th><td><u>#define	TH_RST	0x04</u></td></tr>
+<tr><th id="73">73</th><td><u>#define	TH_PUSH	0x08</u></td></tr>
+<tr><th id="74">74</th><td><u>#define	TH_ACK	0x10</u></td></tr>
+<tr><th id="75">75</th><td><u>#define	TH_URG	0x20</u></td></tr>
+<tr><th id="76">76</th><td><u>#<span data-ppcond="69">endif</span></u></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><u>#<span data-ppcond="78">ifndef</span> <a class="macro" href="../../include/netinet/tcp.h.html#162" data-ref="_M/TCPOPT_EOL">TCPOPT_EOL</a></u></td></tr>
+<tr><th id="79">79</th><td><u>#define	TCPOPT_EOL		0</u></td></tr>
+<tr><th id="80">80</th><td><u>#define	TCPOPT_NOP		1</u></td></tr>
+<tr><th id="81">81</th><td><u>#define	TCPOPT_MAXSEG		2</u></td></tr>
+<tr><th id="82">82</th><td><u>#define TCPOPT_WINDOW		3</u></td></tr>
+<tr><th id="83">83</th><td><u>#define TCPOPT_SACK_PERMITTED	4		/* Experimental */</u></td></tr>
+<tr><th id="84">84</th><td><u>#define TCPOPT_SACK		5		/* Experimental */</u></td></tr>
+<tr><th id="85">85</th><td><u>#define TCPOPT_TIMESTAMP	8</u></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><u>#define TCPOPT_TSTAMP_HDR	\</u></td></tr>
+<tr><th id="88">88</th><td><u>    (TCPOPT_NOP&lt;&lt;24|TCPOPT_NOP&lt;&lt;16|TCPOPT_TIMESTAMP&lt;&lt;8|TCPOLEN_TIMESTAMP)</u></td></tr>
+<tr><th id="89">89</th><td><u>#<span data-ppcond="78">endif</span></u></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><u>#<span data-ppcond="91">ifndef</span> <a class="macro" href="../../include/netinet/tcp.h.html#165" data-ref="_M/TCPOLEN_MAXSEG">TCPOLEN_MAXSEG</a></u></td></tr>
+<tr><th id="92">92</th><td><u>#define    TCPOLEN_MAXSEG		4</u></td></tr>
+<tr><th id="93">93</th><td><u>#define    TCPOLEN_WINDOW		3</u></td></tr>
+<tr><th id="94">94</th><td><u>#define    TCPOLEN_SACK_PERMITTED	2</u></td></tr>
+<tr><th id="95">95</th><td><u>#define    TCPOLEN_TIMESTAMP		10</u></td></tr>
+<tr><th id="96">96</th><td><u>#define    TCPOLEN_TSTAMP_APPA		(TCPOLEN_TIMESTAMP+2) /* appendix A */</u></td></tr>
+<tr><th id="97">97</th><td><u>#<span data-ppcond="91">endif</span></u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><i>/*</i></td></tr>
+<tr><th id="100">100</th><td><i> * Default maximum segment size for TCP.</i></td></tr>
+<tr><th id="101">101</th><td><i> * With an IP MSS of 576, this is 536,</i></td></tr>
+<tr><th id="102">102</th><td><i> * but 512 is probably more convenient.</i></td></tr>
+<tr><th id="103">103</th><td><i> * This should be defined as MIN(512, IP_MSS - sizeof (struct tcpiphdr)).</i></td></tr>
+<tr><th id="104">104</th><td><i> *</i></td></tr>
+<tr><th id="105">105</th><td><i> * We make this 1460 because we only care about Ethernet in the qemu context.</i></td></tr>
+<tr><th id="106">106</th><td><i> */</i></td></tr>
+<tr><th id="107">107</th><td><u>#undef <a class="macro" href="../../include/netinet/tcp.h.html#184" data-ref="_M/TCP_MSS">TCP_MSS</a></u></td></tr>
+<tr><th id="108">108</th><td><u>#define	<dfn class="macro" id="_M/TCP_MSS" data-ref="_M/TCP_MSS">TCP_MSS</dfn>	1460</u></td></tr>
+<tr><th id="109">109</th><td><u>#undef <span class="macro" data-ref="_M/TCP6_MSS">TCP6_MSS</span></u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/TCP6_MSS" data-ref="_M/TCP6_MSS">TCP6_MSS</dfn> 1440</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><u>#undef <a class="macro" href="../../include/netinet/tcp.h.html#186" data-ref="_M/TCP_MAXWIN">TCP_MAXWIN</a></u></td></tr>
+<tr><th id="113">113</th><td><u>#define	<dfn class="macro" id="_M/TCP_MAXWIN" data-ref="_M/TCP_MAXWIN">TCP_MAXWIN</dfn>	65535	/* largest value for (unscaled) window */</u></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><u>#undef <a class="macro" href="../../include/netinet/tcp.h.html#188" data-ref="_M/TCP_MAX_WINSHIFT">TCP_MAX_WINSHIFT</a></u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/TCP_MAX_WINSHIFT" data-ref="_M/TCP_MAX_WINSHIFT">TCP_MAX_WINSHIFT</dfn>	14	/* maximum window shift */</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><i>/*</i></td></tr>
+<tr><th id="119">119</th><td><i> * User-settable options (used with setsockopt).</i></td></tr>
+<tr><th id="120">120</th><td><i> *</i></td></tr>
+<tr><th id="121">121</th><td><i> * We don't use the system headers on unix because we have conflicting</i></td></tr>
+<tr><th id="122">122</th><td><i> * local structures. We can't avoid the system definitions on Windows,</i></td></tr>
+<tr><th id="123">123</th><td><i> * so we undefine them.</i></td></tr>
+<tr><th id="124">124</th><td><i> */</i></td></tr>
+<tr><th id="125">125</th><td><u>#undef <a class="macro" href="../../include/netinet/tcp.h.html#40" data-ref="_M/TCP_NODELAY">TCP_NODELAY</a></u></td></tr>
+<tr><th id="126">126</th><td><u>#define	<dfn class="macro" id="_M/TCP_NODELAY" data-ref="_M/TCP_NODELAY">TCP_NODELAY</dfn>	0x01	/* don't delay send to coalesce packets */</u></td></tr>
+<tr><th id="127">127</th><td><u>#undef <a class="macro" href="../../include/netinet/tcp.h.html#41" data-ref="_M/TCP_MAXSEG">TCP_MAXSEG</a></u></td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><i>/*</i></td></tr>
+<tr><th id="130">130</th><td><i> * TCP FSM state definitions.</i></td></tr>
+<tr><th id="131">131</th><td><i> * Per RFC793, September, 1981.</i></td></tr>
+<tr><th id="132">132</th><td><i> */</i></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/TCP_NSTATES" data-ref="_M/TCP_NSTATES">TCP_NSTATES</dfn>     11</u></td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/TCPS_CLOSED" data-ref="_M/TCPS_CLOSED">TCPS_CLOSED</dfn>             0       /* closed */</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/TCPS_LISTEN" data-ref="_M/TCPS_LISTEN">TCPS_LISTEN</dfn>             1       /* listening for connection */</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/TCPS_SYN_SENT" data-ref="_M/TCPS_SYN_SENT">TCPS_SYN_SENT</dfn>           2       /* active, have sent syn */</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/TCPS_SYN_RECEIVED" data-ref="_M/TCPS_SYN_RECEIVED">TCPS_SYN_RECEIVED</dfn>       3       /* have send and received syn */</u></td></tr>
+<tr><th id="140">140</th><td><i>/* states &lt; TCPS_ESTABLISHED are those where connections not established */</i></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/TCPS_ESTABLISHED" data-ref="_M/TCPS_ESTABLISHED">TCPS_ESTABLISHED</dfn>        4       /* established */</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/TCPS_CLOSE_WAIT" data-ref="_M/TCPS_CLOSE_WAIT">TCPS_CLOSE_WAIT</dfn>         5       /* rcvd fin, waiting for close */</u></td></tr>
+<tr><th id="143">143</th><td><i>/* states &gt; TCPS_CLOSE_WAIT are those where user has closed */</i></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/TCPS_FIN_WAIT_1" data-ref="_M/TCPS_FIN_WAIT_1">TCPS_FIN_WAIT_1</dfn>         6       /* have closed, sent fin */</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/TCPS_CLOSING" data-ref="_M/TCPS_CLOSING">TCPS_CLOSING</dfn>            7       /* closed xchd FIN; await FIN ACK */</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/TCPS_LAST_ACK" data-ref="_M/TCPS_LAST_ACK">TCPS_LAST_ACK</dfn>           8       /* had fin and close; await FIN ACK */</u></td></tr>
+<tr><th id="147">147</th><td><i>/* states &gt; TCPS_CLOSE_WAIT &amp;&amp; &lt; TCPS_FIN_WAIT_2 await ACK of FIN */</i></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/TCPS_FIN_WAIT_2" data-ref="_M/TCPS_FIN_WAIT_2">TCPS_FIN_WAIT_2</dfn>         9       /* have closed, fin is acked */</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/TCPS_TIME_WAIT" data-ref="_M/TCPS_TIME_WAIT">TCPS_TIME_WAIT</dfn>          10      /* in 2*msl quiet wait after close */</u></td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/TCPS_HAVERCVDSYN" data-ref="_M/TCPS_HAVERCVDSYN">TCPS_HAVERCVDSYN</dfn>(s)     ((s) &gt;= TCPS_SYN_RECEIVED)</u></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/TCPS_HAVEESTABLISHED" data-ref="_M/TCPS_HAVEESTABLISHED">TCPS_HAVEESTABLISHED</dfn>(s) ((s) &gt;= TCPS_ESTABLISHED)</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/TCPS_HAVERCVDFIN" data-ref="_M/TCPS_HAVERCVDFIN">TCPS_HAVERCVDFIN</dfn>(s)     ((s) &gt;= TCPS_TIME_WAIT)</u></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><i>/*</i></td></tr>
+<tr><th id="156">156</th><td><i> * TCP sequence numbers are 32 bit integers operated</i></td></tr>
+<tr><th id="157">157</th><td><i> * on with modular arithmetic.  These macros can be</i></td></tr>
+<tr><th id="158">158</th><td><i> * used to compare such integers.</i></td></tr>
+<tr><th id="159">159</th><td><i> */</i></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/SEQ_LT" data-ref="_M/SEQ_LT">SEQ_LT</dfn>(a,b)     ((int)((a)-(b)) &lt; 0)</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/SEQ_LEQ" data-ref="_M/SEQ_LEQ">SEQ_LEQ</dfn>(a,b)    ((int)((a)-(b)) &lt;= 0)</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/SEQ_GT" data-ref="_M/SEQ_GT">SEQ_GT</dfn>(a,b)     ((int)((a)-(b)) &gt; 0)</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/SEQ_GEQ" data-ref="_M/SEQ_GEQ">SEQ_GEQ</dfn>(a,b)    ((int)((a)-(b)) &gt;= 0)</u></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><i>/*</i></td></tr>
+<tr><th id="166">166</th><td><i> * Macros to initialize tcp sequence numbers for</i></td></tr>
+<tr><th id="167">167</th><td><i> * send and receive from initial send and receive</i></td></tr>
+<tr><th id="168">168</th><td><i> * sequence numbers.</i></td></tr>
+<tr><th id="169">169</th><td><i> */</i></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/tcp_rcvseqinit" data-ref="_M/tcp_rcvseqinit">tcp_rcvseqinit</dfn>(tp) \</u></td></tr>
+<tr><th id="171">171</th><td><u>     (tp)-&gt;rcv_adv = (tp)-&gt;rcv_nxt = (tp)-&gt;irs + 1</u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><u>#define <dfn class="macro" id="_M/tcp_sendseqinit" data-ref="_M/tcp_sendseqinit">tcp_sendseqinit</dfn>(tp) \</u></td></tr>
+<tr><th id="174">174</th><td><u>    (tp)-&gt;snd_una = (tp)-&gt;snd_nxt = (tp)-&gt;snd_max = (tp)-&gt;snd_up = (tp)-&gt;iss</u></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/TCP_ISSINCR" data-ref="_M/TCP_ISSINCR">TCP_ISSINCR</dfn>     (125*1024)      /* increment for tcp_iss each second */</u></td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><u>#<span data-ppcond="33">endif</span></u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../net/colo-compare.c.html'>codebrowser/net/colo-compare.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

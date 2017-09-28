@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>virtio-net.h source code [codebrowser/include/hw/virtio/virtio-net.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="VirtIONet,VirtIONetQueue,virtio_net_conf "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/virtio/virtio-net.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>virtio</a>/<a href='virtio-net.h.html'>virtio-net.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Virtio Network Device</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2007</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2.  See</i></td></tr>
+<tr><th id="10">10</th><td><i> * the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/QEMU_VIRTIO_NET_H">QEMU_VIRTIO_NET_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/QEMU_VIRTIO_NET_H" data-ref="_M/QEMU_VIRTIO_NET_H">QEMU_VIRTIO_NET_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../../standard-headers/linux/virtio_net.h.html">"standard-headers/linux/virtio_net.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="virtio.h.html">"hw/virtio/virtio.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/TYPE_VIRTIO_NET" data-ref="_M/TYPE_VIRTIO_NET">TYPE_VIRTIO_NET</dfn> "virtio-net-device"</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/VIRTIO_NET" data-ref="_M/VIRTIO_NET">VIRTIO_NET</dfn>(obj) \</u></td></tr>
+<tr><th id="22">22</th><td><u>        OBJECT_CHECK(VirtIONet, (obj), TYPE_VIRTIO_NET)</u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#define <dfn class="macro" id="_M/TX_TIMER_INTERVAL" data-ref="_M/TX_TIMER_INTERVAL">TX_TIMER_INTERVAL</dfn> 150000 /* 150 us */</u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><i>/* Limit the number of packets that can be sent via a single flush</i></td></tr>
+<tr><th id="27">27</th><td><i> * of the TX queue.  This gives us a guaranteed exit condition and</i></td></tr>
+<tr><th id="28">28</th><td><i> * ensures fairness in the io path.  256 conveniently matches the</i></td></tr>
+<tr><th id="29">29</th><td><i> * length of the TX queue and shows a good balance of performance</i></td></tr>
+<tr><th id="30">30</th><td><i> * and latency. */</i></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/TX_BURST" data-ref="_M/TX_BURST">TX_BURST</dfn> 256</u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="virtio_net_conf" title='virtio_net_conf' data-ref="virtio_net_conf"><a class="type" href="#virtio_net_conf" title='virtio_net_conf' data-ref="virtio_net_conf">virtio_net_conf</a></dfn></td></tr>
+<tr><th id="34">34</th><td>{</td></tr>
+<tr><th id="35">35</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="virtio_net_conf::txtimer" title='virtio_net_conf::txtimer' data-ref="virtio_net_conf::txtimer">txtimer</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="virtio_net_conf::txburst" title='virtio_net_conf::txburst' data-ref="virtio_net_conf::txburst">txburst</dfn>;</td></tr>
+<tr><th id="37">37</th><td>    <em>char</em> *<dfn class="decl" id="virtio_net_conf::tx" title='virtio_net_conf::tx' data-ref="virtio_net_conf::tx">tx</dfn>;</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="virtio_net_conf::rx_queue_size" title='virtio_net_conf::rx_queue_size' data-ref="virtio_net_conf::rx_queue_size">rx_queue_size</dfn>;</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="virtio_net_conf::tx_queue_size" title='virtio_net_conf::tx_queue_size' data-ref="virtio_net_conf::tx_queue_size">tx_queue_size</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="virtio_net_conf::mtu" title='virtio_net_conf::mtu' data-ref="virtio_net_conf::mtu">mtu</dfn>;</td></tr>
+<tr><th id="41">41</th><td>} <dfn class="typedef" id="virtio_net_conf" title='virtio_net_conf' data-type='struct virtio_net_conf' data-ref="virtio_net_conf">virtio_net_conf</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i>/* Maximum packet size we can receive from tap device: header + 64k */</i></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/VIRTIO_NET_MAX_BUFSIZE" data-ref="_M/VIRTIO_NET_MAX_BUFSIZE">VIRTIO_NET_MAX_BUFSIZE</dfn> (sizeof(struct virtio_net_hdr) + (64 &lt;&lt; 10))</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIONetQueue" title='VirtIONetQueue' data-ref="VirtIONetQueue"><a class="type" href="#VirtIONetQueue" title='VirtIONetQueue' data-ref="VirtIONetQueue">VirtIONetQueue</a></dfn> {</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIONetQueue::rx_vq" title='VirtIONetQueue::rx_vq' data-ref="VirtIONetQueue::rx_vq">rx_vq</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIONetQueue::tx_vq" title='VirtIONetQueue::tx_vq' data-ref="VirtIONetQueue::tx_vq">tx_vq</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="VirtIONetQueue::tx_timer" title='VirtIONetQueue::tx_timer' data-ref="VirtIONetQueue::tx_timer">tx_timer</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="VirtIONetQueue::tx_bh" title='VirtIONetQueue::tx_bh' data-ref="VirtIONetQueue::tx_bh">tx_bh</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONetQueue::tx_waiting" title='VirtIONetQueue::tx_waiting' data-ref="VirtIONetQueue::tx_waiting">tx_waiting</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="53">53</th><td>        <a class="typedef" href="virtio.h.html#VirtQueueElement" title='VirtQueueElement' data-type='struct VirtQueueElement' data-ref="VirtQueueElement">VirtQueueElement</a> *<dfn class="decl" id="VirtIONetQueue::(anonymous)::elem" title='VirtIONetQueue::(anonymous struct)::elem' data-ref="VirtIONetQueue::(anonymous)::elem">elem</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    } <dfn class="decl" id="VirtIONetQueue::async_tx" title='VirtIONetQueue::async_tx' data-ref="VirtIONetQueue::async_tx">async_tx</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <b>struct</b> <a class="type" href="#VirtIONet" title='VirtIONet' data-ref="VirtIONet">VirtIONet</a> *<dfn class="decl" id="VirtIONetQueue::n" title='VirtIONetQueue::n' data-ref="VirtIONetQueue::n">n</dfn>;</td></tr>
+<tr><th id="56">56</th><td>} <dfn class="typedef" id="VirtIONetQueue" title='VirtIONetQueue' data-type='struct VirtIONetQueue' data-ref="VirtIONetQueue">VirtIONetQueue</dfn>;</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VirtIONet" title='VirtIONet' data-ref="VirtIONet"><a class="type" href="#VirtIONet" title='VirtIONet' data-ref="VirtIONet">VirtIONet</a></dfn> {</td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#VirtIODevice" title='VirtIODevice' data-type='struct VirtIODevice' data-ref="VirtIODevice">VirtIODevice</a> <dfn class="decl" id="VirtIONet::parent_obj" title='VirtIONet::parent_obj' data-ref="VirtIONet::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::mac" title='VirtIONet::mac' data-ref="VirtIONet::mac">mac</dfn>[<a class="macro" href="../../standard-headers/linux/if_ether.h.html#1" title="6" data-ref="_M/ETH_ALEN">ETH_ALEN</a>];</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VirtIONet::status" title='VirtIONet::status' data-ref="VirtIONet::status">status</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="#VirtIONetQueue" title='VirtIONetQueue' data-type='struct VirtIONetQueue' data-ref="VirtIONetQueue">VirtIONetQueue</a> *<dfn class="decl" id="VirtIONet::vqs" title='VirtIONet::vqs' data-ref="VirtIONet::vqs">vqs</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="virtio.h.html#VirtQueue" title='VirtQueue' data-type='struct VirtQueue' data-ref="VirtQueue">VirtQueue</a> *<dfn class="decl" id="VirtIONet::ctrl_vq" title='VirtIONet::ctrl_vq' data-ref="VirtIONet::ctrl_vq">ctrl_vq</dfn>;</td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../net/net.h.html#NICState" title='NICState' data-type='struct NICState' data-ref="NICState">NICState</a> *<dfn class="decl" id="VirtIONet::nic" title='VirtIONet::nic' data-ref="VirtIONet::nic">nic</dfn>;</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::tx_timeout" title='VirtIONet::tx_timeout' data-ref="VirtIONet::tx_timeout">tx_timeout</dfn>;</td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="VirtIONet::tx_burst" title='VirtIONet::tx_burst' data-ref="VirtIONet::tx_burst">tx_burst</dfn>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::has_vnet_hdr" title='VirtIONet::has_vnet_hdr' data-ref="VirtIONet::has_vnet_hdr">has_vnet_hdr</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VirtIONet::host_hdr_len" title='VirtIONet::host_hdr_len' data-ref="VirtIONet::host_hdr_len">host_hdr_len</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VirtIONet::guest_hdr_len" title='VirtIONet::guest_hdr_len' data-ref="VirtIONet::guest_hdr_len">guest_hdr_len</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::host_features" title='VirtIONet::host_features' data-ref="VirtIONet::host_features">host_features</dfn>;</td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::has_ufo" title='VirtIONet::has_ufo' data-ref="VirtIONet::has_ufo">has_ufo</dfn>;</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::mergeable_rx_bufs" title='VirtIONet::mergeable_rx_bufs' data-ref="VirtIONet::mergeable_rx_bufs">mergeable_rx_bufs</dfn>;</td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::promisc" title='VirtIONet::promisc' data-ref="VirtIONet::promisc">promisc</dfn>;</td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::allmulti" title='VirtIONet::allmulti' data-ref="VirtIONet::allmulti">allmulti</dfn>;</td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::alluni" title='VirtIONet::alluni' data-ref="VirtIONet::alluni">alluni</dfn>;</td></tr>
+<tr><th id="76">76</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::nomulti" title='VirtIONet::nomulti' data-ref="VirtIONet::nomulti">nomulti</dfn>;</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::nouni" title='VirtIONet::nouni' data-ref="VirtIONet::nouni">nouni</dfn>;</td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::nobcast" title='VirtIONet::nobcast' data-ref="VirtIONet::nobcast">nobcast</dfn>;</td></tr>
+<tr><th id="79">79</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::vhost_started" title='VirtIONet::vhost_started' data-ref="VirtIONet::vhost_started">vhost_started</dfn>;</td></tr>
+<tr><th id="80">80</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="81">81</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::(anonymous)::in_use" title='VirtIONet::(anonymous struct)::in_use' data-ref="VirtIONet::(anonymous)::in_use">in_use</dfn>;</td></tr>
+<tr><th id="82">82</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VirtIONet::(anonymous)::first_multi" title='VirtIONet::(anonymous struct)::first_multi' data-ref="VirtIONet::(anonymous)::first_multi">first_multi</dfn>;</td></tr>
+<tr><th id="83">83</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::(anonymous)::multi_overflow" title='VirtIONet::(anonymous struct)::multi_overflow' data-ref="VirtIONet::(anonymous)::multi_overflow">multi_overflow</dfn>;</td></tr>
+<tr><th id="84">84</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VirtIONet::(anonymous)::uni_overflow" title='VirtIONet::(anonymous struct)::uni_overflow' data-ref="VirtIONet::(anonymous)::uni_overflow">uni_overflow</dfn>;</td></tr>
+<tr><th id="85">85</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="VirtIONet::(anonymous)::macs" title='VirtIONet::(anonymous struct)::macs' data-ref="VirtIONet::(anonymous)::macs">macs</dfn>;</td></tr>
+<tr><th id="86">86</th><td>    } <dfn class="decl" id="VirtIONet::mac_table" title='VirtIONet::mac_table' data-ref="VirtIONet::mac_table">mac_table</dfn>;</td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="decl" id="VirtIONet::vlans" title='VirtIONet::vlans' data-ref="VirtIONet::vlans">vlans</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="#virtio_net_conf" title='virtio_net_conf' data-type='struct virtio_net_conf' data-ref="virtio_net_conf">virtio_net_conf</a> <dfn class="decl" id="VirtIONet::net_conf" title='VirtIONet::net_conf' data-ref="VirtIONet::net_conf">net_conf</dfn>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="../../net/net.h.html#NICConf" title='NICConf' data-type='struct NICConf' data-ref="NICConf">NICConf</a> <dfn class="decl" id="VirtIONet::nic_conf" title='VirtIONet::nic_conf' data-ref="VirtIONet::nic_conf">nic_conf</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="VirtIONet::qdev" title='VirtIONet::qdev' data-ref="VirtIONet::qdev">qdev</dfn>;</td></tr>
+<tr><th id="91">91</th><td>    <em>int</em> <dfn class="decl" id="VirtIONet::multiqueue" title='VirtIONet::multiqueue' data-ref="VirtIONet::multiqueue">multiqueue</dfn>;</td></tr>
+<tr><th id="92">92</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VirtIONet::max_queues" title='VirtIONet::max_queues' data-ref="VirtIONet::max_queues">max_queues</dfn>;</td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VirtIONet::curr_queues" title='VirtIONet::curr_queues' data-ref="VirtIONet::curr_queues">curr_queues</dfn>;</td></tr>
+<tr><th id="94">94</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="VirtIONet::config_size" title='VirtIONet::config_size' data-ref="VirtIONet::config_size">config_size</dfn>;</td></tr>
+<tr><th id="95">95</th><td>    <em>char</em> *<dfn class="decl" id="VirtIONet::netclient_name" title='VirtIONet::netclient_name' data-ref="VirtIONet::netclient_name">netclient_name</dfn>;</td></tr>
+<tr><th id="96">96</th><td>    <em>char</em> *<dfn class="decl" id="VirtIONet::netclient_type" title='VirtIONet::netclient_type' data-ref="VirtIONet::netclient_type">netclient_type</dfn>;</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VirtIONet::curr_guest_offloads" title='VirtIONet::curr_guest_offloads' data-ref="VirtIONet::curr_guest_offloads">curr_guest_offloads</dfn>;</td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="VirtIONet::announce_timer" title='VirtIONet::announce_timer' data-ref="VirtIONet::announce_timer">announce_timer</dfn>;</td></tr>
+<tr><th id="99">99</th><td>    <em>int</em> <dfn class="decl" id="VirtIONet::announce_counter" title='VirtIONet::announce_counter' data-ref="VirtIONet::announce_counter">announce_counter</dfn>;</td></tr>
+<tr><th id="100">100</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VirtIONet::needs_vnet_hdr_swap" title='VirtIONet::needs_vnet_hdr_swap' data-ref="VirtIONet::needs_vnet_hdr_swap">needs_vnet_hdr_swap</dfn>;</td></tr>
+<tr><th id="101">101</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VirtIONet::mtu_bypass_backend" title='VirtIONet::mtu_bypass_backend' data-ref="VirtIONet::mtu_bypass_backend">mtu_bypass_backend</dfn>;</td></tr>
+<tr><th id="102">102</th><td>} <dfn class="typedef" id="VirtIONet" title='VirtIONet' data-type='struct VirtIONet' data-ref="VirtIONet">VirtIONet</dfn>;</td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><em>void</em> <dfn class="decl" id="virtio_net_set_netclient_name" title='virtio_net_set_netclient_name' data-ref="virtio_net_set_netclient_name">virtio_net_set_netclient_name</dfn>(<a class="typedef" href="#VirtIONet" title='VirtIONet' data-type='struct VirtIONet' data-ref="VirtIONet">VirtIONet</a> *<dfn class="local col1 decl" id="1n" title='n' data-type='VirtIONet *' data-ref="1n">n</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="2name" title='name' data-type='const char *' data-ref="2name">name</dfn>,</td></tr>
+<tr><th id="105">105</th><td>                                   <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="3type" title='type' data-type='const char *' data-ref="3type">type</dfn>);</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/display/virtio-gpu-pci.c.html'>codebrowser/hw/display/virtio-gpu-pci.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

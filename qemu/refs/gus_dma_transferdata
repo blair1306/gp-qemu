@@ -1,0 +1,22 @@
+<dec f='codebrowser/hw/audio/gusemu.h' l='61' type='void gus_dma_transferdata(GUSEmuState * state, char * dma_addr, unsigned int count, int TC)'/>
+<use f='codebrowser/hw/audio/gus.c' l='198' u='c' c='GUS_read_DMA'/>
+<doc f='codebrowser/hw/audio/gusemu.h' l='60'>/* data pointed to is passed in native x86 order */</doc>
+<def f='codebrowser/hw/audio/gusemu_hal.c' l='501' ll='555' type='void gus_dma_transferdata(GUSEmuState * state, char * dma_addr, unsigned int count, int TC)'/>
+<doc f='codebrowser/hw/audio/gusemu_hal.c' l='482'>/* Attention when breaking up a single DMA transfer to multiple ones:
+ * it may lead to multiple terminal count interrupts and broken transfers:
+ *
+ * 1. Whenever you transfer a piece of data, the gusemu callback is invoked
+ * 2. The callback may generate a TC irq (if the register was set up to do so)
+ * 3. The irq may result in the program using the GUS to reprogram the GUS
+ *
+ * Some programs also decide to upload by just checking if TC occurs
+ * (via interrupt or a cleared GUS dma flag)
+ * and then start the next transfer, without checking DMA state
+ *
+ * Thus: Always make sure to set the TC flag correctly!
+ *
+ * Note that the genuine GUS had a granularity of 16 bytes/words for low/high DMA
+ * while later cards had atomic granularity provided by an additional GUS50DMAHigh register
+ * GUSemu also uses this register to support byte-granular transfers for better compatibility
+ * with emulators other than GUSemu32
+ */</doc>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ahci.h source code [codebrowser/include/hw/ide/ahci.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="AHCIControlRegs,AHCIState,AllwinnerAHCIState,SysbusAHCIState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/ide/ahci.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>ide</a>/<a href='ahci.h.html'>ahci.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU AHCI Emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010 qiaochong@loongson.cn</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2010 Roland Elek &lt;elek.roland@gmail.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (c) 2010 Sebastian Herbszt &lt;herbszt@gmx.de&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> * Copyright (c) 2010 Alexander Graf &lt;agraf@suse.de&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="10">10</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="11">11</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="12">12</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="15">15</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="16">16</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="17">17</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="20">20</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="21">21</th><td><i> *</i></td></tr>
+<tr><th id="22">22</th><td><i> */</i></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="24">ifndef</span> <span class="macro" data-ref="_M/HW_IDE_AHCI_H">HW_IDE_AHCI_H</span></u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/HW_IDE_AHCI_H" data-ref="_M/HW_IDE_AHCI_H">HW_IDE_AHCI_H</dfn></u></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="AHCIDevice" title='AHCIDevice' data-ref="AHCIDevice"><a class="type" href="#AHCIDevice" title='AHCIDevice' data-ref="AHCIDevice">AHCIDevice</a></dfn> <dfn class="typedef" id="AHCIDevice" title='AHCIDevice' data-type='struct AHCIDevice' data-ref="AHCIDevice">AHCIDevice</dfn>;</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AHCIControlRegs" title='AHCIControlRegs' data-ref="AHCIControlRegs"><a class="type" href="#AHCIControlRegs" title='AHCIControlRegs' data-ref="AHCIControlRegs">AHCIControlRegs</a></dfn> {</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIControlRegs::cap" title='AHCIControlRegs::cap' data-ref="AHCIControlRegs::cap">cap</dfn>;</td></tr>
+<tr><th id="33">33</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIControlRegs::ghc" title='AHCIControlRegs::ghc' data-ref="AHCIControlRegs::ghc">ghc</dfn>;</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIControlRegs::irqstatus" title='AHCIControlRegs::irqstatus' data-ref="AHCIControlRegs::irqstatus">irqstatus</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIControlRegs::impl" title='AHCIControlRegs::impl' data-ref="AHCIControlRegs::impl">impl</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIControlRegs::version" title='AHCIControlRegs::version' data-ref="AHCIControlRegs::version">version</dfn>;</td></tr>
+<tr><th id="37">37</th><td>} <dfn class="typedef" id="AHCIControlRegs" title='AHCIControlRegs' data-type='struct AHCIControlRegs' data-ref="AHCIControlRegs">AHCIControlRegs</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AHCIState" title='AHCIState' data-ref="AHCIState"><a class="type" href="#AHCIState" title='AHCIState' data-ref="AHCIState">AHCIState</a></dfn> {</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="AHCIState::container" title='AHCIState::container' data-ref="AHCIState::container">container</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>    <a class="typedef" href="#AHCIDevice" title='AHCIDevice' data-type='struct AHCIDevice' data-ref="AHCIDevice">AHCIDevice</a> *<dfn class="decl" id="AHCIState::dev" title='AHCIState::dev' data-ref="AHCIState::dev">dev</dfn>;</td></tr>
+<tr><th id="43">43</th><td>    <a class="typedef" href="#AHCIControlRegs" title='AHCIControlRegs' data-type='struct AHCIControlRegs' data-ref="AHCIControlRegs">AHCIControlRegs</a> <dfn class="decl" id="AHCIState::control_regs" title='AHCIState::control_regs' data-ref="AHCIState::control_regs">control_regs</dfn>;</td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="AHCIState::mem" title='AHCIState::mem' data-ref="AHCIState::mem">mem</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="AHCIState::idp" title='AHCIState::idp' data-ref="AHCIState::idp">idp</dfn>;       <i>/* Index-Data Pair I/O port space */</i></td></tr>
+<tr><th id="46">46</th><td>    <em>unsigned</em> <dfn class="decl" id="AHCIState::idp_offset" title='AHCIState::idp_offset' data-ref="AHCIState::idp_offset">idp_offset</dfn>;    <i>/* Offset of index in I/O port space */</i></td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AHCIState::idp_index" title='AHCIState::idp_index' data-ref="AHCIState::idp_index">idp_index</dfn>;     <i>/* Current IDP index */</i></td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="AHCIState::ports" title='AHCIState::ports' data-ref="AHCIState::ports">ports</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="AHCIState::irq" title='AHCIState::irq' data-ref="AHCIState::irq">irq</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="decl" id="AHCIState::as" title='AHCIState::as' data-ref="AHCIState::as">as</dfn>;</td></tr>
+<tr><th id="51">51</th><td>} <dfn class="typedef" id="AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</dfn>;</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState"><a class="type" href="#AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</a></dfn> <dfn class="typedef" id="AHCIPCIState" title='AHCIPCIState' data-type='struct AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/TYPE_ICH9_AHCI" data-ref="_M/TYPE_ICH9_AHCI">TYPE_ICH9_AHCI</dfn> "ich9-ahci"</u></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/ICH_AHCI" data-ref="_M/ICH_AHCI">ICH_AHCI</dfn>(obj) \</u></td></tr>
+<tr><th id="58">58</th><td><u>    OBJECT_CHECK(AHCIPCIState, (obj), TYPE_ICH9_AHCI)</u></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="ahci_get_num_ports" title='ahci_get_num_ports' data-ref="ahci_get_num_ports">ahci_get_num_ports</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col4 decl" id="104dev" title='dev' data-type='PCIDevice *' data-ref="104dev">dev</dfn>);</td></tr>
+<tr><th id="61">61</th><td><em>void</em> <dfn class="decl" id="ahci_ide_create_devs" title='ahci_ide_create_devs' data-ref="ahci_ide_create_devs">ahci_ide_create_devs</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> *<dfn class="local col5 decl" id="105dev" title='dev' data-type='PCIDevice *' data-ref="105dev">dev</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> **<dfn class="local col6 decl" id="106hd" title='hd' data-type='DriveInfo **' data-ref="106hd">hd</dfn>);</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/TYPE_SYSBUS_AHCI" data-ref="_M/TYPE_SYSBUS_AHCI">TYPE_SYSBUS_AHCI</dfn> "sysbus-ahci"</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/SYSBUS_AHCI" data-ref="_M/SYSBUS_AHCI">SYSBUS_AHCI</dfn>(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBUS_AHCI)</u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="SysbusAHCIState" title='SysbusAHCIState' data-ref="SysbusAHCIState"><a class="type" href="#SysbusAHCIState" title='SysbusAHCIState' data-ref="SysbusAHCIState">SysbusAHCIState</a></dfn> {</td></tr>
+<tr><th id="67">67</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="decl" id="SysbusAHCIState::parent_obj" title='SysbusAHCIState::parent_obj' data-ref="SysbusAHCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> <dfn class="decl" id="SysbusAHCIState::ahci" title='SysbusAHCIState::ahci' data-ref="SysbusAHCIState::ahci">ahci</dfn>;</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SysbusAHCIState::num_ports" title='SysbusAHCIState::num_ports' data-ref="SysbusAHCIState::num_ports">num_ports</dfn>;</td></tr>
+<tr><th id="73">73</th><td>} <dfn class="typedef" id="SysbusAHCIState" title='SysbusAHCIState' data-type='struct SysbusAHCIState' data-ref="SysbusAHCIState">SysbusAHCIState</dfn>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/TYPE_ALLWINNER_AHCI" data-ref="_M/TYPE_ALLWINNER_AHCI">TYPE_ALLWINNER_AHCI</dfn> "allwinner-ahci"</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/ALLWINNER_AHCI" data-ref="_M/ALLWINNER_AHCI">ALLWINNER_AHCI</dfn>(obj) OBJECT_CHECK(AllwinnerAHCIState, (obj), \</u></td></tr>
+<tr><th id="77">77</th><td><u>                       TYPE_ALLWINNER_AHCI)</u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/ALLWINNER_AHCI_MMIO_OFF" data-ref="_M/ALLWINNER_AHCI_MMIO_OFF">ALLWINNER_AHCI_MMIO_OFF</dfn>  0x80</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/ALLWINNER_AHCI_MMIO_SIZE" data-ref="_M/ALLWINNER_AHCI_MMIO_SIZE">ALLWINNER_AHCI_MMIO_SIZE</dfn> 0x80</u></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><b>struct</b> <dfn class="type def" id="AllwinnerAHCIState" title='AllwinnerAHCIState' data-ref="AllwinnerAHCIState">AllwinnerAHCIState</dfn> {</td></tr>
+<tr><th id="83">83</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="84">84</th><td>    <a class="typedef" href="#SysbusAHCIState" title='SysbusAHCIState' data-type='struct SysbusAHCIState' data-ref="SysbusAHCIState">SysbusAHCIState</a> <dfn class="decl" id="AllwinnerAHCIState::parent_obj" title='AllwinnerAHCIState::parent_obj' data-ref="AllwinnerAHCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="85">85</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="AllwinnerAHCIState::mmio" title='AllwinnerAHCIState::mmio' data-ref="AllwinnerAHCIState::mmio">mmio</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AllwinnerAHCIState::regs" title='AllwinnerAHCIState::regs' data-ref="AllwinnerAHCIState::regs">regs</dfn>[<a class="macro" href="#80" title="0x80" data-ref="_M/ALLWINNER_AHCI_MMIO_SIZE">ALLWINNER_AHCI_MMIO_SIZE</a>/<var>4</var>];</td></tr>
+<tr><th id="89">89</th><td>};</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><u>#<span data-ppcond="24">endif</span> /* HW_IDE_AHCI_H */</u></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/pc_q35.c.html'>codebrowser/hw/i386/pc_q35.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

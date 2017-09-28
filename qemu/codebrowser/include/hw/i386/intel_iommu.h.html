@@ -1,0 +1,332 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>intel_iommu.h source code [codebrowser/include/hw/i386/intel_iommu.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="IntelIOMMUNotifierNode,IntelIOMMUState,VTDAddressSpace,VTDBus,VTDContextCacheEntry,VTDContextEntry,VTDIOTLBEntry,VTDIrq,VTD_IR_MSIAddress,VTD_IR_TableEntry,VTD_MSIMessage "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/i386/intel_iommu.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='intel_iommu.h.html'>intel_iommu.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU emulation of an Intel IOMMU (VT-d)</i></td></tr>
+<tr><th id="3">3</th><td><i> *   (DMA Remapping device)</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2013 Knut Omang, Oracle &lt;knut.omang@oracle.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2014 Le Tan, &lt;tamlokveer@gmail.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="9">9</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="10">10</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="11">11</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i></i></td></tr>
+<tr><th id="13">13</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="16">16</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i></i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="19">19</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#<span data-ppcond="22">ifndef</span> <span class="macro" data-ref="_M/INTEL_IOMMU_H">INTEL_IOMMU_H</span></u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/INTEL_IOMMU_H" data-ref="_M/INTEL_IOMMU_H">INTEL_IOMMU_H</dfn></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../sysemu/dma.h.html">"sysemu/dma.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="x86-iommu.h.html">"hw/i386/x86-iommu.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="ioapic.h.html">"hw/i386/ioapic.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../pci/msi.h.html">"hw/pci/msi.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/TYPE_INTEL_IOMMU_DEVICE" data-ref="_M/TYPE_INTEL_IOMMU_DEVICE">TYPE_INTEL_IOMMU_DEVICE</dfn> "intel-iommu"</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/INTEL_IOMMU_DEVICE" data-ref="_M/INTEL_IOMMU_DEVICE">INTEL_IOMMU_DEVICE</dfn>(obj) \</u></td></tr>
+<tr><th id="33">33</th><td><u>     OBJECT_CHECK(IntelIOMMUState, (obj), TYPE_INTEL_IOMMU_DEVICE)</u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/TYPE_INTEL_IOMMU_MEMORY_REGION" data-ref="_M/TYPE_INTEL_IOMMU_MEMORY_REGION">TYPE_INTEL_IOMMU_MEMORY_REGION</dfn> "intel-iommu-iommu-memory-region"</u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><i>/* DMAR Hardware Unit Definition address (IOMMU unit) */</i></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/Q35_HOST_BRIDGE_IOMMU_ADDR" data-ref="_M/Q35_HOST_BRIDGE_IOMMU_ADDR">Q35_HOST_BRIDGE_IOMMU_ADDR</dfn>  0xfed90000ULL</u></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/VTD_PCI_BUS_MAX" data-ref="_M/VTD_PCI_BUS_MAX">VTD_PCI_BUS_MAX</dfn>             256</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/VTD_PCI_SLOT_MAX" data-ref="_M/VTD_PCI_SLOT_MAX">VTD_PCI_SLOT_MAX</dfn>            32</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/VTD_PCI_FUNC_MAX" data-ref="_M/VTD_PCI_FUNC_MAX">VTD_PCI_FUNC_MAX</dfn>            8</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/VTD_PCI_SLOT" data-ref="_M/VTD_PCI_SLOT">VTD_PCI_SLOT</dfn>(devfn)         (((devfn) &gt;&gt; 3) &amp; 0x1f)</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/VTD_PCI_FUNC" data-ref="_M/VTD_PCI_FUNC">VTD_PCI_FUNC</dfn>(devfn)         ((devfn) &amp; 0x07)</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/VTD_SID_TO_BUS" data-ref="_M/VTD_SID_TO_BUS">VTD_SID_TO_BUS</dfn>(sid)         (((sid) &gt;&gt; 8) &amp; 0xff)</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/VTD_SID_TO_DEVFN" data-ref="_M/VTD_SID_TO_DEVFN">VTD_SID_TO_DEVFN</dfn>(sid)       ((sid) &amp; 0xff)</u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/DMAR_REG_SIZE" data-ref="_M/DMAR_REG_SIZE">DMAR_REG_SIZE</dfn>               0x230</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/VTD_HOST_ADDRESS_WIDTH" data-ref="_M/VTD_HOST_ADDRESS_WIDTH">VTD_HOST_ADDRESS_WIDTH</dfn>      39</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/VTD_HAW_MASK" data-ref="_M/VTD_HAW_MASK">VTD_HAW_MASK</dfn>                ((1ULL &lt;&lt; VTD_HOST_ADDRESS_WIDTH) - 1)</u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/DMAR_REPORT_F_INTR" data-ref="_M/DMAR_REPORT_F_INTR">DMAR_REPORT_F_INTR</dfn>          (1)</u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td><u>#define  <dfn class="macro" id="_M/VTD_MSI_ADDR_HI_MASK" data-ref="_M/VTD_MSI_ADDR_HI_MASK">VTD_MSI_ADDR_HI_MASK</dfn>        (0xffffffff00000000ULL)</u></td></tr>
+<tr><th id="55">55</th><td><u>#define  <dfn class="macro" id="_M/VTD_MSI_ADDR_HI_SHIFT" data-ref="_M/VTD_MSI_ADDR_HI_SHIFT">VTD_MSI_ADDR_HI_SHIFT</dfn>       (32)</u></td></tr>
+<tr><th id="56">56</th><td><u>#define  <dfn class="macro" id="_M/VTD_MSI_ADDR_LO_MASK" data-ref="_M/VTD_MSI_ADDR_LO_MASK">VTD_MSI_ADDR_LO_MASK</dfn>        (0x00000000ffffffffULL)</u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDContextEntry" title='VTDContextEntry' data-ref="VTDContextEntry">VTDContextEntry</a> <dfn class="typedef" id="VTDContextEntry" title='VTDContextEntry' data-type='struct VTDContextEntry' data-ref="VTDContextEntry">VTDContextEntry</dfn>;</td></tr>
+<tr><th id="59">59</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDContextCacheEntry" title='VTDContextCacheEntry' data-ref="VTDContextCacheEntry">VTDContextCacheEntry</a> <dfn class="typedef" id="VTDContextCacheEntry" title='VTDContextCacheEntry' data-type='struct VTDContextCacheEntry' data-ref="VTDContextCacheEntry">VTDContextCacheEntry</dfn>;</td></tr>
+<tr><th id="60">60</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IntelIOMMUState" title='IntelIOMMUState' data-ref="IntelIOMMUState">IntelIOMMUState</a> <dfn class="typedef" id="IntelIOMMUState" title='IntelIOMMUState' data-type='struct IntelIOMMUState' data-ref="IntelIOMMUState">IntelIOMMUState</dfn>;</td></tr>
+<tr><th id="61">61</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDAddressSpace" title='VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</a> <dfn class="typedef" id="VTDAddressSpace" title='VTDAddressSpace' data-type='struct VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</dfn>;</td></tr>
+<tr><th id="62">62</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDIOTLBEntry" title='VTDIOTLBEntry' data-ref="VTDIOTLBEntry">VTDIOTLBEntry</a> <dfn class="typedef" id="VTDIOTLBEntry" title='VTDIOTLBEntry' data-type='struct VTDIOTLBEntry' data-ref="VTDIOTLBEntry">VTDIOTLBEntry</dfn>;</td></tr>
+<tr><th id="63">63</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDBus" title='VTDBus' data-ref="VTDBus">VTDBus</a> <dfn class="typedef" id="VTDBus" title='VTDBus' data-type='struct VTDBus' data-ref="VTDBus">VTDBus</dfn>;</td></tr>
+<tr><th id="64">64</th><td><b>typedef</b> <b>union</b> <a class="type" href="#VTD_IR_TableEntry" title='VTD_IR_TableEntry' data-ref="VTD_IR_TableEntry">VTD_IR_TableEntry</a> <dfn class="typedef" id="VTD_IR_TableEntry" title='VTD_IR_TableEntry' data-type='union VTD_IR_TableEntry' data-ref="VTD_IR_TableEntry">VTD_IR_TableEntry</dfn>;</td></tr>
+<tr><th id="65">65</th><td><b>typedef</b> <b>union</b> <a class="type" href="#VTD_IR_MSIAddress" title='VTD_IR_MSIAddress' data-ref="VTD_IR_MSIAddress">VTD_IR_MSIAddress</a> <dfn class="typedef" id="VTD_IR_MSIAddress" title='VTD_IR_MSIAddress' data-type='union VTD_IR_MSIAddress' data-ref="VTD_IR_MSIAddress">VTD_IR_MSIAddress</dfn>;</td></tr>
+<tr><th id="66">66</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDIrq" title='VTDIrq' data-ref="VTDIrq">VTDIrq</a> <dfn class="typedef" id="VTDIrq" title='VTDIrq' data-type='struct VTDIrq' data-ref="VTDIrq">VTDIrq</dfn>;</td></tr>
+<tr><th id="67">67</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTD_MSIMessage" title='VTD_MSIMessage' data-ref="VTD_MSIMessage">VTD_MSIMessage</a> <dfn class="typedef" id="VTD_MSIMessage" title='VTD_MSIMessage' data-type='struct VTD_MSIMessage' data-ref="VTD_MSIMessage">VTD_MSIMessage</dfn>;</td></tr>
+<tr><th id="68">68</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IntelIOMMUNotifierNode" title='IntelIOMMUNotifierNode' data-ref="IntelIOMMUNotifierNode">IntelIOMMUNotifierNode</a> <dfn class="typedef" id="IntelIOMMUNotifierNode" title='IntelIOMMUNotifierNode' data-type='struct IntelIOMMUNotifierNode' data-ref="IntelIOMMUNotifierNode">IntelIOMMUNotifierNode</dfn>;</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>/* Context-Entry */</i></td></tr>
+<tr><th id="71">71</th><td><b>struct</b> <dfn class="type def" id="VTDContextEntry" title='VTDContextEntry' data-ref="VTDContextEntry">VTDContextEntry</dfn> {</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDContextEntry::lo" title='VTDContextEntry::lo' data-ref="VTDContextEntry::lo">lo</dfn>;</td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDContextEntry::hi" title='VTDContextEntry::hi' data-ref="VTDContextEntry::hi">hi</dfn>;</td></tr>
+<tr><th id="74">74</th><td>};</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><b>struct</b> <dfn class="type def" id="VTDContextCacheEntry" title='VTDContextCacheEntry' data-ref="VTDContextCacheEntry">VTDContextCacheEntry</dfn> {</td></tr>
+<tr><th id="77">77</th><td>    <i>/* The cache entry is obsolete if</i></td></tr>
+<tr><th id="78">78</th><td><i>     * context_cache_gen!=IntelIOMMUState.context_cache_gen</i></td></tr>
+<tr><th id="79">79</th><td><i>     */</i></td></tr>
+<tr><th id="80">80</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDContextCacheEntry::context_cache_gen" title='VTDContextCacheEntry::context_cache_gen' data-ref="VTDContextCacheEntry::context_cache_gen">context_cache_gen</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    <b>struct</b> <a class="type" href="#VTDContextEntry" title='VTDContextEntry' data-ref="VTDContextEntry">VTDContextEntry</a> <dfn class="decl" id="VTDContextCacheEntry::context_entry" title='VTDContextCacheEntry::context_entry' data-ref="VTDContextCacheEntry::context_entry">context_entry</dfn>;</td></tr>
+<tr><th id="82">82</th><td>};</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><b>struct</b> <dfn class="type def" id="VTDAddressSpace" title='VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</dfn> {</td></tr>
+<tr><th id="85">85</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="decl" id="VTDAddressSpace::bus" title='VTDAddressSpace::bus' data-ref="VTDAddressSpace::bus">bus</dfn>;</td></tr>
+<tr><th id="86">86</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDAddressSpace::devfn" title='VTDAddressSpace::devfn' data-ref="VTDAddressSpace::devfn">devfn</dfn>;</td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> <dfn class="decl" id="VTDAddressSpace::as" title='VTDAddressSpace::as' data-ref="VTDAddressSpace::as">as</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#IOMMUMemoryRegion" title='IOMMUMemoryRegion' data-type='struct IOMMUMemoryRegion' data-ref="IOMMUMemoryRegion">IOMMUMemoryRegion</a> <dfn class="decl" id="VTDAddressSpace::iommu" title='VTDAddressSpace::iommu' data-ref="VTDAddressSpace::iommu">iommu</dfn>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="VTDAddressSpace::root" title='VTDAddressSpace::root' data-ref="VTDAddressSpace::root">root</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="VTDAddressSpace::sys_alias" title='VTDAddressSpace::sys_alias' data-ref="VTDAddressSpace::sys_alias">sys_alias</dfn>;</td></tr>
+<tr><th id="91">91</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="VTDAddressSpace::iommu_ir" title='VTDAddressSpace::iommu_ir' data-ref="VTDAddressSpace::iommu_ir">iommu_ir</dfn>;      <i>/* Interrupt region: 0xfeeXXXXX */</i></td></tr>
+<tr><th id="92">92</th><td>    <a class="typedef" href="#IntelIOMMUState" title='IntelIOMMUState' data-type='struct IntelIOMMUState' data-ref="IntelIOMMUState">IntelIOMMUState</a> *<dfn class="decl" id="VTDAddressSpace::iommu_state" title='VTDAddressSpace::iommu_state' data-ref="VTDAddressSpace::iommu_state">iommu_state</dfn>;</td></tr>
+<tr><th id="93">93</th><td>    <a class="typedef" href="#VTDContextCacheEntry" title='VTDContextCacheEntry' data-type='struct VTDContextCacheEntry' data-ref="VTDContextCacheEntry">VTDContextCacheEntry</a> <dfn class="decl" id="VTDAddressSpace::context_cache_entry" title='VTDAddressSpace::context_cache_entry' data-ref="VTDAddressSpace::context_cache_entry">context_cache_entry</dfn>;</td></tr>
+<tr><th id="94">94</th><td>};</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><b>struct</b> <dfn class="type def" id="VTDBus" title='VTDBus' data-ref="VTDBus">VTDBus</dfn> {</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a>* <dfn class="decl" id="VTDBus::bus" title='VTDBus::bus' data-ref="VTDBus::bus">bus</dfn>;		<i>/* A reference to the bus to provide translation for */</i></td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="#VTDAddressSpace" title='VTDAddressSpace' data-type='struct VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</a> *<dfn class="decl" id="VTDBus::dev_as" title='VTDBus::dev_as' data-ref="VTDBus::dev_as">dev_as</dfn>[<var>0</var>];	<i>/* A table of VTDAddressSpace objects indexed by devfn */</i></td></tr>
+<tr><th id="99">99</th><td>};</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><b>struct</b> <dfn class="type def" id="VTDIOTLBEntry" title='VTDIOTLBEntry' data-ref="VTDIOTLBEntry">VTDIOTLBEntry</dfn> {</td></tr>
+<tr><th id="102">102</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDIOTLBEntry::gfn" title='VTDIOTLBEntry::gfn' data-ref="VTDIOTLBEntry::gfn">gfn</dfn>;</td></tr>
+<tr><th id="103">103</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTDIOTLBEntry::domain_id" title='VTDIOTLBEntry::domain_id' data-ref="VTDIOTLBEntry::domain_id">domain_id</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDIOTLBEntry::slpte" title='VTDIOTLBEntry::slpte' data-ref="VTDIOTLBEntry::slpte">slpte</dfn>;</td></tr>
+<tr><th id="105">105</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDIOTLBEntry::mask" title='VTDIOTLBEntry::mask' data-ref="VTDIOTLBEntry::mask">mask</dfn>;</td></tr>
+<tr><th id="106">106</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VTDIOTLBEntry::read_flags" title='VTDIOTLBEntry::read_flags' data-ref="VTDIOTLBEntry::read_flags">read_flags</dfn>;</td></tr>
+<tr><th id="107">107</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="VTDIOTLBEntry::write_flags" title='VTDIOTLBEntry::write_flags' data-ref="VTDIOTLBEntry::write_flags">write_flags</dfn>;</td></tr>
+<tr><th id="108">108</th><td>};</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>/* VT-d Source-ID Qualifier types */</i></td></tr>
+<tr><th id="111">111</th><td><b>enum</b> {</td></tr>
+<tr><th id="112">112</th><td>    <dfn class="enum" id="VTD_SQ_FULL" title='VTD_SQ_FULL' data-ref="VTD_SQ_FULL">VTD_SQ_FULL</dfn> = <var>0x00</var>,     <i>/* Full SID verification */</i></td></tr>
+<tr><th id="113">113</th><td>    <dfn class="enum" id="VTD_SQ_IGN_3" title='VTD_SQ_IGN_3' data-ref="VTD_SQ_IGN_3">VTD_SQ_IGN_3</dfn> = <var>0x01</var>,    <i>/* Ignore bit 3 */</i></td></tr>
+<tr><th id="114">114</th><td>    <dfn class="enum" id="VTD_SQ_IGN_2_3" title='VTD_SQ_IGN_2_3' data-ref="VTD_SQ_IGN_2_3">VTD_SQ_IGN_2_3</dfn> = <var>0x02</var>,  <i>/* Ignore bits 2 &amp; 3 */</i></td></tr>
+<tr><th id="115">115</th><td>    <dfn class="enum" id="VTD_SQ_IGN_1_3" title='VTD_SQ_IGN_1_3' data-ref="VTD_SQ_IGN_1_3">VTD_SQ_IGN_1_3</dfn> = <var>0x03</var>,  <i>/* Ignore bits 1-3 */</i></td></tr>
+<tr><th id="116">116</th><td>    <dfn class="enum" id="VTD_SQ_MAX" title='VTD_SQ_MAX' data-ref="VTD_SQ_MAX">VTD_SQ_MAX</dfn>,</td></tr>
+<tr><th id="117">117</th><td>};</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td><i>/* VT-d Source Validation Types */</i></td></tr>
+<tr><th id="120">120</th><td><b>enum</b> {</td></tr>
+<tr><th id="121">121</th><td>    <dfn class="enum" id="VTD_SVT_NONE" title='VTD_SVT_NONE' data-ref="VTD_SVT_NONE">VTD_SVT_NONE</dfn> = <var>0x00</var>,    <i>/* No validation */</i></td></tr>
+<tr><th id="122">122</th><td>    <dfn class="enum" id="VTD_SVT_ALL" title='VTD_SVT_ALL' data-ref="VTD_SVT_ALL">VTD_SVT_ALL</dfn> = <var>0x01</var>,     <i>/* Do full validation */</i></td></tr>
+<tr><th id="123">123</th><td>    <dfn class="enum" id="VTD_SVT_BUS" title='VTD_SVT_BUS' data-ref="VTD_SVT_BUS">VTD_SVT_BUS</dfn> = <var>0x02</var>,     <i>/* Validate bus range */</i></td></tr>
+<tr><th id="124">124</th><td>    <dfn class="enum" id="VTD_SVT_MAX" title='VTD_SVT_MAX' data-ref="VTD_SVT_MAX">VTD_SVT_MAX</dfn>,</td></tr>
+<tr><th id="125">125</th><td>};</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><i>/* Interrupt Remapping Table Entry Definition */</i></td></tr>
+<tr><th id="128">128</th><td><b>union</b> <dfn class="type def" id="VTD_IR_TableEntry" title='VTD_IR_TableEntry' data-ref="VTD_IR_TableEntry">VTD_IR_TableEntry</dfn> {</td></tr>
+<tr><th id="129">129</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="130">130</th><td><u>#<span data-ppcond="130">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="131">131</th><td>        uint32_t __reserved_1:<var>8</var>;     <i>/* Reserved 1 */</i></td></tr>
+<tr><th id="132">132</th><td>        uint32_t vector:<var>8</var>;           <i>/* Interrupt Vector */</i></td></tr>
+<tr><th id="133">133</th><td>        uint32_t irte_mode:<var>1</var>;        <i>/* IRTE Mode */</i></td></tr>
+<tr><th id="134">134</th><td>        uint32_t __reserved_0:<var>3</var>;     <i>/* Reserved 0 */</i></td></tr>
+<tr><th id="135">135</th><td>        uint32_t __avail:<var>4</var>;          <i>/* Available spaces for software */</i></td></tr>
+<tr><th id="136">136</th><td>        uint32_t delivery_mode:<var>3</var>;    <i>/* Delivery Mode */</i></td></tr>
+<tr><th id="137">137</th><td>        uint32_t trigger_mode:<var>1</var>;     <i>/* Trigger Mode */</i></td></tr>
+<tr><th id="138">138</th><td>        uint32_t redir_hint:<var>1</var>;       <i>/* Redirection Hint */</i></td></tr>
+<tr><th id="139">139</th><td>        uint32_t dest_mode:<var>1</var>;        <i>/* Destination Mode */</i></td></tr>
+<tr><th id="140">140</th><td>        uint32_t fault_disable:<var>1</var>;    <i>/* Fault Processing Disable */</i></td></tr>
+<tr><th id="141">141</th><td>        uint32_t present:<var>1</var>;          <i>/* Whether entry present/available */</i></td></tr>
+<tr><th id="142">142</th><td><u>#<span data-ppcond="130">else</span></u></td></tr>
+<tr><th id="143">143</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::present" title='VTD_IR_TableEntry::(anonymous struct)::present' data-ref="VTD_IR_TableEntry::(anonymous)::present">present</dfn>:<var>1</var>;          <i>/* Whether entry present/available */</i></td></tr>
+<tr><th id="144">144</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::fault_disable" title='VTD_IR_TableEntry::(anonymous struct)::fault_disable' data-ref="VTD_IR_TableEntry::(anonymous)::fault_disable">fault_disable</dfn>:<var>1</var>;    <i>/* Fault Processing Disable */</i></td></tr>
+<tr><th id="145">145</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::dest_mode" title='VTD_IR_TableEntry::(anonymous struct)::dest_mode' data-ref="VTD_IR_TableEntry::(anonymous)::dest_mode">dest_mode</dfn>:<var>1</var>;        <i>/* Destination Mode */</i></td></tr>
+<tr><th id="146">146</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::redir_hint" title='VTD_IR_TableEntry::(anonymous struct)::redir_hint' data-ref="VTD_IR_TableEntry::(anonymous)::redir_hint">redir_hint</dfn>:<var>1</var>;       <i>/* Redirection Hint */</i></td></tr>
+<tr><th id="147">147</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::trigger_mode" title='VTD_IR_TableEntry::(anonymous struct)::trigger_mode' data-ref="VTD_IR_TableEntry::(anonymous)::trigger_mode">trigger_mode</dfn>:<var>1</var>;     <i>/* Trigger Mode */</i></td></tr>
+<tr><th id="148">148</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::delivery_mode" title='VTD_IR_TableEntry::(anonymous struct)::delivery_mode' data-ref="VTD_IR_TableEntry::(anonymous)::delivery_mode">delivery_mode</dfn>:<var>3</var>;    <i>/* Delivery Mode */</i></td></tr>
+<tr><th id="149">149</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::__avail" title='VTD_IR_TableEntry::(anonymous struct)::__avail' data-ref="VTD_IR_TableEntry::(anonymous)::__avail">__avail</dfn>:<var>4</var>;          <i>/* Available spaces for software */</i></td></tr>
+<tr><th id="150">150</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::__reserved_0" title='VTD_IR_TableEntry::(anonymous struct)::__reserved_0' data-ref="VTD_IR_TableEntry::(anonymous)::__reserved_0">__reserved_0</dfn>:<var>3</var>;     <i>/* Reserved 0 */</i></td></tr>
+<tr><th id="151">151</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::irte_mode" title='VTD_IR_TableEntry::(anonymous struct)::irte_mode' data-ref="VTD_IR_TableEntry::(anonymous)::irte_mode">irte_mode</dfn>:<var>1</var>;        <i>/* IRTE Mode */</i></td></tr>
+<tr><th id="152">152</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::vector" title='VTD_IR_TableEntry::(anonymous struct)::vector' data-ref="VTD_IR_TableEntry::(anonymous)::vector">vector</dfn>:<var>8</var>;           <i>/* Interrupt Vector */</i></td></tr>
+<tr><th id="153">153</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::__reserved_1" title='VTD_IR_TableEntry::(anonymous struct)::__reserved_1' data-ref="VTD_IR_TableEntry::(anonymous)::__reserved_1">__reserved_1</dfn>:<var>8</var>;     <i>/* Reserved 1 */</i></td></tr>
+<tr><th id="154">154</th><td><u>#<span data-ppcond="130">endif</span></u></td></tr>
+<tr><th id="155">155</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::dest_id" title='VTD_IR_TableEntry::(anonymous struct)::dest_id' data-ref="VTD_IR_TableEntry::(anonymous)::dest_id">dest_id</dfn>;            <i>/* Destination ID */</i></td></tr>
+<tr><th id="156">156</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::source_id" title='VTD_IR_TableEntry::(anonymous struct)::source_id' data-ref="VTD_IR_TableEntry::(anonymous)::source_id">source_id</dfn>;          <i>/* Source-ID */</i></td></tr>
+<tr><th id="157">157</th><td><u>#<span data-ppcond="157">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="158">158</th><td>        uint64_t __reserved_2:<var>44</var>;    <i>/* Reserved 2 */</i></td></tr>
+<tr><th id="159">159</th><td>        uint64_t sid_vtype:<var>2</var>;        <i>/* Source-ID Validation Type */</i></td></tr>
+<tr><th id="160">160</th><td>        uint64_t sid_q:<var>2</var>;            <i>/* Source-ID Qualifier */</i></td></tr>
+<tr><th id="161">161</th><td><u>#<span data-ppcond="157">else</span></u></td></tr>
+<tr><th id="162">162</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::sid_q" title='VTD_IR_TableEntry::(anonymous struct)::sid_q' data-ref="VTD_IR_TableEntry::(anonymous)::sid_q">sid_q</dfn>:<var>2</var>;            <i>/* Source-ID Qualifier */</i></td></tr>
+<tr><th id="163">163</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::sid_vtype" title='VTD_IR_TableEntry::(anonymous struct)::sid_vtype' data-ref="VTD_IR_TableEntry::(anonymous)::sid_vtype">sid_vtype</dfn>:<var>2</var>;        <i>/* Source-ID Validation Type */</i></td></tr>
+<tr><th id="164">164</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTD_IR_TableEntry::(anonymous)::__reserved_2" title='VTD_IR_TableEntry::(anonymous struct)::__reserved_2' data-ref="VTD_IR_TableEntry::(anonymous)::__reserved_2">__reserved_2</dfn>:<var>44</var>;    <i>/* Reserved 2 */</i></td></tr>
+<tr><th id="165">165</th><td><u>#<span data-ppcond="157">endif</span></u></td></tr>
+<tr><th id="166">166</th><td>    } <a class="macro" href="../../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="decl" id="VTD_IR_TableEntry::irte" title='VTD_IR_TableEntry::irte' data-ref="VTD_IR_TableEntry::irte">irte</dfn>;</td></tr>
+<tr><th id="167">167</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTD_IR_TableEntry::data" title='VTD_IR_TableEntry::data' data-ref="VTD_IR_TableEntry::data">data</dfn>[<var>2</var>];</td></tr>
+<tr><th id="168">168</th><td>};</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/VTD_IR_INT_FORMAT_COMPAT" data-ref="_M/VTD_IR_INT_FORMAT_COMPAT">VTD_IR_INT_FORMAT_COMPAT</dfn>     (0) /* Compatible Interrupt */</u></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/VTD_IR_INT_FORMAT_REMAP" data-ref="_M/VTD_IR_INT_FORMAT_REMAP">VTD_IR_INT_FORMAT_REMAP</dfn>      (1) /* Remappable Interrupt */</u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i>/* Programming format for MSI/MSI-X addresses */</i></td></tr>
+<tr><th id="174">174</th><td><b>union</b> <dfn class="type def" id="VTD_IR_MSIAddress" title='VTD_IR_MSIAddress' data-ref="VTD_IR_MSIAddress">VTD_IR_MSIAddress</dfn> {</td></tr>
+<tr><th id="175">175</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="176">176</th><td><u>#<span data-ppcond="176">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="177">177</th><td>        uint32_t __head:<var>12</var>;          <i>/* Should always be: 0x0fee */</i></td></tr>
+<tr><th id="178">178</th><td>        uint32_t index_l:<var>15</var>;         <i>/* Interrupt index bit 14-0 */</i></td></tr>
+<tr><th id="179">179</th><td>        uint32_t int_mode:<var>1</var>;         <i>/* Interrupt format */</i></td></tr>
+<tr><th id="180">180</th><td>        uint32_t sub_valid:<var>1</var>;        <i>/* SHV: Sub-Handle Valid bit */</i></td></tr>
+<tr><th id="181">181</th><td>        uint32_t index_h:<var>1</var>;          <i>/* Interrupt index bit 15 */</i></td></tr>
+<tr><th id="182">182</th><td>        uint32_t __not_care:<var>2</var>;</td></tr>
+<tr><th id="183">183</th><td><u>#<span data-ppcond="176">else</span></u></td></tr>
+<tr><th id="184">184</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::__not_care" title='VTD_IR_MSIAddress::(anonymous struct)::__not_care' data-ref="VTD_IR_MSIAddress::(anonymous)::__not_care">__not_care</dfn>:<var>2</var>;</td></tr>
+<tr><th id="185">185</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::index_h" title='VTD_IR_MSIAddress::(anonymous struct)::index_h' data-ref="VTD_IR_MSIAddress::(anonymous)::index_h">index_h</dfn>:<var>1</var>;          <i>/* Interrupt index bit 15 */</i></td></tr>
+<tr><th id="186">186</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::sub_valid" title='VTD_IR_MSIAddress::(anonymous struct)::sub_valid' data-ref="VTD_IR_MSIAddress::(anonymous)::sub_valid">sub_valid</dfn>:<var>1</var>;        <i>/* SHV: Sub-Handle Valid bit */</i></td></tr>
+<tr><th id="187">187</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::int_mode" title='VTD_IR_MSIAddress::(anonymous struct)::int_mode' data-ref="VTD_IR_MSIAddress::(anonymous)::int_mode">int_mode</dfn>:<var>1</var>;         <i>/* Interrupt format */</i></td></tr>
+<tr><th id="188">188</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::index_l" title='VTD_IR_MSIAddress::(anonymous struct)::index_l' data-ref="VTD_IR_MSIAddress::(anonymous)::index_l">index_l</dfn>:<var>15</var>;         <i>/* Interrupt index bit 14-0 */</i></td></tr>
+<tr><th id="189">189</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::(anonymous)::__head" title='VTD_IR_MSIAddress::(anonymous struct)::__head' data-ref="VTD_IR_MSIAddress::(anonymous)::__head">__head</dfn>:<var>12</var>;          <i>/* Should always be: 0x0fee */</i></td></tr>
+<tr><th id="190">190</th><td><u>#<span data-ppcond="176">endif</span></u></td></tr>
+<tr><th id="191">191</th><td>    } <a class="macro" href="../../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="decl" id="VTD_IR_MSIAddress::addr" title='VTD_IR_MSIAddress::addr' data-ref="VTD_IR_MSIAddress::addr">addr</dfn>;</td></tr>
+<tr><th id="192">192</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_IR_MSIAddress::data" title='VTD_IR_MSIAddress::data' data-ref="VTD_IR_MSIAddress::data">data</dfn>;</td></tr>
+<tr><th id="193">193</th><td>};</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><i>/* Generic IRQ entry information */</i></td></tr>
+<tr><th id="196">196</th><td><b>struct</b> <dfn class="type def" id="VTDIrq" title='VTDIrq' data-ref="VTDIrq">VTDIrq</dfn> {</td></tr>
+<tr><th id="197">197</th><td>    <i>/* Used by both IOAPIC/MSI interrupt remapping */</i></td></tr>
+<tr><th id="198">198</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::trigger_mode" title='VTDIrq::trigger_mode' data-ref="VTDIrq::trigger_mode">trigger_mode</dfn>;</td></tr>
+<tr><th id="199">199</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::vector" title='VTDIrq::vector' data-ref="VTDIrq::vector">vector</dfn>;</td></tr>
+<tr><th id="200">200</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::delivery_mode" title='VTDIrq::delivery_mode' data-ref="VTDIrq::delivery_mode">delivery_mode</dfn>;</td></tr>
+<tr><th id="201">201</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDIrq::dest" title='VTDIrq::dest' data-ref="VTDIrq::dest">dest</dfn>;</td></tr>
+<tr><th id="202">202</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::dest_mode" title='VTDIrq::dest_mode' data-ref="VTDIrq::dest_mode">dest_mode</dfn>;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>    <i>/* only used by MSI interrupt remapping */</i></td></tr>
+<tr><th id="205">205</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::redir_hint" title='VTDIrq::redir_hint' data-ref="VTDIrq::redir_hint">redir_hint</dfn>;</td></tr>
+<tr><th id="206">206</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIrq::msi_addr_last_bits" title='VTDIrq::msi_addr_last_bits' data-ref="VTDIrq::msi_addr_last_bits">msi_addr_last_bits</dfn>;</td></tr>
+<tr><th id="207">207</th><td>};</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><b>struct</b> <dfn class="type def" id="VTD_MSIMessage" title='VTD_MSIMessage' data-ref="VTD_MSIMessage">VTD_MSIMessage</dfn> {</td></tr>
+<tr><th id="210">210</th><td>    <b>union</b> {</td></tr>
+<tr><th id="211">211</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="212">212</th><td><u>#<span data-ppcond="212">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="213">213</th><td>            uint32_t __addr_head:<var>12</var>; <i>/* 0xfee */</i></td></tr>
+<tr><th id="214">214</th><td>            uint32_t dest:<var>8</var>;</td></tr>
+<tr><th id="215">215</th><td>            uint32_t __reserved:<var>8</var>;</td></tr>
+<tr><th id="216">216</th><td>            uint32_t redir_hint:<var>1</var>;</td></tr>
+<tr><th id="217">217</th><td>            uint32_t dest_mode:<var>1</var>;</td></tr>
+<tr><th id="218">218</th><td>            uint32_t __not_used:<var>2</var>;</td></tr>
+<tr><th id="219">219</th><td><u>#<span data-ppcond="212">else</span></u></td></tr>
+<tr><th id="220">220</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__not_used" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__not_used' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__not_used">__not_used</dfn>:<var>2</var>;</td></tr>
+<tr><th id="221">221</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::dest_mode" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::dest_mode' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::dest_mode">dest_mode</dfn>:<var>1</var>;</td></tr>
+<tr><th id="222">222</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::redir_hint" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::redir_hint' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::redir_hint">redir_hint</dfn>:<var>1</var>;</td></tr>
+<tr><th id="223">223</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__reserved" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__reserved' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__reserved">__reserved</dfn>:<var>8</var>;</td></tr>
+<tr><th id="224">224</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::dest" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::dest' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::dest">dest</dfn>:<var>8</var>;</td></tr>
+<tr><th id="225">225</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__addr_head" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__addr_head' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__addr_head">__addr_head</dfn>:<var>12</var>; <i>/* 0xfee */</i></td></tr>
+<tr><th id="226">226</th><td><u>#<span data-ppcond="212">endif</span></u></td></tr>
+<tr><th id="227">227</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__addr_hi" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__addr_hi' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__addr_hi">__addr_hi</dfn>;</td></tr>
+<tr><th id="228">228</th><td>        } <a class="macro" href="../../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="229">229</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymous)::msi_addr" title='VTD_MSIMessage::(anonymous union)::msi_addr' data-ref="VTD_MSIMessage::(anonymous)::msi_addr">msi_addr</dfn>;</td></tr>
+<tr><th id="230">230</th><td>    };</td></tr>
+<tr><th id="231">231</th><td>    <b>union</b> {</td></tr>
+<tr><th id="232">232</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="233">233</th><td><u>#<span data-ppcond="233">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="234">234</th><td>            uint16_t trigger_mode:<var>1</var>;</td></tr>
+<tr><th id="235">235</th><td>            uint16_t level:<var>1</var>;</td></tr>
+<tr><th id="236">236</th><td>            uint16_t __resved:<var>3</var>;</td></tr>
+<tr><th id="237">237</th><td>            uint16_t delivery_mode:<var>3</var>;</td></tr>
+<tr><th id="238">238</th><td>            uint16_t vector:<var>8</var>;</td></tr>
+<tr><th id="239">239</th><td><u>#<span data-ppcond="233">else</span></u></td></tr>
+<tr><th id="240">240</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::vector" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::vector' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::vector">vector</dfn>:<var>8</var>;</td></tr>
+<tr><th id="241">241</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::delivery_mode" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::delivery_mode' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::delivery_mode">delivery_mode</dfn>:<var>3</var>;</td></tr>
+<tr><th id="242">242</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__resved" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__resved' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__resved">__resved</dfn>:<var>3</var>;</td></tr>
+<tr><th id="243">243</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::level" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::level' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::level">level</dfn>:<var>1</var>;</td></tr>
+<tr><th id="244">244</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::trigger_mode" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::trigger_mode' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::trigger_mode">trigger_mode</dfn>:<var>1</var>;</td></tr>
+<tr><th id="245">245</th><td><u>#<span data-ppcond="233">endif</span></u></td></tr>
+<tr><th id="246">246</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymousunion)::(anonymous)::__resved1" title='VTD_MSIMessage::(anonymous union)::(anonymous struct)::__resved1' data-ref="VTD_MSIMessage::(anonymousunion)::(anonymous)::__resved1">__resved1</dfn>;</td></tr>
+<tr><th id="247">247</th><td>        } <a class="macro" href="../../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="248">248</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTD_MSIMessage::(anonymous)::msi_data" title='VTD_MSIMessage::(anonymous union)::msi_data' data-ref="VTD_MSIMessage::(anonymous)::msi_data">msi_data</dfn>;</td></tr>
+<tr><th id="249">249</th><td>    };</td></tr>
+<tr><th id="250">250</th><td>};</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><i>/* When IR is enabled, all MSI/MSI-X data bits should be zero */</i></td></tr>
+<tr><th id="253">253</th><td><u>#define <dfn class="macro" id="_M/VTD_IR_MSI_DATA" data-ref="_M/VTD_IR_MSI_DATA">VTD_IR_MSI_DATA</dfn>          (0)</u></td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><b>struct</b> <dfn class="type def" id="IntelIOMMUNotifierNode" title='IntelIOMMUNotifierNode' data-ref="IntelIOMMUNotifierNode">IntelIOMMUNotifierNode</dfn> {</td></tr>
+<tr><th id="256">256</th><td>    <a class="typedef" href="#VTDAddressSpace" title='VTDAddressSpace' data-type='struct VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</a> *<dfn class="decl" id="IntelIOMMUNotifierNode::vtd_as" title='IntelIOMMUNotifierNode::vtd_as' data-ref="IntelIOMMUNotifierNode::vtd_as">vtd_as</dfn>;</td></tr>
+<tr><th id="257">257</th><td>    <a class="macro" href="../../qemu/queue.h.html#94" title="struct { struct IntelIOMMUNotifierNode *le_next; struct IntelIOMMUNotifierNode **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#IntelIOMMUNotifierNode" title='IntelIOMMUNotifierNode' data-ref="IntelIOMMUNotifierNode">IntelIOMMUNotifierNode</a>) <dfn class="decl" id="IntelIOMMUNotifierNode::next" title='IntelIOMMUNotifierNode::next' data-ref="IntelIOMMUNotifierNode::next">next</dfn>;</td></tr>
+<tr><th id="258">258</th><td>};</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><i>/* The iommu (DMAR) device state struct */</i></td></tr>
+<tr><th id="261">261</th><td><b>struct</b> <dfn class="type def" id="IntelIOMMUState" title='IntelIOMMUState' data-ref="IntelIOMMUState">IntelIOMMUState</dfn> {</td></tr>
+<tr><th id="262">262</th><td>    <a class="typedef" href="x86-iommu.h.html#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> <dfn class="decl" id="IntelIOMMUState::x86_iommu" title='IntelIOMMUState::x86_iommu' data-ref="IntelIOMMUState::x86_iommu">x86_iommu</dfn>;</td></tr>
+<tr><th id="263">263</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="IntelIOMMUState::csrmem" title='IntelIOMMUState::csrmem' data-ref="IntelIOMMUState::csrmem">csrmem</dfn>;</td></tr>
+<tr><th id="264">264</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IntelIOMMUState::csr" title='IntelIOMMUState::csr' data-ref="IntelIOMMUState::csr">csr</dfn>[<a class="macro" href="#48" title="0x230" data-ref="_M/DMAR_REG_SIZE">DMAR_REG_SIZE</a>];     <i>/* register values */</i></td></tr>
+<tr><th id="265">265</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IntelIOMMUState::wmask" title='IntelIOMMUState::wmask' data-ref="IntelIOMMUState::wmask">wmask</dfn>[<a class="macro" href="#48" title="0x230" data-ref="_M/DMAR_REG_SIZE">DMAR_REG_SIZE</a>];   <i>/* R/W bytes */</i></td></tr>
+<tr><th id="266">266</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IntelIOMMUState::w1cmask" title='IntelIOMMUState::w1cmask' data-ref="IntelIOMMUState::w1cmask">w1cmask</dfn>[<a class="macro" href="#48" title="0x230" data-ref="_M/DMAR_REG_SIZE">DMAR_REG_SIZE</a>]; <i>/* RW1C(Write 1 to Clear) bytes */</i></td></tr>
+<tr><th id="267">267</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IntelIOMMUState::womask" title='IntelIOMMUState::womask' data-ref="IntelIOMMUState::womask">womask</dfn>[<a class="macro" href="#48" title="0x230" data-ref="_M/DMAR_REG_SIZE">DMAR_REG_SIZE</a>];  <i>/* WO (write only - read returns 0) */</i></td></tr>
+<tr><th id="268">268</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IntelIOMMUState::version" title='IntelIOMMUState::version' data-ref="IntelIOMMUState::version">version</dfn>;</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::caching_mode" title='IntelIOMMUState::caching_mode' data-ref="IntelIOMMUState::caching_mode">caching_mode</dfn>;          <i>/* RO - is cap CM enabled? */</i></td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="../../sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="IntelIOMMUState::root" title='IntelIOMMUState::root' data-ref="IntelIOMMUState::root">root</dfn>;                <i>/* Current root table pointer */</i></td></tr>
+<tr><th id="273">273</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::root_extended" title='IntelIOMMUState::root_extended' data-ref="IntelIOMMUState::root_extended">root_extended</dfn>;             <i>/* Type of root table (extended or not) */</i></td></tr>
+<tr><th id="274">274</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::dmar_enabled" title='IntelIOMMUState::dmar_enabled' data-ref="IntelIOMMUState::dmar_enabled">dmar_enabled</dfn>;              <i>/* Set if DMA remapping is enabled */</i></td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="IntelIOMMUState::iq_head" title='IntelIOMMUState::iq_head' data-ref="IntelIOMMUState::iq_head">iq_head</dfn>;               <i>/* Current invalidation queue head */</i></td></tr>
+<tr><th id="277">277</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="IntelIOMMUState::iq_tail" title='IntelIOMMUState::iq_tail' data-ref="IntelIOMMUState::iq_tail">iq_tail</dfn>;               <i>/* Current invalidation queue tail */</i></td></tr>
+<tr><th id="278">278</th><td>    <a class="typedef" href="../../sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="IntelIOMMUState::iq" title='IntelIOMMUState::iq' data-ref="IntelIOMMUState::iq">iq</dfn>;                  <i>/* Current invalidation queue pointer */</i></td></tr>
+<tr><th id="279">279</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="IntelIOMMUState::iq_size" title='IntelIOMMUState::iq_size' data-ref="IntelIOMMUState::iq_size">iq_size</dfn>;               <i>/* IQ Size in number of entries */</i></td></tr>
+<tr><th id="280">280</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::qi_enabled" title='IntelIOMMUState::qi_enabled' data-ref="IntelIOMMUState::qi_enabled">qi_enabled</dfn>;                <i>/* Set if the QI is enabled */</i></td></tr>
+<tr><th id="281">281</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IntelIOMMUState::iq_last_desc_type" title='IntelIOMMUState::iq_last_desc_type' data-ref="IntelIOMMUState::iq_last_desc_type">iq_last_desc_type</dfn>;      <i>/* The type of last completed descriptor */</i></td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>    <i>/* The index of the Fault Recording Register to be used next.</i></td></tr>
+<tr><th id="284">284</th><td><i>     * Wraps around from N-1 to 0, where N is the number of FRCD_REG.</i></td></tr>
+<tr><th id="285">285</th><td><i>     */</i></td></tr>
+<tr><th id="286">286</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="IntelIOMMUState::next_frcd_reg" title='IntelIOMMUState::next_frcd_reg' data-ref="IntelIOMMUState::next_frcd_reg">next_frcd_reg</dfn>;</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IntelIOMMUState::cap" title='IntelIOMMUState::cap' data-ref="IntelIOMMUState::cap">cap</dfn>;                   <i>/* The value of capability reg */</i></td></tr>
+<tr><th id="289">289</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IntelIOMMUState::ecap" title='IntelIOMMUState::ecap' data-ref="IntelIOMMUState::ecap">ecap</dfn>;                  <i>/* The value of extended capability reg */</i></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IntelIOMMUState::context_cache_gen" title='IntelIOMMUState::context_cache_gen' data-ref="IntelIOMMUState::context_cache_gen">context_cache_gen</dfn>;     <i>/* Should be in [1,MAX] */</i></td></tr>
+<tr><th id="292">292</th><td>    <a class="typedef" href="../../../../include/glib-2.0/glib/ghash.h.html#GHashTable" title='GHashTable' data-type='struct _GHashTable' data-ref="GHashTable">GHashTable</a> *<dfn class="decl" id="IntelIOMMUState::iotlb" title='IntelIOMMUState::iotlb' data-ref="IntelIOMMUState::iotlb">iotlb</dfn>;              <i>/* IOTLB */</i></td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    <a class="typedef" href="../../../../include/glib-2.0/glib/ghash.h.html#GHashTable" title='GHashTable' data-type='struct _GHashTable' data-ref="GHashTable">GHashTable</a> *<dfn class="decl" id="IntelIOMMUState::vtd_as_by_busptr" title='IntelIOMMUState::vtd_as_by_busptr' data-ref="IntelIOMMUState::vtd_as_by_busptr">vtd_as_by_busptr</dfn>;   <i>/* VTDBus objects indexed by PCIBus* reference */</i></td></tr>
+<tr><th id="295">295</th><td>    <a class="typedef" href="#VTDBus" title='VTDBus' data-type='struct VTDBus' data-ref="VTDBus">VTDBus</a> *<dfn class="decl" id="IntelIOMMUState::vtd_as_by_bus_num" title='IntelIOMMUState::vtd_as_by_bus_num' data-ref="IntelIOMMUState::vtd_as_by_bus_num">vtd_as_by_bus_num</dfn>[<a class="macro" href="#40" title="256" data-ref="_M/VTD_PCI_BUS_MAX">VTD_PCI_BUS_MAX</a>]; <i>/* VTDBus objects indexed by bus number */</i></td></tr>
+<tr><th id="296">296</th><td>    <i>/* list of registered notifiers */</i></td></tr>
+<tr><th id="297">297</th><td>    <a class="macro" href="../../qemu/queue.h.html#86" title="struct { struct IntelIOMMUNotifierNode *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#IntelIOMMUNotifierNode" title='IntelIOMMUNotifierNode' data-ref="IntelIOMMUNotifierNode">IntelIOMMUNotifierNode</a>) <dfn class="decl" id="IntelIOMMUState::notifiers_list" title='IntelIOMMUState::notifiers_list' data-ref="IntelIOMMUState::notifiers_list">notifiers_list</dfn>;</td></tr>
+<tr><th id="298">298</th><td></td></tr>
+<tr><th id="299">299</th><td>    <i>/* interrupt remapping */</i></td></tr>
+<tr><th id="300">300</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::intr_enabled" title='IntelIOMMUState::intr_enabled' data-ref="IntelIOMMUState::intr_enabled">intr_enabled</dfn>;              <i>/* Whether guest enabled IR */</i></td></tr>
+<tr><th id="301">301</th><td>    <a class="typedef" href="../../sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="IntelIOMMUState::intr_root" title='IntelIOMMUState::intr_root' data-ref="IntelIOMMUState::intr_root">intr_root</dfn>;           <i>/* Interrupt remapping table pointer */</i></td></tr>
+<tr><th id="302">302</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IntelIOMMUState::intr_size" title='IntelIOMMUState::intr_size' data-ref="IntelIOMMUState::intr_size">intr_size</dfn>;             <i>/* Number of IR table entries */</i></td></tr>
+<tr><th id="303">303</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::intr_eime" title='IntelIOMMUState::intr_eime' data-ref="IntelIOMMUState::intr_eime">intr_eime</dfn>;                 <i>/* Extended interrupt mode enabled */</i></td></tr>
+<tr><th id="304">304</th><td>    <a class="typedef" href="../../../qapi-types.h.html#OnOffAuto" title='OnOffAuto' data-type='enum OnOffAuto' data-ref="OnOffAuto">OnOffAuto</a> <dfn class="decl" id="IntelIOMMUState::intr_eim" title='IntelIOMMUState::intr_eim' data-ref="IntelIOMMUState::intr_eim">intr_eim</dfn>;             <i>/* Toggle for EIM cabability */</i></td></tr>
+<tr><th id="305">305</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IntelIOMMUState::buggy_eim" title='IntelIOMMUState::buggy_eim' data-ref="IntelIOMMUState::buggy_eim">buggy_eim</dfn>;                 <i>/* Force buggy EIM unless eim=off */</i></td></tr>
+<tr><th id="306">306</th><td>};</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><i>/* Find the VTD Address space associated with the given bus pointer,</i></td></tr>
+<tr><th id="309">309</th><td><i> * create a new one if none exists</i></td></tr>
+<tr><th id="310">310</th><td><i> */</i></td></tr>
+<tr><th id="311">311</th><td><a class="typedef" href="#VTDAddressSpace" title='VTDAddressSpace' data-type='struct VTDAddressSpace' data-ref="VTDAddressSpace">VTDAddressSpace</a> *<dfn class="decl" id="vtd_find_add_as" title='vtd_find_add_as' data-ref="vtd_find_add_as">vtd_find_add_as</dfn>(<a class="typedef" href="#IntelIOMMUState" title='IntelIOMMUState' data-type='struct IntelIOMMUState' data-ref="IntelIOMMUState">IntelIOMMUState</a> *<dfn class="local col8 decl" id="28s" title='s' data-type='IntelIOMMUState *' data-ref="28s">s</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#PCIBus" title='PCIBus' data-type='struct PCIBus' data-ref="PCIBus">PCIBus</a> *<dfn class="local col9 decl" id="29bus" title='bus' data-type='PCIBus *' data-ref="29bus">bus</dfn>, <em>int</em> <dfn class="local col0 decl" id="30devfn" title='devfn' data-type='int' data-ref="30devfn">devfn</dfn>);</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><u>#<span data-ppcond="22">endif</span></u></td></tr>
+<tr><th id="314">314</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/acpi-build.c.html'>codebrowser/hw/i386/acpi-build.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

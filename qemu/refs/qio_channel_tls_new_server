@@ -1,0 +1,31 @@
+<dec f='codebrowser/include/io/channel-tls.h' l='78' type='QIOChannelTLS * qio_channel_tls_new_server(QIOChannel * master, QCryptoTLSCreds * creds, const char * aclname, Error ** errp)'/>
+<use f='codebrowser/chardev/char-socket.c' l='646' u='c' c='tcp_chr_tls_init'/>
+<doc f='codebrowser/include/io/channel-tls.h' l='53'>/**
+ * qio_channel_tls_new_server:
+ * @master: the underlying channel object
+ * @creds: the credentials to use for TLS handshake
+ * @aclname: the access control list for validating clients
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Create a new TLS channel that runs the server side of
+ * a TLS session. The TLS session handshake will use the
+ * credentials provided in @creds. If the @aclname parameter
+ * is non-NULL, then the client will have to provide
+ * credentials (ie a x509 client certificate) which will
+ * then be validated against the ACL.
+ *
+ * After creating the channel, it is mandatory to call
+ * the qio_channel_tls_handshake() method before attempting
+ * todo any I/O on the channel.
+ *
+ * Once the handshake has completed, all I/O should be done
+ * via the new TLS channel object and not the original
+ * master channel
+ *
+ * Returns: the new TLS channel object, or NULL
+ */</doc>
+<def f='codebrowser/io/channel-tls.c' l='64' ll='99' type='QIOChannelTLS * qio_channel_tls_new_server(QIOChannel * master, QCryptoTLSCreds * creds, const char * aclname, Error ** errp)'/>
+<use f='codebrowser/migration/tls.c' l='95' u='c' c='migration_tls_channel_process_incoming'/>
+<use f='codebrowser/nbd/server.c' l='556' u='c' c='nbd_negotiate_handle_starttls'/>
+<use f='codebrowser/ui/vnc-auth-vencrypt.c' l='108' u='c' c='protocol_client_vencrypt_auth'/>
+<use f='codebrowser/ui/vnc-ws.c' l='59' u='c' c='vncws_tls_handshake_io'/>

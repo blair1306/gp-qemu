@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>sdhci.h source code [codebrowser/include/hw/sd/sdhci.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="SDHCIState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/sd/sdhci.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>sd</a>/<a href='sdhci.h.html'>sdhci.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * SD Association Host Standard Specification v2.0 controller emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2011 Samsung Electronics Co., Ltd.</i></td></tr>
+<tr><th id="5">5</th><td><i> * Mitsyanko Igor &lt;i.mitsyanko@samsung.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Peter A.G. Crosthwaite &lt;peter.crosthwaite@petalogix.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Based on MMC controller for Samsung S5PC1xx-based board emulation</i></td></tr>
+<tr><th id="9">9</th><td><i> * by Alexey Merkulov and Vladimir Monakhov.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is free software; you can redistribute it and/or modify it</i></td></tr>
+<tr><th id="12">12</th><td><i> * under the terms of the GNU General Public License as published by the</i></td></tr>
+<tr><th id="13">13</th><td><i> * Free Software Foundation; either version 2 of the License, or (at your</i></td></tr>
+<tr><th id="14">14</th><td><i> * option) any later version.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="17">17</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="18">18</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.</i></td></tr>
+<tr><th id="19">19</th><td><i> * See the GNU General Public License for more details.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * You should have received a copy of the GNU _General Public License along</i></td></tr>
+<tr><th id="22">22</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/SDHCI_H">SDHCI_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/SDHCI_H" data-ref="_M/SDHCI_H">SDHCI_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../block/block.h.html">"hw/block/block.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="sd.h.html">"hw/sd/sd.h"</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i>/* SD/MMC host controller state */</i></td></tr>
+<tr><th id="35">35</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="SDHCIState" title='SDHCIState' data-ref="SDHCIState"><a class="type" href="#SDHCIState" title='SDHCIState' data-ref="SDHCIState">SDHCIState</a></dfn> {</td></tr>
+<tr><th id="36">36</th><td>    <b>union</b> {</td></tr>
+<tr><th id="37">37</th><td>        <a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="SDHCIState::(anonymous)::pcidev" title='SDHCIState::(anonymous union)::pcidev' data-ref="SDHCIState::(anonymous)::pcidev">pcidev</dfn>;</td></tr>
+<tr><th id="38">38</th><td>        <a class="typedef" href="../sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="decl" id="SDHCIState::(anonymous)::busdev" title='SDHCIState::(anonymous union)::busdev' data-ref="SDHCIState::(anonymous)::busdev">busdev</dfn>;</td></tr>
+<tr><th id="39">39</th><td>    };</td></tr>
+<tr><th id="40">40</th><td>    <a class="typedef" href="sd.h.html#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> <dfn class="decl" id="SDHCIState::sdbus" title='SDHCIState::sdbus' data-ref="SDHCIState::sdbus">sdbus</dfn>;</td></tr>
+<tr><th id="41">41</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="SDHCIState::iomem" title='SDHCIState::iomem' data-ref="SDHCIState::iomem">iomem</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="SDHCIState::insert_timer" title='SDHCIState::insert_timer' data-ref="SDHCIState::insert_timer">insert_timer</dfn>;       <i>/* timer for 'changing' sd card. */</i></td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="SDHCIState::transfer_timer" title='SDHCIState::transfer_timer' data-ref="SDHCIState::transfer_timer">transfer_timer</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="SDHCIState::eject_cb" title='SDHCIState::eject_cb' data-ref="SDHCIState::eject_cb">eject_cb</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="SDHCIState::ro_cb" title='SDHCIState::ro_cb' data-ref="SDHCIState::ro_cb">ro_cb</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="SDHCIState::irq" title='SDHCIState::irq' data-ref="SDHCIState::irq">irq</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::sdmasysad" title='SDHCIState::sdmasysad' data-ref="SDHCIState::sdmasysad">sdmasysad</dfn>;    <i>/* SDMA System Address register */</i></td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::blksize" title='SDHCIState::blksize' data-ref="SDHCIState::blksize">blksize</dfn>;      <i>/* Host DMA Buff Boundary and Transfer BlkSize Reg */</i></td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::blkcnt" title='SDHCIState::blkcnt' data-ref="SDHCIState::blkcnt">blkcnt</dfn>;       <i>/* Blocks count for current transfer */</i></td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::argument" title='SDHCIState::argument' data-ref="SDHCIState::argument">argument</dfn>;     <i>/* Command Argument Register */</i></td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::trnmod" title='SDHCIState::trnmod' data-ref="SDHCIState::trnmod">trnmod</dfn>;       <i>/* Transfer Mode Setting Register */</i></td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::cmdreg" title='SDHCIState::cmdreg' data-ref="SDHCIState::cmdreg">cmdreg</dfn>;       <i>/* Command Register */</i></td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::rspreg" title='SDHCIState::rspreg' data-ref="SDHCIState::rspreg">rspreg</dfn>[<var>4</var>];    <i>/* Response Registers 0-3 */</i></td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::prnsts" title='SDHCIState::prnsts' data-ref="SDHCIState::prnsts">prnsts</dfn>;       <i>/* Present State Register */</i></td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::hostctl" title='SDHCIState::hostctl' data-ref="SDHCIState::hostctl">hostctl</dfn>;      <i>/* Host Control Register */</i></td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::pwrcon" title='SDHCIState::pwrcon' data-ref="SDHCIState::pwrcon">pwrcon</dfn>;       <i>/* Power control Register */</i></td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::blkgap" title='SDHCIState::blkgap' data-ref="SDHCIState::blkgap">blkgap</dfn>;       <i>/* Block Gap Control Register */</i></td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::wakcon" title='SDHCIState::wakcon' data-ref="SDHCIState::wakcon">wakcon</dfn>;       <i>/* WakeUp Control Register */</i></td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::clkcon" title='SDHCIState::clkcon' data-ref="SDHCIState::clkcon">clkcon</dfn>;       <i>/* Clock control Register */</i></td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::timeoutcon" title='SDHCIState::timeoutcon' data-ref="SDHCIState::timeoutcon">timeoutcon</dfn>;   <i>/* Timeout Control Register */</i></td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::admaerr" title='SDHCIState::admaerr' data-ref="SDHCIState::admaerr">admaerr</dfn>;      <i>/* ADMA Error Status Register */</i></td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::norintsts" title='SDHCIState::norintsts' data-ref="SDHCIState::norintsts">norintsts</dfn>;    <i>/* Normal Interrupt Status Register */</i></td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::errintsts" title='SDHCIState::errintsts' data-ref="SDHCIState::errintsts">errintsts</dfn>;    <i>/* Error Interrupt Status Register */</i></td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::norintstsen" title='SDHCIState::norintstsen' data-ref="SDHCIState::norintstsen">norintstsen</dfn>;  <i>/* Normal Interrupt Status Enable Register */</i></td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::errintstsen" title='SDHCIState::errintstsen' data-ref="SDHCIState::errintstsen">errintstsen</dfn>;  <i>/* Error Interrupt Status Enable Register */</i></td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::norintsigen" title='SDHCIState::norintsigen' data-ref="SDHCIState::norintsigen">norintsigen</dfn>;  <i>/* Normal Interrupt Signal Enable Register */</i></td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::errintsigen" title='SDHCIState::errintsigen' data-ref="SDHCIState::errintsigen">errintsigen</dfn>;  <i>/* Error Interrupt Signal Enable Register */</i></td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::acmd12errsts" title='SDHCIState::acmd12errsts' data-ref="SDHCIState::acmd12errsts">acmd12errsts</dfn>; <i>/* Auto CMD12 error status register */</i></td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="SDHCIState::admasysaddr" title='SDHCIState::admasysaddr' data-ref="SDHCIState::admasysaddr">admasysaddr</dfn>;  <i>/* ADMA System Address Register */</i></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::capareg" title='SDHCIState::capareg' data-ref="SDHCIState::capareg">capareg</dfn>;      <i>/* Capabilities Register */</i></td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::maxcurr" title='SDHCIState::maxcurr' data-ref="SDHCIState::maxcurr">maxcurr</dfn>;      <i>/* Maximum Current Capabilities Register */</i></td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  *<dfn class="decl" id="SDHCIState::fifo_buffer" title='SDHCIState::fifo_buffer' data-ref="SDHCIState::fifo_buffer">fifo_buffer</dfn>; <i>/* SD host i/o FIFO buffer */</i></td></tr>
+<tr><th id="76">76</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDHCIState::buf_maxsz" title='SDHCIState::buf_maxsz' data-ref="SDHCIState::buf_maxsz">buf_maxsz</dfn>;</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="SDHCIState::data_count" title='SDHCIState::data_count' data-ref="SDHCIState::data_count">data_count</dfn>;   <i>/* current element in FIFO buffer */</i></td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="SDHCIState::stopped_state" title='SDHCIState::stopped_state' data-ref="SDHCIState::stopped_state">stopped_state</dfn>;<i>/* Current SDHC state */</i></td></tr>
+<tr><th id="79">79</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>     <dfn class="decl" id="SDHCIState::pending_insert_quirk" title='SDHCIState::pending_insert_quirk' data-ref="SDHCIState::pending_insert_quirk">pending_insert_quirk</dfn>;<i>/* Quirk for Raspberry Pi card insert int */</i></td></tr>
+<tr><th id="80">80</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>     <dfn class="decl" id="SDHCIState::pending_insert_state" title='SDHCIState::pending_insert_state' data-ref="SDHCIState::pending_insert_state">pending_insert_state</dfn>;</td></tr>
+<tr><th id="81">81</th><td>    <i>/* Buffer Data Port Register - virtual access point to R and W buffers */</i></td></tr>
+<tr><th id="82">82</th><td>    <i>/* Software Reset Register - always reads as 0 */</i></td></tr>
+<tr><th id="83">83</th><td>    <i>/* Force Event Auto CMD12 Error Interrupt Reg - write only */</i></td></tr>
+<tr><th id="84">84</th><td>    <i>/* Force Event Error Interrupt Register- write only */</i></td></tr>
+<tr><th id="85">85</th><td>    <i>/* RO Host Controller Version Register always reads as 0x2401 */</i></td></tr>
+<tr><th id="86">86</th><td>} <dfn class="typedef" id="SDHCIState" title='SDHCIState' data-type='struct SDHCIState' data-ref="SDHCIState">SDHCIState</dfn>;</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/TYPE_PCI_SDHCI" data-ref="_M/TYPE_PCI_SDHCI">TYPE_PCI_SDHCI</dfn> "sdhci-pci"</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/PCI_SDHCI" data-ref="_M/PCI_SDHCI">PCI_SDHCI</dfn>(obj) OBJECT_CHECK(SDHCIState, (obj), TYPE_PCI_SDHCI)</u></td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/TYPE_SYSBUS_SDHCI" data-ref="_M/TYPE_SYSBUS_SDHCI">TYPE_SYSBUS_SDHCI</dfn> "generic-sdhci"</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/SYSBUS_SDHCI" data-ref="_M/SYSBUS_SDHCI">SYSBUS_SDHCI</dfn>(obj)                               \</u></td></tr>
+<tr><th id="93">93</th><td><u>     OBJECT_CHECK(SDHCIState, (obj), TYPE_SYSBUS_SDHCI)</u></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><u>#<span data-ppcond="25">endif</span> /* SDHCI_H */</u></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/sd/sdhci.c.html'>codebrowser/hw/sd/sdhci.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

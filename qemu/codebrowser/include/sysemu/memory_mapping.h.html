@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>memory_mapping.h source code [codebrowser/include/sysemu/memory_mapping.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="GuestPhysBlock,GuestPhysBlockList,MemoryMapping,MemoryMappingList "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/sysemu/memory_mapping.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>sysemu</a>/<a href='memory_mapping.h.html'>memory_mapping.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU memory mapping</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Fujitsu, Corp. 2011, 2012</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *     Wen Congyang &lt;wency@cn.fujitsu.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/MEMORY_MAPPING_H">MEMORY_MAPPING_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/MEMORY_MAPPING_H" data-ref="_M/MEMORY_MAPPING_H">MEMORY_MAPPING_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="GuestPhysBlock" title='GuestPhysBlock' data-ref="GuestPhysBlock"><a class="type" href="#GuestPhysBlock" title='GuestPhysBlock' data-ref="GuestPhysBlock">GuestPhysBlock</a></dfn> {</td></tr>
+<tr><th id="21">21</th><td>    <i>/* visible to guest, reflects PCI hole, etc */</i></td></tr>
+<tr><th id="22">22</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="GuestPhysBlock::target_start" title='GuestPhysBlock::target_start' data-ref="GuestPhysBlock::target_start">target_start</dfn>;</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td>    <i>/* implies size */</i></td></tr>
+<tr><th id="25">25</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="GuestPhysBlock::target_end" title='GuestPhysBlock::target_end' data-ref="GuestPhysBlock::target_end">target_end</dfn>;</td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td>    <i>/* points into host memory */</i></td></tr>
+<tr><th id="28">28</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="GuestPhysBlock::host_addr" title='GuestPhysBlock::host_addr' data-ref="GuestPhysBlock::host_addr">host_addr</dfn>;</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td>    <i>/* points to the MemoryRegion that this block belongs to */</i></td></tr>
+<tr><th id="31">31</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="GuestPhysBlock::mr" title='GuestPhysBlock::mr' data-ref="GuestPhysBlock::mr">mr</dfn>;</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>    <a class="macro" href="../qemu/queue.h.html#359" title="struct { struct GuestPhysBlock *tqe_next; struct GuestPhysBlock * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#GuestPhysBlock" title='GuestPhysBlock' data-ref="GuestPhysBlock">GuestPhysBlock</a>) <dfn class="decl" id="GuestPhysBlock::next" title='GuestPhysBlock::next' data-ref="GuestPhysBlock::next">next</dfn>;</td></tr>
+<tr><th id="34">34</th><td>} <dfn class="typedef" id="GuestPhysBlock" title='GuestPhysBlock' data-type='struct GuestPhysBlock' data-ref="GuestPhysBlock">GuestPhysBlock</dfn>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/* point-in-time snapshot of guest-visible physical mappings */</i></td></tr>
+<tr><th id="37">37</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="GuestPhysBlockList" title='GuestPhysBlockList' data-ref="GuestPhysBlockList"><a class="type" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a></dfn> {</td></tr>
+<tr><th id="38">38</th><td>    <em>unsigned</em> <dfn class="decl" id="GuestPhysBlockList::num" title='GuestPhysBlockList::num' data-ref="GuestPhysBlockList::num">num</dfn>;</td></tr>
+<tr><th id="39">39</th><td>    <a class="macro" href="../qemu/queue.h.html#349" title="struct GuestPhysBlockHead { struct GuestPhysBlock *tqh_first; struct GuestPhysBlock * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="GuestPhysBlockHead" title='GuestPhysBlockHead' data-ref="GuestPhysBlockHead"><a class="type" href="#39" title='GuestPhysBlockHead' data-ref="GuestPhysBlockHead">GuestPhysBlockHead</a></dfn>, <a class="type" href="#GuestPhysBlock" title='GuestPhysBlock' data-ref="GuestPhysBlock">GuestPhysBlock</a>) <dfn class="decl" id="GuestPhysBlockList::head" title='GuestPhysBlockList::head' data-ref="GuestPhysBlockList::head">head</dfn>;</td></tr>
+<tr><th id="40">40</th><td>} <dfn class="typedef" id="GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* The physical and virtual address in the memory mapping are contiguous. */</i></td></tr>
+<tr><th id="43">43</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="MemoryMapping" title='MemoryMapping' data-ref="MemoryMapping"><a class="type" href="#MemoryMapping" title='MemoryMapping' data-ref="MemoryMapping">MemoryMapping</a></dfn> {</td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="MemoryMapping::phys_addr" title='MemoryMapping::phys_addr' data-ref="MemoryMapping::phys_addr">phys_addr</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../exec/cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="decl" id="MemoryMapping::virt_addr" title='MemoryMapping::virt_addr' data-ref="MemoryMapping::virt_addr">virt_addr</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="decl" id="MemoryMapping::length" title='MemoryMapping::length' data-ref="MemoryMapping::length">length</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="macro" href="../qemu/queue.h.html#359" title="struct { struct MemoryMapping *tqe_next; struct MemoryMapping * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#MemoryMapping" title='MemoryMapping' data-ref="MemoryMapping">MemoryMapping</a>) <dfn class="decl" id="MemoryMapping::next" title='MemoryMapping::next' data-ref="MemoryMapping::next">next</dfn>;</td></tr>
+<tr><th id="48">48</th><td>} <dfn class="typedef" id="MemoryMapping" title='MemoryMapping' data-type='struct MemoryMapping' data-ref="MemoryMapping">MemoryMapping</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>struct</b> <dfn class="type def" id="MemoryMappingList" title='MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="MemoryMappingList::num" title='MemoryMappingList::num' data-ref="MemoryMappingList::num">num</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="#MemoryMapping" title='MemoryMapping' data-type='struct MemoryMapping' data-ref="MemoryMapping">MemoryMapping</a> *<dfn class="decl" id="MemoryMappingList::last_mapping" title='MemoryMappingList::last_mapping' data-ref="MemoryMappingList::last_mapping">last_mapping</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="macro" href="../qemu/queue.h.html#349" title="struct { struct MemoryMapping *tqh_first; struct MemoryMapping * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(, <a class="type" href="#MemoryMapping" title='MemoryMapping' data-ref="MemoryMapping">MemoryMapping</a>) <dfn class="decl" id="MemoryMappingList::head" title='MemoryMappingList::head' data-ref="MemoryMappingList::head">head</dfn>;</td></tr>
+<tr><th id="54">54</th><td>};</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><i>/*</i></td></tr>
+<tr><th id="57">57</th><td><i> * add or merge the memory region [phys_addr, phys_addr + length) into the</i></td></tr>
+<tr><th id="58">58</th><td><i> * memory mapping's list. The region's virtual address starts with virt_addr,</i></td></tr>
+<tr><th id="59">59</th><td><i> * and is contiguous. The list is sorted by phys_addr.</i></td></tr>
+<tr><th id="60">60</th><td><i> */</i></td></tr>
+<tr><th id="61">61</th><td><em>void</em> <dfn class="decl" id="memory_mapping_list_add_merge_sorted" title='memory_mapping_list_add_merge_sorted' data-ref="memory_mapping_list_add_merge_sorted">memory_mapping_list_add_merge_sorted</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col6 decl" id="6list" title='list' data-type='MemoryMappingList *' data-ref="6list">list</dfn>,</td></tr>
+<tr><th id="62">62</th><td>                                          <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col7 decl" id="7phys_addr" title='phys_addr' data-type='hwaddr' data-ref="7phys_addr">phys_addr</dfn>,</td></tr>
+<tr><th id="63">63</th><td>                                          <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="8virt_addr" title='virt_addr' data-type='hwaddr' data-ref="8virt_addr">virt_addr</dfn>,</td></tr>
+<tr><th id="64">64</th><td>                                          <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col9 decl" id="9length" title='length' data-type='ram_addr_t' data-ref="9length">length</dfn>);</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><em>void</em> <dfn class="decl" id="memory_mapping_list_free" title='memory_mapping_list_free' data-ref="memory_mapping_list_free">memory_mapping_list_free</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col0 decl" id="10list" title='list' data-type='MemoryMappingList *' data-ref="10list">list</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><em>void</em> <dfn class="decl" id="memory_mapping_list_init" title='memory_mapping_list_init' data-ref="memory_mapping_list_init">memory_mapping_list_init</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col1 decl" id="11list" title='list' data-type='MemoryMappingList *' data-ref="11list">list</dfn>);</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>void</em> <dfn class="decl" id="guest_phys_blocks_free" title='guest_phys_blocks_free' data-ref="guest_phys_blocks_free">guest_phys_blocks_free</dfn>(<a class="typedef" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a> *<dfn class="local col2 decl" id="12list" title='list' data-type='GuestPhysBlockList *' data-ref="12list">list</dfn>);</td></tr>
+<tr><th id="71">71</th><td><em>void</em> <dfn class="decl" id="guest_phys_blocks_init" title='guest_phys_blocks_init' data-ref="guest_phys_blocks_init">guest_phys_blocks_init</dfn>(<a class="typedef" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a> *<dfn class="local col3 decl" id="13list" title='list' data-type='GuestPhysBlockList *' data-ref="13list">list</dfn>);</td></tr>
+<tr><th id="72">72</th><td><em>void</em> <dfn class="decl" id="guest_phys_blocks_append" title='guest_phys_blocks_append' data-ref="guest_phys_blocks_append">guest_phys_blocks_append</dfn>(<a class="typedef" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a> *<dfn class="local col4 decl" id="14list" title='list' data-type='GuestPhysBlockList *' data-ref="14list">list</dfn>);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><em>void</em> <dfn class="decl" id="qemu_get_guest_memory_mapping" title='qemu_get_guest_memory_mapping' data-ref="qemu_get_guest_memory_mapping">qemu_get_guest_memory_mapping</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col5 decl" id="15list" title='list' data-type='MemoryMappingList *' data-ref="15list">list</dfn>,</td></tr>
+<tr><th id="75">75</th><td>                                   <em>const</em> <a class="typedef" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a> *<dfn class="local col6 decl" id="16guest_phys_blocks" title='guest_phys_blocks' data-type='const GuestPhysBlockList *' data-ref="16guest_phys_blocks">guest_phys_blocks</dfn>,</td></tr>
+<tr><th id="76">76</th><td>                                   <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="17errp" title='errp' data-type='Error **' data-ref="17errp">errp</dfn>);</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><i>/* get guest's memory mapping without do paging(virtual address is 0). */</i></td></tr>
+<tr><th id="79">79</th><td><em>void</em> <dfn class="decl" id="qemu_get_guest_simple_memory_mapping" title='qemu_get_guest_simple_memory_mapping' data-ref="qemu_get_guest_simple_memory_mapping">qemu_get_guest_simple_memory_mapping</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col8 decl" id="18list" title='list' data-type='MemoryMappingList *' data-ref="18list">list</dfn>,</td></tr>
+<tr><th id="80">80</th><td>                                  <em>const</em> <a class="typedef" href="#GuestPhysBlockList" title='GuestPhysBlockList' data-type='struct GuestPhysBlockList' data-ref="GuestPhysBlockList">GuestPhysBlockList</a> *<dfn class="local col9 decl" id="19guest_phys_blocks" title='guest_phys_blocks' data-type='const GuestPhysBlockList *' data-ref="19guest_phys_blocks">guest_phys_blocks</dfn>);</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><em>void</em> <dfn class="decl" id="memory_mapping_filter" title='memory_mapping_filter' data-ref="memory_mapping_filter">memory_mapping_filter</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col0 decl" id="20list" title='list' data-type='MemoryMappingList *' data-ref="20list">list</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="21begin" title='begin' data-type='int64_t' data-ref="21begin">begin</dfn>,</td></tr>
+<tr><th id="83">83</th><td>                           <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col2 decl" id="22length" title='length' data-type='int64_t' data-ref="22length">length</dfn>);</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../dump.c.html'>codebrowser/dump.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

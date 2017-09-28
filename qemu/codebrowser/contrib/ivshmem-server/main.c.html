@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>main.c source code [codebrowser/contrib/ivshmem-server/main.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="IvshmemServerArgs,main "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/contrib/ivshmem-server/main.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>contrib</a>/<a href='./'>ivshmem-server</a>/<a href='main.c.html'>main.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright 6WIND S.A., 2014</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="5">5</th><td><i> * (at your option) any later version.  See the COPYING file in the</i></td></tr>
+<tr><th id="6">6</th><td><i> * top-level directory.</i></td></tr>
+<tr><th id="7">7</th><td><i> */</i></td></tr>
+<tr><th id="8">8</th><td></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="../../include/qemu/cutils.h.html">"qemu/cutils.h"</a></u></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="ivshmem-server.h.html">"ivshmem-server.h"</a></u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_VERBOSE" data-ref="_M/IVSHMEM_SERVER_DEFAULT_VERBOSE">IVSHMEM_SERVER_DEFAULT_VERBOSE</dfn>        0</u></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_FOREGROUND" data-ref="_M/IVSHMEM_SERVER_DEFAULT_FOREGROUND">IVSHMEM_SERVER_DEFAULT_FOREGROUND</dfn>     0</u></td></tr>
+<tr><th id="17">17</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_PID_FILE" data-ref="_M/IVSHMEM_SERVER_DEFAULT_PID_FILE">IVSHMEM_SERVER_DEFAULT_PID_FILE</dfn>       "/var/run/ivshmem-server.pid"</u></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH" data-ref="_M/IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH">IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH</dfn> "/tmp/ivshmem_socket"</u></td></tr>
+<tr><th id="19">19</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_SHM_PATH" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_PATH">IVSHMEM_SERVER_DEFAULT_SHM_PATH</dfn>       "ivshmem"</u></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_SHM_SIZE" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_SIZE">IVSHMEM_SERVER_DEFAULT_SHM_SIZE</dfn>       (4*1024*1024)</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/IVSHMEM_SERVER_DEFAULT_N_VECTORS" data-ref="_M/IVSHMEM_SERVER_DEFAULT_N_VECTORS">IVSHMEM_SERVER_DEFAULT_N_VECTORS</dfn>      1</u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i  data-doc="ivshmem_server_quit">/* used to quit on signal SIGTERM */</i></td></tr>
+<tr><th id="24">24</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="ivshmem_server_quit" title='ivshmem_server_quit' data-type='int' data-ref="ivshmem_server_quit">ivshmem_server_quit</dfn>;</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><i>/* arguments given by the user */</i></td></tr>
+<tr><th id="27">27</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IvshmemServerArgs" title='IvshmemServerArgs' data-ref="IvshmemServerArgs"><a class="type" href="#IvshmemServerArgs" title='IvshmemServerArgs' data-ref="IvshmemServerArgs">IvshmemServerArgs</a></dfn> {</td></tr>
+<tr><th id="28">28</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="IvshmemServerArgs::verbose" title='IvshmemServerArgs::verbose' data-type='_Bool' data-ref="IvshmemServerArgs::verbose">verbose</dfn>;</td></tr>
+<tr><th id="29">29</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="IvshmemServerArgs::foreground" title='IvshmemServerArgs::foreground' data-type='_Bool' data-ref="IvshmemServerArgs::foreground">foreground</dfn>;</td></tr>
+<tr><th id="30">30</th><td>    <em>const</em> <em>char</em> *<dfn class="tu decl" id="IvshmemServerArgs::pid_file" title='IvshmemServerArgs::pid_file' data-type='const char *' data-ref="IvshmemServerArgs::pid_file">pid_file</dfn>;</td></tr>
+<tr><th id="31">31</th><td>    <em>const</em> <em>char</em> *<dfn class="tu decl" id="IvshmemServerArgs::unix_socket_path" title='IvshmemServerArgs::unix_socket_path' data-type='const char *' data-ref="IvshmemServerArgs::unix_socket_path">unix_socket_path</dfn>;</td></tr>
+<tr><th id="32">32</th><td>    <em>const</em> <em>char</em> *<dfn class="tu decl" id="IvshmemServerArgs::shm_path" title='IvshmemServerArgs::shm_path' data-type='const char *' data-ref="IvshmemServerArgs::shm_path">shm_path</dfn>;</td></tr>
+<tr><th id="33">33</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="IvshmemServerArgs::use_shm_open" title='IvshmemServerArgs::use_shm_open' data-type='_Bool' data-ref="IvshmemServerArgs::use_shm_open">use_shm_open</dfn>;</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="tu decl" id="IvshmemServerArgs::shm_size" title='IvshmemServerArgs::shm_size' data-type='uint64_t' data-ref="IvshmemServerArgs::shm_size">shm_size</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    <em>unsigned</em> <dfn class="tu decl" id="IvshmemServerArgs::n_vectors" title='IvshmemServerArgs::n_vectors' data-type='unsigned int' data-ref="IvshmemServerArgs::n_vectors">n_vectors</dfn>;</td></tr>
+<tr><th id="36">36</th><td>} <dfn class="typedef" id="IvshmemServerArgs" title='IvshmemServerArgs' data-type='struct IvshmemServerArgs' data-ref="IvshmemServerArgs">IvshmemServerArgs</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="39">39</th><td><dfn class="tu decl def" id="ivshmem_server_usage" title='ivshmem_server_usage' data-type='void ivshmem_server_usage(const char * progname)' data-ref="ivshmem_server_usage">ivshmem_server_usage</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1progname" title='progname' data-type='const char *' data-ref="1progname">progname</dfn>)</td></tr>
+<tr><th id="40">40</th><td>{</td></tr>
+<tr><th id="41">41</th><td>    <a class="ref" href="../../../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"Usage: %s [OPTION]...\n"</q></td></tr>
+<tr><th id="42">42</th><td>           <q>"  -h: show this help\n"</q></td></tr>
+<tr><th id="43">43</th><td>           <q>"  -v: verbose mode\n"</q></td></tr>
+<tr><th id="44">44</th><td>           <q>"  -F: foreground mode (default is to daemonize)\n"</q></td></tr>
+<tr><th id="45">45</th><td>           <q>"  -p &lt;pid-file&gt;: path to the PID file (used in daemon mode only)\n"</q></td></tr>
+<tr><th id="46">46</th><td>           <q>"     default "</q> <a class="macro" href="#17" title="&quot;/var/run/ivshmem-server.pid&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_PID_FILE">IVSHMEM_SERVER_DEFAULT_PID_FILE</a> <q>"\n"</q></td></tr>
+<tr><th id="47">47</th><td>           <q>"  -S &lt;unix-socket-path&gt;: path to the unix socket to listen to\n"</q></td></tr>
+<tr><th id="48">48</th><td>           <q>"     default "</q> <a class="macro" href="#18" title="&quot;/tmp/ivshmem_socket&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH">IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH</a> <q>"\n"</q></td></tr>
+<tr><th id="49">49</th><td>           <q>"  -M &lt;shm-name&gt;: POSIX shared memory object to use\n"</q></td></tr>
+<tr><th id="50">50</th><td>           <q>"     default "</q> <a class="macro" href="#19" title="&quot;ivshmem&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_PATH">IVSHMEM_SERVER_DEFAULT_SHM_PATH</a> <q>"\n"</q></td></tr>
+<tr><th id="51">51</th><td>           <q>"  -m &lt;dir-name&gt;: where to create shared memory\n"</q></td></tr>
+<tr><th id="52">52</th><td>           <q>"  -l &lt;size&gt;: size of shared memory in bytes\n"</q></td></tr>
+<tr><th id="53">53</th><td>           <q>"     suffixes K, M and G can be used, e.g. 1K means 1024\n"</q></td></tr>
+<tr><th id="54">54</th><td>           <q>"     default %u\n"</q></td></tr>
+<tr><th id="55">55</th><td>           <q>"  -n &lt;nvectors&gt;: number of vectors\n"</q></td></tr>
+<tr><th id="56">56</th><td>           <q>"     default %u\n"</q>,</td></tr>
+<tr><th id="57">57</th><td>           <a class="local col1 ref" href="#1progname" title='progname' data-ref="1progname">progname</a>, <a class="macro" href="#20" title="(4*1024*1024)" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_SIZE">IVSHMEM_SERVER_DEFAULT_SHM_SIZE</a>,</td></tr>
+<tr><th id="58">58</th><td>           <a class="macro" href="#21" title="1" data-ref="_M/IVSHMEM_SERVER_DEFAULT_N_VECTORS">IVSHMEM_SERVER_DEFAULT_N_VECTORS</a>);</td></tr>
+<tr><th id="59">59</th><td>}</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="62">62</th><td><dfn class="tu decl def" id="ivshmem_server_help" title='ivshmem_server_help' data-type='void ivshmem_server_help(const char * progname)' data-ref="ivshmem_server_help">ivshmem_server_help</dfn>(<em>const</em> <em>char</em> *<dfn class="local col2 decl" id="2progname" title='progname' data-type='const char *' data-ref="2progname">progname</dfn>)</td></tr>
+<tr><th id="63">63</th><td>{</td></tr>
+<tr><th id="64">64</th><td>    <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Try '%s -h' for more information.\n"</q>, <a class="local col2 ref" href="#2progname" title='progname' data-ref="2progname">progname</a>);</td></tr>
+<tr><th id="65">65</th><td>}</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><i  data-doc="ivshmem_server_parse_args">/* parse the program arguments, exit on error */</i></td></tr>
+<tr><th id="68">68</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="69">69</th><td><dfn class="tu decl def" id="ivshmem_server_parse_args" title='ivshmem_server_parse_args' data-type='void ivshmem_server_parse_args(IvshmemServerArgs * args, int argc, char ** argv)' data-ref="ivshmem_server_parse_args">ivshmem_server_parse_args</dfn>(<a class="typedef" href="#IvshmemServerArgs" title='IvshmemServerArgs' data-type='struct IvshmemServerArgs' data-ref="IvshmemServerArgs">IvshmemServerArgs</a> *<dfn class="local col3 decl" id="3args" title='args' data-type='IvshmemServerArgs *' data-ref="3args">args</dfn>, <em>int</em> <dfn class="local col4 decl" id="4argc" title='argc' data-type='int' data-ref="4argc">argc</dfn>, <em>char</em> *<dfn class="local col5 decl" id="5argv" title='argv' data-type='char **' data-ref="5argv">argv</dfn>[])</td></tr>
+<tr><th id="70">70</th><td>{</td></tr>
+<tr><th id="71">71</th><td>    <em>int</em> <dfn class="local col6 decl" id="6c" title='c' data-type='int' data-ref="6c">c</dfn>;</td></tr>
+<tr><th id="72">72</th><td>    <em>unsigned</em> <em>long</em> <em>long</em> <dfn class="local col7 decl" id="7v" title='v' data-type='unsigned long long' data-ref="7v">v</dfn>;</td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col8 decl" id="8err" title='err' data-type='Error *' data-ref="8err">err</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <b>while</b> ((<a class="local col6 ref" href="#6c" title='c' data-ref="6c">c</a> = <a class="ref" href="../../../include/getopt.h.html#getopt" title='getopt' data-ref="getopt">getopt</a>(<a class="local col4 ref" href="#4argc" title='argc' data-ref="4argc">argc</a>, <a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>, <q>"hvFp:S:m:M:l:n:"</q>)) != -<var>1</var>) {</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td>        <b>switch</b> (<a class="local col6 ref" href="#6c" title='c' data-ref="6c">c</a>) {</td></tr>
+<tr><th id="78">78</th><td>        <b>case</b> <kbd>'h'</kbd>: <i>/* help */</i></td></tr>
+<tr><th id="79">79</th><td>            <a class="tu ref" href="#ivshmem_server_usage" title='ivshmem_server_usage' data-use='c' data-ref="ivshmem_server_usage">ivshmem_server_usage</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="80">80</th><td>            <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>0</var>);</td></tr>
+<tr><th id="81">81</th><td>            <b>break</b>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>        <b>case</b> <kbd>'v'</kbd>: <i>/* verbose */</i></td></tr>
+<tr><th id="84">84</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::verbose" title='IvshmemServerArgs::verbose' data-use='w' data-ref="IvshmemServerArgs::verbose">verbose</a> = <var>1</var>;</td></tr>
+<tr><th id="85">85</th><td>            <b>break</b>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>        <b>case</b> <kbd>'F'</kbd>: <i>/* foreground */</i></td></tr>
+<tr><th id="88">88</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::foreground" title='IvshmemServerArgs::foreground' data-use='w' data-ref="IvshmemServerArgs::foreground">foreground</a> = <var>1</var>;</td></tr>
+<tr><th id="89">89</th><td>            <b>break</b>;</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>        <b>case</b> <kbd>'p'</kbd>: <i>/* pid file */</i></td></tr>
+<tr><th id="92">92</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::pid_file" title='IvshmemServerArgs::pid_file' data-use='w' data-ref="IvshmemServerArgs::pid_file">pid_file</a> = <a class="ref" href="../../../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>;</td></tr>
+<tr><th id="93">93</th><td>            <b>break</b>;</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>        <b>case</b> <kbd>'S'</kbd>: <i>/* unix socket path */</i></td></tr>
+<tr><th id="96">96</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::unix_socket_path" title='IvshmemServerArgs::unix_socket_path' data-use='w' data-ref="IvshmemServerArgs::unix_socket_path">unix_socket_path</a> = <a class="ref" href="../../../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>;</td></tr>
+<tr><th id="97">97</th><td>            <b>break</b>;</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td>        <b>case</b> <kbd>'M'</kbd>: <i>/* shm name */</i></td></tr>
+<tr><th id="100">100</th><td>        <b>case</b> <kbd>'m'</kbd>: <i>/* dir name */</i></td></tr>
+<tr><th id="101">101</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::shm_path" title='IvshmemServerArgs::shm_path' data-use='w' data-ref="IvshmemServerArgs::shm_path">shm_path</a> = <a class="ref" href="../../../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>;</td></tr>
+<tr><th id="102">102</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::use_shm_open" title='IvshmemServerArgs::use_shm_open' data-use='w' data-ref="IvshmemServerArgs::use_shm_open">use_shm_open</a> = <a class="local col6 ref" href="#6c" title='c' data-ref="6c">c</a> == <kbd>'M'</kbd>;</td></tr>
+<tr><th id="103">103</th><td>            <b>break</b>;</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>        <b>case</b> <kbd>'l'</kbd>: <i>/* shm size */</i></td></tr>
+<tr><th id="106">106</th><td>            <a class="ref" href="../../include/qemu/option.h.html#parse_option_size" title='parse_option_size' data-ref="parse_option_size">parse_option_size</a>(<q>"shm_size"</q>, <a class="ref" href="../../../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::shm_size" title='IvshmemServerArgs::shm_size' data-use='a' data-ref="IvshmemServerArgs::shm_size">shm_size</a>, &amp;<a class="local col8 ref" href="#8err" title='err' data-ref="8err">err</a>);</td></tr>
+<tr><th id="107">107</th><td>            <b>if</b> (<a class="local col8 ref" href="#8err" title='err' data-ref="8err">err</a>) {</td></tr>
+<tr><th id="108">108</th><td>                <a class="ref" href="../../include/qapi/error.h.html#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col8 ref" href="#8err" title='err' data-ref="8err">err</a>);</td></tr>
+<tr><th id="109">109</th><td>                <a class="tu ref" href="#ivshmem_server_help" title='ivshmem_server_help' data-use='c' data-ref="ivshmem_server_help">ivshmem_server_help</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="110">110</th><td>                <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="111">111</th><td>            }</td></tr>
+<tr><th id="112">112</th><td>            <b>break</b>;</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td>        <b>case</b> <kbd>'n'</kbd>: <i>/* number of vectors */</i></td></tr>
+<tr><th id="115">115</th><td>            <b>if</b> (<a class="ref" href="../../include/qemu/cutils.h.html#parse_uint_full" title='parse_uint_full' data-ref="parse_uint_full">parse_uint_full</a>(<a class="ref" href="../../../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col7 ref" href="#7v" title='v' data-ref="7v">v</a>, <var>0</var>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="116">116</th><td>                <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot parse n_vectors\n"</q>);</td></tr>
+<tr><th id="117">117</th><td>                <a class="tu ref" href="#ivshmem_server_help" title='ivshmem_server_help' data-use='c' data-ref="ivshmem_server_help">ivshmem_server_help</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="118">118</th><td>                <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="119">119</th><td>            }</td></tr>
+<tr><th id="120">120</th><td>            <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::n_vectors" title='IvshmemServerArgs::n_vectors' data-use='w' data-ref="IvshmemServerArgs::n_vectors">n_vectors</a> = <a class="local col7 ref" href="#7v" title='v' data-ref="7v">v</a>;</td></tr>
+<tr><th id="121">121</th><td>            <b>break</b>;</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>        <b>default</b>:</td></tr>
+<tr><th id="124">124</th><td>            <a class="tu ref" href="#ivshmem_server_usage" title='ivshmem_server_usage' data-use='c' data-ref="ivshmem_server_usage">ivshmem_server_usage</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="125">125</th><td>            <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="126">126</th><td>            <b>break</b>;</td></tr>
+<tr><th id="127">127</th><td>        }</td></tr>
+<tr><th id="128">128</th><td>    }</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (<a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::n_vectors" title='IvshmemServerArgs::n_vectors' data-use='r' data-ref="IvshmemServerArgs::n_vectors">n_vectors</a> &gt; <a class="macro" href="ivshmem-server.h.html#38" title="64" data-ref="_M/IVSHMEM_SERVER_MAX_VECTORS">IVSHMEM_SERVER_MAX_VECTORS</a>) {</td></tr>
+<tr><th id="131">131</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"too many requested vectors (max is %d)\n"</q>,</td></tr>
+<tr><th id="132">132</th><td>                <a class="macro" href="ivshmem-server.h.html#38" title="64" data-ref="_M/IVSHMEM_SERVER_MAX_VECTORS">IVSHMEM_SERVER_MAX_VECTORS</a>);</td></tr>
+<tr><th id="133">133</th><td>        <a class="tu ref" href="#ivshmem_server_help" title='ivshmem_server_help' data-use='c' data-ref="ivshmem_server_help">ivshmem_server_help</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="134">134</th><td>        <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="135">135</th><td>    }</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <b>if</b> (<a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::verbose" title='IvshmemServerArgs::verbose' data-use='r' data-ref="IvshmemServerArgs::verbose">verbose</a> == <var>1</var> &amp;&amp; <a class="local col3 ref" href="#3args" title='args' data-ref="3args">args</a>-&gt;<a class="tu ref" href="#IvshmemServerArgs::foreground" title='IvshmemServerArgs::foreground' data-use='r' data-ref="IvshmemServerArgs::foreground">foreground</a> == <var>0</var>) {</td></tr>
+<tr><th id="138">138</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot use verbose in daemon mode\n"</q>);</td></tr>
+<tr><th id="139">139</th><td>        <a class="tu ref" href="#ivshmem_server_help" title='ivshmem_server_help' data-use='c' data-ref="ivshmem_server_help">ivshmem_server_help</a>(<a class="local col5 ref" href="#5argv" title='argv' data-ref="5argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="140">140</th><td>        <a class="ref" href="../../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="141">141</th><td>    }</td></tr>
+<tr><th id="142">142</th><td>}</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><i  data-doc="ivshmem_server_poll_events">/* wait for events on listening server unix socket and connected client</i></td></tr>
+<tr><th id="145">145</th><td><i  data-doc="ivshmem_server_poll_events"> * sockets */</i></td></tr>
+<tr><th id="146">146</th><td><em>static</em> <em>int</em></td></tr>
+<tr><th id="147">147</th><td><dfn class="tu decl def" id="ivshmem_server_poll_events" title='ivshmem_server_poll_events' data-type='int ivshmem_server_poll_events(IvshmemServer * server)' data-ref="ivshmem_server_poll_events">ivshmem_server_poll_events</dfn>(<a class="typedef" href="ivshmem-server.h.html#IvshmemServer" title='IvshmemServer' data-type='struct IvshmemServer' data-ref="IvshmemServer">IvshmemServer</a> *<dfn class="local col9 decl" id="9server" title='server' data-type='IvshmemServer *' data-ref="9server">server</dfn>)</td></tr>
+<tr><th id="148">148</th><td>{</td></tr>
+<tr><th id="149">149</th><td>    <a class="typedef" href="../../../include/x86_64-linux-gnu/sys/select.h.html#fd_set" title='fd_set' data-type='struct fd_set' data-ref="fd_set">fd_set</a> <dfn class="local col0 decl" id="10fds" title='fds' data-type='fd_set' data-ref="10fds">fds</dfn>;</td></tr>
+<tr><th id="150">150</th><td>    <em>int</em> <dfn class="local col1 decl" id="11ret" title='ret' data-type='int' data-ref="11ret">ret</dfn> = <var>0</var>, <dfn class="local col2 decl" id="12maxfd" title='maxfd' data-type='int' data-ref="12maxfd">maxfd</dfn>;</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td>    <b>while</b> (!<a class="tu ref" href="#ivshmem_server_quit" title='ivshmem_server_quit' data-use='r' data-ref="ivshmem_server_quit">ivshmem_server_quit</a>) {</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>        <a class="macro" href="../../../include/x86_64-linux-gnu/sys/select.h.html#93" title="do { int __d0, __d1; __asm__ __volatile__ (&quot;cld; rep; &quot; &quot;stosq&quot; : &quot;=c&quot; (__d0), &quot;=D&quot; (__d1) : &quot;a&quot; (0), &quot;0&quot; (sizeof (fd_set) / sizeof (__fd_mask)), &quot;1&quot; (&amp;((&amp;fds)-&gt;fds_bits)[0]) : &quot;memory&quot;); } while (0)" data-ref="_M/FD_ZERO">FD_ZERO</a>(&amp;<a class="local col0 ref" href="#10fds" title='fds' data-ref="10fds">fds</a>);</td></tr>
+<tr><th id="155">155</th><td>        <a class="local col2 ref" href="#12maxfd" title='maxfd' data-ref="12maxfd">maxfd</a> = <var>0</var>;</td></tr>
+<tr><th id="156">156</th><td>        <a class="ref" href="ivshmem-server.h.html#ivshmem_server_get_fds" title='ivshmem_server_get_fds' data-ref="ivshmem_server_get_fds">ivshmem_server_get_fds</a>(<a class="local col9 ref" href="#9server" title='server' data-ref="9server">server</a>, &amp;<a class="local col0 ref" href="#10fds" title='fds' data-ref="10fds">fds</a>, &amp;<a class="local col2 ref" href="#12maxfd" title='maxfd' data-ref="12maxfd">maxfd</a>);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>        <a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> = <a class="ref" href="../../../include/x86_64-linux-gnu/sys/select.h.html#select" title='select' data-ref="select">select</a>(<a class="local col2 ref" href="#12maxfd" title='maxfd' data-ref="12maxfd">maxfd</a>, &amp;<a class="local col0 ref" href="#10fds" title='fds' data-ref="10fds">fds</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>        <b>if</b> (<a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="161">161</th><td>            <b>if</b> (<a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../../include/asm-generic/errno-base.h.html#7" title="4" data-ref="_M/EINTR">EINTR</a>) {</td></tr>
+<tr><th id="162">162</th><td>                <b>continue</b>;</td></tr>
+<tr><th id="163">163</th><td>            }</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td>            <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"select error: %s\n"</q>, <a class="ref" href="../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="166">166</th><td>            <b>break</b>;</td></tr>
+<tr><th id="167">167</th><td>        }</td></tr>
+<tr><th id="168">168</th><td>        <b>if</b> (<a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a> == <var>0</var>) {</td></tr>
+<tr><th id="169">169</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="170">170</th><td>        }</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>        <b>if</b> (<a class="ref" href="ivshmem-server.h.html#ivshmem_server_handle_fds" title='ivshmem_server_handle_fds' data-ref="ivshmem_server_handle_fds">ivshmem_server_handle_fds</a>(<a class="local col9 ref" href="#9server" title='server' data-ref="9server">server</a>, &amp;<a class="local col0 ref" href="#10fds" title='fds' data-ref="10fds">fds</a>, <a class="local col2 ref" href="#12maxfd" title='maxfd' data-ref="12maxfd">maxfd</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="173">173</th><td>            <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"ivshmem_server_handle_fds() failed\n"</q>);</td></tr>
+<tr><th id="174">174</th><td>            <b>break</b>;</td></tr>
+<tr><th id="175">175</th><td>        }</td></tr>
+<tr><th id="176">176</th><td>    }</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <b>return</b> <a class="local col1 ref" href="#11ret" title='ret' data-ref="11ret">ret</a>;</td></tr>
+<tr><th id="179">179</th><td>}</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><em>static</em> <em>void</em></td></tr>
+<tr><th id="182">182</th><td><dfn class="tu decl def" id="ivshmem_server_quit_cb" title='ivshmem_server_quit_cb' data-type='void ivshmem_server_quit_cb(int signum)' data-ref="ivshmem_server_quit_cb">ivshmem_server_quit_cb</dfn>(<em>int</em> <dfn class="local col3 decl" id="13signum" title='signum' data-type='int' data-ref="13signum">signum</dfn>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>    <a class="tu ref" href="#ivshmem_server_quit" title='ivshmem_server_quit' data-use='w' data-ref="ivshmem_server_quit">ivshmem_server_quit</a> = <var>1</var>;</td></tr>
+<tr><th id="185">185</th><td>}</td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><em>int</em></td></tr>
+<tr><th id="188">188</th><td><dfn class="decl def" id="main" title='main' data-ref="main">main</dfn>(<em>int</em> <dfn class="local col4 decl" id="14argc" title='argc' data-type='int' data-ref="14argc">argc</dfn>, <em>char</em> *<dfn class="local col5 decl" id="15argv" title='argv' data-type='char **' data-ref="15argv">argv</dfn>[])</td></tr>
+<tr><th id="189">189</th><td>{</td></tr>
+<tr><th id="190">190</th><td>    <a class="typedef" href="ivshmem-server.h.html#IvshmemServer" title='IvshmemServer' data-type='struct IvshmemServer' data-ref="IvshmemServer">IvshmemServer</a> <dfn class="local col6 decl" id="16server" title='server' data-type='IvshmemServer' data-ref="16server">server</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a> <dfn class="local col7 decl" id="17sa" title='sa' data-type='struct sigaction' data-ref="17sa">sa</dfn>, <dfn class="local col8 decl" id="18sa_quit" title='sa_quit' data-type='struct sigaction' data-ref="18sa_quit">sa_quit</dfn>;</td></tr>
+<tr><th id="192">192</th><td>    <a class="typedef" href="#IvshmemServerArgs" title='IvshmemServerArgs' data-type='struct IvshmemServerArgs' data-ref="IvshmemServerArgs">IvshmemServerArgs</a> <dfn class="local col9 decl" id="19args" title='args' data-type='IvshmemServerArgs' data-ref="19args">args</dfn> = {</td></tr>
+<tr><th id="193">193</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::verbose" title='IvshmemServerArgs::verbose' data-use='w' data-ref="IvshmemServerArgs::verbose">verbose</a> = <a class="macro" href="#15" title="0" data-ref="_M/IVSHMEM_SERVER_DEFAULT_VERBOSE">IVSHMEM_SERVER_DEFAULT_VERBOSE</a>,</td></tr>
+<tr><th id="194">194</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::foreground" title='IvshmemServerArgs::foreground' data-use='w' data-ref="IvshmemServerArgs::foreground">foreground</a> = <a class="macro" href="#16" title="0" data-ref="_M/IVSHMEM_SERVER_DEFAULT_FOREGROUND">IVSHMEM_SERVER_DEFAULT_FOREGROUND</a>,</td></tr>
+<tr><th id="195">195</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::pid_file" title='IvshmemServerArgs::pid_file' data-use='w' data-ref="IvshmemServerArgs::pid_file">pid_file</a> = <a class="macro" href="#17" title="&quot;/var/run/ivshmem-server.pid&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_PID_FILE">IVSHMEM_SERVER_DEFAULT_PID_FILE</a>,</td></tr>
+<tr><th id="196">196</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::unix_socket_path" title='IvshmemServerArgs::unix_socket_path' data-use='w' data-ref="IvshmemServerArgs::unix_socket_path">unix_socket_path</a> = <a class="macro" href="#18" title="&quot;/tmp/ivshmem_socket&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH">IVSHMEM_SERVER_DEFAULT_UNIX_SOCK_PATH</a>,</td></tr>
+<tr><th id="197">197</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::shm_path" title='IvshmemServerArgs::shm_path' data-use='w' data-ref="IvshmemServerArgs::shm_path">shm_path</a> = <a class="macro" href="#19" title="&quot;ivshmem&quot;" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_PATH">IVSHMEM_SERVER_DEFAULT_SHM_PATH</a>,</td></tr>
+<tr><th id="198">198</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::use_shm_open" title='IvshmemServerArgs::use_shm_open' data-use='w' data-ref="IvshmemServerArgs::use_shm_open">use_shm_open</a> = <span class="macro" title="1" data-ref="_M/true">true</span>,</td></tr>
+<tr><th id="199">199</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::shm_size" title='IvshmemServerArgs::shm_size' data-use='w' data-ref="IvshmemServerArgs::shm_size">shm_size</a> = <a class="macro" href="#20" title="(4*1024*1024)" data-ref="_M/IVSHMEM_SERVER_DEFAULT_SHM_SIZE">IVSHMEM_SERVER_DEFAULT_SHM_SIZE</a>,</td></tr>
+<tr><th id="200">200</th><td>        .<a class="tu ref" href="#IvshmemServerArgs::n_vectors" title='IvshmemServerArgs::n_vectors' data-use='w' data-ref="IvshmemServerArgs::n_vectors">n_vectors</a> = <a class="macro" href="#21" title="1" data-ref="_M/IVSHMEM_SERVER_DEFAULT_N_VECTORS">IVSHMEM_SERVER_DEFAULT_N_VECTORS</a>,</td></tr>
+<tr><th id="201">201</th><td>    };</td></tr>
+<tr><th id="202">202</th><td>    <em>int</em> <dfn class="local col0 decl" id="20ret" title='ret' data-type='int' data-ref="20ret">ret</dfn> = <var>1</var>;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td>    <i>/*</i></td></tr>
+<tr><th id="205">205</th><td><i>     * Do not remove this notice without adding proper error handling!</i></td></tr>
+<tr><th id="206">206</th><td><i>     * Start with handling ivshmem_server_send_one_msg() failure.</i></td></tr>
+<tr><th id="207">207</th><td><i>     */</i></td></tr>
+<tr><th id="208">208</th><td>    <a class="ref" href="../../../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"*** Example code, do not use in production ***\n"</q>);</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td>    <i>/* parse arguments, will exit on error */</i></td></tr>
+<tr><th id="211">211</th><td>    <a class="tu ref" href="#ivshmem_server_parse_args" title='ivshmem_server_parse_args' data-use='c' data-ref="ivshmem_server_parse_args">ivshmem_server_parse_args</a>(&amp;<a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>, <a class="local col4 ref" href="#14argc" title='argc' data-ref="14argc">argc</a>, <a class="local col5 ref" href="#15argv" title='argv' data-ref="15argv">argv</a>);</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>    <i>/* Ignore SIGPIPE, see this link for more info:</i></td></tr>
+<tr><th id="214">214</th><td><i>     * <a href="http://www.mail-archive.com/libevent-users@monkey.org/msg01606.html">http://www.mail-archive.com/libevent-users@monkey.org/msg01606.html</a> */</i></td></tr>
+<tr><th id="215">215</th><td>    <a class="local col7 ref" href="#17sa" title='sa' data-ref="17sa">sa</a>.<a class="macro" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a> = <a class="macro" href="../../../include/x86_64-linux-gnu/bits/signum.h.html#24" title="((__sighandler_t) 1)" data-ref="_M/SIG_IGN">SIG_IGN</a>;</td></tr>
+<tr><th id="216">216</th><td>    <a class="local col7 ref" href="#17sa" title='sa' data-ref="17sa">sa</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_flags" title='sigaction::sa_flags' data-ref="sigaction::sa_flags">sa_flags</a> = <var>0</var>;</td></tr>
+<tr><th id="217">217</th><td>    <b>if</b> (<a class="ref" href="../../../include/signal.h.html#sigemptyset" title='sigemptyset' data-ref="sigemptyset">sigemptyset</a>(&amp;<a class="local col7 ref" href="#17sa" title='sa' data-ref="17sa">sa</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_mask" title='sigaction::sa_mask' data-ref="sigaction::sa_mask">sa_mask</a>) == -<var>1</var> ||</td></tr>
+<tr><th id="218">218</th><td>        <a class="ref" href="../../../include/signal.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/signum.h.html#45" title="13" data-ref="_M/SIGPIPE">SIGPIPE</a>, &amp;<a class="local col7 ref" href="#17sa" title='sa' data-ref="17sa">sa</a>, <var>0</var>) == -<var>1</var>) {</td></tr>
+<tr><th id="219">219</th><td>        <a class="ref" href="../../../include/stdio.h.html#perror" title='perror' data-ref="perror">perror</a>(<q>"failed to ignore SIGPIPE; sigaction"</q>);</td></tr>
+<tr><th id="220">220</th><td>        <b>goto</b> <a class="lbl" href="#21err" data-ref="21err">err</a>;</td></tr>
+<tr><th id="221">221</th><td>    }</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>    <a class="local col8 ref" href="#18sa_quit" title='sa_quit' data-ref="18sa_quit">sa_quit</a>.<a class="macro" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#36" title="__sigaction_handler.sa_handler" data-ref="_M/sa_handler">sa_handler</a> = <a class="tu ref" href="#ivshmem_server_quit_cb" title='ivshmem_server_quit_cb' data-use='r' data-ref="ivshmem_server_quit_cb">ivshmem_server_quit_cb</a>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="local col8 ref" href="#18sa_quit" title='sa_quit' data-ref="18sa_quit">sa_quit</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_flags" title='sigaction::sa_flags' data-ref="sigaction::sa_flags">sa_flags</a> = <var>0</var>;</td></tr>
+<tr><th id="225">225</th><td>    <b>if</b> (<a class="ref" href="../../../include/signal.h.html#sigemptyset" title='sigemptyset' data-ref="sigemptyset">sigemptyset</a>(&amp;<a class="local col8 ref" href="#18sa_quit" title='sa_quit' data-ref="18sa_quit">sa_quit</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/sigaction.h.html#sigaction::sa_mask" title='sigaction::sa_mask' data-ref="sigaction::sa_mask">sa_mask</a>) == -<var>1</var> ||</td></tr>
+<tr><th id="226">226</th><td>        <a class="ref" href="../../../include/signal.h.html#sigaction" title='sigaction' data-ref="sigaction">sigaction</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/signum.h.html#47" title="15" data-ref="_M/SIGTERM">SIGTERM</a>, &amp;<a class="local col8 ref" href="#18sa_quit" title='sa_quit' data-ref="18sa_quit">sa_quit</a>, <var>0</var>) == -<var>1</var>) {</td></tr>
+<tr><th id="227">227</th><td>        <a class="ref" href="../../../include/stdio.h.html#perror" title='perror' data-ref="perror">perror</a>(<q>"failed to add SIGTERM handler; sigaction"</q>);</td></tr>
+<tr><th id="228">228</th><td>        <b>goto</b> <a class="lbl" href="#21err" data-ref="21err">err</a>;</td></tr>
+<tr><th id="229">229</th><td>    }</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td>    <i>/* init the ivshms structure */</i></td></tr>
+<tr><th id="232">232</th><td>    <b>if</b> (<a class="ref" href="ivshmem-server.h.html#ivshmem_server_init" title='ivshmem_server_init' data-ref="ivshmem_server_init">ivshmem_server_init</a>(&amp;<a class="local col6 ref" href="#16server" title='server' data-ref="16server">server</a>, <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::unix_socket_path" title='IvshmemServerArgs::unix_socket_path' data-use='r' data-ref="IvshmemServerArgs::unix_socket_path">unix_socket_path</a>,</td></tr>
+<tr><th id="233">233</th><td>                            <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::shm_path" title='IvshmemServerArgs::shm_path' data-use='r' data-ref="IvshmemServerArgs::shm_path">shm_path</a>, <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::use_shm_open" title='IvshmemServerArgs::use_shm_open' data-use='r' data-ref="IvshmemServerArgs::use_shm_open">use_shm_open</a>,</td></tr>
+<tr><th id="234">234</th><td>                            <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::shm_size" title='IvshmemServerArgs::shm_size' data-use='r' data-ref="IvshmemServerArgs::shm_size">shm_size</a>, <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::n_vectors" title='IvshmemServerArgs::n_vectors' data-use='r' data-ref="IvshmemServerArgs::n_vectors">n_vectors</a>, <a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::verbose" title='IvshmemServerArgs::verbose' data-use='r' data-ref="IvshmemServerArgs::verbose">verbose</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="235">235</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot init server\n"</q>);</td></tr>
+<tr><th id="236">236</th><td>        <b>goto</b> <a class="lbl" href="#21err" data-ref="21err">err</a>;</td></tr>
+<tr><th id="237">237</th><td>    }</td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td>    <i>/* start the ivshmem server (open shm &amp; unix socket) */</i></td></tr>
+<tr><th id="240">240</th><td>    <b>if</b> (<a class="ref" href="ivshmem-server.h.html#ivshmem_server_start" title='ivshmem_server_start' data-ref="ivshmem_server_start">ivshmem_server_start</a>(&amp;<a class="local col6 ref" href="#16server" title='server' data-ref="16server">server</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="241">241</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot bind\n"</q>);</td></tr>
+<tr><th id="242">242</th><td>        <b>goto</b> <a class="lbl" href="#21err" data-ref="21err">err</a>;</td></tr>
+<tr><th id="243">243</th><td>    }</td></tr>
+<tr><th id="244">244</th><td></td></tr>
+<tr><th id="245">245</th><td>    <i>/* daemonize if asked to */</i></td></tr>
+<tr><th id="246">246</th><td>    <b>if</b> (!<a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::foreground" title='IvshmemServerArgs::foreground' data-use='r' data-ref="IvshmemServerArgs::foreground">foreground</a>) {</td></tr>
+<tr><th id="247">247</th><td>        <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col2 decl" id="22fp" title='fp' data-type='FILE *' data-ref="22fp">fp</dfn>;</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>        <b>if</b> (<a class="ref" href="../../include/qemu/osdep.h.html#qemu_daemon" title='qemu_daemon' data-ref="qemu_daemon">qemu_daemon</a>(<var>1</var>, <var>1</var>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="250">250</th><td>            <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot daemonize: %s\n"</q>, <a class="ref" href="../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="251">251</th><td>            <b>goto</b> <a class="lbl" href="#23err_close" data-ref="23err_close">err_close</a>;</td></tr>
+<tr><th id="252">252</th><td>        }</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>        <i>/* write pid file */</i></td></tr>
+<tr><th id="255">255</th><td>        <a class="local col2 ref" href="#22fp" title='fp' data-ref="22fp">fp</a> = <a class="ref" href="../../../include/stdio.h.html#283" title='fopen' data-ref="fopen64">fopen</a>(<a class="local col9 ref" href="#19args" title='args' data-ref="19args">args</a>.<a class="tu ref" href="#IvshmemServerArgs::pid_file" title='IvshmemServerArgs::pid_file' data-use='r' data-ref="IvshmemServerArgs::pid_file">pid_file</a>, <q>"w"</q>);</td></tr>
+<tr><th id="256">256</th><td>        <b>if</b> (<a class="local col2 ref" href="#22fp" title='fp' data-ref="22fp">fp</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="257">257</th><td>            <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"cannot write pid file: %s\n"</q>, <a class="ref" href="../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="258">258</th><td>            <b>goto</b> <a class="lbl" href="#23err_close" data-ref="23err_close">err_close</a>;</td></tr>
+<tr><th id="259">259</th><td>        }</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>        <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="local col2 ref" href="#22fp" title='fp' data-ref="22fp">fp</a>, <q>"%d\n"</q>, (<em>int</em>) <a class="ref" href="../../../include/unistd.h.html#getpid" title='getpid' data-ref="getpid">getpid</a>());</td></tr>
+<tr><th id="262">262</th><td>        <a class="ref" href="../../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="local col2 ref" href="#22fp" title='fp' data-ref="22fp">fp</a>);</td></tr>
+<tr><th id="263">263</th><td>    }</td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td>    <a class="tu ref" href="#ivshmem_server_poll_events" title='ivshmem_server_poll_events' data-use='c' data-ref="ivshmem_server_poll_events">ivshmem_server_poll_events</a>(&amp;<a class="local col6 ref" href="#16server" title='server' data-ref="16server">server</a>);</td></tr>
+<tr><th id="266">266</th><td>    <a class="ref" href="../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../include/stdio.h.html#173" title="stdout" data-ref="_M/stdout">stdout</a>, <q>"server disconnected\n"</q>);</td></tr>
+<tr><th id="267">267</th><td>    <a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a> = <var>0</var>;</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><dfn class="lbl" id="23err_close" data-ref="23err_close">err_close</dfn>:</td></tr>
+<tr><th id="270">270</th><td>    <a class="ref" href="ivshmem-server.h.html#ivshmem_server_close" title='ivshmem_server_close' data-ref="ivshmem_server_close">ivshmem_server_close</a>(&amp;<a class="local col6 ref" href="#16server" title='server' data-ref="16server">server</a>);</td></tr>
+<tr><th id="271">271</th><td><dfn class="lbl" id="21err" data-ref="21err">err</dfn>:</td></tr>
+<tr><th id="272">272</th><td>    <b>return</b> <a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a>;</td></tr>
+<tr><th id="273">273</th><td>}</td></tr>
+<tr><th id="274">274</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

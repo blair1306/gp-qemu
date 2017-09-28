@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>char-parallel.c source code [codebrowser/chardev/char-parallel.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/chardev/char-parallel.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>chardev</a>/<a href='char-parallel.c.html'>char-parallel.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/chardev/char.h.html">"chardev/char.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifdef</span> <span class="macro" data-ref="_M/CONFIG_BSD">CONFIG_BSD</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)</u></td></tr>
+<tr><th id="31">31</th><td><u>#include &lt;dev/ppbus/ppi.h&gt;</u></td></tr>
+<tr><th id="32">32</th><td><u>#include &lt;dev/ppbus/ppbconf.h&gt;</u></td></tr>
+<tr><th id="33">33</th><td><u>#elif defined(__DragonFly__)</u></td></tr>
+<tr><th id="34">34</th><td><u>#include &lt;dev/misc/ppi/ppi.h&gt;</u></td></tr>
+<tr><th id="35">35</th><td><u>#include &lt;bus/ppbus/ppbconf.h&gt;</u></td></tr>
+<tr><th id="36">36</th><td><u>#endif</u></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="29">else</span></u></td></tr>
+<tr><th id="38">38</th><td><u>#<span data-ppcond="38">ifdef</span> <span class="macro" data-ref="_M/__linux__">__linux__</span></u></td></tr>
+<tr><th id="39">39</th><td><u>#include <a href="../../include/linux/ppdev.h.html">&lt;linux/ppdev.h&gt;</a></u></td></tr>
+<tr><th id="40">40</th><td><u>#include <a href="../../include/linux/parport.h.html">&lt;linux/parport.h&gt;</a></u></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="38">endif</span></u></td></tr>
+<tr><th id="42">42</th><td><u>#<span data-ppcond="29">endif</span></u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#include <a href="../include/chardev/char-fd.h.html">"chardev/char-fd.h"</a></u></td></tr>
+<tr><th id="45">45</th><td><u>#include <a href="../include/chardev/char-parallel.h.html">"chardev/char-parallel.h"</a></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><u>#<span data-ppcond="47">if</span> defined(<span class="macro" data-ref="_M/__linux__">__linux__</span>)</u></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> <dfn class="tu decl" id="(anonymous)::parent" title='(anonymous struct)::parent' data-type='Chardev' data-ref="(anonymous)::parent">parent</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <em>int</em> <dfn class="tu decl" id="(anonymous)::fd" title='(anonymous struct)::fd' data-type='int' data-ref="(anonymous)::fd">fd</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <em>int</em> <dfn class="tu decl" id="(anonymous)::mode" title='(anonymous struct)::mode' data-type='int' data-ref="(anonymous)::mode">mode</dfn>;</td></tr>
+<tr><th id="53">53</th><td>} <dfn class="typedef" id="ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/PARALLEL_CHARDEV" data-ref="_M/PARALLEL_CHARDEV">PARALLEL_CHARDEV</dfn>(obj) \</u></td></tr>
+<tr><th id="56">56</th><td><u>    OBJECT_CHECK(<a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a>, (obj), TYPE_CHARDEV_PARALLEL)</u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="pp_hw_mode" title='pp_hw_mode' data-type='int pp_hw_mode(ParallelChardev * s, uint16_t mode)' data-ref="pp_hw_mode">pp_hw_mode</dfn>(<a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='ParallelChardev *' data-ref="1s">s</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col2 decl" id="2mode" title='mode' data-type='uint16_t' data-ref="2mode">mode</dfn>)</td></tr>
+<tr><th id="59">59</th><td>{</td></tr>
+<tr><th id="60">60</th><td>    <b>if</b> (<a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a>-&gt;<a class="tu ref" href="#(anonymous)::mode" title='(anonymous struct)::mode' data-use='r' data-ref="(anonymous)::mode">mode</a> != <a class="local col2 ref" href="#2mode" title='mode' data-ref="2mode">mode</a>) {</td></tr>
+<tr><th id="61">61</th><td>        <em>int</em> <dfn class="local col3 decl" id="3m" title='m' data-type='int' data-ref="3m">m</dfn> = <a class="local col2 ref" href="#2mode" title='mode' data-ref="2mode">mode</a>;</td></tr>
+<tr><th id="62">62</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a>-&gt;<a class="tu ref" href="#(anonymous)::fd" title='(anonymous struct)::fd' data-use='r' data-ref="(anonymous)::fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#20" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x80)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPSETMODE">PPSETMODE</a>, &amp;<a class="local col3 ref" href="#3m" title='m' data-ref="3m">m</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="63">63</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="64">64</th><td>        }</td></tr>
+<tr><th id="65">65</th><td>        <a class="local col1 ref" href="#1s" title='s' data-ref="1s">s</a>-&gt;<a class="tu ref" href="#(anonymous)::mode" title='(anonymous struct)::mode' data-use='w' data-ref="(anonymous)::mode">mode</a> = <a class="local col2 ref" href="#2mode" title='mode' data-ref="2mode">mode</a>;</td></tr>
+<tr><th id="66">66</th><td>    }</td></tr>
+<tr><th id="67">67</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="pp_ioctl" title='pp_ioctl' data-type='int pp_ioctl(Chardev * chr, int cmd, void * arg)' data-ref="pp_ioctl">pp_ioctl</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col4 decl" id="4chr" title='chr' data-type='Chardev *' data-ref="4chr">chr</dfn>, <em>int</em> <dfn class="local col5 decl" id="5cmd" title='cmd' data-type='int' data-ref="5cmd">cmd</dfn>, <em>void</em> *<dfn class="local col6 decl" id="6arg" title='arg' data-type='void *' data-ref="6arg">arg</dfn>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a> *<dfn class="local col7 decl" id="7drv" title='drv' data-type='ParallelChardev *' data-ref="7drv">drv</dfn> = <a class="macro" href="#55" title="((ParallelChardev *)object_dynamic_cast_assert(((Object *)((chr))), (&quot;chardev-parallel&quot;), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 72, __func__))" data-ref="_M/PARALLEL_CHARDEV">PARALLEL_CHARDEV</a>(<a class="local col4 ref" href="#4chr" title='chr' data-ref="4chr">chr</a>);</td></tr>
+<tr><th id="73">73</th><td>    <em>int</em> <dfn class="local col8 decl" id="8fd" title='fd' data-type='int' data-ref="8fd">fd</dfn> = <a class="local col7 ref" href="#7drv" title='drv' data-ref="7drv">drv</a>-&gt;<a class="tu ref" href="#(anonymous)::fd" title='(anonymous struct)::fd' data-use='r' data-ref="(anonymous)::fd">fd</a>;</td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col9 decl" id="9b" title='b' data-type='uint8_t' data-ref="9b">b</dfn>;</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td>    <b>switch</b> (<a class="local col5 ref" href="#5cmd" title='cmd' data-ref="5cmd">cmd</a>) {</td></tr>
+<tr><th id="77">77</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#29" title="3" data-ref="_M/CHR_IOCTL_PP_READ_DATA">CHR_IOCTL_PP_READ_DATA</a>:</td></tr>
+<tr><th id="78">78</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#37" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x85)) &lt;&lt; 0) | ((((sizeof(unsigned char)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPRDATA">PPRDATA</a>, &amp;<a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="79">79</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="80">80</th><td>        }</td></tr>
+<tr><th id="81">81</th><td>        *(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a> = <a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>;</td></tr>
+<tr><th id="82">82</th><td>        <b>break</b>;</td></tr>
+<tr><th id="83">83</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#30" title="4" data-ref="_M/CHR_IOCTL_PP_WRITE_DATA">CHR_IOCTL_PP_WRITE_DATA</a>:</td></tr>
+<tr><th id="84">84</th><td>        <a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a> = *(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="85">85</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#38" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x86)) &lt;&lt; 0) | ((((sizeof(unsigned char)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPWDATA">PPWDATA</a>, &amp;<a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="86">86</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="87">87</th><td>        }</td></tr>
+<tr><th id="88">88</th><td>        <b>break</b>;</td></tr>
+<tr><th id="89">89</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#31" title="5" data-ref="_M/CHR_IOCTL_PP_READ_CONTROL">CHR_IOCTL_PP_READ_CONTROL</a>:</td></tr>
+<tr><th id="90">90</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#27" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x83)) &lt;&lt; 0) | ((((sizeof(unsigned char)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPRCONTROL">PPRCONTROL</a>, &amp;<a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="91">91</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="92">92</th><td>        }</td></tr>
+<tr><th id="93">93</th><td>        <i>/* Linux gives only the lowest bits, and no way to know data</i></td></tr>
+<tr><th id="94">94</th><td><i>           direction! For better compatibility set the fixed upper</i></td></tr>
+<tr><th id="95">95</th><td><i>           bits. */</i></td></tr>
+<tr><th id="96">96</th><td>        *(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a> = <a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a> | <var>0xc0</var>;</td></tr>
+<tr><th id="97">97</th><td>        <b>break</b>;</td></tr>
+<tr><th id="98">98</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#32" title="6" data-ref="_M/CHR_IOCTL_PP_WRITE_CONTROL">CHR_IOCTL_PP_WRITE_CONTROL</a>:</td></tr>
+<tr><th id="99">99</th><td>        <a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a> = *(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="100">100</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#28" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x84)) &lt;&lt; 0) | ((((sizeof(unsigned char)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPWCONTROL">PPWCONTROL</a>, &amp;<a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="101">101</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="102">102</th><td>        }</td></tr>
+<tr><th id="103">103</th><td>        <b>break</b>;</td></tr>
+<tr><th id="104">104</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#33" title="7" data-ref="_M/CHR_IOCTL_PP_READ_STATUS">CHR_IOCTL_PP_READ_STATUS</a>:</td></tr>
+<tr><th id="105">105</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#23" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x81)) &lt;&lt; 0) | ((((sizeof(unsigned char)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPRSTATUS">PPRSTATUS</a>, &amp;<a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="106">106</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="107">107</th><td>        }</td></tr>
+<tr><th id="108">108</th><td>        *(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a> = <a class="local col9 ref" href="#9b" title='b' data-ref="9b">b</a>;</td></tr>
+<tr><th id="109">109</th><td>        <b>break</b>;</td></tr>
+<tr><th id="110">110</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#38" title="12" data-ref="_M/CHR_IOCTL_PP_DATA_DIR">CHR_IOCTL_PP_DATA_DIR</a>:</td></tr>
+<tr><th id="111">111</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#62" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x90)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPDATADIR">PPDATADIR</a>, (<em>int</em> *)<a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="112">112</th><td>            <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="113">113</th><td>        }</td></tr>
+<tr><th id="114">114</th><td>        <b>break</b>;</td></tr>
+<tr><th id="115">115</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#34" title="8" data-ref="_M/CHR_IOCTL_PP_EPP_READ_ADDR">CHR_IOCTL_PP_EPP_READ_ADDR</a>:</td></tr>
+<tr><th id="116">116</th><td>        <b>if</b> (<a class="tu ref" href="#pp_hw_mode" title='pp_hw_mode' data-use='c' data-ref="pp_hw_mode">pp_hw_mode</a>(<a class="local col7 ref" href="#7drv" title='drv' data-ref="7drv">drv</a>, <a class="macro" href="../../include/linux/parport.h.html#75" title="(1&lt;&lt;6)" data-ref="_M/IEEE1284_MODE_EPP">IEEE1284_MODE_EPP</a> | <a class="macro" href="../../include/linux/parport.h.html#87" title="(1&lt;&lt;13)" data-ref="_M/IEEE1284_ADDR">IEEE1284_ADDR</a>)) {</td></tr>
+<tr><th id="117">117</th><td>            <b>struct</b> <a class="type" href="../include/chardev/char-parallel.h.html#ParallelIOArg" title='ParallelIOArg' data-ref="ParallelIOArg">ParallelIOArg</a> *<dfn class="local col0 decl" id="10parg" title='parg' data-type='struct ParallelIOArg *' data-ref="10parg">parg</dfn> = <a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="118">118</th><td>            <em>int</em> <dfn class="local col1 decl" id="11n" title='n' data-type='int' data-ref="11n">n</dfn> = <a class="ref" href="../../include/unistd.h.html#read" title='read' data-ref="read">read</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="local col0 ref" href="#10parg" title='parg' data-ref="10parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::buffer" title='ParallelIOArg::buffer' data-ref="ParallelIOArg::buffer">buffer</a>, <a class="local col0 ref" href="#10parg" title='parg' data-ref="10parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>);</td></tr>
+<tr><th id="119">119</th><td>            <b>if</b> (<a class="local col1 ref" href="#11n" title='n' data-ref="11n">n</a> != <a class="local col0 ref" href="#10parg" title='parg' data-ref="10parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>) {</td></tr>
+<tr><th id="120">120</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="121">121</th><td>            }</td></tr>
+<tr><th id="122">122</th><td>        }</td></tr>
+<tr><th id="123">123</th><td>        <b>break</b>;</td></tr>
+<tr><th id="124">124</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#35" title="9" data-ref="_M/CHR_IOCTL_PP_EPP_READ">CHR_IOCTL_PP_EPP_READ</a>:</td></tr>
+<tr><th id="125">125</th><td>        <b>if</b> (<a class="tu ref" href="#pp_hw_mode" title='pp_hw_mode' data-use='c' data-ref="pp_hw_mode">pp_hw_mode</a>(<a class="local col7 ref" href="#7drv" title='drv' data-ref="7drv">drv</a>, <a class="macro" href="../../include/linux/parport.h.html#75" title="(1&lt;&lt;6)" data-ref="_M/IEEE1284_MODE_EPP">IEEE1284_MODE_EPP</a>)) {</td></tr>
+<tr><th id="126">126</th><td>            <b>struct</b> <a class="type" href="../include/chardev/char-parallel.h.html#ParallelIOArg" title='ParallelIOArg' data-ref="ParallelIOArg">ParallelIOArg</a> *<dfn class="local col2 decl" id="12parg" title='parg' data-type='struct ParallelIOArg *' data-ref="12parg">parg</dfn> = <a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="127">127</th><td>            <em>int</em> <dfn class="local col3 decl" id="13n" title='n' data-type='int' data-ref="13n">n</dfn> = <a class="ref" href="../../include/unistd.h.html#read" title='read' data-ref="read">read</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="local col2 ref" href="#12parg" title='parg' data-ref="12parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::buffer" title='ParallelIOArg::buffer' data-ref="ParallelIOArg::buffer">buffer</a>, <a class="local col2 ref" href="#12parg" title='parg' data-ref="12parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>);</td></tr>
+<tr><th id="128">128</th><td>            <b>if</b> (<a class="local col3 ref" href="#13n" title='n' data-ref="13n">n</a> != <a class="local col2 ref" href="#12parg" title='parg' data-ref="12parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>) {</td></tr>
+<tr><th id="129">129</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="130">130</th><td>            }</td></tr>
+<tr><th id="131">131</th><td>        }</td></tr>
+<tr><th id="132">132</th><td>        <b>break</b>;</td></tr>
+<tr><th id="133">133</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#36" title="10" data-ref="_M/CHR_IOCTL_PP_EPP_WRITE_ADDR">CHR_IOCTL_PP_EPP_WRITE_ADDR</a>:</td></tr>
+<tr><th id="134">134</th><td>        <b>if</b> (<a class="tu ref" href="#pp_hw_mode" title='pp_hw_mode' data-use='c' data-ref="pp_hw_mode">pp_hw_mode</a>(<a class="local col7 ref" href="#7drv" title='drv' data-ref="7drv">drv</a>, <a class="macro" href="../../include/linux/parport.h.html#75" title="(1&lt;&lt;6)" data-ref="_M/IEEE1284_MODE_EPP">IEEE1284_MODE_EPP</a> | <a class="macro" href="../../include/linux/parport.h.html#87" title="(1&lt;&lt;13)" data-ref="_M/IEEE1284_ADDR">IEEE1284_ADDR</a>)) {</td></tr>
+<tr><th id="135">135</th><td>            <b>struct</b> <a class="type" href="../include/chardev/char-parallel.h.html#ParallelIOArg" title='ParallelIOArg' data-ref="ParallelIOArg">ParallelIOArg</a> *<dfn class="local col4 decl" id="14parg" title='parg' data-type='struct ParallelIOArg *' data-ref="14parg">parg</dfn> = <a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="136">136</th><td>            <em>int</em> <dfn class="local col5 decl" id="15n" title='n' data-type='int' data-ref="15n">n</dfn> = <a class="ref" href="../../include/unistd.h.html#write" title='write' data-ref="write">write</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="local col4 ref" href="#14parg" title='parg' data-ref="14parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::buffer" title='ParallelIOArg::buffer' data-ref="ParallelIOArg::buffer">buffer</a>, <a class="local col4 ref" href="#14parg" title='parg' data-ref="14parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>);</td></tr>
+<tr><th id="137">137</th><td>            <b>if</b> (<a class="local col5 ref" href="#15n" title='n' data-ref="15n">n</a> != <a class="local col4 ref" href="#14parg" title='parg' data-ref="14parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>) {</td></tr>
+<tr><th id="138">138</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="139">139</th><td>            }</td></tr>
+<tr><th id="140">140</th><td>        }</td></tr>
+<tr><th id="141">141</th><td>        <b>break</b>;</td></tr>
+<tr><th id="142">142</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-parallel.h.html#37" title="11" data-ref="_M/CHR_IOCTL_PP_EPP_WRITE">CHR_IOCTL_PP_EPP_WRITE</a>:</td></tr>
+<tr><th id="143">143</th><td>        <b>if</b> (<a class="tu ref" href="#pp_hw_mode" title='pp_hw_mode' data-use='c' data-ref="pp_hw_mode">pp_hw_mode</a>(<a class="local col7 ref" href="#7drv" title='drv' data-ref="7drv">drv</a>, <a class="macro" href="../../include/linux/parport.h.html#75" title="(1&lt;&lt;6)" data-ref="_M/IEEE1284_MODE_EPP">IEEE1284_MODE_EPP</a>)) {</td></tr>
+<tr><th id="144">144</th><td>            <b>struct</b> <a class="type" href="../include/chardev/char-parallel.h.html#ParallelIOArg" title='ParallelIOArg' data-ref="ParallelIOArg">ParallelIOArg</a> *<dfn class="local col6 decl" id="16parg" title='parg' data-type='struct ParallelIOArg *' data-ref="16parg">parg</dfn> = <a class="local col6 ref" href="#6arg" title='arg' data-ref="6arg">arg</a>;</td></tr>
+<tr><th id="145">145</th><td>            <em>int</em> <dfn class="local col7 decl" id="17n" title='n' data-type='int' data-ref="17n">n</dfn> = <a class="ref" href="../../include/unistd.h.html#write" title='write' data-ref="write">write</a>(<a class="local col8 ref" href="#8fd" title='fd' data-ref="8fd">fd</a>, <a class="local col6 ref" href="#16parg" title='parg' data-ref="16parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::buffer" title='ParallelIOArg::buffer' data-ref="ParallelIOArg::buffer">buffer</a>, <a class="local col6 ref" href="#16parg" title='parg' data-ref="16parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>);</td></tr>
+<tr><th id="146">146</th><td>            <b>if</b> (<a class="local col7 ref" href="#17n" title='n' data-ref="17n">n</a> != <a class="local col6 ref" href="#16parg" title='parg' data-ref="16parg">parg</a>-&gt;<a class="ref" href="../include/chardev/char-parallel.h.html#ParallelIOArg::count" title='ParallelIOArg::count' data-ref="ParallelIOArg::count">count</a>) {</td></tr>
+<tr><th id="147">147</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="148">148</th><td>            }</td></tr>
+<tr><th id="149">149</th><td>        }</td></tr>
+<tr><th id="150">150</th><td>        <b>break</b>;</td></tr>
+<tr><th id="151">151</th><td>    <b>default</b>:</td></tr>
+<tr><th id="152">152</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="153">153</th><td>    }</td></tr>
+<tr><th id="154">154</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="155">155</th><td>}</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_open_pp_fd" title='qemu_chr_open_pp_fd' data-type='void qemu_chr_open_pp_fd(Chardev * chr, int fd, _Bool * be_opened, Error ** errp)' data-ref="qemu_chr_open_pp_fd">qemu_chr_open_pp_fd</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col8 decl" id="18chr" title='chr' data-type='Chardev *' data-ref="18chr">chr</dfn>,</td></tr>
+<tr><th id="158">158</th><td>                                <em>int</em> <dfn class="local col9 decl" id="19fd" title='fd' data-type='int' data-ref="19fd">fd</dfn>,</td></tr>
+<tr><th id="159">159</th><td>                                <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col0 decl" id="20be_opened" title='be_opened' data-type='_Bool *' data-ref="20be_opened">be_opened</dfn>,</td></tr>
+<tr><th id="160">160</th><td>                                <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="21errp" title='errp' data-type='Error **' data-ref="21errp">errp</dfn>)</td></tr>
+<tr><th id="161">161</th><td>{</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a> *<dfn class="local col2 decl" id="22drv" title='drv' data-type='ParallelChardev *' data-ref="22drv">drv</dfn> = <a class="macro" href="#55" title="((ParallelChardev *)object_dynamic_cast_assert(((Object *)((chr))), (&quot;chardev-parallel&quot;), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 162, __func__))" data-ref="_M/PARALLEL_CHARDEV">PARALLEL_CHARDEV</a>(<a class="local col8 ref" href="#18chr" title='chr' data-ref="18chr">chr</a>);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col9 ref" href="#19fd" title='fd' data-ref="19fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#49" title="(((0U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x8b)) &lt;&lt; 0) | ((0) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPCLAIM">PPCLAIM</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="165">165</th><td>        <a class="macro" href="../include/qapi/error.h.html#176" title="error_setg_errno_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 165, __func__, ((*__errno_location ())), (&quot;not a parallel port&quot;))" data-ref="_M/error_setg_errno">error_setg_errno</a>(<a class="local col1 ref" href="#21errp" title='errp' data-ref="21errp">errp</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>, <q>"not a parallel port"</q>);</td></tr>
+<tr><th id="166">166</th><td>        <a class="ref" href="../../include/unistd.h.html#close" title='close' data-ref="close">close</a>(<a class="local col9 ref" href="#19fd" title='fd' data-ref="19fd">fd</a>);</td></tr>
+<tr><th id="167">167</th><td>        <b>return</b>;</td></tr>
+<tr><th id="168">168</th><td>    }</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td>    <a class="local col2 ref" href="#22drv" title='drv' data-ref="22drv">drv</a>-&gt;<a class="tu ref" href="#(anonymous)::fd" title='(anonymous struct)::fd' data-use='w' data-ref="(anonymous)::fd">fd</a> = <a class="local col9 ref" href="#19fd" title='fd' data-ref="19fd">fd</a>;</td></tr>
+<tr><th id="171">171</th><td>    <a class="local col2 ref" href="#22drv" title='drv' data-ref="22drv">drv</a>-&gt;<a class="tu ref" href="#(anonymous)::mode" title='(anonymous struct)::mode' data-use='w' data-ref="(anonymous)::mode">mode</a> = <a class="macro" href="../../include/linux/parport.h.html#70" title="(1&lt;&lt;8)" data-ref="_M/IEEE1284_MODE_COMPAT">IEEE1284_MODE_COMPAT</a>;</td></tr>
+<tr><th id="172">172</th><td>}</td></tr>
+<tr><th id="173">173</th><td><u>#<span data-ppcond="47">endif</span> /* __linux__ */</u></td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><u>#<span data-ppcond="175">if</span> defined(<span class="macro" data-ref="_M/__FreeBSD__">__FreeBSD__</span>) || defined(<span class="macro" data-ref="_M/__FreeBSD_kernel__">__FreeBSD_kernel__</span>) || defined(<span class="macro" data-ref="_M/__DragonFly__">__DragonFly__</span>)</u></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="178">178</th><td>    Chardev parent;</td></tr>
+<tr><th id="179">179</th><td>    <em>int</em> fd;</td></tr>
+<tr><th id="180">180</th><td>} ParallelChardev;</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><u>#define PARALLEL_CHARDEV(obj)                                   \</u></td></tr>
+<tr><th id="183">183</th><td><u>    OBJECT_CHECK(ParallelChardev, (obj), TYPE_CHARDEV_PARALLEL)</u></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><em>static</em> <em>int</em> pp_ioctl(Chardev *chr, <em>int</em> cmd, <em>void</em> *arg)</td></tr>
+<tr><th id="186">186</th><td>{</td></tr>
+<tr><th id="187">187</th><td>    ParallelChardev *drv = PARALLEL_CHARDEV(chr);</td></tr>
+<tr><th id="188">188</th><td>    uint8_t b;</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td>    <b>switch</b> (cmd) {</td></tr>
+<tr><th id="191">191</th><td>    <b>case</b> CHR_IOCTL_PP_READ_DATA:</td></tr>
+<tr><th id="192">192</th><td>        <b>if</b> (ioctl(drv-&gt;fd, PPIGDATA, &amp;b) &lt; <var>0</var>) {</td></tr>
+<tr><th id="193">193</th><td>            <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="194">194</th><td>        }</td></tr>
+<tr><th id="195">195</th><td>        *(uint8_t *)arg = b;</td></tr>
+<tr><th id="196">196</th><td>        <b>break</b>;</td></tr>
+<tr><th id="197">197</th><td>    <b>case</b> CHR_IOCTL_PP_WRITE_DATA:</td></tr>
+<tr><th id="198">198</th><td>        b = *(uint8_t *)arg;</td></tr>
+<tr><th id="199">199</th><td>        <b>if</b> (ioctl(drv-&gt;fd, PPISDATA, &amp;b) &lt; <var>0</var>) {</td></tr>
+<tr><th id="200">200</th><td>            <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="201">201</th><td>        }</td></tr>
+<tr><th id="202">202</th><td>        <b>break</b>;</td></tr>
+<tr><th id="203">203</th><td>    <b>case</b> CHR_IOCTL_PP_READ_CONTROL:</td></tr>
+<tr><th id="204">204</th><td>        <b>if</b> (ioctl(drv-&gt;fd, PPIGCTRL, &amp;b) &lt; <var>0</var>) {</td></tr>
+<tr><th id="205">205</th><td>            <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="206">206</th><td>        }</td></tr>
+<tr><th id="207">207</th><td>        *(uint8_t *)arg = b;</td></tr>
+<tr><th id="208">208</th><td>        <b>break</b>;</td></tr>
+<tr><th id="209">209</th><td>    <b>case</b> CHR_IOCTL_PP_WRITE_CONTROL:</td></tr>
+<tr><th id="210">210</th><td>        b = *(uint8_t *)arg;</td></tr>
+<tr><th id="211">211</th><td>        <b>if</b> (ioctl(drv-&gt;fd, PPISCTRL, &amp;b) &lt; <var>0</var>) {</td></tr>
+<tr><th id="212">212</th><td>            <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="213">213</th><td>        }</td></tr>
+<tr><th id="214">214</th><td>        <b>break</b>;</td></tr>
+<tr><th id="215">215</th><td>    <b>case</b> CHR_IOCTL_PP_READ_STATUS:</td></tr>
+<tr><th id="216">216</th><td>        <b>if</b> (ioctl(drv-&gt;fd, PPIGSTATUS, &amp;b) &lt; <var>0</var>) {</td></tr>
+<tr><th id="217">217</th><td>            <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="218">218</th><td>        }</td></tr>
+<tr><th id="219">219</th><td>        *(uint8_t *)arg = b;</td></tr>
+<tr><th id="220">220</th><td>        <b>break</b>;</td></tr>
+<tr><th id="221">221</th><td>    <b>default</b>:</td></tr>
+<tr><th id="222">222</th><td>        <b>return</b> -ENOTSUP;</td></tr>
+<tr><th id="223">223</th><td>    }</td></tr>
+<tr><th id="224">224</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="225">225</th><td>}</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><em>static</em> <em>void</em> qemu_chr_open_pp_fd(Chardev *chr,</td></tr>
+<tr><th id="228">228</th><td>                                <em>int</em> fd,</td></tr>
+<tr><th id="229">229</th><td>                                bool *be_opened,</td></tr>
+<tr><th id="230">230</th><td>                                Error **errp)</td></tr>
+<tr><th id="231">231</th><td>{</td></tr>
+<tr><th id="232">232</th><td>    ParallelChardev *drv = PARALLEL_CHARDEV(chr);</td></tr>
+<tr><th id="233">233</th><td>    drv-&gt;fd = fd;</td></tr>
+<tr><th id="234">234</th><td>    *be_opened = false;</td></tr>
+<tr><th id="235">235</th><td>}</td></tr>
+<tr><th id="236">236</th><td><u>#<span data-ppcond="175">endif</span></u></td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td><u>#<span data-ppcond="238">ifdef</span> <a class="macro" href="../include/qemu/osdep.h.html#297" data-ref="_M/HAVE_CHARDEV_PARPORT">HAVE_CHARDEV_PARPORT</a></u></td></tr>
+<tr><th id="239">239</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qmp_chardev_open_parallel" title='qmp_chardev_open_parallel' data-type='void qmp_chardev_open_parallel(Chardev * chr, ChardevBackend * backend, _Bool * be_opened, Error ** errp)' data-ref="qmp_chardev_open_parallel">qmp_chardev_open_parallel</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col3 decl" id="23chr" title='chr' data-type='Chardev *' data-ref="23chr">chr</dfn>,</td></tr>
+<tr><th id="240">240</th><td>                                      <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col4 decl" id="24backend" title='backend' data-type='ChardevBackend *' data-ref="24backend">backend</dfn>,</td></tr>
+<tr><th id="241">241</th><td>                                      <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col5 decl" id="25be_opened" title='be_opened' data-type='_Bool *' data-ref="25be_opened">be_opened</dfn>,</td></tr>
+<tr><th id="242">242</th><td>                                      <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="26errp" title='errp' data-type='Error **' data-ref="26errp">errp</dfn>)</td></tr>
+<tr><th id="243">243</th><td>{</td></tr>
+<tr><th id="244">244</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a> *<dfn class="local col7 decl" id="27parallel" title='parallel' data-type='ChardevHostdev *' data-ref="27parallel">parallel</dfn> = <a class="local col4 ref" href="#24backend" title='backend' data-ref="24backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::parallel" title='ChardevBackend::(anonymous union)::parallel' data-ref="ChardevBackend::(anonymous)::parallel">parallel</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevHostdev_wrapper::data" title='q_obj_ChardevHostdev_wrapper::data' data-ref="q_obj_ChardevHostdev_wrapper::data">data</a>;</td></tr>
+<tr><th id="245">245</th><td>    <em>int</em> <dfn class="local col8 decl" id="28fd" title='fd' data-type='int' data-ref="28fd">fd</dfn>;</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td>    <a class="local col8 ref" href="#28fd" title='fd' data-ref="28fd">fd</a> = <a class="ref" href="../include/chardev/char-fd.h.html#qmp_chardev_open_file_source" title='qmp_chardev_open_file_source' data-ref="qmp_chardev_open_file_source">qmp_chardev_open_file_source</a>(<a class="local col7 ref" href="#27parallel" title='parallel' data-ref="27parallel">parallel</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevHostdev::device" title='ChardevHostdev::device' data-ref="ChardevHostdev::device">device</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#45" title="02" data-ref="_M/O_RDWR">O_RDWR</a>, <a class="local col6 ref" href="#26errp" title='errp' data-ref="26errp">errp</a>);</td></tr>
+<tr><th id="248">248</th><td>    <b>if</b> (<a class="local col8 ref" href="#28fd" title='fd' data-ref="28fd">fd</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="249">249</th><td>        <b>return</b>;</td></tr>
+<tr><th id="250">250</th><td>    }</td></tr>
+<tr><th id="251">251</th><td>    <a class="tu ref" href="#qemu_chr_open_pp_fd" title='qemu_chr_open_pp_fd' data-use='c' data-ref="qemu_chr_open_pp_fd">qemu_chr_open_pp_fd</a>(<a class="local col3 ref" href="#23chr" title='chr' data-ref="23chr">chr</a>, <a class="local col8 ref" href="#28fd" title='fd' data-ref="28fd">fd</a>, <a class="local col5 ref" href="#25be_opened" title='be_opened' data-ref="25be_opened">be_opened</a>, <a class="local col6 ref" href="#26errp" title='errp' data-ref="26errp">errp</a>);</td></tr>
+<tr><th id="252">252</th><td>}</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_parse_parallel" title='qemu_chr_parse_parallel' data-type='void qemu_chr_parse_parallel(QemuOpts * opts, ChardevBackend * backend, Error ** errp)' data-ref="qemu_chr_parse_parallel">qemu_chr_parse_parallel</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col9 decl" id="29opts" title='opts' data-type='QemuOpts *' data-ref="29opts">opts</dfn>, <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col0 decl" id="30backend" title='backend' data-type='ChardevBackend *' data-ref="30backend">backend</dfn>,</td></tr>
+<tr><th id="255">255</th><td>                                    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="31errp" title='errp' data-type='Error **' data-ref="31errp">errp</dfn>)</td></tr>
+<tr><th id="256">256</th><td>{</td></tr>
+<tr><th id="257">257</th><td>    <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="32device" title='device' data-type='const char *' data-ref="32device">device</dfn> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col9 ref" href="#29opts" title='opts' data-ref="29opts">opts</a>, <q>"path"</q>);</td></tr>
+<tr><th id="258">258</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a> *<dfn class="local col3 decl" id="33parallel" title='parallel' data-type='ChardevHostdev *' data-ref="33parallel">parallel</dfn>;</td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td>    <b>if</b> (<a class="local col2 ref" href="#32device" title='device' data-ref="32device">device</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="261">261</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 261, __func__, (&quot;chardev: parallel: no device path given&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col1 ref" href="#31errp" title='errp' data-ref="31errp">errp</a>, <q>"chardev: parallel: no device path given"</q>);</td></tr>
+<tr><th id="262">262</th><td>        <b>return</b>;</td></tr>
+<tr><th id="263">263</th><td>    }</td></tr>
+<tr><th id="264">264</th><td>    <a class="local col0 ref" href="#30backend" title='backend' data-ref="30backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::type" title='ChardevBackend::type' data-ref="ChardevBackend::type">type</a> = <a class="enum" href="../qapi-types.h.html#ChardevBackendKind::CHARDEV_BACKEND_KIND_PARALLEL" title='ChardevBackendKind::CHARDEV_BACKEND_KIND_PARALLEL' data-ref="ChardevBackendKind::CHARDEV_BACKEND_KIND_PARALLEL">CHARDEV_BACKEND_KIND_PARALLEL</a>;</td></tr>
+<tr><th id="265">265</th><td>    <a class="local col3 ref" href="#33parallel" title='parallel' data-ref="33parallel">parallel</a> = <a class="local col0 ref" href="#30backend" title='backend' data-ref="30backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::parallel" title='ChardevBackend::(anonymous union)::parallel' data-ref="ChardevBackend::(anonymous)::parallel">parallel</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevHostdev_wrapper::data" title='q_obj_ChardevHostdev_wrapper::data' data-ref="q_obj_ChardevHostdev_wrapper::data">data</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((ChardevHostdev *) g_malloc0_n ((1), sizeof (ChardevHostdev)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a>, <var>1</var>);</td></tr>
+<tr><th id="266">266</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_parse_common" title='qemu_chr_parse_common' data-ref="qemu_chr_parse_common">qemu_chr_parse_common</a>(<a class="local col9 ref" href="#29opts" title='opts' data-ref="29opts">opts</a>, <a class="ref" href="../qapi-types.h.html#qapi_ChardevHostdev_base" title='qapi_ChardevHostdev_base' data-ref="qapi_ChardevHostdev_base">qapi_ChardevHostdev_base</a>(<a class="local col3 ref" href="#33parallel" title='parallel' data-ref="33parallel">parallel</a>));</td></tr>
+<tr><th id="267">267</th><td>    <a class="local col3 ref" href="#33parallel" title='parallel' data-ref="33parallel">parallel</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevHostdev::device" title='ChardevHostdev::device' data-ref="ChardevHostdev::device">device</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col2 ref" href="#32device" title='device' data-ref="32device">device</a>);</td></tr>
+<tr><th id="268">268</th><td>}</td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_parallel_class_init" title='char_parallel_class_init' data-type='void char_parallel_class_init(ObjectClass * oc, void * data)' data-ref="char_parallel_class_init">char_parallel_class_init</dfn>(<a class="typedef" href="../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col4 decl" id="34oc" title='oc' data-type='ObjectClass *' data-ref="34oc">oc</dfn>, <em>void</em> *<dfn class="local col5 decl" id="35data" title='data' data-type='void *' data-ref="35data">data</dfn>)</td></tr>
+<tr><th id="271">271</th><td>{</td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="../include/chardev/char.h.html#ChardevClass" title='ChardevClass' data-type='struct ChardevClass' data-ref="ChardevClass">ChardevClass</a> *<dfn class="local col6 decl" id="36cc" title='cc' data-type='ChardevClass *' data-ref="36cc">cc</dfn> = <a class="macro" href="../include/chardev/char.h.html#192" title="((ChardevClass *)object_class_dynamic_cast_assert(((ObjectClass *)((oc))), (&quot;chardev&quot;), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 272, __func__))" data-ref="_M/CHARDEV_CLASS">CHARDEV_CLASS</a>(<a class="local col4 ref" href="#34oc" title='oc' data-ref="34oc">oc</a>);</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>    <a class="local col6 ref" href="#36cc" title='cc' data-ref="36cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::parse" title='ChardevClass::parse' data-ref="ChardevClass::parse">parse</a> = <a class="tu ref" href="#qemu_chr_parse_parallel" title='qemu_chr_parse_parallel' data-use='r' data-ref="qemu_chr_parse_parallel">qemu_chr_parse_parallel</a>;</td></tr>
+<tr><th id="275">275</th><td>    <a class="local col6 ref" href="#36cc" title='cc' data-ref="36cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::open" title='ChardevClass::open' data-ref="ChardevClass::open">open</a> = <a class="tu ref" href="#qmp_chardev_open_parallel" title='qmp_chardev_open_parallel' data-use='r' data-ref="qmp_chardev_open_parallel">qmp_chardev_open_parallel</a>;</td></tr>
+<tr><th id="276">276</th><td><u>#<span data-ppcond="276">if</span> defined(<span class="macro" data-ref="_M/__linux__">__linux__</span>)</u></td></tr>
+<tr><th id="277">277</th><td>    <a class="local col6 ref" href="#36cc" title='cc' data-ref="36cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::chr_ioctl" title='ChardevClass::chr_ioctl' data-ref="ChardevClass::chr_ioctl">chr_ioctl</a> = <a class="tu ref" href="#pp_ioctl" title='pp_ioctl' data-use='r' data-ref="pp_ioctl">pp_ioctl</a>;</td></tr>
+<tr><th id="278">278</th><td><u>#<span data-ppcond="276">elif</span> defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \</u></td></tr>
+<tr><th id="279">279</th><td><u>    defined(__DragonFly__)</u></td></tr>
+<tr><th id="280">280</th><td>    cc-&gt;chr_ioctl = pp_ioctl;</td></tr>
+<tr><th id="281">281</th><td><u>#<span data-ppcond="276">endif</span></u></td></tr>
+<tr><th id="282">282</th><td>}</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_parallel_finalize" title='char_parallel_finalize' data-type='void char_parallel_finalize(Object * obj)' data-ref="char_parallel_finalize">char_parallel_finalize</dfn>(<a class="typedef" href="../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col7 decl" id="37obj" title='obj' data-type='Object *' data-ref="37obj">obj</dfn>)</td></tr>
+<tr><th id="285">285</th><td>{</td></tr>
+<tr><th id="286">286</th><td><u>#<span data-ppcond="286">if</span> defined(<span class="macro" data-ref="_M/__linux__">__linux__</span>)</u></td></tr>
+<tr><th id="287">287</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col8 decl" id="38chr" title='chr' data-type='Chardev *' data-ref="38chr">chr</dfn> = <a class="macro" href="../include/chardev/char.h.html#191" title="((Chardev *)object_dynamic_cast_assert(((Object *)((obj))), (&quot;chardev&quot;), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 287, __func__))" data-ref="_M/CHARDEV">CHARDEV</a>(<a class="local col7 ref" href="#37obj" title='obj' data-ref="37obj">obj</a>);</td></tr>
+<tr><th id="288">288</th><td>    <a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a> *<dfn class="local col9 decl" id="39drv" title='drv' data-type='ParallelChardev *' data-ref="39drv">drv</dfn> = <a class="macro" href="#55" title="((ParallelChardev *)object_dynamic_cast_assert(((Object *)((chr))), (&quot;chardev-parallel&quot;), &quot;/home/jon/workspace/qemu/chardev/char-parallel.c&quot;, 288, __func__))" data-ref="_M/PARALLEL_CHARDEV">PARALLEL_CHARDEV</a>(<a class="local col8 ref" href="#38chr" title='chr' data-ref="38chr">chr</a>);</td></tr>
+<tr><th id="289">289</th><td>    <em>int</em> <dfn class="local col0 decl" id="40fd" title='fd' data-type='int' data-ref="40fd">fd</dfn> = <a class="local col9 ref" href="#39drv" title='drv' data-ref="39drv">drv</a>-&gt;<a class="tu ref" href="#(anonymous)::fd" title='(anonymous struct)::fd' data-use='r' data-ref="(anonymous)::fd">fd</a>;</td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td>    <a class="tu ref" href="#pp_hw_mode" title='pp_hw_mode' data-use='c' data-ref="pp_hw_mode">pp_hw_mode</a>(<a class="local col9 ref" href="#39drv" title='drv' data-ref="39drv">drv</a>, <a class="macro" href="../../include/linux/parport.h.html#70" title="(1&lt;&lt;8)" data-ref="_M/IEEE1284_MODE_COMPAT">IEEE1284_MODE_COMPAT</a>);</td></tr>
+<tr><th id="292">292</th><td>    <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>, <a class="macro" href="../../include/linux/ppdev.h.html#52" title="(((0U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;p&apos;)) &lt;&lt; (0+8)) | (((0x8c)) &lt;&lt; 0) | ((0) &lt;&lt; ((0+8)+8)))" data-ref="_M/PPRELEASE">PPRELEASE</a>);</td></tr>
+<tr><th id="293">293</th><td>    <a class="ref" href="../../include/unistd.h.html#close" title='close' data-ref="close">close</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>);</td></tr>
+<tr><th id="294">294</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_be_event" title='qemu_chr_be_event' data-ref="qemu_chr_be_event">qemu_chr_be_event</a>(<a class="local col8 ref" href="#38chr" title='chr' data-ref="38chr">chr</a>, <a class="enum" href="../include/chardev/char.h.html#CHR_EVENT_CLOSED" title='CHR_EVENT_CLOSED' data-ref="CHR_EVENT_CLOSED">CHR_EVENT_CLOSED</a>);</td></tr>
+<tr><th id="295">295</th><td><u>#<span data-ppcond="286">elif</span> defined(__FreeBSD__) || defined(__FreeBSD_kernel__) || \</u></td></tr>
+<tr><th id="296">296</th><td><u>    defined(__DragonFly__)</u></td></tr>
+<tr><th id="297">297</th><td>    <i>/* FIXME: close fd? */</i></td></tr>
+<tr><th id="298">298</th><td><u>#<span data-ppcond="286">endif</span></u></td></tr>
+<tr><th id="299">299</th><td>}</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><em>static</em> <em>const</em> <a class="typedef" href="../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="char_parallel_type_info" title='char_parallel_type_info' data-type='const TypeInfo' data-ref="char_parallel_type_info">char_parallel_type_info</dfn> = {</td></tr>
+<tr><th id="302">302</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../include/chardev/char.h.html#205" title="&quot;chardev-parallel&quot;" data-ref="_M/TYPE_CHARDEV_PARALLEL">TYPE_CHARDEV_PARALLEL</a>,</td></tr>
+<tr><th id="303">303</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../include/chardev/char.h.html#190" title="&quot;chardev&quot;" data-ref="_M/TYPE_CHARDEV">TYPE_CHARDEV</a>,</td></tr>
+<tr><th id="304">304</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::instance_size" title='TypeInfo::instance_size' data-ref="TypeInfo::instance_size">instance_size</a> = <b>sizeof</b>(<a class="typedef" href="#ParallelChardev" title='ParallelChardev' data-type='struct ParallelChardev' data-ref="ParallelChardev">ParallelChardev</a>),</td></tr>
+<tr><th id="305">305</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::instance_finalize" title='TypeInfo::instance_finalize' data-ref="TypeInfo::instance_finalize">instance_finalize</a> = <a class="tu ref" href="#char_parallel_finalize" title='char_parallel_finalize' data-use='r' data-ref="char_parallel_finalize">char_parallel_finalize</a>,</td></tr>
+<tr><th id="306">306</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a> = <a class="tu ref" href="#char_parallel_class_init" title='char_parallel_class_init' data-use='r' data-ref="char_parallel_class_init">char_parallel_class_init</a>,</td></tr>
+<tr><th id="307">307</th><td>};</td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="register_types" title='register_types' data-type='void register_types()' data-ref="register_types">register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="310">310</th><td>{</td></tr>
+<tr><th id="311">311</th><td>    <a class="ref" href="../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#char_parallel_type_info" title='char_parallel_type_info' data-use='a' data-ref="char_parallel_type_info">char_parallel_type_info</a>);</td></tr>
+<tr><th id="312">312</th><td>}</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td><a class="macro" href="../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_register_types(void) { register_module_init(register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#register_types" title='register_types' data-use='r' data-ref="register_types">register_types</a>);</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td><u>#<span data-ppcond="238">endif</span></u></td></tr>
+<tr><th id="317">317</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

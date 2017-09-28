@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>replication.h source code [codebrowser/replication.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="ReplicationOps,ReplicationState "/>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/replication.h'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='replication.h.html'>replication.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Replication filter</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2016 Intel Corporation</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (c) 2016 FUJITSU LIMITED</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * Author:</i></td></tr>
+<tr><th id="9">9</th><td><i> *   Changlong Xie &lt;xiecl.fnst@cn.fujitsu.com&gt;</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="12">12</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#<span data-ppcond="15">ifndef</span> <span class="macro" data-ref="_M/REPLICATION_H">REPLICATION_H</span></u></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/REPLICATION_H" data-ref="_M/REPLICATION_H">REPLICATION_H</dfn></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ReplicationOps" title='ReplicationOps' data-ref="ReplicationOps">ReplicationOps</a> <dfn class="typedef" id="ReplicationOps" title='ReplicationOps' data-type='struct ReplicationOps' data-ref="ReplicationOps">ReplicationOps</dfn>;</td></tr>
+<tr><th id="21">21</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#ReplicationState" title='ReplicationState' data-ref="ReplicationState">ReplicationState</a> <dfn class="typedef" id="ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</dfn>;</td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * SECTION:replication.h</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> *<span class="command"> @title</span>:Base Replication System</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * <span class="command">@short</span>_description: interfaces for handling replication</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> * The Replication Model provides a framework for handling Replication</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * &lt;example&gt;</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *   &lt;title&gt;How to use replication interfaces&lt;/title&gt;</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> *   &lt;programlisting&gt;</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * #include "replication.h"</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * typedef struct BDRVReplicationState {</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> *     ReplicationState *rs;</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * } BDRVReplicationState;</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * static void replication_start(ReplicationState *rs, ReplicationMode mode,</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> *                               Error **errp);</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * static void replication_do_checkpoint(ReplicationState *rs, Error **errp);</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> * static void replication_get_error(ReplicationState *rs, Error **errp);</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * static void replication_stop(ReplicationState *rs, bool failover,</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *                              Error **errp);</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * static ReplicationOps replication_ops = {</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> *     .start = replication_start,</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> *     .checkpoint = replication_do_checkpoint,</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> *     .get_error = replication_get_error,</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> *     .stop = replication_stop,</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> * }</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> * static int replication_open(BlockDriverState *bs, QDict *options,</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> *                             int flags, Error **errp)</i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> * {</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> *     BDRVReplicationState *s = bs-&gt;opaque;</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *     s-&gt;rs = replication_new(bs, &amp;replication_ops);</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> *     return 0;</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> * }</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> * static void replication_close(BlockDriverState *bs)</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> * {</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> *     BDRVReplicationState *s = bs-&gt;opaque;</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> *     replication_remove(s-&gt;rs);</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * }</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> * BlockDriver bdrv_replication = {</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *     .format_name                = "replication",</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> *     .protocol_name              = "replication",</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *     .instance_size              = sizeof(BDRVReplicationState),</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *     .bdrv_open                  = replication_open,</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> *     .bdrv_close                 = replication_close,</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> * };</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> * static void bdrv_replication_init(void)</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> * {</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> *     bdrv_register(&amp;bdrv_replication);</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> * }</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * block_init(bdrv_replication_init);</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *   &lt;/programlisting&gt;</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> * &lt;/example&gt;</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> * We create an example about how to use replication interfaces in above.</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> * Then in migration, we can use replication_(start/stop/do_checkpoint/</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> * get_error)_all to handle all replication operations.</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> * ReplicationState:</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> *<span class="command"> @opaque</span>: opaque pointer value passed to this ReplicationState</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> *<span class="command"> @ops</span>: replication operation of this ReplicationState</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> *<span class="command"> @node</span>: node that we will insert into<span class="command"> @replication</span>_states QLIST</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="96">96</th><td><b>struct</b> <dfn class="type def" id="ReplicationState" title='ReplicationState' data-ref="ReplicationState">ReplicationState</dfn> {</td></tr>
+<tr><th id="97">97</th><td>    <em>void</em> *<dfn class="decl" id="ReplicationState::opaque" title='ReplicationState::opaque' data-ref="ReplicationState::opaque">opaque</dfn>;</td></tr>
+<tr><th id="98">98</th><td>    <a class="typedef" href="#ReplicationOps" title='ReplicationOps' data-type='struct ReplicationOps' data-ref="ReplicationOps">ReplicationOps</a> *<dfn class="decl" id="ReplicationState::ops" title='ReplicationState::ops' data-ref="ReplicationState::ops">ops</dfn>;</td></tr>
+<tr><th id="99">99</th><td>    <a class="macro" href="include/qemu/queue.h.html#94" title="struct { struct ReplicationState *le_next; struct ReplicationState **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#ReplicationState" title='ReplicationState' data-ref="ReplicationState">ReplicationState</a>) <dfn class="decl" id="ReplicationState::node" title='ReplicationState::node' data-ref="ReplicationState::node">node</dfn>;</td></tr>
+<tr><th id="100">100</th><td>};</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> * ReplicationOps:</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> *<span class="command"> @start</span>: callback to start replication</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *<span class="command"> @stop</span>: callback to stop replication</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *<span class="command"> @checkpoint</span>: callback to do checkpoint</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *<span class="command"> @get</span>_error: callback to check if error occurred during replication</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="109">109</th><td><b>struct</b> <dfn class="type def" id="ReplicationOps" title='ReplicationOps' data-ref="ReplicationOps">ReplicationOps</dfn> {</td></tr>
+<tr><th id="110">110</th><td>    <em>void</em> (*<dfn class="decl" id="ReplicationOps::start" title='ReplicationOps::start' data-ref="ReplicationOps::start">start</dfn>)(<a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="local col1 decl" id="1rs" title='rs' data-type='ReplicationState *' data-ref="1rs">rs</dfn>, <a class="typedef" href="qapi-types.h.html#ReplicationMode" title='ReplicationMode' data-type='enum ReplicationMode' data-ref="ReplicationMode">ReplicationMode</a> <dfn class="local col2 decl" id="2mode" title='mode' data-type='ReplicationMode' data-ref="2mode">mode</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="3errp" title='errp' data-type='Error **' data-ref="3errp">errp</dfn>);</td></tr>
+<tr><th id="111">111</th><td>    <em>void</em> (*<dfn class="decl" id="ReplicationOps::stop" title='ReplicationOps::stop' data-ref="ReplicationOps::stop">stop</dfn>)(<a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="local col4 decl" id="4rs" title='rs' data-type='ReplicationState *' data-ref="4rs">rs</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="5failover" title='failover' data-type='_Bool' data-ref="5failover">failover</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="6errp" title='errp' data-type='Error **' data-ref="6errp">errp</dfn>);</td></tr>
+<tr><th id="112">112</th><td>    <em>void</em> (*<dfn class="decl" id="ReplicationOps::checkpoint" title='ReplicationOps::checkpoint' data-ref="ReplicationOps::checkpoint">checkpoint</dfn>)(<a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="local col7 decl" id="7rs" title='rs' data-type='ReplicationState *' data-ref="7rs">rs</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="8errp" title='errp' data-type='Error **' data-ref="8errp">errp</dfn>);</td></tr>
+<tr><th id="113">113</th><td>    <em>void</em> (*<dfn class="decl" id="ReplicationOps::get_error" title='ReplicationOps::get_error' data-ref="ReplicationOps::get_error">get_error</dfn>)(<a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="local col9 decl" id="9rs" title='rs' data-type='ReplicationState *' data-ref="9rs">rs</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="10errp" title='errp' data-type='Error **' data-ref="10errp">errp</dfn>);</td></tr>
+<tr><th id="114">114</th><td>};</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> * replication_new:</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> *<span class="command"> @opaque</span>: opaque pointer value passed to ReplicationState</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> *<span class="command"> @ops</span>: replication operation of the new relevant ReplicationState</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> * Called to create a new ReplicationState instance, and then insert it</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * into<span class="command"> @replication</span>_states QLIST</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> * Returns: the new ReplicationState instance</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="126">126</th><td><a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="decl" id="replication_new" title='replication_new' data-ref="replication_new">replication_new</dfn>(<em>void</em> *<dfn class="local col1 decl" id="11opaque" title='opaque' data-type='void *' data-ref="11opaque">opaque</dfn>, <a class="typedef" href="#ReplicationOps" title='ReplicationOps' data-type='struct ReplicationOps' data-ref="ReplicationOps">ReplicationOps</a> *<dfn class="local col2 decl" id="12ops" title='ops' data-type='ReplicationOps *' data-ref="12ops">ops</dfn>);</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> * replication_remove:</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *<span class="command"> @rs</span>: the ReplicationState instance to remove</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * Called to remove a ReplicationState instance, and then delete it from</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *<span class="command"> @replication</span>_states QLIST</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="135">135</th><td><em>void</em> <dfn class="decl" id="replication_remove" title='replication_remove' data-ref="replication_remove">replication_remove</dfn>(<a class="typedef" href="#ReplicationState" title='ReplicationState' data-type='struct ReplicationState' data-ref="ReplicationState">ReplicationState</a> *<dfn class="local col3 decl" id="13rs" title='rs' data-type='ReplicationState *' data-ref="13rs">rs</dfn>);</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> * replication_start_all:</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"> * <span class="command">@mode</span><span class="verb">: replication mode that could be "primary" or "secondary"</span></i></td></tr>
+<tr><th id="140">140</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @errp: returns an error if this function fails</span></i></td></tr>
+<tr><th id="141">141</th><td><i class="doc"><span class="verb"></span> *<span class="verb"></span></i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> Start replication, called in migration/checkpoint thread</span></i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"><span class="verb"></span> *<span class="verb"></span></i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> Note: the caller of the function MUST make sure vm stopped</span></i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"><span class="verb"></span><span class="verb"> *</span>/</i><span class="verb"></span></td></tr>
+<tr><th id="146">146</th><td><span class="verb"></span><em>void</em> <dfn class="decl" id="replication_start_all" title='replication_start_all' data-ref="replication_start_all">replication_start_all</dfn>(<a class="typedef" href="qapi-types.h.html#ReplicationMode" title='ReplicationMode' data-type='enum ReplicationMode' data-ref="ReplicationMode">ReplicationMode</a> <dfn class="local col4 decl" id="14mode" title='mode' data-type='ReplicationMode' data-ref="14mode">mode</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="15errp" title='errp' data-type='Error **' data-ref="15errp">errp</dfn>);</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * replication_do_checkpoint_all:</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @errp</span>: returns an error if this function fails</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> * This interface is called after all VM state is transferred to Secondary QEMU</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="decl" id="replication_do_checkpoint_all" title='replication_do_checkpoint_all' data-ref="replication_do_checkpoint_all">replication_do_checkpoint_all</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="16errp" title='errp' data-type='Error **' data-ref="16errp">errp</dfn>);</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> * replication_get_error_all:</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> *<span class="command"> @errp</span>: returns an error if this function fails</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> * This interface is called to check if error occurred during replication</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="162">162</th><td><em>void</em> <dfn class="decl" id="replication_get_error_all" title='replication_get_error_all' data-ref="replication_get_error_all">replication_get_error_all</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="17errp" title='errp' data-type='Error **' data-ref="17errp">errp</dfn>);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * replication_stop_all:</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> *<span class="command"> @failover</span>: boolean value that indicates if we need do failover or not</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> *<span class="command"> @errp</span>: returns an error if this function fails</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> * It is called on failover. The vm should be stopped before calling it, if you</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> * use this API to shutdown the guest, or other things except failover</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="172">172</th><td><em>void</em> <dfn class="decl" id="replication_stop_all" title='replication_stop_all' data-ref="replication_stop_all">replication_stop_all</dfn>(<span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="18failover" title='failover' data-type='_Bool' data-ref="18failover">failover</dfn>, <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="19errp" title='errp' data-type='Error **' data-ref="19errp">errp</dfn>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><u>#<span data-ppcond="15">endif</span> /* REPLICATION_H */</u></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='block/replication.c.html'>codebrowser/block/replication.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

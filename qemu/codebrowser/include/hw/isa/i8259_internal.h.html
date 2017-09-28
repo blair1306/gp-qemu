@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>i8259_internal.h source code [codebrowser/include/hw/isa/i8259_internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="PICCommonClass,PICCommonState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/isa/i8259_internal.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>isa</a>/<a href='i8259_internal.h.html'>i8259_internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU 8259 - internal interfaces</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2011 Jan Kiszka, Siemens AG</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/QEMU_I8259_INTERNAL_H">QEMU_I8259_INTERNAL_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/QEMU_I8259_INTERNAL_H" data-ref="_M/QEMU_I8259_INTERNAL_H">QEMU_I8259_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../i386/pc.h.html">"hw/i386/pc.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#PICCommonState" title='PICCommonState' data-ref="PICCommonState">PICCommonState</a> <dfn class="typedef" id="PICCommonState" title='PICCommonState' data-type='struct PICCommonState' data-ref="PICCommonState">PICCommonState</dfn>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/TYPE_PIC_COMMON" data-ref="_M/TYPE_PIC_COMMON">TYPE_PIC_COMMON</dfn> "pic-common"</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/PIC_COMMON" data-ref="_M/PIC_COMMON">PIC_COMMON</dfn>(obj) \</u></td></tr>
+<tr><th id="36">36</th><td><u>     OBJECT_CHECK(PICCommonState, (obj), TYPE_PIC_COMMON)</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/PIC_COMMON_CLASS" data-ref="_M/PIC_COMMON_CLASS">PIC_COMMON_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="38">38</th><td><u>     OBJECT_CLASS_CHECK(PICCommonClass, (klass), TYPE_PIC_COMMON)</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/PIC_COMMON_GET_CLASS" data-ref="_M/PIC_COMMON_GET_CLASS">PIC_COMMON_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="40">40</th><td><u>     OBJECT_GET_CLASS(PICCommonClass, (obj), TYPE_PIC_COMMON)</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="PICCommonClass" title='PICCommonClass' data-ref="PICCommonClass"><a class="type" href="#PICCommonClass" title='PICCommonClass' data-ref="PICCommonClass">PICCommonClass</a></dfn></td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="isa.h.html#ISADeviceClass" title='ISADeviceClass' data-type='struct ISADeviceClass' data-ref="ISADeviceClass">ISADeviceClass</a> <dfn class="decl" id="PICCommonClass::parent_class" title='PICCommonClass::parent_class' data-ref="PICCommonClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>    <em>void</em> (*<dfn class="decl" id="PICCommonClass::pre_save" title='PICCommonClass::pre_save' data-ref="PICCommonClass::pre_save">pre_save</dfn>)(<a class="typedef" href="#PICCommonState" title='PICCommonState' data-type='struct PICCommonState' data-ref="PICCommonState">PICCommonState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='PICCommonState *' data-ref="1s">s</dfn>);</td></tr>
+<tr><th id="47">47</th><td>    <em>void</em> (*<dfn class="decl" id="PICCommonClass::post_load" title='PICCommonClass::post_load' data-ref="PICCommonClass::post_load">post_load</dfn>)(<a class="typedef" href="#PICCommonState" title='PICCommonState' data-type='struct PICCommonState' data-ref="PICCommonState">PICCommonState</a> *<dfn class="local col2 decl" id="2s" title='s' data-type='PICCommonState *' data-ref="2s">s</dfn>);</td></tr>
+<tr><th id="48">48</th><td>} <dfn class="typedef" id="PICCommonClass" title='PICCommonClass' data-type='struct PICCommonClass' data-ref="PICCommonClass">PICCommonClass</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>struct</b> <dfn class="type def" id="PICCommonState" title='PICCommonState' data-ref="PICCommonState">PICCommonState</dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> <dfn class="decl" id="PICCommonState::parent_obj" title='PICCommonState::parent_obj' data-ref="PICCommonState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::last_irr" title='PICCommonState::last_irr' data-ref="PICCommonState::last_irr">last_irr</dfn>; <i>/* edge detection */</i></td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::irr" title='PICCommonState::irr' data-ref="PICCommonState::irr">irr</dfn>; <i>/* interrupt request register */</i></td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::imr" title='PICCommonState::imr' data-ref="PICCommonState::imr">imr</dfn>; <i>/* interrupt mask register */</i></td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::isr" title='PICCommonState::isr' data-ref="PICCommonState::isr">isr</dfn>; <i>/* interrupt service register */</i></td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::priority_add" title='PICCommonState::priority_add' data-ref="PICCommonState::priority_add">priority_add</dfn>; <i>/* highest irq priority */</i></td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::irq_base" title='PICCommonState::irq_base' data-ref="PICCommonState::irq_base">irq_base</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::read_reg_select" title='PICCommonState::read_reg_select' data-ref="PICCommonState::read_reg_select">read_reg_select</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::poll" title='PICCommonState::poll' data-ref="PICCommonState::poll">poll</dfn>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::special_mask" title='PICCommonState::special_mask' data-ref="PICCommonState::special_mask">special_mask</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::init_state" title='PICCommonState::init_state' data-ref="PICCommonState::init_state">init_state</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::auto_eoi" title='PICCommonState::auto_eoi' data-ref="PICCommonState::auto_eoi">auto_eoi</dfn>;</td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::rotate_on_auto_eoi" title='PICCommonState::rotate_on_auto_eoi' data-ref="PICCommonState::rotate_on_auto_eoi">rotate_on_auto_eoi</dfn>;</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::special_fully_nested_mode" title='PICCommonState::special_fully_nested_mode' data-ref="PICCommonState::special_fully_nested_mode">special_fully_nested_mode</dfn>;</td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::init4" title='PICCommonState::init4' data-ref="PICCommonState::init4">init4</dfn>; <i>/* true if 4 byte init */</i></td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::single_mode" title='PICCommonState::single_mode' data-ref="PICCommonState::single_mode">single_mode</dfn>; <i>/* true if slave pic is not initialized */</i></td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::elcr" title='PICCommonState::elcr' data-ref="PICCommonState::elcr">elcr</dfn>; <i>/* PIIX edge/trigger selection*/</i></td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="PICCommonState::elcr_mask" title='PICCommonState::elcr_mask' data-ref="PICCommonState::elcr_mask">elcr_mask</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="PICCommonState::int_out" title='PICCommonState::int_out' data-ref="PICCommonState::int_out">int_out</dfn>[<var>1</var>];</td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PICCommonState::master" title='PICCommonState::master' data-ref="PICCommonState::master">master</dfn>; <i>/* reflects /SP input pin */</i></td></tr>
+<tr><th id="72">72</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PICCommonState::iobase" title='PICCommonState::iobase' data-ref="PICCommonState::iobase">iobase</dfn>;</td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="PICCommonState::elcr_addr" title='PICCommonState::elcr_addr' data-ref="PICCommonState::elcr_addr">elcr_addr</dfn>;</td></tr>
+<tr><th id="74">74</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="PICCommonState::base_io" title='PICCommonState::base_io' data-ref="PICCommonState::base_io">base_io</dfn>;</td></tr>
+<tr><th id="75">75</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="PICCommonState::elcr_io" title='PICCommonState::elcr_io' data-ref="PICCommonState::elcr_io">elcr_io</dfn>;</td></tr>
+<tr><th id="76">76</th><td>};</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><em>void</em> <dfn class="decl" id="pic_reset_common" title='pic_reset_common' data-ref="pic_reset_common">pic_reset_common</dfn>(<a class="typedef" href="#PICCommonState" title='PICCommonState' data-type='struct PICCommonState' data-ref="PICCommonState">PICCommonState</a> *<dfn class="local col3 decl" id="3s" title='s' data-type='PICCommonState *' data-ref="3s">s</dfn>);</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="decl" id="i8259_init_chip" title='i8259_init_chip' data-ref="i8259_init_chip">i8259_init_chip</dfn>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="4name" title='name' data-type='const char *' data-ref="4name">name</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#ISABus" title='ISABus' data-type='struct ISABus' data-ref="ISABus">ISABus</a> *<dfn class="local col5 decl" id="5bus" title='bus' data-type='ISABus *' data-ref="5bus">bus</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="6master" title='master' data-type='_Bool' data-ref="6master">master</dfn>);</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><u>#<span data-ppcond="25">endif</span> /* QEMU_I8259_INTERNAL_H */</u></td></tr>
+<tr><th id="84">84</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/kvm/i8259.c.html'>codebrowser/hw/i386/kvm/i8259.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

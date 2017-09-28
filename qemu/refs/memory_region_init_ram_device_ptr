@@ -1,0 +1,25 @@
+<dec f='codebrowser/include/exec/memory.h' l='563' type='void memory_region_init_ram_device_ptr(MemoryRegion * mr, struct Object * owner, const char * name, uint64_t size, void * ptr)'/>
+<doc f='codebrowser/include/exec/memory.h' l='541'>/**
+ * memory_region_init_ram_device_ptr:  Initialize RAM device memory region from
+ *                                     a user-provided pointer.
+ *
+ * A RAM device represents a mapping to a physical device, such as to a PCI
+ * MMIO BAR of an vfio-pci assigned device.  The memory region may be mapped
+ * into the VM address space and access to the region will modify memory
+ * directly.  However, the memory region should not be included in a memory
+ * dump (device may not be enabled/mapped at the time of the dump), and
+ * operations incompatible with manipulating MMIO should be avoided.  Replaces
+ * skip_dump flag.
+ *
+ * @mr: the #MemoryRegion to be initialized.
+ * @owner: the object that tracks the region&apos;s reference count
+ * @name: the name of the region.
+ * @size: size of the region.
+ * @ptr: memory to be mapped; must contain at least @size bytes.
+ *
+ * Note that this function does not do anything to cause the data in the
+ * RAM memory region to be migrated; that is the responsibility of the caller.
+ * (For RAM device memory regions, migrating the contents rarely makes sense.)
+ */</doc>
+<use f='codebrowser/hw/vfio/common.c' l='780' u='c' c='vfio_region_mmap'/>
+<def f='codebrowser/memory.c' l='1453' ll='1463' type='void memory_region_init_ram_device_ptr(MemoryRegion * mr, Object * owner, const char * name, uint64_t size, void * ptr)'/>

@@ -1,0 +1,44 @@
+<def f='codebrowser/util/hbitmap.c' l='55' ll='97'/>
+<size>144</size>
+<doc f='codebrowser/util/hbitmap.c' l='18'>/* HBitmaps provides an array of bits.  The bits are stored as usual in an
+ * array of unsigned longs, but HBitmap is also optimized to provide fast
+ * iteration over set bits; going from one bit to the next is O(logB n)
+ * worst case, with B = sizeof(long) * CHAR_BIT: the result is low enough
+ * that the number of levels is in fact fixed.
+ *
+ * In order to do this, it stacks multiple bitmaps with progressively coarser
+ * granularity; in all levels except the last, bit N is set iff the N-th
+ * unsigned long is nonzero in the immediately next level.  When iteration
+ * completes on the last level it can examine the 2nd-last level to quickly
+ * skip entire words, and even do so recursively to skip blocks of 64 words or
+ * powers thereof (32 on 32-bit machines).
+ *
+ * Given an index in the bitmap, it can be split in group of bits like
+ * this (for the 64-bit case):
+ *
+ *   bits 0-57 =&gt; word in the last bitmap     | bits 58-63 =&gt; bit in the word
+ *   bits 0-51 =&gt; word in the 2nd-last bitmap | bits 52-57 =&gt; bit in the word
+ *   bits 0-45 =&gt; word in the 3rd-last bitmap | bits 46-51 =&gt; bit in the word
+ *
+ * So it is easy to move up simply by shifting the index right by
+ * log2(BITS_PER_LONG) bits.  To move down, you shift the index left
+ * similarly, and add the word index within the group.  Iteration uses
+ * ffs (find first set bit) to find the next word to examine; this
+ * operation can be done in constant time in most current architectures.
+ *
+ * Setting or clearing a range of m bits on all levels, the work to perform
+ * is O(m + m/W + m/W^2 + ...), which is O(m) like on a regular bitmap.
+ *
+ * When iterating on a bitmap, each bit (on any level) is only visited
+ * once.  Hence, The total cost of visiting a bitmap with m bits in it is
+ * the number of bits that are set in all bitmaps.  Unless the bitmap is
+ * extremely sparse, this is also O(m + m/W + m/W^2 + ...), so the amortized
+ * cost of advancing from one bit to the next is usually constant (worst case
+ * O(logB n) as in the non-amortized complexity).
+ */</doc>
+<mbr r='HBitmap::size' o='0' t='uint64_t'/>
+<mbr r='HBitmap::count' o='64' t='uint64_t'/>
+<mbr r='HBitmap::granularity' o='128' t='int'/>
+<mbr r='HBitmap::meta' o='192' t='HBitmap *'/>
+<mbr r='HBitmap::levels' o='256' t='unsigned long *[7]'/>
+<mbr r='HBitmap::sizes' o='704' t='uint64_t [7]'/>

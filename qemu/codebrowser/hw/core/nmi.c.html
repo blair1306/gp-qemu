@@ -1,0 +1,106 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>nmi.c source code [codebrowser/hw/core/nmi.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="do_nmi_s "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/core/nmi.c'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>core</a>/<a href='nmi.c.html'>nmi.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  NMI monitor handler class and helpers.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright IBM Corp., 2014</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> *  Author: Alexey Kardashevskiy &lt;aik@ozlabs.ru&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> *  This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="9">9</th><td><i> *  it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="10">10</th><td><i> *  the Free Software Foundation; either version 2 of the License,</i></td></tr>
+<tr><th id="11">11</th><td><i> *  or (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> *  This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> *  but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="16">16</th><td><i> *  GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> *  You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="19">19</th><td><i> *  along with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../../include/hw/nmi.h.html">"hw/nmi.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../include/qapi/qmp/qerror.h.html">"qapi/qmp/qerror.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/monitor/monitor.h.html">"monitor/monitor.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><b>struct</b> <dfn class="type def" id="do_nmi_s" title='do_nmi_s' data-ref="do_nmi_s">do_nmi_s</dfn> {</td></tr>
+<tr><th id="29">29</th><td>    <em>int</em> <dfn class="tu decl" id="do_nmi_s::cpu_index" title='do_nmi_s::cpu_index' data-type='int' data-ref="do_nmi_s::cpu_index">cpu_index</dfn>;</td></tr>
+<tr><th id="30">30</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="tu decl" id="do_nmi_s::err" title='do_nmi_s::err' data-type='Error *' data-ref="do_nmi_s::err">err</dfn>;</td></tr>
+<tr><th id="31">31</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="do_nmi_s::handled" title='do_nmi_s::handled' data-type='_Bool' data-ref="do_nmi_s::handled">handled</dfn>;</td></tr>
+<tr><th id="32">32</th><td>};</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><em>static</em> <em>void</em> <a class="tu decl" href="#nmi_children" title='nmi_children' data-type='void nmi_children(Object * o, struct do_nmi_s * ns)' data-ref="nmi_children">nmi_children</a>(<a class="typedef" href="../../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col1 decl" id="1o" title='o' data-type='Object *' data-ref="1o">o</dfn>, <b>struct</b> <a class="type" href="#do_nmi_s" title='do_nmi_s' data-ref="do_nmi_s">do_nmi_s</a> *<dfn class="local col2 decl" id="2ns" title='ns' data-type='struct do_nmi_s *' data-ref="2ns">ns</dfn>);</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="do_nmi" title='do_nmi' data-type='int do_nmi(Object * o, void * opaque)' data-ref="do_nmi">do_nmi</dfn>(<a class="typedef" href="../../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col3 decl" id="3o" title='o' data-type='Object *' data-ref="3o">o</dfn>, <em>void</em> *<dfn class="local col4 decl" id="4opaque" title='opaque' data-type='void *' data-ref="4opaque">opaque</dfn>)</td></tr>
+<tr><th id="37">37</th><td>{</td></tr>
+<tr><th id="38">38</th><td>    <b>struct</b> <a class="type" href="#do_nmi_s" title='do_nmi_s' data-ref="do_nmi_s">do_nmi_s</a> *<dfn class="local col5 decl" id="5ns" title='ns' data-type='struct do_nmi_s *' data-ref="5ns">ns</dfn> = <a class="local col4 ref" href="#4opaque" title='opaque' data-ref="4opaque">opaque</a>;</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../include/hw/nmi.h.html#NMIState" title='NMIState' data-type='struct NMIState' data-ref="NMIState">NMIState</a> *<dfn class="local col6 decl" id="6n" title='n' data-type='NMIState *' data-ref="6n">n</dfn> = (<a class="typedef" href="../../include/hw/nmi.h.html#NMIState" title='NMIState' data-type='struct NMIState' data-ref="NMIState">NMIState</a> *) <a class="ref" href="../../include/qom/object.h.html#object_dynamic_cast" title='object_dynamic_cast' data-ref="object_dynamic_cast">object_dynamic_cast</a>(<a class="local col3 ref" href="#3o" title='o' data-ref="3o">o</a>, <a class="macro" href="../../include/hw/nmi.h.html#28" title="&quot;nmi&quot;" data-ref="_M/TYPE_NMI">TYPE_NMI</a>);</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <b>if</b> (<a class="local col6 ref" href="#6n" title='n' data-ref="6n">n</a>) {</td></tr>
+<tr><th id="42">42</th><td>        <a class="typedef" href="../../include/hw/nmi.h.html#NMIClass" title='NMIClass' data-type='struct NMIClass' data-ref="NMIClass">NMIClass</a> *<dfn class="local col7 decl" id="7nc" title='nc' data-type='NMIClass *' data-ref="7nc">nc</dfn> = <a class="macro" href="../../include/hw/nmi.h.html#32" title="((NMIClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((n)))))), (&quot;nmi&quot;), &quot;/home/jon/workspace/qemu/hw/core/nmi.c&quot;, 42, __func__))" data-ref="_M/NMI_GET_CLASS">NMI_GET_CLASS</a>(<a class="local col6 ref" href="#6n" title='n' data-ref="6n">n</a>);</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>        <a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>-&gt;<a class="tu ref" href="#do_nmi_s::handled" title='do_nmi_s::handled' data-use='w' data-ref="do_nmi_s::handled">handled</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="45">45</th><td>        <a class="local col7 ref" href="#7nc" title='nc' data-ref="7nc">nc</a>-&gt;<a class="ref" href="../../include/hw/nmi.h.html#NMIClass::nmi_monitor_handler" title='NMIClass::nmi_monitor_handler' data-ref="NMIClass::nmi_monitor_handler">nmi_monitor_handler</a>(<a class="local col6 ref" href="#6n" title='n' data-ref="6n">n</a>, <a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>-&gt;<a class="tu ref" href="#do_nmi_s::cpu_index" title='do_nmi_s::cpu_index' data-use='r' data-ref="do_nmi_s::cpu_index">cpu_index</a>, &amp;<a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>-&gt;<a class="tu ref" href="#do_nmi_s::err" title='do_nmi_s::err' data-use='a' data-ref="do_nmi_s::err">err</a>);</td></tr>
+<tr><th id="46">46</th><td>        <b>if</b> (<a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>-&gt;<a class="tu ref" href="#do_nmi_s::err" title='do_nmi_s::err' data-use='r' data-ref="do_nmi_s::err">err</a>) {</td></tr>
+<tr><th id="47">47</th><td>            <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="48">48</th><td>        }</td></tr>
+<tr><th id="49">49</th><td>    }</td></tr>
+<tr><th id="50">50</th><td>    <a class="tu ref" href="#nmi_children" title='nmi_children' data-use='c' data-ref="nmi_children">nmi_children</a>(<a class="local col3 ref" href="#3o" title='o' data-ref="3o">o</a>, <a class="local col5 ref" href="#5ns" title='ns' data-ref="5ns">ns</a>);</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="53">53</th><td>}</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="nmi_children" title='nmi_children' data-type='void nmi_children(Object * o, struct do_nmi_s * ns)' data-ref="nmi_children">nmi_children</dfn>(<a class="typedef" href="../../include/qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col8 decl" id="8o" title='o' data-type='Object *' data-ref="8o">o</dfn>, <b>struct</b> <a class="type" href="#do_nmi_s" title='do_nmi_s' data-ref="do_nmi_s">do_nmi_s</a> *<dfn class="local col9 decl" id="9ns" title='ns' data-type='struct do_nmi_s *' data-ref="9ns">ns</dfn>)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>    <a class="ref" href="../../include/qom/object.h.html#object_child_foreach" title='object_child_foreach' data-ref="object_child_foreach">object_child_foreach</a>(<a class="local col8 ref" href="#8o" title='o' data-ref="8o">o</a>, <a class="tu ref" href="#do_nmi" title='do_nmi' data-use='r' data-ref="do_nmi">do_nmi</a>, <a class="local col9 ref" href="#9ns" title='ns' data-ref="9ns">ns</a>);</td></tr>
+<tr><th id="58">58</th><td>}</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><em>void</em> <dfn class="decl def" id="nmi_monitor_handle" title='nmi_monitor_handle' data-ref="nmi_monitor_handle">nmi_monitor_handle</dfn>(<em>int</em> <dfn class="local col0 decl" id="10cpu_index" title='cpu_index' data-type='int' data-ref="10cpu_index">cpu_index</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="11errp" title='errp' data-type='Error **' data-ref="11errp">errp</dfn>)</td></tr>
+<tr><th id="61">61</th><td>{</td></tr>
+<tr><th id="62">62</th><td>    <b>struct</b> <a class="type" href="#do_nmi_s" title='do_nmi_s' data-ref="do_nmi_s">do_nmi_s</a> <dfn class="local col2 decl" id="12ns" title='ns' data-type='struct do_nmi_s' data-ref="12ns">ns</dfn> = {</td></tr>
+<tr><th id="63">63</th><td>        .<a class="tu ref" href="#do_nmi_s::cpu_index" title='do_nmi_s::cpu_index' data-use='w' data-ref="do_nmi_s::cpu_index">cpu_index</a> = <a class="local col0 ref" href="#10cpu_index" title='cpu_index' data-ref="10cpu_index">cpu_index</a>,</td></tr>
+<tr><th id="64">64</th><td>        .<a class="tu ref" href="#do_nmi_s::err" title='do_nmi_s::err' data-use='w' data-ref="do_nmi_s::err">err</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="65">65</th><td>        .<a class="tu ref" href="#do_nmi_s::handled" title='do_nmi_s::handled' data-use='w' data-ref="do_nmi_s::handled">handled</a> = <span class="macro" title="0" data-ref="_M/false">false</span></td></tr>
+<tr><th id="66">66</th><td>    };</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    <a class="tu ref" href="#nmi_children" title='nmi_children' data-use='c' data-ref="nmi_children">nmi_children</a>(<a class="ref" href="../../include/qom/object.h.html#object_get_root" title='object_get_root' data-ref="object_get_root">object_get_root</a>(), &amp;<a class="local col2 ref" href="#12ns" title='ns' data-ref="12ns">ns</a>);</td></tr>
+<tr><th id="69">69</th><td>    <b>if</b> (<a class="local col2 ref" href="#12ns" title='ns' data-ref="12ns">ns</a>.<a class="tu ref" href="#do_nmi_s::handled" title='do_nmi_s::handled' data-use='r' data-ref="do_nmi_s::handled">handled</a>) {</td></tr>
+<tr><th id="70">70</th><td>        <a class="ref" href="../../include/qapi/error.h.html#error_propagate" title='error_propagate' data-ref="error_propagate">error_propagate</a>(<a class="local col1 ref" href="#11errp" title='errp' data-ref="11errp">errp</a>, <a class="local col2 ref" href="#12ns" title='ns' data-ref="12ns">ns</a>.<a class="tu ref" href="#do_nmi_s::err" title='do_nmi_s::err' data-use='r' data-ref="do_nmi_s::err">err</a>);</td></tr>
+<tr><th id="71">71</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="72">72</th><td>        <a class="macro" href="../../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/hw/core/nmi.c&quot;, 72, __func__, (&quot;this feature or command is not currently supported&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col1 ref" href="#11errp" title='errp' data-ref="11errp">errp</a>, <a class="macro" href="../../include/qapi/qmp/qerror.h.html#91" title="&quot;this feature or command is not currently supported&quot;" data-ref="_M/QERR_UNSUPPORTED">QERR_UNSUPPORTED</a>);</td></tr>
+<tr><th id="73">73</th><td>    }</td></tr>
+<tr><th id="74">74</th><td>}</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="nmi_info" title='nmi_info' data-type='const TypeInfo' data-ref="nmi_info">nmi_info</dfn> = {</td></tr>
+<tr><th id="77">77</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a>          = <a class="macro" href="../../include/hw/nmi.h.html#28" title="&quot;nmi&quot;" data-ref="_M/TYPE_NMI">TYPE_NMI</a>,</td></tr>
+<tr><th id="78">78</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a>        = <a class="macro" href="../../include/qom/object.h.html#555" title="&quot;interface&quot;" data-ref="_M/TYPE_INTERFACE">TYPE_INTERFACE</a>,</td></tr>
+<tr><th id="79">79</th><td>    .<a class="ref" href="../../include/qom/object.h.html#TypeInfo::class_size" title='TypeInfo::class_size' data-ref="TypeInfo::class_size">class_size</a>    = <b>sizeof</b>(<a class="typedef" href="../../include/hw/nmi.h.html#NMIClass" title='NMIClass' data-type='struct NMIClass' data-ref="NMIClass">NMIClass</a>),</td></tr>
+<tr><th id="80">80</th><td>};</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="nmi_register_types" title='nmi_register_types' data-type='void nmi_register_types()' data-ref="nmi_register_types">nmi_register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="83">83</th><td>{</td></tr>
+<tr><th id="84">84</th><td>    <a class="ref" href="../../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#nmi_info" title='nmi_info' data-use='a' data-ref="nmi_info">nmi_info</a>);</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><a class="macro" href="../../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_nmi_register_types(void) { register_module_init(nmi_register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#nmi_register_types" title='nmi_register_types' data-use='r' data-ref="nmi_register_types">nmi_register_types</a>)</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

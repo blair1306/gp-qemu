@@ -1,0 +1,247 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>dns-resolver.h source code [codebrowser/include/io/dns-resolver.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QIODNSResolver,QIODNSResolverClass "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/io/dns-resolver.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>io</a>/<a href='dns-resolver.h.html'>dns-resolver.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU DNS resolver</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016-2017 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifndef</span> <span class="macro" data-ref="_M/QIO_DNS_RESOLVER_H">QIO_DNS_RESOLVER_H</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/QIO_DNS_RESOLVER_H" data-ref="_M/QIO_DNS_RESOLVER_H">QIO_DNS_RESOLVER_H</dfn></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../qom/object.h.html">"qom/object.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="task.h.html">"io/task.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/TYPE_QIO_DNS_RESOLVER" data-ref="_M/TYPE_QIO_DNS_RESOLVER">TYPE_QIO_DNS_RESOLVER</dfn> "qio-dns-resolver"</u></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/QIO_DNS_RESOLVER" data-ref="_M/QIO_DNS_RESOLVER">QIO_DNS_RESOLVER</dfn>(obj)                                    \</u></td></tr>
+<tr><th id="30">30</th><td><u>    OBJECT_CHECK(QIODNSResolver, (obj), TYPE_QIO_DNS_RESOLVER)</u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/QIO_DNS_RESOLVER_CLASS" data-ref="_M/QIO_DNS_RESOLVER_CLASS">QIO_DNS_RESOLVER_CLASS</dfn>(klass)                                    \</u></td></tr>
+<tr><th id="32">32</th><td><u>    OBJECT_CLASS_CHECK(QIODNSResolverClass, klass, TYPE_QIO_DNS_RESOLVER)</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/QIO_DNS_RESOLVER_GET_CLASS" data-ref="_M/QIO_DNS_RESOLVER_GET_CLASS">QIO_DNS_RESOLVER_GET_CLASS</dfn>(obj)                                  \</u></td></tr>
+<tr><th id="34">34</th><td><u>    OBJECT_GET_CLASS(QIODNSResolverClass, obj, TYPE_QIO_DNS_RESOLVER)</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QIODNSResolver" title='QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</a> <dfn class="typedef" id="QIODNSResolver" title='QIODNSResolver' data-type='struct QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</dfn>;</td></tr>
+<tr><th id="37">37</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QIODNSResolverClass" title='QIODNSResolverClass' data-ref="QIODNSResolverClass">QIODNSResolverClass</a> <dfn class="typedef" id="QIODNSResolverClass" title='QIODNSResolverClass' data-type='struct QIODNSResolverClass' data-ref="QIODNSResolverClass">QIODNSResolverClass</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * QIODNSResolver:</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> * The QIODNSResolver class provides a framework for doing</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * DNS resolution on SocketAddress objects, independently</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> * of socket creation.</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * &lt;example&gt;</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> *   &lt;title&gt;Resolving addresses synchronously&lt;/title&gt;</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> *   &lt;programlisting&gt;</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> *    int mylisten(SocketAddress *addr, Error **errp) {</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> *      QIODNSResolver *resolver = qio_dns_resolver_get_instance();</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> *      SocketAddress **rawaddrs = NULL;</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> *      size_t nrawaddrs = 0;</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> *      Error *err = NULL;</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> *      QIOChannel **socks = NULL;</i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> *      size_t nsocks = 0;</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *      if (qio_dns_resolver_lookup_sync(dns, addr, &amp;nrawaddrs,</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> *                                       &amp;rawaddrs, errp) &lt; 0) {</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> *          return -1;</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> *      for (i = 0; i &lt; nrawaddrs; i++) {</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> *         QIOChannel *sock = qio_channel_new();</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> *         Error *local_err = NULL;</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> *         qio_channel_listen_sync(sock, rawaddrs[i], &amp;local_err);</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> *         if (local_err) {</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> *            error_propagate(&amp;err, local_err);</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *         } else {</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> *            socks = g_renew(QIOChannelSocket *, socks, nsocks + 1);</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *            socks[nsocks++] = sock;</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *         }</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *         qapi_free_SocketAddress(rawaddrs[i]);</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> *      g_free(rawaddrs);</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> *      if (nsocks == 0) {</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> *         error_propagate(errp, err);</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> *      } else {</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> *         error_free(err);</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> *   }</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *   &lt;/programlisting&gt;</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> * &lt;/example&gt;</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> * &lt;example&gt;</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> *   &lt;title&gt;Resolving addresses asynchronously&lt;/title&gt;</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> *   &lt;programlisting&gt;</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> *    typedef struct MyListenData {</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> *       Error *err;</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> *       QIOChannelSocket **socks;</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> *       size_t nsocks;</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> *    } MyListenData;</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> *    void mylistenresult(QIOTask *task, void *opaque) {</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *      MyListenData *data = opaque;</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *      QIODNSResolver *resolver =</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *         QIO_DNS_RESOLVER(qio_task_get_source(task);</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *      SocketAddress **rawaddrs = NULL;</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> *      size_t nrawaddrs = 0;</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> *      Error *err = NULL;</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> *      if (qio_task_propagate_error(task, &amp;data-&gt;err)) {</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> *         return;</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *      qio_dns_resolver_lookup_result(resolver, task,</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *                                     &amp;nrawaddrs, &amp;rawaddrs);</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> *      for (i = 0; i &lt; nrawaddrs; i++) {</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> *         QIOChannel *sock = qio_channel_new();</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> *         Error *local_err = NULL;</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> *         qio_channel_listen_sync(sock, rawaddrs[i], &amp;local_err);</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> *         if (local_err) {</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> *            error_propagate(&amp;err, local_err);</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> *         } else {</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> *            socks = g_renew(QIOChannelSocket *, socks, nsocks + 1);</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> *            socks[nsocks++] = sock;</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> *         }</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> *         qapi_free_SocketAddress(rawaddrs[i]);</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *      g_free(rawaddrs);</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *      if (nsocks == 0) {</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *         error_propagate(&amp;data-&gt;err, err);</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> *      } else {</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> *         error_free(err);</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> *      }</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> *    }</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *    void mylisten(SocketAddress *addr, MyListenData *data) {</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> *      QIODNSResolver *resolver = qio_dns_resolver_get_instance();</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> *      qio_dns_resolver_lookup_async(dns, addr,</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *                                    mylistenresult, data, NULL);</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> *    }</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> *   &lt;/programlisting&gt;</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> * &lt;/example&gt;</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="138">138</th><td><b>struct</b> <dfn class="type def" id="QIODNSResolver" title='QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</dfn> {</td></tr>
+<tr><th id="139">139</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> <dfn class="decl" id="QIODNSResolver::parent" title='QIODNSResolver::parent' data-ref="QIODNSResolver::parent">parent</dfn>;</td></tr>
+<tr><th id="140">140</th><td>};</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><b>struct</b> <dfn class="type def" id="QIODNSResolverClass" title='QIODNSResolverClass' data-ref="QIODNSResolverClass">QIODNSResolverClass</dfn> {</td></tr>
+<tr><th id="143">143</th><td>    <a class="typedef" href="../qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> <dfn class="decl" id="QIODNSResolverClass::parent" title='QIODNSResolverClass::parent' data-ref="QIODNSResolverClass::parent">parent</dfn>;</td></tr>
+<tr><th id="144">144</th><td>};</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> * qio_dns_resolver_get_instance:</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> * Get the singleton dns resolver instance. The caller</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> * does not own a reference on the returned object.</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * Returns: the single dns resolver instance</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="155">155</th><td><a class="typedef" href="#QIODNSResolver" title='QIODNSResolver' data-type='struct QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</a> *<a class="decl" href="../../io/dns-resolver.c.html#qio_dns_resolver_get_instance" title='qio_dns_resolver_get_instance' data-ref="qio_dns_resolver_get_instance" id="qio_dns_resolver_get_instance">qio_dns_resolver_get_instance</a>(<em>void</em>);</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> * qio_dns_resolver_lookup_sync:</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> *<span class="command"> @resolver</span>: the DNS resolver instance</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> *<span class="command"> @addr</span>: the address to resolve</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> *<span class="command"> @naddr</span>: pointer to hold number of resolved addresses</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> *<span class="command"> @addrs</span>: pointer to hold resolved addresses</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> *<span class="command"> @errp</span>: pointer to NULL initialized error object</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * This will attempt to resolve the address provided</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> * in<span class="command"> @addr</span>. If resolution succeeds,<span class="command"> @addrs</span> will be filled</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> * with all the resolved addresses.<span class="command"> @naddrs</span> will specify</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> * the number of entries allocated in<span class="command"> @addrs</span>. The caller</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> * is responsible for freeing each entry in<span class="command"> @addrs</span>, as</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> * well as<span class="command"> @addrs</span> itself.<span class="command"> @naddrs</span> is guaranteed to be</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> * greater than zero on success.</i></td></tr>
+<tr><th id="172">172</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="173">173</th><td><i class="doc"> * DNS resolution will be done synchronously so execution</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * of the caller may be blocked for an arbitrary length</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> * of time.</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> * Returns: 0 if resolution was successful, -1 on error</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="179">179</th><td><em>int</em> <a class="decl" href="../../io/dns-resolver.c.html#qio_dns_resolver_lookup_sync" title='qio_dns_resolver_lookup_sync' data-ref="qio_dns_resolver_lookup_sync" id="qio_dns_resolver_lookup_sync">qio_dns_resolver_lookup_sync</a>(<a class="typedef" href="#QIODNSResolver" title='QIODNSResolver' data-type='struct QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</a> *<dfn class="local col1 decl" id="1resolver" title='resolver' data-type='QIODNSResolver *' data-ref="1resolver">resolver</dfn>,</td></tr>
+<tr><th id="180">180</th><td>                                 <a class="typedef" href="../../qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> *<dfn class="local col2 decl" id="2addr" title='addr' data-type='SocketAddress *' data-ref="2addr">addr</dfn>,</td></tr>
+<tr><th id="181">181</th><td>                                 <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> *<dfn class="local col3 decl" id="3naddrs" title='naddrs' data-type='size_t *' data-ref="3naddrs">naddrs</dfn>,</td></tr>
+<tr><th id="182">182</th><td>                                 <a class="typedef" href="../../qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> ***<dfn class="local col4 decl" id="4addrs" title='addrs' data-type='SocketAddress ***' data-ref="4addrs">addrs</dfn>,</td></tr>
+<tr><th id="183">183</th><td>                                 <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="5errp" title='errp' data-type='Error **' data-ref="5errp">errp</dfn>);</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> * qio_dns_resolver_lookup_async:</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> *<span class="command"> @resolver</span>: the DNS resolver instance</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> *<span class="command"> @addr</span>: the address to resolve</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> *<span class="command"> @func</span>: the callback to invoke on lookup completion</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> *<span class="command"> @opaque</span>: data blob to pass to<span class="command"> @func</span></i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> *<span class="command"> @notify</span>: the callback to free<span class="command"> @opaque</span>, or NULL</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> * This will attempt to resolve the address provided</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> * in<span class="command"> @addr</span>. The callback<span class="command"> @func</span> will be invoked when</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> * resolution has either completed or failed. On</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> * success, the<span class="command"> @func</span> should call the method</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> * qio_dns_resolver_lookup_result() to obtain the</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> * results.</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> * DNS resolution will be done asynchronously so execution</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> * of the caller will not be blocked.</i></td></tr>
+<tr><th id="202">202</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="203">203</th><td><em>void</em> <a class="decl" href="../../io/dns-resolver.c.html#qio_dns_resolver_lookup_async" title='qio_dns_resolver_lookup_async' data-ref="qio_dns_resolver_lookup_async" id="qio_dns_resolver_lookup_async">qio_dns_resolver_lookup_async</a>(<a class="typedef" href="#QIODNSResolver" title='QIODNSResolver' data-type='struct QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</a> *<dfn class="local col6 decl" id="6resolver" title='resolver' data-type='QIODNSResolver *' data-ref="6resolver">resolver</dfn>,</td></tr>
+<tr><th id="204">204</th><td>                                   <a class="typedef" href="../../qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> *<dfn class="local col7 decl" id="7addr" title='addr' data-type='SocketAddress *' data-ref="7addr">addr</dfn>,</td></tr>
+<tr><th id="205">205</th><td>                                   <a class="typedef" href="task.h.html#QIOTaskFunc" title='QIOTaskFunc' data-type='void (*)(QIOTask *, gpointer)' data-ref="QIOTaskFunc">QIOTaskFunc</a> <dfn class="local col8 decl" id="8func" title='func' data-type='QIOTaskFunc' data-ref="8func">func</dfn>,</td></tr>
+<tr><th id="206">206</th><td>                                   <a class="typedef" href="../../../include/glib-2.0/glib/gtypes.h.html#gpointer" title='gpointer' data-type='void *' data-ref="gpointer">gpointer</a> <dfn class="local col9 decl" id="9opaque" title='opaque' data-type='gpointer' data-ref="9opaque">opaque</dfn>,</td></tr>
+<tr><th id="207">207</th><td>                                   <a class="typedef" href="../../../include/glib-2.0/glib/gtypes.h.html#GDestroyNotify" title='GDestroyNotify' data-type='void (*)(gpointer)' data-ref="GDestroyNotify">GDestroyNotify</a> <dfn class="local col0 decl" id="10notify" title='notify' data-type='GDestroyNotify' data-ref="10notify">notify</dfn>);</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> * qio_dns_resolver_lookup_result:</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> *<span class="command"> @resolver</span>: the DNS resolver instance</i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> *<span class="command"> @task</span>: the task object to get results for</i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> *<span class="command"> @naddr</span>: pointer to hold number of resolved addresses</i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"> *<span class="command"> @addrs</span>: pointer to hold resolved addresses</i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> * This method should be called from the callback passed</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> * to qio_dns_resolver_lookup_async() in order to obtain</i></td></tr>
+<tr><th id="218">218</th><td><i class="doc"> * results. <span class="command"> @addrs</span> will be filled with all the resolved</i></td></tr>
+<tr><th id="219">219</th><td><i class="doc"> * addresses.<span class="command"> @naddrs</span> will specify the number of entries</i></td></tr>
+<tr><th id="220">220</th><td><i class="doc"> * allocated in<span class="command"> @addrs</span>. The caller is responsible for</i></td></tr>
+<tr><th id="221">221</th><td><i class="doc"> * freeing each entry in<span class="command"> @addrs</span>, as well as<span class="command"> @addrs</span> itself.</i></td></tr>
+<tr><th id="222">222</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="223">223</th><td><em>void</em> <a class="decl" href="../../io/dns-resolver.c.html#qio_dns_resolver_lookup_result" title='qio_dns_resolver_lookup_result' data-ref="qio_dns_resolver_lookup_result" id="qio_dns_resolver_lookup_result">qio_dns_resolver_lookup_result</a>(<a class="typedef" href="#QIODNSResolver" title='QIODNSResolver' data-type='struct QIODNSResolver' data-ref="QIODNSResolver">QIODNSResolver</a> *<dfn class="local col1 decl" id="11resolver" title='resolver' data-type='QIODNSResolver *' data-ref="11resolver">resolver</dfn>,</td></tr>
+<tr><th id="224">224</th><td>                                    <a class="typedef" href="task.h.html#QIOTask" title='QIOTask' data-type='struct QIOTask' data-ref="QIOTask">QIOTask</a> *<dfn class="local col2 decl" id="12task" title='task' data-type='QIOTask *' data-ref="12task">task</dfn>,</td></tr>
+<tr><th id="225">225</th><td>                                    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> *<dfn class="local col3 decl" id="13naddrs" title='naddrs' data-type='size_t *' data-ref="13naddrs">naddrs</dfn>,</td></tr>
+<tr><th id="226">226</th><td>                                    <a class="typedef" href="../../qapi-types.h.html#SocketAddress" title='SocketAddress' data-type='struct SocketAddress' data-ref="SocketAddress">SocketAddress</a> ***<dfn class="local col4 decl" id="14addrs" title='addrs' data-type='SocketAddress ***' data-ref="14addrs">addrs</dfn>);</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><u>#<span data-ppcond="21">endif</span> /* QIO_DNS_RESOLVER_H */</u></td></tr>
+<tr><th id="229">229</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../io/dns-resolver.c.html'>codebrowser/io/dns-resolver.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

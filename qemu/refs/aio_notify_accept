@@ -1,0 +1,20 @@
+<dec f='codebrowser/include/block/aio.h' l='240' type='void aio_notify_accept(AioContext * ctx)'/>
+<doc f='codebrowser/include/block/aio.h' l='224'>/**
+ * aio_notify_accept: Acknowledge receiving an aio_notify.
+ *
+ * aio_notify() uses an EventNotifier in order to wake up a sleeping
+ * aio_poll() or g_main_context_iteration().  Calls to aio_notify() are
+ * usually rare, but the AioContext has to clear the EventNotifier on
+ * every aio_poll() or g_main_context_iteration() in order to avoid
+ * busy waiting.  This event_notifier_test_and_clear() cannot be done
+ * using the usual aio_context_set_event_notifier(), because it must
+ * be done before processing all events (file descriptors, bottom halves,
+ * timers).
+ *
+ * aio_notify_accept() is an optimized event_notifier_test_and_clear()
+ * that is specific to an AioContext&apos;s notifier; it is used internally
+ * to clear the EventNotifier only if aio_notify() had been called.
+ */</doc>
+<use f='codebrowser/util/aio-posix.c' l='671' u='c' c='aio_poll'/>
+<use f='codebrowser/util/async.c' l='243' u='c' c='aio_ctx_check'/>
+<def f='codebrowser/util/async.c' l='347' ll='352' type='void aio_notify_accept(AioContext * ctx)'/>

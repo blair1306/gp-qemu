@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>page_cache.h source code [codebrowser/migration/page_cache.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/page_cache.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='page_cache.h.html'>page_cache.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Page cache for QEMU</i></td></tr>
+<tr><th id="3">3</th><td><i> * The cache is base on a hash of the page address</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright 2012 Red Hat, Inc. and/or its affiliates</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Authors:</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Orit Wasserman  &lt;owasserm@redhat.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="11">11</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#<span data-ppcond="15">ifndef</span> <span class="macro" data-ref="_M/PAGE_CACHE_H">PAGE_CACHE_H</span></u></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/PAGE_CACHE_H" data-ref="_M/PAGE_CACHE_H">PAGE_CACHE_H</dfn></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><i>/* Page cache for storing guest pages */</i></td></tr>
+<tr><th id="19">19</th><td><b>typedef</b> <b>struct</b> <a class="type" href="page_cache.c.html#PageCache" title='PageCache' data-ref="PageCache" id="PageCache"><a class="type" href="page_cache.c.html#PageCache" title='PageCache' data-ref="PageCache">PageCache</a></a> <dfn class="typedef" id="PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</dfn>;</td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> * cache_init: Initialize the page cache</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * Returns new allocated cache or NULL on error</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> * <span class="command">@num_</span><span class="verb">pages: cache maximal number of cached pages</span></i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> *<span class="command"> @page</span>_size: cache page size</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="31">31</th><td><a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<a class="decl" href="page_cache.c.html#cache_init" title='cache_init' data-ref="cache_init" id="cache_init">cache_init</a>(<a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="1num_pages" title='num_pages' data-type='int64_t' data-ref="1num_pages">num_pages</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col2 decl" id="2page_size" title='page_size' data-type='unsigned int' data-ref="2page_size">page_size</dfn>);</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * cache_fini: free all cache resources</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="37">37</th><td><em>void</em> <a class="decl" href="page_cache.c.html#cache_fini" title='cache_fini' data-ref="cache_fini" id="cache_fini">cache_fini</a>(<a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<dfn class="local col3 decl" id="3cache" title='cache' data-type='PageCache *' data-ref="3cache">cache</dfn>);</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * cache_is_cached: Checks to see if the page is cached</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> * Returns %true if page is cached</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> *<span class="command"> @addr</span>: page addr</i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> *<span class="command"> @current</span>_age: current bitmap generation</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="48">48</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="decl" href="page_cache.c.html#cache_is_cached" title='cache_is_cached' data-ref="cache_is_cached" id="cache_is_cached">cache_is_cached</a>(<em>const</em> <a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<dfn class="local col4 decl" id="4cache" title='cache' data-type='const PageCache *' data-ref="4cache">cache</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="5addr" title='addr' data-type='uint64_t' data-ref="5addr">addr</dfn>,</td></tr>
+<tr><th id="49">49</th><td>                     <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="6current_age" title='current_age' data-type='uint64_t' data-ref="6current_age">current_age</dfn>);</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * get_cached_data: Get the data cached for an addr</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> * Returns pointer to the data cached or NULL if not cached</i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *<span class="command"> @addr</span>: page addr</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="59">59</th><td><a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<a class="decl" href="page_cache.c.html#get_cached_data" title='get_cached_data' data-ref="get_cached_data" id="get_cached_data">get_cached_data</a>(<em>const</em> <a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<dfn class="local col7 decl" id="7cache" title='cache' data-type='const PageCache *' data-ref="7cache">cache</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="8addr" title='addr' data-type='uint64_t' data-ref="8addr">addr</dfn>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> * cache_insert: insert the page into the cache. the page cache</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * will dup the data on insert. the previous value will be overwritten</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * Returns -1 when the page isn't inserted into cache</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *<span class="command"> @addr</span>: page address</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> *<span class="command"> @pdata</span>: pointer to the page</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *<span class="command"> @current</span>_age: current bitmap generation</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="72">72</th><td><em>int</em> <a class="decl" href="page_cache.c.html#cache_insert" title='cache_insert' data-ref="cache_insert" id="cache_insert">cache_insert</a>(<a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<dfn class="local col9 decl" id="9cache" title='cache' data-type='PageCache *' data-ref="9cache">cache</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="10addr" title='addr' data-type='uint64_t' data-ref="10addr">addr</dfn>, <em>const</em> <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col1 decl" id="11pdata" title='pdata' data-type='const uint8_t *' data-ref="11pdata">pdata</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                 <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="12current_age" title='current_age' data-type='uint64_t' data-ref="12current_age">current_age</dfn>);</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> * cache_resize: resize the page cache. In case of size reduction the extra</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> * pages will be freed</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> * Returns -1 on error new cache size on success</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> *<span class="command"> @cache</span> pointer to the PageCache struct</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> * <span class="command">@num_</span><span class="verb">pages: new page cache size (in pages)</span></i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="84">84</th><td><a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <a class="decl" href="page_cache.c.html#cache_resize" title='cache_resize' data-ref="cache_resize" id="cache_resize">cache_resize</a>(<a class="typedef" href="#PageCache" title='PageCache' data-type='struct PageCache' data-ref="PageCache">PageCache</a> *<dfn class="local col3 decl" id="13cache" title='cache' data-type='PageCache *' data-ref="13cache">cache</dfn>, <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col4 decl" id="14num_pages" title='num_pages' data-type='int64_t' data-ref="14num_pages">num_pages</dfn>);</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><u>#<span data-ppcond="15">endif</span></u></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='page_cache.c.html'>codebrowser/migration/page_cache.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

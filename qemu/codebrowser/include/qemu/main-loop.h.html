@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>main-loop.h source code [codebrowser/include/qemu/main-loop.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/main-loop.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='main-loop.h.html'>main-loop.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/QEMU_MAIN_LOOP_H">QEMU_MAIN_LOOP_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/QEMU_MAIN_LOOP_H" data-ref="_M/QEMU_MAIN_LOOP_H">QEMU_MAIN_LOOP_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/SIG_IPI" data-ref="_M/SIG_IPI">SIG_IPI</dfn> SIGUSR1</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * qemu_init_main_loop: Set up the process so that it can run the main loop.</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * This includes setting up signal handlers.  It should be called before</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * any other threads are created.  In addition, threads other than the</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * main one should block signals that are trapped by the main loop.</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> * For simplicity, you can consider these signals to be safe: SIGUSR1,</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * SIGUSR2, thread signals (SIGFPE, SIGILL, SIGSEGV, SIGBUS) and real-time</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * signals if available.  Remember that Windows in practice does not have</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * signals, though.</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * In the case of QEMU tools, this will also start/initialize timers.</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="45">45</th><td><em>int</em> <dfn class="decl" id="qemu_init_main_loop" title='qemu_init_main_loop' data-ref="qemu_init_main_loop">qemu_init_main_loop</dfn>(<a class="typedef" href="typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="10194errp" title='errp' data-type='Error **' data-ref="10194errp">errp</dfn>);</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> * main_loop_wait: Run one iteration of the main loop.</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * If<span class="command"> @nonblocking</span> is true, poll for events, otherwise suspend until</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> * one actually occurs.  The main loop usually consists of a loop that</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * repeatedly calls main_loop_wait(false).</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> * Main loop services include file descriptor callbacks, bottom halves</i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> * and timers (defined in qemu-timer.h).  Bottom halves are similar to timers</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * that execute immediately, but have a lower overhead and scheduling them</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> * is wait-free, thread-safe and signal-safe.</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> * It is sometimes useful to put a whole program in a coroutine.  In this</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> * case, the coroutine actually should be started from within the main loop,</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> * so that the main loop can run whenever the coroutine yields.  To do this,</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> * you can use a bottom half to enter the coroutine as soon as the main loop</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * starts:</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> *     void enter_co_bh(void *opaque) {</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> *         QEMUCoroutine *co = opaque;</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> *         qemu_coroutine_enter(co);</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *     }</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *     ...</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *     QEMUCoroutine *co = qemu_coroutine_create(coroutine_entry, NULL);</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *     QEMUBH *start_bh = qemu_bh_new(enter_co_bh, co);</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> *     qemu_bh_schedule(start_bh);</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> *     while (...) {</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> *         main_loop_wait(false);</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> *     }</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> * (In the future we may provide a wrapper for this).</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> *<span class="command"> @nonblocking</span>: Whether the caller should block until an event occurs.</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="82">82</th><td><em>void</em> <dfn class="decl" id="main_loop_wait" title='main_loop_wait' data-ref="main_loop_wait">main_loop_wait</dfn>(<em>int</em> <dfn class="local col5 decl" id="10195nonblocking" title='nonblocking' data-type='int' data-ref="10195nonblocking">nonblocking</dfn>);</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> * qemu_get_aio_context: Return the main loop's AioContext</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="87">87</th><td><a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl" id="qemu_get_aio_context" title='qemu_get_aio_context' data-ref="qemu_get_aio_context">qemu_get_aio_context</dfn>(<em>void</em>);</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> * qemu_notify_event: Force processing of pending events.</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> * Similar to signaling a condition variable, qemu_notify_event forces</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * main_loop_wait to look at pending events and exit.  The caller of</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> * main_loop_wait will usually call it again very soon, so qemu_notify_event</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> * also has the side effect of recalculating the sets of file descriptors</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> * that the main loop waits for.</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> * Calling qemu_notify_event is rarely necessary, because main loop</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> * services (bottom halves and timers) call it themselves.</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="101">101</th><td><em>void</em> <dfn class="decl" id="qemu_notify_event" title='qemu_notify_event' data-ref="qemu_notify_event">qemu_notify_event</dfn>(<em>void</em>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><u>#<span data-ppcond="103">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="104">104</th><td><i>/* return TRUE if no sleep should be done afterwards */</i></td></tr>
+<tr><th id="105">105</th><td><b>typedef</b> <em>int</em> PollingFunc(<em>void</em> *opaque);</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> * qemu_add_polling_cb: Register a Windows-specific polling callback</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> * Currently, under Windows some events are polled rather than waited for.</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> * Polling callbacks do not ensure that<span class="command"> @func</span> is called timely, because</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> * the main loop might wait for an arbitrarily long time.  If possible,</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> * you should instead create a separate thread that does a blocking poll</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> * and set a Win32 event object.  The event can then be passed to</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> * qemu_add_wait_object.</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> * Polling callbacks really have nothing Windows specific in them, but</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> * as they are a hack and are currently not necessary under POSIX systems,</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> * they are only available when QEMU is running under Windows.</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *<span class="command"> @func</span>: The function that does the polling, and returns 1 to force</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * immediate completion of main_loop_wait.</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *<span class="command"> @opaque</span>: A pointer-size value that is passed to<span class="command"> @func</span>.</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="125">125</th><td><em>int</em> qemu_add_polling_cb(PollingFunc *func, <em>void</em> *opaque);</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> * qemu_del_polling_cb: Unregister a Windows-specific polling callback</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> * This function removes a callback that was registered with</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> * qemu_add_polling_cb.</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *<span class="command"> @func</span>: The function that was passed to qemu_add_polling_cb.</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> *<span class="command"> @opaque</span>: A pointer-size value that was passed to qemu_add_polling_cb.</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="136">136</th><td><em>void</em> qemu_del_polling_cb(PollingFunc *func, <em>void</em> *opaque);</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><i>/* Wait objects handling */</i></td></tr>
+<tr><th id="139">139</th><td><b>typedef</b> <em>void</em> WaitObjectFunc(<em>void</em> *opaque);</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"> * qemu_add_wait_object: Register a callback for a Windows handle</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> * Under Windows, the iohandler mechanism can only be used with sockets.</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> * QEMU must use the WaitForMultipleObjects API to wait on other handles.</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> * This function registers a #HANDLE with QEMU, so that it will be included</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> * in the main loop's calls to WaitForMultipleObjects.  When the handle</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> * is in a signaled state, QEMU will call<span class="command"> @func</span>.</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @handle</span>: The Windows handle to be observed.</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *<span class="command"> @func</span>: A function to be called when<span class="command"> @handle</span> is in a signaled state.</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> *<span class="command"> @opaque</span>: A pointer-size value that is passed to<span class="command"> @func</span>.</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="154">154</th><td><em>int</em> qemu_add_wait_object(HANDLE handle, WaitObjectFunc *func, <em>void</em> *opaque);</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> * qemu_del_wait_object: Unregister a callback for a Windows handle</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> * This function removes a callback that was registered with</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> * qemu_add_wait_object.</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> *<span class="command"> @func</span>: The function that was passed to qemu_add_wait_object.</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> *<span class="command"> @opaque</span>: A pointer-size value that was passed to qemu_add_wait_object.</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="165">165</th><td><em>void</em> qemu_del_wait_object(HANDLE handle, WaitObjectFunc *func, <em>void</em> *opaque);</td></tr>
+<tr><th id="166">166</th><td><u>#<span data-ppcond="103">endif</span></u></td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td><i>/* async I/O support */</i></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="IOReadHandler" title='IOReadHandler' data-type='void (void *, const uint8_t *, int)' data-ref="IOReadHandler">IOReadHandler</dfn>(<em>void</em> *<dfn class="local col6 decl" id="10196opaque" title='opaque' data-type='void *' data-ref="10196opaque">opaque</dfn>, <em>const</em> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="10197buf" title='buf' data-type='const uint8_t *' data-ref="10197buf">buf</dfn>, <em>int</em> <dfn class="local col8 decl" id="10198size" title='size' data-type='int' data-ref="10198size">size</dfn>);</td></tr>
+<tr><th id="171">171</th><td><b>typedef</b> <em>int</em> <dfn class="typedef" id="IOCanReadHandler" title='IOCanReadHandler' data-type='int (void *)' data-ref="IOCanReadHandler">IOCanReadHandler</dfn>(<em>void</em> *<dfn class="local col9 decl" id="10199opaque" title='opaque' data-type='void *' data-ref="10199opaque">opaque</dfn>);</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * qemu_set_fd_handler: Register a file descriptor with the main loop</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> * This function tells the main loop to wake up whenever one of the</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> * following conditions is true:</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> * 1) if<span class="command"> @fd</span>_write is not %NULL, when the file descriptor is writable;</i></td></tr>
+<tr><th id="180">180</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="181">181</th><td><i class="doc"> * 2) if<span class="command"> @fd</span>_read is not %NULL, when the file descriptor is readable.</i></td></tr>
+<tr><th id="182">182</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc"> * The callbacks that are set up by qemu_set_fd_handler are level-triggered.</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * If<span class="command"> @fd</span>_read does not read from<span class="command"> @fd</span>, or<span class="command"> @fd</span>_write does not write to<span class="command"> @fd</span></i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> * until its buffers are full, they will be called again on the next</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> * iteration.</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> *<span class="command"> @fd</span>: The file descriptor to be observed.  Under Windows it must be</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> * a #SOCKET.</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> *<span class="command"> @fd</span>_read: A level-triggered callback that is fired if<span class="command"> @fd</span> is readable</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> * at the beginning of a main loop iteration, or if it becomes readable</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> * during one.</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> *<span class="command"> @fd</span>_write: A level-triggered callback that is fired when<span class="command"> @fd</span> is writable</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> * at the beginning of a main loop iteration, or if it becomes writable</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> * during one.</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> *<span class="command"> @opaque</span>: A pointer-sized value that is passed to<span class="command"> @fd</span>_read and<span class="command"> @fd</span>_write.</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="201">201</th><td><em>void</em> <dfn class="decl" id="qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</dfn>(<em>int</em> <dfn class="local col0 decl" id="10200fd" title='fd' data-type='int' data-ref="10200fd">fd</dfn>,</td></tr>
+<tr><th id="202">202</th><td>                         <a class="typedef" href="../block/aio.h.html#IOHandler" title='IOHandler' data-type='void (void *)' data-ref="IOHandler">IOHandler</a> *<dfn class="local col1 decl" id="10201fd_read" title='fd_read' data-type='IOHandler *' data-ref="10201fd_read">fd_read</dfn>,</td></tr>
+<tr><th id="203">203</th><td>                         <a class="typedef" href="../block/aio.h.html#IOHandler" title='IOHandler' data-type='void (void *)' data-ref="IOHandler">IOHandler</a> *<dfn class="local col2 decl" id="10202fd_write" title='fd_write' data-type='IOHandler *' data-ref="10202fd_write">fd_write</dfn>,</td></tr>
+<tr><th id="204">204</th><td>                         <em>void</em> *<dfn class="local col3 decl" id="10203opaque" title='opaque' data-type='void *' data-ref="10203opaque">opaque</dfn>);</td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> * event_notifier_set_handler: Register an EventNotifier with the main loop</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> * This function tells the main loop to wake up whenever the</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> * #EventNotifier was set.</i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> *<span class="command"> @e</span><span class="arg">:</span> The #EventNotifier to be observed.</i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"> *<span class="command"> @handler</span>: A level-triggered callback that is fired when<span class="command"> @e</span></i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> * <span class="arg">has</span> been set. <span class="command"> @e</span> <span class="arg">is</span> passed to it as a parameter.</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="218">218</th><td><em>void</em> <dfn class="decl" id="event_notifier_set_handler" title='event_notifier_set_handler' data-ref="event_notifier_set_handler">event_notifier_set_handler</dfn>(<a class="typedef" href="typedefs.h.html#EventNotifier" title='EventNotifier' data-type='struct EventNotifier' data-ref="EventNotifier">EventNotifier</a> *<dfn class="local col4 decl" id="10204e" title='e' data-type='EventNotifier *' data-ref="10204e">e</dfn>,</td></tr>
+<tr><th id="219">219</th><td>                                <a class="typedef" href="event_notifier.h.html#EventNotifierHandler" title='EventNotifierHandler' data-type='void (EventNotifier *)' data-ref="EventNotifierHandler">EventNotifierHandler</a> *<dfn class="local col5 decl" id="10205handler" title='handler' data-type='EventNotifierHandler *' data-ref="10205handler">handler</dfn>);</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><a class="typedef" href="../../../include/glib-2.0/glib/gmain.h.html#GSource" title='GSource' data-type='struct _GSource' data-ref="GSource">GSource</a> *<dfn class="decl" id="iohandler_get_g_source" title='iohandler_get_g_source' data-ref="iohandler_get_g_source">iohandler_get_g_source</dfn>(<em>void</em>);</td></tr>
+<tr><th id="222">222</th><td><a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl" id="iohandler_get_aio_context" title='iohandler_get_aio_context' data-ref="iohandler_get_aio_context">iohandler_get_aio_context</dfn>(<em>void</em>);</td></tr>
+<tr><th id="223">223</th><td><u>#<span data-ppcond="223">ifdef</span> <a class="macro" href="../../config-host.h.html#11" data-ref="_M/CONFIG_POSIX">CONFIG_POSIX</a></u></td></tr>
+<tr><th id="224">224</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> * qemu_add_child_watch: Register a child process for reaping.</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="227">227</th><td><i class="doc"> * Under POSIX systems, a parent process must read the exit status of</i></td></tr>
+<tr><th id="228">228</th><td><i class="doc"> * its child processes using waitpid, or the operating system will not</i></td></tr>
+<tr><th id="229">229</th><td><i class="doc"> * free some of the resources attached to that process.</i></td></tr>
+<tr><th id="230">230</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="231">231</th><td><i class="doc"> * This function directs the QEMU main loop to observe a child process</i></td></tr>
+<tr><th id="232">232</th><td><i class="doc"> * and call waitpid as soon as it exits; the watch is then removed</i></td></tr>
+<tr><th id="233">233</th><td><i class="doc"> * automatically.  It is useful whenever QEMU forks a child process</i></td></tr>
+<tr><th id="234">234</th><td><i class="doc"> * but will find out about its termination by other means such as a</i></td></tr>
+<tr><th id="235">235</th><td><i class="doc"> * "broken pipe".</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="237">237</th><td><i class="doc"> *<span class="command"> @pid</span>: The pid that QEMU should observe.</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="239">239</th><td><em>int</em> <dfn class="decl" id="qemu_add_child_watch" title='qemu_add_child_watch' data-ref="qemu_add_child_watch">qemu_add_child_watch</dfn>(<a class="typedef" href="../../../include/x86_64-linux-gnu/sys/types.h.html#pid_t" title='pid_t' data-type='__pid_t' data-ref="pid_t">pid_t</a> <dfn class="local col6 decl" id="10206pid" title='pid' data-type='pid_t' data-ref="10206pid">pid</dfn>);</td></tr>
+<tr><th id="240">240</th><td><u>#<span data-ppcond="223">endif</span></u></td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="243">243</th><td><i class="doc"> * qemu_mutex_iothread_locked: Return lock status of the main loop mutex.</i></td></tr>
+<tr><th id="244">244</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="245">245</th><td><i class="doc"> * The main loop mutex is the coarsest lock in QEMU, and as such it</i></td></tr>
+<tr><th id="246">246</th><td><i class="doc"> * must always be taken outside other locks.  This function helps</i></td></tr>
+<tr><th id="247">247</th><td><i class="doc"> * functions take different paths depending on whether the current</i></td></tr>
+<tr><th id="248">248</th><td><i class="doc"> * thread is running within the main loop mutex.</i></td></tr>
+<tr><th id="249">249</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="250">250</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_mutex_iothread_locked" title='qemu_mutex_iothread_locked' data-ref="qemu_mutex_iothread_locked">qemu_mutex_iothread_locked</dfn>(<em>void</em>);</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="253">253</th><td><i class="doc"> * qemu_mutex_lock_iothread: Lock the main loop mutex.</i></td></tr>
+<tr><th id="254">254</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="255">255</th><td><i class="doc"> * This function locks the main loop mutex.  The mutex is taken by</i></td></tr>
+<tr><th id="256">256</th><td><i class="doc"> * main() in vl.c and always taken except while waiting on</i></td></tr>
+<tr><th id="257">257</th><td><i class="doc"> * external events (such as with select).  The mutex should be taken</i></td></tr>
+<tr><th id="258">258</th><td><i class="doc"> * by threads other than the main loop thread when calling</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc"> * qemu_bh_new(), qemu_set_fd_handler() and basically all other</i></td></tr>
+<tr><th id="260">260</th><td><i class="doc"> * functions documented in this file.</i></td></tr>
+<tr><th id="261">261</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="262">262</th><td><i class="doc"> * NOTE: tools currently are single-threaded and qemu_mutex_lock_iothread</i></td></tr>
+<tr><th id="263">263</th><td><i class="doc"> * is a no-op there.</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="265">265</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_lock_iothread" title='qemu_mutex_lock_iothread' data-ref="qemu_mutex_lock_iothread">qemu_mutex_lock_iothread</dfn>(<em>void</em>);</td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> * qemu_mutex_unlock_iothread: Unlock the main loop mutex.</i></td></tr>
+<tr><th id="269">269</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="270">270</th><td><i class="doc"> * This function unlocks the main loop mutex.  The mutex is taken by</i></td></tr>
+<tr><th id="271">271</th><td><i class="doc"> * main() in vl.c and always taken except while waiting on</i></td></tr>
+<tr><th id="272">272</th><td><i class="doc"> * external events (such as with select).  The mutex should be unlocked</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> * as soon as possible by threads other than the main loop thread,</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> * because it prevents the main loop from processing callbacks,</i></td></tr>
+<tr><th id="275">275</th><td><i class="doc"> * including timers and bottom halves.</i></td></tr>
+<tr><th id="276">276</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="277">277</th><td><i class="doc"> * NOTE: tools currently are single-threaded and qemu_mutex_unlock_iothread</i></td></tr>
+<tr><th id="278">278</th><td><i class="doc"> * is a no-op there.</i></td></tr>
+<tr><th id="279">279</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="280">280</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_unlock_iothread" title='qemu_mutex_unlock_iothread' data-ref="qemu_mutex_unlock_iothread">qemu_mutex_unlock_iothread</dfn>(<em>void</em>);</td></tr>
+<tr><th id="281">281</th><td></td></tr>
+<tr><th id="282">282</th><td><i>/* internal interfaces */</i></td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><em>void</em> <dfn class="decl" id="qemu_fd_register" title='qemu_fd_register' data-ref="qemu_fd_register">qemu_fd_register</dfn>(<em>int</em> <dfn class="local col7 decl" id="10207fd" title='fd' data-type='int' data-ref="10207fd">fd</dfn>);</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td><a class="typedef" href="typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="qemu_bh_new" title='qemu_bh_new' data-ref="qemu_bh_new">qemu_bh_new</dfn>(<a class="typedef" href="../block/aio.h.html#QEMUBHFunc" title='QEMUBHFunc' data-type='void (void *)' data-ref="QEMUBHFunc">QEMUBHFunc</a> *<dfn class="local col8 decl" id="10208cb" title='cb' data-type='QEMUBHFunc *' data-ref="10208cb">cb</dfn>, <em>void</em> *<dfn class="local col9 decl" id="10209opaque" title='opaque' data-type='void *' data-ref="10209opaque">opaque</dfn>);</td></tr>
+<tr><th id="287">287</th><td><em>void</em> <dfn class="decl" id="qemu_bh_schedule_idle" title='qemu_bh_schedule_idle' data-ref="qemu_bh_schedule_idle">qemu_bh_schedule_idle</dfn>(<a class="typedef" href="typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="local col0 decl" id="10210bh" title='bh' data-type='QEMUBH *' data-ref="10210bh">bh</dfn>);</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

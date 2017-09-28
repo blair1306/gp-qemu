@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>sd.h source code [codebrowser/include/hw/sd/sd.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="SDBus "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/sd/sd.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>sd</a>/<a href='sd.h.html'>sd.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * SD Memory Card emulation.  Mostly correct for MMC too.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2006 Andrzej Zaborowski  &lt;balrog@zabor.org&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Redistribution and use in source and binary forms, with or without</i></td></tr>
+<tr><th id="7">7</th><td><i> * modification, are permitted provided that the following conditions</i></td></tr>
+<tr><th id="8">8</th><td><i> * are met:</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * 1. Redistributions of source code must retain the above copyright</i></td></tr>
+<tr><th id="11">11</th><td><i> *    notice, this list of conditions and the following disclaimer.</i></td></tr>
+<tr><th id="12">12</th><td><i> * 2. Redistributions in binary form must reproduce the above copyright</i></td></tr>
+<tr><th id="13">13</th><td><i> *    notice, this list of conditions and the following disclaimer in</i></td></tr>
+<tr><th id="14">14</th><td><i> *    the documentation and/or other materials provided with the</i></td></tr>
+<tr><th id="15">15</th><td><i> *    distribution.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS''</i></td></tr>
+<tr><th id="18">18</th><td><i> * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A</i></td></tr>
+<tr><th id="20">20</th><td><i> * PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR</i></td></tr>
+<tr><th id="21">21</th><td><i> * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,</i></td></tr>
+<tr><th id="22">22</th><td><i> * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,</i></td></tr>
+<tr><th id="23">23</th><td><i> * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR</i></td></tr>
+<tr><th id="24">24</th><td><i> * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY</i></td></tr>
+<tr><th id="25">25</th><td><i> * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT</i></td></tr>
+<tr><th id="26">26</th><td><i> * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE</i></td></tr>
+<tr><th id="27">27</th><td><i> * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</i></td></tr>
+<tr><th id="28">28</th><td><i> */</i></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#<span data-ppcond="30">ifndef</span> <span class="macro" data-ref="_M/HW_SD_H">HW_SD_H</span></u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/HW_SD_H" data-ref="_M/HW_SD_H">HW_SD_H</dfn></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/OUT_OF_RANGE" data-ref="_M/OUT_OF_RANGE">OUT_OF_RANGE</dfn>		(1 &lt;&lt; 31)</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/ADDRESS_ERROR" data-ref="_M/ADDRESS_ERROR">ADDRESS_ERROR</dfn>		(1 &lt;&lt; 30)</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/BLOCK_LEN_ERROR" data-ref="_M/BLOCK_LEN_ERROR">BLOCK_LEN_ERROR</dfn>		(1 &lt;&lt; 29)</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/ERASE_SEQ_ERROR" data-ref="_M/ERASE_SEQ_ERROR">ERASE_SEQ_ERROR</dfn>		(1 &lt;&lt; 28)</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/ERASE_PARAM" data-ref="_M/ERASE_PARAM">ERASE_PARAM</dfn>		(1 &lt;&lt; 27)</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/WP_VIOLATION" data-ref="_M/WP_VIOLATION">WP_VIOLATION</dfn>		(1 &lt;&lt; 26)</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/CARD_IS_LOCKED" data-ref="_M/CARD_IS_LOCKED">CARD_IS_LOCKED</dfn>		(1 &lt;&lt; 25)</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/LOCK_UNLOCK_FAILED" data-ref="_M/LOCK_UNLOCK_FAILED">LOCK_UNLOCK_FAILED</dfn>	(1 &lt;&lt; 24)</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/COM_CRC_ERROR" data-ref="_M/COM_CRC_ERROR">COM_CRC_ERROR</dfn>		(1 &lt;&lt; 23)</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/ILLEGAL_COMMAND" data-ref="_M/ILLEGAL_COMMAND">ILLEGAL_COMMAND</dfn>		(1 &lt;&lt; 22)</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/CARD_ECC_FAILED" data-ref="_M/CARD_ECC_FAILED">CARD_ECC_FAILED</dfn>		(1 &lt;&lt; 21)</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/CC_ERROR" data-ref="_M/CC_ERROR">CC_ERROR</dfn>		(1 &lt;&lt; 20)</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/SD_ERROR" data-ref="_M/SD_ERROR">SD_ERROR</dfn>		(1 &lt;&lt; 19)</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/CID_CSD_OVERWRITE" data-ref="_M/CID_CSD_OVERWRITE">CID_CSD_OVERWRITE</dfn>	(1 &lt;&lt; 16)</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/WP_ERASE_SKIP" data-ref="_M/WP_ERASE_SKIP">WP_ERASE_SKIP</dfn>		(1 &lt;&lt; 15)</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/CARD_ECC_DISABLED" data-ref="_M/CARD_ECC_DISABLED">CARD_ECC_DISABLED</dfn>	(1 &lt;&lt; 14)</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/ERASE_RESET" data-ref="_M/ERASE_RESET">ERASE_RESET</dfn>		(1 &lt;&lt; 13)</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/CURRENT_STATE" data-ref="_M/CURRENT_STATE">CURRENT_STATE</dfn>		(7 &lt;&lt; 9)</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/READY_FOR_DATA" data-ref="_M/READY_FOR_DATA">READY_FOR_DATA</dfn>		(1 &lt;&lt; 8)</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/APP_CMD" data-ref="_M/APP_CMD">APP_CMD</dfn>			(1 &lt;&lt; 5)</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/AKE_SEQ_ERROR" data-ref="_M/AKE_SEQ_ERROR">AKE_SEQ_ERROR</dfn>		(1 &lt;&lt; 3)</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/OCR_CCS_BITN" data-ref="_M/OCR_CCS_BITN">OCR_CCS_BITN</dfn>        30</u></td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="59">59</th><td>    <dfn class="enum" id="sd_none" title='sd_none' data-ref="sd_none">sd_none</dfn> = -<var>1</var>,</td></tr>
+<tr><th id="60">60</th><td>    <dfn class="enum" id="sd_bc" title='sd_bc' data-ref="sd_bc">sd_bc</dfn> = <var>0</var>,	<i>/* broadcast -- no response */</i></td></tr>
+<tr><th id="61">61</th><td>    <dfn class="enum" id="sd_bcr" title='sd_bcr' data-ref="sd_bcr">sd_bcr</dfn>,	<i>/* broadcast with response */</i></td></tr>
+<tr><th id="62">62</th><td>    <dfn class="enum" id="sd_ac" title='sd_ac' data-ref="sd_ac">sd_ac</dfn>,	<i>/* addressed -- no data transfer */</i></td></tr>
+<tr><th id="63">63</th><td>    <dfn class="enum" id="sd_adtc" title='sd_adtc' data-ref="sd_adtc">sd_adtc</dfn>,	<i>/* addressed with data transfer */</i></td></tr>
+<tr><th id="64">64</th><td>} <dfn class="typedef" id="sd_cmd_type_t" title='sd_cmd_type_t' data-type='enum sd_cmd_type_t' data-ref="sd_cmd_type_t">sd_cmd_type_t</dfn>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="(anonymous)::cmd" title='(anonymous struct)::cmd' data-ref="(anonymous)::cmd">cmd</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="(anonymous)::arg" title='(anonymous struct)::arg' data-ref="(anonymous)::arg">arg</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="(anonymous)::crc" title='(anonymous struct)::crc' data-ref="(anonymous)::crc">crc</dfn>;</td></tr>
+<tr><th id="70">70</th><td>} <dfn class="typedef" id="SDRequest" title='SDRequest' data-type='struct SDRequest' data-ref="SDRequest">SDRequest</dfn>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="SDState" title='SDState' data-ref="SDState"><a class="type" href="#SDState" title='SDState' data-ref="SDState">SDState</a></dfn> <dfn class="typedef" id="SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</dfn>;</td></tr>
+<tr><th id="73">73</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#SDBus" title='SDBus' data-ref="SDBus">SDBus</a> <dfn class="typedef" id="SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</dfn>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/TYPE_SD_CARD" data-ref="_M/TYPE_SD_CARD">TYPE_SD_CARD</dfn> "sd-card"</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/SD_CARD" data-ref="_M/SD_CARD">SD_CARD</dfn>(obj) OBJECT_CHECK(SDState, (obj), TYPE_SD_CARD)</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/SD_CARD_CLASS" data-ref="_M/SD_CARD_CLASS">SD_CARD_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="78">78</th><td><u>    OBJECT_CLASS_CHECK(SDCardClass, (klass), TYPE_SD_CARD)</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/SD_CARD_GET_CLASS" data-ref="_M/SD_CARD_GET_CLASS">SD_CARD_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="80">80</th><td><u>    OBJECT_GET_CLASS(SDCardClass, (obj), TYPE_SD_CARD)</u></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="83">83</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="84">84</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="(anonymous)::parent_class" title='(anonymous struct)::parent_class' data-ref="(anonymous)::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="85">85</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <em>int</em> (*<dfn class="decl" id="(anonymous)::do_command" title='(anonymous struct)::do_command' data-ref="(anonymous)::do_command">do_command</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col1 decl" id="1sd" title='sd' data-type='SDState *' data-ref="1sd">sd</dfn>, <a class="typedef" href="#SDRequest" title='SDRequest' data-type='struct SDRequest' data-ref="SDRequest">SDRequest</a> *<dfn class="local col2 decl" id="2req" title='req' data-type='SDRequest *' data-ref="2req">req</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="3response" title='response' data-type='uint8_t *' data-ref="3response">response</dfn>);</td></tr>
+<tr><th id="88">88</th><td>    <em>void</em> (*<dfn class="decl" id="(anonymous)::write_data" title='(anonymous struct)::write_data' data-ref="(anonymous)::write_data">write_data</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col4 decl" id="4sd" title='sd' data-type='SDState *' data-ref="4sd">sd</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col5 decl" id="5value" title='value' data-type='uint8_t' data-ref="5value">value</dfn>);</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> (*<dfn class="decl" id="(anonymous)::read_data" title='(anonymous struct)::read_data' data-ref="(anonymous)::read_data">read_data</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col6 decl" id="6sd" title='sd' data-type='SDState *' data-ref="6sd">sd</dfn>);</td></tr>
+<tr><th id="90">90</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="(anonymous)::data_ready" title='(anonymous struct)::data_ready' data-ref="(anonymous)::data_ready">data_ready</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col7 decl" id="7sd" title='sd' data-type='SDState *' data-ref="7sd">sd</dfn>);</td></tr>
+<tr><th id="91">91</th><td>    <em>void</em> (*<dfn class="decl" id="(anonymous)::enable" title='(anonymous struct)::enable' data-ref="(anonymous)::enable">enable</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col8 decl" id="8sd" title='sd' data-type='SDState *' data-ref="8sd">sd</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="9enable" title='enable' data-type='_Bool' data-ref="9enable">enable</dfn>);</td></tr>
+<tr><th id="92">92</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="(anonymous)::get_inserted" title='(anonymous struct)::get_inserted' data-ref="(anonymous)::get_inserted">get_inserted</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col0 decl" id="10sd" title='sd' data-type='SDState *' data-ref="10sd">sd</dfn>);</td></tr>
+<tr><th id="93">93</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="(anonymous)::get_readonly" title='(anonymous struct)::get_readonly' data-ref="(anonymous)::get_readonly">get_readonly</dfn>)(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col1 decl" id="11sd" title='sd' data-type='SDState *' data-ref="11sd">sd</dfn>);</td></tr>
+<tr><th id="94">94</th><td>} <dfn class="typedef" id="SDCardClass" title='SDCardClass' data-type='struct SDCardClass' data-ref="SDCardClass">SDCardClass</dfn>;</td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/TYPE_SD_BUS" data-ref="_M/TYPE_SD_BUS">TYPE_SD_BUS</dfn> "sd-bus"</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/SD_BUS" data-ref="_M/SD_BUS">SD_BUS</dfn>(obj) OBJECT_CHECK(SDBus, (obj), TYPE_SD_BUS)</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/SD_BUS_CLASS" data-ref="_M/SD_BUS_CLASS">SD_BUS_CLASS</dfn>(klass) OBJECT_CLASS_CHECK(SDBusClass, (klass), TYPE_SD_BUS)</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/SD_BUS_GET_CLASS" data-ref="_M/SD_BUS_GET_CLASS">SD_BUS_GET_CLASS</dfn>(obj) OBJECT_GET_CLASS(SDBusClass, (obj), TYPE_SD_BUS)</u></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><b>struct</b> <dfn class="type def" id="SDBus" title='SDBus' data-ref="SDBus">SDBus</dfn> {</td></tr>
+<tr><th id="102">102</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#BusState" title='BusState' data-type='struct BusState' data-ref="BusState">BusState</a> <dfn class="decl" id="SDBus::qbus" title='SDBus::qbus' data-ref="SDBus::qbus">qbus</dfn>;</td></tr>
+<tr><th id="103">103</th><td>};</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="106">106</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#BusClass" title='BusClass' data-type='struct BusClass' data-ref="BusClass">BusClass</a> <dfn class="decl" id="(anonymous)::parent_class" title='(anonymous struct)::parent_class' data-ref="(anonymous)::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="108">108</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <i>/* These methods are called by the SD device to notify the controller</i></td></tr>
+<tr><th id="111">111</th><td><i>     * when the card insertion or readonly status changes</i></td></tr>
+<tr><th id="112">112</th><td><i>     */</i></td></tr>
+<tr><th id="113">113</th><td>    <em>void</em> (*<dfn class="decl" id="(anonymous)::set_inserted" title='(anonymous struct)::set_inserted' data-ref="(anonymous)::set_inserted">set_inserted</dfn>)(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col2 decl" id="12dev" title='dev' data-type='DeviceState *' data-ref="12dev">dev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="13inserted" title='inserted' data-type='_Bool' data-ref="13inserted">inserted</dfn>);</td></tr>
+<tr><th id="114">114</th><td>    <em>void</em> (*<dfn class="decl" id="(anonymous)::set_readonly" title='(anonymous struct)::set_readonly' data-ref="(anonymous)::set_readonly">set_readonly</dfn>)(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col4 decl" id="14dev" title='dev' data-type='DeviceState *' data-ref="14dev">dev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="15readonly" title='readonly' data-type='_Bool' data-ref="15readonly">readonly</dfn>);</td></tr>
+<tr><th id="115">115</th><td>} <dfn class="typedef" id="SDBusClass" title='SDBusClass' data-type='struct SDBusClass' data-ref="SDBusClass">SDBusClass</dfn>;</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td><i>/* Legacy functions to be used only by non-qdevified callers */</i></td></tr>
+<tr><th id="118">118</th><td><a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="decl" id="sd_init" title='sd_init' data-ref="sd_init">sd_init</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col6 decl" id="16bs" title='bs' data-type='BlockBackend *' data-ref="16bs">bs</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="17is_spi" title='is_spi' data-type='_Bool' data-ref="17is_spi">is_spi</dfn>);</td></tr>
+<tr><th id="119">119</th><td><em>int</em> <dfn class="decl" id="sd_do_command" title='sd_do_command' data-ref="sd_do_command">sd_do_command</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col8 decl" id="18sd" title='sd' data-type='SDState *' data-ref="18sd">sd</dfn>, <a class="typedef" href="#SDRequest" title='SDRequest' data-type='struct SDRequest' data-ref="SDRequest">SDRequest</a> *<dfn class="local col9 decl" id="19req" title='req' data-type='SDRequest *' data-ref="19req">req</dfn>,</td></tr>
+<tr><th id="120">120</th><td>                  <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col0 decl" id="20response" title='response' data-type='uint8_t *' data-ref="20response">response</dfn>);</td></tr>
+<tr><th id="121">121</th><td><em>void</em> <dfn class="decl" id="sd_write_data" title='sd_write_data' data-ref="sd_write_data">sd_write_data</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col1 decl" id="21sd" title='sd' data-type='SDState *' data-ref="21sd">sd</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col2 decl" id="22value" title='value' data-type='uint8_t' data-ref="22value">value</dfn>);</td></tr>
+<tr><th id="122">122</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="sd_read_data" title='sd_read_data' data-ref="sd_read_data">sd_read_data</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col3 decl" id="23sd" title='sd' data-type='SDState *' data-ref="23sd">sd</dfn>);</td></tr>
+<tr><th id="123">123</th><td><em>void</em> <dfn class="decl" id="sd_set_cb" title='sd_set_cb' data-ref="sd_set_cb">sd_set_cb</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col4 decl" id="24sd" title='sd' data-type='SDState *' data-ref="24sd">sd</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col5 decl" id="25readonly" title='readonly' data-type='qemu_irq' data-ref="25readonly">readonly</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col6 decl" id="26insert" title='insert' data-type='qemu_irq' data-ref="26insert">insert</dfn>);</td></tr>
+<tr><th id="124">124</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="sd_data_ready" title='sd_data_ready' data-ref="sd_data_ready">sd_data_ready</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col7 decl" id="27sd" title='sd' data-type='SDState *' data-ref="27sd">sd</dfn>);</td></tr>
+<tr><th id="125">125</th><td><i>/* sd_enable should not be used -- it is only used on the nseries boards,</i></td></tr>
+<tr><th id="126">126</th><td><i> * where it is part of a broken implementation of the MMC card slot switch</i></td></tr>
+<tr><th id="127">127</th><td><i> * (there should be two card slots which are multiplexed to a single MMC</i></td></tr>
+<tr><th id="128">128</th><td><i> * controller, but instead we model it with one card and controller and</i></td></tr>
+<tr><th id="129">129</th><td><i> * disable the card when the second slot is selected, so it looks like the</i></td></tr>
+<tr><th id="130">130</th><td><i> * second slot is always empty).</i></td></tr>
+<tr><th id="131">131</th><td><i> */</i></td></tr>
+<tr><th id="132">132</th><td><em>void</em> <dfn class="decl" id="sd_enable" title='sd_enable' data-ref="sd_enable">sd_enable</dfn>(<a class="typedef" href="#SDState" title='SDState' data-type='struct SDState' data-ref="SDState">SDState</a> *<dfn class="local col8 decl" id="28sd" title='sd' data-type='SDState *' data-ref="28sd">sd</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="29enable" title='enable' data-type='_Bool' data-ref="29enable">enable</dfn>);</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><i>/* Functions to be used by qdevified callers (working via</i></td></tr>
+<tr><th id="135">135</th><td><i> * an SDBus rather than directly with SDState)</i></td></tr>
+<tr><th id="136">136</th><td><i> */</i></td></tr>
+<tr><th id="137">137</th><td><em>int</em> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_do_command" title='sdbus_do_command' data-ref="sdbus_do_command" id="sdbus_do_command">sdbus_do_command</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col0 decl" id="30sd" title='sd' data-type='SDBus *' data-ref="30sd">sd</dfn>, <a class="typedef" href="#SDRequest" title='SDRequest' data-type='struct SDRequest' data-ref="SDRequest">SDRequest</a> *<dfn class="local col1 decl" id="31req" title='req' data-type='SDRequest *' data-ref="31req">req</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="32response" title='response' data-type='uint8_t *' data-ref="32response">response</dfn>);</td></tr>
+<tr><th id="138">138</th><td><em>void</em> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_write_data" title='sdbus_write_data' data-ref="sdbus_write_data" id="sdbus_write_data">sdbus_write_data</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col3 decl" id="33sd" title='sd' data-type='SDBus *' data-ref="33sd">sd</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="34value" title='value' data-type='uint8_t' data-ref="34value">value</dfn>);</td></tr>
+<tr><th id="139">139</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_read_data" title='sdbus_read_data' data-ref="sdbus_read_data" id="sdbus_read_data">sdbus_read_data</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col5 decl" id="35sd" title='sd' data-type='SDBus *' data-ref="35sd">sd</dfn>);</td></tr>
+<tr><th id="140">140</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_data_ready" title='sdbus_data_ready' data-ref="sdbus_data_ready" id="sdbus_data_ready">sdbus_data_ready</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col6 decl" id="36sd" title='sd' data-type='SDBus *' data-ref="36sd">sd</dfn>);</td></tr>
+<tr><th id="141">141</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_get_inserted" title='sdbus_get_inserted' data-ref="sdbus_get_inserted" id="sdbus_get_inserted">sdbus_get_inserted</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col7 decl" id="37sd" title='sd' data-type='SDBus *' data-ref="37sd">sd</dfn>);</td></tr>
+<tr><th id="142">142</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_get_readonly" title='sdbus_get_readonly' data-ref="sdbus_get_readonly" id="sdbus_get_readonly">sdbus_get_readonly</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col8 decl" id="38sd" title='sd' data-type='SDBus *' data-ref="38sd">sd</dfn>);</td></tr>
+<tr><th id="143">143</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> * sdbus_reparent_card: Reparent an SD card from one controller to another</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> *<span class="command"> @from</span>: controller bus to remove card from</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> *<span class="command"> @to</span>: controller bus to move card to</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> * Reparent an SD card, effectively unplugging it from one controller</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * and inserting it into another. This is useful for SoCs like the</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> * bcm2835 which have two SD controllers and connect a single SD card</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> * to them, selected by the guest reprogramming GPIO line routing.</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="153">153</th><td><em>void</em> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_reparent_card" title='sdbus_reparent_card' data-ref="sdbus_reparent_card" id="sdbus_reparent_card">sdbus_reparent_card</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col9 decl" id="39from" title='from' data-type='SDBus *' data-ref="39from">from</dfn>, <a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col0 decl" id="40to" title='to' data-type='SDBus *' data-ref="40to">to</dfn>);</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><i>/* Functions to be used by SD devices to report back to qdevified controllers */</i></td></tr>
+<tr><th id="156">156</th><td><em>void</em> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_set_inserted" title='sdbus_set_inserted' data-ref="sdbus_set_inserted" id="sdbus_set_inserted">sdbus_set_inserted</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col1 decl" id="41sd" title='sd' data-type='SDBus *' data-ref="41sd">sd</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="42inserted" title='inserted' data-type='_Bool' data-ref="42inserted">inserted</dfn>);</td></tr>
+<tr><th id="157">157</th><td><em>void</em> <a class="decl" href="../../../hw/sd/core.c.html#sdbus_set_readonly" title='sdbus_set_readonly' data-ref="sdbus_set_readonly" id="sdbus_set_readonly">sdbus_set_readonly</a>(<a class="typedef" href="#SDBus" title='SDBus' data-type='struct SDBus' data-ref="SDBus">SDBus</a> *<dfn class="local col3 decl" id="43sd" title='sd' data-type='SDBus *' data-ref="43sd">sd</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="44inserted" title='inserted' data-type='_Bool' data-ref="44inserted">inserted</dfn>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="30">endif</span> /* HW_SD_H */</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/sd/core.c.html'>codebrowser/hw/sd/core.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

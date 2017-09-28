@@ -1,0 +1,102 @@
+<def f='codebrowser/include/qom/cpu.h' l='311' ll='410'/>
+<size>33424</size>
+<doc f='codebrowser/include/qom/cpu.h' l='264'>/**
+ * CPUState:
+ * @cpu_index: CPU index (informative).
+ * @nr_cores: Number of cores within this CPU package.
+ * @nr_threads: Number of threads within this CPU.
+ * @running: #true if CPU is currently running (lockless).
+ * @has_waiter: #true if a CPU is currently waiting for the cpu_exec_end;
+ * valid under cpu_list_lock.
+ * @created: Indicates whether the CPU thread has been successfully created.
+ * @interrupt_request: Indicates a pending interrupt request.
+ * @halted: Nonzero if the CPU is in suspended state.
+ * @stop: Indicates a pending stop request.
+ * @stopped: Indicates the CPU has been artificially stopped.
+ * @unplug: Indicates a pending CPU unplug request.
+ * @crash_occurred: Indicates the OS reported a crash (panic) for this CPU
+ * @singlestep_enabled: Flags for single-stepping.
+ * @icount_extra: Instructions until next timer event.
+ * @icount_decr: Low 16 bits: number of cycles left, only used in icount mode.
+ * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this
+ * CPU and return to its top level loop (even in non-icount mode).
+ * This allows a single read-compare-cbranch-write sequence to test
+ * for both decrementer underflow and exceptions.
+ * @can_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution
+ * requires that IO only be performed on the last instruction of a TB
+ * so that interrupts take effect immediately.
+ * @cpu_ases: Pointer to array of CPUAddressSpaces (which define the
+ *            AddressSpaces this CPU has)
+ * @num_ases: number of CPUAddressSpaces in @cpu_ases
+ * @as: Pointer to the first AddressSpace, for the convenience of targets which
+ *      only have a single AddressSpace
+ * @env_ptr: Pointer to subclass-specific CPUArchState field.
+ * @gdb_regs: Additional GDB registers.
+ * @gdb_num_regs: Number of total registers accessible to GDB.
+ * @gdb_num_g_regs: Number of registers in GDB &apos;g&apos; packets.
+ * @next_cpu: Next CPU sharing TB cache.
+ * @opaque: User data.
+ * @mem_io_pc: Host Program Counter at which the memory was accessed.
+ * @mem_io_vaddr: Target virtual address at which the memory was accessed.
+ * @kvm_fd: vCPU file descriptor for KVM.
+ * @work_mutex: Lock to prevent multiple access to queued_work_*.
+ * @queued_work_first: First asynchronous work pending.
+ * @trace_dstate_delayed: Delayed changes to trace_dstate (includes all changes
+ *                        to @trace_dstate).
+ * @trace_dstate: Dynamic tracing state of events for this vCPU (bitmask).
+ *
+ * State of one CPU core or thread.
+ */</doc>
+<mbr r='CPUState::parent_obj' o='0' t='DeviceState'/>
+<mbr r='CPUState::nr_cores' o='896' t='int'/>
+<mbr r='CPUState::nr_threads' o='928' t='int'/>
+<mbr r='CPUState::thread' o='960' t='struct QemuThread *'/>
+<mbr r='CPUState::thread_id' o='1024' t='int'/>
+<mbr r='CPUState::running' o='1056' t='_Bool'/>
+<mbr r='CPUState::has_waiter' o='1064' t='_Bool'/>
+<mbr r='CPUState::halt_cond' o='1088' t='struct QemuCond *'/>
+<mbr r='CPUState::thread_kicked' o='1152' t='_Bool'/>
+<mbr r='CPUState::created' o='1160' t='_Bool'/>
+<mbr r='CPUState::stop' o='1168' t='_Bool'/>
+<mbr r='CPUState::stopped' o='1176' t='_Bool'/>
+<mbr r='CPUState::unplug' o='1184' t='_Bool'/>
+<mbr r='CPUState::crash_occurred' o='1192' t='_Bool'/>
+<mbr r='CPUState::exit_request' o='1200' t='_Bool'/>
+<mbr r='CPUState::interrupt_request' o='1216' t='uint32_t'/>
+<mbr r='CPUState::singlestep_enabled' o='1248' t='int'/>
+<mbr r='CPUState::icount_budget' o='1280' t='int64_t'/>
+<mbr r='CPUState::icount_extra' o='1344' t='int64_t'/>
+<mbr r='CPUState::jmp_env' o='1408' t='sigjmp_buf'/>
+<mbr r='CPUState::work_mutex' o='3008' t='QemuMutex'/>
+<mbr r='CPUState::queued_work_first' o='3392' t='struct qemu_work_item *'/>
+<mbr r='CPUState::queued_work_last' o='3456' t='struct qemu_work_item *'/>
+<mbr r='CPUState::cpu_ases' o='3520' t='CPUAddressSpace *'/>
+<mbr r='CPUState::num_ases' o='3584' t='int'/>
+<mbr r='CPUState::as' o='3648' t='AddressSpace *'/>
+<mbr r='CPUState::memory' o='3712' t='MemoryRegion *'/>
+<mbr r='CPUState::env_ptr' o='3776' t='void *'/>
+<mbr r='CPUState::tb_jmp_cache' o='3840' t='struct TranslationBlock *[4096]'/>
+<mbr r='CPUState::gdb_regs' o='265984' t='struct GDBRegisterState *'/>
+<mbr r='CPUState::gdb_num_regs' o='266048' t='int'/>
+<mbr r='CPUState::gdb_num_g_regs' o='266080' t='int'/>
+<mbr r='CPUState::node' o='266112' t='struct (anonymous struct at /home/jon/workspace/qemu/include/qom/cpu.h:356:5)'/>
+<mbr r='CPUState::breakpoints' o='266240' t='struct breakpoints_head'/>
+<mbr r='CPUState::watchpoints' o='266368' t='struct watchpoints_head'/>
+<mbr r='CPUState::watchpoint_hit' o='266496' t='CPUWatchpoint *'/>
+<mbr r='CPUState::opaque' o='266560' t='void *'/>
+<mbr r='CPUState::mem_io_pc' o='266624' t='uintptr_t'/>
+<mbr r='CPUState::mem_io_vaddr' o='266688' t='vaddr'/>
+<mbr r='CPUState::kvm_fd' o='266752' t='int'/>
+<mbr r='CPUState::kvm_state' o='266816' t='struct KVMState *'/>
+<mbr r='CPUState::kvm_run' o='266880' t='struct kvm_run *'/>
+<mbr r='CPUState::trace_dstate_delayed' o='266944' t='unsigned long [1]'/>
+<mbr r='CPUState::trace_dstate' o='267008' t='unsigned long [1]'/>
+<mbr r='CPUState::cpu_index' o='267072' t='int'/>
+<mbr r='CPUState::halted' o='267104' t='uint32_t'/>
+<mbr r='CPUState::can_do_io' o='267136' t='uint32_t'/>
+<mbr r='CPUState::exception_index' o='267168' t='int32_t'/>
+<mbr r='CPUState::vcpu_dirty' o='267200' t='_Bool'/>
+<mbr r='CPUState::throttle_thread_scheduled' o='267208' t='_Bool'/>
+<mbr r='CPUState::icount_decr' o='267232' t='union (anonymous union at /home/jon/workspace/qemu/include/qom/cpu.h:398:5)'/>
+<mbr r='CPUState::hax_vcpu' o='267264' t='struct hax_vcpu_state *'/>
+<mbr r='CPUState::pending_tlb_flush' o='267328' t='uint16_t'/>

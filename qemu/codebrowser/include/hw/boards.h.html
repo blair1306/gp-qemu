@@ -1,0 +1,279 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>boards.h source code [codebrowser/include/hw/boards.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="MachineClass,MachineState "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/boards.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>hw</a>/<a href='boards.h.html'>boards.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/* Declarations for use by board files for creating devices.  */</i></td></tr>
+<tr><th id="2">2</th><td></td></tr>
+<tr><th id="3">3</th><td><u>#<span data-ppcond="3">ifndef</span> <span class="macro" data-ref="_M/HW_BOARDS_H">HW_BOARDS_H</span></u></td></tr>
+<tr><th id="4">4</th><td><u>#define <dfn class="macro" id="_M/HW_BOARDS_H" data-ref="_M/HW_BOARDS_H">HW_BOARDS_H</dfn></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="../sysemu/blockdev.h.html">"sysemu/blockdev.h"</a></u></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="../sysemu/accel.h.html">"sysemu/accel.h"</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="qdev.h.html">"hw/qdev.h"</a></u></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../qom/object.h.html">"qom/object.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../qom/cpu.h.html">"qom/cpu.h"</a></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="13">13</th><td><i class="doc"> * memory_region_allocate_system_memory - Allocate a board's main memory</i></td></tr>
+<tr><th id="14">14</th><td><i class="doc"> *<span class="command"> @mr</span>: the #MemoryRegion to be initialized</i></td></tr>
+<tr><th id="15">15</th><td><i class="doc"> *<span class="command"> @owner</span>: the object that tracks the region's reference count</i></td></tr>
+<tr><th id="16">16</th><td><i class="doc"> * <span class="command">@name</span>:<span class="verb"> name of the memory region</span></i></td></tr>
+<tr><th id="17">17</th><td><i class="doc"> *<span class="command"> @ram</span>_size: size of the region in bytes</i></td></tr>
+<tr><th id="18">18</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="19">19</th><td><i class="doc"> * This function allocates the main memory for a board model, and</i></td></tr>
+<tr><th id="20">20</th><td><i class="doc"> * initializes<span class="command"> @mr</span> appropriately. It also arranges for the memory</i></td></tr>
+<tr><th id="21">21</th><td><i class="doc"> * to be migrated (by calling vmstate_register_ram_global()).</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> * Memory allocated via this function will be backed with the memory</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * backend the user provided using "-mem-path" or "-numa node,memdev=..."</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * if appropriate; this is typically used to cause host huge pages to be</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * used. This function should therefore be called by a board exactly once,</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> * for the primary or largest RAM area it implements.</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> * For boards where the major RAM is split into two parts in the memory</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * map, you can deal with this by calling memory_region_allocate_system_memory()</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> * once to get a MemoryRegion with enough RAM for both parts, and then</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> * creating alias MemoryRegions via memory_region_init_alias() which</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * alias into different parts of the RAM MemoryRegion and can be mapped</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * into the memory map in the appropriate places.</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * Smaller pieces of memory (display RAM, static RAMs, etc) don't need</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * to be backed via the -mem-path memory backend and can simply</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> * be created via memory_region_allocate_aux_memory() or</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * memory_region_init_ram().</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="41">41</th><td><em>void</em> <dfn class="decl" id="memory_region_allocate_system_memory" title='memory_region_allocate_system_memory' data-ref="memory_region_allocate_system_memory">memory_region_allocate_system_memory</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col9 decl" id="9179mr" title='mr' data-type='MemoryRegion *' data-ref="9179mr">mr</dfn>, <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col0 decl" id="9180owner" title='owner' data-type='Object *' data-ref="9180owner">owner</dfn>,</td></tr>
+<tr><th id="42">42</th><td>                                          <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="9181name" title='name' data-type='const char *' data-ref="9181name">name</dfn>,</td></tr>
+<tr><th id="43">43</th><td>                                          <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="9182ram_size" title='ram_size' data-type='uint64_t' data-ref="9182ram_size">ram_size</dfn>);</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/TYPE_MACHINE_SUFFIX" data-ref="_M/TYPE_MACHINE_SUFFIX">TYPE_MACHINE_SUFFIX</dfn> "-machine"</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i>/* Machine class name that needs to be used for class-name-based machine</i></td></tr>
+<tr><th id="48">48</th><td><i> * type lookup to work.</i></td></tr>
+<tr><th id="49">49</th><td><i> */</i></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/MACHINE_TYPE_NAME" data-ref="_M/MACHINE_TYPE_NAME">MACHINE_TYPE_NAME</dfn>(machinename) (machinename TYPE_MACHINE_SUFFIX)</u></td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/TYPE_MACHINE" data-ref="_M/TYPE_MACHINE">TYPE_MACHINE</dfn> "machine"</u></td></tr>
+<tr><th id="53">53</th><td><u>#undef <span class="macro" data-ref="_M/MACHINE">MACHINE</span>  /* BSD defines it and QEMU does not use it */</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/MACHINE" data-ref="_M/MACHINE">MACHINE</dfn>(obj) \</u></td></tr>
+<tr><th id="55">55</th><td><u>    OBJECT_CHECK(MachineState, (obj), TYPE_MACHINE)</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/MACHINE_GET_CLASS" data-ref="_M/MACHINE_GET_CLASS">MACHINE_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="57">57</th><td><u>    OBJECT_GET_CLASS(MachineClass, (obj), TYPE_MACHINE)</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/MACHINE_CLASS" data-ref="_M/MACHINE_CLASS">MACHINE_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="59">59</th><td><u>    OBJECT_CLASS_CHECK(MachineClass, (klass), TYPE_MACHINE)</u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><a class="typedef" href="../qemu/typedefs.h.html#MachineClass" title='MachineClass' data-type='struct MachineClass' data-ref="MachineClass">MachineClass</a> *<dfn class="decl" id="find_default_machine" title='find_default_machine' data-ref="find_default_machine">find_default_machine</dfn>(<em>void</em>);</td></tr>
+<tr><th id="62">62</th><td><b>extern</b> <a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="decl" id="current_machine" title='current_machine' data-ref="current_machine">current_machine</dfn>;</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><em>void</em> <dfn class="decl" id="machine_run_board_init" title='machine_run_board_init' data-ref="machine_run_board_init">machine_run_board_init</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col3 decl" id="9183machine" title='machine' data-type='MachineState *' data-ref="9183machine">machine</dfn>);</td></tr>
+<tr><th id="65">65</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_usb" title='machine_usb' data-ref="machine_usb">machine_usb</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col4 decl" id="9184machine" title='machine' data-type='MachineState *' data-ref="9184machine">machine</dfn>);</td></tr>
+<tr><th id="66">66</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_kernel_irqchip_allowed" title='machine_kernel_irqchip_allowed' data-ref="machine_kernel_irqchip_allowed">machine_kernel_irqchip_allowed</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col5 decl" id="9185machine" title='machine' data-type='MachineState *' data-ref="9185machine">machine</dfn>);</td></tr>
+<tr><th id="67">67</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_kernel_irqchip_required" title='machine_kernel_irqchip_required' data-ref="machine_kernel_irqchip_required">machine_kernel_irqchip_required</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col6 decl" id="9186machine" title='machine' data-type='MachineState *' data-ref="9186machine">machine</dfn>);</td></tr>
+<tr><th id="68">68</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_kernel_irqchip_split" title='machine_kernel_irqchip_split' data-ref="machine_kernel_irqchip_split">machine_kernel_irqchip_split</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col7 decl" id="9187machine" title='machine' data-type='MachineState *' data-ref="9187machine">machine</dfn>);</td></tr>
+<tr><th id="69">69</th><td><em>int</em> <dfn class="decl" id="machine_kvm_shadow_mem" title='machine_kvm_shadow_mem' data-ref="machine_kvm_shadow_mem">machine_kvm_shadow_mem</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col8 decl" id="9188machine" title='machine' data-type='MachineState *' data-ref="9188machine">machine</dfn>);</td></tr>
+<tr><th id="70">70</th><td><em>int</em> <dfn class="decl" id="machine_phandle_start" title='machine_phandle_start' data-ref="machine_phandle_start">machine_phandle_start</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col9 decl" id="9189machine" title='machine' data-type='MachineState *' data-ref="9189machine">machine</dfn>);</td></tr>
+<tr><th id="71">71</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_dump_guest_core" title='machine_dump_guest_core' data-ref="machine_dump_guest_core">machine_dump_guest_core</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col0 decl" id="9190machine" title='machine' data-type='MachineState *' data-ref="9190machine">machine</dfn>);</td></tr>
+<tr><th id="72">72</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="machine_mem_merge" title='machine_mem_merge' data-ref="machine_mem_merge">machine_mem_merge</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col1 decl" id="9191machine" title='machine' data-type='MachineState *' data-ref="9191machine">machine</dfn>);</td></tr>
+<tr><th id="73">73</th><td><em>void</em> <dfn class="decl" id="machine_register_compat_props" title='machine_register_compat_props' data-ref="machine_register_compat_props">machine_register_compat_props</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col2 decl" id="9192machine" title='machine' data-type='MachineState *' data-ref="9192machine">machine</dfn>);</td></tr>
+<tr><th id="74">74</th><td><a class="typedef" href="../../qapi-types.h.html#HotpluggableCPUList" title='HotpluggableCPUList' data-type='struct HotpluggableCPUList' data-ref="HotpluggableCPUList">HotpluggableCPUList</a> *<dfn class="decl" id="machine_query_hotpluggable_cpus" title='machine_query_hotpluggable_cpus' data-ref="machine_query_hotpluggable_cpus">machine_query_hotpluggable_cpus</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col3 decl" id="9193machine" title='machine' data-type='MachineState *' data-ref="9193machine">machine</dfn>);</td></tr>
+<tr><th id="75">75</th><td><em>void</em> <dfn class="decl" id="machine_set_cpu_numa_node" title='machine_set_cpu_numa_node' data-ref="machine_set_cpu_numa_node">machine_set_cpu_numa_node</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col4 decl" id="9194machine" title='machine' data-type='MachineState *' data-ref="9194machine">machine</dfn>,</td></tr>
+<tr><th id="76">76</th><td>                               <em>const</em> <a class="typedef" href="../../qapi-types.h.html#CpuInstanceProperties" title='CpuInstanceProperties' data-type='struct CpuInstanceProperties' data-ref="CpuInstanceProperties">CpuInstanceProperties</a> *<dfn class="local col5 decl" id="9195props" title='props' data-type='const CpuInstanceProperties *' data-ref="9195props">props</dfn>,</td></tr>
+<tr><th id="77">77</th><td>                               <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="9196errp" title='errp' data-type='Error **' data-ref="9196errp">errp</dfn>);</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * CPUArchId:</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> *<span class="command"> @arch</span>_id - architecture-dependent CPU ID of present or possible CPU</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *<span class="command"> @cpu</span> - pointer to corresponding CPU object if it's present on NULL otherwise</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> *<span class="command"> @props</span> - CPU object properties, initialized by board</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> * #vcpus_count - number of threads provided by<span class="command"> @cpu</span> object</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="86">86</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="87">87</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="(anonymous)::arch_id" title='(anonymous struct)::arch_id' data-ref="(anonymous)::arch_id">arch_id</dfn>;</td></tr>
+<tr><th id="88">88</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="(anonymous)::vcpus_count" title='(anonymous struct)::vcpus_count' data-ref="(anonymous)::vcpus_count">vcpus_count</dfn>;</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="../../qapi-types.h.html#CpuInstanceProperties" title='CpuInstanceProperties' data-type='struct CpuInstanceProperties' data-ref="CpuInstanceProperties">CpuInstanceProperties</a> <dfn class="decl" id="(anonymous)::props" title='(anonymous struct)::props' data-ref="(anonymous)::props">props</dfn>;</td></tr>
+<tr><th id="90">90</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="decl" id="(anonymous)::cpu" title='(anonymous struct)::cpu' data-ref="(anonymous)::cpu">cpu</dfn>;</td></tr>
+<tr><th id="91">91</th><td>} <dfn class="typedef" id="CPUArchId" title='CPUArchId' data-type='struct CPUArchId' data-ref="CPUArchId">CPUArchId</dfn>;</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> * CPUArchIdList:</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *<span class="command"> @len</span> - number of<span class="command"> @CPUArchId</span> items in<span class="command"> @cpus</span> array</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @cpus</span> - array of present or possible CPUs for current machine configuration</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="98">98</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="99">99</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::len" title='(anonymous struct)::len' data-ref="(anonymous)::len">len</dfn>;</td></tr>
+<tr><th id="100">100</th><td>    <a class="typedef" href="#CPUArchId" title='CPUArchId' data-type='struct CPUArchId' data-ref="CPUArchId">CPUArchId</a> <dfn class="decl" id="(anonymous)::cpus" title='(anonymous struct)::cpus' data-ref="(anonymous)::cpus">cpus</dfn>[<var>0</var>];</td></tr>
+<tr><th id="101">101</th><td>} <dfn class="typedef" id="CPUArchIdList" title='CPUArchIdList' data-type='struct CPUArchIdList' data-ref="CPUArchIdList">CPUArchIdList</dfn>;</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * MachineClass:</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *<span class="command"> @get</span>_hotplug_handler: this function is called during bus-less</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *    device hotplug. If defined it returns pointer to an instance</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *    of HotplugHandler object, which handles hotplug operation</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *    for a given <span class="command">@dev</span>.<span class="verb"> It may return NULL if @dev doesn't require</span></i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> *    any actions to be performed by hotplug handler.</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> *<span class="command"> @cpu</span>_index_to_instance_props:</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> *    used to provide<span class="command"> @cpu</span>_index to socket/core/thread number mapping, allowing</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> *    legacy code to perform maping from cpu_index to topology properties</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> *    Returns: tuple of socket/core/thread ids given cpu_index belongs to.</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> *    used to provide<span class="command"> @cpu</span>_index to socket number mapping, allowing</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> *    a machine to group CPU threads belonging to the same socket/package</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> *    Returns: socket number given cpu_index belongs to.</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> *<span class="command"> @hw</span>_version:</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> *    Value of QEMU_VERSION when the machine was added to QEMU.</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> *    Set only by old machines because they need to keep</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *    compatibility on code that exposed QEMU_VERSION to guests in</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *    the past (and now use qemu_hw_version()).</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> *<span class="command"> @possible</span>_cpu_arch_ids:</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *    Returns an array of<span class="command"> @CPUArchId</span> architecture-dependent CPU IDs</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *    which includes CPU IDs for present and possible to hotplug CPUs.</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> *    Caller is responsible for freeing returned list.</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> *<span class="command"> @has</span>_hotpluggable_cpus:</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> *    If true, board supports CPUs creation with -device/device_add.</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> *<span class="command"> @minimum</span>_page_bits:</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> *    If non-zero, the board promises never to create a CPU with a page size</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *    smaller than this, so QEMU can use a more efficient larger page</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> *    size than the target architecture's minimum. (Attempting to create</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> *    such a CPU will fail.) Note that changing this is a migration</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *    compatibility break for the machine.</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="135">135</th><td><b>struct</b> <dfn class="type def" id="MachineClass" title='MachineClass' data-ref="MachineClass">MachineClass</dfn> {</td></tr>
+<tr><th id="136">136</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="137">137</th><td>    <a class="typedef" href="../qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> <dfn class="decl" id="MachineClass::parent_class" title='MachineClass::parent_class' data-ref="MachineClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="138">138</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::family" title='MachineClass::family' data-ref="MachineClass::family">family</dfn>; <i>/* NULL iff @name identifies a standalone machtype */</i></td></tr>
+<tr><th id="141">141</th><td>    <em>char</em> *<dfn class="decl" id="MachineClass::name" title='MachineClass::name' data-ref="MachineClass::name">name</dfn>;</td></tr>
+<tr><th id="142">142</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::alias" title='MachineClass::alias' data-ref="MachineClass::alias">alias</dfn>;</td></tr>
+<tr><th id="143">143</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::desc" title='MachineClass::desc' data-ref="MachineClass::desc">desc</dfn>;</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>    <em>void</em> (*<dfn class="decl" id="MachineClass::init" title='MachineClass::init' data-ref="MachineClass::init">init</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col7 decl" id="9197state" title='state' data-type='MachineState *' data-ref="9197state">state</dfn>);</td></tr>
+<tr><th id="146">146</th><td>    <em>void</em> (*<dfn class="decl" id="MachineClass::reset" title='MachineClass::reset' data-ref="MachineClass::reset">reset</dfn>)(<em>void</em>);</td></tr>
+<tr><th id="147">147</th><td>    <em>void</em> (*<dfn class="decl" id="MachineClass::hot_add_cpu" title='MachineClass::hot_add_cpu' data-ref="MachineClass::hot_add_cpu">hot_add_cpu</dfn>)(<em>const</em> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col8 decl" id="9198id" title='id' data-type='const int64_t' data-ref="9198id">id</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="9199errp" title='errp' data-type='Error **' data-ref="9199errp">errp</dfn>);</td></tr>
+<tr><th id="148">148</th><td>    <em>int</em> (*<dfn class="decl" id="MachineClass::kvm_type" title='MachineClass::kvm_type' data-ref="MachineClass::kvm_type">kvm_type</dfn>)(<em>const</em> <em>char</em> *<dfn class="local col0 decl" id="9200arg" title='arg' data-type='const char *' data-ref="9200arg">arg</dfn>);</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td>    <a class="typedef" href="../sysemu/blockdev.h.html#BlockInterfaceType" title='BlockInterfaceType' data-type='enum BlockInterfaceType' data-ref="BlockInterfaceType">BlockInterfaceType</a> <dfn class="decl" id="MachineClass::block_default_type" title='MachineClass::block_default_type' data-ref="MachineClass::block_default_type">block_default_type</dfn>;</td></tr>
+<tr><th id="151">151</th><td>    <em>int</em> <dfn class="decl" id="MachineClass::units_per_default_bus" title='MachineClass::units_per_default_bus' data-ref="MachineClass::units_per_default_bus">units_per_default_bus</dfn>;</td></tr>
+<tr><th id="152">152</th><td>    <em>int</em> <dfn class="decl" id="MachineClass::max_cpus" title='MachineClass::max_cpus' data-ref="MachineClass::max_cpus">max_cpus</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="MachineClass::no_serial" title='MachineClass::no_serial' data-ref="MachineClass::no_serial">no_serial</dfn>:<var>1</var>,</td></tr>
+<tr><th id="154">154</th><td>        <dfn class="decl" id="MachineClass::no_parallel" title='MachineClass::no_parallel' data-ref="MachineClass::no_parallel">no_parallel</dfn>:<var>1</var>,</td></tr>
+<tr><th id="155">155</th><td>        <dfn class="decl" id="MachineClass::use_virtcon" title='MachineClass::use_virtcon' data-ref="MachineClass::use_virtcon">use_virtcon</dfn>:<var>1</var>,</td></tr>
+<tr><th id="156">156</th><td>        <dfn class="decl" id="MachineClass::use_sclp" title='MachineClass::use_sclp' data-ref="MachineClass::use_sclp">use_sclp</dfn>:<var>1</var>,</td></tr>
+<tr><th id="157">157</th><td>        <dfn class="decl" id="MachineClass::no_floppy" title='MachineClass::no_floppy' data-ref="MachineClass::no_floppy">no_floppy</dfn>:<var>1</var>,</td></tr>
+<tr><th id="158">158</th><td>        <dfn class="decl" id="MachineClass::no_cdrom" title='MachineClass::no_cdrom' data-ref="MachineClass::no_cdrom">no_cdrom</dfn>:<var>1</var>,</td></tr>
+<tr><th id="159">159</th><td>        <dfn class="decl" id="MachineClass::no_sdcard" title='MachineClass::no_sdcard' data-ref="MachineClass::no_sdcard">no_sdcard</dfn>:<var>1</var>,</td></tr>
+<tr><th id="160">160</th><td>        <dfn class="decl" id="MachineClass::has_dynamic_sysbus" title='MachineClass::has_dynamic_sysbus' data-ref="MachineClass::has_dynamic_sysbus">has_dynamic_sysbus</dfn>:<var>1</var>,</td></tr>
+<tr><th id="161">161</th><td>        <dfn class="decl" id="MachineClass::pci_allow_0_address" title='MachineClass::pci_allow_0_address' data-ref="MachineClass::pci_allow_0_address">pci_allow_0_address</dfn>:<var>1</var>,</td></tr>
+<tr><th id="162">162</th><td>        <dfn class="decl" id="MachineClass::legacy_fw_cfg_order" title='MachineClass::legacy_fw_cfg_order' data-ref="MachineClass::legacy_fw_cfg_order">legacy_fw_cfg_order</dfn>:<var>1</var>;</td></tr>
+<tr><th id="163">163</th><td>    <em>int</em> <dfn class="decl" id="MachineClass::is_default" title='MachineClass::is_default' data-ref="MachineClass::is_default">is_default</dfn>;</td></tr>
+<tr><th id="164">164</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::default_machine_opts" title='MachineClass::default_machine_opts' data-ref="MachineClass::default_machine_opts">default_machine_opts</dfn>;</td></tr>
+<tr><th id="165">165</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::default_boot_order" title='MachineClass::default_boot_order' data-ref="MachineClass::default_boot_order">default_boot_order</dfn>;</td></tr>
+<tr><th id="166">166</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::default_display" title='MachineClass::default_display' data-ref="MachineClass::default_display">default_display</dfn>;</td></tr>
+<tr><th id="167">167</th><td>    <a class="typedef" href="../../../include/glib-2.0/glib/garray.h.html#GArray" title='GArray' data-type='struct _GArray' data-ref="GArray">GArray</a> *<dfn class="decl" id="MachineClass::compat_props" title='MachineClass::compat_props' data-ref="MachineClass::compat_props">compat_props</dfn>;</td></tr>
+<tr><th id="168">168</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineClass::hw_version" title='MachineClass::hw_version' data-ref="MachineClass::hw_version">hw_version</dfn>;</td></tr>
+<tr><th id="169">169</th><td>    <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="decl" id="MachineClass::default_ram_size" title='MachineClass::default_ram_size' data-ref="MachineClass::default_ram_size">default_ram_size</dfn>;</td></tr>
+<tr><th id="170">170</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineClass::option_rom_has_mr" title='MachineClass::option_rom_has_mr' data-ref="MachineClass::option_rom_has_mr">option_rom_has_mr</dfn>;</td></tr>
+<tr><th id="171">171</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineClass::rom_file_has_mr" title='MachineClass::rom_file_has_mr' data-ref="MachineClass::rom_file_has_mr">rom_file_has_mr</dfn>;</td></tr>
+<tr><th id="172">172</th><td>    <em>int</em> <dfn class="decl" id="MachineClass::minimum_page_bits" title='MachineClass::minimum_page_bits' data-ref="MachineClass::minimum_page_bits">minimum_page_bits</dfn>;</td></tr>
+<tr><th id="173">173</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineClass::has_hotpluggable_cpus" title='MachineClass::has_hotpluggable_cpus' data-ref="MachineClass::has_hotpluggable_cpus">has_hotpluggable_cpus</dfn>;</td></tr>
+<tr><th id="174">174</th><td>    <em>int</em> <dfn class="decl" id="MachineClass::numa_mem_align_shift" title='MachineClass::numa_mem_align_shift' data-ref="MachineClass::numa_mem_align_shift">numa_mem_align_shift</dfn>;</td></tr>
+<tr><th id="175">175</th><td>    <em>void</em> (*<dfn class="decl" id="MachineClass::numa_auto_assign_ram" title='MachineClass::numa_auto_assign_ram' data-ref="MachineClass::numa_auto_assign_ram">numa_auto_assign_ram</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#MachineClass" title='MachineClass' data-type='struct MachineClass' data-ref="MachineClass">MachineClass</a> *<dfn class="local col1 decl" id="9201mc" title='mc' data-type='MachineClass *' data-ref="9201mc">mc</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#NodeInfo" title='NodeInfo' data-type='struct node_info' data-ref="NodeInfo">NodeInfo</a> *<dfn class="local col2 decl" id="9202nodes" title='nodes' data-type='NodeInfo *' data-ref="9202nodes">nodes</dfn>,</td></tr>
+<tr><th id="176">176</th><td>                                 <em>int</em> <dfn class="local col3 decl" id="9203nb_nodes" title='nb_nodes' data-type='int' data-ref="9203nb_nodes">nb_nodes</dfn>, <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="local col4 decl" id="9204size" title='size' data-type='ram_addr_t' data-ref="9204size">size</dfn>);</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <a class="typedef" href="hotplug.h.html#HotplugHandler" title='HotplugHandler' data-type='struct HotplugHandler' data-ref="HotplugHandler">HotplugHandler</a> *(*<dfn class="decl" id="MachineClass::get_hotplug_handler" title='MachineClass::get_hotplug_handler' data-ref="MachineClass::get_hotplug_handler">get_hotplug_handler</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col5 decl" id="9205machine" title='machine' data-type='MachineState *' data-ref="9205machine">machine</dfn>,</td></tr>
+<tr><th id="179">179</th><td>                                           <a class="typedef" href="../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col6 decl" id="9206dev" title='dev' data-type='DeviceState *' data-ref="9206dev">dev</dfn>);</td></tr>
+<tr><th id="180">180</th><td>    <a class="typedef" href="../../qapi-types.h.html#CpuInstanceProperties" title='CpuInstanceProperties' data-type='struct CpuInstanceProperties' data-ref="CpuInstanceProperties">CpuInstanceProperties</a> (*<dfn class="decl" id="MachineClass::cpu_index_to_instance_props" title='MachineClass::cpu_index_to_instance_props' data-ref="MachineClass::cpu_index_to_instance_props">cpu_index_to_instance_props</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col7 decl" id="9207machine" title='machine' data-type='MachineState *' data-ref="9207machine">machine</dfn>,</td></tr>
+<tr><th id="181">181</th><td>                                                         <em>unsigned</em> <dfn class="local col8 decl" id="9208cpu_index" title='cpu_index' data-type='unsigned int' data-ref="9208cpu_index">cpu_index</dfn>);</td></tr>
+<tr><th id="182">182</th><td>    <em>const</em> <a class="typedef" href="#CPUArchIdList" title='CPUArchIdList' data-type='struct CPUArchIdList' data-ref="CPUArchIdList">CPUArchIdList</a> *(*<dfn class="decl" id="MachineClass::possible_cpu_arch_ids" title='MachineClass::possible_cpu_arch_ids' data-ref="MachineClass::possible_cpu_arch_ids">possible_cpu_arch_ids</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#MachineState" title='MachineState' data-type='struct MachineState' data-ref="MachineState">MachineState</a> *<dfn class="local col9 decl" id="9209machine" title='machine' data-type='MachineState *' data-ref="9209machine">machine</dfn>);</td></tr>
+<tr><th id="183">183</th><td>};</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> * MachineState:</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="188">188</th><td><b>struct</b> <dfn class="type def" id="MachineState" title='MachineState' data-ref="MachineState">MachineState</dfn> {</td></tr>
+<tr><th id="189">189</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="190">190</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> <dfn class="decl" id="MachineState::parent_obj" title='MachineState::parent_obj' data-ref="MachineState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> <dfn class="decl" id="MachineState::sysbus_notifier" title='MachineState::sysbus_notifier' data-ref="MachineState::sysbus_notifier">sysbus_notifier</dfn>;</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::accel" title='MachineState::accel' data-ref="MachineState::accel">accel</dfn>;</td></tr>
+<tr><th id="196">196</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::kernel_irqchip_allowed" title='MachineState::kernel_irqchip_allowed' data-ref="MachineState::kernel_irqchip_allowed">kernel_irqchip_allowed</dfn>;</td></tr>
+<tr><th id="197">197</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::kernel_irqchip_required" title='MachineState::kernel_irqchip_required' data-ref="MachineState::kernel_irqchip_required">kernel_irqchip_required</dfn>;</td></tr>
+<tr><th id="198">198</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::kernel_irqchip_split" title='MachineState::kernel_irqchip_split' data-ref="MachineState::kernel_irqchip_split">kernel_irqchip_split</dfn>;</td></tr>
+<tr><th id="199">199</th><td>    <em>int</em> <dfn class="decl" id="MachineState::kvm_shadow_mem" title='MachineState::kvm_shadow_mem' data-ref="MachineState::kvm_shadow_mem">kvm_shadow_mem</dfn>;</td></tr>
+<tr><th id="200">200</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::dtb" title='MachineState::dtb' data-ref="MachineState::dtb">dtb</dfn>;</td></tr>
+<tr><th id="201">201</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::dumpdtb" title='MachineState::dumpdtb' data-ref="MachineState::dumpdtb">dumpdtb</dfn>;</td></tr>
+<tr><th id="202">202</th><td>    <em>int</em> <dfn class="decl" id="MachineState::phandle_start" title='MachineState::phandle_start' data-ref="MachineState::phandle_start">phandle_start</dfn>;</td></tr>
+<tr><th id="203">203</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::dt_compatible" title='MachineState::dt_compatible' data-ref="MachineState::dt_compatible">dt_compatible</dfn>;</td></tr>
+<tr><th id="204">204</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::dump_guest_core" title='MachineState::dump_guest_core' data-ref="MachineState::dump_guest_core">dump_guest_core</dfn>;</td></tr>
+<tr><th id="205">205</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::mem_merge" title='MachineState::mem_merge' data-ref="MachineState::mem_merge">mem_merge</dfn>;</td></tr>
+<tr><th id="206">206</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::usb" title='MachineState::usb' data-ref="MachineState::usb">usb</dfn>;</td></tr>
+<tr><th id="207">207</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::usb_disabled" title='MachineState::usb_disabled' data-ref="MachineState::usb_disabled">usb_disabled</dfn>;</td></tr>
+<tr><th id="208">208</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::igd_gfx_passthru" title='MachineState::igd_gfx_passthru' data-ref="MachineState::igd_gfx_passthru">igd_gfx_passthru</dfn>;</td></tr>
+<tr><th id="209">209</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::firmware" title='MachineState::firmware' data-ref="MachineState::firmware">firmware</dfn>;</td></tr>
+<tr><th id="210">210</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::iommu" title='MachineState::iommu' data-ref="MachineState::iommu">iommu</dfn>;</td></tr>
+<tr><th id="211">211</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::suppress_vmdesc" title='MachineState::suppress_vmdesc' data-ref="MachineState::suppress_vmdesc">suppress_vmdesc</dfn>;</td></tr>
+<tr><th id="212">212</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::enforce_config_section" title='MachineState::enforce_config_section' data-ref="MachineState::enforce_config_section">enforce_config_section</dfn>;</td></tr>
+<tr><th id="213">213</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="MachineState::enable_graphics" title='MachineState::enable_graphics' data-ref="MachineState::enable_graphics">enable_graphics</dfn>;</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="decl" id="MachineState::ram_size" title='MachineState::ram_size' data-ref="MachineState::ram_size">ram_size</dfn>;</td></tr>
+<tr><th id="216">216</th><td>    <a class="typedef" href="../exec/cpu-common.h.html#ram_addr_t" title='ram_addr_t' data-type='uintptr_t' data-ref="ram_addr_t">ram_addr_t</a> <dfn class="decl" id="MachineState::maxram_size" title='MachineState::maxram_size' data-ref="MachineState::maxram_size">maxram_size</dfn>;</td></tr>
+<tr><th id="217">217</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>   <dfn class="decl" id="MachineState::ram_slots" title='MachineState::ram_slots' data-ref="MachineState::ram_slots">ram_slots</dfn>;</td></tr>
+<tr><th id="218">218</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineState::boot_order" title='MachineState::boot_order' data-ref="MachineState::boot_order">boot_order</dfn>;</td></tr>
+<tr><th id="219">219</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::kernel_filename" title='MachineState::kernel_filename' data-ref="MachineState::kernel_filename">kernel_filename</dfn>;</td></tr>
+<tr><th id="220">220</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::kernel_cmdline" title='MachineState::kernel_cmdline' data-ref="MachineState::kernel_cmdline">kernel_cmdline</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <em>char</em> *<dfn class="decl" id="MachineState::initrd_filename" title='MachineState::initrd_filename' data-ref="MachineState::initrd_filename">initrd_filename</dfn>;</td></tr>
+<tr><th id="222">222</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="MachineState::cpu_model" title='MachineState::cpu_model' data-ref="MachineState::cpu_model">cpu_model</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="typedef" href="../sysemu/accel.h.html#AccelState" title='AccelState' data-type='struct AccelState' data-ref="AccelState">AccelState</a> *<dfn class="decl" id="MachineState::accelerator" title='MachineState::accelerator' data-ref="MachineState::accelerator">accelerator</dfn>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="typedef" href="#CPUArchIdList" title='CPUArchIdList' data-type='struct CPUArchIdList' data-ref="CPUArchIdList">CPUArchIdList</a> *<dfn class="decl" id="MachineState::possible_cpus" title='MachineState::possible_cpus' data-ref="MachineState::possible_cpus">possible_cpus</dfn>;</td></tr>
+<tr><th id="225">225</th><td>};</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><u>#define <dfn class="macro" id="_M/DEFINE_MACHINE" data-ref="_M/DEFINE_MACHINE">DEFINE_MACHINE</dfn>(namestr, machine_initfn) \</u></td></tr>
+<tr><th id="228">228</th><td><u>    static void machine_initfn##_class_init(ObjectClass *oc, void *data) \</u></td></tr>
+<tr><th id="229">229</th><td><u>    { \</u></td></tr>
+<tr><th id="230">230</th><td><u>        MachineClass *mc = MACHINE_CLASS(oc); \</u></td></tr>
+<tr><th id="231">231</th><td><u>        machine_initfn(mc); \</u></td></tr>
+<tr><th id="232">232</th><td><u>    } \</u></td></tr>
+<tr><th id="233">233</th><td><u>    static const TypeInfo machine_initfn##_typeinfo = { \</u></td></tr>
+<tr><th id="234">234</th><td><u>        .name       = MACHINE_TYPE_NAME(namestr), \</u></td></tr>
+<tr><th id="235">235</th><td><u>        .parent     = TYPE_MACHINE, \</u></td></tr>
+<tr><th id="236">236</th><td><u>        .class_init = machine_initfn##_class_init, \</u></td></tr>
+<tr><th id="237">237</th><td><u>    }; \</u></td></tr>
+<tr><th id="238">238</th><td><u>    static void machine_initfn##_register_types(void) \</u></td></tr>
+<tr><th id="239">239</th><td><u>    { \</u></td></tr>
+<tr><th id="240">240</th><td><u>        type_register_static(&amp;machine_initfn##_typeinfo); \</u></td></tr>
+<tr><th id="241">241</th><td><u>    } \</u></td></tr>
+<tr><th id="242">242</th><td><u>    type_init(machine_initfn##_register_types)</u></td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><u>#define <dfn class="macro" id="_M/SET_MACHINE_COMPAT" data-ref="_M/SET_MACHINE_COMPAT">SET_MACHINE_COMPAT</dfn>(m, COMPAT) \</u></td></tr>
+<tr><th id="245">245</th><td><u>    do {                              \</u></td></tr>
+<tr><th id="246">246</th><td><u>        int i;                        \</u></td></tr>
+<tr><th id="247">247</th><td><u>        static GlobalProperty props[] = {       \</u></td></tr>
+<tr><th id="248">248</th><td><u>            COMPAT                              \</u></td></tr>
+<tr><th id="249">249</th><td><u>            { /* end of list */ }               \</u></td></tr>
+<tr><th id="250">250</th><td><u>        };                                      \</u></td></tr>
+<tr><th id="251">251</th><td><u>        if (!m-&gt;compat_props) { \</u></td></tr>
+<tr><th id="252">252</th><td><u>            m-&gt;compat_props = g_array_new(false, false, sizeof(void *)); \</u></td></tr>
+<tr><th id="253">253</th><td><u>        } \</u></td></tr>
+<tr><th id="254">254</th><td><u>        for (i = 0; props[i].driver != NULL; i++) {    \</u></td></tr>
+<tr><th id="255">255</th><td><u>            GlobalProperty *prop = &amp;props[i];          \</u></td></tr>
+<tr><th id="256">256</th><td><u>            g_array_append_val(m-&gt;compat_props, prop); \</u></td></tr>
+<tr><th id="257">257</th><td><u>        }                                              \</u></td></tr>
+<tr><th id="258">258</th><td><u>    } while (0)</u></td></tr>
+<tr><th id="259">259</th><td></td></tr>
+<tr><th id="260">260</th><td><u>#<span data-ppcond="3">endif</span></u></td></tr>
+<tr><th id="261">261</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

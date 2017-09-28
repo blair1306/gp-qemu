@@ -1,0 +1,39 @@
+<dec f='codebrowser/include/io/channel.h' l='264' type='ssize_t qio_channel_writev_full(QIOChannel * ioc, const struct iovec * iov, size_t niov, int * fds, size_t nfds, Error ** errp)'/>
+<doc f='codebrowser/include/io/channel.h' l='230'>/**
+ * qio_channel_writev_full:
+ * @ioc: the channel object
+ * @iov: the array of memory regions to write data from
+ * @niov: the length of the @iov array
+ * @fds: an array of file handles to send
+ * @nfds: number of file handles in @fds
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Write data to the IO channel, reading it from the
+ * memory regions referenced by @iov. Each element
+ * in the @iov will be fully sent, before the next
+ * one is used. The @niov parameter specifies the
+ * total number of elements in @iov.
+ *
+ * It is not required for all @iov data to be fully
+ * sent. If the channel is in blocking mode, at least
+ * one byte of data will be sent, but no more is
+ * guaranteed. If the channel is non-blocking and no
+ * data can be sent, it will return QIO_CHANNEL_ERR_BLOCK
+ *
+ * If there are file descriptors to send, the @fds
+ * array should be non-NULL and provide the handles.
+ * All file descriptors will be sent if at least one
+ * byte of data was sent.
+ *
+ * It is an error to pass a non-NULL @fds parameter
+ * unless qio_channel_has_feature() returns a true
+ * value for the QIO_CHANNEL_FEATURE_FD_PASS constant.
+ *
+ * Returns: the number of bytes sent, or -1 on error,
+ * or QIO_CHANNEL_ERR_BLOCK if no data is can be sent
+ * and the channel is non-blocking
+ */</doc>
+<use f='codebrowser/chardev/char-io.c' l='161' u='c' c='io_channel_send_full'/>
+<def f='codebrowser/io/channel.c' l='68' ll='85' type='ssize_t qio_channel_writev_full(QIOChannel * ioc, const struct iovec * iov, size_t niov, int * fds, size_t nfds, Error ** errp)'/>
+<use f='codebrowser/io/channel.c' l='102' u='c' c='qio_channel_writev'/>
+<use f='codebrowser/io/channel.c' l='122' u='c' c='qio_channel_write'/>

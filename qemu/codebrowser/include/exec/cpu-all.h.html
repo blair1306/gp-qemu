@@ -1,0 +1,368 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>cpu-all.h source code [codebrowser/include/exec/cpu-all.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/exec/cpu-all.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>exec</a>/<a href='cpu-all.h.html'>cpu-all.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * defines common to all virtual CPUs</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright (c) 2003 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td><u>#<span data-ppcond="19">ifndef</span> <span class="macro" data-ref="_M/CPU_ALL_H">CPU_ALL_H</span></u></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/CPU_ALL_H" data-ref="_M/CPU_ALL_H">CPU_ALL_H</dfn></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="cpu-common.h.html">"exec/cpu-common.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../qom/cpu.h.html">"qom/cpu.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../qemu/rcu.h.html">"qemu/rcu.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/EXCP_INTERRUPT" data-ref="_M/EXCP_INTERRUPT">EXCP_INTERRUPT</dfn> 	0x10000 /* async interruption */</u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/EXCP_HLT" data-ref="_M/EXCP_HLT">EXCP_HLT</dfn>        0x10001 /* hlt instruction reached */</u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/EXCP_DEBUG" data-ref="_M/EXCP_DEBUG">EXCP_DEBUG</dfn>      0x10002 /* cpu stopped after a breakpoint or singlestep */</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/EXCP_HALTED" data-ref="_M/EXCP_HALTED">EXCP_HALTED</dfn>     0x10003 /* cpu is halted (waiting for external event) */</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/EXCP_YIELD" data-ref="_M/EXCP_YIELD">EXCP_YIELD</dfn>      0x10004 /* cpu wants to yield timeslice to another */</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/EXCP_ATOMIC" data-ref="_M/EXCP_ATOMIC">EXCP_ATOMIC</dfn>     0x10005 /* stop-the-world and emulate atomic */</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/* some important defines:</i></td></tr>
+<tr><th id="37">37</th><td><i> *</i></td></tr>
+<tr><th id="38">38</th><td><i> * HOST_WORDS_BIGENDIAN : if defined, the host cpu is big endian and</i></td></tr>
+<tr><th id="39">39</th><td><i> * otherwise little endian.</i></td></tr>
+<tr><th id="40">40</th><td><i> *</i></td></tr>
+<tr><th id="41">41</th><td><i> * TARGET_WORDS_BIGENDIAN : same for target cpu</i></td></tr>
+<tr><th id="42">42</th><td><i> */</i></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><u>#<span data-ppcond="44">if</span> defined(<span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span>) != defined(<span class="macro" data-ref="_M/TARGET_WORDS_BIGENDIAN">TARGET_WORDS_BIGENDIAN</span>)</u></td></tr>
+<tr><th id="45">45</th><td><u>#define BSWAP_NEEDED</u></td></tr>
+<tr><th id="46">46</th><td><u>#<span data-ppcond="44">endif</span></u></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><u>#<span data-ppcond="48">ifdef</span> <span class="macro" data-ref="_M/BSWAP_NEEDED">BSWAP_NEEDED</span></u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>static</em> <b>inline</b> uint16_t tswap16(uint16_t s)</td></tr>
+<tr><th id="51">51</th><td>{</td></tr>
+<tr><th id="52">52</th><td>    <b>return</b> bswap16(s);</td></tr>
+<tr><th id="53">53</th><td>}</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>static</em> <b>inline</b> uint32_t tswap32(uint32_t s)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>    <b>return</b> bswap32(s);</td></tr>
+<tr><th id="58">58</th><td>}</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><em>static</em> <b>inline</b> uint64_t tswap64(uint64_t s)</td></tr>
+<tr><th id="61">61</th><td>{</td></tr>
+<tr><th id="62">62</th><td>    <b>return</b> bswap64(s);</td></tr>
+<tr><th id="63">63</th><td>}</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><em>static</em> <b>inline</b> <em>void</em> tswap16s(uint16_t *s)</td></tr>
+<tr><th id="66">66</th><td>{</td></tr>
+<tr><th id="67">67</th><td>    *s = bswap16(*s);</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>static</em> <b>inline</b> <em>void</em> tswap32s(uint32_t *s)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    *s = bswap32(*s);</td></tr>
+<tr><th id="73">73</th><td>}</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><em>static</em> <b>inline</b> <em>void</em> tswap64s(uint64_t *s)</td></tr>
+<tr><th id="76">76</th><td>{</td></tr>
+<tr><th id="77">77</th><td>    *s = bswap64(*s);</td></tr>
+<tr><th id="78">78</th><td>}</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><u>#<span data-ppcond="48">else</span></u></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl def" id="tswap16" title='tswap16' data-ref="tswap16">tswap16</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col6 decl" id="10436s" title='s' data-type='uint16_t' data-ref="10436s">s</dfn>)</td></tr>
+<tr><th id="83">83</th><td>{</td></tr>
+<tr><th id="84">84</th><td>    <b>return</b> <a class="local col6 ref" href="#10436s" title='s' data-ref="10436s">s</a>;</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl def" id="tswap32" title='tswap32' data-ref="tswap32">tswap32</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="10437s" title='s' data-type='uint32_t' data-ref="10437s">s</dfn>)</td></tr>
+<tr><th id="88">88</th><td>{</td></tr>
+<tr><th id="89">89</th><td>    <b>return</b> <a class="local col7 ref" href="#10437s" title='s' data-ref="10437s">s</a>;</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="tswap64" title='tswap64' data-ref="tswap64">tswap64</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="10438s" title='s' data-type='uint64_t' data-ref="10438s">s</dfn>)</td></tr>
+<tr><th id="93">93</th><td>{</td></tr>
+<tr><th id="94">94</th><td>    <b>return</b> <a class="local col8 ref" href="#10438s" title='s' data-ref="10438s">s</a>;</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="tswap16s" title='tswap16s' data-ref="tswap16s">tswap16s</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> *<dfn class="local col9 decl" id="10439s" title='s' data-type='uint16_t *' data-ref="10439s">s</dfn>)</td></tr>
+<tr><th id="98">98</th><td>{</td></tr>
+<tr><th id="99">99</th><td>}</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="tswap32s" title='tswap32s' data-ref="tswap32s">tswap32s</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col0 decl" id="10440s" title='s' data-type='uint32_t *' data-ref="10440s">s</dfn>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>}</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="tswap64s" title='tswap64s' data-ref="tswap64s">tswap64s</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col1 decl" id="10441s" title='s' data-type='uint64_t *' data-ref="10441s">s</dfn>)</td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td>}</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><u>#<span data-ppcond="48">endif</span></u></td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><u>#<span data-ppcond="111">if</span> <a class="macro" href="cpu-defs.h.html#40" title="(64 / 8)" data-ref="_M/TARGET_LONG_SIZE">TARGET_LONG_SIZE</a> == 4</u></td></tr>
+<tr><th id="112">112</th><td><u>#define tswapl(s) tswap32(s)</u></td></tr>
+<tr><th id="113">113</th><td><u>#define tswapls(s) tswap32s((uint32_t *)(s))</u></td></tr>
+<tr><th id="114">114</th><td><u>#define bswaptls(s) bswap32s(s)</u></td></tr>
+<tr><th id="115">115</th><td><u>#<span data-ppcond="111">else</span></u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/tswapl" data-ref="_M/tswapl">tswapl</dfn>(s) tswap64(s)</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/tswapls" data-ref="_M/tswapls">tswapls</dfn>(s) tswap64s((uint64_t *)(s))</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/bswaptls" data-ref="_M/bswaptls">bswaptls</dfn>(s) bswap64s(s)</u></td></tr>
+<tr><th id="119">119</th><td><u>#<span data-ppcond="111">endif</span></u></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i>/* Target-endianness CPU memory access functions. These fit into the</i></td></tr>
+<tr><th id="122">122</th><td><i> * {ld,st}{type}{sign}{size}{endian}_p naming scheme described in bswap.h.</i></td></tr>
+<tr><th id="123">123</th><td><i> */</i></td></tr>
+<tr><th id="124">124</th><td><u>#<span data-ppcond="124">if</span> defined(<span class="macro" data-ref="_M/TARGET_WORDS_BIGENDIAN">TARGET_WORDS_BIGENDIAN</span>)</u></td></tr>
+<tr><th id="125">125</th><td><u>#define lduw_p(p) lduw_be_p(p)</u></td></tr>
+<tr><th id="126">126</th><td><u>#define ldsw_p(p) ldsw_be_p(p)</u></td></tr>
+<tr><th id="127">127</th><td><u>#define ldl_p(p) ldl_be_p(p)</u></td></tr>
+<tr><th id="128">128</th><td><u>#define ldq_p(p) ldq_be_p(p)</u></td></tr>
+<tr><th id="129">129</th><td><u>#define ldfl_p(p) ldfl_be_p(p)</u></td></tr>
+<tr><th id="130">130</th><td><u>#define ldfq_p(p) ldfq_be_p(p)</u></td></tr>
+<tr><th id="131">131</th><td><u>#define stw_p(p, v) stw_be_p(p, v)</u></td></tr>
+<tr><th id="132">132</th><td><u>#define stl_p(p, v) stl_be_p(p, v)</u></td></tr>
+<tr><th id="133">133</th><td><u>#define stq_p(p, v) stq_be_p(p, v)</u></td></tr>
+<tr><th id="134">134</th><td><u>#define stfl_p(p, v) stfl_be_p(p, v)</u></td></tr>
+<tr><th id="135">135</th><td><u>#define stfq_p(p, v) stfq_be_p(p, v)</u></td></tr>
+<tr><th id="136">136</th><td><u>#<span data-ppcond="124">else</span></u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/lduw_p" data-ref="_M/lduw_p">lduw_p</dfn>(p) lduw_le_p(p)</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/ldsw_p" data-ref="_M/ldsw_p">ldsw_p</dfn>(p) ldsw_le_p(p)</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/ldl_p" data-ref="_M/ldl_p">ldl_p</dfn>(p) ldl_le_p(p)</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/ldq_p" data-ref="_M/ldq_p">ldq_p</dfn>(p) ldq_le_p(p)</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/ldfl_p" data-ref="_M/ldfl_p">ldfl_p</dfn>(p) ldfl_le_p(p)</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/ldfq_p" data-ref="_M/ldfq_p">ldfq_p</dfn>(p) ldfq_le_p(p)</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/stw_p" data-ref="_M/stw_p">stw_p</dfn>(p, v) stw_le_p(p, v)</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/stl_p" data-ref="_M/stl_p">stl_p</dfn>(p, v) stl_le_p(p, v)</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/stq_p" data-ref="_M/stq_p">stq_p</dfn>(p, v) stq_le_p(p, v)</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/stfl_p" data-ref="_M/stfl_p">stfl_p</dfn>(p, v) stfl_le_p(p, v)</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/stfq_p" data-ref="_M/stfq_p">stfq_p</dfn>(p, v) stfq_le_p(p, v)</u></td></tr>
+<tr><th id="148">148</th><td><u>#<span data-ppcond="124">endif</span></u></td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>/* MMU memory access macros */</i></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><u>#<span data-ppcond="152">if</span> defined(<span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span>)</u></td></tr>
+<tr><th id="153">153</th><td><u>#include "exec/user/abitypes.h"</u></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><i>/* On some host systems the guest address space is reserved on the host.</i></td></tr>
+<tr><th id="156">156</th><td><i> * This allows the guest address space to be offset to a convenient location.</i></td></tr>
+<tr><th id="157">157</th><td><i> */</i></td></tr>
+<tr><th id="158">158</th><td><b>extern</b> <em>unsigned</em> <em>long</em> guest_base;</td></tr>
+<tr><th id="159">159</th><td><b>extern</b> <em>int</em> have_guest_base;</td></tr>
+<tr><th id="160">160</th><td><b>extern</b> <em>unsigned</em> <em>long</em> reserved_va;</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><u>#define GUEST_ADDR_MAX (reserved_va ? reserved_va : \</u></td></tr>
+<tr><th id="163">163</th><td><u>                                    (1ul &lt;&lt; TARGET_VIRT_ADDR_SPACE_BITS) - 1)</u></td></tr>
+<tr><th id="164">164</th><td><u>#<span data-ppcond="152">else</span></u></td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td><u>#include <a href="hwaddr.h.html">"exec/hwaddr.h"</a></u></td></tr>
+<tr><th id="167">167</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="lduw_phys" title='lduw_phys' data-ref="lduw_phys">lduw_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col2 decl" id="10442as" title='as' data-type='AddressSpace *' data-ref="10442as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10443addr" title='addr' data-type='hwaddr' data-ref="10443addr">addr</dfn>);</td></tr>
+<tr><th id="168">168</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ldl_phys" title='ldl_phys' data-ref="ldl_phys">ldl_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col4 decl" id="10444as" title='as' data-type='AddressSpace *' data-ref="10444as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10445addr" title='addr' data-type='hwaddr' data-ref="10445addr">addr</dfn>);</td></tr>
+<tr><th id="169">169</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="ldq_phys" title='ldq_phys' data-ref="ldq_phys">ldq_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col6 decl" id="10446as" title='as' data-type='AddressSpace *' data-ref="10446as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col7 decl" id="10447addr" title='addr' data-type='hwaddr' data-ref="10447addr">addr</dfn>);</td></tr>
+<tr><th id="170">170</th><td><em>void</em> <dfn class="decl" id="stl_phys_notdirty" title='stl_phys_notdirty' data-ref="stl_phys_notdirty">stl_phys_notdirty</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col8 decl" id="10448as" title='as' data-type='AddressSpace *' data-ref="10448as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="10449addr" title='addr' data-type='hwaddr' data-ref="10449addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10450val" title='val' data-type='uint32_t' data-ref="10450val">val</dfn>);</td></tr>
+<tr><th id="171">171</th><td><em>void</em> <dfn class="decl" id="stw_phys" title='stw_phys' data-ref="stw_phys">stw_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col1 decl" id="10451as" title='as' data-type='AddressSpace *' data-ref="10451as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col2 decl" id="10452addr" title='addr' data-type='hwaddr' data-ref="10452addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="10453val" title='val' data-type='uint32_t' data-ref="10453val">val</dfn>);</td></tr>
+<tr><th id="172">172</th><td><em>void</em> <dfn class="decl" id="stl_phys" title='stl_phys' data-ref="stl_phys">stl_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col4 decl" id="10454as" title='as' data-type='AddressSpace *' data-ref="10454as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10455addr" title='addr' data-type='hwaddr' data-ref="10455addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="10456val" title='val' data-type='uint32_t' data-ref="10456val">val</dfn>);</td></tr>
+<tr><th id="173">173</th><td><em>void</em> <dfn class="decl" id="stq_phys" title='stq_phys' data-ref="stq_phys">stq_phys</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col7 decl" id="10457as" title='as' data-type='AddressSpace *' data-ref="10457as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10458addr" title='addr' data-type='hwaddr' data-ref="10458addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="10459val" title='val' data-type='uint64_t' data-ref="10459val">val</dfn>);</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="address_space_lduw" title='address_space_lduw' data-ref="address_space_lduw">address_space_lduw</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col0 decl" id="10460as" title='as' data-type='AddressSpace *' data-ref="10460as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col1 decl" id="10461addr" title='addr' data-type='hwaddr' data-ref="10461addr">addr</dfn>,</td></tr>
+<tr><th id="176">176</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col2 decl" id="10462attrs" title='attrs' data-type='MemTxAttrs' data-ref="10462attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col3 decl" id="10463result" title='result' data-type='MemTxResult *' data-ref="10463result">result</dfn>);</td></tr>
+<tr><th id="177">177</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="address_space_ldl" title='address_space_ldl' data-ref="address_space_ldl">address_space_ldl</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col4 decl" id="10464as" title='as' data-type='AddressSpace *' data-ref="10464as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10465addr" title='addr' data-type='hwaddr' data-ref="10465addr">addr</dfn>,</td></tr>
+<tr><th id="178">178</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col6 decl" id="10466attrs" title='attrs' data-type='MemTxAttrs' data-ref="10466attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col7 decl" id="10467result" title='result' data-type='MemTxResult *' data-ref="10467result">result</dfn>);</td></tr>
+<tr><th id="179">179</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="address_space_ldq" title='address_space_ldq' data-ref="address_space_ldq">address_space_ldq</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col8 decl" id="10468as" title='as' data-type='AddressSpace *' data-ref="10468as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="10469addr" title='addr' data-type='hwaddr' data-ref="10469addr">addr</dfn>,</td></tr>
+<tr><th id="180">180</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10470attrs" title='attrs' data-type='MemTxAttrs' data-ref="10470attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10471result" title='result' data-type='MemTxResult *' data-ref="10471result">result</dfn>);</td></tr>
+<tr><th id="181">181</th><td><em>void</em> <dfn class="decl" id="address_space_stl_notdirty" title='address_space_stl_notdirty' data-ref="address_space_stl_notdirty">address_space_stl_notdirty</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col2 decl" id="10472as" title='as' data-type='AddressSpace *' data-ref="10472as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10473addr" title='addr' data-type='hwaddr' data-ref="10473addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="10474val" title='val' data-type='uint32_t' data-ref="10474val">val</dfn>,</td></tr>
+<tr><th id="182">182</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col5 decl" id="10475attrs" title='attrs' data-type='MemTxAttrs' data-ref="10475attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col6 decl" id="10476result" title='result' data-type='MemTxResult *' data-ref="10476result">result</dfn>);</td></tr>
+<tr><th id="183">183</th><td><em>void</em> <dfn class="decl" id="address_space_stw" title='address_space_stw' data-ref="address_space_stw">address_space_stw</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col7 decl" id="10477as" title='as' data-type='AddressSpace *' data-ref="10477as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10478addr" title='addr' data-type='hwaddr' data-ref="10478addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="10479val" title='val' data-type='uint32_t' data-ref="10479val">val</dfn>,</td></tr>
+<tr><th id="184">184</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10480attrs" title='attrs' data-type='MemTxAttrs' data-ref="10480attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10481result" title='result' data-type='MemTxResult *' data-ref="10481result">result</dfn>);</td></tr>
+<tr><th id="185">185</th><td><em>void</em> <dfn class="decl" id="address_space_stl" title='address_space_stl' data-ref="address_space_stl">address_space_stl</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col2 decl" id="10482as" title='as' data-type='AddressSpace *' data-ref="10482as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10483addr" title='addr' data-type='hwaddr' data-ref="10483addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="10484val" title='val' data-type='uint32_t' data-ref="10484val">val</dfn>,</td></tr>
+<tr><th id="186">186</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col5 decl" id="10485attrs" title='attrs' data-type='MemTxAttrs' data-ref="10485attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col6 decl" id="10486result" title='result' data-type='MemTxResult *' data-ref="10486result">result</dfn>);</td></tr>
+<tr><th id="187">187</th><td><em>void</em> <dfn class="decl" id="address_space_stq" title='address_space_stq' data-ref="address_space_stq">address_space_stq</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col7 decl" id="10487as" title='as' data-type='AddressSpace *' data-ref="10487as">as</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10488addr" title='addr' data-type='hwaddr' data-ref="10488addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="10489val" title='val' data-type='uint64_t' data-ref="10489val">val</dfn>,</td></tr>
+<tr><th id="188">188</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10490attrs" title='attrs' data-type='MemTxAttrs' data-ref="10490attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10491result" title='result' data-type='MemTxResult *' data-ref="10491result">result</dfn>);</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="lduw_phys_cached" title='lduw_phys_cached' data-ref="lduw_phys_cached">lduw_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col2 decl" id="10492cache" title='cache' data-type='MemoryRegionCache *' data-ref="10492cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10493addr" title='addr' data-type='hwaddr' data-ref="10493addr">addr</dfn>);</td></tr>
+<tr><th id="191">191</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ldl_phys_cached" title='ldl_phys_cached' data-ref="ldl_phys_cached">ldl_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col4 decl" id="10494cache" title='cache' data-type='MemoryRegionCache *' data-ref="10494cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10495addr" title='addr' data-type='hwaddr' data-ref="10495addr">addr</dfn>);</td></tr>
+<tr><th id="192">192</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="ldq_phys_cached" title='ldq_phys_cached' data-ref="ldq_phys_cached">ldq_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col6 decl" id="10496cache" title='cache' data-type='MemoryRegionCache *' data-ref="10496cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col7 decl" id="10497addr" title='addr' data-type='hwaddr' data-ref="10497addr">addr</dfn>);</td></tr>
+<tr><th id="193">193</th><td><em>void</em> <dfn class="decl" id="stl_phys_notdirty_cached" title='stl_phys_notdirty_cached' data-ref="stl_phys_notdirty_cached">stl_phys_notdirty_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col8 decl" id="10498cache" title='cache' data-type='MemoryRegionCache *' data-ref="10498cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="10499addr" title='addr' data-type='hwaddr' data-ref="10499addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="10500val" title='val' data-type='uint32_t' data-ref="10500val">val</dfn>);</td></tr>
+<tr><th id="194">194</th><td><em>void</em> <dfn class="decl" id="stw_phys_cached" title='stw_phys_cached' data-ref="stw_phys_cached">stw_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col1 decl" id="10501cache" title='cache' data-type='MemoryRegionCache *' data-ref="10501cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col2 decl" id="10502addr" title='addr' data-type='hwaddr' data-ref="10502addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="10503val" title='val' data-type='uint32_t' data-ref="10503val">val</dfn>);</td></tr>
+<tr><th id="195">195</th><td><em>void</em> <dfn class="decl" id="stl_phys_cached" title='stl_phys_cached' data-ref="stl_phys_cached">stl_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col4 decl" id="10504cache" title='cache' data-type='MemoryRegionCache *' data-ref="10504cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10505addr" title='addr' data-type='hwaddr' data-ref="10505addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col6 decl" id="10506val" title='val' data-type='uint32_t' data-ref="10506val">val</dfn>);</td></tr>
+<tr><th id="196">196</th><td><em>void</em> <dfn class="decl" id="stq_phys_cached" title='stq_phys_cached' data-ref="stq_phys_cached">stq_phys_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col7 decl" id="10507cache" title='cache' data-type='MemoryRegionCache *' data-ref="10507cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10508addr" title='addr' data-type='hwaddr' data-ref="10508addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="10509val" title='val' data-type='uint64_t' data-ref="10509val">val</dfn>);</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="address_space_lduw_cached" title='address_space_lduw_cached' data-ref="address_space_lduw_cached">address_space_lduw_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col0 decl" id="10510cache" title='cache' data-type='MemoryRegionCache *' data-ref="10510cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col1 decl" id="10511addr" title='addr' data-type='hwaddr' data-ref="10511addr">addr</dfn>,</td></tr>
+<tr><th id="199">199</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col2 decl" id="10512attrs" title='attrs' data-type='MemTxAttrs' data-ref="10512attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col3 decl" id="10513result" title='result' data-type='MemTxResult *' data-ref="10513result">result</dfn>);</td></tr>
+<tr><th id="200">200</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="address_space_ldl_cached" title='address_space_ldl_cached' data-ref="address_space_ldl_cached">address_space_ldl_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col4 decl" id="10514cache" title='cache' data-type='MemoryRegionCache *' data-ref="10514cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col5 decl" id="10515addr" title='addr' data-type='hwaddr' data-ref="10515addr">addr</dfn>,</td></tr>
+<tr><th id="201">201</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col6 decl" id="10516attrs" title='attrs' data-type='MemTxAttrs' data-ref="10516attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col7 decl" id="10517result" title='result' data-type='MemTxResult *' data-ref="10517result">result</dfn>);</td></tr>
+<tr><th id="202">202</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="address_space_ldq_cached" title='address_space_ldq_cached' data-ref="address_space_ldq_cached">address_space_ldq_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col8 decl" id="10518cache" title='cache' data-type='MemoryRegionCache *' data-ref="10518cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="10519addr" title='addr' data-type='hwaddr' data-ref="10519addr">addr</dfn>,</td></tr>
+<tr><th id="203">203</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10520attrs" title='attrs' data-type='MemTxAttrs' data-ref="10520attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10521result" title='result' data-type='MemTxResult *' data-ref="10521result">result</dfn>);</td></tr>
+<tr><th id="204">204</th><td><em>void</em> <dfn class="decl" id="address_space_stl_notdirty_cached" title='address_space_stl_notdirty_cached' data-ref="address_space_stl_notdirty_cached">address_space_stl_notdirty_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col2 decl" id="10522cache" title='cache' data-type='MemoryRegionCache *' data-ref="10522cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10523addr" title='addr' data-type='hwaddr' data-ref="10523addr">addr</dfn>,</td></tr>
+<tr><th id="205">205</th><td>                            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="10524val" title='val' data-type='uint32_t' data-ref="10524val">val</dfn>, <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col5 decl" id="10525attrs" title='attrs' data-type='MemTxAttrs' data-ref="10525attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col6 decl" id="10526result" title='result' data-type='MemTxResult *' data-ref="10526result">result</dfn>);</td></tr>
+<tr><th id="206">206</th><td><em>void</em> <dfn class="decl" id="address_space_stw_cached" title='address_space_stw_cached' data-ref="address_space_stw_cached">address_space_stw_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col7 decl" id="10527cache" title='cache' data-type='MemoryRegionCache *' data-ref="10527cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10528addr" title='addr' data-type='hwaddr' data-ref="10528addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="10529val" title='val' data-type='uint32_t' data-ref="10529val">val</dfn>,</td></tr>
+<tr><th id="207">207</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10530attrs" title='attrs' data-type='MemTxAttrs' data-ref="10530attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10531result" title='result' data-type='MemTxResult *' data-ref="10531result">result</dfn>);</td></tr>
+<tr><th id="208">208</th><td><em>void</em> <dfn class="decl" id="address_space_stl_cached" title='address_space_stl_cached' data-ref="address_space_stl_cached">address_space_stl_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col2 decl" id="10532cache" title='cache' data-type='MemoryRegionCache *' data-ref="10532cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="10533addr" title='addr' data-type='hwaddr' data-ref="10533addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="10534val" title='val' data-type='uint32_t' data-ref="10534val">val</dfn>,</td></tr>
+<tr><th id="209">209</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col5 decl" id="10535attrs" title='attrs' data-type='MemTxAttrs' data-ref="10535attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col6 decl" id="10536result" title='result' data-type='MemTxResult *' data-ref="10536result">result</dfn>);</td></tr>
+<tr><th id="210">210</th><td><em>void</em> <dfn class="decl" id="address_space_stq_cached" title='address_space_stq_cached' data-ref="address_space_stq_cached">address_space_stq_cached</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#MemoryRegionCache" title='MemoryRegionCache' data-type='struct MemoryRegionCache' data-ref="MemoryRegionCache">MemoryRegionCache</a> *<dfn class="local col7 decl" id="10537cache" title='cache' data-type='MemoryRegionCache *' data-ref="10537cache">cache</dfn>, <a class="typedef" href="hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col8 decl" id="10538addr" title='addr' data-type='hwaddr' data-ref="10538addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="10539val" title='val' data-type='uint64_t' data-ref="10539val">val</dfn>,</td></tr>
+<tr><th id="211">211</th><td>                            <a class="typedef" href="memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="10540attrs" title='attrs' data-type='MemTxAttrs' data-ref="10540attrs">attrs</dfn>, <a class="typedef" href="memory.h.html#MemTxResult" title='MemTxResult' data-type='uint32_t' data-ref="MemTxResult">MemTxResult</a> *<dfn class="local col1 decl" id="10541result" title='result' data-type='MemTxResult *' data-ref="10541result">result</dfn>);</td></tr>
+<tr><th id="212">212</th><td><u>#<span data-ppcond="152">endif</span></u></td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><i>/* page related stuff */</i></td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><u>#<span data-ppcond="216">ifdef</span> <span class="macro" data-ref="_M/TARGET_PAGE_BITS_VARY">TARGET_PAGE_BITS_VARY</span></u></td></tr>
+<tr><th id="217">217</th><td><b>extern</b> bool target_page_bits_decided;</td></tr>
+<tr><th id="218">218</th><td><b>extern</b> <em>int</em> target_page_bits;</td></tr>
+<tr><th id="219">219</th><td><u>#define TARGET_PAGE_BITS ({ assert(target_page_bits_decided); \</u></td></tr>
+<tr><th id="220">220</th><td><u>                            target_page_bits; })</u></td></tr>
+<tr><th id="221">221</th><td><u>#<span data-ppcond="216">else</span></u></td></tr>
+<tr><th id="222">222</th><td><u>#define <dfn class="macro" id="_M/TARGET_PAGE_BITS_MIN" data-ref="_M/TARGET_PAGE_BITS_MIN">TARGET_PAGE_BITS_MIN</dfn> TARGET_PAGE_BITS</u></td></tr>
+<tr><th id="223">223</th><td><u>#<span data-ppcond="216">endif</span></u></td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><u>#define <dfn class="macro" id="_M/TARGET_PAGE_SIZE" data-ref="_M/TARGET_PAGE_SIZE">TARGET_PAGE_SIZE</dfn> (1 &lt;&lt; TARGET_PAGE_BITS)</u></td></tr>
+<tr><th id="226">226</th><td><u>#define <dfn class="macro" id="_M/TARGET_PAGE_MASK" data-ref="_M/TARGET_PAGE_MASK">TARGET_PAGE_MASK</dfn> ~(TARGET_PAGE_SIZE - 1)</u></td></tr>
+<tr><th id="227">227</th><td><u>#define <dfn class="macro" id="_M/TARGET_PAGE_ALIGN" data-ref="_M/TARGET_PAGE_ALIGN">TARGET_PAGE_ALIGN</dfn>(addr) (((addr) + TARGET_PAGE_SIZE - 1) &amp; TARGET_PAGE_MASK)</u></td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><i>/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even</i></td></tr>
+<tr><th id="230">230</th><td><i> * when intptr_t is 32-bit and we are aligning a long long.</i></td></tr>
+<tr><th id="231">231</th><td><i> */</i></td></tr>
+<tr><th id="232">232</th><td><b>extern</b> <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="decl" id="qemu_real_host_page_size" title='qemu_real_host_page_size' data-ref="qemu_real_host_page_size">qemu_real_host_page_size</dfn>;</td></tr>
+<tr><th id="233">233</th><td><b>extern</b> <a class="typedef" href="../../../include/stdint.h.html#intptr_t" title='intptr_t' data-type='long' data-ref="intptr_t">intptr_t</a> <dfn class="decl" id="qemu_real_host_page_mask" title='qemu_real_host_page_mask' data-ref="qemu_real_host_page_mask">qemu_real_host_page_mask</dfn>;</td></tr>
+<tr><th id="234">234</th><td><b>extern</b> <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="decl" id="qemu_host_page_size" title='qemu_host_page_size' data-ref="qemu_host_page_size">qemu_host_page_size</dfn>;</td></tr>
+<tr><th id="235">235</th><td><b>extern</b> <a class="typedef" href="../../../include/stdint.h.html#intptr_t" title='intptr_t' data-type='long' data-ref="intptr_t">intptr_t</a> <dfn class="decl" id="qemu_host_page_mask" title='qemu_host_page_mask' data-ref="qemu_host_page_mask">qemu_host_page_mask</dfn>;</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/HOST_PAGE_ALIGN" data-ref="_M/HOST_PAGE_ALIGN">HOST_PAGE_ALIGN</dfn>(addr) (((addr) + qemu_host_page_size - 1) &amp; qemu_host_page_mask)</u></td></tr>
+<tr><th id="238">238</th><td><u>#define <dfn class="macro" id="_M/REAL_HOST_PAGE_ALIGN" data-ref="_M/REAL_HOST_PAGE_ALIGN">REAL_HOST_PAGE_ALIGN</dfn>(addr) (((addr) + qemu_real_host_page_size - 1) &amp; \</u></td></tr>
+<tr><th id="239">239</th><td><u>                                    qemu_real_host_page_mask)</u></td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><i>/* same as PROT_xxx */</i></td></tr>
+<tr><th id="242">242</th><td><u>#define <dfn class="macro" id="_M/PAGE_READ" data-ref="_M/PAGE_READ">PAGE_READ</dfn>      0x0001</u></td></tr>
+<tr><th id="243">243</th><td><u>#define <dfn class="macro" id="_M/PAGE_WRITE" data-ref="_M/PAGE_WRITE">PAGE_WRITE</dfn>     0x0002</u></td></tr>
+<tr><th id="244">244</th><td><u>#define <dfn class="macro" id="_M/PAGE_EXEC" data-ref="_M/PAGE_EXEC">PAGE_EXEC</dfn>      0x0004</u></td></tr>
+<tr><th id="245">245</th><td><u>#define <dfn class="macro" id="_M/PAGE_BITS" data-ref="_M/PAGE_BITS">PAGE_BITS</dfn>      (PAGE_READ | PAGE_WRITE | PAGE_EXEC)</u></td></tr>
+<tr><th id="246">246</th><td><u>#define <dfn class="macro" id="_M/PAGE_VALID" data-ref="_M/PAGE_VALID">PAGE_VALID</dfn>     0x0008</u></td></tr>
+<tr><th id="247">247</th><td><i>/* original state of the write flag (used when tracking self-modifying</i></td></tr>
+<tr><th id="248">248</th><td><i>   code */</i></td></tr>
+<tr><th id="249">249</th><td><u>#define <dfn class="macro" id="_M/PAGE_WRITE_ORG" data-ref="_M/PAGE_WRITE_ORG">PAGE_WRITE_ORG</dfn> 0x0010</u></td></tr>
+<tr><th id="250">250</th><td><u>#<span data-ppcond="250">if</span> defined(<span class="macro" data-ref="_M/CONFIG_BSD">CONFIG_BSD</span>) &amp;&amp; defined(<span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span>)</u></td></tr>
+<tr><th id="251">251</th><td><i>/* FIXME: Code that sets/uses this is broken and needs to go away.  */</i></td></tr>
+<tr><th id="252">252</th><td><u>#define PAGE_RESERVED  0x0020</u></td></tr>
+<tr><th id="253">253</th><td><u>#<span data-ppcond="250">endif</span></u></td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><u>#<span data-ppcond="255">if</span> defined(<span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span>)</u></td></tr>
+<tr><th id="256">256</th><td><em>void</em> page_dump(FILE *f);</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td><b>typedef</b> <em>int</em> (*walk_memory_regions_fn)(<em>void</em> *, target_ulong,</td></tr>
+<tr><th id="259">259</th><td>                                      target_ulong, <em>unsigned</em> <em>long</em>);</td></tr>
+<tr><th id="260">260</th><td><em>int</em> walk_memory_regions(<em>void</em> *, walk_memory_regions_fn);</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><em>int</em> page_get_flags(target_ulong address);</td></tr>
+<tr><th id="263">263</th><td><em>void</em> page_set_flags(target_ulong start, target_ulong end, <em>int</em> flags);</td></tr>
+<tr><th id="264">264</th><td><em>int</em> page_check_range(target_ulong start, target_ulong len, <em>int</em> flags);</td></tr>
+<tr><th id="265">265</th><td><u>#<span data-ppcond="255">endif</span></u></td></tr>
+<tr><th id="266">266</th><td></td></tr>
+<tr><th id="267">267</th><td><a class="macro" href="../../target/i386/cpu.h.html#51" title="struct CPUX86State" data-ref="_M/CPUArchState">CPUArchState</a> *<dfn class="decl" id="cpu_copy" title='cpu_copy' data-ref="cpu_copy">cpu_copy</dfn>(<a class="macro" href="../../target/i386/cpu.h.html#51" title="struct CPUX86State" data-ref="_M/CPUArchState">CPUArchState</a> *<dfn class="local col2 decl" id="10542env" title='env' data-type='struct CPUX86State *' data-ref="10542env">env</dfn>);</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><i>/* Flags for use in ENV-&gt;INTERRUPT_PENDING.</i></td></tr>
+<tr><th id="270">270</th><td><i></i></td></tr>
+<tr><th id="271">271</th><td><i>   The numbers assigned here are non-sequential in order to preserve</i></td></tr>
+<tr><th id="272">272</th><td><i>   binary compatibility with the vmstate dump.  Bit 0 (0x0001) was</i></td></tr>
+<tr><th id="273">273</th><td><i>   previously used for CPU_INTERRUPT_EXIT, and is cleared when loading</i></td></tr>
+<tr><th id="274">274</th><td><i>   the vmstate dump.  */</i></td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><i>/* External hardware interrupt pending.  This is typically used for</i></td></tr>
+<tr><th id="277">277</th><td><i>   interrupts from devices.  */</i></td></tr>
+<tr><th id="278">278</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_HARD" data-ref="_M/CPU_INTERRUPT_HARD">CPU_INTERRUPT_HARD</dfn>        0x0002</u></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><i>/* Exit the current TB.  This is typically used when some system-level device</i></td></tr>
+<tr><th id="281">281</th><td><i>   makes some change to the memory mapping.  E.g. the a20 line change.  */</i></td></tr>
+<tr><th id="282">282</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_EXITTB" data-ref="_M/CPU_INTERRUPT_EXITTB">CPU_INTERRUPT_EXITTB</dfn>      0x0004</u></td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td><i>/* Halt the CPU.  */</i></td></tr>
+<tr><th id="285">285</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_HALT" data-ref="_M/CPU_INTERRUPT_HALT">CPU_INTERRUPT_HALT</dfn>        0x0020</u></td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td><i>/* Debug event pending.  */</i></td></tr>
+<tr><th id="288">288</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_DEBUG" data-ref="_M/CPU_INTERRUPT_DEBUG">CPU_INTERRUPT_DEBUG</dfn>       0x0080</u></td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><i>/* Reset signal.  */</i></td></tr>
+<tr><th id="291">291</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_RESET" data-ref="_M/CPU_INTERRUPT_RESET">CPU_INTERRUPT_RESET</dfn>       0x0400</u></td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><i>/* Several target-specific external hardware interrupts.  Each target/cpu.h</i></td></tr>
+<tr><th id="294">294</th><td><i>   should define proper names based on these defines.  */</i></td></tr>
+<tr><th id="295">295</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_EXT_0" data-ref="_M/CPU_INTERRUPT_TGT_EXT_0">CPU_INTERRUPT_TGT_EXT_0</dfn>   0x0008</u></td></tr>
+<tr><th id="296">296</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_EXT_1" data-ref="_M/CPU_INTERRUPT_TGT_EXT_1">CPU_INTERRUPT_TGT_EXT_1</dfn>   0x0010</u></td></tr>
+<tr><th id="297">297</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_EXT_2" data-ref="_M/CPU_INTERRUPT_TGT_EXT_2">CPU_INTERRUPT_TGT_EXT_2</dfn>   0x0040</u></td></tr>
+<tr><th id="298">298</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_EXT_3" data-ref="_M/CPU_INTERRUPT_TGT_EXT_3">CPU_INTERRUPT_TGT_EXT_3</dfn>   0x0200</u></td></tr>
+<tr><th id="299">299</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_EXT_4" data-ref="_M/CPU_INTERRUPT_TGT_EXT_4">CPU_INTERRUPT_TGT_EXT_4</dfn>   0x1000</u></td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><i>/* Several target-specific internal interrupts.  These differ from the</i></td></tr>
+<tr><th id="302">302</th><td><i>   preceding target-specific interrupts in that they are intended to</i></td></tr>
+<tr><th id="303">303</th><td><i>   originate from within the cpu itself, typically in response to some</i></td></tr>
+<tr><th id="304">304</th><td><i>   instruction being executed.  These, therefore, are not masked while</i></td></tr>
+<tr><th id="305">305</th><td><i>   single-stepping within the debugger.  */</i></td></tr>
+<tr><th id="306">306</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_INT_0" data-ref="_M/CPU_INTERRUPT_TGT_INT_0">CPU_INTERRUPT_TGT_INT_0</dfn>   0x0100</u></td></tr>
+<tr><th id="307">307</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_INT_1" data-ref="_M/CPU_INTERRUPT_TGT_INT_1">CPU_INTERRUPT_TGT_INT_1</dfn>   0x0800</u></td></tr>
+<tr><th id="308">308</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_TGT_INT_2" data-ref="_M/CPU_INTERRUPT_TGT_INT_2">CPU_INTERRUPT_TGT_INT_2</dfn>   0x2000</u></td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td><i>/* First unused bit: 0x4000.  */</i></td></tr>
+<tr><th id="311">311</th><td></td></tr>
+<tr><th id="312">312</th><td><i>/* The set of all bits that should be masked when single-stepping.  */</i></td></tr>
+<tr><th id="313">313</th><td><u>#define <dfn class="macro" id="_M/CPU_INTERRUPT_SSTEP_MASK" data-ref="_M/CPU_INTERRUPT_SSTEP_MASK">CPU_INTERRUPT_SSTEP_MASK</dfn> \</u></td></tr>
+<tr><th id="314">314</th><td><u>    (CPU_INTERRUPT_HARD          \</u></td></tr>
+<tr><th id="315">315</th><td><u>     | CPU_INTERRUPT_TGT_EXT_0   \</u></td></tr>
+<tr><th id="316">316</th><td><u>     | CPU_INTERRUPT_TGT_EXT_1   \</u></td></tr>
+<tr><th id="317">317</th><td><u>     | CPU_INTERRUPT_TGT_EXT_2   \</u></td></tr>
+<tr><th id="318">318</th><td><u>     | CPU_INTERRUPT_TGT_EXT_3   \</u></td></tr>
+<tr><th id="319">319</th><td><u>     | CPU_INTERRUPT_TGT_EXT_4)</u></td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td><u>#<span data-ppcond="321">if</span> !defined(<span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span>)</u></td></tr>
+<tr><th id="322">322</th><td></td></tr>
+<tr><th id="323">323</th><td><i>/* Flags stored in the low bits of the TLB virtual address.  These are</i></td></tr>
+<tr><th id="324">324</th><td><i> * defined so that fast path ram access is all zeros.</i></td></tr>
+<tr><th id="325">325</th><td><i> * The flags all must be between TARGET_PAGE_BITS and</i></td></tr>
+<tr><th id="326">326</th><td><i> * maximum address alignment bit.</i></td></tr>
+<tr><th id="327">327</th><td><i> */</i></td></tr>
+<tr><th id="328">328</th><td><i>/* Zero if TLB entry is valid.  */</i></td></tr>
+<tr><th id="329">329</th><td><u>#define <dfn class="macro" id="_M/TLB_INVALID_MASK" data-ref="_M/TLB_INVALID_MASK">TLB_INVALID_MASK</dfn>    (1 &lt;&lt; (TARGET_PAGE_BITS - 1))</u></td></tr>
+<tr><th id="330">330</th><td><i>/* Set if TLB entry references a clean RAM page.  The iotlb entry will</i></td></tr>
+<tr><th id="331">331</th><td><i>   contain the page physical address.  */</i></td></tr>
+<tr><th id="332">332</th><td><u>#define <dfn class="macro" id="_M/TLB_NOTDIRTY" data-ref="_M/TLB_NOTDIRTY">TLB_NOTDIRTY</dfn>        (1 &lt;&lt; (TARGET_PAGE_BITS - 2))</u></td></tr>
+<tr><th id="333">333</th><td><i>/* Set if TLB entry is an IO callback.  */</i></td></tr>
+<tr><th id="334">334</th><td><u>#define <dfn class="macro" id="_M/TLB_MMIO" data-ref="_M/TLB_MMIO">TLB_MMIO</dfn>            (1 &lt;&lt; (TARGET_PAGE_BITS - 3))</u></td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td><i>/* Use this mask to check interception with an alignment mask</i></td></tr>
+<tr><th id="337">337</th><td><i> * in a TCG backend.</i></td></tr>
+<tr><th id="338">338</th><td><i> */</i></td></tr>
+<tr><th id="339">339</th><td><u>#define <dfn class="macro" id="_M/TLB_FLAGS_MASK" data-ref="_M/TLB_FLAGS_MASK">TLB_FLAGS_MASK</dfn>  (TLB_INVALID_MASK | TLB_NOTDIRTY | TLB_MMIO)</u></td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td><em>void</em> <dfn class="decl" id="dump_exec_info" title='dump_exec_info' data-ref="dump_exec_info">dump_exec_info</dfn>(<a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col3 decl" id="10543f" title='f' data-type='FILE *' data-ref="10543f">f</dfn>, <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col4 decl" id="10544cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="10544cpu_fprintf">cpu_fprintf</dfn>);</td></tr>
+<tr><th id="342">342</th><td><em>void</em> <dfn class="decl" id="dump_opcount_info" title='dump_opcount_info' data-ref="dump_opcount_info">dump_opcount_info</dfn>(<a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col5 decl" id="10545f" title='f' data-type='FILE *' data-ref="10545f">f</dfn>, <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col6 decl" id="10546cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="10546cpu_fprintf">cpu_fprintf</dfn>);</td></tr>
+<tr><th id="343">343</th><td><u>#<span data-ppcond="321">endif</span> /* !CONFIG_USER_ONLY */</u></td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td><em>int</em> <dfn class="decl" id="cpu_memory_rw_debug" title='cpu_memory_rw_debug' data-ref="cpu_memory_rw_debug">cpu_memory_rw_debug</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="10547cpu" title='cpu' data-type='CPUState *' data-ref="10547cpu">cpu</dfn>, <a class="typedef" href="cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="local col8 decl" id="10548addr" title='addr' data-type='target_ulong' data-ref="10548addr">addr</dfn>,</td></tr>
+<tr><th id="346">346</th><td>                        <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="10549buf" title='buf' data-type='uint8_t *' data-ref="10549buf">buf</dfn>, <em>int</em> <dfn class="local col0 decl" id="10550len" title='len' data-type='int' data-ref="10550len">len</dfn>, <em>int</em> <dfn class="local col1 decl" id="10551is_write" title='is_write' data-type='int' data-ref="10551is_write">is_write</dfn>);</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td><em>int</em> <dfn class="decl" id="cpu_exec" title='cpu_exec' data-ref="cpu_exec">cpu_exec</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="10552cpu" title='cpu' data-type='CPUState *' data-ref="10552cpu">cpu</dfn>);</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td><u>#<span data-ppcond="19">endif</span> /* CPU_ALL_H */</u></td></tr>
+<tr><th id="351">351</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

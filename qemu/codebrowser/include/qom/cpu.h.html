@@ -1,0 +1,1060 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>cpu.h source code [codebrowser/include/qom/cpu.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CPUBreakpoint,CPUClass,CPUDumpFlags,CPUState,CPUWatchpoint,MMUAccessType,icount_decr_u16 "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qom/cpu.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qom</a>/<a href='cpu.h.html'>cpu.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU CPU model</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2012 SUSE LINUX Products GmbH</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This program is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU General Public License</i></td></tr>
+<tr><th id="8">8</th><td><i> * as published by the Free Software Foundation; either version 2</i></td></tr>
+<tr><th id="9">9</th><td><i> * of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="14">14</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU General Public License</i></td></tr>
+<tr><th id="17">17</th><td><i> * along with this program; if not, see</i></td></tr>
+<tr><th id="18">18</th><td><i> * &lt;<a href="http://www.gnu.org/licenses/gpl-2.0.html">http://www.gnu.org/licenses/gpl-2.0.html</a>&gt;</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td><u>#<span data-ppcond="20">ifndef</span> <span class="macro" data-ref="_M/QEMU_CPU_H">QEMU_CPU_H</span></u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/QEMU_CPU_H" data-ref="_M/QEMU_CPU_H">QEMU_CPU_H</dfn></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../hw/qdev-core.h.html">"hw/qdev-core.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../disas/bfd.h.html">"disas/bfd.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../exec/hwaddr.h.html">"exec/hwaddr.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../exec/memattrs.h.html">"exec/memattrs.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../qemu/bitmap.h.html">"qemu/bitmap.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><b>typedef</b> <em>int</em> (*<dfn class="typedef" id="WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</dfn>)(<em>const</em> <em>void</em> *<dfn class="local col5 decl" id="8955buf" title='buf' data-type='const void *' data-ref="8955buf">buf</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="8956size" title='size' data-type='size_t' data-ref="8956size">size</dfn>,</td></tr>
+<tr><th id="32">32</th><td>                                     <em>void</em> *<dfn class="local col7 decl" id="8957opaque" title='opaque' data-type='void *' data-ref="8957opaque">opaque</dfn>);</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * vaddr:</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * Type wide enough to contain any #target_ulong virtual address.</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="38">38</th><td><b>typedef</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="typedef" id="vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</dfn>;</td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/VADDR_PRId" data-ref="_M/VADDR_PRId">VADDR_PRId</dfn> PRId64</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/VADDR_PRIu" data-ref="_M/VADDR_PRIu">VADDR_PRIu</dfn> PRIu64</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/VADDR_PRIo" data-ref="_M/VADDR_PRIo">VADDR_PRIo</dfn> PRIo64</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/VADDR_PRIx" data-ref="_M/VADDR_PRIx">VADDR_PRIx</dfn> PRIx64</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/VADDR_PRIX" data-ref="_M/VADDR_PRIX">VADDR_PRIX</dfn> PRIX64</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/VADDR_MAX" data-ref="_M/VADDR_MAX">VADDR_MAX</dfn> UINT64_MAX</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> * SECTION:cpu</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> * <span class="command">@section</span>_<span class="verb">id: QEMU-cpu</span></i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> *<span class="command"> @title</span>: CPU Class</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * <span class="command">@short</span>_description: Base class for all CPUs</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/TYPE_CPU" data-ref="_M/TYPE_CPU">TYPE_CPU</dfn> "cpu"</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>/* Since this macro is used a lot in hot code paths and in conjunction with</i></td></tr>
+<tr><th id="56">56</th><td><i> * FooCPU *foo_env_get_cpu(), we deviate from usual QOM practice by using</i></td></tr>
+<tr><th id="57">57</th><td><i> * an unchecked cast.</i></td></tr>
+<tr><th id="58">58</th><td><i> */</i></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/CPU" data-ref="_M/CPU">CPU</dfn>(obj) ((CPUState *)(obj))</u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/CPU_CLASS" data-ref="_M/CPU_CLASS">CPU_CLASS</dfn>(class) OBJECT_CLASS_CHECK(CPUClass, (class), TYPE_CPU)</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/CPU_GET_CLASS" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</dfn>(obj) OBJECT_GET_CLASS(<a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a>, (obj), TYPE_CPU)</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="MMUAccessType" title='MMUAccessType' data-ref="MMUAccessType"><a class="type" href="#MMUAccessType" title='MMUAccessType' data-ref="MMUAccessType">MMUAccessType</a></dfn> {</td></tr>
+<tr><th id="65">65</th><td>    <dfn class="enum" id="MMUAccessType::MMU_DATA_LOAD" title='MMUAccessType::MMU_DATA_LOAD' data-ref="MMUAccessType::MMU_DATA_LOAD">MMU_DATA_LOAD</dfn>  = <var>0</var>,</td></tr>
+<tr><th id="66">66</th><td>    <dfn class="enum" id="MMUAccessType::MMU_DATA_STORE" title='MMUAccessType::MMU_DATA_STORE' data-ref="MMUAccessType::MMU_DATA_STORE">MMU_DATA_STORE</dfn> = <var>1</var>,</td></tr>
+<tr><th id="67">67</th><td>    <dfn class="enum" id="MMUAccessType::MMU_INST_FETCH" title='MMUAccessType::MMU_INST_FETCH' data-ref="MMUAccessType::MMU_INST_FETCH">MMU_INST_FETCH</dfn> = <var>2</var></td></tr>
+<tr><th id="68">68</th><td>} <dfn class="typedef" id="MMUAccessType" title='MMUAccessType' data-type='enum MMUAccessType' data-ref="MMUAccessType">MMUAccessType</dfn>;</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#CPUWatchpoint" title='CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a> <dfn class="typedef" id="CPUWatchpoint" title='CPUWatchpoint' data-type='struct CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</dfn>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="CPUUnassignedAccess" title='CPUUnassignedAccess' data-type='void (*)(CPUState *, hwaddr, _Bool, _Bool, int, unsigned int)' data-ref="CPUUnassignedAccess">CPUUnassignedAccess</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="8958cpu" title='cpu' data-type='CPUState *' data-ref="8958cpu">cpu</dfn>, <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="8959addr" title='addr' data-type='hwaddr' data-ref="8959addr">addr</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                                    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="8960is_write" title='is_write' data-type='_Bool' data-ref="8960is_write">is_write</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="8961is_exec" title='is_exec' data-type='_Bool' data-ref="8961is_exec">is_exec</dfn>, <em>int</em> <dfn class="local col2 decl" id="8962opaque" title='opaque' data-type='int' data-ref="8962opaque">opaque</dfn>,</td></tr>
+<tr><th id="74">74</th><td>                                    <em>unsigned</em> <dfn class="local col3 decl" id="8963size" title='size' data-type='unsigned int' data-ref="8963size">size</dfn>);</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><b>struct</b> <dfn class="type" id="TranslationBlock" title='TranslationBlock' data-ref="TranslationBlock">TranslationBlock</dfn>;</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> * CPUClass:</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * <span class="command">@class</span>_<span class="verb">by_name: Callback to map -cpu command line model name to an</span></i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * instantiatable CPU type.</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> *<span class="command"> @parse</span>_features: Callback to parse command line arguments.</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> *<span class="command"> @reset</span>: Callback to reset the #CPUState to its initial state.</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> *<span class="command"> @reset</span>_dump_flags: #CPUDumpFlags to use for reset logging.</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> *<span class="command"> @has</span>_work: Callback for checking if there is work to do.</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> * <span class="command">@do<span class="verb">_interrupt: Callback for interrupt handling.</span></span></i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"><span class="command"><span class="verb"></span></span> *<span class="verb"> @do_unassigned_access: Callback for unassigned access handling.</span></i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @do_unaligned_access: Callback for unaligned access handling, if</span></i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> the target defines #ALIGNED_ONLY.</span></i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @virtio_is_big_endian: Callback to return %true if a CPU which supports</span></i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> runtime configurable endianness is currently big-endian. Non-configurable</span></i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> CPUs can use the default implementation of this method. This method should</span></i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> not be used by any callers other than the pre-1.0 virtio devices.</span></i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @memory_rw_debug: Callback for GDB memory access.</span></i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @dump_state: Callback for dumping state.</span></i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @dump_statistics: Callback for dumping statistics.</span></i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @get_arch_id: Callback for getting architecture-dependent CPU ID.</span></i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @get_paging_enabled: Callback for inquiring whether paging is enabled.</span></i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @get_memory_mapping: Callback for obtaining the memory mappings.</span></i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @set_pc: Callback for setting the Program Counter register.</span></i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @synchronize_from_tb: Callback for synchronizing state from a TCG</span></i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> #TranslationBlock.</span></i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @handle_mmu_fault: Callback for handling an MMU fault.</span></i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @get_phys_page_debug: Callback for obtaining a physical address.</span></i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @get_phys_page_attrs_debug: Callback for obtaining a physical address and the</span></i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"><span class="verb"></span> *<span class="verb">       associated memory transaction attributes to use for the access.</span></i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"><span class="verb"></span> *<span class="verb">       CPUs which use memory transaction attributes should implement this</span></i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"><span class="verb"></span> *<span class="verb">       instead of get_phys_page_debug.</span></i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @asidx_from_attrs: Callback to return the CPU AddressSpace to use for</span></i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"><span class="verb"></span> *<span class="verb">       a memory access with the specified memory transaction attributes.</span></i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_read_register: Callback for letting GDB read a register.</span></i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_write_register: Callback for letting GDB write a register.</span></i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @debug_check_watchpoint: Callback: return true if the architectural</span></i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"><span class="verb"></span> *<span class="verb">       watchpoint whose address has matched should really fire.</span></i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @debug_excp_handler: Callback for handling debug exceptions.</span></i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @write_elf64_note: Callback for writing a CPU-specific ELF note to a</span></i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> 64-bit VM coredump.</span></i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @write_elf32_qemunote: Callback for writing a CPU- and QEMU-specific ELF</span></i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> note to a 32-bit VM coredump.</span></i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @write_elf32_note: Callback for writing a CPU-specific ELF note to a</span></i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> 32-bit VM coredump.</span></i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @write_elf32_qemunote: Callback for writing a CPU- and QEMU-specific ELF</span></i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> note to a 32-bit VM coredump.</span></i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @vmsd: State description for migration.</span></i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_num_core_regs: Number of core registers accessible to GDB.</span></i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_core_xml_file: File name for core registers GDB XML description.</span></i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_stop_before_watchpoint: Indicates whether GDB expects the CPU to stop</span></i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"><span class="verb"></span> *<span class="verb">           before the insn which triggers a watchpoint rather than after it.</span></i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @gdb_arch_name: Optional callback that returns the architecture name known</span></i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> to GDB. The caller must free the returned string with g_free.</span></i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @cpu_exec_enter: Callback for cpu_exec preparation.</span></i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @cpu_exec_exit: Callback for cpu_exec cleanup.</span></i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @cpu_exec_interrupt: Callback for processing interrupts in cpu_exec.</span></i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @disas_set_info: Setup architecture specific components of disassembly info</span></i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> @adjust_watchpoint_address: Perform a target-specific adjustment to an</span></i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> address before attempting to match it against watchpoints.</span></i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"><span class="verb"></span> *<span class="verb"></span></i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"><span class="verb"></span> *<span class="verb"> Represents a CPU family or model.</span></i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"><span class="verb"></span><span class="verb"> *</span>/</i><span class="verb"></span></td></tr>
+<tr><th id="140">140</th><td><span class="verb"></span><b>typedef</b> <b>struct</b> <dfn class="type def" id="CPUClass" title='CPUClass' data-ref="CPUClass"><a class="type" href="#CPUClass" title='CPUClass' data-ref="CPUClass">CPUClass</a></dfn> {</td></tr>
+<tr><th id="141">141</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="142">142</th><td>    <a class="typedef" href="../hw/qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="CPUClass::parent_class" title='CPUClass::parent_class' data-ref="CPUClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="143">143</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>    <a class="typedef" href="object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *(*<dfn class="decl" id="CPUClass::class_by_name" title='CPUClass::class_by_name' data-ref="CPUClass::class_by_name">class_by_name</dfn>)(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="8964cpu_model" title='cpu_model' data-type='const char *' data-ref="8964cpu_model">cpu_model</dfn>);</td></tr>
+<tr><th id="146">146</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::parse_features" title='CPUClass::parse_features' data-ref="CPUClass::parse_features">parse_features</dfn>)(<em>const</em> <em>char</em> *<dfn class="local col5 decl" id="8965typename" title='typename' data-type='const char *' data-ref="8965typename">typename</dfn>, <em>char</em> *<dfn class="local col6 decl" id="8966str" title='str' data-type='char *' data-ref="8966str">str</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="8967errp" title='errp' data-type='Error **' data-ref="8967errp">errp</dfn>);</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::reset" title='CPUClass::reset' data-ref="CPUClass::reset">reset</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="8968cpu" title='cpu' data-type='CPUState *' data-ref="8968cpu">cpu</dfn>);</td></tr>
+<tr><th id="149">149</th><td>    <em>int</em> <dfn class="decl" id="CPUClass::reset_dump_flags" title='CPUClass::reset_dump_flags' data-ref="CPUClass::reset_dump_flags">reset_dump_flags</dfn>;</td></tr>
+<tr><th id="150">150</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="CPUClass::has_work" title='CPUClass::has_work' data-ref="CPUClass::has_work">has_work</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="8969cpu" title='cpu' data-type='CPUState *' data-ref="8969cpu">cpu</dfn>);</td></tr>
+<tr><th id="151">151</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::do_interrupt" title='CPUClass::do_interrupt' data-ref="CPUClass::do_interrupt">do_interrupt</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="8970cpu" title='cpu' data-type='CPUState *' data-ref="8970cpu">cpu</dfn>);</td></tr>
+<tr><th id="152">152</th><td>    <a class="typedef" href="#CPUUnassignedAccess" title='CPUUnassignedAccess' data-type='void (*)(CPUState *, hwaddr, _Bool, _Bool, int, unsigned int)' data-ref="CPUUnassignedAccess">CPUUnassignedAccess</a> <dfn class="decl" id="CPUClass::do_unassigned_access" title='CPUClass::do_unassigned_access' data-ref="CPUClass::do_unassigned_access">do_unassigned_access</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::do_unaligned_access" title='CPUClass::do_unaligned_access' data-ref="CPUClass::do_unaligned_access">do_unaligned_access</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="8971cpu" title='cpu' data-type='CPUState *' data-ref="8971cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col2 decl" id="8972addr" title='addr' data-type='vaddr' data-ref="8972addr">addr</dfn>,</td></tr>
+<tr><th id="154">154</th><td>                                <a class="typedef" href="#MMUAccessType" title='MMUAccessType' data-type='enum MMUAccessType' data-ref="MMUAccessType">MMUAccessType</a> <dfn class="local col3 decl" id="8973access_type" title='access_type' data-type='MMUAccessType' data-ref="8973access_type">access_type</dfn>,</td></tr>
+<tr><th id="155">155</th><td>                                <em>int</em> <dfn class="local col4 decl" id="8974mmu_idx" title='mmu_idx' data-type='int' data-ref="8974mmu_idx">mmu_idx</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="local col5 decl" id="8975retaddr" title='retaddr' data-type='uintptr_t' data-ref="8975retaddr">retaddr</dfn>);</td></tr>
+<tr><th id="156">156</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="CPUClass::virtio_is_big_endian" title='CPUClass::virtio_is_big_endian' data-ref="CPUClass::virtio_is_big_endian">virtio_is_big_endian</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="8976cpu" title='cpu' data-type='CPUState *' data-ref="8976cpu">cpu</dfn>);</td></tr>
+<tr><th id="157">157</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::memory_rw_debug" title='CPUClass::memory_rw_debug' data-ref="CPUClass::memory_rw_debug">memory_rw_debug</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="8977cpu" title='cpu' data-type='CPUState *' data-ref="8977cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col8 decl" id="8978addr" title='addr' data-type='vaddr' data-ref="8978addr">addr</dfn>,</td></tr>
+<tr><th id="158">158</th><td>                           <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="8979buf" title='buf' data-type='uint8_t *' data-ref="8979buf">buf</dfn>, <em>int</em> <dfn class="local col0 decl" id="8980len" title='len' data-type='int' data-ref="8980len">len</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="8981is_write" title='is_write' data-type='_Bool' data-ref="8981is_write">is_write</dfn>);</td></tr>
+<tr><th id="159">159</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::dump_state" title='CPUClass::dump_state' data-ref="CPUClass::dump_state">dump_state</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="8982cpu" title='cpu' data-type='CPUState *' data-ref="8982cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col3 decl" id="8983f" title='f' data-type='FILE *' data-ref="8983f">f</dfn>, <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col4 decl" id="8984cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="8984cpu_fprintf">cpu_fprintf</dfn>,</td></tr>
+<tr><th id="160">160</th><td>                       <em>int</em> <dfn class="local col5 decl" id="8985flags" title='flags' data-type='int' data-ref="8985flags">flags</dfn>);</td></tr>
+<tr><th id="161">161</th><td>    <a class="typedef" href="../../qapi-types.h.html#GuestPanicInformation" title='GuestPanicInformation' data-type='struct GuestPanicInformation' data-ref="GuestPanicInformation">GuestPanicInformation</a>* (*<dfn class="decl" id="CPUClass::get_crash_info" title='CPUClass::get_crash_info' data-ref="CPUClass::get_crash_info">get_crash_info</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="8986cpu" title='cpu' data-type='CPUState *' data-ref="8986cpu">cpu</dfn>);</td></tr>
+<tr><th id="162">162</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::dump_statistics" title='CPUClass::dump_statistics' data-ref="CPUClass::dump_statistics">dump_statistics</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="8987cpu" title='cpu' data-type='CPUState *' data-ref="8987cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col8 decl" id="8988f" title='f' data-type='FILE *' data-ref="8988f">f</dfn>,</td></tr>
+<tr><th id="163">163</th><td>                            <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col9 decl" id="8989cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="8989cpu_fprintf">cpu_fprintf</dfn>, <em>int</em> <dfn class="local col0 decl" id="8990flags" title='flags' data-type='int' data-ref="8990flags">flags</dfn>);</td></tr>
+<tr><th id="164">164</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> (*<dfn class="decl" id="CPUClass::get_arch_id" title='CPUClass::get_arch_id' data-ref="CPUClass::get_arch_id">get_arch_id</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="8991cpu" title='cpu' data-type='CPUState *' data-ref="8991cpu">cpu</dfn>);</td></tr>
+<tr><th id="165">165</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="CPUClass::get_paging_enabled" title='CPUClass::get_paging_enabled' data-ref="CPUClass::get_paging_enabled">get_paging_enabled</dfn>)(<em>const</em> <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="8992cpu" title='cpu' data-type='const CPUState *' data-ref="8992cpu">cpu</dfn>);</td></tr>
+<tr><th id="166">166</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::get_memory_mapping" title='CPUClass::get_memory_mapping' data-ref="CPUClass::get_memory_mapping">get_memory_mapping</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="8993cpu" title='cpu' data-type='CPUState *' data-ref="8993cpu">cpu</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col4 decl" id="8994list" title='list' data-type='MemoryMappingList *' data-ref="8994list">list</dfn>,</td></tr>
+<tr><th id="167">167</th><td>                               <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="8995errp" title='errp' data-type='Error **' data-ref="8995errp">errp</dfn>);</td></tr>
+<tr><th id="168">168</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::set_pc" title='CPUClass::set_pc' data-ref="CPUClass::set_pc">set_pc</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="8996cpu" title='cpu' data-type='CPUState *' data-ref="8996cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col7 decl" id="8997value" title='value' data-type='vaddr' data-ref="8997value">value</dfn>);</td></tr>
+<tr><th id="169">169</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::synchronize_from_tb" title='CPUClass::synchronize_from_tb' data-ref="CPUClass::synchronize_from_tb">synchronize_from_tb</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="8998cpu" title='cpu' data-type='CPUState *' data-ref="8998cpu">cpu</dfn>, <b>struct</b> <a class="type" href="#TranslationBlock" title='TranslationBlock' data-ref="TranslationBlock">TranslationBlock</a> *<dfn class="local col9 decl" id="8999tb" title='tb' data-type='struct TranslationBlock *' data-ref="8999tb">tb</dfn>);</td></tr>
+<tr><th id="170">170</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::handle_mmu_fault" title='CPUClass::handle_mmu_fault' data-ref="CPUClass::handle_mmu_fault">handle_mmu_fault</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="9000cpu" title='cpu' data-type='CPUState *' data-ref="9000cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col1 decl" id="9001address" title='address' data-type='vaddr' data-ref="9001address">address</dfn>, <em>int</em> <dfn class="local col2 decl" id="9002rw" title='rw' data-type='int' data-ref="9002rw">rw</dfn>,</td></tr>
+<tr><th id="171">171</th><td>                            <em>int</em> <dfn class="local col3 decl" id="9003mmu_index" title='mmu_index' data-type='int' data-ref="9003mmu_index">mmu_index</dfn>);</td></tr>
+<tr><th id="172">172</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> (*<dfn class="decl" id="CPUClass::get_phys_page_debug" title='CPUClass::get_phys_page_debug' data-ref="CPUClass::get_phys_page_debug">get_phys_page_debug</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9004cpu" title='cpu' data-type='CPUState *' data-ref="9004cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col5 decl" id="9005addr" title='addr' data-type='vaddr' data-ref="9005addr">addr</dfn>);</td></tr>
+<tr><th id="173">173</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> (*<dfn class="decl" id="CPUClass::get_phys_page_attrs_debug" title='CPUClass::get_phys_page_attrs_debug' data-ref="CPUClass::get_phys_page_attrs_debug">get_phys_page_attrs_debug</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9006cpu" title='cpu' data-type='CPUState *' data-ref="9006cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col7 decl" id="9007addr" title='addr' data-type='vaddr' data-ref="9007addr">addr</dfn>,</td></tr>
+<tr><th id="174">174</th><td>                                        <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> *<dfn class="local col8 decl" id="9008attrs" title='attrs' data-type='MemTxAttrs *' data-ref="9008attrs">attrs</dfn>);</td></tr>
+<tr><th id="175">175</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::asidx_from_attrs" title='CPUClass::asidx_from_attrs' data-ref="CPUClass::asidx_from_attrs">asidx_from_attrs</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9009cpu" title='cpu' data-type='CPUState *' data-ref="9009cpu">cpu</dfn>, <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col0 decl" id="9010attrs" title='attrs' data-type='MemTxAttrs' data-ref="9010attrs">attrs</dfn>);</td></tr>
+<tr><th id="176">176</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::gdb_read_register" title='CPUClass::gdb_read_register' data-ref="CPUClass::gdb_read_register">gdb_read_register</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9011cpu" title='cpu' data-type='CPUState *' data-ref="9011cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="9012buf" title='buf' data-type='uint8_t *' data-ref="9012buf">buf</dfn>, <em>int</em> <dfn class="local col3 decl" id="9013reg" title='reg' data-type='int' data-ref="9013reg">reg</dfn>);</td></tr>
+<tr><th id="177">177</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::gdb_write_register" title='CPUClass::gdb_write_register' data-ref="CPUClass::gdb_write_register">gdb_write_register</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9014cpu" title='cpu' data-type='CPUState *' data-ref="9014cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="9015buf" title='buf' data-type='uint8_t *' data-ref="9015buf">buf</dfn>, <em>int</em> <dfn class="local col6 decl" id="9016reg" title='reg' data-type='int' data-ref="9016reg">reg</dfn>);</td></tr>
+<tr><th id="178">178</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="CPUClass::debug_check_watchpoint" title='CPUClass::debug_check_watchpoint' data-ref="CPUClass::debug_check_watchpoint">debug_check_watchpoint</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9017cpu" title='cpu' data-type='CPUState *' data-ref="9017cpu">cpu</dfn>, <a class="typedef" href="#CPUWatchpoint" title='CPUWatchpoint' data-type='struct CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a> *<dfn class="local col8 decl" id="9018wp" title='wp' data-type='CPUWatchpoint *' data-ref="9018wp">wp</dfn>);</td></tr>
+<tr><th id="179">179</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::debug_excp_handler" title='CPUClass::debug_excp_handler' data-ref="CPUClass::debug_excp_handler">debug_excp_handler</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9019cpu" title='cpu' data-type='CPUState *' data-ref="9019cpu">cpu</dfn>);</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::write_elf64_note" title='CPUClass::write_elf64_note' data-ref="CPUClass::write_elf64_note">write_elf64_note</dfn>)(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col0 decl" id="9020f" title='f' data-type='WriteCoreDumpFunction' data-ref="9020f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9021cpu" title='cpu' data-type='CPUState *' data-ref="9021cpu">cpu</dfn>,</td></tr>
+<tr><th id="182">182</th><td>                            <em>int</em> <dfn class="local col2 decl" id="9022cpuid" title='cpuid' data-type='int' data-ref="9022cpuid">cpuid</dfn>, <em>void</em> *<dfn class="local col3 decl" id="9023opaque" title='opaque' data-type='void *' data-ref="9023opaque">opaque</dfn>);</td></tr>
+<tr><th id="183">183</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::write_elf64_qemunote" title='CPUClass::write_elf64_qemunote' data-ref="CPUClass::write_elf64_qemunote">write_elf64_qemunote</dfn>)(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col4 decl" id="9024f" title='f' data-type='WriteCoreDumpFunction' data-ref="9024f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9025cpu" title='cpu' data-type='CPUState *' data-ref="9025cpu">cpu</dfn>,</td></tr>
+<tr><th id="184">184</th><td>                                <em>void</em> *<dfn class="local col6 decl" id="9026opaque" title='opaque' data-type='void *' data-ref="9026opaque">opaque</dfn>);</td></tr>
+<tr><th id="185">185</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::write_elf32_note" title='CPUClass::write_elf32_note' data-ref="CPUClass::write_elf32_note">write_elf32_note</dfn>)(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col7 decl" id="9027f" title='f' data-type='WriteCoreDumpFunction' data-ref="9027f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9028cpu" title='cpu' data-type='CPUState *' data-ref="9028cpu">cpu</dfn>,</td></tr>
+<tr><th id="186">186</th><td>                            <em>int</em> <dfn class="local col9 decl" id="9029cpuid" title='cpuid' data-type='int' data-ref="9029cpuid">cpuid</dfn>, <em>void</em> *<dfn class="local col0 decl" id="9030opaque" title='opaque' data-type='void *' data-ref="9030opaque">opaque</dfn>);</td></tr>
+<tr><th id="187">187</th><td>    <em>int</em> (*<dfn class="decl" id="CPUClass::write_elf32_qemunote" title='CPUClass::write_elf32_qemunote' data-ref="CPUClass::write_elf32_qemunote">write_elf32_qemunote</dfn>)(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col1 decl" id="9031f" title='f' data-type='WriteCoreDumpFunction' data-ref="9031f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="9032cpu" title='cpu' data-type='CPUState *' data-ref="9032cpu">cpu</dfn>,</td></tr>
+<tr><th id="188">188</th><td>                                <em>void</em> *<dfn class="local col3 decl" id="9033opaque" title='opaque' data-type='void *' data-ref="9033opaque">opaque</dfn>);</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td>    <em>const</em> <b>struct</b> <a class="type" href="../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> *<dfn class="decl" id="CPUClass::vmsd" title='CPUClass::vmsd' data-ref="CPUClass::vmsd">vmsd</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    <em>int</em> <dfn class="decl" id="CPUClass::gdb_num_core_regs" title='CPUClass::gdb_num_core_regs' data-ref="CPUClass::gdb_num_core_regs">gdb_num_core_regs</dfn>;</td></tr>
+<tr><th id="192">192</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="CPUClass::gdb_core_xml_file" title='CPUClass::gdb_core_xml_file' data-ref="CPUClass::gdb_core_xml_file">gdb_core_xml_file</dfn>;</td></tr>
+<tr><th id="193">193</th><td>    <a class="typedef" href="../../../include/glib-2.0/glib/gtypes.h.html#gchar" title='gchar' data-type='char' data-ref="gchar">gchar</a> * (*<dfn class="decl" id="CPUClass::gdb_arch_name" title='CPUClass::gdb_arch_name' data-ref="CPUClass::gdb_arch_name">gdb_arch_name</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9034cpu" title='cpu' data-type='CPUState *' data-ref="9034cpu">cpu</dfn>);</td></tr>
+<tr><th id="194">194</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUClass::gdb_stop_before_watchpoint" title='CPUClass::gdb_stop_before_watchpoint' data-ref="CPUClass::gdb_stop_before_watchpoint">gdb_stop_before_watchpoint</dfn>;</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::cpu_exec_enter" title='CPUClass::cpu_exec_enter' data-ref="CPUClass::cpu_exec_enter">cpu_exec_enter</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9035cpu" title='cpu' data-type='CPUState *' data-ref="9035cpu">cpu</dfn>);</td></tr>
+<tr><th id="197">197</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::cpu_exec_exit" title='CPUClass::cpu_exec_exit' data-ref="CPUClass::cpu_exec_exit">cpu_exec_exit</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9036cpu" title='cpu' data-type='CPUState *' data-ref="9036cpu">cpu</dfn>);</td></tr>
+<tr><th id="198">198</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> (*<dfn class="decl" id="CPUClass::cpu_exec_interrupt" title='CPUClass::cpu_exec_interrupt' data-ref="CPUClass::cpu_exec_interrupt">cpu_exec_interrupt</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9037cpu" title='cpu' data-type='CPUState *' data-ref="9037cpu">cpu</dfn>, <em>int</em> <dfn class="local col8 decl" id="9038interrupt_request" title='interrupt_request' data-type='int' data-ref="9038interrupt_request">interrupt_request</dfn>);</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <em>void</em> (*<dfn class="decl" id="CPUClass::disas_set_info" title='CPUClass::disas_set_info' data-ref="CPUClass::disas_set_info">disas_set_info</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9039cpu" title='cpu' data-type='CPUState *' data-ref="9039cpu">cpu</dfn>, <a class="typedef" href="../disas/bfd.h.html#disassemble_info" title='disassemble_info' data-type='struct disassemble_info' data-ref="disassemble_info">disassemble_info</a> *<dfn class="local col0 decl" id="9040info" title='info' data-type='disassemble_info *' data-ref="9040info">info</dfn>);</td></tr>
+<tr><th id="201">201</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> (*<dfn class="decl" id="CPUClass::adjust_watchpoint_address" title='CPUClass::adjust_watchpoint_address' data-ref="CPUClass::adjust_watchpoint_address">adjust_watchpoint_address</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9041cpu" title='cpu' data-type='CPUState *' data-ref="9041cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col2 decl" id="9042addr" title='addr' data-type='vaddr' data-ref="9042addr">addr</dfn>, <em>int</em> <dfn class="local col3 decl" id="9043len" title='len' data-type='int' data-ref="9043len">len</dfn>);</td></tr>
+<tr><th id="202">202</th><td>} <dfn class="typedef" id="CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</dfn>;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><u>#<span data-ppcond="204">ifdef</span> <span class="macro" data-ref="_M/HOST_WORDS_BIGENDIAN">HOST_WORDS_BIGENDIAN</span></u></td></tr>
+<tr><th id="205">205</th><td><b>typedef</b> <b>struct</b> icount_decr_u16 {</td></tr>
+<tr><th id="206">206</th><td>    uint16_t high;</td></tr>
+<tr><th id="207">207</th><td>    uint16_t low;</td></tr>
+<tr><th id="208">208</th><td>} icount_decr_u16;</td></tr>
+<tr><th id="209">209</th><td><u>#<span data-ppcond="204">else</span></u></td></tr>
+<tr><th id="210">210</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="icount_decr_u16" title='icount_decr_u16' data-ref="icount_decr_u16"><a class="type" href="#icount_decr_u16" title='icount_decr_u16' data-ref="icount_decr_u16">icount_decr_u16</a></dfn> {</td></tr>
+<tr><th id="211">211</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="icount_decr_u16::low" title='icount_decr_u16::low' data-ref="icount_decr_u16::low">low</dfn>;</td></tr>
+<tr><th id="212">212</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="icount_decr_u16::high" title='icount_decr_u16::high' data-ref="icount_decr_u16::high">high</dfn>;</td></tr>
+<tr><th id="213">213</th><td>} <dfn class="typedef" id="icount_decr_u16" title='icount_decr_u16' data-type='struct icount_decr_u16' data-ref="icount_decr_u16">icount_decr_u16</dfn>;</td></tr>
+<tr><th id="214">214</th><td><u>#<span data-ppcond="204">endif</span></u></td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CPUBreakpoint" title='CPUBreakpoint' data-ref="CPUBreakpoint"><a class="type" href="#CPUBreakpoint" title='CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a></dfn> {</td></tr>
+<tr><th id="217">217</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="decl" id="CPUBreakpoint::pc" title='CPUBreakpoint::pc' data-ref="CPUBreakpoint::pc">pc</dfn>;</td></tr>
+<tr><th id="218">218</th><td>    <em>int</em> <dfn class="decl" id="CPUBreakpoint::flags" title='CPUBreakpoint::flags' data-ref="CPUBreakpoint::flags">flags</dfn>; <i>/* BP_* */</i></td></tr>
+<tr><th id="219">219</th><td>    <a class="macro" href="../qemu/queue.h.html#359" title="struct { struct CPUBreakpoint *tqe_next; struct CPUBreakpoint * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#CPUBreakpoint" title='CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a>) <dfn class="decl" id="CPUBreakpoint::entry" title='CPUBreakpoint::entry' data-ref="CPUBreakpoint::entry">entry</dfn>;</td></tr>
+<tr><th id="220">220</th><td>} <dfn class="typedef" id="CPUBreakpoint" title='CPUBreakpoint' data-type='struct CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</dfn>;</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td><b>struct</b> <dfn class="type def" id="CPUWatchpoint" title='CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</dfn> {</td></tr>
+<tr><th id="223">223</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="decl" id="CPUWatchpoint::vaddr" title='CPUWatchpoint::vaddr' data-ref="CPUWatchpoint::vaddr">vaddr</dfn>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="decl" id="CPUWatchpoint::len" title='CPUWatchpoint::len' data-ref="CPUWatchpoint::len">len</dfn>;</td></tr>
+<tr><th id="225">225</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="decl" id="CPUWatchpoint::hitaddr" title='CPUWatchpoint::hitaddr' data-ref="CPUWatchpoint::hitaddr">hitaddr</dfn>;</td></tr>
+<tr><th id="226">226</th><td>    <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="decl" id="CPUWatchpoint::hitattrs" title='CPUWatchpoint::hitattrs' data-ref="CPUWatchpoint::hitattrs">hitattrs</dfn>;</td></tr>
+<tr><th id="227">227</th><td>    <em>int</em> <dfn class="decl" id="CPUWatchpoint::flags" title='CPUWatchpoint::flags' data-ref="CPUWatchpoint::flags">flags</dfn>; <i>/* BP_* */</i></td></tr>
+<tr><th id="228">228</th><td>    <a class="macro" href="../qemu/queue.h.html#359" title="struct { struct CPUWatchpoint *tqe_next; struct CPUWatchpoint * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#CPUWatchpoint" title='CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a>) <dfn class="decl" id="CPUWatchpoint::entry" title='CPUWatchpoint::entry' data-ref="CPUWatchpoint::entry">entry</dfn>;</td></tr>
+<tr><th id="229">229</th><td>};</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><b>struct</b> <dfn class="type" id="KVMState" title='KVMState' data-ref="KVMState">KVMState</dfn>;</td></tr>
+<tr><th id="232">232</th><td><b>struct</b> <a class="type" href="../../linux-headers/linux/kvm.h.html#kvm_run" title='kvm_run' data-ref="kvm_run" id="kvm_run">kvm_run</a>;</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td><b>struct</b> <dfn class="type" id="hax_vcpu_state" title='hax_vcpu_state' data-ref="hax_vcpu_state">hax_vcpu_state</dfn>;</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><u>#define <dfn class="macro" id="_M/TB_JMP_CACHE_BITS" data-ref="_M/TB_JMP_CACHE_BITS">TB_JMP_CACHE_BITS</dfn> 12</u></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/TB_JMP_CACHE_SIZE" data-ref="_M/TB_JMP_CACHE_SIZE">TB_JMP_CACHE_SIZE</dfn> (1 &lt;&lt; TB_JMP_CACHE_BITS)</u></td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td><i>/* work queue */</i></td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><i>/* The union type allows passing of 64 bit target pointers on 32 bit</i></td></tr>
+<tr><th id="242">242</th><td><i> * hosts in a single parameter</i></td></tr>
+<tr><th id="243">243</th><td><i> */</i></td></tr>
+<tr><th id="244">244</th><td><b>typedef</b> <b>union</b> {</td></tr>
+<tr><th id="245">245</th><td>    <em>int</em>           <dfn class="decl" id="(anonymous)::host_int" title='(anonymous union)::host_int' data-ref="(anonymous)::host_int">host_int</dfn>;</td></tr>
+<tr><th id="246">246</th><td>    <em>unsigned</em> <em>long</em> <dfn class="decl" id="(anonymous)::host_ulong" title='(anonymous union)::host_ulong' data-ref="(anonymous)::host_ulong">host_ulong</dfn>;</td></tr>
+<tr><th id="247">247</th><td>    <em>void</em>         *<dfn class="decl" id="(anonymous)::host_ptr" title='(anonymous union)::host_ptr' data-ref="(anonymous)::host_ptr">host_ptr</dfn>;</td></tr>
+<tr><th id="248">248</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a>         <dfn class="decl" id="(anonymous)::target_ptr" title='(anonymous union)::target_ptr' data-ref="(anonymous)::target_ptr">target_ptr</dfn>;</td></tr>
+<tr><th id="249">249</th><td>} <dfn class="typedef" id="run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</dfn>;</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><u>#define <dfn class="macro" id="_M/RUN_ON_CPU_HOST_PTR" data-ref="_M/RUN_ON_CPU_HOST_PTR">RUN_ON_CPU_HOST_PTR</dfn>(p)    ((run_on_cpu_data){.host_ptr = (p)})</u></td></tr>
+<tr><th id="252">252</th><td><u>#define <dfn class="macro" id="_M/RUN_ON_CPU_HOST_INT" data-ref="_M/RUN_ON_CPU_HOST_INT">RUN_ON_CPU_HOST_INT</dfn>(i)    ((run_on_cpu_data){.host_int = (i)})</u></td></tr>
+<tr><th id="253">253</th><td><u>#define <dfn class="macro" id="_M/RUN_ON_CPU_HOST_ULONG" data-ref="_M/RUN_ON_CPU_HOST_ULONG">RUN_ON_CPU_HOST_ULONG</dfn>(ul) ((run_on_cpu_data){.host_ulong = (ul)})</u></td></tr>
+<tr><th id="254">254</th><td><u>#define <dfn class="macro" id="_M/RUN_ON_CPU_TARGET_PTR" data-ref="_M/RUN_ON_CPU_TARGET_PTR">RUN_ON_CPU_TARGET_PTR</dfn>(v)  ((run_on_cpu_data){.target_ptr = (v)})</u></td></tr>
+<tr><th id="255">255</th><td><u>#define <dfn class="macro" id="_M/RUN_ON_CPU_NULL" data-ref="_M/RUN_ON_CPU_NULL">RUN_ON_CPU_NULL</dfn>           RUN_ON_CPU_HOST_PTR(NULL)</u></td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="run_on_cpu_func" title='run_on_cpu_func' data-type='void (*)(CPUState *, run_on_cpu_data)' data-ref="run_on_cpu_func">run_on_cpu_func</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9044cpu" title='cpu' data-type='CPUState *' data-ref="9044cpu">cpu</dfn>, <a class="typedef" href="#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col5 decl" id="9045data" title='data' data-type='run_on_cpu_data' data-ref="9045data">data</dfn>);</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td><b>struct</b> <dfn class="type" id="qemu_work_item" title='qemu_work_item' data-ref="qemu_work_item">qemu_work_item</dfn>;</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td><u>#define <dfn class="macro" id="_M/CPU_UNSET_NUMA_NODE_ID" data-ref="_M/CPU_UNSET_NUMA_NODE_ID">CPU_UNSET_NUMA_NODE_ID</dfn> -1</u></td></tr>
+<tr><th id="262">262</th><td><u>#define <dfn class="macro" id="_M/CPU_TRACE_DSTATE_MAX_EVENTS" data-ref="_M/CPU_TRACE_DSTATE_MAX_EVENTS">CPU_TRACE_DSTATE_MAX_EVENTS</dfn> 32</u></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> * CPUState:</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> *<span class="command"> @cpu</span>_index: CPU index (informative).</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> *<span class="command"> @nr</span>_cores: Number of cores within this CPU package.</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> *<span class="command"> @nr</span>_threads: Number of threads within this CPU.</i></td></tr>
+<tr><th id="269">269</th><td><i class="doc"> *<span class="command"> @running</span>: #true if CPU is currently running (lockless).</i></td></tr>
+<tr><th id="270">270</th><td><i class="doc"> *<span class="command"> @has</span>_waiter: #true if a CPU is currently waiting for the cpu_exec_end;</i></td></tr>
+<tr><th id="271">271</th><td><i class="doc"> * valid under cpu_list_lock.</i></td></tr>
+<tr><th id="272">272</th><td><i class="doc"> *<span class="command"> @created</span>: Indicates whether the CPU thread has been successfully created.</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> *<span class="command"> @interrupt</span>_request: Indicates a pending interrupt request.</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> *<span class="command"> @halted</span>: Nonzero if the CPU is in suspended state.</i></td></tr>
+<tr><th id="275">275</th><td><i class="doc"> *<span class="command"> @stop</span>: Indicates a pending stop request.</i></td></tr>
+<tr><th id="276">276</th><td><i class="doc"> *<span class="command"> @stopped</span>: Indicates the CPU has been artificially stopped.</i></td></tr>
+<tr><th id="277">277</th><td><i class="doc"> *<span class="command"> @unplug</span>: Indicates a pending CPU unplug request.</i></td></tr>
+<tr><th id="278">278</th><td><i class="doc"> *<span class="command"> @crash</span>_occurred: Indicates the OS reported a crash (panic) for this CPU</i></td></tr>
+<tr><th id="279">279</th><td><i class="doc"> *<span class="command"> @singlestep</span>_enabled: Flags for single-stepping.</i></td></tr>
+<tr><th id="280">280</th><td><i class="doc"> *<span class="command"> @icount</span>_extra: Instructions until next timer event.</i></td></tr>
+<tr><th id="281">281</th><td><i class="doc"> *<span class="command"> @icount</span>_decr: Low 16 bits: number of cycles left, only used in icount mode.</i></td></tr>
+<tr><th id="282">282</th><td><i class="doc"> * High 16 bits: Set to -1 to force TCG to stop executing linked TBs for this</i></td></tr>
+<tr><th id="283">283</th><td><i class="doc"> * CPU and return to its top level loop (even in non-icount mode).</i></td></tr>
+<tr><th id="284">284</th><td><i class="doc"> * This allows a single read-compare-cbranch-write sequence to test</i></td></tr>
+<tr><th id="285">285</th><td><i class="doc"> * for both decrementer underflow and exceptions.</i></td></tr>
+<tr><th id="286">286</th><td><i class="doc"> *<span class="command"> @can</span>_do_io: Nonzero if memory-mapped IO is safe. Deterministic execution</i></td></tr>
+<tr><th id="287">287</th><td><i class="doc"> * requires that IO only be performed on the last instruction of a TB</i></td></tr>
+<tr><th id="288">288</th><td><i class="doc"> * so that interrupts take effect immediately.</i></td></tr>
+<tr><th id="289">289</th><td><i class="doc"> *<span class="command"> @cpu</span>_ases: Pointer to array of CPUAddressSpaces (which define the</i></td></tr>
+<tr><th id="290">290</th><td><i class="doc"> *            AddressSpaces this CPU has)</i></td></tr>
+<tr><th id="291">291</th><td><i class="doc"> * <span class="command">@num_</span><span class="verb">ases: number of CPUAddressSpaces in @cpu_ases</span></i></td></tr>
+<tr><th id="292">292</th><td><i class="doc"> *<span class="command"> @as</span><span class="arg">:</span> Pointer to the first AddressSpace, for the convenience of targets which</i></td></tr>
+<tr><th id="293">293</th><td><i class="doc"> *      only have a single AddressSpace</i></td></tr>
+<tr><th id="294">294</th><td><i class="doc"> *<span class="command"> @env</span>_ptr: Pointer to subclass-specific CPUArchState field.</i></td></tr>
+<tr><th id="295">295</th><td><i class="doc"> *<span class="command"> @gdb</span>_regs: Additional GDB registers.</i></td></tr>
+<tr><th id="296">296</th><td><i class="doc"> *<span class="command"> @gdb</span>_num_regs: Number of total registers accessible to GDB.</i></td></tr>
+<tr><th id="297">297</th><td><i class="doc"> *<span class="command"> @gdb</span>_num_g_regs: Number of registers in GDB 'g' packets.</i></td></tr>
+<tr><th id="298">298</th><td><i class="doc"> *<span class="command"> @next</span>_cpu: Next CPU sharing TB cache.</i></td></tr>
+<tr><th id="299">299</th><td><i class="doc"> *<span class="command"> @opaque</span>: User data.</i></td></tr>
+<tr><th id="300">300</th><td><i class="doc"> *<span class="command"> @mem</span><span class="arg">_io_pc:</span> Host Program Counter at which the memory was accessed.</i></td></tr>
+<tr><th id="301">301</th><td><i class="doc"> *<span class="command"> @mem</span><span class="arg">_io_vaddr:</span> Target virtual address at which the memory was accessed.</i></td></tr>
+<tr><th id="302">302</th><td><i class="doc"> *<span class="command"> @kvm</span>_fd: vCPU file descriptor for KVM.</i></td></tr>
+<tr><th id="303">303</th><td><i class="doc"> *<span class="command"> @work</span>_mutex: Lock to prevent multiple access to queued_work_*.</i></td></tr>
+<tr><th id="304">304</th><td><i class="doc"> *<span class="command"> @queued</span>_work_first: First asynchronous work pending.</i></td></tr>
+<tr><th id="305">305</th><td><i class="doc"> *<span class="command"> @trace</span>_dstate_delayed: Delayed changes to trace_dstate (includes all changes</i></td></tr>
+<tr><th id="306">306</th><td><i class="doc"> *                        to<span class="command"> @trace</span>_dstate).</i></td></tr>
+<tr><th id="307">307</th><td><i class="doc"> *<span class="command"> @trace</span>_dstate: Dynamic tracing state of events for this vCPU (bitmask).</i></td></tr>
+<tr><th id="308">308</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="309">309</th><td><i class="doc"> * State of one CPU core or thread.</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="311">311</th><td><b>struct</b> <dfn class="type def" id="CPUState" title='CPUState' data-ref="CPUState">CPUState</dfn> {</td></tr>
+<tr><th id="312">312</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="313">313</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="CPUState::parent_obj" title='CPUState::parent_obj' data-ref="CPUState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="314">314</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>    <em>int</em> <dfn class="decl" id="CPUState::nr_cores" title='CPUState::nr_cores' data-ref="CPUState::nr_cores">nr_cores</dfn>;</td></tr>
+<tr><th id="317">317</th><td>    <em>int</em> <dfn class="decl" id="CPUState::nr_threads" title='CPUState::nr_threads' data-ref="CPUState::nr_threads">nr_threads</dfn>;</td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td>    <b>struct</b> <a class="type" href="../qemu/thread-posix.h.html#QemuThread" title='QemuThread' data-ref="QemuThread">QemuThread</a> *<dfn class="decl" id="CPUState::thread" title='CPUState::thread' data-ref="CPUState::thread">thread</dfn>;</td></tr>
+<tr><th id="320">320</th><td><u>#<span data-ppcond="320">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="321">321</th><td>    HANDLE hThread;</td></tr>
+<tr><th id="322">322</th><td><u>#<span data-ppcond="320">endif</span></u></td></tr>
+<tr><th id="323">323</th><td>    <em>int</em> <dfn class="decl" id="CPUState::thread_id" title='CPUState::thread_id' data-ref="CPUState::thread_id">thread_id</dfn>;</td></tr>
+<tr><th id="324">324</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::running" title='CPUState::running' data-ref="CPUState::running">running</dfn>, <dfn class="decl" id="CPUState::has_waiter" title='CPUState::has_waiter' data-ref="CPUState::has_waiter">has_waiter</dfn>;</td></tr>
+<tr><th id="325">325</th><td>    <b>struct</b> <a class="type" href="../qemu/thread-posix.h.html#QemuCond" title='QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="decl" id="CPUState::halt_cond" title='CPUState::halt_cond' data-ref="CPUState::halt_cond">halt_cond</dfn>;</td></tr>
+<tr><th id="326">326</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::thread_kicked" title='CPUState::thread_kicked' data-ref="CPUState::thread_kicked">thread_kicked</dfn>;</td></tr>
+<tr><th id="327">327</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::created" title='CPUState::created' data-ref="CPUState::created">created</dfn>;</td></tr>
+<tr><th id="328">328</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::stop" title='CPUState::stop' data-ref="CPUState::stop">stop</dfn>;</td></tr>
+<tr><th id="329">329</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::stopped" title='CPUState::stopped' data-ref="CPUState::stopped">stopped</dfn>;</td></tr>
+<tr><th id="330">330</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::unplug" title='CPUState::unplug' data-ref="CPUState::unplug">unplug</dfn>;</td></tr>
+<tr><th id="331">331</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::crash_occurred" title='CPUState::crash_occurred' data-ref="CPUState::crash_occurred">crash_occurred</dfn>;</td></tr>
+<tr><th id="332">332</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::exit_request" title='CPUState::exit_request' data-ref="CPUState::exit_request">exit_request</dfn>;</td></tr>
+<tr><th id="333">333</th><td>    <i>/* updates protected by BQL */</i></td></tr>
+<tr><th id="334">334</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="CPUState::interrupt_request" title='CPUState::interrupt_request' data-ref="CPUState::interrupt_request">interrupt_request</dfn>;</td></tr>
+<tr><th id="335">335</th><td>    <em>int</em> <dfn class="decl" id="CPUState::singlestep_enabled" title='CPUState::singlestep_enabled' data-ref="CPUState::singlestep_enabled">singlestep_enabled</dfn>;</td></tr>
+<tr><th id="336">336</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="CPUState::icount_budget" title='CPUState::icount_budget' data-ref="CPUState::icount_budget">icount_budget</dfn>;</td></tr>
+<tr><th id="337">337</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="CPUState::icount_extra" title='CPUState::icount_extra' data-ref="CPUState::icount_extra">icount_extra</dfn>;</td></tr>
+<tr><th id="338">338</th><td>    <a class="typedef" href="../../../include/setjmp.h.html#sigjmp_buf" title='sigjmp_buf' data-type='struct __jmp_buf_tag [1]' data-ref="sigjmp_buf">sigjmp_buf</a> <dfn class="decl" id="CPUState::jmp_env" title='CPUState::jmp_env' data-ref="CPUState::jmp_env">jmp_env</dfn>;</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>    <a class="typedef" href="../qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="CPUState::work_mutex" title='CPUState::work_mutex' data-ref="CPUState::work_mutex">work_mutex</dfn>;</td></tr>
+<tr><th id="341">341</th><td>    <b>struct</b> <a class="type" href="#qemu_work_item" title='qemu_work_item' data-ref="qemu_work_item">qemu_work_item</a> *<dfn class="decl" id="CPUState::queued_work_first" title='CPUState::queued_work_first' data-ref="CPUState::queued_work_first">queued_work_first</dfn>, *<dfn class="decl" id="CPUState::queued_work_last" title='CPUState::queued_work_last' data-ref="CPUState::queued_work_last">queued_work_last</dfn>;</td></tr>
+<tr><th id="342">342</th><td></td></tr>
+<tr><th id="343">343</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#CPUAddressSpace" title='CPUAddressSpace' data-type='struct CPUAddressSpace' data-ref="CPUAddressSpace">CPUAddressSpace</a> *<dfn class="decl" id="CPUState::cpu_ases" title='CPUState::cpu_ases' data-ref="CPUState::cpu_ases">cpu_ases</dfn>;</td></tr>
+<tr><th id="344">344</th><td>    <em>int</em> <dfn class="decl" id="CPUState::num_ases" title='CPUState::num_ases' data-ref="CPUState::num_ases">num_ases</dfn>;</td></tr>
+<tr><th id="345">345</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="decl" id="CPUState::as" title='CPUState::as' data-ref="CPUState::as">as</dfn>;</td></tr>
+<tr><th id="346">346</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="CPUState::memory" title='CPUState::memory' data-ref="CPUState::memory">memory</dfn>;</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td>    <em>void</em> *<dfn class="decl" id="CPUState::env_ptr" title='CPUState::env_ptr' data-ref="CPUState::env_ptr">env_ptr</dfn>; <i>/* CPUArchState */</i></td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td>    <i>/* Accessed in parallel; all accesses must be atomic */</i></td></tr>
+<tr><th id="351">351</th><td>    <b>struct</b> <a class="type" href="#TranslationBlock" title='TranslationBlock' data-ref="TranslationBlock">TranslationBlock</a> *<dfn class="decl" id="CPUState::tb_jmp_cache" title='CPUState::tb_jmp_cache' data-ref="CPUState::tb_jmp_cache">tb_jmp_cache</dfn>[<a class="macro" href="#237" title="(1 &lt;&lt; 12)" data-ref="_M/TB_JMP_CACHE_SIZE">TB_JMP_CACHE_SIZE</a>];</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td>    <b>struct</b> <dfn class="type" id="GDBRegisterState" title='GDBRegisterState' data-ref="GDBRegisterState"><a class="type" href="#GDBRegisterState" title='GDBRegisterState' data-ref="GDBRegisterState">GDBRegisterState</a></dfn> *<dfn class="decl" id="CPUState::gdb_regs" title='CPUState::gdb_regs' data-ref="CPUState::gdb_regs">gdb_regs</dfn>;</td></tr>
+<tr><th id="354">354</th><td>    <em>int</em> <dfn class="decl" id="CPUState::gdb_num_regs" title='CPUState::gdb_num_regs' data-ref="CPUState::gdb_num_regs">gdb_num_regs</dfn>;</td></tr>
+<tr><th id="355">355</th><td>    <em>int</em> <dfn class="decl" id="CPUState::gdb_num_g_regs" title='CPUState::gdb_num_g_regs' data-ref="CPUState::gdb_num_g_regs">gdb_num_g_regs</dfn>;</td></tr>
+<tr><th id="356">356</th><td>    <a class="macro" href="../qemu/queue.h.html#359" title="struct { struct CPUState *tqe_next; struct CPUState * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#CPUState" title='CPUState' data-ref="CPUState">CPUState</a>) <dfn class="decl" id="CPUState::node" title='CPUState::node' data-ref="CPUState::node">node</dfn>;</td></tr>
+<tr><th id="357">357</th><td></td></tr>
+<tr><th id="358">358</th><td>    <i>/* ice debug support */</i></td></tr>
+<tr><th id="359">359</th><td>    <a class="macro" href="../qemu/queue.h.html#349" title="struct breakpoints_head { struct CPUBreakpoint *tqh_first; struct CPUBreakpoint * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="breakpoints_head" title='breakpoints_head' data-ref="breakpoints_head"><a class="type" href="#359" title='breakpoints_head' data-ref="breakpoints_head">breakpoints_head</a></dfn>, <a class="type" href="#CPUBreakpoint" title='CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a>) <dfn class="decl" id="CPUState::breakpoints" title='CPUState::breakpoints' data-ref="CPUState::breakpoints">breakpoints</dfn>;</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td>    <a class="macro" href="../qemu/queue.h.html#349" title="struct watchpoints_head { struct CPUWatchpoint *tqh_first; struct CPUWatchpoint * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="watchpoints_head" title='watchpoints_head' data-ref="watchpoints_head"><a class="type" href="#361" title='watchpoints_head' data-ref="watchpoints_head">watchpoints_head</a></dfn>, <a class="type" href="#CPUWatchpoint" title='CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a>) <dfn class="decl" id="CPUState::watchpoints" title='CPUState::watchpoints' data-ref="CPUState::watchpoints">watchpoints</dfn>;</td></tr>
+<tr><th id="362">362</th><td>    <a class="typedef" href="#CPUWatchpoint" title='CPUWatchpoint' data-type='struct CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a> *<dfn class="decl" id="CPUState::watchpoint_hit" title='CPUState::watchpoint_hit' data-ref="CPUState::watchpoint_hit">watchpoint_hit</dfn>;</td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td>    <em>void</em> *<dfn class="decl" id="CPUState::opaque" title='CPUState::opaque' data-ref="CPUState::opaque">opaque</dfn>;</td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td>    <i>/* In order to avoid passing too many arguments to the MMIO helpers,</i></td></tr>
+<tr><th id="367">367</th><td><i>     * we store some rarely used information in the CPU context.</i></td></tr>
+<tr><th id="368">368</th><td><i>     */</i></td></tr>
+<tr><th id="369">369</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="decl" id="CPUState::mem_io_pc" title='CPUState::mem_io_pc' data-ref="CPUState::mem_io_pc">mem_io_pc</dfn>;</td></tr>
+<tr><th id="370">370</th><td>    <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="decl" id="CPUState::mem_io_vaddr" title='CPUState::mem_io_vaddr' data-ref="CPUState::mem_io_vaddr">mem_io_vaddr</dfn>;</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td>    <em>int</em> <dfn class="decl" id="CPUState::kvm_fd" title='CPUState::kvm_fd' data-ref="CPUState::kvm_fd">kvm_fd</dfn>;</td></tr>
+<tr><th id="373">373</th><td>    <b>struct</b> <a class="type" href="#KVMState" title='KVMState' data-ref="KVMState">KVMState</a> *<dfn class="decl" id="CPUState::kvm_state" title='CPUState::kvm_state' data-ref="CPUState::kvm_state">kvm_state</dfn>;</td></tr>
+<tr><th id="374">374</th><td>    <b>struct</b> <a class="type" href="../../linux-headers/linux/kvm.h.html#kvm_run" title='kvm_run' data-ref="kvm_run">kvm_run</a> *<dfn class="decl" id="CPUState::kvm_run" title='CPUState::kvm_run' data-ref="CPUState::kvm_run">kvm_run</dfn>;</td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td>    <i>/* Used for events with 'vcpu' and *without* the 'disabled' properties */</i></td></tr>
+<tr><th id="377">377</th><td>    <a class="macro" href="../qemu/bitmap.h.html#63" title="unsigned long trace_dstate_delayed[(((32) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))]" data-ref="_M/DECLARE_BITMAP">DECLARE_BITMAP</a>(<dfn class="decl" id="CPUState::trace_dstate_delayed" title='CPUState::trace_dstate_delayed' data-ref="CPUState::trace_dstate_delayed">trace_dstate_delayed</dfn>, <a class="macro" href="#262" title="32" data-ref="_M/CPU_TRACE_DSTATE_MAX_EVENTS">CPU_TRACE_DSTATE_MAX_EVENTS</a>);</td></tr>
+<tr><th id="378">378</th><td>    <a class="macro" href="../qemu/bitmap.h.html#63" title="unsigned long trace_dstate[(((32) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))]" data-ref="_M/DECLARE_BITMAP">DECLARE_BITMAP</a>(<dfn class="decl" id="CPUState::trace_dstate" title='CPUState::trace_dstate' data-ref="CPUState::trace_dstate">trace_dstate</dfn>, <a class="macro" href="#262" title="32" data-ref="_M/CPU_TRACE_DSTATE_MAX_EVENTS">CPU_TRACE_DSTATE_MAX_EVENTS</a>);</td></tr>
+<tr><th id="379">379</th><td></td></tr>
+<tr><th id="380">380</th><td>    <i>/* TODO Move common fields from CPUArchState here. */</i></td></tr>
+<tr><th id="381">381</th><td>    <em>int</em> <dfn class="decl" id="CPUState::cpu_index" title='CPUState::cpu_index' data-ref="CPUState::cpu_index">cpu_index</dfn>; <i>/* used by alpha TCG */</i></td></tr>
+<tr><th id="382">382</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="CPUState::halted" title='CPUState::halted' data-ref="CPUState::halted">halted</dfn>; <i>/* used by alpha, cris, ppc TCG */</i></td></tr>
+<tr><th id="383">383</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="CPUState::can_do_io" title='CPUState::can_do_io' data-ref="CPUState::can_do_io">can_do_io</dfn>;</td></tr>
+<tr><th id="384">384</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="CPUState::exception_index" title='CPUState::exception_index' data-ref="CPUState::exception_index">exception_index</dfn>; <i>/* used by m68k TCG */</i></td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td>    <i>/* shared by kvm, hax and hvf */</i></td></tr>
+<tr><th id="387">387</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::vcpu_dirty" title='CPUState::vcpu_dirty' data-ref="CPUState::vcpu_dirty">vcpu_dirty</dfn>;</td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td>    <i>/* Used to keep track of an outstanding cpu throttle thread for migration</i></td></tr>
+<tr><th id="390">390</th><td><i>     * autoconverge</i></td></tr>
+<tr><th id="391">391</th><td><i>     */</i></td></tr>
+<tr><th id="392">392</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="CPUState::throttle_thread_scheduled" title='CPUState::throttle_thread_scheduled' data-ref="CPUState::throttle_thread_scheduled">throttle_thread_scheduled</dfn>;</td></tr>
+<tr><th id="393">393</th><td></td></tr>
+<tr><th id="394">394</th><td>    <i>/* Note that this is accessed at the start of every TB via a negative</i></td></tr>
+<tr><th id="395">395</th><td><i>       offset from AREG0.  Leave this field at the end so as to make the</i></td></tr>
+<tr><th id="396">396</th><td><i>       (absolute value) offset as small as possible.  This reduces code</i></td></tr>
+<tr><th id="397">397</th><td><i>       size, especially for hosts without large memory offsets.  */</i></td></tr>
+<tr><th id="398">398</th><td>    <b>union</b> {</td></tr>
+<tr><th id="399">399</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="CPUState::(anonymous)::u32" title='CPUState::(anonymous union)::u32' data-ref="CPUState::(anonymous)::u32">u32</dfn>;</td></tr>
+<tr><th id="400">400</th><td>        <a class="typedef" href="#icount_decr_u16" title='icount_decr_u16' data-type='struct icount_decr_u16' data-ref="icount_decr_u16">icount_decr_u16</a> <dfn class="decl" id="CPUState::(anonymous)::u16" title='CPUState::(anonymous union)::u16' data-ref="CPUState::(anonymous)::u16">u16</dfn>;</td></tr>
+<tr><th id="401">401</th><td>    } <dfn class="decl" id="CPUState::icount_decr" title='CPUState::icount_decr' data-ref="CPUState::icount_decr">icount_decr</dfn>;</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td>    <b>struct</b> <a class="type" href="#hax_vcpu_state" title='hax_vcpu_state' data-ref="hax_vcpu_state">hax_vcpu_state</a> *<dfn class="decl" id="CPUState::hax_vcpu" title='CPUState::hax_vcpu' data-ref="CPUState::hax_vcpu">hax_vcpu</dfn>;</td></tr>
+<tr><th id="404">404</th><td></td></tr>
+<tr><th id="405">405</th><td>    <i>/* The pending_tlb_flush flag is set and cleared atomically to</i></td></tr>
+<tr><th id="406">406</th><td><i>     * avoid potential races. The aim of the flag is to avoid</i></td></tr>
+<tr><th id="407">407</th><td><i>     * unnecessary flushes.</i></td></tr>
+<tr><th id="408">408</th><td><i>     */</i></td></tr>
+<tr><th id="409">409</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="CPUState::pending_tlb_flush" title='CPUState::pending_tlb_flush' data-ref="CPUState::pending_tlb_flush">pending_tlb_flush</dfn>;</td></tr>
+<tr><th id="410">410</th><td>};</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td><a class="macro" href="../qemu/queue.h.html#349" title="struct CPUTailQ { struct CPUState *tqh_first; struct CPUState * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(<dfn class="type def" id="CPUTailQ" title='CPUTailQ' data-ref="CPUTailQ">CPUTailQ</dfn>, <a class="type" href="#CPUState" title='CPUState' data-ref="CPUState">CPUState</a>);</td></tr>
+<tr><th id="413">413</th><td><b>extern</b> <b>struct</b> <a class="type" href="#412" title='CPUTailQ' data-ref="CPUTailQ">CPUTailQ</a> <dfn class="decl" id="cpus" title='cpus' data-ref="cpus">cpus</dfn>;</td></tr>
+<tr><th id="414">414</th><td><u>#define <dfn class="macro" id="_M/CPU_NEXT" data-ref="_M/CPU_NEXT">CPU_NEXT</dfn>(cpu) QTAILQ_NEXT(cpu, node)</u></td></tr>
+<tr><th id="415">415</th><td><u>#define <dfn class="macro" id="_M/CPU_FOREACH" data-ref="_M/CPU_FOREACH">CPU_FOREACH</dfn>(cpu) QTAILQ_FOREACH(cpu, &amp;cpus, node)</u></td></tr>
+<tr><th id="416">416</th><td><u>#define <dfn class="macro" id="_M/CPU_FOREACH_SAFE" data-ref="_M/CPU_FOREACH_SAFE">CPU_FOREACH_SAFE</dfn>(cpu, next_cpu) \</u></td></tr>
+<tr><th id="417">417</th><td><u>    QTAILQ_FOREACH_SAFE(cpu, &amp;cpus, node, next_cpu)</u></td></tr>
+<tr><th id="418">418</th><td><u>#define <dfn class="macro" id="_M/CPU_FOREACH_REVERSE" data-ref="_M/CPU_FOREACH_REVERSE">CPU_FOREACH_REVERSE</dfn>(cpu) \</u></td></tr>
+<tr><th id="419">419</th><td><u>    QTAILQ_FOREACH_REVERSE(cpu, &amp;cpus, CPUTailQ, node)</u></td></tr>
+<tr><th id="420">420</th><td><u>#define <dfn class="macro" id="_M/first_cpu" data-ref="_M/first_cpu">first_cpu</dfn> QTAILQ_FIRST(&amp;cpus)</u></td></tr>
+<tr><th id="421">421</th><td></td></tr>
+<tr><th id="422">422</th><td><b>extern</b> <b>__thread</b> <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="decl" id="current_cpu" title='current_cpu' data-ref="current_cpu">current_cpu</dfn>;</td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="cpu_tb_jmp_cache_clear" title='cpu_tb_jmp_cache_clear' data-ref="cpu_tb_jmp_cache_clear">cpu_tb_jmp_cache_clear</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9046cpu" title='cpu' data-type='CPUState *' data-ref="9046cpu">cpu</dfn>)</td></tr>
+<tr><th id="425">425</th><td>{</td></tr>
+<tr><th id="426">426</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col7 decl" id="9047i" title='i' data-type='unsigned int' data-ref="9047i">i</dfn>;</td></tr>
+<tr><th id="427">427</th><td></td></tr>
+<tr><th id="428">428</th><td>    <b>for</b> (<a class="local col7 ref" href="#9047i" title='i' data-ref="9047i">i</a> = <var>0</var>; <a class="local col7 ref" href="#9047i" title='i' data-ref="9047i">i</a> &lt; <a class="macro" href="#237" title="(1 &lt;&lt; 12)" data-ref="_M/TB_JMP_CACHE_SIZE">TB_JMP_CACHE_SIZE</a>; <a class="local col7 ref" href="#9047i" title='i' data-ref="9047i">i</a>++) {</td></tr>
+<tr><th id="429">429</th><td>        <a class="macro" href="../qemu/atomic.h.html#132" title="do { _Static_assert(!(sizeof(*&amp;cpu-&gt;tb_jmp_cache[i]) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;cpu-&gt;tb_jmp_cache[i]) &gt; ATOMIC_REG_SIZE&quot;); __atomic_store_n(&amp;cpu-&gt;tb_jmp_cache[i], ((void*)0), 0); } while(0)" data-ref="_M/atomic_set">atomic_set</a>(&amp;<a class="local col6 ref" href="#9046cpu" title='cpu' data-ref="9046cpu">cpu</a>-&gt;<a class="ref" href="#CPUState::tb_jmp_cache" title='CPUState::tb_jmp_cache' data-ref="CPUState::tb_jmp_cache">tb_jmp_cache</a>[<a class="local col7 ref" href="#9047i" title='i' data-ref="9047i">i</a>], <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="430">430</th><td>    }</td></tr>
+<tr><th id="431">431</th><td>}</td></tr>
+<tr><th id="432">432</th><td></td></tr>
+<tr><th id="433">433</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="434">434</th><td><i class="doc"> * qemu_tcg_mttcg_enabled:</i></td></tr>
+<tr><th id="435">435</th><td><i class="doc"> * Check whether we are running MultiThread TCG or not.</i></td></tr>
+<tr><th id="436">436</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="437">437</th><td><i class="doc"> * Returns: %true if we are in MTTCG mode %false otherwise.</i></td></tr>
+<tr><th id="438">438</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="439">439</th><td><b>extern</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="mttcg_enabled" title='mttcg_enabled' data-ref="mttcg_enabled">mttcg_enabled</dfn>;</td></tr>
+<tr><th id="440">440</th><td><u>#define <dfn class="macro" id="_M/qemu_tcg_mttcg_enabled" data-ref="_M/qemu_tcg_mttcg_enabled">qemu_tcg_mttcg_enabled</dfn>() (mttcg_enabled)</u></td></tr>
+<tr><th id="441">441</th><td></td></tr>
+<tr><th id="442">442</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="443">443</th><td><i class="doc"> * cpu_paging_enabled:</i></td></tr>
+<tr><th id="444">444</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose state is to be inspected.</i></td></tr>
+<tr><th id="445">445</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="446">446</th><td><i class="doc"> * Returns: %true if paging is enabled, %false otherwise.</i></td></tr>
+<tr><th id="447">447</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="448">448</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="cpu_paging_enabled" title='cpu_paging_enabled' data-ref="cpu_paging_enabled">cpu_paging_enabled</dfn>(<em>const</em> <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9048cpu" title='cpu' data-type='const CPUState *' data-ref="9048cpu">cpu</dfn>);</td></tr>
+<tr><th id="449">449</th><td></td></tr>
+<tr><th id="450">450</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="451">451</th><td><i class="doc"> * cpu_get_memory_mapping:</i></td></tr>
+<tr><th id="452">452</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose memory mappings are to be obtained.</i></td></tr>
+<tr><th id="453">453</th><td><i class="doc"> *<span class="command"> @list</span>: Where to write the memory mappings to.</i></td></tr>
+<tr><th id="454">454</th><td><i class="doc"> *<span class="command"> @errp</span>: Pointer for reporting an #Error.</i></td></tr>
+<tr><th id="455">455</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="456">456</th><td><em>void</em> <dfn class="decl" id="cpu_get_memory_mapping" title='cpu_get_memory_mapping' data-ref="cpu_get_memory_mapping">cpu_get_memory_mapping</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9049cpu" title='cpu' data-type='CPUState *' data-ref="9049cpu">cpu</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#MemoryMappingList" title='MemoryMappingList' data-type='struct MemoryMappingList' data-ref="MemoryMappingList">MemoryMappingList</a> *<dfn class="local col0 decl" id="9050list" title='list' data-type='MemoryMappingList *' data-ref="9050list">list</dfn>,</td></tr>
+<tr><th id="457">457</th><td>                            <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="9051errp" title='errp' data-type='Error **' data-ref="9051errp">errp</dfn>);</td></tr>
+<tr><th id="458">458</th><td></td></tr>
+<tr><th id="459">459</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="460">460</th><td><i class="doc"> * cpu_write_elf64_note:</i></td></tr>
+<tr><th id="461">461</th><td><i class="doc"> *<span class="command"> @f</span>: pointer to a function that writes memory to a file</i></td></tr>
+<tr><th id="462">462</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose memory is to be dumped</i></td></tr>
+<tr><th id="463">463</th><td><i class="doc"> *<span class="command"> @cpuid</span>: ID number of the CPU</i></td></tr>
+<tr><th id="464">464</th><td><i class="doc"> *<span class="command"> @opaque</span>: pointer to the CPUState struct</i></td></tr>
+<tr><th id="465">465</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="466">466</th><td><em>int</em> <dfn class="decl" id="cpu_write_elf64_note" title='cpu_write_elf64_note' data-ref="cpu_write_elf64_note">cpu_write_elf64_note</dfn>(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col2 decl" id="9052f" title='f' data-type='WriteCoreDumpFunction' data-ref="9052f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9053cpu" title='cpu' data-type='CPUState *' data-ref="9053cpu">cpu</dfn>,</td></tr>
+<tr><th id="467">467</th><td>                         <em>int</em> <dfn class="local col4 decl" id="9054cpuid" title='cpuid' data-type='int' data-ref="9054cpuid">cpuid</dfn>, <em>void</em> *<dfn class="local col5 decl" id="9055opaque" title='opaque' data-type='void *' data-ref="9055opaque">opaque</dfn>);</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="470">470</th><td><i class="doc"> * cpu_write_elf64_qemunote:</i></td></tr>
+<tr><th id="471">471</th><td><i class="doc"> *<span class="command"> @f</span>: pointer to a function that writes memory to a file</i></td></tr>
+<tr><th id="472">472</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose memory is to be dumped</i></td></tr>
+<tr><th id="473">473</th><td><i class="doc"> *<span class="command"> @cpuid</span>: ID number of the CPU</i></td></tr>
+<tr><th id="474">474</th><td><i class="doc"> *<span class="command"> @opaque</span>: pointer to the CPUState struct</i></td></tr>
+<tr><th id="475">475</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="476">476</th><td><em>int</em> <dfn class="decl" id="cpu_write_elf64_qemunote" title='cpu_write_elf64_qemunote' data-ref="cpu_write_elf64_qemunote">cpu_write_elf64_qemunote</dfn>(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col6 decl" id="9056f" title='f' data-type='WriteCoreDumpFunction' data-ref="9056f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9057cpu" title='cpu' data-type='CPUState *' data-ref="9057cpu">cpu</dfn>,</td></tr>
+<tr><th id="477">477</th><td>                             <em>void</em> *<dfn class="local col8 decl" id="9058opaque" title='opaque' data-type='void *' data-ref="9058opaque">opaque</dfn>);</td></tr>
+<tr><th id="478">478</th><td></td></tr>
+<tr><th id="479">479</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="480">480</th><td><i class="doc"> * cpu_write_elf32_note:</i></td></tr>
+<tr><th id="481">481</th><td><i class="doc"> *<span class="command"> @f</span>: pointer to a function that writes memory to a file</i></td></tr>
+<tr><th id="482">482</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose memory is to be dumped</i></td></tr>
+<tr><th id="483">483</th><td><i class="doc"> *<span class="command"> @cpuid</span>: ID number of the CPU</i></td></tr>
+<tr><th id="484">484</th><td><i class="doc"> *<span class="command"> @opaque</span>: pointer to the CPUState struct</i></td></tr>
+<tr><th id="485">485</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="486">486</th><td><em>int</em> <dfn class="decl" id="cpu_write_elf32_note" title='cpu_write_elf32_note' data-ref="cpu_write_elf32_note">cpu_write_elf32_note</dfn>(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col9 decl" id="9059f" title='f' data-type='WriteCoreDumpFunction' data-ref="9059f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="9060cpu" title='cpu' data-type='CPUState *' data-ref="9060cpu">cpu</dfn>,</td></tr>
+<tr><th id="487">487</th><td>                         <em>int</em> <dfn class="local col1 decl" id="9061cpuid" title='cpuid' data-type='int' data-ref="9061cpuid">cpuid</dfn>, <em>void</em> *<dfn class="local col2 decl" id="9062opaque" title='opaque' data-type='void *' data-ref="9062opaque">opaque</dfn>);</td></tr>
+<tr><th id="488">488</th><td></td></tr>
+<tr><th id="489">489</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="490">490</th><td><i class="doc"> * cpu_write_elf32_qemunote:</i></td></tr>
+<tr><th id="491">491</th><td><i class="doc"> *<span class="command"> @f</span>: pointer to a function that writes memory to a file</i></td></tr>
+<tr><th id="492">492</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose memory is to be dumped</i></td></tr>
+<tr><th id="493">493</th><td><i class="doc"> *<span class="command"> @cpuid</span>: ID number of the CPU</i></td></tr>
+<tr><th id="494">494</th><td><i class="doc"> *<span class="command"> @opaque</span>: pointer to the CPUState struct</i></td></tr>
+<tr><th id="495">495</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="496">496</th><td><em>int</em> <dfn class="decl" id="cpu_write_elf32_qemunote" title='cpu_write_elf32_qemunote' data-ref="cpu_write_elf32_qemunote">cpu_write_elf32_qemunote</dfn>(<a class="typedef" href="#WriteCoreDumpFunction" title='WriteCoreDumpFunction' data-type='int (*)(const void *, size_t, void *)' data-ref="WriteCoreDumpFunction">WriteCoreDumpFunction</a> <dfn class="local col3 decl" id="9063f" title='f' data-type='WriteCoreDumpFunction' data-ref="9063f">f</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9064cpu" title='cpu' data-type='CPUState *' data-ref="9064cpu">cpu</dfn>,</td></tr>
+<tr><th id="497">497</th><td>                             <em>void</em> *<dfn class="local col5 decl" id="9065opaque" title='opaque' data-type='void *' data-ref="9065opaque">opaque</dfn>);</td></tr>
+<tr><th id="498">498</th><td></td></tr>
+<tr><th id="499">499</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="500">500</th><td><i class="doc"> * cpu_get_crash_info:</i></td></tr>
+<tr><th id="501">501</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to get crash information for</i></td></tr>
+<tr><th id="502">502</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="503">503</th><td><i class="doc"> * Gets the previously saved crash information.</i></td></tr>
+<tr><th id="504">504</th><td><i class="doc"> * Caller is responsible for freeing the data.</i></td></tr>
+<tr><th id="505">505</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="506">506</th><td><a class="typedef" href="../../qapi-types.h.html#GuestPanicInformation" title='GuestPanicInformation' data-type='struct GuestPanicInformation' data-ref="GuestPanicInformation">GuestPanicInformation</a> *<dfn class="decl" id="cpu_get_crash_info" title='cpu_get_crash_info' data-ref="cpu_get_crash_info">cpu_get_crash_info</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9066cpu" title='cpu' data-type='CPUState *' data-ref="9066cpu">cpu</dfn>);</td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="509">509</th><td><i class="doc"> * CPUDumpFlags:</i></td></tr>
+<tr><th id="510">510</th><td><i class="doc"> *<span class="command"> @CPU</span>_DUMP_CODE:</i></td></tr>
+<tr><th id="511">511</th><td><i class="doc"> *<span class="command"> @CPU</span>_DUMP_FPU: dump FPU register state, not just integer</i></td></tr>
+<tr><th id="512">512</th><td><i class="doc"> *<span class="command"> @CPU</span>_DUMP_CCOP: dump info about TCG QEMU's condition code optimization state</i></td></tr>
+<tr><th id="513">513</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="514">514</th><td><b>enum</b> <dfn class="type def" id="CPUDumpFlags" title='CPUDumpFlags' data-ref="CPUDumpFlags">CPUDumpFlags</dfn> {</td></tr>
+<tr><th id="515">515</th><td>    <dfn class="enum" id="CPUDumpFlags::CPU_DUMP_CODE" title='CPUDumpFlags::CPU_DUMP_CODE' data-ref="CPUDumpFlags::CPU_DUMP_CODE">CPU_DUMP_CODE</dfn> = <var>0x00010000</var>,</td></tr>
+<tr><th id="516">516</th><td>    <dfn class="enum" id="CPUDumpFlags::CPU_DUMP_FPU" title='CPUDumpFlags::CPU_DUMP_FPU' data-ref="CPUDumpFlags::CPU_DUMP_FPU">CPU_DUMP_FPU</dfn>  = <var>0x00020000</var>,</td></tr>
+<tr><th id="517">517</th><td>    <dfn class="enum" id="CPUDumpFlags::CPU_DUMP_CCOP" title='CPUDumpFlags::CPU_DUMP_CCOP' data-ref="CPUDumpFlags::CPU_DUMP_CCOP">CPU_DUMP_CCOP</dfn> = <var>0x00040000</var>,</td></tr>
+<tr><th id="518">518</th><td>};</td></tr>
+<tr><th id="519">519</th><td></td></tr>
+<tr><th id="520">520</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="521">521</th><td><i class="doc"> * cpu_dump_state:</i></td></tr>
+<tr><th id="522">522</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose state is to be dumped.</i></td></tr>
+<tr><th id="523">523</th><td><i class="doc"> *<span class="command"> @f</span>: File to dump to.</i></td></tr>
+<tr><th id="524">524</th><td><i class="doc"> *<span class="command"> @cpu</span>_fprintf: Function to dump with.</i></td></tr>
+<tr><th id="525">525</th><td><i class="doc"> *<span class="command"> @flags</span>: Flags what to dump.</i></td></tr>
+<tr><th id="526">526</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="527">527</th><td><i class="doc"> * Dumps CPU state.</i></td></tr>
+<tr><th id="528">528</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="529">529</th><td><em>void</em> <dfn class="decl" id="cpu_dump_state" title='cpu_dump_state' data-ref="cpu_dump_state">cpu_dump_state</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9067cpu" title='cpu' data-type='CPUState *' data-ref="9067cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col8 decl" id="9068f" title='f' data-type='FILE *' data-ref="9068f">f</dfn>, <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col9 decl" id="9069cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="9069cpu_fprintf">cpu_fprintf</dfn>,</td></tr>
+<tr><th id="530">530</th><td>                    <em>int</em> <dfn class="local col0 decl" id="9070flags" title='flags' data-type='int' data-ref="9070flags">flags</dfn>);</td></tr>
+<tr><th id="531">531</th><td></td></tr>
+<tr><th id="532">532</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="533">533</th><td><i class="doc"> * cpu_dump_statistics:</i></td></tr>
+<tr><th id="534">534</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose state is to be dumped.</i></td></tr>
+<tr><th id="535">535</th><td><i class="doc"> *<span class="command"> @f</span>: File to dump to.</i></td></tr>
+<tr><th id="536">536</th><td><i class="doc"> *<span class="command"> @cpu</span>_fprintf: Function to dump with.</i></td></tr>
+<tr><th id="537">537</th><td><i class="doc"> *<span class="command"> @flags</span>: Flags what to dump.</i></td></tr>
+<tr><th id="538">538</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="539">539</th><td><i class="doc"> * Dumps CPU statistics.</i></td></tr>
+<tr><th id="540">540</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="541">541</th><td><em>void</em> <dfn class="decl" id="cpu_dump_statistics" title='cpu_dump_statistics' data-ref="cpu_dump_statistics">cpu_dump_statistics</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9071cpu" title='cpu' data-type='CPUState *' data-ref="9071cpu">cpu</dfn>, <a class="typedef" href="../../../include/stdio.h.html#FILE" title='FILE' data-type='struct _IO_FILE' data-ref="FILE">FILE</a> *<dfn class="local col2 decl" id="9072f" title='f' data-type='FILE *' data-ref="9072f">f</dfn>, <a class="typedef" href="../qemu/fprintf-fn.h.html#fprintf_function" title='fprintf_function' data-type='int (*)(FILE *, const char *, ...)' data-ref="fprintf_function">fprintf_function</a> <dfn class="local col3 decl" id="9073cpu_fprintf" title='cpu_fprintf' data-type='fprintf_function' data-ref="9073cpu_fprintf">cpu_fprintf</dfn>,</td></tr>
+<tr><th id="542">542</th><td>                         <em>int</em> <dfn class="local col4 decl" id="9074flags" title='flags' data-type='int' data-ref="9074flags">flags</dfn>);</td></tr>
+<tr><th id="543">543</th><td></td></tr>
+<tr><th id="544">544</th><td><u>#<span data-ppcond="544">ifndef</span> <span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span></u></td></tr>
+<tr><th id="545">545</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="546">546</th><td><i class="doc"> * cpu_get_phys_page_attrs_debug:</i></td></tr>
+<tr><th id="547">547</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to obtain the physical page address for.</i></td></tr>
+<tr><th id="548">548</th><td><i class="doc"> *<span class="command"> @addr</span>: The virtual address.</i></td></tr>
+<tr><th id="549">549</th><td><i class="doc"> *<span class="command"> @attrs</span>: Updated on return with the memory transaction attributes to use</i></td></tr>
+<tr><th id="550">550</th><td><i class="doc"> *         for this access.</i></td></tr>
+<tr><th id="551">551</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="552">552</th><td><i class="doc"> * Obtains the physical page corresponding to a virtual one, together</i></td></tr>
+<tr><th id="553">553</th><td><i class="doc"> * with the corresponding memory transaction attributes to use for the access.</i></td></tr>
+<tr><th id="554">554</th><td><i class="doc"> * Use it only for debugging because no protection checks are done.</i></td></tr>
+<tr><th id="555">555</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="556">556</th><td><i class="doc"> * Returns: Corresponding physical page address or -1 if no page found.</i></td></tr>
+<tr><th id="557">557</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="558">558</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl def" id="cpu_get_phys_page_attrs_debug" title='cpu_get_phys_page_attrs_debug' data-ref="cpu_get_phys_page_attrs_debug">cpu_get_phys_page_attrs_debug</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9075cpu" title='cpu' data-type='CPUState *' data-ref="9075cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col6 decl" id="9076addr" title='addr' data-type='vaddr' data-ref="9076addr">addr</dfn>,</td></tr>
+<tr><th id="559">559</th><td>                                                   <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> *<dfn class="local col7 decl" id="9077attrs" title='attrs' data-type='MemTxAttrs *' data-ref="9077attrs">attrs</dfn>)</td></tr>
+<tr><th id="560">560</th><td>{</td></tr>
+<tr><th id="561">561</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col8 decl" id="9078cc" title='cc' data-type='CPUClass *' data-ref="9078cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 561, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col5 ref" href="#9075cpu" title='cpu' data-ref="9075cpu">cpu</a>);</td></tr>
+<tr><th id="562">562</th><td></td></tr>
+<tr><th id="563">563</th><td>    <b>if</b> (<a class="local col8 ref" href="#9078cc" title='cc' data-ref="9078cc">cc</a>-&gt;<a class="ref" href="#CPUClass::get_phys_page_attrs_debug" title='CPUClass::get_phys_page_attrs_debug' data-ref="CPUClass::get_phys_page_attrs_debug">get_phys_page_attrs_debug</a>) {</td></tr>
+<tr><th id="564">564</th><td>        <b>return</b> <a class="local col8 ref" href="#9078cc" title='cc' data-ref="9078cc">cc</a>-&gt;<a class="ref" href="#CPUClass::get_phys_page_attrs_debug" title='CPUClass::get_phys_page_attrs_debug' data-ref="CPUClass::get_phys_page_attrs_debug">get_phys_page_attrs_debug</a>(<a class="local col5 ref" href="#9075cpu" title='cpu' data-ref="9075cpu">cpu</a>, <a class="local col6 ref" href="#9076addr" title='addr' data-ref="9076addr">addr</a>, <a class="local col7 ref" href="#9077attrs" title='attrs' data-ref="9077attrs">attrs</a>);</td></tr>
+<tr><th id="565">565</th><td>    }</td></tr>
+<tr><th id="566">566</th><td>    <i>/* Fallback for CPUs which don't implement the _attrs_ hook */</i></td></tr>
+<tr><th id="567">567</th><td>    *<a class="local col7 ref" href="#9077attrs" title='attrs' data-ref="9077attrs">attrs</a> = <a class="macro" href="../exec/memattrs.h.html#47" title="((MemTxAttrs) { .unspecified = 1 })" data-ref="_M/MEMTXATTRS_UNSPECIFIED">MEMTXATTRS_UNSPECIFIED</a>;</td></tr>
+<tr><th id="568">568</th><td>    <b>return</b> <a class="local col8 ref" href="#9078cc" title='cc' data-ref="9078cc">cc</a>-&gt;<a class="ref" href="#CPUClass::get_phys_page_debug" title='CPUClass::get_phys_page_debug' data-ref="CPUClass::get_phys_page_debug">get_phys_page_debug</a>(<a class="local col5 ref" href="#9075cpu" title='cpu' data-ref="9075cpu">cpu</a>, <a class="local col6 ref" href="#9076addr" title='addr' data-ref="9076addr">addr</a>);</td></tr>
+<tr><th id="569">569</th><td>}</td></tr>
+<tr><th id="570">570</th><td></td></tr>
+<tr><th id="571">571</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="572">572</th><td><i class="doc"> * cpu_get_phys_page_debug:</i></td></tr>
+<tr><th id="573">573</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to obtain the physical page address for.</i></td></tr>
+<tr><th id="574">574</th><td><i class="doc"> *<span class="command"> @addr</span>: The virtual address.</i></td></tr>
+<tr><th id="575">575</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="576">576</th><td><i class="doc"> * Obtains the physical page corresponding to a virtual one.</i></td></tr>
+<tr><th id="577">577</th><td><i class="doc"> * Use it only for debugging because no protection checks are done.</i></td></tr>
+<tr><th id="578">578</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="579">579</th><td><i class="doc"> * Returns: Corresponding physical page address or -1 if no page found.</i></td></tr>
+<tr><th id="580">580</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="581">581</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl def" id="cpu_get_phys_page_debug" title='cpu_get_phys_page_debug' data-ref="cpu_get_phys_page_debug">cpu_get_phys_page_debug</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9079cpu" title='cpu' data-type='CPUState *' data-ref="9079cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col0 decl" id="9080addr" title='addr' data-type='vaddr' data-ref="9080addr">addr</dfn>)</td></tr>
+<tr><th id="582">582</th><td>{</td></tr>
+<tr><th id="583">583</th><td>    <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col1 decl" id="9081attrs" title='attrs' data-type='MemTxAttrs' data-ref="9081attrs">attrs</dfn> = {};</td></tr>
+<tr><th id="584">584</th><td></td></tr>
+<tr><th id="585">585</th><td>    <b>return</b> <a class="ref" href="#cpu_get_phys_page_attrs_debug" title='cpu_get_phys_page_attrs_debug' data-ref="cpu_get_phys_page_attrs_debug">cpu_get_phys_page_attrs_debug</a>(<a class="local col9 ref" href="#9079cpu" title='cpu' data-ref="9079cpu">cpu</a>, <a class="local col0 ref" href="#9080addr" title='addr' data-ref="9080addr">addr</a>, &amp;<a class="local col1 ref" href="#9081attrs" title='attrs' data-ref="9081attrs">attrs</a>);</td></tr>
+<tr><th id="586">586</th><td>}</td></tr>
+<tr><th id="587">587</th><td></td></tr>
+<tr><th id="588">588</th><td><i class="doc">/** cpu_asidx_from_attrs:</i></td></tr>
+<tr><th id="589">589</th><td><i class="doc"> *<span class="command"> @cpu</span>: CPU</i></td></tr>
+<tr><th id="590">590</th><td><i class="doc"> *<span class="command"> @attrs</span>: memory transaction attributes</i></td></tr>
+<tr><th id="591">591</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="592">592</th><td><i class="doc"> * Returns the address space index specifying the CPU AddressSpace</i></td></tr>
+<tr><th id="593">593</th><td><i class="doc"> * to use for a memory access with the given transaction attributes.</i></td></tr>
+<tr><th id="594">594</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="595">595</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="cpu_asidx_from_attrs" title='cpu_asidx_from_attrs' data-ref="cpu_asidx_from_attrs">cpu_asidx_from_attrs</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="9082cpu" title='cpu' data-type='CPUState *' data-ref="9082cpu">cpu</dfn>, <a class="typedef" href="../exec/memattrs.h.html#MemTxAttrs" title='MemTxAttrs' data-type='struct MemTxAttrs' data-ref="MemTxAttrs">MemTxAttrs</a> <dfn class="local col3 decl" id="9083attrs" title='attrs' data-type='MemTxAttrs' data-ref="9083attrs">attrs</dfn>)</td></tr>
+<tr><th id="596">596</th><td>{</td></tr>
+<tr><th id="597">597</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col4 decl" id="9084cc" title='cc' data-type='CPUClass *' data-ref="9084cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 597, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col2 ref" href="#9082cpu" title='cpu' data-ref="9082cpu">cpu</a>);</td></tr>
+<tr><th id="598">598</th><td></td></tr>
+<tr><th id="599">599</th><td>    <b>if</b> (<a class="local col4 ref" href="#9084cc" title='cc' data-ref="9084cc">cc</a>-&gt;<a class="ref" href="#CPUClass::asidx_from_attrs" title='CPUClass::asidx_from_attrs' data-ref="CPUClass::asidx_from_attrs">asidx_from_attrs</a>) {</td></tr>
+<tr><th id="600">600</th><td>        <b>return</b> <a class="local col4 ref" href="#9084cc" title='cc' data-ref="9084cc">cc</a>-&gt;<a class="ref" href="#CPUClass::asidx_from_attrs" title='CPUClass::asidx_from_attrs' data-ref="CPUClass::asidx_from_attrs">asidx_from_attrs</a>(<a class="local col2 ref" href="#9082cpu" title='cpu' data-ref="9082cpu">cpu</a>, <a class="local col3 ref" href="#9083attrs" title='attrs' data-ref="9083attrs">attrs</a>);</td></tr>
+<tr><th id="601">601</th><td>    }</td></tr>
+<tr><th id="602">602</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="603">603</th><td>}</td></tr>
+<tr><th id="604">604</th><td><u>#<span data-ppcond="544">endif</span></u></td></tr>
+<tr><th id="605">605</th><td></td></tr>
+<tr><th id="606">606</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="607">607</th><td><i class="doc"> * cpu_list_add:</i></td></tr>
+<tr><th id="608">608</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to be added to the list of CPUs.</i></td></tr>
+<tr><th id="609">609</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="610">610</th><td><em>void</em> <dfn class="decl" id="cpu_list_add" title='cpu_list_add' data-ref="cpu_list_add">cpu_list_add</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9085cpu" title='cpu' data-type='CPUState *' data-ref="9085cpu">cpu</dfn>);</td></tr>
+<tr><th id="611">611</th><td></td></tr>
+<tr><th id="612">612</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="613">613</th><td><i class="doc"> * cpu_list_remove:</i></td></tr>
+<tr><th id="614">614</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to be removed from the list of CPUs.</i></td></tr>
+<tr><th id="615">615</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="616">616</th><td><em>void</em> <dfn class="decl" id="cpu_list_remove" title='cpu_list_remove' data-ref="cpu_list_remove">cpu_list_remove</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9086cpu" title='cpu' data-type='CPUState *' data-ref="9086cpu">cpu</dfn>);</td></tr>
+<tr><th id="617">617</th><td></td></tr>
+<tr><th id="618">618</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="619">619</th><td><i class="doc"> * cpu_reset:</i></td></tr>
+<tr><th id="620">620</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU whose state is to be reset.</i></td></tr>
+<tr><th id="621">621</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="622">622</th><td><em>void</em> <dfn class="decl" id="cpu_reset" title='cpu_reset' data-ref="cpu_reset">cpu_reset</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9087cpu" title='cpu' data-type='CPUState *' data-ref="9087cpu">cpu</dfn>);</td></tr>
+<tr><th id="623">623</th><td></td></tr>
+<tr><th id="624">624</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="625">625</th><td><i class="doc"> * cpu_class_by_name:</i></td></tr>
+<tr><th id="626">626</th><td><i class="doc"> *<span class="command"> @typename</span>: The CPU base type.</i></td></tr>
+<tr><th id="627">627</th><td><i class="doc"> *<span class="command"> @cpu</span>_model: The model string without any parameters.</i></td></tr>
+<tr><th id="628">628</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="629">629</th><td><i class="doc"> * Looks up a CPU #ObjectClass matching name<span class="command"> @cpu</span>_model.</i></td></tr>
+<tr><th id="630">630</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="631">631</th><td><i class="doc"> * Returns: A #CPUClass or %NULL if not matching class is found.</i></td></tr>
+<tr><th id="632">632</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="633">633</th><td><a class="typedef" href="object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="decl" id="cpu_class_by_name" title='cpu_class_by_name' data-ref="cpu_class_by_name">cpu_class_by_name</dfn>(<em>const</em> <em>char</em> *<dfn class="local col8 decl" id="9088typename" title='typename' data-type='const char *' data-ref="9088typename">typename</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9089cpu_model" title='cpu_model' data-type='const char *' data-ref="9089cpu_model">cpu_model</dfn>);</td></tr>
+<tr><th id="634">634</th><td></td></tr>
+<tr><th id="635">635</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="636">636</th><td><i class="doc"> * cpu_generic_init:</i></td></tr>
+<tr><th id="637">637</th><td><i class="doc"> *<span class="command"> @typename</span>: The CPU base type.</i></td></tr>
+<tr><th id="638">638</th><td><i class="doc"> *<span class="command"> @cpu</span>_model: The model string including optional parameters.</i></td></tr>
+<tr><th id="639">639</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="640">640</th><td><i class="doc"> * Instantiates a CPU, processes optional parameters and realizes the CPU.</i></td></tr>
+<tr><th id="641">641</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="642">642</th><td><i class="doc"> * Returns: A #CPUState or %NULL if an error occurred.</i></td></tr>
+<tr><th id="643">643</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="644">644</th><td><a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="decl" id="cpu_generic_init" title='cpu_generic_init' data-ref="cpu_generic_init">cpu_generic_init</dfn>(<em>const</em> <em>char</em> *<dfn class="local col0 decl" id="9090typename" title='typename' data-type='const char *' data-ref="9090typename">typename</dfn>, <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="9091cpu_model" title='cpu_model' data-type='const char *' data-ref="9091cpu_model">cpu_model</dfn>);</td></tr>
+<tr><th id="645">645</th><td></td></tr>
+<tr><th id="646">646</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="647">647</th><td><i class="doc"> * cpu_has_work:</i></td></tr>
+<tr><th id="648">648</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to check.</i></td></tr>
+<tr><th id="649">649</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="650">650</th><td><i class="doc"> * Checks whether the CPU has work to do.</i></td></tr>
+<tr><th id="651">651</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="652">652</th><td><i class="doc"> * Returns: %true if the CPU has work, %false otherwise.</i></td></tr>
+<tr><th id="653">653</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="654">654</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="cpu_has_work" title='cpu_has_work' data-ref="cpu_has_work">cpu_has_work</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="9092cpu" title='cpu' data-type='CPUState *' data-ref="9092cpu">cpu</dfn>)</td></tr>
+<tr><th id="655">655</th><td>{</td></tr>
+<tr><th id="656">656</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col3 decl" id="9093cc" title='cc' data-type='CPUClass *' data-ref="9093cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 656, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col2 ref" href="#9092cpu" title='cpu' data-ref="9092cpu">cpu</a>);</td></tr>
+<tr><th id="657">657</th><td></td></tr>
+<tr><th id="658">658</th><td>    <a class="macro" href="../../../include/glib-2.0/glib/gtestutils.h.html#115" title="do { if (cc-&gt;has_work) ; else g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 658, ((const char*) (__func__)), &quot;cc-&gt;has_work&quot;); } while (0)" data-ref="_M/g_assert">g_assert</a>(<a class="local col3 ref" href="#9093cc" title='cc' data-ref="9093cc">cc</a>-&gt;<a class="ref" href="#CPUClass::has_work" title='CPUClass::has_work' data-ref="CPUClass::has_work">has_work</a>);</td></tr>
+<tr><th id="659">659</th><td>    <b>return</b> <a class="local col3 ref" href="#9093cc" title='cc' data-ref="9093cc">cc</a>-&gt;<a class="ref" href="#CPUClass::has_work" title='CPUClass::has_work' data-ref="CPUClass::has_work">has_work</a>(<a class="local col2 ref" href="#9092cpu" title='cpu' data-ref="9092cpu">cpu</a>);</td></tr>
+<tr><th id="660">660</th><td>}</td></tr>
+<tr><th id="661">661</th><td></td></tr>
+<tr><th id="662">662</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="663">663</th><td><i class="doc"> * qemu_cpu_is_self:</i></td></tr>
+<tr><th id="664">664</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to check against.</i></td></tr>
+<tr><th id="665">665</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="666">666</th><td><i class="doc"> * Checks whether the caller is executing on the vCPU thread.</i></td></tr>
+<tr><th id="667">667</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="668">668</th><td><i class="doc"> * Returns: %true if called from<span class="command"> @cpu</span>'s thread, %false otherwise.</i></td></tr>
+<tr><th id="669">669</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="670">670</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_cpu_is_self" title='qemu_cpu_is_self' data-ref="qemu_cpu_is_self">qemu_cpu_is_self</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9094cpu" title='cpu' data-type='CPUState *' data-ref="9094cpu">cpu</dfn>);</td></tr>
+<tr><th id="671">671</th><td></td></tr>
+<tr><th id="672">672</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="673">673</th><td><i class="doc"> * qemu_cpu_kick:</i></td></tr>
+<tr><th id="674">674</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to kick.</i></td></tr>
+<tr><th id="675">675</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="676">676</th><td><i class="doc"> * Kicks<span class="command"> @cpu</span>'s thread.</i></td></tr>
+<tr><th id="677">677</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="678">678</th><td><em>void</em> <dfn class="decl" id="qemu_cpu_kick" title='qemu_cpu_kick' data-ref="qemu_cpu_kick">qemu_cpu_kick</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9095cpu" title='cpu' data-type='CPUState *' data-ref="9095cpu">cpu</dfn>);</td></tr>
+<tr><th id="679">679</th><td></td></tr>
+<tr><th id="680">680</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="681">681</th><td><i class="doc"> * cpu_is_stopped:</i></td></tr>
+<tr><th id="682">682</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to check.</i></td></tr>
+<tr><th id="683">683</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="684">684</th><td><i class="doc"> * Checks whether the CPU is stopped.</i></td></tr>
+<tr><th id="685">685</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="686">686</th><td><i class="doc"> * Returns: %true if run state is not running or if artificially stopped;</i></td></tr>
+<tr><th id="687">687</th><td><i class="doc"> * %false otherwise.</i></td></tr>
+<tr><th id="688">688</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="689">689</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="cpu_is_stopped" title='cpu_is_stopped' data-ref="cpu_is_stopped">cpu_is_stopped</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9096cpu" title='cpu' data-type='CPUState *' data-ref="9096cpu">cpu</dfn>);</td></tr>
+<tr><th id="690">690</th><td></td></tr>
+<tr><th id="691">691</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="692">692</th><td><i class="doc"> * do_run_on_cpu:</i></td></tr>
+<tr><th id="693">693</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to run on.</i></td></tr>
+<tr><th id="694">694</th><td><i class="doc"> *<span class="command"> @func</span>: The function to be executed.</i></td></tr>
+<tr><th id="695">695</th><td><i class="doc"> * <span class="command">@data</span>: Data to pass to the function.</i></td></tr>
+<tr><th id="696">696</th><td><i class="doc"> *<span class="command"> @mutex</span>: Mutex to release while waiting for<span class="command"> @func</span> to run.</i></td></tr>
+<tr><th id="697">697</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="698">698</th><td><i class="doc"> * Used internally in the implementation of run_on_cpu.</i></td></tr>
+<tr><th id="699">699</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="700">700</th><td><em>void</em> <dfn class="decl" id="do_run_on_cpu" title='do_run_on_cpu' data-ref="do_run_on_cpu">do_run_on_cpu</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9097cpu" title='cpu' data-type='CPUState *' data-ref="9097cpu">cpu</dfn>, <a class="typedef" href="#run_on_cpu_func" title='run_on_cpu_func' data-type='void (*)(CPUState *, run_on_cpu_data)' data-ref="run_on_cpu_func">run_on_cpu_func</a> <dfn class="local col8 decl" id="9098func" title='func' data-type='run_on_cpu_func' data-ref="9098func">func</dfn>, <a class="typedef" href="#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col9 decl" id="9099data" title='data' data-type='run_on_cpu_data' data-ref="9099data">data</dfn>,</td></tr>
+<tr><th id="701">701</th><td>                   <a class="typedef" href="../qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col0 decl" id="9100mutex" title='mutex' data-type='QemuMutex *' data-ref="9100mutex">mutex</dfn>);</td></tr>
+<tr><th id="702">702</th><td></td></tr>
+<tr><th id="703">703</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="704">704</th><td><i class="doc"> * run_on_cpu:</i></td></tr>
+<tr><th id="705">705</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to run on.</i></td></tr>
+<tr><th id="706">706</th><td><i class="doc"> *<span class="command"> @func</span>: The function to be executed.</i></td></tr>
+<tr><th id="707">707</th><td><i class="doc"> * <span class="command">@data</span>: Data to pass to the function.</i></td></tr>
+<tr><th id="708">708</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="709">709</th><td><i class="doc"> * Schedules the function<span class="command"> @func</span> for execution on the vCPU<span class="command"> @cpu</span>.</i></td></tr>
+<tr><th id="710">710</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="711">711</th><td><em>void</em> <dfn class="decl" id="run_on_cpu" title='run_on_cpu' data-ref="run_on_cpu">run_on_cpu</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9101cpu" title='cpu' data-type='CPUState *' data-ref="9101cpu">cpu</dfn>, <a class="typedef" href="#run_on_cpu_func" title='run_on_cpu_func' data-type='void (*)(CPUState *, run_on_cpu_data)' data-ref="run_on_cpu_func">run_on_cpu_func</a> <dfn class="local col2 decl" id="9102func" title='func' data-type='run_on_cpu_func' data-ref="9102func">func</dfn>, <a class="typedef" href="#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col3 decl" id="9103data" title='data' data-type='run_on_cpu_data' data-ref="9103data">data</dfn>);</td></tr>
+<tr><th id="712">712</th><td></td></tr>
+<tr><th id="713">713</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="714">714</th><td><i class="doc"> * async_run_on_cpu:</i></td></tr>
+<tr><th id="715">715</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to run on.</i></td></tr>
+<tr><th id="716">716</th><td><i class="doc"> *<span class="command"> @func</span>: The function to be executed.</i></td></tr>
+<tr><th id="717">717</th><td><i class="doc"> * <span class="command">@data</span>: Data to pass to the function.</i></td></tr>
+<tr><th id="718">718</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="719">719</th><td><i class="doc"> * Schedules the function<span class="command"> @func</span> for execution on the vCPU<span class="command"> @cpu</span> asynchronously.</i></td></tr>
+<tr><th id="720">720</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="721">721</th><td><em>void</em> <dfn class="decl" id="async_run_on_cpu" title='async_run_on_cpu' data-ref="async_run_on_cpu">async_run_on_cpu</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9104cpu" title='cpu' data-type='CPUState *' data-ref="9104cpu">cpu</dfn>, <a class="typedef" href="#run_on_cpu_func" title='run_on_cpu_func' data-type='void (*)(CPUState *, run_on_cpu_data)' data-ref="run_on_cpu_func">run_on_cpu_func</a> <dfn class="local col5 decl" id="9105func" title='func' data-type='run_on_cpu_func' data-ref="9105func">func</dfn>, <a class="typedef" href="#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col6 decl" id="9106data" title='data' data-type='run_on_cpu_data' data-ref="9106data">data</dfn>);</td></tr>
+<tr><th id="722">722</th><td></td></tr>
+<tr><th id="723">723</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="724">724</th><td><i class="doc"> * async_safe_run_on_cpu:</i></td></tr>
+<tr><th id="725">725</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to run on.</i></td></tr>
+<tr><th id="726">726</th><td><i class="doc"> *<span class="command"> @func</span>: The function to be executed.</i></td></tr>
+<tr><th id="727">727</th><td><i class="doc"> * <span class="command">@data</span>: Data to pass to the function.</i></td></tr>
+<tr><th id="728">728</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="729">729</th><td><i class="doc"> * Schedules the function<span class="command"> @func</span> for execution on the vCPU<span class="command"> @cpu</span> asynchronously,</i></td></tr>
+<tr><th id="730">730</th><td><i class="doc"> * while all other vCPUs are sleeping.</i></td></tr>
+<tr><th id="731">731</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="732">732</th><td><i class="doc"> * Unlike run_on_cpu and async_run_on_cpu, the function is run outside the</i></td></tr>
+<tr><th id="733">733</th><td><i class="doc"> * BQL.</i></td></tr>
+<tr><th id="734">734</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="735">735</th><td><em>void</em> <dfn class="decl" id="async_safe_run_on_cpu" title='async_safe_run_on_cpu' data-ref="async_safe_run_on_cpu">async_safe_run_on_cpu</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9107cpu" title='cpu' data-type='CPUState *' data-ref="9107cpu">cpu</dfn>, <a class="typedef" href="#run_on_cpu_func" title='run_on_cpu_func' data-type='void (*)(CPUState *, run_on_cpu_data)' data-ref="run_on_cpu_func">run_on_cpu_func</a> <dfn class="local col8 decl" id="9108func" title='func' data-type='run_on_cpu_func' data-ref="9108func">func</dfn>, <a class="typedef" href="#run_on_cpu_data" title='run_on_cpu_data' data-type='union run_on_cpu_data' data-ref="run_on_cpu_data">run_on_cpu_data</a> <dfn class="local col9 decl" id="9109data" title='data' data-type='run_on_cpu_data' data-ref="9109data">data</dfn>);</td></tr>
+<tr><th id="736">736</th><td></td></tr>
+<tr><th id="737">737</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="738">738</th><td><i class="doc"> * qemu_get_cpu:</i></td></tr>
+<tr><th id="739">739</th><td><i class="doc"> *<span class="command"> @index</span>: The CPUStat<span class="command">e@cpu</span>_index value of the CPU to obtain.</i></td></tr>
+<tr><th id="740">740</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="741">741</th><td><i class="doc"> * Gets a CPU matching<span class="command"> @index</span>.</i></td></tr>
+<tr><th id="742">742</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="743">743</th><td><i class="doc"> * Returns: The CPU or %NULL if there is no matching CPU.</i></td></tr>
+<tr><th id="744">744</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="745">745</th><td><a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="decl" id="qemu_get_cpu" title='qemu_get_cpu' data-ref="qemu_get_cpu">qemu_get_cpu</dfn>(<em>int</em> <dfn class="local col0 decl" id="9110index" title='index' data-type='int' data-ref="9110index">index</dfn>);</td></tr>
+<tr><th id="746">746</th><td></td></tr>
+<tr><th id="747">747</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="748">748</th><td><i class="doc"> * cpu_exists:</i></td></tr>
+<tr><th id="749">749</th><td><i class="doc"> *<span class="command"> @id</span>: Guest-exposed CPU ID to lookup.</i></td></tr>
+<tr><th id="750">750</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="751">751</th><td><i class="doc"> * Search for CPU with specified ID.</i></td></tr>
+<tr><th id="752">752</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="753">753</th><td><i class="doc"> * Returns: %true - CPU is found, %false - CPU isn't found.</i></td></tr>
+<tr><th id="754">754</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="755">755</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="cpu_exists" title='cpu_exists' data-ref="cpu_exists">cpu_exists</dfn>(<a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="9111id" title='id' data-type='int64_t' data-ref="9111id">id</dfn>);</td></tr>
+<tr><th id="756">756</th><td></td></tr>
+<tr><th id="757">757</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="758">758</th><td><i class="doc"> * cpu_throttle_set:</i></td></tr>
+<tr><th id="759">759</th><td><i class="doc"> *<span class="command"> @new</span>_throttle_pct: Percent of sleep time. Valid range is 1 to 99.</i></td></tr>
+<tr><th id="760">760</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="761">761</th><td><i class="doc"> * Throttles all vcpus by forcing them to sleep for the given percentage of</i></td></tr>
+<tr><th id="762">762</th><td><i class="doc"> * time. A throttle_percentage of 25 corresponds to a 75% duty cycle roughly.</i></td></tr>
+<tr><th id="763">763</th><td><i class="doc"> * (example: 10ms sleep for every 30ms awake).</i></td></tr>
+<tr><th id="764">764</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="765">765</th><td><i class="doc"> * cpu_throttle_set can be called as needed to adjust new_throttle_pct.</i></td></tr>
+<tr><th id="766">766</th><td><i class="doc"> * Once the throttling starts, it will remain in effect until cpu_throttle_stop</i></td></tr>
+<tr><th id="767">767</th><td><i class="doc"> * is called.</i></td></tr>
+<tr><th id="768">768</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="769">769</th><td><em>void</em> <dfn class="decl" id="cpu_throttle_set" title='cpu_throttle_set' data-ref="cpu_throttle_set">cpu_throttle_set</dfn>(<em>int</em> <dfn class="local col2 decl" id="9112new_throttle_pct" title='new_throttle_pct' data-type='int' data-ref="9112new_throttle_pct">new_throttle_pct</dfn>);</td></tr>
+<tr><th id="770">770</th><td></td></tr>
+<tr><th id="771">771</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="772">772</th><td><i class="doc"> * cpu_throttle_stop:</i></td></tr>
+<tr><th id="773">773</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="774">774</th><td><i class="doc"> * Stops the vcpu throttling started by cpu_throttle_set.</i></td></tr>
+<tr><th id="775">775</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="776">776</th><td><em>void</em> <dfn class="decl" id="cpu_throttle_stop" title='cpu_throttle_stop' data-ref="cpu_throttle_stop">cpu_throttle_stop</dfn>(<em>void</em>);</td></tr>
+<tr><th id="777">777</th><td></td></tr>
+<tr><th id="778">778</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="779">779</th><td><i class="doc"> * cpu_throttle_active:</i></td></tr>
+<tr><th id="780">780</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="781">781</th><td><i class="doc"> * Returns: %true if the vcpus are currently being throttled, %false otherwise.</i></td></tr>
+<tr><th id="782">782</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="783">783</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="cpu_throttle_active" title='cpu_throttle_active' data-ref="cpu_throttle_active">cpu_throttle_active</dfn>(<em>void</em>);</td></tr>
+<tr><th id="784">784</th><td></td></tr>
+<tr><th id="785">785</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="786">786</th><td><i class="doc"> * cpu_throttle_get_percentage:</i></td></tr>
+<tr><th id="787">787</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="788">788</th><td><i class="doc"> * Returns the vcpu throttle percentage. See cpu_throttle_set for details.</i></td></tr>
+<tr><th id="789">789</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="790">790</th><td><i class="doc"> * Returns: The throttle percentage in range 1 to 99.</i></td></tr>
+<tr><th id="791">791</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="792">792</th><td><em>int</em> <dfn class="decl" id="cpu_throttle_get_percentage" title='cpu_throttle_get_percentage' data-ref="cpu_throttle_get_percentage">cpu_throttle_get_percentage</dfn>(<em>void</em>);</td></tr>
+<tr><th id="793">793</th><td></td></tr>
+<tr><th id="794">794</th><td><u>#<span data-ppcond="794">ifndef</span> <span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span></u></td></tr>
+<tr><th id="795">795</th><td></td></tr>
+<tr><th id="796">796</th><td><b>typedef</b> <em>void</em> (*<dfn class="typedef" id="CPUInterruptHandler" title='CPUInterruptHandler' data-type='void (*)(CPUState *, int)' data-ref="CPUInterruptHandler">CPUInterruptHandler</dfn>)(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *, <em>int</em>);</td></tr>
+<tr><th id="797">797</th><td></td></tr>
+<tr><th id="798">798</th><td><b>extern</b> <a class="typedef" href="#CPUInterruptHandler" title='CPUInterruptHandler' data-type='void (*)(CPUState *, int)' data-ref="CPUInterruptHandler">CPUInterruptHandler</a> <dfn class="decl" id="cpu_interrupt_handler" title='cpu_interrupt_handler' data-ref="cpu_interrupt_handler">cpu_interrupt_handler</dfn>;</td></tr>
+<tr><th id="799">799</th><td></td></tr>
+<tr><th id="800">800</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="801">801</th><td><i class="doc"> * cpu_interrupt:</i></td></tr>
+<tr><th id="802">802</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to set an interrupt on.</i></td></tr>
+<tr><th id="803">803</th><td><i class="doc"> *<span class="command"> @mask</span>: The interupts to set.</i></td></tr>
+<tr><th id="804">804</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="805">805</th><td><i class="doc"> * Invokes the interrupt handler.</i></td></tr>
+<tr><th id="806">806</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="807">807</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="cpu_interrupt" title='cpu_interrupt' data-ref="cpu_interrupt">cpu_interrupt</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9113cpu" title='cpu' data-type='CPUState *' data-ref="9113cpu">cpu</dfn>, <em>int</em> <dfn class="local col4 decl" id="9114mask" title='mask' data-type='int' data-ref="9114mask">mask</dfn>)</td></tr>
+<tr><th id="808">808</th><td>{</td></tr>
+<tr><th id="809">809</th><td>    <a class="ref" href="#cpu_interrupt_handler" title='cpu_interrupt_handler' data-ref="cpu_interrupt_handler">cpu_interrupt_handler</a>(<a class="local col3 ref" href="#9113cpu" title='cpu' data-ref="9113cpu">cpu</a>, <a class="local col4 ref" href="#9114mask" title='mask' data-ref="9114mask">mask</a>);</td></tr>
+<tr><th id="810">810</th><td>}</td></tr>
+<tr><th id="811">811</th><td></td></tr>
+<tr><th id="812">812</th><td><u>#<span data-ppcond="794">else</span> /* USER_ONLY */</u></td></tr>
+<tr><th id="813">813</th><td></td></tr>
+<tr><th id="814">814</th><td><em>void</em> cpu_interrupt(CPUState *cpu, <em>int</em> mask);</td></tr>
+<tr><th id="815">815</th><td></td></tr>
+<tr><th id="816">816</th><td><u>#<span data-ppcond="794">endif</span> /* USER_ONLY */</u></td></tr>
+<tr><th id="817">817</th><td></td></tr>
+<tr><th id="818">818</th><td><u>#<span data-ppcond="818">ifdef</span> <span class="macro" data-ref="_M/NEED_CPU_H">NEED_CPU_H</span></u></td></tr>
+<tr><th id="819">819</th><td></td></tr>
+<tr><th id="820">820</th><td><u>#<span data-ppcond="820">ifdef</span> <a class="macro" href="../../x86_64-softmmu/config-target.h.html#7" data-ref="_M/CONFIG_SOFTMMU">CONFIG_SOFTMMU</a></u></td></tr>
+<tr><th id="821">821</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="cpu_unassigned_access" title='cpu_unassigned_access' data-ref="cpu_unassigned_access">cpu_unassigned_access</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9115cpu" title='cpu' data-type='CPUState *' data-ref="9115cpu">cpu</dfn>, <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col6 decl" id="9116addr" title='addr' data-type='hwaddr' data-ref="9116addr">addr</dfn>,</td></tr>
+<tr><th id="822">822</th><td>                                         <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="9117is_write" title='is_write' data-type='_Bool' data-ref="9117is_write">is_write</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="9118is_exec" title='is_exec' data-type='_Bool' data-ref="9118is_exec">is_exec</dfn>,</td></tr>
+<tr><th id="823">823</th><td>                                         <em>int</em> <dfn class="local col9 decl" id="9119opaque" title='opaque' data-type='int' data-ref="9119opaque">opaque</dfn>, <em>unsigned</em> <dfn class="local col0 decl" id="9120size" title='size' data-type='unsigned int' data-ref="9120size">size</dfn>)</td></tr>
+<tr><th id="824">824</th><td>{</td></tr>
+<tr><th id="825">825</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col1 decl" id="9121cc" title='cc' data-type='CPUClass *' data-ref="9121cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 825, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col5 ref" href="#9115cpu" title='cpu' data-ref="9115cpu">cpu</a>);</td></tr>
+<tr><th id="826">826</th><td></td></tr>
+<tr><th id="827">827</th><td>    <b>if</b> (<a class="local col1 ref" href="#9121cc" title='cc' data-ref="9121cc">cc</a>-&gt;<a class="ref" href="#CPUClass::do_unassigned_access" title='CPUClass::do_unassigned_access' data-ref="CPUClass::do_unassigned_access">do_unassigned_access</a>) {</td></tr>
+<tr><th id="828">828</th><td>        <a class="local col1 ref" href="#9121cc" title='cc' data-ref="9121cc">cc</a>-&gt;<a class="ref" href="#CPUClass::do_unassigned_access" title='CPUClass::do_unassigned_access' data-ref="CPUClass::do_unassigned_access">do_unassigned_access</a>(<a class="local col5 ref" href="#9115cpu" title='cpu' data-ref="9115cpu">cpu</a>, <a class="local col6 ref" href="#9116addr" title='addr' data-ref="9116addr">addr</a>, <a class="local col7 ref" href="#9117is_write" title='is_write' data-ref="9117is_write">is_write</a>, <a class="local col8 ref" href="#9118is_exec" title='is_exec' data-ref="9118is_exec">is_exec</a>, <a class="local col9 ref" href="#9119opaque" title='opaque' data-ref="9119opaque">opaque</a>, <a class="local col0 ref" href="#9120size" title='size' data-ref="9120size">size</a>);</td></tr>
+<tr><th id="829">829</th><td>    }</td></tr>
+<tr><th id="830">830</th><td>}</td></tr>
+<tr><th id="831">831</th><td></td></tr>
+<tr><th id="832">832</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="cpu_unaligned_access" title='cpu_unaligned_access' data-ref="cpu_unaligned_access">cpu_unaligned_access</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="9122cpu" title='cpu' data-type='CPUState *' data-ref="9122cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col3 decl" id="9123addr" title='addr' data-type='vaddr' data-ref="9123addr">addr</dfn>,</td></tr>
+<tr><th id="833">833</th><td>                                        <a class="typedef" href="#MMUAccessType" title='MMUAccessType' data-type='enum MMUAccessType' data-ref="MMUAccessType">MMUAccessType</a> <dfn class="local col4 decl" id="9124access_type" title='access_type' data-type='MMUAccessType' data-ref="9124access_type">access_type</dfn>,</td></tr>
+<tr><th id="834">834</th><td>                                        <em>int</em> <dfn class="local col5 decl" id="9125mmu_idx" title='mmu_idx' data-type='int' data-ref="9125mmu_idx">mmu_idx</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="local col6 decl" id="9126retaddr" title='retaddr' data-type='uintptr_t' data-ref="9126retaddr">retaddr</dfn>)</td></tr>
+<tr><th id="835">835</th><td>{</td></tr>
+<tr><th id="836">836</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col7 decl" id="9127cc" title='cc' data-type='CPUClass *' data-ref="9127cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 836, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col2 ref" href="#9122cpu" title='cpu' data-ref="9122cpu">cpu</a>);</td></tr>
+<tr><th id="837">837</th><td></td></tr>
+<tr><th id="838">838</th><td>    <a class="local col7 ref" href="#9127cc" title='cc' data-ref="9127cc">cc</a>-&gt;<a class="ref" href="#CPUClass::do_unaligned_access" title='CPUClass::do_unaligned_access' data-ref="CPUClass::do_unaligned_access">do_unaligned_access</a>(<a class="local col2 ref" href="#9122cpu" title='cpu' data-ref="9122cpu">cpu</a>, <a class="local col3 ref" href="#9123addr" title='addr' data-ref="9123addr">addr</a>, <a class="local col4 ref" href="#9124access_type" title='access_type' data-ref="9124access_type">access_type</a>, <a class="local col5 ref" href="#9125mmu_idx" title='mmu_idx' data-ref="9125mmu_idx">mmu_idx</a>, <a class="local col6 ref" href="#9126retaddr" title='retaddr' data-ref="9126retaddr">retaddr</a>);</td></tr>
+<tr><th id="839">839</th><td>}</td></tr>
+<tr><th id="840">840</th><td><u>#<span data-ppcond="820">endif</span></u></td></tr>
+<tr><th id="841">841</th><td></td></tr>
+<tr><th id="842">842</th><td><u>#<span data-ppcond="818">endif</span> /* NEED_CPU_H */</u></td></tr>
+<tr><th id="843">843</th><td></td></tr>
+<tr><th id="844">844</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="845">845</th><td><i class="doc"> * cpu_set_pc:</i></td></tr>
+<tr><th id="846">846</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to set the program counter for.</i></td></tr>
+<tr><th id="847">847</th><td><i class="doc"> *<span class="command"> @addr</span>: Program counter value.</i></td></tr>
+<tr><th id="848">848</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="849">849</th><td><i class="doc"> * Sets the program counter for a CPU.</i></td></tr>
+<tr><th id="850">850</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="851">851</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="cpu_set_pc" title='cpu_set_pc' data-ref="cpu_set_pc">cpu_set_pc</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9128cpu" title='cpu' data-type='CPUState *' data-ref="9128cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col9 decl" id="9129addr" title='addr' data-type='vaddr' data-ref="9129addr">addr</dfn>)</td></tr>
+<tr><th id="852">852</th><td>{</td></tr>
+<tr><th id="853">853</th><td>    <a class="typedef" href="#CPUClass" title='CPUClass' data-type='struct CPUClass' data-ref="CPUClass">CPUClass</a> *<dfn class="local col0 decl" id="9130cc" title='cc' data-type='CPUClass *' data-ref="9130cc">cc</dfn> = <a class="macro" href="#62" title="((CPUClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((cpu)))))), (&quot;cpu&quot;), &quot;/home/jon/workspace/qemu/include/qom/cpu.h&quot;, 853, __func__))" data-ref="_M/CPU_GET_CLASS">CPU_GET_CLASS</a>(<a class="local col8 ref" href="#9128cpu" title='cpu' data-ref="9128cpu">cpu</a>);</td></tr>
+<tr><th id="854">854</th><td></td></tr>
+<tr><th id="855">855</th><td>    <a class="local col0 ref" href="#9130cc" title='cc' data-ref="9130cc">cc</a>-&gt;<a class="ref" href="#CPUClass::set_pc" title='CPUClass::set_pc' data-ref="CPUClass::set_pc">set_pc</a>(<a class="local col8 ref" href="#9128cpu" title='cpu' data-ref="9128cpu">cpu</a>, <a class="local col9 ref" href="#9129addr" title='addr' data-ref="9129addr">addr</a>);</td></tr>
+<tr><th id="856">856</th><td>}</td></tr>
+<tr><th id="857">857</th><td></td></tr>
+<tr><th id="858">858</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="859">859</th><td><i class="doc"> * cpu_reset_interrupt:</i></td></tr>
+<tr><th id="860">860</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to clear the interrupt on.</i></td></tr>
+<tr><th id="861">861</th><td><i class="doc"> *<span class="command"> @mask</span>: The interrupt mask to clear.</i></td></tr>
+<tr><th id="862">862</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="863">863</th><td><i class="doc"> * Resets interrupts on the vCPU<span class="command"> @cpu</span>.</i></td></tr>
+<tr><th id="864">864</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="865">865</th><td><em>void</em> <dfn class="decl" id="cpu_reset_interrupt" title='cpu_reset_interrupt' data-ref="cpu_reset_interrupt">cpu_reset_interrupt</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9131cpu" title='cpu' data-type='CPUState *' data-ref="9131cpu">cpu</dfn>, <em>int</em> <dfn class="local col2 decl" id="9132mask" title='mask' data-type='int' data-ref="9132mask">mask</dfn>);</td></tr>
+<tr><th id="866">866</th><td></td></tr>
+<tr><th id="867">867</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="868">868</th><td><i class="doc"> * cpu_exit:</i></td></tr>
+<tr><th id="869">869</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to exit.</i></td></tr>
+<tr><th id="870">870</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="871">871</th><td><i class="doc"> * Requests the CPU<span class="command"> @cpu</span> to exit execution.</i></td></tr>
+<tr><th id="872">872</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="873">873</th><td><em>void</em> <dfn class="decl" id="cpu_exit" title='cpu_exit' data-ref="cpu_exit">cpu_exit</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9133cpu" title='cpu' data-type='CPUState *' data-ref="9133cpu">cpu</dfn>);</td></tr>
+<tr><th id="874">874</th><td></td></tr>
+<tr><th id="875">875</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="876">876</th><td><i class="doc"> * cpu_resume:</i></td></tr>
+<tr><th id="877">877</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to resume.</i></td></tr>
+<tr><th id="878">878</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="879">879</th><td><i class="doc"> * Resumes CPU, i.e. puts CPU into runnable state.</i></td></tr>
+<tr><th id="880">880</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="881">881</th><td><em>void</em> <dfn class="decl" id="cpu_resume" title='cpu_resume' data-ref="cpu_resume">cpu_resume</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9134cpu" title='cpu' data-type='CPUState *' data-ref="9134cpu">cpu</dfn>);</td></tr>
+<tr><th id="882">882</th><td></td></tr>
+<tr><th id="883">883</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="884">884</th><td><i class="doc"> * cpu_remove:</i></td></tr>
+<tr><th id="885">885</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to remove.</i></td></tr>
+<tr><th id="886">886</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="887">887</th><td><i class="doc"> * Requests the CPU to be removed.</i></td></tr>
+<tr><th id="888">888</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="889">889</th><td><em>void</em> <dfn class="decl" id="cpu_remove" title='cpu_remove' data-ref="cpu_remove">cpu_remove</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9135cpu" title='cpu' data-type='CPUState *' data-ref="9135cpu">cpu</dfn>);</td></tr>
+<tr><th id="890">890</th><td></td></tr>
+<tr><th id="891">891</th><td> <i class="doc">/**</i></td></tr>
+<tr><th id="892">892</th><td><i class="doc"> * cpu_remove_sync:</i></td></tr>
+<tr><th id="893">893</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU to remove.</i></td></tr>
+<tr><th id="894">894</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="895">895</th><td><i class="doc"> * Requests the CPU to be removed and waits till it is removed.</i></td></tr>
+<tr><th id="896">896</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="897">897</th><td><em>void</em> <dfn class="decl" id="cpu_remove_sync" title='cpu_remove_sync' data-ref="cpu_remove_sync">cpu_remove_sync</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9136cpu" title='cpu' data-type='CPUState *' data-ref="9136cpu">cpu</dfn>);</td></tr>
+<tr><th id="898">898</th><td></td></tr>
+<tr><th id="899">899</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="900">900</th><td><i class="doc"> * process_queued_cpu_work() - process all items on CPU work queue</i></td></tr>
+<tr><th id="901">901</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU which work queue to process.</i></td></tr>
+<tr><th id="902">902</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="903">903</th><td><em>void</em> <dfn class="decl" id="process_queued_cpu_work" title='process_queued_cpu_work' data-ref="process_queued_cpu_work">process_queued_cpu_work</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9137cpu" title='cpu' data-type='CPUState *' data-ref="9137cpu">cpu</dfn>);</td></tr>
+<tr><th id="904">904</th><td></td></tr>
+<tr><th id="905">905</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="906">906</th><td><i class="doc"> * cpu_exec_start:</i></td></tr>
+<tr><th id="907">907</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU for the current thread.</i></td></tr>
+<tr><th id="908">908</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="909">909</th><td><i class="doc"> * Record that a CPU has started execution and can be interrupted with</i></td></tr>
+<tr><th id="910">910</th><td><i class="doc"> * cpu_exit.</i></td></tr>
+<tr><th id="911">911</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="912">912</th><td><em>void</em> <dfn class="decl" id="cpu_exec_start" title='cpu_exec_start' data-ref="cpu_exec_start">cpu_exec_start</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9138cpu" title='cpu' data-type='CPUState *' data-ref="9138cpu">cpu</dfn>);</td></tr>
+<tr><th id="913">913</th><td></td></tr>
+<tr><th id="914">914</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="915">915</th><td><i class="doc"> * cpu_exec_end:</i></td></tr>
+<tr><th id="916">916</th><td><i class="doc"> *<span class="command"> @cpu</span>: The CPU for the current thread.</i></td></tr>
+<tr><th id="917">917</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="918">918</th><td><i class="doc"> * Record that a CPU has stopped execution and exclusive sections</i></td></tr>
+<tr><th id="919">919</th><td><i class="doc"> * can be executed without interrupting it.</i></td></tr>
+<tr><th id="920">920</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="921">921</th><td><em>void</em> <dfn class="decl" id="cpu_exec_end" title='cpu_exec_end' data-ref="cpu_exec_end">cpu_exec_end</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9139cpu" title='cpu' data-type='CPUState *' data-ref="9139cpu">cpu</dfn>);</td></tr>
+<tr><th id="922">922</th><td></td></tr>
+<tr><th id="923">923</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="924">924</th><td><i class="doc"> * start_exclusive:</i></td></tr>
+<tr><th id="925">925</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="926">926</th><td><i class="doc"> * Wait for a concurrent exclusive section to end, and then start</i></td></tr>
+<tr><th id="927">927</th><td><i class="doc"> * a section of work that is run while other CPUs are not running</i></td></tr>
+<tr><th id="928">928</th><td><i class="doc"> * between cpu_exec_start and cpu_exec_end.  CPUs that are running</i></td></tr>
+<tr><th id="929">929</th><td><i class="doc"> * cpu_exec are exited immediately.  CPUs that call cpu_exec_start</i></td></tr>
+<tr><th id="930">930</th><td><i class="doc"> * during the exclusive section go to sleep until this CPU calls</i></td></tr>
+<tr><th id="931">931</th><td><i class="doc"> * end_exclusive.</i></td></tr>
+<tr><th id="932">932</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="933">933</th><td><em>void</em> <dfn class="decl" id="start_exclusive" title='start_exclusive' data-ref="start_exclusive">start_exclusive</dfn>(<em>void</em>);</td></tr>
+<tr><th id="934">934</th><td></td></tr>
+<tr><th id="935">935</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="936">936</th><td><i class="doc"> * end_exclusive:</i></td></tr>
+<tr><th id="937">937</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="938">938</th><td><i class="doc"> * Concludes an exclusive execution section started by start_exclusive.</i></td></tr>
+<tr><th id="939">939</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="940">940</th><td><em>void</em> <dfn class="decl" id="end_exclusive" title='end_exclusive' data-ref="end_exclusive">end_exclusive</dfn>(<em>void</em>);</td></tr>
+<tr><th id="941">941</th><td></td></tr>
+<tr><th id="942">942</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="943">943</th><td><i class="doc"> * qemu_init_vcpu:</i></td></tr>
+<tr><th id="944">944</th><td><i class="doc"> *<span class="command"> @cpu</span>: The vCPU to initialize.</i></td></tr>
+<tr><th id="945">945</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="946">946</th><td><i class="doc"> * Initializes a vCPU.</i></td></tr>
+<tr><th id="947">947</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="948">948</th><td><em>void</em> <dfn class="decl" id="qemu_init_vcpu" title='qemu_init_vcpu' data-ref="qemu_init_vcpu">qemu_init_vcpu</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="9140cpu" title='cpu' data-type='CPUState *' data-ref="9140cpu">cpu</dfn>);</td></tr>
+<tr><th id="949">949</th><td></td></tr>
+<tr><th id="950">950</th><td><u>#define <dfn class="macro" id="_M/SSTEP_ENABLE" data-ref="_M/SSTEP_ENABLE">SSTEP_ENABLE</dfn>  0x1  /* Enable simulated HW single stepping */</u></td></tr>
+<tr><th id="951">951</th><td><u>#define <dfn class="macro" id="_M/SSTEP_NOIRQ" data-ref="_M/SSTEP_NOIRQ">SSTEP_NOIRQ</dfn>   0x2  /* Do not use IRQ while single stepping */</u></td></tr>
+<tr><th id="952">952</th><td><u>#define <dfn class="macro" id="_M/SSTEP_NOTIMER" data-ref="_M/SSTEP_NOTIMER">SSTEP_NOTIMER</dfn> 0x4  /* Do not Timers while single stepping */</u></td></tr>
+<tr><th id="953">953</th><td></td></tr>
+<tr><th id="954">954</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="955">955</th><td><i class="doc"> * cpu_single_step:</i></td></tr>
+<tr><th id="956">956</th><td><i class="doc"> *<span class="command"> @cpu</span>: CPU to the flags for.</i></td></tr>
+<tr><th id="957">957</th><td><i class="doc"> *<span class="command"> @enabled</span>: Flags to enable.</i></td></tr>
+<tr><th id="958">958</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="959">959</th><td><i class="doc"> * Enables or disables single-stepping for<span class="command"> @cpu</span>.</i></td></tr>
+<tr><th id="960">960</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="961">961</th><td><em>void</em> <dfn class="decl" id="cpu_single_step" title='cpu_single_step' data-ref="cpu_single_step">cpu_single_step</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9141cpu" title='cpu' data-type='CPUState *' data-ref="9141cpu">cpu</dfn>, <em>int</em> <dfn class="local col2 decl" id="9142enabled" title='enabled' data-type='int' data-ref="9142enabled">enabled</dfn>);</td></tr>
+<tr><th id="962">962</th><td></td></tr>
+<tr><th id="963">963</th><td><i>/* Breakpoint/watchpoint flags */</i></td></tr>
+<tr><th id="964">964</th><td><u>#define <dfn class="macro" id="_M/BP_MEM_READ" data-ref="_M/BP_MEM_READ">BP_MEM_READ</dfn>           0x01</u></td></tr>
+<tr><th id="965">965</th><td><u>#define <dfn class="macro" id="_M/BP_MEM_WRITE" data-ref="_M/BP_MEM_WRITE">BP_MEM_WRITE</dfn>          0x02</u></td></tr>
+<tr><th id="966">966</th><td><u>#define <dfn class="macro" id="_M/BP_MEM_ACCESS" data-ref="_M/BP_MEM_ACCESS">BP_MEM_ACCESS</dfn>         (BP_MEM_READ | BP_MEM_WRITE)</u></td></tr>
+<tr><th id="967">967</th><td><u>#define <dfn class="macro" id="_M/BP_STOP_BEFORE_ACCESS" data-ref="_M/BP_STOP_BEFORE_ACCESS">BP_STOP_BEFORE_ACCESS</dfn> 0x04</u></td></tr>
+<tr><th id="968">968</th><td><i>/* 0x08 currently unused */</i></td></tr>
+<tr><th id="969">969</th><td><u>#define <dfn class="macro" id="_M/BP_GDB" data-ref="_M/BP_GDB">BP_GDB</dfn>                0x10</u></td></tr>
+<tr><th id="970">970</th><td><u>#define <dfn class="macro" id="_M/BP_CPU" data-ref="_M/BP_CPU">BP_CPU</dfn>                0x20</u></td></tr>
+<tr><th id="971">971</th><td><u>#define <dfn class="macro" id="_M/BP_ANY" data-ref="_M/BP_ANY">BP_ANY</dfn>                (BP_GDB | BP_CPU)</u></td></tr>
+<tr><th id="972">972</th><td><u>#define <dfn class="macro" id="_M/BP_WATCHPOINT_HIT_READ" data-ref="_M/BP_WATCHPOINT_HIT_READ">BP_WATCHPOINT_HIT_READ</dfn> 0x40</u></td></tr>
+<tr><th id="973">973</th><td><u>#define <dfn class="macro" id="_M/BP_WATCHPOINT_HIT_WRITE" data-ref="_M/BP_WATCHPOINT_HIT_WRITE">BP_WATCHPOINT_HIT_WRITE</dfn> 0x80</u></td></tr>
+<tr><th id="974">974</th><td><u>#define <dfn class="macro" id="_M/BP_WATCHPOINT_HIT" data-ref="_M/BP_WATCHPOINT_HIT">BP_WATCHPOINT_HIT</dfn> (BP_WATCHPOINT_HIT_READ | BP_WATCHPOINT_HIT_WRITE)</u></td></tr>
+<tr><th id="975">975</th><td></td></tr>
+<tr><th id="976">976</th><td><em>int</em> <dfn class="decl" id="cpu_breakpoint_insert" title='cpu_breakpoint_insert' data-ref="cpu_breakpoint_insert">cpu_breakpoint_insert</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9143cpu" title='cpu' data-type='CPUState *' data-ref="9143cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col4 decl" id="9144pc" title='pc' data-type='vaddr' data-ref="9144pc">pc</dfn>, <em>int</em> <dfn class="local col5 decl" id="9145flags" title='flags' data-type='int' data-ref="9145flags">flags</dfn>,</td></tr>
+<tr><th id="977">977</th><td>                          <a class="typedef" href="#CPUBreakpoint" title='CPUBreakpoint' data-type='struct CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a> **<dfn class="local col6 decl" id="9146breakpoint" title='breakpoint' data-type='CPUBreakpoint **' data-ref="9146breakpoint">breakpoint</dfn>);</td></tr>
+<tr><th id="978">978</th><td><em>int</em> <dfn class="decl" id="cpu_breakpoint_remove" title='cpu_breakpoint_remove' data-ref="cpu_breakpoint_remove">cpu_breakpoint_remove</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9147cpu" title='cpu' data-type='CPUState *' data-ref="9147cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col8 decl" id="9148pc" title='pc' data-type='vaddr' data-ref="9148pc">pc</dfn>, <em>int</em> <dfn class="local col9 decl" id="9149flags" title='flags' data-type='int' data-ref="9149flags">flags</dfn>);</td></tr>
+<tr><th id="979">979</th><td><em>void</em> <dfn class="decl" id="cpu_breakpoint_remove_by_ref" title='cpu_breakpoint_remove_by_ref' data-ref="cpu_breakpoint_remove_by_ref">cpu_breakpoint_remove_by_ref</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col0 decl" id="9150cpu" title='cpu' data-type='CPUState *' data-ref="9150cpu">cpu</dfn>, <a class="typedef" href="#CPUBreakpoint" title='CPUBreakpoint' data-type='struct CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a> *<dfn class="local col1 decl" id="9151breakpoint" title='breakpoint' data-type='CPUBreakpoint *' data-ref="9151breakpoint">breakpoint</dfn>);</td></tr>
+<tr><th id="980">980</th><td><em>void</em> <dfn class="decl" id="cpu_breakpoint_remove_all" title='cpu_breakpoint_remove_all' data-ref="cpu_breakpoint_remove_all">cpu_breakpoint_remove_all</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="9152cpu" title='cpu' data-type='CPUState *' data-ref="9152cpu">cpu</dfn>, <em>int</em> <dfn class="local col3 decl" id="9153mask" title='mask' data-type='int' data-ref="9153mask">mask</dfn>);</td></tr>
+<tr><th id="981">981</th><td></td></tr>
+<tr><th id="982">982</th><td><i>/* Return true if PC matches an installed breakpoint.  */</i></td></tr>
+<tr><th id="983">983</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="cpu_breakpoint_test" title='cpu_breakpoint_test' data-ref="cpu_breakpoint_test">cpu_breakpoint_test</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="9154cpu" title='cpu' data-type='CPUState *' data-ref="9154cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col5 decl" id="9155pc" title='pc' data-type='vaddr' data-ref="9155pc">pc</dfn>, <em>int</em> <dfn class="local col6 decl" id="9156mask" title='mask' data-type='int' data-ref="9156mask">mask</dfn>)</td></tr>
+<tr><th id="984">984</th><td>{</td></tr>
+<tr><th id="985">985</th><td>    <a class="typedef" href="#CPUBreakpoint" title='CPUBreakpoint' data-type='struct CPUBreakpoint' data-ref="CPUBreakpoint">CPUBreakpoint</a> *<dfn class="local col7 decl" id="9157bp" title='bp' data-type='CPUBreakpoint *' data-ref="9157bp">bp</dfn>;</td></tr>
+<tr><th id="986">986</th><td></td></tr>
+<tr><th id="987">987</th><td>    <b>if</b> (<a class="macro" href="../qemu/compiler.h.html#58" title="__builtin_expect(!!(!((&amp;cpu-&gt;breakpoints)-&gt;tqh_first == ((void*)0))), 0)" data-ref="_M/unlikely">unlikely</a>(!<a class="macro" href="../qemu/queue.h.html#431" title="((&amp;cpu-&gt;breakpoints)-&gt;tqh_first == ((void*)0))" data-ref="_M/QTAILQ_EMPTY">QTAILQ_EMPTY</a>(&amp;<a class="local col4 ref" href="#9154cpu" title='cpu' data-ref="9154cpu">cpu</a>-&gt;<a class="ref" href="#CPUState::breakpoints" title='CPUState::breakpoints' data-ref="CPUState::breakpoints">breakpoints</a>))) {</td></tr>
+<tr><th id="988">988</th><td>        <a class="macro" href="../qemu/queue.h.html#413" title="for ((bp) = ((&amp;cpu-&gt;breakpoints)-&gt;tqh_first); (bp); (bp) = ((bp)-&gt;entry.tqe_next))" data-ref="_M/QTAILQ_FOREACH">QTAILQ_FOREACH</a>(<a class="local col7 ref" href="#9157bp" title='bp' data-ref="9157bp">bp</a>, &amp;<a class="local col4 ref" href="#9154cpu" title='cpu' data-ref="9154cpu">cpu</a>-&gt;<a class="ref" href="#CPUState::breakpoints" title='CPUState::breakpoints' data-ref="CPUState::breakpoints">breakpoints</a>, <a class="ref" href="#CPUBreakpoint::entry" title='CPUBreakpoint::entry' data-ref="CPUBreakpoint::entry">entry</a>) {</td></tr>
+<tr><th id="989">989</th><td>            <b>if</b> (<a class="local col7 ref" href="#9157bp" title='bp' data-ref="9157bp">bp</a>-&gt;<a class="ref" href="#CPUBreakpoint::pc" title='CPUBreakpoint::pc' data-ref="CPUBreakpoint::pc">pc</a> == <a class="local col5 ref" href="#9155pc" title='pc' data-ref="9155pc">pc</a> &amp;&amp; (<a class="local col7 ref" href="#9157bp" title='bp' data-ref="9157bp">bp</a>-&gt;<a class="ref" href="#CPUBreakpoint::flags" title='CPUBreakpoint::flags' data-ref="CPUBreakpoint::flags">flags</a> &amp; <a class="local col6 ref" href="#9156mask" title='mask' data-ref="9156mask">mask</a>)) {</td></tr>
+<tr><th id="990">990</th><td>                <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="991">991</th><td>            }</td></tr>
+<tr><th id="992">992</th><td>        }</td></tr>
+<tr><th id="993">993</th><td>    }</td></tr>
+<tr><th id="994">994</th><td>    <b>return</b> <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="995">995</th><td>}</td></tr>
+<tr><th id="996">996</th><td></td></tr>
+<tr><th id="997">997</th><td><em>int</em> <dfn class="decl" id="cpu_watchpoint_insert" title='cpu_watchpoint_insert' data-ref="cpu_watchpoint_insert">cpu_watchpoint_insert</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9158cpu" title='cpu' data-type='CPUState *' data-ref="9158cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col9 decl" id="9159addr" title='addr' data-type='vaddr' data-ref="9159addr">addr</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col0 decl" id="9160len" title='len' data-type='vaddr' data-ref="9160len">len</dfn>,</td></tr>
+<tr><th id="998">998</th><td>                          <em>int</em> <dfn class="local col1 decl" id="9161flags" title='flags' data-type='int' data-ref="9161flags">flags</dfn>, <a class="typedef" href="#CPUWatchpoint" title='CPUWatchpoint' data-type='struct CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a> **<dfn class="local col2 decl" id="9162watchpoint" title='watchpoint' data-type='CPUWatchpoint **' data-ref="9162watchpoint">watchpoint</dfn>);</td></tr>
+<tr><th id="999">999</th><td><em>int</em> <dfn class="decl" id="cpu_watchpoint_remove" title='cpu_watchpoint_remove' data-ref="cpu_watchpoint_remove">cpu_watchpoint_remove</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9163cpu" title='cpu' data-type='CPUState *' data-ref="9163cpu">cpu</dfn>, <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col4 decl" id="9164addr" title='addr' data-type='vaddr' data-ref="9164addr">addr</dfn>,</td></tr>
+<tr><th id="1000">1000</th><td>                          <a class="typedef" href="#vaddr" title='vaddr' data-type='uint64_t' data-ref="vaddr">vaddr</a> <dfn class="local col5 decl" id="9165len" title='len' data-type='vaddr' data-ref="9165len">len</dfn>, <em>int</em> <dfn class="local col6 decl" id="9166flags" title='flags' data-type='int' data-ref="9166flags">flags</dfn>);</td></tr>
+<tr><th id="1001">1001</th><td><em>void</em> <dfn class="decl" id="cpu_watchpoint_remove_by_ref" title='cpu_watchpoint_remove_by_ref' data-ref="cpu_watchpoint_remove_by_ref">cpu_watchpoint_remove_by_ref</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col7 decl" id="9167cpu" title='cpu' data-type='CPUState *' data-ref="9167cpu">cpu</dfn>, <a class="typedef" href="#CPUWatchpoint" title='CPUWatchpoint' data-type='struct CPUWatchpoint' data-ref="CPUWatchpoint">CPUWatchpoint</a> *<dfn class="local col8 decl" id="9168watchpoint" title='watchpoint' data-type='CPUWatchpoint *' data-ref="9168watchpoint">watchpoint</dfn>);</td></tr>
+<tr><th id="1002">1002</th><td><em>void</em> <dfn class="decl" id="cpu_watchpoint_remove_all" title='cpu_watchpoint_remove_all' data-ref="cpu_watchpoint_remove_all">cpu_watchpoint_remove_all</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col9 decl" id="9169cpu" title='cpu' data-type='CPUState *' data-ref="9169cpu">cpu</dfn>, <em>int</em> <dfn class="local col0 decl" id="9170mask" title='mask' data-type='int' data-ref="9170mask">mask</dfn>);</td></tr>
+<tr><th id="1003">1003</th><td></td></tr>
+<tr><th id="1004">1004</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="1005">1005</th><td><i class="doc"> * cpu_get_address_space:</i></td></tr>
+<tr><th id="1006">1006</th><td><i class="doc"> *<span class="command"> @cpu</span>: CPU to get address space from</i></td></tr>
+<tr><th id="1007">1007</th><td><i class="doc"> *<span class="command"> @asidx</span>: index identifying which address space to get</i></td></tr>
+<tr><th id="1008">1008</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="1009">1009</th><td><i class="doc"> * Return the requested address space of this CPU.<span class="command"> @asidx</span></i></td></tr>
+<tr><th id="1010">1010</th><td><i class="doc"> * specifies which address space to read.</i></td></tr>
+<tr><th id="1011">1011</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="1012">1012</th><td><a class="typedef" href="../qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="decl" id="cpu_get_address_space" title='cpu_get_address_space' data-ref="cpu_get_address_space">cpu_get_address_space</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col1 decl" id="9171cpu" title='cpu' data-type='CPUState *' data-ref="9171cpu">cpu</dfn>, <em>int</em> <dfn class="local col2 decl" id="9172asidx" title='asidx' data-type='int' data-ref="9172asidx">asidx</dfn>);</td></tr>
+<tr><th id="1013">1013</th><td></td></tr>
+<tr><th id="1014">1014</th><td><em>void</em> <a class="macro" href="../qemu/compiler.h.html#25" title="__attribute__ ((__noreturn__))" data-ref="_M/QEMU_NORETURN">QEMU_NORETURN</a> <dfn class="decl" id="cpu_abort" title='cpu_abort' data-ref="cpu_abort">cpu_abort</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col3 decl" id="9173cpu" title='cpu' data-type='CPUState *' data-ref="9173cpu">cpu</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="9174fmt" title='fmt' data-type='const char *' data-ref="9174fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="1015">1015</th><td>    <a class="macro" href="../qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>);</td></tr>
+<tr><th id="1016">1016</th><td><b>extern</b> <a class="typedef" href="../qemu/typedefs.h.html#Property" title='Property' data-type='struct Property' data-ref="Property">Property</a> <dfn class="decl" id="cpu_common_props" title='cpu_common_props' data-ref="cpu_common_props">cpu_common_props</dfn>[];</td></tr>
+<tr><th id="1017">1017</th><td><em>void</em> <dfn class="decl" id="cpu_exec_initfn" title='cpu_exec_initfn' data-ref="cpu_exec_initfn">cpu_exec_initfn</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col5 decl" id="9175cpu" title='cpu' data-type='CPUState *' data-ref="9175cpu">cpu</dfn>);</td></tr>
+<tr><th id="1018">1018</th><td><em>void</em> <dfn class="decl" id="cpu_exec_realizefn" title='cpu_exec_realizefn' data-ref="cpu_exec_realizefn">cpu_exec_realizefn</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col6 decl" id="9176cpu" title='cpu' data-type='CPUState *' data-ref="9176cpu">cpu</dfn>, <a class="typedef" href="../qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="9177errp" title='errp' data-type='Error **' data-ref="9177errp">errp</dfn>);</td></tr>
+<tr><th id="1019">1019</th><td><em>void</em> <dfn class="decl" id="cpu_exec_unrealizefn" title='cpu_exec_unrealizefn' data-ref="cpu_exec_unrealizefn">cpu_exec_unrealizefn</dfn>(<a class="typedef" href="../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="9178cpu" title='cpu' data-type='CPUState *' data-ref="9178cpu">cpu</dfn>);</td></tr>
+<tr><th id="1020">1020</th><td></td></tr>
+<tr><th id="1021">1021</th><td><u>#<span data-ppcond="1021">ifdef</span> <span class="macro" data-ref="_M/NEED_CPU_H">NEED_CPU_H</span></u></td></tr>
+<tr><th id="1022">1022</th><td></td></tr>
+<tr><th id="1023">1023</th><td><u>#<span data-ppcond="1023">ifdef</span> <a class="macro" href="../../x86_64-softmmu/config-target.h.html#7" data-ref="_M/CONFIG_SOFTMMU">CONFIG_SOFTMMU</a></u></td></tr>
+<tr><th id="1024">1024</th><td><b>extern</b> <em>const</em> <b>struct</b> <a class="type" href="../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_cpu_common" title='vmstate_cpu_common' data-ref="vmstate_cpu_common">vmstate_cpu_common</dfn>;</td></tr>
+<tr><th id="1025">1025</th><td><u>#<span data-ppcond="1023">else</span></u></td></tr>
+<tr><th id="1026">1026</th><td><u>#define vmstate_cpu_common vmstate_dummy</u></td></tr>
+<tr><th id="1027">1027</th><td><u>#<span data-ppcond="1023">endif</span></u></td></tr>
+<tr><th id="1028">1028</th><td></td></tr>
+<tr><th id="1029">1029</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_CPU" data-ref="_M/VMSTATE_CPU">VMSTATE_CPU</dfn>() {                                                     \</u></td></tr>
+<tr><th id="1030">1030</th><td><u>    .name = "parent_obj",                                                   \</u></td></tr>
+<tr><th id="1031">1031</th><td><u>    .size = sizeof(CPUState),                                               \</u></td></tr>
+<tr><th id="1032">1032</th><td><u>    .vmsd = &amp;vmstate_cpu_common,                                            \</u></td></tr>
+<tr><th id="1033">1033</th><td><u>    .flags = VMS_STRUCT,                                                    \</u></td></tr>
+<tr><th id="1034">1034</th><td><u>    .offset = 0,                                                            \</u></td></tr>
+<tr><th id="1035">1035</th><td><u>}</u></td></tr>
+<tr><th id="1036">1036</th><td></td></tr>
+<tr><th id="1037">1037</th><td><u>#<span data-ppcond="1021">endif</span> /* NEED_CPU_H */</u></td></tr>
+<tr><th id="1038">1038</th><td></td></tr>
+<tr><th id="1039">1039</th><td><u>#define <dfn class="macro" id="_M/UNASSIGNED_CPU_INDEX" data-ref="_M/UNASSIGNED_CPU_INDEX">UNASSIGNED_CPU_INDEX</dfn> -1</u></td></tr>
+<tr><th id="1040">1040</th><td></td></tr>
+<tr><th id="1041">1041</th><td><u>#<span data-ppcond="20">endif</span></u></td></tr>
+<tr><th id="1042">1042</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

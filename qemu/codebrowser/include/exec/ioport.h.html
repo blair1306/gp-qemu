@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ioport.h source code [codebrowser/include/exec/ioport.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="MemoryRegionPortio,PortioList "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/exec/ioport.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>exec</a>/<a href='ioport.h.html'>ioport.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * defines ioport related functions</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright (c) 2003 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> */</i></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><i>/**************************************************************************</i></td></tr>
+<tr><th id="21">21</th><td><i> * IO ports API</i></td></tr>
+<tr><th id="22">22</th><td><i> */</i></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="24">ifndef</span> <span class="macro" data-ref="_M/IOPORT_H">IOPORT_H</span></u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/IOPORT_H" data-ref="_M/IOPORT_H">IOPORT_H</dfn></u></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/MAX_IOPORTS" data-ref="_M/MAX_IOPORTS">MAX_IOPORTS</dfn>     (64 * 1024)</u></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/IOPORTS_MASK" data-ref="_M/IOPORTS_MASK">IOPORTS_MASK</dfn>    (MAX_IOPORTS - 1)</u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="MemoryRegionPortio" title='MemoryRegionPortio' data-ref="MemoryRegionPortio"><a class="type" href="#MemoryRegionPortio" title='MemoryRegionPortio' data-ref="MemoryRegionPortio">MemoryRegionPortio</a></dfn> {</td></tr>
+<tr><th id="31">31</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="MemoryRegionPortio::offset" title='MemoryRegionPortio::offset' data-ref="MemoryRegionPortio::offset">offset</dfn>;</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="MemoryRegionPortio::len" title='MemoryRegionPortio::len' data-ref="MemoryRegionPortio::len">len</dfn>;</td></tr>
+<tr><th id="33">33</th><td>    <em>unsigned</em> <dfn class="decl" id="MemoryRegionPortio::size" title='MemoryRegionPortio::size' data-ref="MemoryRegionPortio::size">size</dfn>;</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> (*<dfn class="decl" id="MemoryRegionPortio::read" title='MemoryRegionPortio::read' data-ref="MemoryRegionPortio::read">read</dfn>)(<em>void</em> *<dfn class="local col8 decl" id="178opaque" title='opaque' data-type='void *' data-ref="178opaque">opaque</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="179address" title='address' data-type='uint32_t' data-ref="179address">address</dfn>);</td></tr>
+<tr><th id="35">35</th><td>    <em>void</em> (*<dfn class="decl" id="MemoryRegionPortio::write" title='MemoryRegionPortio::write' data-ref="MemoryRegionPortio::write">write</dfn>)(<em>void</em> *<dfn class="local col0 decl" id="180opaque" title='opaque' data-type='void *' data-ref="180opaque">opaque</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="181address" title='address' data-type='uint32_t' data-ref="181address">address</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="182data" title='data' data-type='uint32_t' data-ref="182data">data</dfn>);</td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="MemoryRegionPortio::base" title='MemoryRegionPortio::base' data-ref="MemoryRegionPortio::base">base</dfn>; <i>/* private field */</i></td></tr>
+<tr><th id="37">37</th><td>} <dfn class="typedef" id="MemoryRegionPortio" title='MemoryRegionPortio' data-type='struct MemoryRegionPortio' data-ref="MemoryRegionPortio">MemoryRegionPortio</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/PORTIO_END_OF_LIST" data-ref="_M/PORTIO_END_OF_LIST">PORTIO_END_OF_LIST</dfn>() { }</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="41">ifndef</span> <span class="macro" data-ref="_M/CONFIG_USER_ONLY">CONFIG_USER_ONLY</span></u></td></tr>
+<tr><th id="42">42</th><td><b>extern</b> <em>const</em> <a class="typedef" href="memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> <dfn class="decl" id="unassigned_io_ops" title='unassigned_io_ops' data-ref="unassigned_io_ops">unassigned_io_ops</dfn>;</td></tr>
+<tr><th id="43">43</th><td><u>#<span data-ppcond="41">endif</span></u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><em>void</em> <dfn class="decl" id="cpu_outb" title='cpu_outb' data-ref="cpu_outb">cpu_outb</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="183addr" title='addr' data-type='uint32_t' data-ref="183addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="184val" title='val' data-type='uint8_t' data-ref="184val">val</dfn>);</td></tr>
+<tr><th id="46">46</th><td><em>void</em> <dfn class="decl" id="cpu_outw" title='cpu_outw' data-ref="cpu_outw">cpu_outw</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="185addr" title='addr' data-type='uint32_t' data-ref="185addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col6 decl" id="186val" title='val' data-type='uint16_t' data-ref="186val">val</dfn>);</td></tr>
+<tr><th id="47">47</th><td><em>void</em> <dfn class="decl" id="cpu_outl" title='cpu_outl' data-ref="cpu_outl">cpu_outl</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="187addr" title='addr' data-type='uint32_t' data-ref="187addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="188val" title='val' data-type='uint32_t' data-ref="188val">val</dfn>);</td></tr>
+<tr><th id="48">48</th><td><a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="cpu_inb" title='cpu_inb' data-ref="cpu_inb">cpu_inb</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="189addr" title='addr' data-type='uint32_t' data-ref="189addr">addr</dfn>);</td></tr>
+<tr><th id="49">49</th><td><a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="cpu_inw" title='cpu_inw' data-ref="cpu_inw">cpu_inw</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="190addr" title='addr' data-type='uint32_t' data-ref="190addr">addr</dfn>);</td></tr>
+<tr><th id="50">50</th><td><a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="cpu_inl" title='cpu_inl' data-ref="cpu_inl">cpu_inl</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="191addr" title='addr' data-type='uint32_t' data-ref="191addr">addr</dfn>);</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="PortioList" title='PortioList' data-ref="PortioList"><a class="type" href="#PortioList" title='PortioList' data-ref="PortioList">PortioList</a></dfn> {</td></tr>
+<tr><th id="53">53</th><td>    <em>const</em> <b>struct</b> <a class="type" href="#MemoryRegionPortio" title='MemoryRegionPortio' data-ref="MemoryRegionPortio">MemoryRegionPortio</a> *<dfn class="decl" id="PortioList::ports" title='PortioList::ports' data-ref="PortioList::ports">ports</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="decl" id="PortioList::owner" title='PortioList::owner' data-ref="PortioList::owner">owner</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <b>struct</b> <a class="type" href="memory.h.html#MemoryRegion" title='MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="PortioList::address_space" title='PortioList::address_space' data-ref="PortioList::address_space">address_space</dfn>;</td></tr>
+<tr><th id="56">56</th><td>    <em>unsigned</em> <dfn class="decl" id="PortioList::nr" title='PortioList::nr' data-ref="PortioList::nr">nr</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <b>struct</b> <a class="type" href="memory.h.html#MemoryRegion" title='MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> **<dfn class="decl" id="PortioList::regions" title='PortioList::regions' data-ref="PortioList::regions">regions</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <em>void</em> *<dfn class="decl" id="PortioList::opaque" title='PortioList::opaque' data-ref="PortioList::opaque">opaque</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="PortioList::name" title='PortioList::name' data-ref="PortioList::name">name</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="PortioList::flush_coalesced_mmio" title='PortioList::flush_coalesced_mmio' data-ref="PortioList::flush_coalesced_mmio">flush_coalesced_mmio</dfn>;</td></tr>
+<tr><th id="61">61</th><td>} <dfn class="typedef" id="PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</dfn>;</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><em>void</em> <dfn class="decl" id="portio_list_init" title='portio_list_init' data-ref="portio_list_init">portio_list_init</dfn>(<a class="typedef" href="#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> *<dfn class="local col2 decl" id="192piolist" title='piolist' data-type='PortioList *' data-ref="192piolist">piolist</dfn>, <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> *<dfn class="local col3 decl" id="193owner" title='owner' data-type='Object *' data-ref="193owner">owner</dfn>,</td></tr>
+<tr><th id="64">64</th><td>                      <em>const</em> <b>struct</b> <a class="type" href="#MemoryRegionPortio" title='MemoryRegionPortio' data-ref="MemoryRegionPortio">MemoryRegionPortio</a> *<dfn class="local col4 decl" id="194callbacks" title='callbacks' data-type='const struct MemoryRegionPortio *' data-ref="194callbacks">callbacks</dfn>,</td></tr>
+<tr><th id="65">65</th><td>                      <em>void</em> *<dfn class="local col5 decl" id="195opaque" title='opaque' data-type='void *' data-ref="195opaque">opaque</dfn>, <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="196name" title='name' data-type='const char *' data-ref="196name">name</dfn>);</td></tr>
+<tr><th id="66">66</th><td><em>void</em> <dfn class="decl" id="portio_list_set_flush_coalesced" title='portio_list_set_flush_coalesced' data-ref="portio_list_set_flush_coalesced">portio_list_set_flush_coalesced</dfn>(<a class="typedef" href="#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> *<dfn class="local col7 decl" id="197piolist" title='piolist' data-type='PortioList *' data-ref="197piolist">piolist</dfn>);</td></tr>
+<tr><th id="67">67</th><td><em>void</em> <dfn class="decl" id="portio_list_destroy" title='portio_list_destroy' data-ref="portio_list_destroy">portio_list_destroy</dfn>(<a class="typedef" href="#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> *<dfn class="local col8 decl" id="198piolist" title='piolist' data-type='PortioList *' data-ref="198piolist">piolist</dfn>);</td></tr>
+<tr><th id="68">68</th><td><em>void</em> <dfn class="decl" id="portio_list_add" title='portio_list_add' data-ref="portio_list_add">portio_list_add</dfn>(<a class="typedef" href="#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> *<dfn class="local col9 decl" id="199piolist" title='piolist' data-type='PortioList *' data-ref="199piolist">piolist</dfn>,</td></tr>
+<tr><th id="69">69</th><td>                     <b>struct</b> <a class="type" href="memory.h.html#MemoryRegion" title='MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col0 decl" id="200address_space" title='address_space' data-type='struct MemoryRegion *' data-ref="200address_space">address_space</dfn>,</td></tr>
+<tr><th id="70">70</th><td>                     <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="201addr" title='addr' data-type='uint32_t' data-ref="201addr">addr</dfn>);</td></tr>
+<tr><th id="71">71</th><td><em>void</em> <dfn class="decl" id="portio_list_del" title='portio_list_del' data-ref="portio_list_del">portio_list_del</dfn>(<a class="typedef" href="#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> *<dfn class="local col2 decl" id="202piolist" title='piolist' data-type='PortioList *' data-ref="202piolist">piolist</dfn>);</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#<span data-ppcond="24">endif</span> /* IOPORT_H */</u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/kvm/kvm-all.c.html'>codebrowser/accel/kvm/kvm-all.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

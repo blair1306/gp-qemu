@@ -1,0 +1,375 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>bitmap.c source code [codebrowser/util/bitmap.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/bitmap.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='bitmap.c.html'>bitmap.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Bitmap Module</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Stolen from linux/src/lib/bitmap.c</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2010 Corentin Chary</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This source code is licensed under the GNU General Public License,</i></td></tr>
+<tr><th id="9">9</th><td><i> * Version 2.</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qemu/bitops.h.html">"qemu/bitops.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu/bitmap.h.html">"qemu/bitmap.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/qemu/atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><i>/*</i></td></tr>
+<tr><th id="18">18</th><td><i> * bitmaps provide an array of bits, implemented using an</i></td></tr>
+<tr><th id="19">19</th><td><i> * array of unsigned longs.  The number of valid bits in a</i></td></tr>
+<tr><th id="20">20</th><td><i> * given bitmap does _not_ need to be an exact multiple of</i></td></tr>
+<tr><th id="21">21</th><td><i> * BITS_PER_LONG.</i></td></tr>
+<tr><th id="22">22</th><td><i> *</i></td></tr>
+<tr><th id="23">23</th><td><i> * The possible unused bits in the last, partially used word</i></td></tr>
+<tr><th id="24">24</th><td><i> * of a bitmap are 'don't care'.  The implementation makes</i></td></tr>
+<tr><th id="25">25</th><td><i> * no particular effort to keep them zero.  It ensures that</i></td></tr>
+<tr><th id="26">26</th><td><i> * their value will not affect the results of any operation.</i></td></tr>
+<tr><th id="27">27</th><td><i> * The bitmap operations that return Boolean (bitmap_empty,</i></td></tr>
+<tr><th id="28">28</th><td><i> * for example) or scalar (bitmap_weight, for example) results</i></td></tr>
+<tr><th id="29">29</th><td><i> * carefully filter out these unused bits from impacting their</i></td></tr>
+<tr><th id="30">30</th><td><i> * results.</i></td></tr>
+<tr><th id="31">31</th><td><i> *</i></td></tr>
+<tr><th id="32">32</th><td><i> * These operations actually hold to a slightly stronger rule:</i></td></tr>
+<tr><th id="33">33</th><td><i> * if you don't input any bitmaps to these ops that have some</i></td></tr>
+<tr><th id="34">34</th><td><i> * unused bits set, then they won't output any set unused bits</i></td></tr>
+<tr><th id="35">35</th><td><i> * in output bitmaps.</i></td></tr>
+<tr><th id="36">36</th><td><i> *</i></td></tr>
+<tr><th id="37">37</th><td><i> * The byte ordering of bitmaps is more natural on little</i></td></tr>
+<tr><th id="38">38</th><td><i> * endian architectures.</i></td></tr>
+<tr><th id="39">39</th><td><i> */</i></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_empty" title='slow_bitmap_empty' data-ref="slow_bitmap_empty">slow_bitmap_empty</dfn>(<em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col1 decl" id="1bitmap" title='bitmap' data-type='const unsigned long *' data-ref="1bitmap">bitmap</dfn>, <em>long</em> <dfn class="local col2 decl" id="2bits" title='bits' data-type='long' data-ref="2bits">bits</dfn>)</td></tr>
+<tr><th id="42">42</th><td>{</td></tr>
+<tr><th id="43">43</th><td>    <em>long</em> <dfn class="local col3 decl" id="3k" title='k' data-type='long' data-ref="3k">k</dfn>, <dfn class="local col4 decl" id="4lim" title='lim' data-type='long' data-ref="4lim">lim</dfn> = <a class="local col2 ref" href="#2bits" title='bits' data-ref="2bits">bits</a>/<a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <b>for</b> (<a class="local col3 ref" href="#3k" title='k' data-ref="3k">k</a> = <var>0</var>; <a class="local col3 ref" href="#3k" title='k' data-ref="3k">k</a> &lt; <a class="local col4 ref" href="#4lim" title='lim' data-ref="4lim">lim</a>; ++<a class="local col3 ref" href="#3k" title='k' data-ref="3k">k</a>) {</td></tr>
+<tr><th id="46">46</th><td>        <b>if</b> (<a class="local col1 ref" href="#1bitmap" title='bitmap' data-ref="1bitmap">bitmap</a>[<a class="local col3 ref" href="#3k" title='k' data-ref="3k">k</a>]) {</td></tr>
+<tr><th id="47">47</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="48">48</th><td>        }</td></tr>
+<tr><th id="49">49</th><td>    }</td></tr>
+<tr><th id="50">50</th><td>    <b>if</b> (<a class="local col2 ref" href="#2bits" title='bits' data-ref="2bits">bits</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="51">51</th><td>        <b>if</b> (<a class="local col1 ref" href="#1bitmap" title='bitmap' data-ref="1bitmap">bitmap</a>[<a class="local col3 ref" href="#3k" title='k' data-ref="3k">k</a>] &amp; <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(bits) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col2 ref" href="#2bits" title='bits' data-ref="2bits">bits</a>)) {</td></tr>
+<tr><th id="52">52</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="53">53</th><td>        }</td></tr>
+<tr><th id="54">54</th><td>    }</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="57">57</th><td>}</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_full" title='slow_bitmap_full' data-ref="slow_bitmap_full">slow_bitmap_full</dfn>(<em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col5 decl" id="5bitmap" title='bitmap' data-type='const unsigned long *' data-ref="5bitmap">bitmap</dfn>, <em>long</em> <dfn class="local col6 decl" id="6bits" title='bits' data-type='long' data-ref="6bits">bits</dfn>)</td></tr>
+<tr><th id="60">60</th><td>{</td></tr>
+<tr><th id="61">61</th><td>    <em>long</em> <dfn class="local col7 decl" id="7k" title='k' data-type='long' data-ref="7k">k</dfn>, <dfn class="local col8 decl" id="8lim" title='lim' data-type='long' data-ref="8lim">lim</dfn> = <a class="local col6 ref" href="#6bits" title='bits' data-ref="6bits">bits</a>/<a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>    <b>for</b> (<a class="local col7 ref" href="#7k" title='k' data-ref="7k">k</a> = <var>0</var>; <a class="local col7 ref" href="#7k" title='k' data-ref="7k">k</a> &lt; <a class="local col8 ref" href="#8lim" title='lim' data-ref="8lim">lim</a>; ++<a class="local col7 ref" href="#7k" title='k' data-ref="7k">k</a>) {</td></tr>
+<tr><th id="64">64</th><td>        <b>if</b> (~<a class="local col5 ref" href="#5bitmap" title='bitmap' data-ref="5bitmap">bitmap</a>[<a class="local col7 ref" href="#7k" title='k' data-ref="7k">k</a>]) {</td></tr>
+<tr><th id="65">65</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="66">66</th><td>        }</td></tr>
+<tr><th id="67">67</th><td>    }</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <b>if</b> (<a class="local col6 ref" href="#6bits" title='bits' data-ref="6bits">bits</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="70">70</th><td>        <b>if</b> (~<a class="local col5 ref" href="#5bitmap" title='bitmap' data-ref="5bitmap">bitmap</a>[<a class="local col7 ref" href="#7k" title='k' data-ref="7k">k</a>] &amp; <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(bits) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col6 ref" href="#6bits" title='bits' data-ref="6bits">bits</a>)) {</td></tr>
+<tr><th id="71">71</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="72">72</th><td>        }</td></tr>
+<tr><th id="73">73</th><td>    }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_equal" title='slow_bitmap_equal' data-ref="slow_bitmap_equal">slow_bitmap_equal</dfn>(<em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col9 decl" id="9bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="9bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="79">79</th><td>                      <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col0 decl" id="10bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="10bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col1 decl" id="11bits" title='bits' data-type='long' data-ref="11bits">bits</dfn>)</td></tr>
+<tr><th id="80">80</th><td>{</td></tr>
+<tr><th id="81">81</th><td>    <em>long</em> <dfn class="local col2 decl" id="12k" title='k' data-type='long' data-ref="12k">k</dfn>, <dfn class="local col3 decl" id="13lim" title='lim' data-type='long' data-ref="13lim">lim</dfn> = <a class="local col1 ref" href="#11bits" title='bits' data-ref="11bits">bits</a>/<a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <b>for</b> (<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a> = <var>0</var>; <a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a> &lt; <a class="local col3 ref" href="#13lim" title='lim' data-ref="13lim">lim</a>; ++<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>) {</td></tr>
+<tr><th id="84">84</th><td>        <b>if</b> (<a class="local col9 ref" href="#9bitmap1" title='bitmap1' data-ref="9bitmap1">bitmap1</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>] != <a class="local col0 ref" href="#10bitmap2" title='bitmap2' data-ref="10bitmap2">bitmap2</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>]) {</td></tr>
+<tr><th id="85">85</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="86">86</th><td>        }</td></tr>
+<tr><th id="87">87</th><td>    }</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>if</b> (<a class="local col1 ref" href="#11bits" title='bits' data-ref="11bits">bits</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="90">90</th><td>        <b>if</b> ((<a class="local col9 ref" href="#9bitmap1" title='bitmap1' data-ref="9bitmap1">bitmap1</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>] ^ <a class="local col0 ref" href="#10bitmap2" title='bitmap2' data-ref="10bitmap2">bitmap2</a>[<a class="local col2 ref" href="#12k" title='k' data-ref="12k">k</a>]) &amp; <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(bits) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col1 ref" href="#11bits" title='bits' data-ref="11bits">bits</a>)) {</td></tr>
+<tr><th id="91">91</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="92">92</th><td>        }</td></tr>
+<tr><th id="93">93</th><td>    }</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="96">96</th><td>}</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><em>void</em> <dfn class="decl def" id="slow_bitmap_complement" title='slow_bitmap_complement' data-ref="slow_bitmap_complement">slow_bitmap_complement</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col4 decl" id="14dst" title='dst' data-type='unsigned long *' data-ref="14dst">dst</dfn>, <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col5 decl" id="15src" title='src' data-type='const unsigned long *' data-ref="15src">src</dfn>,</td></tr>
+<tr><th id="99">99</th><td>                            <em>long</em> <dfn class="local col6 decl" id="16bits" title='bits' data-type='long' data-ref="16bits">bits</dfn>)</td></tr>
+<tr><th id="100">100</th><td>{</td></tr>
+<tr><th id="101">101</th><td>    <em>long</em> <dfn class="local col7 decl" id="17k" title='k' data-type='long' data-ref="17k">k</dfn>, <dfn class="local col8 decl" id="18lim" title='lim' data-type='long' data-ref="18lim">lim</dfn> = <a class="local col6 ref" href="#16bits" title='bits' data-ref="16bits">bits</a>/<a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td>    <b>for</b> (<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a> = <var>0</var>; <a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a> &lt; <a class="local col8 ref" href="#18lim" title='lim' data-ref="18lim">lim</a>; ++<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a>) {</td></tr>
+<tr><th id="104">104</th><td>        <a class="local col4 ref" href="#14dst" title='dst' data-ref="14dst">dst</a>[<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a>] = ~<a class="local col5 ref" href="#15src" title='src' data-ref="15src">src</a>[<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a>];</td></tr>
+<tr><th id="105">105</th><td>    }</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <b>if</b> (<a class="local col6 ref" href="#16bits" title='bits' data-ref="16bits">bits</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="108">108</th><td>        <a class="local col4 ref" href="#14dst" title='dst' data-ref="14dst">dst</a>[<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a>] = ~<a class="local col5 ref" href="#15src" title='src' data-ref="15src">src</a>[<a class="local col7 ref" href="#17k" title='k' data-ref="17k">k</a>] &amp; <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(bits) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col6 ref" href="#16bits" title='bits' data-ref="16bits">bits</a>);</td></tr>
+<tr><th id="109">109</th><td>    }</td></tr>
+<tr><th id="110">110</th><td>}</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_and" title='slow_bitmap_and' data-ref="slow_bitmap_and">slow_bitmap_and</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col9 decl" id="19dst" title='dst' data-type='unsigned long *' data-ref="19dst">dst</dfn>, <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col0 decl" id="20bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="20bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="113">113</th><td>                    <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col1 decl" id="21bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="21bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col2 decl" id="22bits" title='bits' data-type='long' data-ref="22bits">bits</dfn>)</td></tr>
+<tr><th id="114">114</th><td>{</td></tr>
+<tr><th id="115">115</th><td>    <em>long</em> <dfn class="local col3 decl" id="23k" title='k' data-type='long' data-ref="23k">k</dfn>;</td></tr>
+<tr><th id="116">116</th><td>    <em>long</em> <dfn class="local col4 decl" id="24nr" title='nr' data-type='long' data-ref="24nr">nr</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#25" title="(((bits) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))" data-ref="_M/BITS_TO_LONGS">BITS_TO_LONGS</a>(<a class="local col2 ref" href="#22bits" title='bits' data-ref="22bits">bits</a>);</td></tr>
+<tr><th id="117">117</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col5 decl" id="25result" title='result' data-type='unsigned long' data-ref="25result">result</dfn> = <var>0</var>;</td></tr>
+<tr><th id="118">118</th><td></td></tr>
+<tr><th id="119">119</th><td>    <b>for</b> (<a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a> = <var>0</var>; <a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a> &lt; <a class="local col4 ref" href="#24nr" title='nr' data-ref="24nr">nr</a>; <a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a>++) {</td></tr>
+<tr><th id="120">120</th><td>        <a class="local col5 ref" href="#25result" title='result' data-ref="25result">result</a> |= (<a class="local col9 ref" href="#19dst" title='dst' data-ref="19dst">dst</a>[<a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a>] = <a class="local col0 ref" href="#20bitmap1" title='bitmap1' data-ref="20bitmap1">bitmap1</a>[<a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a>] &amp; <a class="local col1 ref" href="#21bitmap2" title='bitmap2' data-ref="21bitmap2">bitmap2</a>[<a class="local col3 ref" href="#23k" title='k' data-ref="23k">k</a>]);</td></tr>
+<tr><th id="121">121</th><td>    }</td></tr>
+<tr><th id="122">122</th><td>    <b>return</b> <a class="local col5 ref" href="#25result" title='result' data-ref="25result">result</a> != <var>0</var>;</td></tr>
+<tr><th id="123">123</th><td>}</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><em>void</em> <dfn class="decl def" id="slow_bitmap_or" title='slow_bitmap_or' data-ref="slow_bitmap_or">slow_bitmap_or</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col6 decl" id="26dst" title='dst' data-type='unsigned long *' data-ref="26dst">dst</dfn>, <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col7 decl" id="27bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="27bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="126">126</th><td>                    <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col8 decl" id="28bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="28bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col9 decl" id="29bits" title='bits' data-type='long' data-ref="29bits">bits</dfn>)</td></tr>
+<tr><th id="127">127</th><td>{</td></tr>
+<tr><th id="128">128</th><td>    <em>long</em> <dfn class="local col0 decl" id="30k" title='k' data-type='long' data-ref="30k">k</dfn>;</td></tr>
+<tr><th id="129">129</th><td>    <em>long</em> <dfn class="local col1 decl" id="31nr" title='nr' data-type='long' data-ref="31nr">nr</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#25" title="(((bits) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))" data-ref="_M/BITS_TO_LONGS">BITS_TO_LONGS</a>(<a class="local col9 ref" href="#29bits" title='bits' data-ref="29bits">bits</a>);</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <b>for</b> (<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a> = <var>0</var>; <a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a> &lt; <a class="local col1 ref" href="#31nr" title='nr' data-ref="31nr">nr</a>; <a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>++) {</td></tr>
+<tr><th id="132">132</th><td>        <a class="local col6 ref" href="#26dst" title='dst' data-ref="26dst">dst</a>[<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>] = <a class="local col7 ref" href="#27bitmap1" title='bitmap1' data-ref="27bitmap1">bitmap1</a>[<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>] | <a class="local col8 ref" href="#28bitmap2" title='bitmap2' data-ref="28bitmap2">bitmap2</a>[<a class="local col0 ref" href="#30k" title='k' data-ref="30k">k</a>];</td></tr>
+<tr><th id="133">133</th><td>    }</td></tr>
+<tr><th id="134">134</th><td>}</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><em>void</em> <dfn class="decl def" id="slow_bitmap_xor" title='slow_bitmap_xor' data-ref="slow_bitmap_xor">slow_bitmap_xor</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col2 decl" id="32dst" title='dst' data-type='unsigned long *' data-ref="32dst">dst</dfn>, <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col3 decl" id="33bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="33bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="137">137</th><td>                     <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col4 decl" id="34bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="34bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col5 decl" id="35bits" title='bits' data-type='long' data-ref="35bits">bits</dfn>)</td></tr>
+<tr><th id="138">138</th><td>{</td></tr>
+<tr><th id="139">139</th><td>    <em>long</em> <dfn class="local col6 decl" id="36k" title='k' data-type='long' data-ref="36k">k</dfn>;</td></tr>
+<tr><th id="140">140</th><td>    <em>long</em> <dfn class="local col7 decl" id="37nr" title='nr' data-type='long' data-ref="37nr">nr</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#25" title="(((bits) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))" data-ref="_M/BITS_TO_LONGS">BITS_TO_LONGS</a>(<a class="local col5 ref" href="#35bits" title='bits' data-ref="35bits">bits</a>);</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    <b>for</b> (<a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a> = <var>0</var>; <a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a> &lt; <a class="local col7 ref" href="#37nr" title='nr' data-ref="37nr">nr</a>; <a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a>++) {</td></tr>
+<tr><th id="143">143</th><td>        <a class="local col2 ref" href="#32dst" title='dst' data-ref="32dst">dst</a>[<a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a>] = <a class="local col3 ref" href="#33bitmap1" title='bitmap1' data-ref="33bitmap1">bitmap1</a>[<a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a>] ^ <a class="local col4 ref" href="#34bitmap2" title='bitmap2' data-ref="34bitmap2">bitmap2</a>[<a class="local col6 ref" href="#36k" title='k' data-ref="36k">k</a>];</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_andnot" title='slow_bitmap_andnot' data-ref="slow_bitmap_andnot">slow_bitmap_andnot</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col8 decl" id="38dst" title='dst' data-type='unsigned long *' data-ref="38dst">dst</dfn>, <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col9 decl" id="39bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="39bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="148">148</th><td>                       <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col0 decl" id="40bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="40bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col1 decl" id="41bits" title='bits' data-type='long' data-ref="41bits">bits</dfn>)</td></tr>
+<tr><th id="149">149</th><td>{</td></tr>
+<tr><th id="150">150</th><td>    <em>long</em> <dfn class="local col2 decl" id="42k" title='k' data-type='long' data-ref="42k">k</dfn>;</td></tr>
+<tr><th id="151">151</th><td>    <em>long</em> <dfn class="local col3 decl" id="43nr" title='nr' data-type='long' data-ref="43nr">nr</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#25" title="(((bits) + (8 * sizeof(long)) - 1) / (8 * sizeof(long)))" data-ref="_M/BITS_TO_LONGS">BITS_TO_LONGS</a>(<a class="local col1 ref" href="#41bits" title='bits' data-ref="41bits">bits</a>);</td></tr>
+<tr><th id="152">152</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col4 decl" id="44result" title='result' data-type='unsigned long' data-ref="44result">result</dfn> = <var>0</var>;</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <b>for</b> (<a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a> = <var>0</var>; <a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a> &lt; <a class="local col3 ref" href="#43nr" title='nr' data-ref="43nr">nr</a>; <a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a>++) {</td></tr>
+<tr><th id="155">155</th><td>        <a class="local col4 ref" href="#44result" title='result' data-ref="44result">result</a> |= (<a class="local col8 ref" href="#38dst" title='dst' data-ref="38dst">dst</a>[<a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a>] = <a class="local col9 ref" href="#39bitmap1" title='bitmap1' data-ref="39bitmap1">bitmap1</a>[<a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a>] &amp; ~<a class="local col0 ref" href="#40bitmap2" title='bitmap2' data-ref="40bitmap2">bitmap2</a>[<a class="local col2 ref" href="#42k" title='k' data-ref="42k">k</a>]);</td></tr>
+<tr><th id="156">156</th><td>    }</td></tr>
+<tr><th id="157">157</th><td>    <b>return</b> <a class="local col4 ref" href="#44result" title='result' data-ref="44result">result</a> != <var>0</var>;</td></tr>
+<tr><th id="158">158</th><td>}</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td><em>void</em> <dfn class="decl def" id="bitmap_set" title='bitmap_set' data-ref="bitmap_set">bitmap_set</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col5 decl" id="45map" title='map' data-type='unsigned long *' data-ref="45map">map</dfn>, <em>long</em> <dfn class="local col6 decl" id="46start" title='start' data-type='long' data-ref="46start">start</dfn>, <em>long</em> <dfn class="local col7 decl" id="47nr" title='nr' data-type='long' data-ref="47nr">nr</dfn>)</td></tr>
+<tr><th id="161">161</th><td>{</td></tr>
+<tr><th id="162">162</th><td>    <em>unsigned</em> <em>long</em> *<dfn class="local col8 decl" id="48p" title='p' data-type='unsigned long *' data-ref="48p">p</dfn> = <a class="local col5 ref" href="#45map" title='map' data-ref="45map">map</a> + <a class="macro" href="../include/qemu/bitops.h.html#24" title="((start) / (sizeof (unsigned long) * 8))" data-ref="_M/BIT_WORD">BIT_WORD</a>(<a class="local col6 ref" href="#46start" title='start' data-ref="46start">start</a>);</td></tr>
+<tr><th id="163">163</th><td>    <em>const</em> <em>long</em> <dfn class="local col9 decl" id="49size" title='size' data-type='const long' data-ref="49size">size</dfn> = <a class="local col6 ref" href="#46start" title='start' data-ref="46start">start</a> + <a class="local col7 ref" href="#47nr" title='nr' data-ref="47nr">nr</a>;</td></tr>
+<tr><th id="164">164</th><td>    <em>int</em> <dfn class="local col0 decl" id="50bits_to_set" title='bits_to_set' data-type='int' data-ref="50bits_to_set">bits_to_set</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a> - (<a class="local col6 ref" href="#46start" title='start' data-ref="46start">start</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>);</td></tr>
+<tr><th id="165">165</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col1 decl" id="51mask_to_set" title='mask_to_set' data-type='unsigned long' data-ref="51mask_to_set">mask_to_set</dfn> = <a class="macro" href="../include/qemu/bitmap.h.html#60" title="(~0UL &lt;&lt; ((start) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_FIRST_WORD_MASK">BITMAP_FIRST_WORD_MASK</a>(<a class="local col6 ref" href="#46start" title='start' data-ref="46start">start</a>);</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((start &gt;= 0 &amp;&amp; nr &gt;= 0) ? (void) (0) : __assert_fail (&quot;start &gt;= 0 &amp;&amp; nr &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/util/bitmap.c&quot;, 167, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col6 ref" href="#46start" title='start' data-ref="46start">start</a> &gt;= <var>0</var> &amp;&amp; <a class="local col7 ref" href="#47nr" title='nr' data-ref="47nr">nr</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <b>while</b> (<a class="local col7 ref" href="#47nr" title='nr' data-ref="47nr">nr</a> - <a class="local col0 ref" href="#50bits_to_set" title='bits_to_set' data-ref="50bits_to_set">bits_to_set</a> &gt;= <var>0</var>) {</td></tr>
+<tr><th id="170">170</th><td>        *<a class="local col8 ref" href="#48p" title='p' data-ref="48p">p</a> |= <a class="local col1 ref" href="#51mask_to_set" title='mask_to_set' data-ref="51mask_to_set">mask_to_set</a>;</td></tr>
+<tr><th id="171">171</th><td>        <a class="local col7 ref" href="#47nr" title='nr' data-ref="47nr">nr</a> -= <a class="local col0 ref" href="#50bits_to_set" title='bits_to_set' data-ref="50bits_to_set">bits_to_set</a>;</td></tr>
+<tr><th id="172">172</th><td>        <a class="local col0 ref" href="#50bits_to_set" title='bits_to_set' data-ref="50bits_to_set">bits_to_set</a> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="173">173</th><td>        <a class="local col1 ref" href="#51mask_to_set" title='mask_to_set' data-ref="51mask_to_set">mask_to_set</a> = ~<var>0UL</var>;</td></tr>
+<tr><th id="174">174</th><td>        <a class="local col8 ref" href="#48p" title='p' data-ref="48p">p</a>++;</td></tr>
+<tr><th id="175">175</th><td>    }</td></tr>
+<tr><th id="176">176</th><td>    <b>if</b> (<a class="local col7 ref" href="#47nr" title='nr' data-ref="47nr">nr</a>) {</td></tr>
+<tr><th id="177">177</th><td>        <a class="local col1 ref" href="#51mask_to_set" title='mask_to_set' data-ref="51mask_to_set">mask_to_set</a> &amp;= <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(size) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col9 ref" href="#49size" title='size' data-ref="49size">size</a>);</td></tr>
+<tr><th id="178">178</th><td>        *<a class="local col8 ref" href="#48p" title='p' data-ref="48p">p</a> |= <a class="local col1 ref" href="#51mask_to_set" title='mask_to_set' data-ref="51mask_to_set">mask_to_set</a>;</td></tr>
+<tr><th id="179">179</th><td>    }</td></tr>
+<tr><th id="180">180</th><td>}</td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><em>void</em> <dfn class="decl def" id="bitmap_set_atomic" title='bitmap_set_atomic' data-ref="bitmap_set_atomic">bitmap_set_atomic</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col2 decl" id="52map" title='map' data-type='unsigned long *' data-ref="52map">map</dfn>, <em>long</em> <dfn class="local col3 decl" id="53start" title='start' data-type='long' data-ref="53start">start</dfn>, <em>long</em> <dfn class="local col4 decl" id="54nr" title='nr' data-type='long' data-ref="54nr">nr</dfn>)</td></tr>
+<tr><th id="183">183</th><td>{</td></tr>
+<tr><th id="184">184</th><td>    <em>unsigned</em> <em>long</em> *<dfn class="local col5 decl" id="55p" title='p' data-type='unsigned long *' data-ref="55p">p</dfn> = <a class="local col2 ref" href="#52map" title='map' data-ref="52map">map</a> + <a class="macro" href="../include/qemu/bitops.h.html#24" title="((start) / (sizeof (unsigned long) * 8))" data-ref="_M/BIT_WORD">BIT_WORD</a>(<a class="local col3 ref" href="#53start" title='start' data-ref="53start">start</a>);</td></tr>
+<tr><th id="185">185</th><td>    <em>const</em> <em>long</em> <dfn class="local col6 decl" id="56size" title='size' data-type='const long' data-ref="56size">size</dfn> = <a class="local col3 ref" href="#53start" title='start' data-ref="53start">start</a> + <a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a>;</td></tr>
+<tr><th id="186">186</th><td>    <em>int</em> <dfn class="local col7 decl" id="57bits_to_set" title='bits_to_set' data-type='int' data-ref="57bits_to_set">bits_to_set</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a> - (<a class="local col3 ref" href="#53start" title='start' data-ref="53start">start</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>);</td></tr>
+<tr><th id="187">187</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col8 decl" id="58mask_to_set" title='mask_to_set' data-type='unsigned long' data-ref="58mask_to_set">mask_to_set</dfn> = <a class="macro" href="../include/qemu/bitmap.h.html#60" title="(~0UL &lt;&lt; ((start) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_FIRST_WORD_MASK">BITMAP_FIRST_WORD_MASK</a>(<a class="local col3 ref" href="#53start" title='start' data-ref="53start">start</a>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((start &gt;= 0 &amp;&amp; nr &gt;= 0) ? (void) (0) : __assert_fail (&quot;start &gt;= 0 &amp;&amp; nr &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/util/bitmap.c&quot;, 189, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col3 ref" href="#53start" title='start' data-ref="53start">start</a> &gt;= <var>0</var> &amp;&amp; <a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td>    <i>/* First word */</i></td></tr>
+<tr><th id="192">192</th><td>    <b>if</b> (<a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a> - <a class="local col7 ref" href="#57bits_to_set" title='bits_to_set' data-ref="57bits_to_set">bits_to_set</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="193">193</th><td>        <a class="macro" href="../include/qemu/atomic.h.html#223" title="((void) __atomic_fetch_or(p, mask_to_set, 5))" data-ref="_M/atomic_or">atomic_or</a>(<a class="local col5 ref" href="#55p" title='p' data-ref="55p">p</a>, <a class="local col8 ref" href="#58mask_to_set" title='mask_to_set' data-ref="58mask_to_set">mask_to_set</a>);</td></tr>
+<tr><th id="194">194</th><td>        <a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a> -= <a class="local col7 ref" href="#57bits_to_set" title='bits_to_set' data-ref="57bits_to_set">bits_to_set</a>;</td></tr>
+<tr><th id="195">195</th><td>        <a class="local col7 ref" href="#57bits_to_set" title='bits_to_set' data-ref="57bits_to_set">bits_to_set</a> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="196">196</th><td>        <a class="local col8 ref" href="#58mask_to_set" title='mask_to_set' data-ref="58mask_to_set">mask_to_set</a> = ~<var>0UL</var>;</td></tr>
+<tr><th id="197">197</th><td>        <a class="local col5 ref" href="#55p" title='p' data-ref="55p">p</a>++;</td></tr>
+<tr><th id="198">198</th><td>    }</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <i>/* Full words */</i></td></tr>
+<tr><th id="201">201</th><td>    <b>if</b> (<a class="local col7 ref" href="#57bits_to_set" title='bits_to_set' data-ref="57bits_to_set">bits_to_set</a> == <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="202">202</th><td>        <b>while</b> (<a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a> &gt;= <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="203">203</th><td>            *<a class="local col5 ref" href="#55p" title='p' data-ref="55p">p</a> = ~<var>0UL</var>;</td></tr>
+<tr><th id="204">204</th><td>            <a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a> -= <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="205">205</th><td>            <a class="local col5 ref" href="#55p" title='p' data-ref="55p">p</a>++;</td></tr>
+<tr><th id="206">206</th><td>        }</td></tr>
+<tr><th id="207">207</th><td>    }</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td>    <i>/* Last word */</i></td></tr>
+<tr><th id="210">210</th><td>    <b>if</b> (<a class="local col4 ref" href="#54nr" title='nr' data-ref="54nr">nr</a>) {</td></tr>
+<tr><th id="211">211</th><td>        <a class="local col8 ref" href="#58mask_to_set" title='mask_to_set' data-ref="58mask_to_set">mask_to_set</a> &amp;= <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(size) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col6 ref" href="#56size" title='size' data-ref="56size">size</a>);</td></tr>
+<tr><th id="212">212</th><td>        <a class="macro" href="../include/qemu/atomic.h.html#223" title="((void) __atomic_fetch_or(p, mask_to_set, 5))" data-ref="_M/atomic_or">atomic_or</a>(<a class="local col5 ref" href="#55p" title='p' data-ref="55p">p</a>, <a class="local col8 ref" href="#58mask_to_set" title='mask_to_set' data-ref="58mask_to_set">mask_to_set</a>);</td></tr>
+<tr><th id="213">213</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="214">214</th><td>        <i>/* If we avoided the full barrier in atomic_or(), issue a</i></td></tr>
+<tr><th id="215">215</th><td><i>         * barrier to account for the assignments in the while loop.</i></td></tr>
+<tr><th id="216">216</th><td><i>         */</i></td></tr>
+<tr><th id="217">217</th><td>        <a class="macro" href="../include/qemu/atomic.h.html#75" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(5); })" data-ref="_M/smp_mb">smp_mb</a>();</td></tr>
+<tr><th id="218">218</th><td>    }</td></tr>
+<tr><th id="219">219</th><td>}</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><em>void</em> <dfn class="decl def" id="bitmap_clear" title='bitmap_clear' data-ref="bitmap_clear">bitmap_clear</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col9 decl" id="59map" title='map' data-type='unsigned long *' data-ref="59map">map</dfn>, <em>long</em> <dfn class="local col0 decl" id="60start" title='start' data-type='long' data-ref="60start">start</dfn>, <em>long</em> <dfn class="local col1 decl" id="61nr" title='nr' data-type='long' data-ref="61nr">nr</dfn>)</td></tr>
+<tr><th id="222">222</th><td>{</td></tr>
+<tr><th id="223">223</th><td>    <em>unsigned</em> <em>long</em> *<dfn class="local col2 decl" id="62p" title='p' data-type='unsigned long *' data-ref="62p">p</dfn> = <a class="local col9 ref" href="#59map" title='map' data-ref="59map">map</a> + <a class="macro" href="../include/qemu/bitops.h.html#24" title="((start) / (sizeof (unsigned long) * 8))" data-ref="_M/BIT_WORD">BIT_WORD</a>(<a class="local col0 ref" href="#60start" title='start' data-ref="60start">start</a>);</td></tr>
+<tr><th id="224">224</th><td>    <em>const</em> <em>long</em> <dfn class="local col3 decl" id="63size" title='size' data-type='const long' data-ref="63size">size</dfn> = <a class="local col0 ref" href="#60start" title='start' data-ref="60start">start</a> + <a class="local col1 ref" href="#61nr" title='nr' data-ref="61nr">nr</a>;</td></tr>
+<tr><th id="225">225</th><td>    <em>int</em> <dfn class="local col4 decl" id="64bits_to_clear" title='bits_to_clear' data-type='int' data-ref="64bits_to_clear">bits_to_clear</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a> - (<a class="local col0 ref" href="#60start" title='start' data-ref="60start">start</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>);</td></tr>
+<tr><th id="226">226</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col5 decl" id="65mask_to_clear" title='mask_to_clear' data-type='unsigned long' data-ref="65mask_to_clear">mask_to_clear</dfn> = <a class="macro" href="../include/qemu/bitmap.h.html#60" title="(~0UL &lt;&lt; ((start) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_FIRST_WORD_MASK">BITMAP_FIRST_WORD_MASK</a>(<a class="local col0 ref" href="#60start" title='start' data-ref="60start">start</a>);</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((start &gt;= 0 &amp;&amp; nr &gt;= 0) ? (void) (0) : __assert_fail (&quot;start &gt;= 0 &amp;&amp; nr &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/util/bitmap.c&quot;, 228, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col0 ref" href="#60start" title='start' data-ref="60start">start</a> &gt;= <var>0</var> &amp;&amp; <a class="local col1 ref" href="#61nr" title='nr' data-ref="61nr">nr</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>    <b>while</b> (<a class="local col1 ref" href="#61nr" title='nr' data-ref="61nr">nr</a> - <a class="local col4 ref" href="#64bits_to_clear" title='bits_to_clear' data-ref="64bits_to_clear">bits_to_clear</a> &gt;= <var>0</var>) {</td></tr>
+<tr><th id="231">231</th><td>        *<a class="local col2 ref" href="#62p" title='p' data-ref="62p">p</a> &amp;= ~<a class="local col5 ref" href="#65mask_to_clear" title='mask_to_clear' data-ref="65mask_to_clear">mask_to_clear</a>;</td></tr>
+<tr><th id="232">232</th><td>        <a class="local col1 ref" href="#61nr" title='nr' data-ref="61nr">nr</a> -= <a class="local col4 ref" href="#64bits_to_clear" title='bits_to_clear' data-ref="64bits_to_clear">bits_to_clear</a>;</td></tr>
+<tr><th id="233">233</th><td>        <a class="local col4 ref" href="#64bits_to_clear" title='bits_to_clear' data-ref="64bits_to_clear">bits_to_clear</a> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="234">234</th><td>        <a class="local col5 ref" href="#65mask_to_clear" title='mask_to_clear' data-ref="65mask_to_clear">mask_to_clear</a> = ~<var>0UL</var>;</td></tr>
+<tr><th id="235">235</th><td>        <a class="local col2 ref" href="#62p" title='p' data-ref="62p">p</a>++;</td></tr>
+<tr><th id="236">236</th><td>    }</td></tr>
+<tr><th id="237">237</th><td>    <b>if</b> (<a class="local col1 ref" href="#61nr" title='nr' data-ref="61nr">nr</a>) {</td></tr>
+<tr><th id="238">238</th><td>        <a class="local col5 ref" href="#65mask_to_clear" title='mask_to_clear' data-ref="65mask_to_clear">mask_to_clear</a> &amp;= <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(size) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col3 ref" href="#63size" title='size' data-ref="63size">size</a>);</td></tr>
+<tr><th id="239">239</th><td>        *<a class="local col2 ref" href="#62p" title='p' data-ref="62p">p</a> &amp;= ~<a class="local col5 ref" href="#65mask_to_clear" title='mask_to_clear' data-ref="65mask_to_clear">mask_to_clear</a>;</td></tr>
+<tr><th id="240">240</th><td>    }</td></tr>
+<tr><th id="241">241</th><td>}</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="bitmap_test_and_clear_atomic" title='bitmap_test_and_clear_atomic' data-ref="bitmap_test_and_clear_atomic">bitmap_test_and_clear_atomic</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col6 decl" id="66map" title='map' data-type='unsigned long *' data-ref="66map">map</dfn>, <em>long</em> <dfn class="local col7 decl" id="67start" title='start' data-type='long' data-ref="67start">start</dfn>, <em>long</em> <dfn class="local col8 decl" id="68nr" title='nr' data-type='long' data-ref="68nr">nr</dfn>)</td></tr>
+<tr><th id="244">244</th><td>{</td></tr>
+<tr><th id="245">245</th><td>    <em>unsigned</em> <em>long</em> *<dfn class="local col9 decl" id="69p" title='p' data-type='unsigned long *' data-ref="69p">p</dfn> = <a class="local col6 ref" href="#66map" title='map' data-ref="66map">map</a> + <a class="macro" href="../include/qemu/bitops.h.html#24" title="((start) / (sizeof (unsigned long) * 8))" data-ref="_M/BIT_WORD">BIT_WORD</a>(<a class="local col7 ref" href="#67start" title='start' data-ref="67start">start</a>);</td></tr>
+<tr><th id="246">246</th><td>    <em>const</em> <em>long</em> <dfn class="local col0 decl" id="70size" title='size' data-type='const long' data-ref="70size">size</dfn> = <a class="local col7 ref" href="#67start" title='start' data-ref="67start">start</a> + <a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a>;</td></tr>
+<tr><th id="247">247</th><td>    <em>int</em> <dfn class="local col1 decl" id="71bits_to_clear" title='bits_to_clear' data-type='int' data-ref="71bits_to_clear">bits_to_clear</dfn> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a> - (<a class="local col7 ref" href="#67start" title='start' data-ref="67start">start</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>);</td></tr>
+<tr><th id="248">248</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col2 decl" id="72mask_to_clear" title='mask_to_clear' data-type='unsigned long' data-ref="72mask_to_clear">mask_to_clear</dfn> = <a class="macro" href="../include/qemu/bitmap.h.html#60" title="(~0UL &lt;&lt; ((start) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_FIRST_WORD_MASK">BITMAP_FIRST_WORD_MASK</a>(<a class="local col7 ref" href="#67start" title='start' data-ref="67start">start</a>);</td></tr>
+<tr><th id="249">249</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col3 decl" id="73dirty" title='dirty' data-type='unsigned long' data-ref="73dirty">dirty</dfn> = <var>0</var>;</td></tr>
+<tr><th id="250">250</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col4 decl" id="74old_bits" title='old_bits' data-type='unsigned long' data-ref="74old_bits">old_bits</dfn>;</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((start &gt;= 0 &amp;&amp; nr &gt;= 0) ? (void) (0) : __assert_fail (&quot;start &gt;= 0 &amp;&amp; nr &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/util/bitmap.c&quot;, 252, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col7 ref" href="#67start" title='start' data-ref="67start">start</a> &gt;= <var>0</var> &amp;&amp; <a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td>    <i>/* First word */</i></td></tr>
+<tr><th id="255">255</th><td>    <b>if</b> (<a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a> - <a class="local col1 ref" href="#71bits_to_clear" title='bits_to_clear' data-ref="71bits_to_clear">bits_to_clear</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="256">256</th><td>        <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a> = <a class="macro" href="../include/qemu/atomic.h.html#205" title="__atomic_fetch_and(p, ~mask_to_clear, 5)" data-ref="_M/atomic_fetch_and">atomic_fetch_and</a>(<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>, ~<a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a>);</td></tr>
+<tr><th id="257">257</th><td>        <a class="local col3 ref" href="#73dirty" title='dirty' data-ref="73dirty">dirty</a> |= <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a> &amp; <a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a>;</td></tr>
+<tr><th id="258">258</th><td>        <a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a> -= <a class="local col1 ref" href="#71bits_to_clear" title='bits_to_clear' data-ref="71bits_to_clear">bits_to_clear</a>;</td></tr>
+<tr><th id="259">259</th><td>        <a class="local col1 ref" href="#71bits_to_clear" title='bits_to_clear' data-ref="71bits_to_clear">bits_to_clear</a> = <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="260">260</th><td>        <a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a> = ~<var>0UL</var>;</td></tr>
+<tr><th id="261">261</th><td>        <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>++;</td></tr>
+<tr><th id="262">262</th><td>    }</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>    <i>/* Full words */</i></td></tr>
+<tr><th id="265">265</th><td>    <b>if</b> (<a class="local col1 ref" href="#71bits_to_clear" title='bits_to_clear' data-ref="71bits_to_clear">bits_to_clear</a> == <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="266">266</th><td>        <b>while</b> (<a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a> &gt;= <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="267">267</th><td>            <b>if</b> (*<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>) {</td></tr>
+<tr><th id="268">268</th><td>                <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a> = <a class="macro" href="../include/qemu/atomic.h.html#182" title="({ _Static_assert(!(sizeof(*p) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*p) &gt; ATOMIC_REG_SIZE&quot;); ({ __atomic_exchange_n(p, (0), 5); }); })" data-ref="_M/atomic_xchg">atomic_xchg</a>(<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>, <var>0</var>);</td></tr>
+<tr><th id="269">269</th><td>                <a class="local col3 ref" href="#73dirty" title='dirty' data-ref="73dirty">dirty</a> |= <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a>;</td></tr>
+<tr><th id="270">270</th><td>            }</td></tr>
+<tr><th id="271">271</th><td>            <a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a> -= <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="272">272</th><td>            <a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>++;</td></tr>
+<tr><th id="273">273</th><td>        }</td></tr>
+<tr><th id="274">274</th><td>    }</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>    <i>/* Last word */</i></td></tr>
+<tr><th id="277">277</th><td>    <b>if</b> (<a class="local col8 ref" href="#68nr" title='nr' data-ref="68nr">nr</a>) {</td></tr>
+<tr><th id="278">278</th><td>        <a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a> &amp;= <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(size) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col0 ref" href="#70size" title='size' data-ref="70size">size</a>);</td></tr>
+<tr><th id="279">279</th><td>        <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a> = <a class="macro" href="../include/qemu/atomic.h.html#205" title="__atomic_fetch_and(p, ~mask_to_clear, 5)" data-ref="_M/atomic_fetch_and">atomic_fetch_and</a>(<a class="local col9 ref" href="#69p" title='p' data-ref="69p">p</a>, ~<a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a>);</td></tr>
+<tr><th id="280">280</th><td>        <a class="local col3 ref" href="#73dirty" title='dirty' data-ref="73dirty">dirty</a> |= <a class="local col4 ref" href="#74old_bits" title='old_bits' data-ref="74old_bits">old_bits</a> &amp; <a class="local col2 ref" href="#72mask_to_clear" title='mask_to_clear' data-ref="72mask_to_clear">mask_to_clear</a>;</td></tr>
+<tr><th id="281">281</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="282">282</th><td>        <b>if</b> (!<a class="local col3 ref" href="#73dirty" title='dirty' data-ref="73dirty">dirty</a>) {</td></tr>
+<tr><th id="283">283</th><td>            <a class="macro" href="../include/qemu/atomic.h.html#75" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(5); })" data-ref="_M/smp_mb">smp_mb</a>();</td></tr>
+<tr><th id="284">284</th><td>        }</td></tr>
+<tr><th id="285">285</th><td>    }</td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>    <b>return</b> <a class="local col3 ref" href="#73dirty" title='dirty' data-ref="73dirty">dirty</a> != <var>0</var>;</td></tr>
+<tr><th id="288">288</th><td>}</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><em>void</em> <dfn class="decl def" id="bitmap_copy_and_clear_atomic" title='bitmap_copy_and_clear_atomic' data-ref="bitmap_copy_and_clear_atomic">bitmap_copy_and_clear_atomic</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col5 decl" id="75dst" title='dst' data-type='unsigned long *' data-ref="75dst">dst</dfn>, <em>unsigned</em> <em>long</em> *<dfn class="local col6 decl" id="76src" title='src' data-type='unsigned long *' data-ref="76src">src</dfn>,</td></tr>
+<tr><th id="291">291</th><td>                                  <em>long</em> <dfn class="local col7 decl" id="77nr" title='nr' data-type='long' data-ref="77nr">nr</dfn>)</td></tr>
+<tr><th id="292">292</th><td>{</td></tr>
+<tr><th id="293">293</th><td>    <b>while</b> (<a class="local col7 ref" href="#77nr" title='nr' data-ref="77nr">nr</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="294">294</th><td>        *<a class="local col5 ref" href="#75dst" title='dst' data-ref="75dst">dst</a> = <a class="macro" href="../include/qemu/atomic.h.html#182" title="({ _Static_assert(!(sizeof(*src) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*src) &gt; ATOMIC_REG_SIZE&quot;); ({ __atomic_exchange_n(src, (0), 5); }); })" data-ref="_M/atomic_xchg">atomic_xchg</a>(<a class="local col6 ref" href="#76src" title='src' data-ref="76src">src</a>, <var>0</var>);</td></tr>
+<tr><th id="295">295</th><td>        <a class="local col5 ref" href="#75dst" title='dst' data-ref="75dst">dst</a>++;</td></tr>
+<tr><th id="296">296</th><td>        <a class="local col6 ref" href="#76src" title='src' data-ref="76src">src</a>++;</td></tr>
+<tr><th id="297">297</th><td>        <a class="local col7 ref" href="#77nr" title='nr' data-ref="77nr">nr</a> -= <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="298">298</th><td>    }</td></tr>
+<tr><th id="299">299</th><td>}</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><u>#define <dfn class="macro" id="_M/ALIGN_MASK" data-ref="_M/ALIGN_MASK">ALIGN_MASK</dfn>(x,mask)      (((x)+(mask))&amp;~(mask))</u></td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="304">304</th><td><i class="doc"> * bitmap_find_next_zero_area - find a contiguous aligned zero area</i></td></tr>
+<tr><th id="305">305</th><td><i class="doc"> *<span class="command"> @map</span>: The address to base the search on</i></td></tr>
+<tr><th id="306">306</th><td><i class="doc"> *<span class="command"> @size</span>: The bitmap size in bits</i></td></tr>
+<tr><th id="307">307</th><td><i class="doc"> *<span class="command"> @start</span>: The bitnumber to start searching at</i></td></tr>
+<tr><th id="308">308</th><td><i class="doc"> *<span class="command"> @nr</span>: The number of zeroed bits we're looking for</i></td></tr>
+<tr><th id="309">309</th><td><i class="doc"> *<span class="command"> @align</span>_mask: Alignment mask for zero area</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="311">311</th><td><i class="doc"> * The<span class="command"> @align</span>_mask should be one less than a power of 2; the effect is that</i></td></tr>
+<tr><th id="312">312</th><td><i class="doc"> * the bit offset of all zero areas this function finds is multiples of that</i></td></tr>
+<tr><th id="313">313</th><td><i class="doc"> * power of 2. A<span class="command"> @align</span>_mask of 0 means no alignment is required.</i></td></tr>
+<tr><th id="314">314</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="315">315</th><td><em>unsigned</em> <em>long</em> <dfn class="decl def" id="bitmap_find_next_zero_area" title='bitmap_find_next_zero_area' data-ref="bitmap_find_next_zero_area">bitmap_find_next_zero_area</dfn>(<em>unsigned</em> <em>long</em> *<dfn class="local col8 decl" id="78map" title='map' data-type='unsigned long *' data-ref="78map">map</dfn>,</td></tr>
+<tr><th id="316">316</th><td>                                         <em>unsigned</em> <em>long</em> <dfn class="local col9 decl" id="79size" title='size' data-type='unsigned long' data-ref="79size">size</dfn>,</td></tr>
+<tr><th id="317">317</th><td>                                         <em>unsigned</em> <em>long</em> <dfn class="local col0 decl" id="80start" title='start' data-type='unsigned long' data-ref="80start">start</dfn>,</td></tr>
+<tr><th id="318">318</th><td>                                         <em>unsigned</em> <em>long</em> <dfn class="local col1 decl" id="81nr" title='nr' data-type='unsigned long' data-ref="81nr">nr</dfn>,</td></tr>
+<tr><th id="319">319</th><td>                                         <em>unsigned</em> <em>long</em> <dfn class="local col2 decl" id="82align_mask" title='align_mask' data-type='unsigned long' data-ref="82align_mask">align_mask</dfn>)</td></tr>
+<tr><th id="320">320</th><td>{</td></tr>
+<tr><th id="321">321</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col3 decl" id="83index" title='index' data-type='unsigned long' data-ref="83index">index</dfn>, <dfn class="local col4 decl" id="84end" title='end' data-type='unsigned long' data-ref="84end">end</dfn>, <dfn class="local col5 decl" id="85i" title='i' data-type='unsigned long' data-ref="85i">i</dfn>;</td></tr>
+<tr><th id="322">322</th><td><dfn class="lbl" id="86again" data-ref="86again">again</dfn>:</td></tr>
+<tr><th id="323">323</th><td>    <a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a> = <a class="ref" href="../include/qemu/bitops.h.html#find_next_zero_bit" title='find_next_zero_bit' data-ref="find_next_zero_bit">find_next_zero_bit</a>(<a class="local col8 ref" href="#78map" title='map' data-ref="78map">map</a>, <a class="local col9 ref" href="#79size" title='size' data-ref="79size">size</a>, <a class="local col0 ref" href="#80start" title='start' data-ref="80start">start</a>);</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>    <i>/* Align allocation */</i></td></tr>
+<tr><th id="326">326</th><td>    <a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a> = <a class="macro" href="#301" title="(((index)+(align_mask))&amp;~(align_mask))" data-ref="_M/ALIGN_MASK">ALIGN_MASK</a>(<a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a>, <a class="local col2 ref" href="#82align_mask" title='align_mask' data-ref="82align_mask">align_mask</a>);</td></tr>
+<tr><th id="327">327</th><td></td></tr>
+<tr><th id="328">328</th><td>    <a class="local col4 ref" href="#84end" title='end' data-ref="84end">end</a> = <a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a> + <a class="local col1 ref" href="#81nr" title='nr' data-ref="81nr">nr</a>;</td></tr>
+<tr><th id="329">329</th><td>    <b>if</b> (<a class="local col4 ref" href="#84end" title='end' data-ref="84end">end</a> &gt; <a class="local col9 ref" href="#79size" title='size' data-ref="79size">size</a>) {</td></tr>
+<tr><th id="330">330</th><td>        <b>return</b> <a class="local col4 ref" href="#84end" title='end' data-ref="84end">end</a>;</td></tr>
+<tr><th id="331">331</th><td>    }</td></tr>
+<tr><th id="332">332</th><td>    <a class="local col5 ref" href="#85i" title='i' data-ref="85i">i</a> = <a class="ref" href="../include/qemu/bitops.h.html#find_next_bit" title='find_next_bit' data-ref="find_next_bit">find_next_bit</a>(<a class="local col8 ref" href="#78map" title='map' data-ref="78map">map</a>, <a class="local col4 ref" href="#84end" title='end' data-ref="84end">end</a>, <a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a>);</td></tr>
+<tr><th id="333">333</th><td>    <b>if</b> (<a class="local col5 ref" href="#85i" title='i' data-ref="85i">i</a> &lt; <a class="local col4 ref" href="#84end" title='end' data-ref="84end">end</a>) {</td></tr>
+<tr><th id="334">334</th><td>        <a class="local col0 ref" href="#80start" title='start' data-ref="80start">start</a> = <a class="local col5 ref" href="#85i" title='i' data-ref="85i">i</a> + <var>1</var>;</td></tr>
+<tr><th id="335">335</th><td>        <b>goto</b> <a class="lbl" href="#86again" data-ref="86again">again</a>;</td></tr>
+<tr><th id="336">336</th><td>    }</td></tr>
+<tr><th id="337">337</th><td>    <b>return</b> <a class="local col3 ref" href="#83index" title='index' data-ref="83index">index</a>;</td></tr>
+<tr><th id="338">338</th><td>}</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td><em>int</em> <dfn class="decl def" id="slow_bitmap_intersects" title='slow_bitmap_intersects' data-ref="slow_bitmap_intersects">slow_bitmap_intersects</dfn>(<em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col7 decl" id="87bitmap1" title='bitmap1' data-type='const unsigned long *' data-ref="87bitmap1">bitmap1</dfn>,</td></tr>
+<tr><th id="341">341</th><td>                           <em>const</em> <em>unsigned</em> <em>long</em> *<dfn class="local col8 decl" id="88bitmap2" title='bitmap2' data-type='const unsigned long *' data-ref="88bitmap2">bitmap2</dfn>, <em>long</em> <dfn class="local col9 decl" id="89bits" title='bits' data-type='long' data-ref="89bits">bits</dfn>)</td></tr>
+<tr><th id="342">342</th><td>{</td></tr>
+<tr><th id="343">343</th><td>    <em>long</em> <dfn class="local col0 decl" id="90k" title='k' data-type='long' data-ref="90k">k</dfn>, <dfn class="local col1 decl" id="91lim" title='lim' data-type='long' data-ref="91lim">lim</dfn> = <a class="local col9 ref" href="#89bits" title='bits' data-ref="89bits">bits</a>/<a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>;</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>    <b>for</b> (<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a> = <var>0</var>; <a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a> &lt; <a class="local col1 ref" href="#91lim" title='lim' data-ref="91lim">lim</a>; ++<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a>) {</td></tr>
+<tr><th id="346">346</th><td>        <b>if</b> (<a class="local col7 ref" href="#87bitmap1" title='bitmap1' data-ref="87bitmap1">bitmap1</a>[<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a>] &amp; <a class="local col8 ref" href="#88bitmap2" title='bitmap2' data-ref="88bitmap2">bitmap2</a>[<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a>]) {</td></tr>
+<tr><th id="347">347</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="348">348</th><td>        }</td></tr>
+<tr><th id="349">349</th><td>    }</td></tr>
+<tr><th id="350">350</th><td></td></tr>
+<tr><th id="351">351</th><td>    <b>if</b> (<a class="local col9 ref" href="#89bits" title='bits' data-ref="89bits">bits</a> % <a class="macro" href="../include/qemu/bitops.h.html#20" title="(sizeof (unsigned long) * 8)" data-ref="_M/BITS_PER_LONG">BITS_PER_LONG</a>) {</td></tr>
+<tr><th id="352">352</th><td>        <b>if</b> ((<a class="local col7 ref" href="#87bitmap1" title='bitmap1' data-ref="87bitmap1">bitmap1</a>[<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a>] &amp; <a class="local col8 ref" href="#88bitmap2" title='bitmap2' data-ref="88bitmap2">bitmap2</a>[<a class="local col0 ref" href="#90k" title='k' data-ref="90k">k</a>]) &amp; <a class="macro" href="../include/qemu/bitmap.h.html#61" title="(~0UL &gt;&gt; (-(bits) &amp; ((sizeof (unsigned long) * 8) - 1)))" data-ref="_M/BITMAP_LAST_WORD_MASK">BITMAP_LAST_WORD_MASK</a>(<a class="local col9 ref" href="#89bits" title='bits' data-ref="89bits">bits</a>)) {</td></tr>
+<tr><th id="353">353</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="354">354</th><td>        }</td></tr>
+<tr><th id="355">355</th><td>    }</td></tr>
+<tr><th id="356">356</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="357">357</th><td>}</td></tr>
+<tr><th id="358">358</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>uuid.h source code [codebrowser/include/qemu/uuid.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/uuid.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='uuid.h.html'>uuid.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  QEMU UUID functions</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright 2016 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> *  Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *   Fam Zheng &lt;famz@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This program is free software; you can redistribute it and/or modify it</i></td></tr>
+<tr><th id="10">10</th><td><i> * under the terms of the GNU General Public License as published by the Free</i></td></tr>
+<tr><th id="11">11</th><td><i> * Software Foundation; either version 2 of the License, or (at your option)</i></td></tr>
+<tr><th id="12">12</th><td><i> * any later version.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> */</i></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#<span data-ppcond="16">ifndef</span> <span class="macro" data-ref="_M/QEMU_UUID_H">QEMU_UUID_H</span></u></td></tr>
+<tr><th id="17">17</th><td><u>#define <dfn class="macro" id="_M/QEMU_UUID_H" data-ref="_M/QEMU_UUID_H">QEMU_UUID_H</dfn></u></td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i>/* Version 4 UUID (pseudo random numbers), RFC4122 4.4. */</i></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="24">24</th><td>    <b>union</b> {</td></tr>
+<tr><th id="25">25</th><td>        <em>unsigned</em> <em>char</em> <dfn class="decl" id="(anonymousstruct)::(anonymous)::data" title='(anonymous struct)::(anonymous union)::data' data-ref="(anonymousstruct)::(anonymous)::data">data</dfn>[<var>16</var>];</td></tr>
+<tr><th id="26">26</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="27">27</th><td>            <i>/* Generated in BE endian, can be swapped with qemu_uuid_bswap. */</i></td></tr>
+<tr><th id="28">28</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::time_low" title='(anonymous struct)::(anonymous union)::(anonymous struct)::time_low' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::time_low">time_low</dfn>;</td></tr>
+<tr><th id="29">29</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::time_mid" title='(anonymous struct)::(anonymous union)::(anonymous struct)::time_mid' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::time_mid">time_mid</dfn>;</td></tr>
+<tr><th id="30">30</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::time_high_and_version" title='(anonymous struct)::(anonymous union)::(anonymous struct)::time_high_and_version' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::time_high_and_version">time_high_and_version</dfn>;</td></tr>
+<tr><th id="31">31</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::clock_seq_and_reserved" title='(anonymous struct)::(anonymous union)::(anonymous struct)::clock_seq_and_reserved' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::clock_seq_and_reserved">clock_seq_and_reserved</dfn>;</td></tr>
+<tr><th id="32">32</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::clock_seq_low" title='(anonymous struct)::(anonymous union)::(anonymous struct)::clock_seq_low' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::clock_seq_low">clock_seq_low</dfn>;</td></tr>
+<tr><th id="33">33</th><td>            <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>  <dfn class="decl" id="(anonymousstruct)::(anonymousunion)::(anonymous)::node" title='(anonymous struct)::(anonymous union)::(anonymous struct)::node' data-ref="(anonymousstruct)::(anonymousunion)::(anonymous)::node">node</dfn>[<var>6</var>];</td></tr>
+<tr><th id="34">34</th><td>        } <dfn class="decl" id="(anonymousstruct)::(anonymous)::fields" title='(anonymous struct)::(anonymous union)::fields' data-ref="(anonymousstruct)::(anonymous)::fields">fields</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    };</td></tr>
+<tr><th id="36">36</th><td>} <dfn class="typedef" id="QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/UUID_FMT" data-ref="_M/UUID_FMT">UUID_FMT</dfn> "%02hhx%02hhx%02hhx%02hhx-" \</u></td></tr>
+<tr><th id="39">39</th><td><u>                 "%02hhx%02hhx-%02hhx%02hhx-" \</u></td></tr>
+<tr><th id="40">40</th><td><u>                 "%02hhx%02hhx-" \</u></td></tr>
+<tr><th id="41">41</th><td><u>                 "%02hhx%02hhx%02hhx%02hhx%02hhx%02hhx"</u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/UUID_FMT_LEN" data-ref="_M/UUID_FMT_LEN">UUID_FMT_LEN</dfn> 36</u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/UUID_NONE" data-ref="_M/UUID_NONE">UUID_NONE</dfn> "00000000-0000-0000-0000-000000000000"</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><em>void</em> <dfn class="decl" id="qemu_uuid_generate" title='qemu_uuid_generate' data-ref="qemu_uuid_generate">qemu_uuid_generate</dfn>(<a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col1 decl" id="10211out" title='out' data-type='QemuUUID *' data-ref="10211out">out</dfn>);</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><em>int</em> <dfn class="decl" id="qemu_uuid_is_null" title='qemu_uuid_is_null' data-ref="qemu_uuid_is_null">qemu_uuid_is_null</dfn>(<em>const</em> <a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col2 decl" id="10212uu" title='uu' data-type='const QemuUUID *' data-ref="10212uu">uu</dfn>);</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><em>void</em> <dfn class="decl" id="qemu_uuid_unparse" title='qemu_uuid_unparse' data-ref="qemu_uuid_unparse">qemu_uuid_unparse</dfn>(<em>const</em> <a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col3 decl" id="10213uuid" title='uuid' data-type='const QemuUUID *' data-ref="10213uuid">uuid</dfn>, <em>char</em> *<dfn class="local col4 decl" id="10214out" title='out' data-type='char *' data-ref="10214out">out</dfn>);</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><em>char</em> *<dfn class="decl" id="qemu_uuid_unparse_strdup" title='qemu_uuid_unparse_strdup' data-ref="qemu_uuid_unparse_strdup">qemu_uuid_unparse_strdup</dfn>(<em>const</em> <a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col5 decl" id="10215uuid" title='uuid' data-type='const QemuUUID *' data-ref="10215uuid">uuid</dfn>);</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>int</em> <dfn class="decl" id="qemu_uuid_parse" title='qemu_uuid_parse' data-ref="qemu_uuid_parse">qemu_uuid_parse</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="10216str" title='str' data-type='const char *' data-ref="10216str">str</dfn>, <a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col7 decl" id="10217uuid" title='uuid' data-type='QemuUUID *' data-ref="10217uuid">uuid</dfn>);</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><em>void</em> <dfn class="decl" id="qemu_uuid_bswap" title='qemu_uuid_bswap' data-ref="qemu_uuid_bswap">qemu_uuid_bswap</dfn>(<a class="typedef" href="#QemuUUID" title='QemuUUID' data-type='struct QemuUUID' data-ref="QemuUUID">QemuUUID</a> *<dfn class="local col8 decl" id="10218uuid" title='uuid' data-type='QemuUUID *' data-ref="10218uuid">uuid</dfn>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="16">endif</span></u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

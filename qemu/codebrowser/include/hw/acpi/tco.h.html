@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tco.h source code [codebrowser/include/hw/acpi/tco.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TCOIORegs "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/acpi/tco.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>acpi</a>/<a href='tco.h.html'>tco.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU ICH9 TCO emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015 Paulo Alcantara &lt;pcacjr@zytor.com&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="7">7</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="8">8</th><td><i> */</i></td></tr>
+<tr><th id="9">9</th><td><u>#<span data-ppcond="9">ifndef</span> <span class="macro" data-ref="_M/HW_ACPI_TCO_H">HW_ACPI_TCO_H</span></u></td></tr>
+<tr><th id="10">10</th><td><u>#define <dfn class="macro" id="_M/HW_ACPI_TCO_H" data-ref="_M/HW_ACPI_TCO_H">HW_ACPI_TCO_H</dfn></u></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><i>/* As per ICH9 spec, the internal timer has an error of ~0.6s on every tick */</i></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/TCO_TICK_NSEC" data-ref="_M/TCO_TICK_NSEC">TCO_TICK_NSEC</dfn> 600000000LL</u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><i>/* TCO I/O register offsets */</i></td></tr>
+<tr><th id="18">18</th><td><b>enum</b> {</td></tr>
+<tr><th id="19">19</th><td>    <dfn class="enum" id="TCO_RLD" title='TCO_RLD' data-ref="TCO_RLD">TCO_RLD</dfn>           = <var>0x00</var>,</td></tr>
+<tr><th id="20">20</th><td>    <dfn class="enum" id="TCO_DAT_IN" title='TCO_DAT_IN' data-ref="TCO_DAT_IN">TCO_DAT_IN</dfn>        = <var>0x02</var>,</td></tr>
+<tr><th id="21">21</th><td>    <dfn class="enum" id="TCO_DAT_OUT" title='TCO_DAT_OUT' data-ref="TCO_DAT_OUT">TCO_DAT_OUT</dfn>       = <var>0x03</var>,</td></tr>
+<tr><th id="22">22</th><td>    <dfn class="enum" id="TCO1_STS" title='TCO1_STS' data-ref="TCO1_STS">TCO1_STS</dfn>          = <var>0x04</var>,</td></tr>
+<tr><th id="23">23</th><td>    <dfn class="enum" id="TCO2_STS" title='TCO2_STS' data-ref="TCO2_STS">TCO2_STS</dfn>          = <var>0x06</var>,</td></tr>
+<tr><th id="24">24</th><td>    <dfn class="enum" id="TCO1_CNT" title='TCO1_CNT' data-ref="TCO1_CNT">TCO1_CNT</dfn>          = <var>0x08</var>,</td></tr>
+<tr><th id="25">25</th><td>    <dfn class="enum" id="TCO2_CNT" title='TCO2_CNT' data-ref="TCO2_CNT">TCO2_CNT</dfn>          = <var>0x0a</var>,</td></tr>
+<tr><th id="26">26</th><td>    <dfn class="enum" id="TCO_MESSAGE1" title='TCO_MESSAGE1' data-ref="TCO_MESSAGE1">TCO_MESSAGE1</dfn>      = <var>0x0c</var>,</td></tr>
+<tr><th id="27">27</th><td>    <dfn class="enum" id="TCO_MESSAGE2" title='TCO_MESSAGE2' data-ref="TCO_MESSAGE2">TCO_MESSAGE2</dfn>      = <var>0x0d</var>,</td></tr>
+<tr><th id="28">28</th><td>    <dfn class="enum" id="TCO_WDCNT" title='TCO_WDCNT' data-ref="TCO_WDCNT">TCO_WDCNT</dfn>         = <var>0x0e</var>,</td></tr>
+<tr><th id="29">29</th><td>    <dfn class="enum" id="SW_IRQ_GEN" title='SW_IRQ_GEN' data-ref="SW_IRQ_GEN">SW_IRQ_GEN</dfn>        = <var>0x10</var>,</td></tr>
+<tr><th id="30">30</th><td>    <dfn class="enum" id="TCO_TMR" title='TCO_TMR' data-ref="TCO_TMR">TCO_TMR</dfn>           = <var>0x12</var>,</td></tr>
+<tr><th id="31">31</th><td>};</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>/* TCO I/O register control/status bits */</i></td></tr>
+<tr><th id="34">34</th><td><b>enum</b> {</td></tr>
+<tr><th id="35">35</th><td>    <dfn class="enum" id="SW_TCO_SMI" title='SW_TCO_SMI' data-ref="SW_TCO_SMI">SW_TCO_SMI</dfn>           = <var>1</var> &lt;&lt; <var>1</var>,</td></tr>
+<tr><th id="36">36</th><td>    <dfn class="enum" id="TCO_INT_STS" title='TCO_INT_STS' data-ref="TCO_INT_STS">TCO_INT_STS</dfn>          = <var>1</var> &lt;&lt; <var>2</var>,</td></tr>
+<tr><th id="37">37</th><td>    <dfn class="enum" id="TCO_LOCK" title='TCO_LOCK' data-ref="TCO_LOCK">TCO_LOCK</dfn>             = <var>1</var> &lt;&lt; <var>12</var>,</td></tr>
+<tr><th id="38">38</th><td>    <dfn class="enum" id="TCO_TMR_HLT" title='TCO_TMR_HLT' data-ref="TCO_TMR_HLT">TCO_TMR_HLT</dfn>          = <var>1</var> &lt;&lt; <var>11</var>,</td></tr>
+<tr><th id="39">39</th><td>    <dfn class="enum" id="TCO_TIMEOUT" title='TCO_TIMEOUT' data-ref="TCO_TIMEOUT">TCO_TIMEOUT</dfn>          = <var>1</var> &lt;&lt; <var>3</var>,</td></tr>
+<tr><th id="40">40</th><td>    <dfn class="enum" id="TCO_SECOND_TO_STS" title='TCO_SECOND_TO_STS' data-ref="TCO_SECOND_TO_STS">TCO_SECOND_TO_STS</dfn>    = <var>1</var> &lt;&lt; <var>1</var>,</td></tr>
+<tr><th id="41">41</th><td>    <dfn class="enum" id="TCO_BOOT_STS" title='TCO_BOOT_STS' data-ref="TCO_BOOT_STS">TCO_BOOT_STS</dfn>         = <var>1</var> &lt;&lt; <var>2</var>,</td></tr>
+<tr><th id="42">42</th><td>};</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><i>/* TCO I/O registers mask bits */</i></td></tr>
+<tr><th id="45">45</th><td><b>enum</b> {</td></tr>
+<tr><th id="46">46</th><td>    <dfn class="enum" id="TCO_RLD_MASK" title='TCO_RLD_MASK' data-ref="TCO_RLD_MASK">TCO_RLD_MASK</dfn>     = <var>0x3ff</var>,</td></tr>
+<tr><th id="47">47</th><td>    <dfn class="enum" id="TCO1_STS_MASK" title='TCO1_STS_MASK' data-ref="TCO1_STS_MASK">TCO1_STS_MASK</dfn>    = <var>0xe870</var>,</td></tr>
+<tr><th id="48">48</th><td>    <dfn class="enum" id="TCO2_STS_MASK" title='TCO2_STS_MASK' data-ref="TCO2_STS_MASK">TCO2_STS_MASK</dfn>    = <var>0xfff8</var>,</td></tr>
+<tr><th id="49">49</th><td>    <dfn class="enum" id="TCO1_CNT_MASK" title='TCO1_CNT_MASK' data-ref="TCO1_CNT_MASK">TCO1_CNT_MASK</dfn>    = <var>0xfeff</var>,</td></tr>
+<tr><th id="50">50</th><td>    <dfn class="enum" id="TCO_TMR_MASK" title='TCO_TMR_MASK' data-ref="TCO_TMR_MASK">TCO_TMR_MASK</dfn>     = <var>0x3ff</var>,</td></tr>
+<tr><th id="51">51</th><td>};</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="TCOIORegs" title='TCOIORegs' data-ref="TCOIORegs"><a class="type" href="#TCOIORegs" title='TCOIORegs' data-ref="TCOIORegs">TCOIORegs</a></dfn> {</td></tr>
+<tr><th id="54">54</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="55">55</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::rld" title='TCOIORegs::(anonymous struct)::rld' data-ref="TCOIORegs::(anonymous)::rld">rld</dfn>;</td></tr>
+<tr><th id="56">56</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::din" title='TCOIORegs::(anonymous struct)::din' data-ref="TCOIORegs::(anonymous)::din">din</dfn>;</td></tr>
+<tr><th id="57">57</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::dout" title='TCOIORegs::(anonymous struct)::dout' data-ref="TCOIORegs::(anonymous)::dout">dout</dfn>;</td></tr>
+<tr><th id="58">58</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::sts1" title='TCOIORegs::(anonymous struct)::sts1' data-ref="TCOIORegs::(anonymous)::sts1">sts1</dfn>;</td></tr>
+<tr><th id="59">59</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::sts2" title='TCOIORegs::(anonymous struct)::sts2' data-ref="TCOIORegs::(anonymous)::sts2">sts2</dfn>;</td></tr>
+<tr><th id="60">60</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::cnt1" title='TCOIORegs::(anonymous struct)::cnt1' data-ref="TCOIORegs::(anonymous)::cnt1">cnt1</dfn>;</td></tr>
+<tr><th id="61">61</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::cnt2" title='TCOIORegs::(anonymous struct)::cnt2' data-ref="TCOIORegs::(anonymous)::cnt2">cnt2</dfn>;</td></tr>
+<tr><th id="62">62</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::msg1" title='TCOIORegs::(anonymous struct)::msg1' data-ref="TCOIORegs::(anonymous)::msg1">msg1</dfn>;</td></tr>
+<tr><th id="63">63</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::msg2" title='TCOIORegs::(anonymous struct)::msg2' data-ref="TCOIORegs::(anonymous)::msg2">msg2</dfn>;</td></tr>
+<tr><th id="64">64</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::wdcnt" title='TCOIORegs::(anonymous struct)::wdcnt' data-ref="TCOIORegs::(anonymous)::wdcnt">wdcnt</dfn>;</td></tr>
+<tr><th id="65">65</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="TCOIORegs::(anonymous)::tmr" title='TCOIORegs::(anonymous struct)::tmr' data-ref="TCOIORegs::(anonymous)::tmr">tmr</dfn>;</td></tr>
+<tr><th id="66">66</th><td>    } <dfn class="decl" id="TCOIORegs::tco" title='TCOIORegs::tco' data-ref="TCOIORegs::tco">tco</dfn>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::sw_irq_gen" title='TCOIORegs::sw_irq_gen' data-ref="TCOIORegs::sw_irq_gen">sw_irq_gen</dfn>;</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="TCOIORegs::tco_timer" title='TCOIORegs::tco_timer' data-ref="TCOIORegs::tco_timer">tco_timer</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="TCOIORegs::expire_time" title='TCOIORegs::expire_time' data-ref="TCOIORegs::expire_time">expire_time</dfn>;</td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="TCOIORegs::timeouts_no" title='TCOIORegs::timeouts_no' data-ref="TCOIORegs::timeouts_no">timeouts_no</dfn>;</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="TCOIORegs::io" title='TCOIORegs::io' data-ref="TCOIORegs::io">io</dfn>;</td></tr>
+<tr><th id="74">74</th><td>} <dfn class="typedef" id="TCOIORegs" title='TCOIORegs' data-type='struct TCOIORegs' data-ref="TCOIORegs">TCOIORegs</dfn>;</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><i>/* tco.c */</i></td></tr>
+<tr><th id="77">77</th><td><em>void</em> <dfn class="decl" id="acpi_pm_tco_init" title='acpi_pm_tco_init' data-ref="acpi_pm_tco_init">acpi_pm_tco_init</dfn>(<a class="typedef" href="#TCOIORegs" title='TCOIORegs' data-type='struct TCOIORegs' data-ref="TCOIORegs">TCOIORegs</a> *<dfn class="local col1 decl" id="1tr" title='tr' data-type='TCOIORegs *' data-ref="1tr">tr</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="local col2 decl" id="2parent" title='parent' data-type='MemoryRegion *' data-ref="2parent">parent</dfn>);</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_tco_io_sts" title='vmstate_tco_io_sts' data-ref="vmstate_tco_io_sts">vmstate_tco_io_sts</dfn>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><u>#<span data-ppcond="9">endif</span> /* HW_ACPI_TCO_H */</u></td></tr>
+<tr><th id="82">82</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/acpi/ich9.c.html'>codebrowser/hw/acpi/ich9.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

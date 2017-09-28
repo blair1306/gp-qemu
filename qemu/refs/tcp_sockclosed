@@ -1,0 +1,15 @@
+<dec f='codebrowser/slirp/slirp.h' l='289' type='void tcp_sockclosed(struct tcpcb * )'/>
+<use f='codebrowser/slirp/socket.c' l='215' u='c' c='soread'/>
+<use f='codebrowser/slirp/socket.c' l='286' u='c' c='soreadbuf'/>
+<use f='codebrowser/slirp/socket.c' l='491' u='c' c='sowrite'/>
+<def f='codebrowser/slirp/tcp_subr.c' l='352' ll='382' type='void tcp_sockclosed(struct tcpcb * tp)'/>
+<doc f='codebrowser/slirp/tcp_subr.c' l='342'>/*
+ * User issued close, and wish to trail through shutdown states:
+ * if never received SYN, just forget it.  If got a SYN from peer,
+ * but haven&apos;t sent FIN, then go to FIN_WAIT_1 state to send peer a FIN.
+ * If already got a FIN from peer, then almost done; go to LAST_ACK
+ * state.  In all other cases, have already sent FIN to peer (e.g.
+ * after PRU_SHUTDOWN), and just have to play tedious game waiting
+ * for peer to send FIN or not respond to keep-alives, etc.
+ * We can let the user exit from the close as soon as the FIN is acked.
+ */</doc>

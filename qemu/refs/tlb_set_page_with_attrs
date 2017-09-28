@@ -1,0 +1,33 @@
+<dec f='codebrowser/include/exec/exec-all.h' l='256' type='void tlb_set_page_with_attrs(CPUState * cpu, target_ulong vaddr, hwaddr paddr, MemTxAttrs attrs, int prot, int mmu_idx, target_ulong size)'/>
+<doc f='codebrowser/include/exec/exec-all.h' l='234'>/**
+ * tlb_set_page_with_attrs:
+ * @cpu: CPU to add this TLB entry for
+ * @vaddr: virtual address of page to add entry for
+ * @paddr: physical address of the page
+ * @attrs: memory transaction attributes
+ * @prot: access permissions (PAGE_READ/PAGE_WRITE/PAGE_EXEC bits)
+ * @mmu_idx: MMU index to insert TLB entry for
+ * @size: size of the page in bytes
+ *
+ * Add an entry to this CPU&apos;s TLB (a mapping from virtual address
+ * @vaddr to physical address @paddr) with the specified memory
+ * transaction attributes. This is generally called by the target CPU
+ * specific code after it has been called through the tlb_fill()
+ * entry point and performed a successful page table walk to find
+ * the physical address and attributes for the virtual address
+ * which provoked the TLB miss.
+ *
+ * At most one entry for a given virtual address is permitted. Only a
+ * single TARGET_PAGE_SIZE region is mapped; the supplied @size is only
+ * used by tlb_flush_page.
+ */</doc>
+<def f='codebrowser/accel/tcg/cputlb.c' l='602' ll='691' type='void tlb_set_page_with_attrs(CPUState * cpu, target_ulong vaddr, hwaddr paddr, MemTxAttrs attrs, int prot, int mmu_idx, target_ulong size)'/>
+<use f='codebrowser/accel/tcg/cputlb.c' l='700' u='c' c='tlb_set_page'/>
+<doc f='codebrowser/accel/tcg/cputlb.c' l='595'>/* Add a new TLB entry. At most one entry for a given virtual address
+ * is permitted. Only a single TARGET_PAGE_SIZE region is mapped, the
+ * supplied size is only used by tlb_flush_page.
+ *
+ * Called from TCG-generated code, which is under an RCU read-side
+ * critical section.
+ */</doc>
+<use f='codebrowser/target/i386/excp_helper.c' l='453' u='c' c='x86_cpu_handle_mmu_fault'/>

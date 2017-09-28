@@ -1,0 +1,198 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tcg-target.h source code [codebrowser/tcg/i386/tcg-target.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/tcg/i386/tcg-target.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>tcg</a>/<a href='./'>i386</a>/<a href='tcg-target.h.html'>tcg-target.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Tiny Code Generator for QEMU</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#<span data-ppcond="25">ifndef</span> <span class="macro" data-ref="_M/I386_TCG_TARGET_H">I386_TCG_TARGET_H</span></u></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/I386_TCG_TARGET_H" data-ref="_M/I386_TCG_TARGET_H">I386_TCG_TARGET_H</dfn></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_INSN_UNIT_SIZE" data-ref="_M/TCG_TARGET_INSN_UNIT_SIZE">TCG_TARGET_INSN_UNIT_SIZE</dfn>  1</u></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_TLB_DISPLACEMENT_BITS" data-ref="_M/TCG_TARGET_TLB_DISPLACEMENT_BITS">TCG_TARGET_TLB_DISPLACEMENT_BITS</dfn> 31</u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="31">ifdef</span> <span class="macro" data-ref="_M/__x86_64__">__x86_64__</span></u></td></tr>
+<tr><th id="32">32</th><td><u># define <dfn class="macro" id="_M/TCG_TARGET_REG_BITS" data-ref="_M/TCG_TARGET_REG_BITS">TCG_TARGET_REG_BITS</dfn>  64</u></td></tr>
+<tr><th id="33">33</th><td><u># define <dfn class="macro" id="_M/TCG_TARGET_NB_REGS" data-ref="_M/TCG_TARGET_NB_REGS">TCG_TARGET_NB_REGS</dfn>   16</u></td></tr>
+<tr><th id="34">34</th><td><u>#<span data-ppcond="31">else</span></u></td></tr>
+<tr><th id="35">35</th><td><u># define TCG_TARGET_REG_BITS  32</u></td></tr>
+<tr><th id="36">36</th><td><u># define TCG_TARGET_NB_REGS    8</u></td></tr>
+<tr><th id="37">37</th><td><u>#<span data-ppcond="31">endif</span></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="40">40</th><td>    <dfn class="enum" id="TCG_REG_EAX" title='TCG_REG_EAX' data-ref="TCG_REG_EAX">TCG_REG_EAX</dfn> = <var>0</var>,</td></tr>
+<tr><th id="41">41</th><td>    <dfn class="enum" id="TCG_REG_ECX" title='TCG_REG_ECX' data-ref="TCG_REG_ECX">TCG_REG_ECX</dfn>,</td></tr>
+<tr><th id="42">42</th><td>    <dfn class="enum" id="TCG_REG_EDX" title='TCG_REG_EDX' data-ref="TCG_REG_EDX">TCG_REG_EDX</dfn>,</td></tr>
+<tr><th id="43">43</th><td>    <dfn class="enum" id="TCG_REG_EBX" title='TCG_REG_EBX' data-ref="TCG_REG_EBX">TCG_REG_EBX</dfn>,</td></tr>
+<tr><th id="44">44</th><td>    <dfn class="enum" id="TCG_REG_ESP" title='TCG_REG_ESP' data-ref="TCG_REG_ESP">TCG_REG_ESP</dfn>,</td></tr>
+<tr><th id="45">45</th><td>    <dfn class="enum" id="TCG_REG_EBP" title='TCG_REG_EBP' data-ref="TCG_REG_EBP">TCG_REG_EBP</dfn>,</td></tr>
+<tr><th id="46">46</th><td>    <dfn class="enum" id="TCG_REG_ESI" title='TCG_REG_ESI' data-ref="TCG_REG_ESI">TCG_REG_ESI</dfn>,</td></tr>
+<tr><th id="47">47</th><td>    <dfn class="enum" id="TCG_REG_EDI" title='TCG_REG_EDI' data-ref="TCG_REG_EDI">TCG_REG_EDI</dfn>,</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <i>/* 64-bit registers; always define the symbols to avoid</i></td></tr>
+<tr><th id="50">50</th><td><i>       too much if-deffing.  */</i></td></tr>
+<tr><th id="51">51</th><td>    <dfn class="enum" id="TCG_REG_R8" title='TCG_REG_R8' data-ref="TCG_REG_R8">TCG_REG_R8</dfn>,</td></tr>
+<tr><th id="52">52</th><td>    <dfn class="enum" id="TCG_REG_R9" title='TCG_REG_R9' data-ref="TCG_REG_R9">TCG_REG_R9</dfn>,</td></tr>
+<tr><th id="53">53</th><td>    <dfn class="enum" id="TCG_REG_R10" title='TCG_REG_R10' data-ref="TCG_REG_R10">TCG_REG_R10</dfn>,</td></tr>
+<tr><th id="54">54</th><td>    <dfn class="enum" id="TCG_REG_R11" title='TCG_REG_R11' data-ref="TCG_REG_R11">TCG_REG_R11</dfn>,</td></tr>
+<tr><th id="55">55</th><td>    <dfn class="enum" id="TCG_REG_R12" title='TCG_REG_R12' data-ref="TCG_REG_R12">TCG_REG_R12</dfn>,</td></tr>
+<tr><th id="56">56</th><td>    <dfn class="enum" id="TCG_REG_R13" title='TCG_REG_R13' data-ref="TCG_REG_R13">TCG_REG_R13</dfn>,</td></tr>
+<tr><th id="57">57</th><td>    <dfn class="enum" id="TCG_REG_R14" title='TCG_REG_R14' data-ref="TCG_REG_R14">TCG_REG_R14</dfn>,</td></tr>
+<tr><th id="58">58</th><td>    <dfn class="enum" id="TCG_REG_R15" title='TCG_REG_R15' data-ref="TCG_REG_R15">TCG_REG_R15</dfn>,</td></tr>
+<tr><th id="59">59</th><td>    <dfn class="enum" id="TCG_REG_RAX" title='TCG_REG_RAX' data-ref="TCG_REG_RAX">TCG_REG_RAX</dfn> = <a class="enum" href="#TCG_REG_EAX" title='TCG_REG_EAX' data-ref="TCG_REG_EAX">TCG_REG_EAX</a>,</td></tr>
+<tr><th id="60">60</th><td>    <dfn class="enum" id="TCG_REG_RCX" title='TCG_REG_RCX' data-ref="TCG_REG_RCX">TCG_REG_RCX</dfn> = <a class="enum" href="#TCG_REG_ECX" title='TCG_REG_ECX' data-ref="TCG_REG_ECX">TCG_REG_ECX</a>,</td></tr>
+<tr><th id="61">61</th><td>    <dfn class="enum" id="TCG_REG_RDX" title='TCG_REG_RDX' data-ref="TCG_REG_RDX">TCG_REG_RDX</dfn> = <a class="enum" href="#TCG_REG_EDX" title='TCG_REG_EDX' data-ref="TCG_REG_EDX">TCG_REG_EDX</a>,</td></tr>
+<tr><th id="62">62</th><td>    <dfn class="enum" id="TCG_REG_RBX" title='TCG_REG_RBX' data-ref="TCG_REG_RBX">TCG_REG_RBX</dfn> = <a class="enum" href="#TCG_REG_EBX" title='TCG_REG_EBX' data-ref="TCG_REG_EBX">TCG_REG_EBX</a>,</td></tr>
+<tr><th id="63">63</th><td>    <dfn class="enum" id="TCG_REG_RSP" title='TCG_REG_RSP' data-ref="TCG_REG_RSP">TCG_REG_RSP</dfn> = <a class="enum" href="#TCG_REG_ESP" title='TCG_REG_ESP' data-ref="TCG_REG_ESP">TCG_REG_ESP</a>,</td></tr>
+<tr><th id="64">64</th><td>    <dfn class="enum" id="TCG_REG_RBP" title='TCG_REG_RBP' data-ref="TCG_REG_RBP">TCG_REG_RBP</dfn> = <a class="enum" href="#TCG_REG_EBP" title='TCG_REG_EBP' data-ref="TCG_REG_EBP">TCG_REG_EBP</a>,</td></tr>
+<tr><th id="65">65</th><td>    <dfn class="enum" id="TCG_REG_RSI" title='TCG_REG_RSI' data-ref="TCG_REG_RSI">TCG_REG_RSI</dfn> = <a class="enum" href="#TCG_REG_ESI" title='TCG_REG_ESI' data-ref="TCG_REG_ESI">TCG_REG_ESI</a>,</td></tr>
+<tr><th id="66">66</th><td>    <dfn class="enum" id="TCG_REG_RDI" title='TCG_REG_RDI' data-ref="TCG_REG_RDI">TCG_REG_RDI</dfn> = <a class="enum" href="#TCG_REG_EDI" title='TCG_REG_EDI' data-ref="TCG_REG_EDI">TCG_REG_EDI</a>,</td></tr>
+<tr><th id="67">67</th><td>} <dfn class="typedef" id="TCGReg" title='TCGReg' data-type='enum TCGReg' data-ref="TCGReg">TCGReg</dfn>;</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><i>/* used for function call generation */</i></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/TCG_REG_CALL_STACK" data-ref="_M/TCG_REG_CALL_STACK">TCG_REG_CALL_STACK</dfn> TCG_REG_ESP</u> </td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_STACK_ALIGN" data-ref="_M/TCG_TARGET_STACK_ALIGN">TCG_TARGET_STACK_ALIGN</dfn> 16</u></td></tr>
+<tr><th id="72">72</th><td><u>#<span data-ppcond="72">if</span> defined(<span class="macro" data-ref="_M/_WIN64">_WIN64</span>)</u></td></tr>
+<tr><th id="73">73</th><td><u>#define TCG_TARGET_CALL_STACK_OFFSET 32</u></td></tr>
+<tr><th id="74">74</th><td><u>#<span data-ppcond="72">else</span></u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_CALL_STACK_OFFSET" data-ref="_M/TCG_TARGET_CALL_STACK_OFFSET">TCG_TARGET_CALL_STACK_OFFSET</dfn> 0</u></td></tr>
+<tr><th id="76">76</th><td><u>#<span data-ppcond="72">endif</span></u></td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><b>extern</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="have_bmi1" title='have_bmi1' data-ref="have_bmi1">have_bmi1</dfn>;</td></tr>
+<tr><th id="79">79</th><td><b>extern</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="have_popcnt" title='have_popcnt' data-ref="have_popcnt">have_popcnt</dfn>;</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><i>/* optional instructions */</i></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_div2_i32" data-ref="_M/TCG_TARGET_HAS_div2_i32">TCG_TARGET_HAS_div2_i32</dfn>         1</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_rot_i32" data-ref="_M/TCG_TARGET_HAS_rot_i32">TCG_TARGET_HAS_rot_i32</dfn>          1</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext8s_i32" data-ref="_M/TCG_TARGET_HAS_ext8s_i32">TCG_TARGET_HAS_ext8s_i32</dfn>        1</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext16s_i32" data-ref="_M/TCG_TARGET_HAS_ext16s_i32">TCG_TARGET_HAS_ext16s_i32</dfn>       1</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext8u_i32" data-ref="_M/TCG_TARGET_HAS_ext8u_i32">TCG_TARGET_HAS_ext8u_i32</dfn>        1</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext16u_i32" data-ref="_M/TCG_TARGET_HAS_ext16u_i32">TCG_TARGET_HAS_ext16u_i32</dfn>       1</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_bswap16_i32" data-ref="_M/TCG_TARGET_HAS_bswap16_i32">TCG_TARGET_HAS_bswap16_i32</dfn>      1</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_bswap32_i32" data-ref="_M/TCG_TARGET_HAS_bswap32_i32">TCG_TARGET_HAS_bswap32_i32</dfn>      1</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_neg_i32" data-ref="_M/TCG_TARGET_HAS_neg_i32">TCG_TARGET_HAS_neg_i32</dfn>          1</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_not_i32" data-ref="_M/TCG_TARGET_HAS_not_i32">TCG_TARGET_HAS_not_i32</dfn>          1</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_andc_i32" data-ref="_M/TCG_TARGET_HAS_andc_i32">TCG_TARGET_HAS_andc_i32</dfn>         have_bmi1</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_orc_i32" data-ref="_M/TCG_TARGET_HAS_orc_i32">TCG_TARGET_HAS_orc_i32</dfn>          0</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_eqv_i32" data-ref="_M/TCG_TARGET_HAS_eqv_i32">TCG_TARGET_HAS_eqv_i32</dfn>          0</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_nand_i32" data-ref="_M/TCG_TARGET_HAS_nand_i32">TCG_TARGET_HAS_nand_i32</dfn>         0</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_nor_i32" data-ref="_M/TCG_TARGET_HAS_nor_i32">TCG_TARGET_HAS_nor_i32</dfn>          0</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_clz_i32" data-ref="_M/TCG_TARGET_HAS_clz_i32">TCG_TARGET_HAS_clz_i32</dfn>          1</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ctz_i32" data-ref="_M/TCG_TARGET_HAS_ctz_i32">TCG_TARGET_HAS_ctz_i32</dfn>          1</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ctpop_i32" data-ref="_M/TCG_TARGET_HAS_ctpop_i32">TCG_TARGET_HAS_ctpop_i32</dfn>        have_popcnt</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_deposit_i32" data-ref="_M/TCG_TARGET_HAS_deposit_i32">TCG_TARGET_HAS_deposit_i32</dfn>      1</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_extract_i32" data-ref="_M/TCG_TARGET_HAS_extract_i32">TCG_TARGET_HAS_extract_i32</dfn>      1</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_sextract_i32" data-ref="_M/TCG_TARGET_HAS_sextract_i32">TCG_TARGET_HAS_sextract_i32</dfn>     1</u></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_movcond_i32" data-ref="_M/TCG_TARGET_HAS_movcond_i32">TCG_TARGET_HAS_movcond_i32</dfn>      1</u></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_add2_i32" data-ref="_M/TCG_TARGET_HAS_add2_i32">TCG_TARGET_HAS_add2_i32</dfn>         1</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_sub2_i32" data-ref="_M/TCG_TARGET_HAS_sub2_i32">TCG_TARGET_HAS_sub2_i32</dfn>         1</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_mulu2_i32" data-ref="_M/TCG_TARGET_HAS_mulu2_i32">TCG_TARGET_HAS_mulu2_i32</dfn>        1</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_muls2_i32" data-ref="_M/TCG_TARGET_HAS_muls2_i32">TCG_TARGET_HAS_muls2_i32</dfn>        1</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_muluh_i32" data-ref="_M/TCG_TARGET_HAS_muluh_i32">TCG_TARGET_HAS_muluh_i32</dfn>        0</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_mulsh_i32" data-ref="_M/TCG_TARGET_HAS_mulsh_i32">TCG_TARGET_HAS_mulsh_i32</dfn>        0</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_goto_ptr" data-ref="_M/TCG_TARGET_HAS_goto_ptr">TCG_TARGET_HAS_goto_ptr</dfn>         1</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><u>#<span data-ppcond="112">if</span> <a class="macro" href="#32" title="64" data-ref="_M/TCG_TARGET_REG_BITS">TCG_TARGET_REG_BITS</a> == 64</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_extrl_i64_i32" data-ref="_M/TCG_TARGET_HAS_extrl_i64_i32">TCG_TARGET_HAS_extrl_i64_i32</dfn>    0</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_extrh_i64_i32" data-ref="_M/TCG_TARGET_HAS_extrh_i64_i32">TCG_TARGET_HAS_extrh_i64_i32</dfn>    0</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_div2_i64" data-ref="_M/TCG_TARGET_HAS_div2_i64">TCG_TARGET_HAS_div2_i64</dfn>         1</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_rot_i64" data-ref="_M/TCG_TARGET_HAS_rot_i64">TCG_TARGET_HAS_rot_i64</dfn>          1</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext8s_i64" data-ref="_M/TCG_TARGET_HAS_ext8s_i64">TCG_TARGET_HAS_ext8s_i64</dfn>        1</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext16s_i64" data-ref="_M/TCG_TARGET_HAS_ext16s_i64">TCG_TARGET_HAS_ext16s_i64</dfn>       1</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext32s_i64" data-ref="_M/TCG_TARGET_HAS_ext32s_i64">TCG_TARGET_HAS_ext32s_i64</dfn>       1</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext8u_i64" data-ref="_M/TCG_TARGET_HAS_ext8u_i64">TCG_TARGET_HAS_ext8u_i64</dfn>        1</u></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext16u_i64" data-ref="_M/TCG_TARGET_HAS_ext16u_i64">TCG_TARGET_HAS_ext16u_i64</dfn>       1</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ext32u_i64" data-ref="_M/TCG_TARGET_HAS_ext32u_i64">TCG_TARGET_HAS_ext32u_i64</dfn>       1</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_bswap16_i64" data-ref="_M/TCG_TARGET_HAS_bswap16_i64">TCG_TARGET_HAS_bswap16_i64</dfn>      1</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_bswap32_i64" data-ref="_M/TCG_TARGET_HAS_bswap32_i64">TCG_TARGET_HAS_bswap32_i64</dfn>      1</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_bswap64_i64" data-ref="_M/TCG_TARGET_HAS_bswap64_i64">TCG_TARGET_HAS_bswap64_i64</dfn>      1</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_neg_i64" data-ref="_M/TCG_TARGET_HAS_neg_i64">TCG_TARGET_HAS_neg_i64</dfn>          1</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_not_i64" data-ref="_M/TCG_TARGET_HAS_not_i64">TCG_TARGET_HAS_not_i64</dfn>          1</u></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_andc_i64" data-ref="_M/TCG_TARGET_HAS_andc_i64">TCG_TARGET_HAS_andc_i64</dfn>         have_bmi1</u></td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_orc_i64" data-ref="_M/TCG_TARGET_HAS_orc_i64">TCG_TARGET_HAS_orc_i64</dfn>          0</u></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_eqv_i64" data-ref="_M/TCG_TARGET_HAS_eqv_i64">TCG_TARGET_HAS_eqv_i64</dfn>          0</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_nand_i64" data-ref="_M/TCG_TARGET_HAS_nand_i64">TCG_TARGET_HAS_nand_i64</dfn>         0</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_nor_i64" data-ref="_M/TCG_TARGET_HAS_nor_i64">TCG_TARGET_HAS_nor_i64</dfn>          0</u></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_clz_i64" data-ref="_M/TCG_TARGET_HAS_clz_i64">TCG_TARGET_HAS_clz_i64</dfn>          1</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ctz_i64" data-ref="_M/TCG_TARGET_HAS_ctz_i64">TCG_TARGET_HAS_ctz_i64</dfn>          1</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_ctpop_i64" data-ref="_M/TCG_TARGET_HAS_ctpop_i64">TCG_TARGET_HAS_ctpop_i64</dfn>        have_popcnt</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_deposit_i64" data-ref="_M/TCG_TARGET_HAS_deposit_i64">TCG_TARGET_HAS_deposit_i64</dfn>      1</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_extract_i64" data-ref="_M/TCG_TARGET_HAS_extract_i64">TCG_TARGET_HAS_extract_i64</dfn>      1</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_sextract_i64" data-ref="_M/TCG_TARGET_HAS_sextract_i64">TCG_TARGET_HAS_sextract_i64</dfn>     0</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_movcond_i64" data-ref="_M/TCG_TARGET_HAS_movcond_i64">TCG_TARGET_HAS_movcond_i64</dfn>      1</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_add2_i64" data-ref="_M/TCG_TARGET_HAS_add2_i64">TCG_TARGET_HAS_add2_i64</dfn>         1</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_sub2_i64" data-ref="_M/TCG_TARGET_HAS_sub2_i64">TCG_TARGET_HAS_sub2_i64</dfn>         1</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_mulu2_i64" data-ref="_M/TCG_TARGET_HAS_mulu2_i64">TCG_TARGET_HAS_mulu2_i64</dfn>        1</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_muls2_i64" data-ref="_M/TCG_TARGET_HAS_muls2_i64">TCG_TARGET_HAS_muls2_i64</dfn>        1</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_muluh_i64" data-ref="_M/TCG_TARGET_HAS_muluh_i64">TCG_TARGET_HAS_muluh_i64</dfn>        0</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_HAS_mulsh_i64" data-ref="_M/TCG_TARGET_HAS_mulsh_i64">TCG_TARGET_HAS_mulsh_i64</dfn>        0</u></td></tr>
+<tr><th id="146">146</th><td><u>#<span data-ppcond="112">endif</span></u></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_deposit_i32_valid" data-ref="_M/TCG_TARGET_deposit_i32_valid">TCG_TARGET_deposit_i32_valid</dfn>(ofs, len) \</u></td></tr>
+<tr><th id="149">149</th><td><u>    (((ofs) == 0 &amp;&amp; (len) == 8) || ((ofs) == 8 &amp;&amp; (len) == 8) || \</u></td></tr>
+<tr><th id="150">150</th><td><u>     ((ofs) == 0 &amp;&amp; (len) == 16))</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_deposit_i64_valid" data-ref="_M/TCG_TARGET_deposit_i64_valid">TCG_TARGET_deposit_i64_valid</dfn>    TCG_TARGET_deposit_i32_valid</u></td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i>/* Check for the possibility of high-byte extraction and, for 64-bit,</i></td></tr>
+<tr><th id="154">154</th><td><i>   zero-extending 32-bit right-shift.  */</i></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_extract_i32_valid" data-ref="_M/TCG_TARGET_extract_i32_valid">TCG_TARGET_extract_i32_valid</dfn>(ofs, len) ((ofs) == 8 &amp;&amp; (len) == 8)</u></td></tr>
+<tr><th id="156">156</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_extract_i64_valid" data-ref="_M/TCG_TARGET_extract_i64_valid">TCG_TARGET_extract_i64_valid</dfn>(ofs, len) \</u></td></tr>
+<tr><th id="157">157</th><td><u>    (((ofs) == 8 &amp;&amp; (len) == 8) || ((ofs) + (len)) == 32)</u></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="159">if</span> <a class="macro" href="#32" title="64" data-ref="_M/TCG_TARGET_REG_BITS">TCG_TARGET_REG_BITS</a> == 64</u></td></tr>
+<tr><th id="160">160</th><td><u># define <dfn class="macro" id="_M/TCG_AREG0" data-ref="_M/TCG_AREG0">TCG_AREG0</dfn> TCG_REG_R14</u></td></tr>
+<tr><th id="161">161</th><td><u>#<span data-ppcond="159">else</span></u></td></tr>
+<tr><th id="162">162</th><td><u># define TCG_AREG0 TCG_REG_EBP</u></td></tr>
+<tr><th id="163">163</th><td><u>#<span data-ppcond="159">endif</span></u></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="flush_icache_range" title='flush_icache_range' data-ref="flush_icache_range">flush_icache_range</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="local col3 decl" id="10293start" title='start' data-type='uintptr_t' data-ref="10293start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uintptr_t" title='uintptr_t' data-type='unsigned long' data-ref="uintptr_t">uintptr_t</a> <dfn class="local col4 decl" id="10294stop" title='stop' data-type='uintptr_t' data-ref="10294stop">stop</dfn>)</td></tr>
+<tr><th id="166">166</th><td>{</td></tr>
+<tr><th id="167">167</th><td>}</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><i>/* This defines the natural memory order supported by this</i></td></tr>
+<tr><th id="170">170</th><td><i> * architecture before guarantees made by various barrier</i></td></tr>
+<tr><th id="171">171</th><td><i> * instructions.</i></td></tr>
+<tr><th id="172">172</th><td><i> *</i></td></tr>
+<tr><th id="173">173</th><td><i> * The x86 has a pretty strong memory ordering which only really</i></td></tr>
+<tr><th id="174">174</th><td><i> * allows for some stores to be re-ordered after loads.</i></td></tr>
+<tr><th id="175">175</th><td><i> */</i></td></tr>
+<tr><th id="176">176</th><td><u>#include <a href="../tcg-mo.h.html">"tcg-mo.h"</a></u></td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/TCG_TARGET_DEFAULT_MO" data-ref="_M/TCG_TARGET_DEFAULT_MO">TCG_TARGET_DEFAULT_MO</dfn> (TCG_MO_ALL &amp; ~TCG_MO_ST_LD)</u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td><u>#<span data-ppcond="25">endif</span></u></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

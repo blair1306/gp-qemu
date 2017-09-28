@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>cutils.h source code [codebrowser/include/qemu/cutils.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/cutils.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='cutils.h.html'>cutils.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_CUTILS_H">QEMU_CUTILS_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_CUTILS_H" data-ref="_M/QEMU_CUTILS_H">QEMU_CUTILS_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="fprintf-fn.h.html">"qemu/fprintf-fn.h"</a></u></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="7">7</th><td><i class="doc"> * pstrcpy:</i></td></tr>
+<tr><th id="8">8</th><td><i class="doc"> * <span class="command">@buf</span>: buffer to copy string into</i></td></tr>
+<tr><th id="9">9</th><td><i class="doc"> * <span class="command">@buf</span>_size: size of <span class="command">@buf</span> in bytes</i></td></tr>
+<tr><th id="10">10</th><td><i class="doc"> *<span class="command"> @str</span>: string to copy</i></td></tr>
+<tr><th id="11">11</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="12">12</th><td><i class="doc"> * Copy<span class="command"> @str</span> into <span class="command">@buf</span>, including the trailing NUL, but do not</i></td></tr>
+<tr><th id="13">13</th><td><i class="doc"> * write more than <span class="command">@buf</span>_size bytes. The resulting buffer is</i></td></tr>
+<tr><th id="14">14</th><td><i class="doc"> * always NUL terminated (even if the source string was too long).</i></td></tr>
+<tr><th id="15">15</th><td><i class="doc"> * If <span class="command">@buf</span>_size is zero or negative then no bytes are copied.</i></td></tr>
+<tr><th id="16">16</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="17">17</th><td><i class="doc"> * This function is similar to strncpy(), but avoids two of that</i></td></tr>
+<tr><th id="18">18</th><td><i class="doc"> * function's problems:</i></td></tr>
+<tr><th id="19">19</th><td><i class="doc"> *  * if<span class="command"> @str</span> fits in the buffer, pstrcpy() does not zero-fill the</i></td></tr>
+<tr><th id="20">20</th><td><i class="doc"> *    remaining space at the end of <span class="command">@buf</span></i></td></tr>
+<tr><th id="21">21</th><td><i class="doc"> *  * if<span class="command"> @str</span> is too long, pstrcpy() will copy the first <span class="command">@buf</span>_size-1</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> *    bytes and then add a NUL</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="24">24</th><td><em>void</em> <dfn class="decl" id="pstrcpy" title='pstrcpy' data-ref="pstrcpy">pstrcpy</dfn>(<em>char</em> *<dfn class="local col8 decl" id="148buf" title='buf' data-type='char *' data-ref="148buf">buf</dfn>, <em>int</em> <dfn class="local col9 decl" id="149buf_size" title='buf_size' data-type='int' data-ref="149buf_size">buf_size</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="150str" title='str' data-type='const char *' data-ref="150str">str</dfn>);</td></tr>
+<tr><th id="25">25</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * strpadcpy:</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> * <span class="command">@buf</span>: buffer to copy string into</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> * <span class="command">@buf</span>_size: size of <span class="command">@buf</span> in bytes</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> *<span class="command"> @str</span>: string to copy</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * <span class="command">@pad</span>: character to pad the remainder of <span class="command">@buf</span> with</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> * Copy<span class="command"> @str</span> into <span class="command">@buf</span> (but *not* its trailing NUL!), and then pad the</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * rest of the buffer with the <span class="command">@pad</span> character. If<span class="command"> @str</span> is too large</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * for the buffer then it is truncated, so that <span class="command">@buf</span> contains the</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * first <span class="command">@buf</span>_size characters of<span class="command"> @str</span>, with no terminator.</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="37">37</th><td><em>void</em> <dfn class="decl" id="strpadcpy" title='strpadcpy' data-ref="strpadcpy">strpadcpy</dfn>(<em>char</em> *<dfn class="local col1 decl" id="151buf" title='buf' data-type='char *' data-ref="151buf">buf</dfn>, <em>int</em> <dfn class="local col2 decl" id="152buf_size" title='buf_size' data-type='int' data-ref="152buf_size">buf_size</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="153str" title='str' data-type='const char *' data-ref="153str">str</dfn>, <em>char</em> <dfn class="local col4 decl" id="154pad" title='pad' data-type='char' data-ref="154pad">pad</dfn>);</td></tr>
+<tr><th id="38">38</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * pstrcat:</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * <span class="command">@buf</span>: buffer containing existing string</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * <span class="command">@buf</span>_size: size of <span class="command">@buf</span> in bytes</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *<span class="command"> @s</span>: string to concatenate to <span class="command">@buf</span></i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> * Append a copy of<span class="command"> @s</span> to the string already in <span class="command">@buf</span>, but do not</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> * allow the buffer to overflow. If the existing contents of <span class="command">@buf</span></i></td></tr>
+<tr><th id="46">46</th><td><i class="doc"> * plus<span class="command"> @str</span> would total more than <span class="command">@buf</span>_size bytes, then write</i></td></tr>
+<tr><th id="47">47</th><td><i class="doc"> * as much of<span class="command"> @str</span> as will fit followed by a NUL terminator.</i></td></tr>
+<tr><th id="48">48</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="49">49</th><td><i class="doc"> * <span class="command">@buf</span> must already contain a NUL-terminated string, or the</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * behaviour is undefined.</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * Returns: <span class="command">@buf</span>.</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="54">54</th><td><em>char</em> *<dfn class="decl" id="pstrcat" title='pstrcat' data-ref="pstrcat">pstrcat</dfn>(<em>char</em> *<dfn class="local col5 decl" id="155buf" title='buf' data-type='char *' data-ref="155buf">buf</dfn>, <em>int</em> <dfn class="local col6 decl" id="156buf_size" title='buf_size' data-type='int' data-ref="156buf_size">buf_size</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="157s" title='s' data-type='const char *' data-ref="157s">s</dfn>);</td></tr>
+<tr><th id="55">55</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * strstart:</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> *<span class="command"> @str</span>: string to test</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> * <span class="command">@val</span>:<span class="verb"> prefix string to look for</span></i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> * <span class="command">@ptr</span>: NULL, or pointer to be written to indicate start of</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> *       the remainder of the string</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> * Test whether<span class="command"> @str</span> starts with the prefix <span class="command">@val</span>.</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * If it does (including the degenerate case where<span class="command"> @str</span> and <span class="command">@val</span></i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> * are equal) then return true. If <span class="command">@ptr</span> is not NULL then a</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * pointer to the first character following the prefix is written</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> * to it. If <span class="command">@val</span> <span class="verb">is not a prefix of @str then return false (and</span></i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> * <span class="command">@ptr</span> is not written to).</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> * Returns: true if<span class="command"> @str</span> starts with prefix <span class="command">@val</span>,<span class="verb"> false otherwise.</span></i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="71">71</th><td><em>int</em> <dfn class="decl" id="strstart" title='strstart' data-ref="strstart">strstart</dfn>(<em>const</em> <em>char</em> *<dfn class="local col8 decl" id="158str" title='str' data-type='const char *' data-ref="158str">str</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="159val" title='val' data-type='const char *' data-ref="159val">val</dfn>, <em>const</em> <em>char</em> **<dfn class="local col0 decl" id="160ptr" title='ptr' data-type='const char **' data-ref="160ptr">ptr</dfn>);</td></tr>
+<tr><th id="72">72</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> * stristart:</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> *<span class="command"> @str</span>: string to test</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> * <span class="command">@val</span>:<span class="verb"> prefix string to look for</span></i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> * <span class="command">@ptr</span>: NULL, or pointer to be written to indicate start of</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> *       the remainder of the string</i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> * Test whether<span class="command"> @str</span> starts with the case-insensitive prefix <span class="command">@val</span>.</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * This function behaves identically to strstart(), except that the</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * comparison is made after calling qemu_toupper() on each pair of</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> * characters.</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> * Returns: true if<span class="command"> @str</span> starts with case-insensitive prefix <span class="command">@val</span>,</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> *          false otherwise.</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="87">87</th><td><em>int</em> <dfn class="decl" id="stristart" title='stristart' data-ref="stristart">stristart</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="161str" title='str' data-type='const char *' data-ref="161str">str</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="162val" title='val' data-type='const char *' data-ref="162val">val</dfn>, <em>const</em> <em>char</em> **<dfn class="local col3 decl" id="163ptr" title='ptr' data-type='const char **' data-ref="163ptr">ptr</dfn>);</td></tr>
+<tr><th id="88">88</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> * qemu_strnlen:</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> *<span class="command"> @s</span>: string</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> *<span class="command"> @max</span>_len: maximum number of bytes in<span class="command"> @s</span> to scan</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * Return the length of the string<span class="command"> @s</span>, like strlen(), but do not</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> * examine more than<span class="command"> @max</span>_len bytes of the memory pointed to by<span class="command"> @s</span>.</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> * If no NUL terminator is found within<span class="command"> @max</span>_len bytes, then return</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @max</span>_len instead.</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> * This function has the same behaviour as the POSIX strnlen()</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> * function.</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> * Returns: length of<span class="command"> @s</span> in bytes, or<span class="command"> @max</span>_len, whichever is smaller.</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="103">103</th><td><em>int</em> <dfn class="decl" id="qemu_strnlen" title='qemu_strnlen' data-ref="qemu_strnlen">qemu_strnlen</dfn>(<em>const</em> <em>char</em> *<dfn class="local col4 decl" id="164s" title='s' data-type='const char *' data-ref="164s">s</dfn>, <em>int</em> <dfn class="local col5 decl" id="165max_len" title='max_len' data-type='int' data-ref="165max_len">max_len</dfn>);</td></tr>
+<tr><th id="104">104</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> * qemu_strsep:</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *<span class="command"> @input</span>: pointer to string to parse</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> *<span class="command"> @delim</span>: string containing delimiter characters to search for</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> * Locate the first occurrence of any character in<span class="command"> @delim</span> within</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> * the string referenced by<span class="command"> @input</span>, and replace it with a NUL.</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> * The location of the next character after the delimiter character</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> * is stored into<span class="command"> @input</span>.</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> * If the end of the string was reached without finding a delimiter</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> * character, then NULL is stored into<span class="command"> @input</span>.</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> * If<span class="command"> @input</span> points to a NULL pointer on entry, return NULL.</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> * The return value is always the original value of <span class="command">*@input</span> (and</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> * so now points to a NUL-terminated string corresponding to the</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> * part of the input up to the first delimiter).</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> * This function has the same behaviour as the BSD strsep() function.</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * Returns: the pointer originally in<span class="command"> @input</span>.</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="124">124</th><td><em>char</em> *<dfn class="decl" id="qemu_strsep" title='qemu_strsep' data-ref="qemu_strsep">qemu_strsep</dfn>(<em>char</em> **<dfn class="local col6 decl" id="166input" title='input' data-type='char **' data-ref="166input">input</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="167delim" title='delim' data-type='const char *' data-ref="167delim">delim</dfn>);</td></tr>
+<tr><th id="125">125</th><td><a class="typedef" href="../../../include/time.h.html#time_t" title='time_t' data-type='__time_t' data-ref="time_t">time_t</a> <dfn class="decl" id="mktimegm" title='mktimegm' data-ref="mktimegm">mktimegm</dfn>(<b>struct</b> <a class="type" href="../../../include/time.h.html#tm" title='tm' data-ref="tm">tm</a> *<dfn class="local col8 decl" id="168tm" title='tm' data-type='struct tm *' data-ref="168tm">tm</dfn>);</td></tr>
+<tr><th id="126">126</th><td><em>int</em> <dfn class="decl" id="qemu_fdatasync" title='qemu_fdatasync' data-ref="qemu_fdatasync">qemu_fdatasync</dfn>(<em>int</em> <dfn class="local col9 decl" id="169fd" title='fd' data-type='int' data-ref="169fd">fd</dfn>);</td></tr>
+<tr><th id="127">127</th><td><em>int</em> <dfn class="decl" id="fcntl_setfl" title='fcntl_setfl' data-ref="fcntl_setfl">fcntl_setfl</dfn>(<em>int</em> <dfn class="local col0 decl" id="170fd" title='fd' data-type='int' data-ref="170fd">fd</dfn>, <em>int</em> <dfn class="local col1 decl" id="171flag" title='flag' data-type='int' data-ref="171flag">flag</dfn>);</td></tr>
+<tr><th id="128">128</th><td><em>int</em> <dfn class="decl" id="qemu_parse_fd" title='qemu_parse_fd' data-ref="qemu_parse_fd">qemu_parse_fd</dfn>(<em>const</em> <em>char</em> *<dfn class="local col2 decl" id="172param" title='param' data-type='const char *' data-ref="172param">param</dfn>);</td></tr>
+<tr><th id="129">129</th><td><em>int</em> <dfn class="decl" id="qemu_strtol" title='qemu_strtol' data-ref="qemu_strtol">qemu_strtol</dfn>(<em>const</em> <em>char</em> *<dfn class="local col3 decl" id="173nptr" title='nptr' data-type='const char *' data-ref="173nptr">nptr</dfn>, <em>const</em> <em>char</em> **<dfn class="local col4 decl" id="174endptr" title='endptr' data-type='const char **' data-ref="174endptr">endptr</dfn>, <em>int</em> <dfn class="local col5 decl" id="175base" title='base' data-type='int' data-ref="175base">base</dfn>,</td></tr>
+<tr><th id="130">130</th><td>                <em>long</em> *<dfn class="local col6 decl" id="176result" title='result' data-type='long *' data-ref="176result">result</dfn>);</td></tr>
+<tr><th id="131">131</th><td><em>int</em> <dfn class="decl" id="qemu_strtoul" title='qemu_strtoul' data-ref="qemu_strtoul">qemu_strtoul</dfn>(<em>const</em> <em>char</em> *<dfn class="local col7 decl" id="177nptr" title='nptr' data-type='const char *' data-ref="177nptr">nptr</dfn>, <em>const</em> <em>char</em> **<dfn class="local col8 decl" id="178endptr" title='endptr' data-type='const char **' data-ref="178endptr">endptr</dfn>, <em>int</em> <dfn class="local col9 decl" id="179base" title='base' data-type='int' data-ref="179base">base</dfn>,</td></tr>
+<tr><th id="132">132</th><td>                 <em>unsigned</em> <em>long</em> *<dfn class="local col0 decl" id="180result" title='result' data-type='unsigned long *' data-ref="180result">result</dfn>);</td></tr>
+<tr><th id="133">133</th><td><em>int</em> <dfn class="decl" id="qemu_strtoi64" title='qemu_strtoi64' data-ref="qemu_strtoi64">qemu_strtoi64</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="181nptr" title='nptr' data-type='const char *' data-ref="181nptr">nptr</dfn>, <em>const</em> <em>char</em> **<dfn class="local col2 decl" id="182endptr" title='endptr' data-type='const char **' data-ref="182endptr">endptr</dfn>, <em>int</em> <dfn class="local col3 decl" id="183base" title='base' data-type='int' data-ref="183base">base</dfn>,</td></tr>
+<tr><th id="134">134</th><td>                  <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> *<dfn class="local col4 decl" id="184result" title='result' data-type='int64_t *' data-ref="184result">result</dfn>);</td></tr>
+<tr><th id="135">135</th><td><em>int</em> <dfn class="decl" id="qemu_strtou64" title='qemu_strtou64' data-ref="qemu_strtou64">qemu_strtou64</dfn>(<em>const</em> <em>char</em> *<dfn class="local col5 decl" id="185nptr" title='nptr' data-type='const char *' data-ref="185nptr">nptr</dfn>, <em>const</em> <em>char</em> **<dfn class="local col6 decl" id="186endptr" title='endptr' data-type='const char **' data-ref="186endptr">endptr</dfn>, <em>int</em> <dfn class="local col7 decl" id="187base" title='base' data-type='int' data-ref="187base">base</dfn>,</td></tr>
+<tr><th id="136">136</th><td>                  <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="188result" title='result' data-type='uint64_t *' data-ref="188result">result</dfn>);</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><em>int</em> <dfn class="decl" id="parse_uint" title='parse_uint' data-ref="parse_uint">parse_uint</dfn>(<em>const</em> <em>char</em> *<dfn class="local col9 decl" id="189s" title='s' data-type='const char *' data-ref="189s">s</dfn>, <em>unsigned</em> <em>long</em> <em>long</em> *<dfn class="local col0 decl" id="190value" title='value' data-type='unsigned long long *' data-ref="190value">value</dfn>, <em>char</em> **<dfn class="local col1 decl" id="191endptr" title='endptr' data-type='char **' data-ref="191endptr">endptr</dfn>,</td></tr>
+<tr><th id="139">139</th><td>               <em>int</em> <dfn class="local col2 decl" id="192base" title='base' data-type='int' data-ref="192base">base</dfn>);</td></tr>
+<tr><th id="140">140</th><td><em>int</em> <dfn class="decl" id="parse_uint_full" title='parse_uint_full' data-ref="parse_uint_full">parse_uint_full</dfn>(<em>const</em> <em>char</em> *<dfn class="local col3 decl" id="193s" title='s' data-type='const char *' data-ref="193s">s</dfn>, <em>unsigned</em> <em>long</em> <em>long</em> *<dfn class="local col4 decl" id="194value" title='value' data-type='unsigned long long *' data-ref="194value">value</dfn>, <em>int</em> <dfn class="local col5 decl" id="195base" title='base' data-type='int' data-ref="195base">base</dfn>);</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><em>int</em> <dfn class="decl" id="qemu_strtosz" title='qemu_strtosz' data-ref="qemu_strtosz">qemu_strtosz</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="196nptr" title='nptr' data-type='const char *' data-ref="196nptr">nptr</dfn>, <em>char</em> **<dfn class="local col7 decl" id="197end" title='end' data-type='char **' data-ref="197end">end</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col8 decl" id="198result" title='result' data-type='uint64_t *' data-ref="198result">result</dfn>);</td></tr>
+<tr><th id="143">143</th><td><em>int</em> <dfn class="decl" id="qemu_strtosz_MiB" title='qemu_strtosz_MiB' data-ref="qemu_strtosz_MiB">qemu_strtosz_MiB</dfn>(<em>const</em> <em>char</em> *<dfn class="local col9 decl" id="199nptr" title='nptr' data-type='const char *' data-ref="199nptr">nptr</dfn>, <em>char</em> **<dfn class="local col0 decl" id="200end" title='end' data-type='char **' data-ref="200end">end</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col1 decl" id="201result" title='result' data-type='uint64_t *' data-ref="201result">result</dfn>);</td></tr>
+<tr><th id="144">144</th><td><em>int</em> <dfn class="decl" id="qemu_strtosz_metric" title='qemu_strtosz_metric' data-ref="qemu_strtosz_metric">qemu_strtosz_metric</dfn>(<em>const</em> <em>char</em> *<dfn class="local col2 decl" id="202nptr" title='nptr' data-type='const char *' data-ref="202nptr">nptr</dfn>, <em>char</em> **<dfn class="local col3 decl" id="203end" title='end' data-type='char **' data-ref="203end">end</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="local col4 decl" id="204result" title='result' data-type='uint64_t *' data-ref="204result">result</dfn>);</td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/K_BYTE" data-ref="_M/K_BYTE">K_BYTE</dfn>     (1ULL &lt;&lt; 10)</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/M_BYTE" data-ref="_M/M_BYTE">M_BYTE</dfn>     (1ULL &lt;&lt; 20)</u></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/G_BYTE" data-ref="_M/G_BYTE">G_BYTE</dfn>     (1ULL &lt;&lt; 30)</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/T_BYTE" data-ref="_M/T_BYTE">T_BYTE</dfn>     (1ULL &lt;&lt; 40)</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/P_BYTE" data-ref="_M/P_BYTE">P_BYTE</dfn>     (1ULL &lt;&lt; 50)</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/E_BYTE" data-ref="_M/E_BYTE">E_BYTE</dfn>     (1ULL &lt;&lt; 60)</u></td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i>/* used to print char* safely */</i></td></tr>
+<tr><th id="154">154</th><td><u>#define <dfn class="macro" id="_M/STR_OR_NULL" data-ref="_M/STR_OR_NULL">STR_OR_NULL</dfn>(str) ((str) ? (str) : "null")</u></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="buffer_is_zero" title='buffer_is_zero' data-ref="buffer_is_zero">buffer_is_zero</dfn>(<em>const</em> <em>void</em> *<dfn class="local col5 decl" id="205buf" title='buf' data-type='const void *' data-ref="205buf">buf</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="206len" title='len' data-type='size_t' data-ref="206len">len</dfn>);</td></tr>
+<tr><th id="157">157</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="test_buffer_is_zero_next_accel" title='test_buffer_is_zero_next_accel' data-ref="test_buffer_is_zero_next_accel">test_buffer_is_zero_next_accel</dfn>(<em>void</em>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i>/*</i></td></tr>
+<tr><th id="160">160</th><td><i> * Implementation of ULEB128 (<a href="http://en.wikipedia.org/wiki/LEB128">http://en.wikipedia.org/wiki/LEB128</a>)</i></td></tr>
+<tr><th id="161">161</th><td><i> * Input is limited to 14-bit numbers</i></td></tr>
+<tr><th id="162">162</th><td><i> */</i></td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><em>int</em> <dfn class="decl" id="uleb128_encode_small" title='uleb128_encode_small' data-ref="uleb128_encode_small">uleb128_encode_small</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="207out" title='out' data-type='uint8_t *' data-ref="207out">out</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="208n" title='n' data-type='uint32_t' data-ref="208n">n</dfn>);</td></tr>
+<tr><th id="165">165</th><td><em>int</em> <dfn class="decl" id="uleb128_decode_small" title='uleb128_decode_small' data-ref="uleb128_decode_small">uleb128_decode_small</dfn>(<em>const</em> <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col9 decl" id="209in" title='in' data-type='const uint8_t *' data-ref="209in">in</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col0 decl" id="210n" title='n' data-type='uint32_t *' data-ref="210n">n</dfn>);</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../audio/audio.c.html'>codebrowser/audio/audio.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

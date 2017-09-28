@@ -1,0 +1,437 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>keyval.c source code [codebrowser/util/keyval.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/keyval.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='keyval.c.html'>keyval.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Parsing KEY=VALUE,... strings</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2017 Red Hat Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Markus Armbruster &lt;armbru@redhat.com&gt;,</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td></td></tr>
+<tr><th id="13">13</th><td><i>/*</i></td></tr>
+<tr><th id="14">14</th><td><i> * KEY=VALUE,... syntax:</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> *   key-vals     = [ key-val { ',' key-val } [ ',' ] ]</i></td></tr>
+<tr><th id="17">17</th><td><i> *   key-val      = key '=' val</i></td></tr>
+<tr><th id="18">18</th><td><i> *   key          = key-fragment { '.' key-fragment }</i></td></tr>
+<tr><th id="19">19</th><td><i> *   key-fragment = / [^=,.]* /</i></td></tr>
+<tr><th id="20">20</th><td><i> *   val          = { / [^,]* / | ',,' }</i></td></tr>
+<tr><th id="21">21</th><td><i> *</i></td></tr>
+<tr><th id="22">22</th><td><i> * Semantics defined by reduction to JSON:</i></td></tr>
+<tr><th id="23">23</th><td><i> *</i></td></tr>
+<tr><th id="24">24</th><td><i> *   key-vals specifies a JSON object, i.e. a tree whose root is an</i></td></tr>
+<tr><th id="25">25</th><td><i> *   object, inner nodes other than the root are objects or arrays,</i></td></tr>
+<tr><th id="26">26</th><td><i> *   and leaves are strings.</i></td></tr>
+<tr><th id="27">27</th><td><i> *</i></td></tr>
+<tr><th id="28">28</th><td><i> *   Each key-val = key-fragment '.' ... '=' val specifies a path from</i></td></tr>
+<tr><th id="29">29</th><td><i> *   root to a leaf (left of '='), and the leaf's value (right of</i></td></tr>
+<tr><th id="30">30</th><td><i> *   '=').</i></td></tr>
+<tr><th id="31">31</th><td><i> *</i></td></tr>
+<tr><th id="32">32</th><td><i> *   A path from the root is defined recursively:</i></td></tr>
+<tr><th id="33">33</th><td><i> *       L '.' key-fragment is a child of the node denoted by path L</i></td></tr>
+<tr><th id="34">34</th><td><i> *       key-fragment is a child of the tree root</i></td></tr>
+<tr><th id="35">35</th><td><i> *   If key-fragment is numeric, the parent is an array and the child</i></td></tr>
+<tr><th id="36">36</th><td><i> *   is its key-fragment-th member, counting from zero.</i></td></tr>
+<tr><th id="37">37</th><td><i> *   Else, the parent is an object, and the child is its member named</i></td></tr>
+<tr><th id="38">38</th><td><i> *   key-fragment.</i></td></tr>
+<tr><th id="39">39</th><td><i> *</i></td></tr>
+<tr><th id="40">40</th><td><i> *   This constrains inner nodes to be either array or object.  The</i></td></tr>
+<tr><th id="41">41</th><td><i> *   constraints must be satisfiable.  Counter-example: a.b=1,a=2 is</i></td></tr>
+<tr><th id="42">42</th><td><i> *   not, because root.a must be an object to satisfy a.b=1 and a</i></td></tr>
+<tr><th id="43">43</th><td><i> *   string to satisfy a=2.</i></td></tr>
+<tr><th id="44">44</th><td><i> *</i></td></tr>
+<tr><th id="45">45</th><td><i> *   Array subscripts can occur in any order, but the set of</i></td></tr>
+<tr><th id="46">46</th><td><i> *   subscripts must not have gaps.  For instance, a.1=v is not okay,</i></td></tr>
+<tr><th id="47">47</th><td><i> *   because root.a[0] is missing.</i></td></tr>
+<tr><th id="48">48</th><td><i> *</i></td></tr>
+<tr><th id="49">49</th><td><i> *   If multiple key-val denote the same leaf, the last one determines</i></td></tr>
+<tr><th id="50">50</th><td><i> *   the value.</i></td></tr>
+<tr><th id="51">51</th><td><i> *</i></td></tr>
+<tr><th id="52">52</th><td><i> * Key-fragments must be valid QAPI names or consist only of decimal</i></td></tr>
+<tr><th id="53">53</th><td><i> * digits.</i></td></tr>
+<tr><th id="54">54</th><td><i> *</i></td></tr>
+<tr><th id="55">55</th><td><i> * The length of any key-fragment must be between 1 and 127.</i></td></tr>
+<tr><th id="56">56</th><td><i> *</i></td></tr>
+<tr><th id="57">57</th><td><i> * Design flaw: there is no way to denote an empty array or non-root</i></td></tr>
+<tr><th id="58">58</th><td><i> * object.  While interpreting "key absent" as empty seems natural</i></td></tr>
+<tr><th id="59">59</th><td><i> * (removing a key-val from the input string removes the member when</i></td></tr>
+<tr><th id="60">60</th><td><i> * there are more, so why not when it's the last), it doesn't work:</i></td></tr>
+<tr><th id="61">61</th><td><i> * "key absent" already means "optional object/array absent", which</i></td></tr>
+<tr><th id="62">62</th><td><i> * isn't the same as "empty object/array present".</i></td></tr>
+<tr><th id="63">63</th><td><i> *</i></td></tr>
+<tr><th id="64">64</th><td><i> * Design flaw: scalar values can only be strings; there is no way to</i></td></tr>
+<tr><th id="65">65</th><td><i> * denote numbers, true, false or null.  The special QObject input</i></td></tr>
+<tr><th id="66">66</th><td><i> * visitor returned by qobject_input_visitor_new_keyval() mostly hides</i></td></tr>
+<tr><th id="67">67</th><td><i> * this by automatically converting strings to the type the visitor</i></td></tr>
+<tr><th id="68">68</th><td><i> * expects.  Breaks down for type 'any', where the visitor's</i></td></tr>
+<tr><th id="69">69</th><td><i> * expectation isn't clear.  Code visiting 'any' needs to do the</i></td></tr>
+<tr><th id="70">70</th><td><i> * conversion itself, but only when using this keyval visitor.</i></td></tr>
+<tr><th id="71">71</th><td><i> * Awkward.  Note that we carefully restrict alternate types to avoid</i></td></tr>
+<tr><th id="72">72</th><td><i> * similar ambiguity.</i></td></tr>
+<tr><th id="73">73</th><td><i> *</i></td></tr>
+<tr><th id="74">74</th><td><i> * Additional syntax for use with an implied key:</i></td></tr>
+<tr><th id="75">75</th><td><i> *</i></td></tr>
+<tr><th id="76">76</th><td><i> *   key-vals-ik  = val-no-key [ ',' key-vals ]</i></td></tr>
+<tr><th id="77">77</th><td><i> *   val-no-key   = / [^=,]* /</i></td></tr>
+<tr><th id="78">78</th><td><i> *</i></td></tr>
+<tr><th id="79">79</th><td><i> * where no-key is syntactic sugar for implied-key=val-no-key.</i></td></tr>
+<tr><th id="80">80</th><td><i> */</i></td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="83">83</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="84">84</th><td><u>#include <a href="../include/qapi/qmp/qstring.h.html">"qapi/qmp/qstring.h"</a></u></td></tr>
+<tr><th id="85">85</th><td><u>#include <a href="../include/qapi/util.h.html">"qapi/util.h"</a></u></td></tr>
+<tr><th id="86">86</th><td><u>#include <a href="../include/qemu/cutils.h.html">"qemu/cutils.h"</a></u></td></tr>
+<tr><th id="87">87</th><td><u>#include <a href="../include/qemu/option.h.html">"qemu/option.h"</a></u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><i  data-doc="key_to_index">/*</i></td></tr>
+<tr><th id="90">90</th><td><i  data-doc="key_to_index"> * Convert @key to a list index.</i></td></tr>
+<tr><th id="91">91</th><td><i  data-doc="key_to_index"> * Convert all leading decimal digits to a (non-negative) number,</i></td></tr>
+<tr><th id="92">92</th><td><i  data-doc="key_to_index"> * capped at INT_MAX.</i></td></tr>
+<tr><th id="93">93</th><td><i  data-doc="key_to_index"> * If @end is non-null, assign a pointer to the first character after</i></td></tr>
+<tr><th id="94">94</th><td><i  data-doc="key_to_index"> * the number to *@end.</i></td></tr>
+<tr><th id="95">95</th><td><i  data-doc="key_to_index"> * Else, fail if any characters follow.</i></td></tr>
+<tr><th id="96">96</th><td><i  data-doc="key_to_index"> * On success, return the converted number.</i></td></tr>
+<tr><th id="97">97</th><td><i  data-doc="key_to_index"> * On failure, return a negative value.</i></td></tr>
+<tr><th id="98">98</th><td><i  data-doc="key_to_index"> * Note: since only digits are converted, no two keys can map to the</i></td></tr>
+<tr><th id="99">99</th><td><i  data-doc="key_to_index"> * same number, except by overflow to INT_MAX.</i></td></tr>
+<tr><th id="100">100</th><td><i  data-doc="key_to_index"> */</i></td></tr>
+<tr><th id="101">101</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="key_to_index" title='key_to_index' data-type='int key_to_index(const char * key, const char ** end)' data-ref="key_to_index">key_to_index</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1key" title='key' data-type='const char *' data-ref="1key">key</dfn>, <em>const</em> <em>char</em> **<dfn class="local col2 decl" id="2end" title='end' data-type='const char **' data-ref="2end">end</dfn>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <em>int</em> <dfn class="local col3 decl" id="3ret" title='ret' data-type='int' data-ref="3ret">ret</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col4 decl" id="4index" title='index' data-type='unsigned long' data-ref="4index">index</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>if</b> (*<a class="local col1 ref" href="#1key" title='key' data-ref="1key">key</a> &lt; <kbd>'0'</kbd> || *<a class="local col1 ref" href="#1key" title='key' data-ref="1key">key</a> &gt; <kbd>'9'</kbd>) {</td></tr>
+<tr><th id="107">107</th><td>        <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>;</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td>    <a class="local col3 ref" href="#3ret" title='ret' data-ref="3ret">ret</a> = <a class="ref" href="../include/qemu/cutils.h.html#qemu_strtoul" title='qemu_strtoul' data-ref="qemu_strtoul">qemu_strtoul</a>(<a class="local col1 ref" href="#1key" title='key' data-ref="1key">key</a>, <a class="local col2 ref" href="#2end" title='end' data-ref="2end">end</a>, <var>10</var>, &amp;<a class="local col4 ref" href="#4index" title='index' data-ref="4index">index</a>);</td></tr>
+<tr><th id="110">110</th><td>    <b>if</b> (<a class="local col3 ref" href="#3ret" title='ret' data-ref="3ret">ret</a>) {</td></tr>
+<tr><th id="111">111</th><td>        <b>return</b> <a class="local col3 ref" href="#3ret" title='ret' data-ref="3ret">ret</a> == -<a class="macro" href="../../include/asm-generic/errno-base.h.html#37" title="34" data-ref="_M/ERANGE">ERANGE</a> ? <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span> : <a class="local col3 ref" href="#3ret" title='ret' data-ref="3ret">ret</a>;</td></tr>
+<tr><th id="112">112</th><td>    }</td></tr>
+<tr><th id="113">113</th><td>    <b>return</b> <a class="local col4 ref" href="#4index" title='index' data-ref="4index">index</a> &lt;= <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span> ? <a class="local col4 ref" href="#4index" title='index' data-ref="4index">index</a> : <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span>;</td></tr>
+<tr><th id="114">114</th><td>}</td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><i  data-doc="keyval_parse_put">/*</i></td></tr>
+<tr><th id="117">117</th><td><i  data-doc="keyval_parse_put"> * Ensure @cur maps @key_in_cur the right way.</i></td></tr>
+<tr><th id="118">118</th><td><i  data-doc="keyval_parse_put"> * If @value is null, it needs to map to a QDict, else to this</i></td></tr>
+<tr><th id="119">119</th><td><i  data-doc="keyval_parse_put"> * QString.</i></td></tr>
+<tr><th id="120">120</th><td><i  data-doc="keyval_parse_put"> * If @cur doesn't have @key_in_cur, put an empty QDict or @value,</i></td></tr>
+<tr><th id="121">121</th><td><i  data-doc="keyval_parse_put"> * respectively.</i></td></tr>
+<tr><th id="122">122</th><td><i  data-doc="keyval_parse_put"> * Else, if it needs to map to a QDict, and already does, do nothing.</i></td></tr>
+<tr><th id="123">123</th><td><i  data-doc="keyval_parse_put"> * Else, if it needs to map to this QString, and already maps to a</i></td></tr>
+<tr><th id="124">124</th><td><i  data-doc="keyval_parse_put"> * QString, replace it by @value.</i></td></tr>
+<tr><th id="125">125</th><td><i  data-doc="keyval_parse_put"> * Else, fail because we have conflicting needs on how to map</i></td></tr>
+<tr><th id="126">126</th><td><i  data-doc="keyval_parse_put"> * @key_in_cur.</i></td></tr>
+<tr><th id="127">127</th><td><i  data-doc="keyval_parse_put"> * In any case, take over the reference to @value, i.e. if the caller</i></td></tr>
+<tr><th id="128">128</th><td><i  data-doc="keyval_parse_put"> * wants to hold on to a reference, it needs to QINCREF().</i></td></tr>
+<tr><th id="129">129</th><td><i  data-doc="keyval_parse_put"> * Use @key up to @key_cursor to identify the key in error messages.</i></td></tr>
+<tr><th id="130">130</th><td><i  data-doc="keyval_parse_put"> * On success, return the mapped value.</i></td></tr>
+<tr><th id="131">131</th><td><i  data-doc="keyval_parse_put"> * On failure, store an error through @errp and return NULL.</i></td></tr>
+<tr><th id="132">132</th><td><i  data-doc="keyval_parse_put"> */</i></td></tr>
+<tr><th id="133">133</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="tu decl def" id="keyval_parse_put" title='keyval_parse_put' data-type='QObject * keyval_parse_put(QDict * cur, const char * key_in_cur, QString * value, const char * key, const char * key_cursor, Error ** errp)' data-ref="keyval_parse_put">keyval_parse_put</dfn>(<a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col5 decl" id="5cur" title='cur' data-type='QDict *' data-ref="5cur">cur</dfn>,</td></tr>
+<tr><th id="134">134</th><td>                                 <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="6key_in_cur" title='key_in_cur' data-type='const char *' data-ref="6key_in_cur">key_in_cur</dfn>, <a class="typedef" href="../include/qapi/qmp/qstring.h.html#QString" title='QString' data-type='struct QString' data-ref="QString">QString</a> *<dfn class="local col7 decl" id="7value" title='value' data-type='QString *' data-ref="7value">value</dfn>,</td></tr>
+<tr><th id="135">135</th><td>                                 <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="8key" title='key' data-type='const char *' data-ref="8key">key</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="9key_cursor" title='key_cursor' data-type='const char *' data-ref="9key_cursor">key_cursor</dfn>,</td></tr>
+<tr><th id="136">136</th><td>                                 <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col0 decl" id="10errp" title='errp' data-type='Error **' data-ref="10errp">errp</dfn>)</td></tr>
+<tr><th id="137">137</th><td>{</td></tr>
+<tr><th id="138">138</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="local col1 decl" id="11old" title='old' data-type='QObject *' data-ref="11old">old</dfn>, *<dfn class="local col2 decl" id="12new" title='new' data-type='QObject *' data-ref="12new">new</dfn>;</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td>    <a class="local col1 ref" href="#11old" title='old' data-ref="11old">old</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_get" title='qdict_get' data-ref="qdict_get">qdict_get</a>(<a class="local col5 ref" href="#5cur" title='cur' data-ref="5cur">cur</a>, <a class="local col6 ref" href="#6key_in_cur" title='key_in_cur' data-ref="6key_in_cur">key_in_cur</a>);</td></tr>
+<tr><th id="141">141</th><td>    <b>if</b> (<a class="local col1 ref" href="#11old" title='old' data-ref="11old">old</a>) {</td></tr>
+<tr><th id="142">142</th><td>        <b>if</b> (<a class="ref" href="../include/qapi/qmp/qobject.h.html#qobject_type" title='qobject_type' data-ref="qobject_type">qobject_type</a>(<a class="local col1 ref" href="#11old" title='old' data-ref="11old">old</a>) != (<a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a> ? <a class="enum" href="../qapi-types.h.html#QType::QTYPE_QSTRING" title='QType::QTYPE_QSTRING' data-ref="QType::QTYPE_QSTRING">QTYPE_QSTRING</a> : <a class="enum" href="../qapi-types.h.html#QType::QTYPE_QDICT" title='QType::QTYPE_QDICT' data-ref="QType::QTYPE_QDICT">QTYPE_QDICT</a>)) {</td></tr>
+<tr><th id="143">143</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 144, __func__, (&quot;Parameters &apos;%.*s.*&apos; used inconsistently&quot;), (int)(key_cursor - key), key)" data-ref="_M/error_setg">error_setg</a>(<a class="local col0 ref" href="#10errp" title='errp' data-ref="10errp">errp</a>, <q>"Parameters '%.*s.*' used inconsistently"</q>,</td></tr>
+<tr><th id="144">144</th><td>                       (<em>int</em>)(<a class="local col9 ref" href="#9key_cursor" title='key_cursor' data-ref="9key_cursor">key_cursor</a> - <a class="local col8 ref" href="#8key" title='key' data-ref="8key">key</a>), <a class="local col8 ref" href="#8key" title='key' data-ref="8key">key</a>);</td></tr>
+<tr><th id="145">145</th><td>            <a class="macro" href="../include/qapi/qmp/qobject.h.html#50" title="qobject_decref(value ? (&amp;(value)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a>);</td></tr>
+<tr><th id="146">146</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="147">147</th><td>        }</td></tr>
+<tr><th id="148">148</th><td>        <b>if</b> (!<a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a>) {</td></tr>
+<tr><th id="149">149</th><td>            <b>return</b> <a class="local col1 ref" href="#11old" title='old' data-ref="11old">old</a>;         <i>/* already QDict, do nothing */</i></td></tr>
+<tr><th id="150">150</th><td>        }</td></tr>
+<tr><th id="151">151</th><td>        <a class="local col2 ref" href="#12new" title='new' data-ref="12new">new</a> = <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(value)-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a>);   <i>/* replacement */</i></td></tr>
+<tr><th id="152">152</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="153">153</th><td>        <a class="local col2 ref" href="#12new" title='new' data-ref="12new">new</a> = <a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a> ? <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(value)-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="local col7 ref" href="#7value" title='value' data-ref="7value">value</a>) : <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(qdict_new())-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_new" title='qdict_new' data-ref="qdict_new">qdict_new</a>());</td></tr>
+<tr><th id="154">154</th><td>    }</td></tr>
+<tr><th id="155">155</th><td>    <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_put_obj" title='qdict_put_obj' data-ref="qdict_put_obj">qdict_put_obj</a>(<a class="local col5 ref" href="#5cur" title='cur' data-ref="5cur">cur</a>, <a class="local col6 ref" href="#6key_in_cur" title='key_in_cur' data-ref="6key_in_cur">key_in_cur</a>, <a class="local col2 ref" href="#12new" title='new' data-ref="12new">new</a>);</td></tr>
+<tr><th id="156">156</th><td>    <b>return</b> <a class="local col2 ref" href="#12new" title='new' data-ref="12new">new</a>;</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i  data-doc="keyval_parse_one">/*</i></td></tr>
+<tr><th id="160">160</th><td><i  data-doc="keyval_parse_one"> * Parse one KEY=VALUE from @params, store result in @qdict.</i></td></tr>
+<tr><th id="161">161</th><td><i  data-doc="keyval_parse_one"> * The first fragment of KEY applies to @qdict.  Subsequent fragments</i></td></tr>
+<tr><th id="162">162</th><td><i  data-doc="keyval_parse_one"> * apply to nested QDicts, which are created on demand.  @implied_key</i></td></tr>
+<tr><th id="163">163</th><td><i  data-doc="keyval_parse_one"> * is as in keyval_parse().</i></td></tr>
+<tr><th id="164">164</th><td><i  data-doc="keyval_parse_one"> * On success, return a pointer to the next KEY=VALUE, or else to '\0'.</i></td></tr>
+<tr><th id="165">165</th><td><i  data-doc="keyval_parse_one"> * On failure, return NULL.</i></td></tr>
+<tr><th id="166">166</th><td><i  data-doc="keyval_parse_one"> */</i></td></tr>
+<tr><th id="167">167</th><td><em>static</em> <em>const</em> <em>char</em> *<dfn class="tu decl def" id="keyval_parse_one" title='keyval_parse_one' data-type='const char * keyval_parse_one(QDict * qdict, const char * params, const char * implied_key, Error ** errp)' data-ref="keyval_parse_one">keyval_parse_one</dfn>(<a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col3 decl" id="13qdict" title='qdict' data-type='QDict *' data-ref="13qdict">qdict</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="14params" title='params' data-type='const char *' data-ref="14params">params</dfn>,</td></tr>
+<tr><th id="168">168</th><td>                                    <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="15implied_key" title='implied_key' data-type='const char *' data-ref="15implied_key">implied_key</dfn>,</td></tr>
+<tr><th id="169">169</th><td>                                    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="16errp" title='errp' data-type='Error **' data-ref="16errp">errp</dfn>)</td></tr>
+<tr><th id="170">170</th><td>{</td></tr>
+<tr><th id="171">171</th><td>    <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="17key" title='key' data-type='const char *' data-ref="17key">key</dfn>, *<dfn class="local col8 decl" id="18key_end" title='key_end' data-type='const char *' data-ref="18key_end">key_end</dfn>, *<dfn class="local col9 decl" id="19s" title='s' data-type='const char *' data-ref="19s">s</dfn>, *<dfn class="local col0 decl" id="20end" title='end' data-type='const char *' data-ref="20end">end</dfn>;</td></tr>
+<tr><th id="172">172</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="21len" title='len' data-type='size_t' data-ref="21len">len</dfn>;</td></tr>
+<tr><th id="173">173</th><td>    <em>char</em> <dfn class="local col2 decl" id="22key_in_cur" title='key_in_cur' data-type='char [128]' data-ref="22key_in_cur">key_in_cur</dfn>[<var>128</var>];</td></tr>
+<tr><th id="174">174</th><td>    <a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col3 decl" id="23cur" title='cur' data-type='QDict *' data-ref="23cur">cur</dfn>;</td></tr>
+<tr><th id="175">175</th><td>    <em>int</em> <dfn class="local col4 decl" id="24ret" title='ret' data-type='int' data-ref="24ret">ret</dfn>;</td></tr>
+<tr><th id="176">176</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="local col5 decl" id="25next" title='next' data-type='QObject *' data-ref="25next">next</dfn>;</td></tr>
+<tr><th id="177">177</th><td>    <a class="typedef" href="../include/qapi/qmp/qstring.h.html#QString" title='QString' data-type='struct QString' data-ref="QString">QString</a> *<dfn class="local col6 decl" id="26val" title='val' data-type='QString *' data-ref="26val">val</dfn>;</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>    <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> = <a class="local col4 ref" href="#14params" title='params' data-ref="14params">params</a>;</td></tr>
+<tr><th id="180">180</th><td>    <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> = <a class="ref" href="../../include/string.h.html#strcspn" title='strcspn' data-ref="strcspn">strcspn</a>(<a class="local col4 ref" href="#14params" title='params' data-ref="14params">params</a>, <q>"=,"</q>);</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (<a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a> &amp;&amp; <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> &amp;&amp; <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>[<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>] != <kbd>'='</kbd>) {</td></tr>
+<tr><th id="182">182</th><td>        <i>/* Desugar implied key */</i></td></tr>
+<tr><th id="183">183</th><td>        <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> = <a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a>;</td></tr>
+<tr><th id="184">184</th><td>        <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> = <a class="ref" href="../../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a>);</td></tr>
+<tr><th id="185">185</th><td>    }</td></tr>
+<tr><th id="186">186</th><td>    <a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a> = <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> + <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>;</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>    <i>/*</i></td></tr>
+<tr><th id="189">189</th><td><i>     * Loop over key fragments: @s points to current fragment, it</i></td></tr>
+<tr><th id="190">190</th><td><i>     * applies to @cur.  @key_in_cur[] holds the previous fragment.</i></td></tr>
+<tr><th id="191">191</th><td><i>     */</i></td></tr>
+<tr><th id="192">192</th><td>    <a class="local col3 ref" href="#23cur" title='cur' data-ref="23cur">cur</a> = <a class="local col3 ref" href="#13qdict" title='qdict' data-ref="13qdict">qdict</a>;</td></tr>
+<tr><th id="193">193</th><td>    <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> = <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>;</td></tr>
+<tr><th id="194">194</th><td>    <b>for</b> (;;) {</td></tr>
+<tr><th id="195">195</th><td>        <i>/* Want a key index (unless it's first) or a QAPI name */</i></td></tr>
+<tr><th id="196">196</th><td>        <b>if</b> (<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> &amp;&amp; <a class="tu ref" href="#key_to_index" title='key_to_index' data-use='c' data-ref="key_to_index">key_to_index</a>(<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>, &amp;<a class="local col0 ref" href="#20end" title='end' data-ref="20end">end</a>) &gt;= <var>0</var>) {</td></tr>
+<tr><th id="197">197</th><td>            <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> = <a class="local col0 ref" href="#20end" title='end' data-ref="20end">end</a> - <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>;</td></tr>
+<tr><th id="198">198</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="199">199</th><td>            <a class="local col4 ref" href="#24ret" title='ret' data-ref="24ret">ret</a> = <a class="ref" href="../include/qapi/util.h.html#parse_qapi_name" title='parse_qapi_name' data-ref="parse_qapi_name">parse_qapi_name</a>(<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="200">200</th><td>            <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> = <a class="local col4 ref" href="#24ret" title='ret' data-ref="24ret">ret</a> &lt; <var>0</var> ? <var>0</var> : <a class="local col4 ref" href="#24ret" title='ret' data-ref="24ret">ret</a>;</td></tr>
+<tr><th id="201">201</th><td>        }</td></tr>
+<tr><th id="202">202</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((s + len &lt;= key_end) ? (void) (0) : __assert_fail (&quot;s + len &lt;= key_end&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 202, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> + <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> &lt;= <a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a>);</td></tr>
+<tr><th id="203">203</th><td>        <b>if</b> (!<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> || (<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> + <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> &lt; <a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a> &amp;&amp; <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>[<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>] != <kbd>'.'</kbd>)) {</td></tr>
+<tr><th id="204">204</th><td>            <a class="macro" href="../../include/assert.h.html#88" title="((key != implied_key) ? (void) (0) : __assert_fail (&quot;key != implied_key&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 204, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> != <a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a>);</td></tr>
+<tr><th id="205">205</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 206, __func__, (&quot;Invalid parameter &apos;%.*s&apos;&quot;), (int)(key_end - key), key)" data-ref="_M/error_setg">error_setg</a>(<a class="local col6 ref" href="#16errp" title='errp' data-ref="16errp">errp</a>, <q>"Invalid parameter '%.*s'"</q>,</td></tr>
+<tr><th id="206">206</th><td>                       (<em>int</em>)(<a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a> - <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>), <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>);</td></tr>
+<tr><th id="207">207</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="208">208</th><td>        }</td></tr>
+<tr><th id="209">209</th><td>        <b>if</b> (<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> &gt;= <b>sizeof</b>(<a class="local col2 ref" href="#22key_in_cur" title='key_in_cur' data-ref="22key_in_cur">key_in_cur</a>)) {</td></tr>
+<tr><th id="210">210</th><td>            <a class="macro" href="../../include/assert.h.html#88" title="((key != implied_key) ? (void) (0) : __assert_fail (&quot;key != implied_key&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 210, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> != <a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a>);</td></tr>
+<tr><th id="211">211</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 213, __func__, (&quot;Parameter%s &apos;%.*s&apos; is too long&quot;), s != key || s + len != key_end ? &quot; fragment&quot; : &quot;&quot;, (int)len, s)" data-ref="_M/error_setg">error_setg</a>(<a class="local col6 ref" href="#16errp" title='errp' data-ref="16errp">errp</a>, <q>"Parameter%s '%.*s' is too long"</q>,</td></tr>
+<tr><th id="212">212</th><td>                       <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> || <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> + <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a> != <a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a> ? <q>" fragment"</q> : <q>""</q>,</td></tr>
+<tr><th id="213">213</th><td>                       (<em>int</em>)<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>, <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>);</td></tr>
+<tr><th id="214">214</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="215">215</th><td>        }</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td>        <b>if</b> (<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>) {</td></tr>
+<tr><th id="218">218</th><td>            <a class="local col5 ref" href="#25next" title='next' data-ref="25next">next</a> = <a class="tu ref" href="#keyval_parse_put" title='keyval_parse_put' data-use='c' data-ref="keyval_parse_put">keyval_parse_put</a>(<a class="local col3 ref" href="#23cur" title='cur' data-ref="23cur">cur</a>, <a class="local col2 ref" href="#22key_in_cur" title='key_in_cur' data-ref="22key_in_cur">key_in_cur</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="219">219</th><td>                                    <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>, <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> - <var>1</var>, <a class="local col6 ref" href="#16errp" title='errp' data-ref="16errp">errp</a>);</td></tr>
+<tr><th id="220">220</th><td>            <b>if</b> (!<a class="local col5 ref" href="#25next" title='next' data-ref="25next">next</a>) {</td></tr>
+<tr><th id="221">221</th><td>                <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="222">222</th><td>            }</td></tr>
+<tr><th id="223">223</th><td>            <a class="local col3 ref" href="#23cur" title='cur' data-ref="23cur">cur</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qobject_to_qdict" title='qobject_to_qdict' data-ref="qobject_to_qdict">qobject_to_qdict</a>(<a class="local col5 ref" href="#25next" title='next' data-ref="25next">next</a>);</td></tr>
+<tr><th id="224">224</th><td>            <a class="macro" href="../../include/assert.h.html#88" title="((cur) ? (void) (0) : __assert_fail (&quot;cur&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 224, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col3 ref" href="#23cur" title='cur' data-ref="23cur">cur</a>);</td></tr>
+<tr><th id="225">225</th><td>        }</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td>        <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col2 ref" href="#22key_in_cur" title='key_in_cur' data-ref="22key_in_cur">key_in_cur</a>, <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>, <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>);</td></tr>
+<tr><th id="228">228</th><td>        <a class="local col2 ref" href="#22key_in_cur" title='key_in_cur' data-ref="22key_in_cur">key_in_cur</a>[<a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>] = <var>0</var>;</td></tr>
+<tr><th id="229">229</th><td>        <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> += <a class="local col1 ref" href="#21len" title='len' data-ref="21len">len</a>;</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td>        <b>if</b> (*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <kbd>'.'</kbd>) {</td></tr>
+<tr><th id="232">232</th><td>            <b>break</b>;</td></tr>
+<tr><th id="233">233</th><td>        }</td></tr>
+<tr><th id="234">234</th><td>        <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>++;</td></tr>
+<tr><th id="235">235</th><td>    }</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td>    <b>if</b> (<a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a> == <a class="local col5 ref" href="#15implied_key" title='implied_key' data-ref="15implied_key">implied_key</a>) {</td></tr>
+<tr><th id="238">238</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((!*s) ? (void) (0) : __assert_fail (&quot;!*s&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 238, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>);</td></tr>
+<tr><th id="239">239</th><td>        <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> = <a class="local col4 ref" href="#14params" title='params' data-ref="14params">params</a>;</td></tr>
+<tr><th id="240">240</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="241">241</th><td>        <b>if</b> (*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <kbd>'='</kbd>) {</td></tr>
+<tr><th id="242">242</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 243, __func__, (&quot;Expected &apos;=&apos; after parameter &apos;%.*s&apos;&quot;), (int)(s - key), key)" data-ref="_M/error_setg">error_setg</a>(<a class="local col6 ref" href="#16errp" title='errp' data-ref="16errp">errp</a>, <q>"Expected '=' after parameter '%.*s'"</q>,</td></tr>
+<tr><th id="243">243</th><td>                       (<em>int</em>)(<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> - <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>), <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>);</td></tr>
+<tr><th id="244">244</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="245">245</th><td>        }</td></tr>
+<tr><th id="246">246</th><td>        <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>++;</td></tr>
+<tr><th id="247">247</th><td>    }</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>    <a class="local col6 ref" href="#26val" title='val' data-ref="26val">val</a> = <a class="ref" href="../include/qapi/qmp/qstring.h.html#qstring_new" title='qstring_new' data-ref="qstring_new">qstring_new</a>();</td></tr>
+<tr><th id="250">250</th><td>    <b>for</b> (;;) {</td></tr>
+<tr><th id="251">251</th><td>        <b>if</b> (!*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>) {</td></tr>
+<tr><th id="252">252</th><td>            <b>break</b>;</td></tr>
+<tr><th id="253">253</th><td>        } <b>else</b> <b>if</b> (*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> == <kbd>','</kbd>) {</td></tr>
+<tr><th id="254">254</th><td>            <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>++;</td></tr>
+<tr><th id="255">255</th><td>            <b>if</b> (*<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a> != <kbd>','</kbd>) {</td></tr>
+<tr><th id="256">256</th><td>                <b>break</b>;</td></tr>
+<tr><th id="257">257</th><td>            }</td></tr>
+<tr><th id="258">258</th><td>        }</td></tr>
+<tr><th id="259">259</th><td>        <a class="ref" href="../include/qapi/qmp/qstring.h.html#qstring_append_chr" title='qstring_append_chr' data-ref="qstring_append_chr">qstring_append_chr</a>(<a class="local col6 ref" href="#26val" title='val' data-ref="26val">val</a>, *<a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>++);</td></tr>
+<tr><th id="260">260</th><td>    }</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td>    <b>if</b> (!<a class="tu ref" href="#keyval_parse_put" title='keyval_parse_put' data-use='c' data-ref="keyval_parse_put">keyval_parse_put</a>(<a class="local col3 ref" href="#23cur" title='cur' data-ref="23cur">cur</a>, <a class="local col2 ref" href="#22key_in_cur" title='key_in_cur' data-ref="22key_in_cur">key_in_cur</a>, <a class="local col6 ref" href="#26val" title='val' data-ref="26val">val</a>, <a class="local col7 ref" href="#17key" title='key' data-ref="17key">key</a>, <a class="local col8 ref" href="#18key_end" title='key_end' data-ref="18key_end">key_end</a>, <a class="local col6 ref" href="#16errp" title='errp' data-ref="16errp">errp</a>)) {</td></tr>
+<tr><th id="263">263</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="264">264</th><td>    }</td></tr>
+<tr><th id="265">265</th><td>    <b>return</b> <a class="local col9 ref" href="#19s" title='s' data-ref="19s">s</a>;</td></tr>
+<tr><th id="266">266</th><td>}</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="reassemble_key" title='reassemble_key' data-type='char * reassemble_key(GSList * key)' data-ref="reassemble_key">reassemble_key</dfn>(<a class="typedef" href="../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> *<dfn class="local col7 decl" id="27key" title='key' data-type='GSList *' data-ref="27key">key</dfn>)</td></tr>
+<tr><th id="269">269</th><td>{</td></tr>
+<tr><th id="270">270</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gstring.h.html#GString" title='GString' data-type='struct _GString' data-ref="GString">GString</a> *<dfn class="local col8 decl" id="28s" title='s' data-type='GString *' data-ref="28s">s</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_new" title='g_string_new' data-ref="g_string_new">g_string_new</a>(<q>""</q>);</td></tr>
+<tr><th id="271">271</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> *<dfn class="local col9 decl" id="29p" title='p' data-type='GSList *' data-ref="29p">p</dfn>;</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>    <b>for</b> (<a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a> = <a class="local col7 ref" href="#27key" title='key' data-ref="27key">key</a>; <a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a>; <a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a> = <a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#_GSList::next" title='_GSList::next' data-ref="_GSList::next">next</a>) {</td></tr>
+<tr><th id="274">274</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_prepend_c" title='g_string_prepend_c' data-ref="g_string_prepend_c">g_string_prepend_c</a>(<a class="local col8 ref" href="#28s" title='s' data-ref="28s">s</a>, <kbd>'.'</kbd>);</td></tr>
+<tr><th id="275">275</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_prepend" title='g_string_prepend' data-ref="g_string_prepend">g_string_prepend</a>(<a class="local col8 ref" href="#28s" title='s' data-ref="28s">s</a>, (<em>char</em> *)<a class="local col9 ref" href="#29p" title='p' data-ref="29p">p</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#_GSList::data" title='_GSList::data' data-ref="_GSList::data">data</a>);</td></tr>
+<tr><th id="276">276</th><td>    }</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td>    <b>return</b> <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_free" title='g_string_free' data-ref="g_string_free">g_string_free</a>(<a class="local col8 ref" href="#28s" title='s' data-ref="28s">s</a>, <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#280" title="(0)" data-ref="_M/FALSE">FALSE</a>);</td></tr>
+<tr><th id="279">279</th><td>}</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td><i  data-doc="keyval_listify">/*</i></td></tr>
+<tr><th id="282">282</th><td><i  data-doc="keyval_listify"> * Listify @cur recursively.</i></td></tr>
+<tr><th id="283">283</th><td><i  data-doc="keyval_listify"> * Replace QDicts whose keys are all valid list indexes by QLists.</i></td></tr>
+<tr><th id="284">284</th><td><i  data-doc="keyval_listify"> * @key_of_cur is the list of key fragments leading up to @cur.</i></td></tr>
+<tr><th id="285">285</th><td><i  data-doc="keyval_listify"> * On success, return either @cur or its replacement.</i></td></tr>
+<tr><th id="286">286</th><td><i  data-doc="keyval_listify"> * On failure, store an error through @errp and return NULL.</i></td></tr>
+<tr><th id="287">287</th><td><i  data-doc="keyval_listify"> */</i></td></tr>
+<tr><th id="288">288</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="tu decl def" id="keyval_listify" title='keyval_listify' data-type='QObject * keyval_listify(QDict * cur, GSList * key_of_cur, Error ** errp)' data-ref="keyval_listify">keyval_listify</dfn>(<a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col0 decl" id="30cur" title='cur' data-type='QDict *' data-ref="30cur">cur</dfn>, <a class="typedef" href="../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> *<dfn class="local col1 decl" id="31key_of_cur" title='key_of_cur' data-type='GSList *' data-ref="31key_of_cur">key_of_cur</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="32errp" title='errp' data-type='Error **' data-ref="32errp">errp</dfn>)</td></tr>
+<tr><th id="289">289</th><td>{</td></tr>
+<tr><th id="290">290</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> <dfn class="local col3 decl" id="33key_node" title='key_node' data-type='GSList' data-ref="33key_node">key_node</dfn>;</td></tr>
+<tr><th id="291">291</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="34has_index" title='has_index' data-type='_Bool' data-ref="34has_index">has_index</dfn>, <dfn class="local col5 decl" id="35has_member" title='has_member' data-type='_Bool' data-ref="35has_member">has_member</dfn>;</td></tr>
+<tr><th id="292">292</th><td>    <em>const</em> <a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDictEntry" title='QDictEntry' data-type='struct QDictEntry' data-ref="QDictEntry">QDictEntry</a> *<dfn class="local col6 decl" id="36ent" title='ent' data-type='const QDictEntry *' data-ref="36ent">ent</dfn>;</td></tr>
+<tr><th id="293">293</th><td>    <a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col7 decl" id="37qdict" title='qdict' data-type='QDict *' data-ref="37qdict">qdict</dfn>;</td></tr>
+<tr><th id="294">294</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="local col8 decl" id="38val" title='val' data-type='QObject *' data-ref="38val">val</dfn>;</td></tr>
+<tr><th id="295">295</th><td>    <em>char</em> *<dfn class="local col9 decl" id="39key" title='key' data-type='char *' data-ref="39key">key</dfn>;</td></tr>
+<tr><th id="296">296</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col0 decl" id="40nelt" title='nelt' data-type='size_t' data-ref="40nelt">nelt</dfn>;</td></tr>
+<tr><th id="297">297</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> **<dfn class="local col1 decl" id="41elt" title='elt' data-type='QObject **' data-ref="41elt">elt</dfn>;</td></tr>
+<tr><th id="298">298</th><td>    <em>int</em> <dfn class="local col2 decl" id="42index" title='index' data-type='int' data-ref="42index">index</dfn>, <dfn class="local col3 decl" id="43max_index" title='max_index' data-type='int' data-ref="43max_index">max_index</dfn>, <dfn class="local col4 decl" id="44i" title='i' data-type='int' data-ref="44i">i</dfn>;</td></tr>
+<tr><th id="299">299</th><td>    <a class="typedef" href="../include/qapi/qmp/qlist.h.html#QList" title='QList' data-type='struct QList' data-ref="QList">QList</a> *<dfn class="local col5 decl" id="45list" title='list' data-type='QList *' data-ref="45list">list</dfn>;</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>    <a class="local col3 ref" href="#33key_node" title='key_node' data-ref="33key_node">key_node</a>.<a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#_GSList::next" title='_GSList::next' data-ref="_GSList::next">next</a> = <a class="local col1 ref" href="#31key_of_cur" title='key_of_cur' data-ref="31key_of_cur">key_of_cur</a>;</td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td>    <i>/*</i></td></tr>
+<tr><th id="304">304</th><td><i>     * Recursively listify @cur's members, and figure out whether @cur</i></td></tr>
+<tr><th id="305">305</th><td><i>     * itself is to be listified.</i></td></tr>
+<tr><th id="306">306</th><td><i>     */</i></td></tr>
+<tr><th id="307">307</th><td>    <a class="local col4 ref" href="#34has_index" title='has_index' data-ref="34has_index">has_index</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="308">308</th><td>    <a class="local col5 ref" href="#35has_member" title='has_member' data-ref="35has_member">has_member</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="309">309</th><td>    <b>for</b> (<a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_first" title='qdict_first' data-ref="qdict_first">qdict_first</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>); <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>; <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_next" title='qdict_next' data-ref="qdict_next">qdict_next</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>, <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>)) {</td></tr>
+<tr><th id="310">310</th><td>        <b>if</b> (<a class="tu ref" href="#key_to_index" title='key_to_index' data-use='c' data-ref="key_to_index">key_to_index</a>(<a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::key" title='QDictEntry::key' data-ref="QDictEntry::key">key</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) &gt;= <var>0</var>) {</td></tr>
+<tr><th id="311">311</th><td>            <a class="local col4 ref" href="#34has_index" title='has_index' data-ref="34has_index">has_index</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="312">312</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="313">313</th><td>            <a class="local col5 ref" href="#35has_member" title='has_member' data-ref="35has_member">has_member</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="314">314</th><td>        }</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>        <a class="local col7 ref" href="#37qdict" title='qdict' data-ref="37qdict">qdict</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qobject_to_qdict" title='qobject_to_qdict' data-ref="qobject_to_qdict">qobject_to_qdict</a>(<a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::value" title='QDictEntry::value' data-ref="QDictEntry::value">value</a>);</td></tr>
+<tr><th id="317">317</th><td>        <b>if</b> (!<a class="local col7 ref" href="#37qdict" title='qdict' data-ref="37qdict">qdict</a>) {</td></tr>
+<tr><th id="318">318</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="319">319</th><td>        }</td></tr>
+<tr><th id="320">320</th><td></td></tr>
+<tr><th id="321">321</th><td>        <a class="local col3 ref" href="#33key_node" title='key_node' data-ref="33key_node">key_node</a>.<a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#_GSList::data" title='_GSList::data' data-ref="_GSList::data">data</a> = <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::key" title='QDictEntry::key' data-ref="QDictEntry::key">key</a>;</td></tr>
+<tr><th id="322">322</th><td>        <a class="local col8 ref" href="#38val" title='val' data-ref="38val">val</a> = <a class="tu ref" href="#keyval_listify" title='keyval_listify' data-use='c' data-ref="keyval_listify">keyval_listify</a>(<a class="local col7 ref" href="#37qdict" title='qdict' data-ref="37qdict">qdict</a>, &amp;<a class="local col3 ref" href="#33key_node" title='key_node' data-ref="33key_node">key_node</a>, <a class="local col2 ref" href="#32errp" title='errp' data-ref="32errp">errp</a>);</td></tr>
+<tr><th id="323">323</th><td>        <b>if</b> (!<a class="local col8 ref" href="#38val" title='val' data-ref="38val">val</a>) {</td></tr>
+<tr><th id="324">324</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="325">325</th><td>        }</td></tr>
+<tr><th id="326">326</th><td>        <b>if</b> (<a class="local col8 ref" href="#38val" title='val' data-ref="38val">val</a> != <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::value" title='QDictEntry::value' data-ref="QDictEntry::value">value</a>) {</td></tr>
+<tr><th id="327">327</th><td>            <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_put_obj" title='qdict_put_obj' data-ref="qdict_put_obj">qdict_put_obj</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>, <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::key" title='QDictEntry::key' data-ref="QDictEntry::key">key</a>, <a class="local col8 ref" href="#38val" title='val' data-ref="38val">val</a>);</td></tr>
+<tr><th id="328">328</th><td>        }</td></tr>
+<tr><th id="329">329</th><td>    }</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>    <b>if</b> (<a class="local col4 ref" href="#34has_index" title='has_index' data-ref="34has_index">has_index</a> &amp;&amp; <a class="local col5 ref" href="#35has_member" title='has_member' data-ref="35has_member">has_member</a>) {</td></tr>
+<tr><th id="332">332</th><td>        <a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a> = <a class="tu ref" href="#reassemble_key" title='reassemble_key' data-use='c' data-ref="reassemble_key">reassemble_key</a>(<a class="local col1 ref" href="#31key_of_cur" title='key_of_cur' data-ref="31key_of_cur">key_of_cur</a>);</td></tr>
+<tr><th id="333">333</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 333, __func__, (&quot;Parameters &apos;%s*&apos; used inconsistently&quot;), key)" data-ref="_M/error_setg">error_setg</a>(<a class="local col2 ref" href="#32errp" title='errp' data-ref="32errp">errp</a>, <q>"Parameters '%s*' used inconsistently"</q>, <a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a>);</td></tr>
+<tr><th id="334">334</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a>);</td></tr>
+<tr><th id="335">335</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="336">336</th><td>    }</td></tr>
+<tr><th id="337">337</th><td>    <b>if</b> (!<a class="local col4 ref" href="#34has_index" title='has_index' data-ref="34has_index">has_index</a>) {</td></tr>
+<tr><th id="338">338</th><td>        <b>return</b> <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(cur)-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>);</td></tr>
+<tr><th id="339">339</th><td>    }</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>    <i>/* Copy @cur's values to @elt[] */</i></td></tr>
+<tr><th id="342">342</th><td>    <a class="local col0 ref" href="#40nelt" title='nelt' data-ref="40nelt">nelt</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_size" title='qdict_size' data-ref="qdict_size">qdict_size</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>) + <var>1</var>; <i>/* one extra, for use as sentinel */</i></td></tr>
+<tr><th id="343">343</th><td>    <a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((QObject * *) g_malloc0_n ((nelt), sizeof (QObject *)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *, <a class="local col0 ref" href="#40nelt" title='nelt' data-ref="40nelt">nelt</a>);</td></tr>
+<tr><th id="344">344</th><td>    <a class="local col3 ref" href="#43max_index" title='max_index' data-ref="43max_index">max_index</a> = -<var>1</var>;</td></tr>
+<tr><th id="345">345</th><td>    <b>for</b> (<a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_first" title='qdict_first' data-ref="qdict_first">qdict_first</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>); <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>; <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_next" title='qdict_next' data-ref="qdict_next">qdict_next</a>(<a class="local col0 ref" href="#30cur" title='cur' data-ref="30cur">cur</a>, <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>)) {</td></tr>
+<tr><th id="346">346</th><td>        <a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a> = <a class="tu ref" href="#key_to_index" title='key_to_index' data-use='c' data-ref="key_to_index">key_to_index</a>(<a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::key" title='QDictEntry::key' data-ref="QDictEntry::key">key</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="347">347</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((index &gt;= 0) ? (void) (0) : __assert_fail (&quot;index &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 347, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="348">348</th><td>        <b>if</b> (<a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a> &gt; <a class="local col3 ref" href="#43max_index" title='max_index' data-ref="43max_index">max_index</a>) {</td></tr>
+<tr><th id="349">349</th><td>            <a class="local col3 ref" href="#43max_index" title='max_index' data-ref="43max_index">max_index</a> = <a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a>;</td></tr>
+<tr><th id="350">350</th><td>        }</td></tr>
+<tr><th id="351">351</th><td>        <i>/*</i></td></tr>
+<tr><th id="352">352</th><td><i>         * We iterate @nelt times.  If we get one exceeding @nelt</i></td></tr>
+<tr><th id="353">353</th><td><i>         * here, we will put less than @nelt values into @elt[],</i></td></tr>
+<tr><th id="354">354</th><td><i>         * triggering the error in the next loop.</i></td></tr>
+<tr><th id="355">355</th><td><i>         */</i></td></tr>
+<tr><th id="356">356</th><td>        <b>if</b> ((<span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span>)<a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a> &gt;= <a class="local col0 ref" href="#40nelt" title='nelt' data-ref="40nelt">nelt</a> - <var>1</var>) {</td></tr>
+<tr><th id="357">357</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="358">358</th><td>        }</td></tr>
+<tr><th id="359">359</th><td>        <i>/* Even though dict keys are distinct, indexes need not be */</i></td></tr>
+<tr><th id="360">360</th><td>        <a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>[<a class="local col2 ref" href="#42index" title='index' data-ref="42index">index</a>] = <a class="local col6 ref" href="#36ent" title='ent' data-ref="36ent">ent</a>-&gt;<a class="ref" href="../include/qapi/qmp/qdict.h.html#QDictEntry::value" title='QDictEntry::value' data-ref="QDictEntry::value">value</a>;</td></tr>
+<tr><th id="361">361</th><td>    }</td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td>    <i>/*</i></td></tr>
+<tr><th id="364">364</th><td><i>     * Make a list from @elt[], reporting the first missing element,</i></td></tr>
+<tr><th id="365">365</th><td><i>     * if any.</i></td></tr>
+<tr><th id="366">366</th><td><i>     * If we dropped an index &gt;= nelt in the previous loop, this loop</i></td></tr>
+<tr><th id="367">367</th><td><i>     * will run into the sentinel and report index @nelt missing.</i></td></tr>
+<tr><th id="368">368</th><td><i>     */</i></td></tr>
+<tr><th id="369">369</th><td>    <a class="local col5 ref" href="#45list" title='list' data-ref="45list">list</a> = <a class="ref" href="../include/qapi/qmp/qlist.h.html#qlist_new" title='qlist_new' data-ref="qlist_new">qlist_new</a>();</td></tr>
+<tr><th id="370">370</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((!elt[nelt-1]) ? (void) (0) : __assert_fail (&quot;!elt[nelt-1]&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 370, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>[<a class="local col0 ref" href="#40nelt" title='nelt' data-ref="40nelt">nelt</a>-<var>1</var>]);       <i>/* need the sentinel to be null */</i></td></tr>
+<tr><th id="371">371</th><td>    <b>for</b> (<a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a> = <var>0</var>; <a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a> &lt; <a class="macro" href="../../include/glib-2.0/glib/gmacros.h.html#291" title="(((nelt) &lt; (max_index + 1)) ? (nelt) : (max_index + 1))" data-ref="_M/MIN">MIN</a>(<a class="local col0 ref" href="#40nelt" title='nelt' data-ref="40nelt">nelt</a>, <a class="local col3 ref" href="#43max_index" title='max_index' data-ref="43max_index">max_index</a> + <var>1</var>); <a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a>++) {</td></tr>
+<tr><th id="372">372</th><td>        <b>if</b> (!<a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>[<a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a>]) {</td></tr>
+<tr><th id="373">373</th><td>            <a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a> = <a class="tu ref" href="#reassemble_key" title='reassemble_key' data-use='c' data-ref="reassemble_key">reassemble_key</a>(<a class="local col1 ref" href="#31key_of_cur" title='key_of_cur' data-ref="31key_of_cur">key_of_cur</a>);</td></tr>
+<tr><th id="374">374</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 374, __func__, (&quot;Parameter &apos;%s%d&apos; missing&quot;), key, i)" data-ref="_M/error_setg">error_setg</a>(<a class="local col2 ref" href="#32errp" title='errp' data-ref="32errp">errp</a>, <q>"Parameter '%s%d' missing"</q>, <a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a>, <a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a>);</td></tr>
+<tr><th id="375">375</th><td>            <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col9 ref" href="#39key" title='key' data-ref="39key">key</a>);</td></tr>
+<tr><th id="376">376</th><td>            <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>);</td></tr>
+<tr><th id="377">377</th><td>            <a class="macro" href="../include/qapi/qmp/qobject.h.html#50" title="qobject_decref(list ? (&amp;(list)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col5 ref" href="#45list" title='list' data-ref="45list">list</a>);</td></tr>
+<tr><th id="378">378</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="379">379</th><td>        }</td></tr>
+<tr><th id="380">380</th><td>        <a class="ref" href="../include/qapi/qmp/qobject.h.html#qobject_incref" title='qobject_incref' data-ref="qobject_incref">qobject_incref</a>(<a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>[<a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a>]);</td></tr>
+<tr><th id="381">381</th><td>        <a class="ref" href="../include/qapi/qmp/qlist.h.html#qlist_append_obj" title='qlist_append_obj' data-ref="qlist_append_obj">qlist_append_obj</a>(<a class="local col5 ref" href="#45list" title='list' data-ref="45list">list</a>, <a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>[<a class="local col4 ref" href="#44i" title='i' data-ref="44i">i</a>]);</td></tr>
+<tr><th id="382">382</th><td>    }</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col1 ref" href="#41elt" title='elt' data-ref="41elt">elt</a>);</td></tr>
+<tr><th id="385">385</th><td>    <b>return</b> <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(list)-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="local col5 ref" href="#45list" title='list' data-ref="45list">list</a>);</td></tr>
+<tr><th id="386">386</th><td>}</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td><i>/*</i></td></tr>
+<tr><th id="389">389</th><td><i> * Parse @params in QEMU's traditional KEY=VALUE,... syntax.</i></td></tr>
+<tr><th id="390">390</th><td><i> * If @implied_key, the first KEY= can be omitted.  @implied_key is</i></td></tr>
+<tr><th id="391">391</th><td><i> * implied then, and VALUE can't be empty or contain ',' or '='.</i></td></tr>
+<tr><th id="392">392</th><td><i> * On success, return a dictionary of the parsed keys and values.</i></td></tr>
+<tr><th id="393">393</th><td><i> * On failure, store an error through @errp and return NULL.</i></td></tr>
+<tr><th id="394">394</th><td><i> */</i></td></tr>
+<tr><th id="395">395</th><td><a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="decl def" id="keyval_parse" title='keyval_parse' data-ref="keyval_parse">keyval_parse</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="46params" title='params' data-type='const char *' data-ref="46params">params</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="47implied_key" title='implied_key' data-type='const char *' data-ref="47implied_key">implied_key</dfn>,</td></tr>
+<tr><th id="396">396</th><td>                    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="48errp" title='errp' data-type='Error **' data-ref="48errp">errp</dfn>)</td></tr>
+<tr><th id="397">397</th><td>{</td></tr>
+<tr><th id="398">398</th><td>    <a class="typedef" href="../include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col9 decl" id="49qdict" title='qdict' data-type='QDict *' data-ref="49qdict">qdict</dfn> = <a class="ref" href="../include/qapi/qmp/qdict.h.html#qdict_new" title='qdict_new' data-ref="qdict_new">qdict_new</a>();</td></tr>
+<tr><th id="399">399</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#QObject" title='QObject' data-type='struct QObject' data-ref="QObject">QObject</a> *<dfn class="local col0 decl" id="50listified" title='listified' data-type='QObject *' data-ref="50listified">listified</dfn>;</td></tr>
+<tr><th id="400">400</th><td>    <em>const</em> <em>char</em> *<dfn class="local col1 decl" id="51s" title='s' data-type='const char *' data-ref="51s">s</dfn>;</td></tr>
+<tr><th id="401">401</th><td></td></tr>
+<tr><th id="402">402</th><td>    <a class="local col1 ref" href="#51s" title='s' data-ref="51s">s</a> = <a class="local col6 ref" href="#46params" title='params' data-ref="46params">params</a>;</td></tr>
+<tr><th id="403">403</th><td>    <b>while</b> (*<a class="local col1 ref" href="#51s" title='s' data-ref="51s">s</a>) {</td></tr>
+<tr><th id="404">404</th><td>        <a class="local col1 ref" href="#51s" title='s' data-ref="51s">s</a> = <a class="tu ref" href="#keyval_parse_one" title='keyval_parse_one' data-use='c' data-ref="keyval_parse_one">keyval_parse_one</a>(<a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>, <a class="local col1 ref" href="#51s" title='s' data-ref="51s">s</a>, <a class="local col7 ref" href="#47implied_key" title='implied_key' data-ref="47implied_key">implied_key</a>, <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>);</td></tr>
+<tr><th id="405">405</th><td>        <b>if</b> (!<a class="local col1 ref" href="#51s" title='s' data-ref="51s">s</a>) {</td></tr>
+<tr><th id="406">406</th><td>            <a class="macro" href="../include/qapi/qmp/qobject.h.html#50" title="qobject_decref(qdict ? (&amp;(qdict)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>);</td></tr>
+<tr><th id="407">407</th><td>            <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="408">408</th><td>        }</td></tr>
+<tr><th id="409">409</th><td>        <a class="local col7 ref" href="#47implied_key" title='implied_key' data-ref="47implied_key">implied_key</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="410">410</th><td>    }</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td>    <a class="local col0 ref" href="#50listified" title='listified' data-ref="50listified">listified</a> = <a class="tu ref" href="#keyval_listify" title='keyval_listify' data-use='c' data-ref="keyval_listify">keyval_listify</a>(<a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>);</td></tr>
+<tr><th id="413">413</th><td>    <b>if</b> (!<a class="local col0 ref" href="#50listified" title='listified' data-ref="50listified">listified</a>) {</td></tr>
+<tr><th id="414">414</th><td>        <a class="macro" href="../include/qapi/qmp/qobject.h.html#50" title="qobject_decref(qdict ? (&amp;(qdict)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>);</td></tr>
+<tr><th id="415">415</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="416">416</th><td>    }</td></tr>
+<tr><th id="417">417</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((listified == (&amp;(qdict)-&gt;base)) ? (void) (0) : __assert_fail (&quot;listified == QOBJECT(qdict)&quot;, &quot;/home/jon/workspace/qemu/util/keyval.c&quot;, 417, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col0 ref" href="#50listified" title='listified' data-ref="50listified">listified</a> == <a class="macro" href="../include/qapi/qmp/qobject.h.html#43" title="(&amp;(qdict)-&gt;base)" data-ref="_M/QOBJECT">QOBJECT</a>(<a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>));</td></tr>
+<tr><th id="418">418</th><td>    <b>return</b> <a class="local col9 ref" href="#49qdict" title='qdict' data-ref="49qdict">qdict</a>;</td></tr>
+<tr><th id="419">419</th><td>}</td></tr>
+<tr><th id="420">420</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

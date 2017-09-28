@@ -1,0 +1,200 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>qemu-file-channel.c source code [codebrowser/migration/qemu-file-channel.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/qemu-file-channel.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='qemu-file-channel.c.html'>qemu-file-channel.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMUFile backend for QIOChannel objects</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015-2016 Red Hat, Inc</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="qemu-file-channel.h.html">"qemu-file-channel.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/exec/cpu-common.h.html">"exec/cpu-common.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="qemu-file.h.html">"qemu-file.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/io/channel-socket.h.html">"io/channel-socket.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu/iov.h.html">"qemu/iov.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><em>static</em> <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="tu decl def" id="channel_writev_buffer" title='channel_writev_buffer' data-type='ssize_t channel_writev_buffer(void * opaque, struct iovec * iov, int iovcnt, int64_t pos)' data-ref="channel_writev_buffer">channel_writev_buffer</dfn>(<em>void</em> *<dfn class="local col1 decl" id="1opaque" title='opaque' data-type='void *' data-ref="1opaque">opaque</dfn>,</td></tr>
+<tr><th id="34">34</th><td>                                     <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col2 decl" id="2iov" title='iov' data-type='struct iovec *' data-ref="2iov">iov</dfn>,</td></tr>
+<tr><th id="35">35</th><td>                                     <em>int</em> <dfn class="local col3 decl" id="3iovcnt" title='iovcnt' data-type='int' data-ref="3iovcnt">iovcnt</dfn>,</td></tr>
+<tr><th id="36">36</th><td>                                     <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col4 decl" id="4pos" title='pos' data-type='int64_t' data-ref="4pos">pos</dfn>)</td></tr>
+<tr><th id="37">37</th><td>{</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col5 decl" id="5ioc" title='ioc' data-type='QIOChannel *' data-ref="5ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 38, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col1 ref" href="#1opaque" title='opaque' data-ref="1opaque">opaque</a>);</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col6 decl" id="6done" title='done' data-type='ssize_t' data-ref="6done">done</dfn> = <var>0</var>;</td></tr>
+<tr><th id="40">40</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col7 decl" id="7local_iov" title='local_iov' data-type='struct iovec *' data-ref="7local_iov">local_iov</dfn> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#261" title="((struct iovec *) g_malloc_n ((iovcnt), sizeof (struct iovec)))" data-ref="_M/g_new">g_new</a>(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a>, <a class="local col3 ref" href="#3iovcnt" title='iovcnt' data-ref="3iovcnt">iovcnt</a>);</td></tr>
+<tr><th id="41">41</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col8 decl" id="8local_iov_head" title='local_iov_head' data-type='struct iovec *' data-ref="8local_iov_head">local_iov_head</dfn> = <a class="local col7 ref" href="#7local_iov" title='local_iov' data-ref="7local_iov">local_iov</a>;</td></tr>
+<tr><th id="42">42</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col9 decl" id="9nlocal_iov" title='nlocal_iov' data-type='unsigned int' data-ref="9nlocal_iov">nlocal_iov</dfn> = <a class="local col3 ref" href="#3iovcnt" title='iovcnt' data-ref="3iovcnt">iovcnt</a>;</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="local col9 ref" href="#9nlocal_iov" title='nlocal_iov' data-ref="9nlocal_iov">nlocal_iov</a> = <a class="ref" href="../include/qemu/iov.h.html#iov_copy" title='iov_copy' data-ref="iov_copy">iov_copy</a>(<a class="local col7 ref" href="#7local_iov" title='local_iov' data-ref="7local_iov">local_iov</a>, <a class="local col9 ref" href="#9nlocal_iov" title='nlocal_iov' data-ref="9nlocal_iov">nlocal_iov</a>,</td></tr>
+<tr><th id="45">45</th><td>                          <a class="local col2 ref" href="#2iov" title='iov' data-ref="2iov">iov</a>, <a class="local col3 ref" href="#3iovcnt" title='iovcnt' data-ref="3iovcnt">iovcnt</a>,</td></tr>
+<tr><th id="46">46</th><td>                          <var>0</var>, <a class="ref" href="../include/qemu/iov.h.html#iov_size" title='iov_size' data-ref="iov_size">iov_size</a>(<a class="local col2 ref" href="#2iov" title='iov' data-ref="2iov">iov</a>, <a class="local col3 ref" href="#3iovcnt" title='iovcnt' data-ref="3iovcnt">iovcnt</a>));</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td>    <b>while</b> (<a class="local col9 ref" href="#9nlocal_iov" title='nlocal_iov' data-ref="9nlocal_iov">nlocal_iov</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="49">49</th><td>        <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col0 decl" id="10len" title='len' data-type='ssize_t' data-ref="10len">len</dfn>;</td></tr>
+<tr><th id="50">50</th><td>        <a class="local col0 ref" href="#10len" title='len' data-ref="10len">len</a> = <a class="ref" href="../include/io/channel.h.html#qio_channel_writev" title='qio_channel_writev' data-ref="qio_channel_writev">qio_channel_writev</a>(<a class="local col5 ref" href="#5ioc" title='ioc' data-ref="5ioc">ioc</a>, <a class="local col7 ref" href="#7local_iov" title='local_iov' data-ref="7local_iov">local_iov</a>, <a class="local col9 ref" href="#9nlocal_iov" title='nlocal_iov' data-ref="9nlocal_iov">nlocal_iov</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="51">51</th><td>        <b>if</b> (<a class="local col0 ref" href="#10len" title='len' data-ref="10len">len</a> == <a class="macro" href="../include/io/channel.h.html#40" title="-2" data-ref="_M/QIO_CHANNEL_ERR_BLOCK">QIO_CHANNEL_ERR_BLOCK</a>) {</td></tr>
+<tr><th id="52">52</th><td>            <a class="ref" href="../include/io/channel.h.html#qio_channel_wait" title='qio_channel_wait' data-ref="qio_channel_wait">qio_channel_wait</a>(<a class="local col5 ref" href="#5ioc" title='ioc' data-ref="5ioc">ioc</a>, <a class="enum" href="../../include/glib-2.0/glib/gmain.h.html#G_IO_OUT" title='G_IO_OUT' data-ref="G_IO_OUT">G_IO_OUT</a>);</td></tr>
+<tr><th id="53">53</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="54">54</th><td>        }</td></tr>
+<tr><th id="55">55</th><td>        <b>if</b> (<a class="local col0 ref" href="#10len" title='len' data-ref="10len">len</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="56">56</th><td>            <i>/* XXX handle Error objects */</i></td></tr>
+<tr><th id="57">57</th><td>            <a class="local col6 ref" href="#6done" title='done' data-ref="6done">done</a> = -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="58">58</th><td>            <b>goto</b> <a class="lbl" href="#11cleanup" data-ref="11cleanup">cleanup</a>;</td></tr>
+<tr><th id="59">59</th><td>        }</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>        <a class="ref" href="../include/qemu/iov.h.html#iov_discard_front" title='iov_discard_front' data-ref="iov_discard_front">iov_discard_front</a>(&amp;<a class="local col7 ref" href="#7local_iov" title='local_iov' data-ref="7local_iov">local_iov</a>, &amp;<a class="local col9 ref" href="#9nlocal_iov" title='nlocal_iov' data-ref="9nlocal_iov">nlocal_iov</a>, <a class="local col0 ref" href="#10len" title='len' data-ref="10len">len</a>);</td></tr>
+<tr><th id="62">62</th><td>        <a class="local col6 ref" href="#6done" title='done' data-ref="6done">done</a> += <a class="local col0 ref" href="#10len" title='len' data-ref="10len">len</a>;</td></tr>
+<tr><th id="63">63</th><td>    }</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td> <dfn class="lbl" id="11cleanup" data-ref="11cleanup">cleanup</dfn>:</td></tr>
+<tr><th id="66">66</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col8 ref" href="#8local_iov_head" title='local_iov_head' data-ref="8local_iov_head">local_iov_head</a>);</td></tr>
+<tr><th id="67">67</th><td>    <b>return</b> <a class="local col6 ref" href="#6done" title='done' data-ref="6done">done</a>;</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><em>static</em> <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="tu decl def" id="channel_get_buffer" title='channel_get_buffer' data-type='ssize_t channel_get_buffer(void * opaque, uint8_t * buf, int64_t pos, size_t size)' data-ref="channel_get_buffer">channel_get_buffer</dfn>(<em>void</em> *<dfn class="local col2 decl" id="12opaque" title='opaque' data-type='void *' data-ref="12opaque">opaque</dfn>,</td></tr>
+<tr><th id="72">72</th><td>                                  <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="13buf" title='buf' data-type='uint8_t *' data-ref="13buf">buf</dfn>,</td></tr>
+<tr><th id="73">73</th><td>                                  <a class="typedef" href="../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col4 decl" id="14pos" title='pos' data-type='int64_t' data-ref="14pos">pos</dfn>,</td></tr>
+<tr><th id="74">74</th><td>                                  <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col5 decl" id="15size" title='size' data-type='size_t' data-ref="15size">size</dfn>)</td></tr>
+<tr><th id="75">75</th><td>{</td></tr>
+<tr><th id="76">76</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col6 decl" id="16ioc" title='ioc' data-type='QIOChannel *' data-ref="16ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 76, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col2 ref" href="#12opaque" title='opaque' data-ref="12opaque">opaque</a>);</td></tr>
+<tr><th id="77">77</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col7 decl" id="17ret" title='ret' data-type='ssize_t' data-ref="17ret">ret</dfn>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <b>do</b> {</td></tr>
+<tr><th id="80">80</th><td>        <a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> = <a class="ref" href="../include/io/channel.h.html#qio_channel_read" title='qio_channel_read' data-ref="qio_channel_read">qio_channel_read</a>(<a class="local col6 ref" href="#16ioc" title='ioc' data-ref="16ioc">ioc</a>, (<em>char</em> *)<a class="local col3 ref" href="#13buf" title='buf' data-ref="13buf">buf</a>, <a class="local col5 ref" href="#15size" title='size' data-ref="15size">size</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="81">81</th><td>        <b>if</b> (<a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="82">82</th><td>            <b>if</b> (<a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> == <a class="macro" href="../include/io/channel.h.html#40" title="-2" data-ref="_M/QIO_CHANNEL_ERR_BLOCK">QIO_CHANNEL_ERR_BLOCK</a>) {</td></tr>
+<tr><th id="83">83</th><td>                <a class="ref" href="../include/io/channel.h.html#qio_channel_yield" title='qio_channel_yield' data-ref="qio_channel_yield">qio_channel_yield</a>(<a class="local col6 ref" href="#16ioc" title='ioc' data-ref="16ioc">ioc</a>, <a class="enum" href="../../include/glib-2.0/glib/gmain.h.html#G_IO_IN" title='G_IO_IN' data-ref="G_IO_IN">G_IO_IN</a>);</td></tr>
+<tr><th id="84">84</th><td>            } <b>else</b> {</td></tr>
+<tr><th id="85">85</th><td>                <i>/* XXX handle Error * object */</i></td></tr>
+<tr><th id="86">86</th><td>                <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="87">87</th><td>            }</td></tr>
+<tr><th id="88">88</th><td>        }</td></tr>
+<tr><th id="89">89</th><td>    } <b>while</b> (<a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> == <a class="macro" href="../include/io/channel.h.html#40" title="-2" data-ref="_M/QIO_CHANNEL_ERR_BLOCK">QIO_CHANNEL_ERR_BLOCK</a>);</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>    <b>return</b> <a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a>;</td></tr>
+<tr><th id="92">92</th><td>}</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="channel_close" title='channel_close' data-type='int channel_close(void * opaque)' data-ref="channel_close">channel_close</dfn>(<em>void</em> *<dfn class="local col8 decl" id="18opaque" title='opaque' data-type='void *' data-ref="18opaque">opaque</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col9 decl" id="19ioc" title='ioc' data-type='QIOChannel *' data-ref="19ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 97, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col8 ref" href="#18opaque" title='opaque' data-ref="18opaque">opaque</a>);</td></tr>
+<tr><th id="98">98</th><td>    <a class="ref" href="../include/io/channel.h.html#qio_channel_close" title='qio_channel_close' data-ref="qio_channel_close">qio_channel_close</a>(<a class="local col9 ref" href="#19ioc" title='ioc' data-ref="19ioc">ioc</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="99">99</th><td>    <a class="ref" href="../include/qom/object.h.html#object_unref" title='object_unref' data-ref="object_unref">object_unref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col9 ref" href="#19ioc" title='ioc' data-ref="19ioc">ioc</a>));</td></tr>
+<tr><th id="100">100</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="101">101</th><td>}</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="channel_shutdown" title='channel_shutdown' data-type='int channel_shutdown(void * opaque, _Bool rd, _Bool wr)' data-ref="channel_shutdown">channel_shutdown</dfn>(<em>void</em> *<dfn class="local col0 decl" id="20opaque" title='opaque' data-type='void *' data-ref="20opaque">opaque</dfn>,</td></tr>
+<tr><th id="105">105</th><td>                            <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="21rd" title='rd' data-type='_Bool' data-ref="21rd">rd</dfn>,</td></tr>
+<tr><th id="106">106</th><td>                            <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="22wr" title='wr' data-type='_Bool' data-ref="22wr">wr</dfn>)</td></tr>
+<tr><th id="107">107</th><td>{</td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col3 decl" id="23ioc" title='ioc' data-type='QIOChannel *' data-ref="23ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 108, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col0 ref" href="#20opaque" title='opaque' data-ref="20opaque">opaque</a>);</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <b>if</b> (<a class="ref" href="../include/io/channel.h.html#qio_channel_has_feature" title='qio_channel_has_feature' data-ref="qio_channel_has_feature">qio_channel_has_feature</a>(<a class="local col3 ref" href="#23ioc" title='ioc' data-ref="23ioc">ioc</a>,</td></tr>
+<tr><th id="111">111</th><td>                                <a class="enum" href="../include/io/channel.h.html#QIOChannelFeature::QIO_CHANNEL_FEATURE_SHUTDOWN" title='QIOChannelFeature::QIO_CHANNEL_FEATURE_SHUTDOWN' data-ref="QIOChannelFeature::QIO_CHANNEL_FEATURE_SHUTDOWN">QIO_CHANNEL_FEATURE_SHUTDOWN</a>)) {</td></tr>
+<tr><th id="112">112</th><td>        <a class="typedef" href="../include/io/channel.h.html#QIOChannelShutdown" title='QIOChannelShutdown' data-type='enum QIOChannelShutdown' data-ref="QIOChannelShutdown">QIOChannelShutdown</a> <dfn class="local col4 decl" id="24mode" title='mode' data-type='QIOChannelShutdown' data-ref="24mode">mode</dfn>;</td></tr>
+<tr><th id="113">113</th><td>        <b>if</b> (<a class="local col1 ref" href="#21rd" title='rd' data-ref="21rd">rd</a> &amp;&amp; <a class="local col2 ref" href="#22wr" title='wr' data-ref="22wr">wr</a>) {</td></tr>
+<tr><th id="114">114</th><td>            <a class="local col4 ref" href="#24mode" title='mode' data-ref="24mode">mode</a> = <a class="enum" href="../include/io/channel.h.html#QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_BOTH" title='QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_BOTH' data-ref="QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_BOTH">QIO_CHANNEL_SHUTDOWN_BOTH</a>;</td></tr>
+<tr><th id="115">115</th><td>        } <b>else</b> <b>if</b> (<a class="local col1 ref" href="#21rd" title='rd' data-ref="21rd">rd</a>) {</td></tr>
+<tr><th id="116">116</th><td>            <a class="local col4 ref" href="#24mode" title='mode' data-ref="24mode">mode</a> = <a class="enum" href="../include/io/channel.h.html#QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_READ" title='QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_READ' data-ref="QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_READ">QIO_CHANNEL_SHUTDOWN_READ</a>;</td></tr>
+<tr><th id="117">117</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="118">118</th><td>            <a class="local col4 ref" href="#24mode" title='mode' data-ref="24mode">mode</a> = <a class="enum" href="../include/io/channel.h.html#QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_WRITE" title='QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_WRITE' data-ref="QIOChannelShutdown::QIO_CHANNEL_SHUTDOWN_WRITE">QIO_CHANNEL_SHUTDOWN_WRITE</a>;</td></tr>
+<tr><th id="119">119</th><td>        }</td></tr>
+<tr><th id="120">120</th><td>        <b>if</b> (<a class="ref" href="../include/io/channel.h.html#qio_channel_shutdown" title='qio_channel_shutdown' data-ref="qio_channel_shutdown">qio_channel_shutdown</a>(<a class="local col3 ref" href="#23ioc" title='ioc' data-ref="23ioc">ioc</a>, <a class="local col4 ref" href="#24mode" title='mode' data-ref="24mode">mode</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="121">121</th><td>            <i>/* XXX handler Error * object */</i></td></tr>
+<tr><th id="122">122</th><td>            <b>return</b> -<a class="macro" href="../../include/asm-generic/errno-base.h.html#8" title="5" data-ref="_M/EIO">EIO</a>;</td></tr>
+<tr><th id="123">123</th><td>        }</td></tr>
+<tr><th id="124">124</th><td>    }</td></tr>
+<tr><th id="125">125</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="channel_set_blocking" title='channel_set_blocking' data-type='int channel_set_blocking(void * opaque, _Bool enabled)' data-ref="channel_set_blocking">channel_set_blocking</dfn>(<em>void</em> *<dfn class="local col5 decl" id="25opaque" title='opaque' data-type='void *' data-ref="25opaque">opaque</dfn>,</td></tr>
+<tr><th id="130">130</th><td>                                <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="26enabled" title='enabled' data-type='_Bool' data-ref="26enabled">enabled</dfn>)</td></tr>
+<tr><th id="131">131</th><td>{</td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col7 decl" id="27ioc" title='ioc' data-type='QIOChannel *' data-ref="27ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 132, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col5 ref" href="#25opaque" title='opaque' data-ref="25opaque">opaque</a>);</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <b>if</b> (<a class="ref" href="../include/io/channel.h.html#qio_channel_set_blocking" title='qio_channel_set_blocking' data-ref="qio_channel_set_blocking">qio_channel_set_blocking</a>(<a class="local col7 ref" href="#27ioc" title='ioc' data-ref="27ioc">ioc</a>, <a class="local col6 ref" href="#26enabled" title='enabled' data-ref="26enabled">enabled</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="135">135</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="136">136</th><td>    }</td></tr>
+<tr><th id="137">137</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="138">138</th><td>}</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="tu decl def" id="channel_get_input_return_path" title='channel_get_input_return_path' data-type='QEMUFile * channel_get_input_return_path(void * opaque)' data-ref="channel_get_input_return_path">channel_get_input_return_path</dfn>(<em>void</em> *<dfn class="local col8 decl" id="28opaque" title='opaque' data-type='void *' data-ref="28opaque">opaque</dfn>)</td></tr>
+<tr><th id="141">141</th><td>{</td></tr>
+<tr><th id="142">142</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col9 decl" id="29ioc" title='ioc' data-type='QIOChannel *' data-ref="29ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 142, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col8 ref" href="#28opaque" title='opaque' data-ref="28opaque">opaque</a>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>    <b>return</b> <a class="ref" href="#qemu_fopen_channel_output" title='qemu_fopen_channel_output' data-ref="qemu_fopen_channel_output">qemu_fopen_channel_output</a>(<a class="local col9 ref" href="#29ioc" title='ioc' data-ref="29ioc">ioc</a>);</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="tu decl def" id="channel_get_output_return_path" title='channel_get_output_return_path' data-type='QEMUFile * channel_get_output_return_path(void * opaque)' data-ref="channel_get_output_return_path">channel_get_output_return_path</dfn>(<em>void</em> *<dfn class="local col0 decl" id="30opaque" title='opaque' data-type='void *' data-ref="30opaque">opaque</dfn>)</td></tr>
+<tr><th id="148">148</th><td>{</td></tr>
+<tr><th id="149">149</th><td>    <a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col1 decl" id="31ioc" title='ioc' data-type='QIOChannel *' data-ref="31ioc">ioc</dfn> = <a class="macro" href="../include/io/channel.h.html#30" title="((QIOChannel *)object_dynamic_cast_assert(((Object *)((opaque))), (&quot;qio-channel&quot;), &quot;/home/jon/workspace/qemu/migration/qemu-file-channel.c&quot;, 149, __func__))" data-ref="_M/QIO_CHANNEL">QIO_CHANNEL</a>(<a class="local col0 ref" href="#30opaque" title='opaque' data-ref="30opaque">opaque</a>);</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td>    <b>return</b> <a class="ref" href="#qemu_fopen_channel_input" title='qemu_fopen_channel_input' data-ref="qemu_fopen_channel_input">qemu_fopen_channel_input</a>(<a class="local col1 ref" href="#31ioc" title='ioc' data-ref="31ioc">ioc</a>);</td></tr>
+<tr><th id="152">152</th><td>}</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><em>static</em> <em>const</em> <a class="typedef" href="qemu-file.h.html#QEMUFileOps" title='QEMUFileOps' data-type='struct QEMUFileOps' data-ref="QEMUFileOps">QEMUFileOps</a> <dfn class="tu decl def" id="channel_input_ops" title='channel_input_ops' data-type='const QEMUFileOps' data-ref="channel_input_ops">channel_input_ops</dfn> = {</td></tr>
+<tr><th id="155">155</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::get_buffer" title='QEMUFileOps::get_buffer' data-ref="QEMUFileOps::get_buffer">get_buffer</a> = <a class="tu ref" href="#channel_get_buffer" title='channel_get_buffer' data-use='r' data-ref="channel_get_buffer">channel_get_buffer</a>,</td></tr>
+<tr><th id="156">156</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::close" title='QEMUFileOps::close' data-ref="QEMUFileOps::close">close</a> = <a class="tu ref" href="#channel_close" title='channel_close' data-use='r' data-ref="channel_close">channel_close</a>,</td></tr>
+<tr><th id="157">157</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::shut_down" title='QEMUFileOps::shut_down' data-ref="QEMUFileOps::shut_down">shut_down</a> = <a class="tu ref" href="#channel_shutdown" title='channel_shutdown' data-use='r' data-ref="channel_shutdown">channel_shutdown</a>,</td></tr>
+<tr><th id="158">158</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::set_blocking" title='QEMUFileOps::set_blocking' data-ref="QEMUFileOps::set_blocking">set_blocking</a> = <a class="tu ref" href="#channel_set_blocking" title='channel_set_blocking' data-use='r' data-ref="channel_set_blocking">channel_set_blocking</a>,</td></tr>
+<tr><th id="159">159</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::get_return_path" title='QEMUFileOps::get_return_path' data-ref="QEMUFileOps::get_return_path">get_return_path</a> = <a class="tu ref" href="#channel_get_input_return_path" title='channel_get_input_return_path' data-use='r' data-ref="channel_get_input_return_path">channel_get_input_return_path</a>,</td></tr>
+<tr><th id="160">160</th><td>};</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td><em>static</em> <em>const</em> <a class="typedef" href="qemu-file.h.html#QEMUFileOps" title='QEMUFileOps' data-type='struct QEMUFileOps' data-ref="QEMUFileOps">QEMUFileOps</a> <dfn class="tu decl def" id="channel_output_ops" title='channel_output_ops' data-type='const QEMUFileOps' data-ref="channel_output_ops">channel_output_ops</dfn> = {</td></tr>
+<tr><th id="164">164</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::writev_buffer" title='QEMUFileOps::writev_buffer' data-ref="QEMUFileOps::writev_buffer">writev_buffer</a> = <a class="tu ref" href="#channel_writev_buffer" title='channel_writev_buffer' data-ref="channel_writev_buffer">channel_writev_buffer</a>,</td></tr>
+<tr><th id="165">165</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::close" title='QEMUFileOps::close' data-ref="QEMUFileOps::close">close</a> = <a class="tu ref" href="#channel_close" title='channel_close' data-ref="channel_close">channel_close</a>,</td></tr>
+<tr><th id="166">166</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::shut_down" title='QEMUFileOps::shut_down' data-ref="QEMUFileOps::shut_down">shut_down</a> = <a class="tu ref" href="#channel_shutdown" title='channel_shutdown' data-ref="channel_shutdown">channel_shutdown</a>,</td></tr>
+<tr><th id="167">167</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::set_blocking" title='QEMUFileOps::set_blocking' data-ref="QEMUFileOps::set_blocking">set_blocking</a> = <a class="tu ref" href="#channel_set_blocking" title='channel_set_blocking' data-ref="channel_set_blocking">channel_set_blocking</a>,</td></tr>
+<tr><th id="168">168</th><td>    .<a class="ref" href="qemu-file.h.html#QEMUFileOps::get_return_path" title='QEMUFileOps::get_return_path' data-ref="QEMUFileOps::get_return_path">get_return_path</a> = <a class="tu ref" href="#channel_get_output_return_path" title='channel_get_output_return_path' data-ref="channel_get_output_return_path">channel_get_output_return_path</a>,</td></tr>
+<tr><th id="169">169</th><td>};</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="decl def" id="qemu_fopen_channel_input" title='qemu_fopen_channel_input' data-ref="qemu_fopen_channel_input">qemu_fopen_channel_input</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col2 decl" id="32ioc" title='ioc' data-type='QIOChannel *' data-ref="32ioc">ioc</dfn>)</td></tr>
+<tr><th id="173">173</th><td>{</td></tr>
+<tr><th id="174">174</th><td>    <a class="ref" href="../include/qom/object.h.html#object_ref" title='object_ref' data-ref="object_ref">object_ref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col2 ref" href="#32ioc" title='ioc' data-ref="32ioc">ioc</a>));</td></tr>
+<tr><th id="175">175</th><td>    <b>return</b> <a class="ref" href="qemu-file.h.html#qemu_fopen_ops" title='qemu_fopen_ops' data-ref="qemu_fopen_ops">qemu_fopen_ops</a>(<a class="local col2 ref" href="#32ioc" title='ioc' data-ref="32ioc">ioc</a>, &amp;<a class="tu ref" href="#channel_input_ops" title='channel_input_ops' data-use='a' data-ref="channel_input_ops">channel_input_ops</a>);</td></tr>
+<tr><th id="176">176</th><td>}</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="decl def" id="qemu_fopen_channel_output" title='qemu_fopen_channel_output' data-ref="qemu_fopen_channel_output">qemu_fopen_channel_output</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col3 decl" id="33ioc" title='ioc' data-type='QIOChannel *' data-ref="33ioc">ioc</dfn>)</td></tr>
+<tr><th id="179">179</th><td>{</td></tr>
+<tr><th id="180">180</th><td>    <a class="ref" href="../include/qom/object.h.html#object_ref" title='object_ref' data-ref="object_ref">object_ref</a>(<a class="macro" href="../include/qom/object.h.html#473" title="((Object *)(ioc))" data-ref="_M/OBJECT">OBJECT</a>(<a class="local col3 ref" href="#33ioc" title='ioc' data-ref="33ioc">ioc</a>));</td></tr>
+<tr><th id="181">181</th><td>    <b>return</b> <a class="ref" href="qemu-file.h.html#qemu_fopen_ops" title='qemu_fopen_ops' data-ref="qemu_fopen_ops">qemu_fopen_ops</a>(<a class="local col3 ref" href="#33ioc" title='ioc' data-ref="33ioc">ioc</a>, &amp;<a class="tu ref" href="#channel_output_ops" title='channel_output_ops' data-use='a' data-ref="channel_output_ops">channel_output_ops</a>);</td></tr>
+<tr><th id="182">182</th><td>}</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

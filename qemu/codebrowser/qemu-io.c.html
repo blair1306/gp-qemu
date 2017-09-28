@@ -1,0 +1,647 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>qemu-io.c source code [codebrowser/qemu-io.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="main "/>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/qemu-io.c'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='qemu-io.c.html'>qemu-io.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Command line utility to exercise the QEMU I/O path.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2009 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2003-2005 Silicon Graphics, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="8">8</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> */</i></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="../include/getopt.h.html">&lt;getopt.h&gt;</a></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/libgen.h.html">&lt;libgen.h&gt;</a></u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="include/qemu-io.h.html">"qemu-io.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="include/qemu/option.h.html">"qemu/option.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="include/qemu/config-file.h.html">"qemu/config-file.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="include/qemu/readline.h.html">"qemu/readline.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="include/qemu/log.h.html">"qemu/log.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="include/qapi/qmp/qstring.h.html">"qapi/qmp/qstring.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="include/qapi/qmp/qbool.h.html">"qapi/qmp/qbool.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="include/qom/object_interfaces.h.html">"qom/object_interfaces.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="include/block/block_int.h.html">"block/block_int.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="trace/control.h.html">"trace/control.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="include/crypto/init.h.html">"crypto/init.h"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/CMD_NOFILE_OK" data-ref="_M/CMD_NOFILE_OK">CMD_NOFILE_OK</dfn>   0x01</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="progname" title='progname' data-type='char *' data-ref="progname">progname</dfn>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><em>static</em> <a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="tu decl def" id="qemuio_blk" title='qemuio_blk' data-type='BlockBackend *' data-ref="qemuio_blk">qemuio_blk</dfn>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i  data-doc="ncmdline">/* qemu-io commands passed using -c */</i></td></tr>
+<tr><th id="37">37</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="ncmdline" title='ncmdline' data-type='int' data-ref="ncmdline">ncmdline</dfn>;</td></tr>
+<tr><th id="38">38</th><td><em>static</em> <em>char</em> **<dfn class="tu decl def" id="cmdline" title='cmdline' data-type='char **' data-ref="cmdline">cmdline</dfn>;</td></tr>
+<tr><th id="39">39</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="imageOpts" title='imageOpts' data-type='_Bool' data-ref="imageOpts">imageOpts</dfn>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>static</em> <a class="typedef" href="include/qemu/readline.h.html#ReadLineState" title='ReadLineState' data-type='struct ReadLineState' data-ref="ReadLineState">ReadLineState</a> *<dfn class="tu decl def" id="readline_state" title='readline_state' data-type='ReadLineState *' data-ref="readline_state">readline_state</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="close_f" title='close_f' data-type='int close_f(BlockBackend * blk, int argc, char ** argv)' data-ref="close_f">close_f</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col1 decl" id="1blk" title='blk' data-type='BlockBackend *' data-ref="1blk">blk</dfn>, <em>int</em> <dfn class="local col2 decl" id="2argc" title='argc' data-type='int' data-ref="2argc">argc</dfn>, <em>char</em> **<dfn class="local col3 decl" id="3argv" title='argv' data-type='char **' data-ref="3argv">argv</dfn>)</td></tr>
+<tr><th id="44">44</th><td>{</td></tr>
+<tr><th id="45">45</th><td>    <a class="ref" href="include/sysemu/block-backend.h.html#blk_unref" title='blk_unref' data-ref="blk_unref">blk_unref</a>(<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>);</td></tr>
+<tr><th id="46">46</th><td>    <a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='w' data-ref="qemuio_blk">qemuio_blk</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="47">47</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="48">48</th><td>}</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>static</em> <em>const</em> <a class="typedef" href="include/qemu-io.h.html#cmdinfo_t" title='cmdinfo_t' data-type='struct cmdinfo' data-ref="cmdinfo_t">cmdinfo_t</a> <dfn class="tu decl def" id="close_cmd" title='close_cmd' data-type='const cmdinfo_t' data-ref="close_cmd">close_cmd</dfn> = {</td></tr>
+<tr><th id="51">51</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::name" title='cmdinfo::name' data-ref="cmdinfo::name">name</a>       = <q>"close"</q>,</td></tr>
+<tr><th id="52">52</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::altname" title='cmdinfo::altname' data-ref="cmdinfo::altname">altname</a>    = <q>"c"</q>,</td></tr>
+<tr><th id="53">53</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::cfunc" title='cmdinfo::cfunc' data-ref="cmdinfo::cfunc">cfunc</a>      = <a class="tu ref" href="#close_f" title='close_f' data-use='r' data-ref="close_f">close_f</a>,</td></tr>
+<tr><th id="54">54</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::oneline" title='cmdinfo::oneline' data-ref="cmdinfo::oneline">oneline</a>    = <q>"close the current open file"</q>,</td></tr>
+<tr><th id="55">55</th><td>};</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="openfile" title='openfile' data-type='int openfile(char * name, int flags, _Bool writethrough, _Bool force_share, QDict * opts)' data-ref="openfile">openfile</dfn>(<em>char</em> *<dfn class="local col4 decl" id="4name" title='name' data-type='char *' data-ref="4name">name</dfn>, <em>int</em> <dfn class="local col5 decl" id="5flags" title='flags' data-type='int' data-ref="5flags">flags</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="6writethrough" title='writethrough' data-type='_Bool' data-ref="6writethrough">writethrough</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="7force_share" title='force_share' data-type='_Bool' data-ref="7force_share">force_share</dfn>,</td></tr>
+<tr><th id="58">58</th><td>                    <a class="typedef" href="include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col8 decl" id="8opts" title='opts' data-type='QDict *' data-ref="8opts">opts</dfn>)</td></tr>
+<tr><th id="59">59</th><td>{</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col9 decl" id="9local_err" title='local_err' data-type='Error *' data-ref="9local_err">local_err</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <b>if</b> (<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>) {</td></tr>
+<tr><th id="63">63</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"file open already, try 'help close'"</q>);</td></tr>
+<tr><th id="64">64</th><td>        <a class="macro" href="include/qapi/qmp/qobject.h.html#50" title="qobject_decref(opts ? (&amp;(opts)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>);</td></tr>
+<tr><th id="65">65</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="66">66</th><td>    }</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>    <b>if</b> (<a class="local col7 ref" href="#7force_share" title='force_share' data-ref="7force_share">force_share</a>) {</td></tr>
+<tr><th id="69">69</th><td>        <b>if</b> (!<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>) {</td></tr>
+<tr><th id="70">70</th><td>            <a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a> = <a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_new" title='qdict_new' data-ref="qdict_new">qdict_new</a>();</td></tr>
+<tr><th id="71">71</th><td>        }</td></tr>
+<tr><th id="72">72</th><td>        <b>if</b> (<a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_haskey" title='qdict_haskey' data-ref="qdict_haskey">qdict_haskey</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>, <a class="macro" href="include/block/block.h.html#112" title="&quot;force-share&quot;" data-ref="_M/BDRV_OPT_FORCE_SHARE">BDRV_OPT_FORCE_SHARE</a>)</td></tr>
+<tr><th id="73">73</th><td>            &amp;&amp; !<a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_get_bool" title='qdict_get_bool' data-ref="qdict_get_bool">qdict_get_bool</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>, <a class="macro" href="include/block/block.h.html#112" title="&quot;force-share&quot;" data-ref="_M/BDRV_OPT_FORCE_SHARE">BDRV_OPT_FORCE_SHARE</a>)) {</td></tr>
+<tr><th id="74">74</th><td>            <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"-U conflicts with image options"</q>);</td></tr>
+<tr><th id="75">75</th><td>            <a class="macro" href="include/qapi/qmp/qobject.h.html#50" title="qobject_decref(opts ? (&amp;(opts)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>);</td></tr>
+<tr><th id="76">76</th><td>            <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="77">77</th><td>        }</td></tr>
+<tr><th id="78">78</th><td>        <a class="macro" href="include/qapi/qmp/qdict.h.html#59" title="qdict_put_obj(opts, &quot;force-share&quot;, (&amp;(qbool_from_bool(1))-&gt;base))" data-ref="_M/qdict_put_bool">qdict_put_bool</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>, <a class="macro" href="include/block/block.h.html#112" title="&quot;force-share&quot;" data-ref="_M/BDRV_OPT_FORCE_SHARE">BDRV_OPT_FORCE_SHARE</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="79">79</th><td>    }</td></tr>
+<tr><th id="80">80</th><td>    <a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='w' data-ref="qemuio_blk">qemuio_blk</a> = <a class="ref" href="include/sysemu/block-backend.h.html#blk_new_open" title='blk_new_open' data-ref="blk_new_open">blk_new_open</a>(<a class="local col4 ref" href="#4name" title='name' data-ref="4name">name</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>, <a class="local col5 ref" href="#5flags" title='flags' data-ref="5flags">flags</a>, &amp;<a class="local col9 ref" href="#9local_err" title='local_err' data-ref="9local_err">local_err</a>);</td></tr>
+<tr><th id="81">81</th><td>    <b>if</b> (!<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>) {</td></tr>
+<tr><th id="82">82</th><td>        <a class="ref" href="include/qapi/error.h.html#error_reportf_err" title='error_reportf_err' data-ref="error_reportf_err">error_reportf_err</a>(<a class="local col9 ref" href="#9local_err" title='local_err' data-ref="9local_err">local_err</a>, <q>"can't open%s%s: "</q>,</td></tr>
+<tr><th id="83">83</th><td>                          <a class="local col4 ref" href="#4name" title='name' data-ref="4name">name</a> ? <q>" device "</q> : <q>""</q>, <a class="local col4 ref" href="#4name" title='name' data-ref="4name">name</a> ?: <q>""</q>);</td></tr>
+<tr><th id="84">84</th><td>        <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="85">85</th><td>    }</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td>    <a class="ref" href="include/sysemu/block-backend.h.html#blk_set_enable_write_cache" title='blk_set_enable_write_cache' data-ref="blk_set_enable_write_cache">blk_set_enable_write_cache</a>(<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>, !<a class="local col6 ref" href="#6writethrough" title='writethrough' data-ref="6writethrough">writethrough</a>);</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="open_help" title='open_help' data-type='void open_help()' data-ref="open_help">open_help</dfn>(<em>void</em>)</td></tr>
+<tr><th id="93">93</th><td>{</td></tr>
+<tr><th id="94">94</th><td>    <a class="ref" href="../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(</td></tr>
+<tr><th id="95">95</th><td><q>"\n"</q></td></tr>
+<tr><th id="96">96</th><td><q>" opens a new file in the requested mode\n"</q></td></tr>
+<tr><th id="97">97</th><td><q>"\n"</q></td></tr>
+<tr><th id="98">98</th><td><q>" Example:\n"</q></td></tr>
+<tr><th id="99">99</th><td><q>" 'open -n -o driver=raw /tmp/data' - opens raw data file read-write, uncached\n"</q></td></tr>
+<tr><th id="100">100</th><td><q>"\n"</q></td></tr>
+<tr><th id="101">101</th><td><q>" Opens a file for subsequent use by all of the other qemu-io commands.\n"</q></td></tr>
+<tr><th id="102">102</th><td><q>" -r, -- open file read-only\n"</q></td></tr>
+<tr><th id="103">103</th><td><q>" -s, -- use snapshot file\n"</q></td></tr>
+<tr><th id="104">104</th><td><q>" -n, -- disable host cache, short for -t none\n"</q></td></tr>
+<tr><th id="105">105</th><td><q>" -U, -- force shared permissions\n"</q></td></tr>
+<tr><th id="106">106</th><td><q>" -k, -- use kernel AIO implementation (on Linux only)\n"</q></td></tr>
+<tr><th id="107">107</th><td><q>" -t, -- use the given cache mode for the image\n"</q></td></tr>
+<tr><th id="108">108</th><td><q>" -d, -- use the given discard mode for the image\n"</q></td></tr>
+<tr><th id="109">109</th><td><q>" -o, -- options to be given to the block driver"</q></td></tr>
+<tr><th id="110">110</th><td><q>"\n"</q>);</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><em>static</em> <em>int</em> <a class="tu decl" href="#open_f" title='open_f' data-type='int open_f(BlockBackend * blk, int argc, char ** argv)' data-ref="open_f">open_f</a>(<a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col0 decl" id="10blk" title='blk' data-type='BlockBackend *' data-ref="10blk">blk</dfn>, <em>int</em> <dfn class="local col1 decl" id="11argc" title='argc' data-type='int' data-ref="11argc">argc</dfn>, <em>char</em> **<dfn class="local col2 decl" id="12argv" title='argv' data-type='char **' data-ref="12argv">argv</dfn>);</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><em>static</em> <em>const</em> <a class="typedef" href="include/qemu-io.h.html#cmdinfo_t" title='cmdinfo_t' data-type='struct cmdinfo' data-ref="cmdinfo_t">cmdinfo_t</a> <dfn class="tu decl def" id="open_cmd" title='open_cmd' data-type='const cmdinfo_t' data-ref="open_cmd">open_cmd</dfn> = {</td></tr>
+<tr><th id="116">116</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::name" title='cmdinfo::name' data-ref="cmdinfo::name">name</a>       = <q>"open"</q>,</td></tr>
+<tr><th id="117">117</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::altname" title='cmdinfo::altname' data-ref="cmdinfo::altname">altname</a>    = <q>"o"</q>,</td></tr>
+<tr><th id="118">118</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::cfunc" title='cmdinfo::cfunc' data-ref="cmdinfo::cfunc">cfunc</a>      = <a class="tu ref" href="#open_f" title='open_f' data-ref="open_f">open_f</a>,</td></tr>
+<tr><th id="119">119</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::argmin" title='cmdinfo::argmin' data-ref="cmdinfo::argmin">argmin</a>     = <var>1</var>,</td></tr>
+<tr><th id="120">120</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::argmax" title='cmdinfo::argmax' data-ref="cmdinfo::argmax">argmax</a>     = -<var>1</var>,</td></tr>
+<tr><th id="121">121</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::flags" title='cmdinfo::flags' data-ref="cmdinfo::flags">flags</a>      = <a class="macro" href="#30" title="0x01" data-ref="_M/CMD_NOFILE_OK">CMD_NOFILE_OK</a>,</td></tr>
+<tr><th id="122">122</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::args" title='cmdinfo::args' data-ref="cmdinfo::args">args</a>       = <q>"[-rsnkU] [-t cache] [-d discard] [-o options] [path]"</q>,</td></tr>
+<tr><th id="123">123</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::oneline" title='cmdinfo::oneline' data-ref="cmdinfo::oneline">oneline</a>    = <q>"open the file specified by path"</q>,</td></tr>
+<tr><th id="124">124</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::help" title='cmdinfo::help' data-ref="cmdinfo::help">help</a>       = <a class="tu ref" href="#open_help" title='open_help' data-ref="open_help">open_help</a>,</td></tr>
+<tr><th id="125">125</th><td>};</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td><em>static</em> <a class="typedef" href="include/qemu/typedefs.h.html#QemuOptsList" title='QemuOptsList' data-type='struct QemuOptsList' data-ref="QemuOptsList">QemuOptsList</a> <dfn class="tu decl def" id="empty_opts" title='empty_opts' data-type='QemuOptsList' data-ref="empty_opts">empty_opts</dfn> = {</td></tr>
+<tr><th id="128">128</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::name" title='QemuOptsList::name' data-ref="QemuOptsList::name">name</a> = <q>"drive"</q>,</td></tr>
+<tr><th id="129">129</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::merge_lists" title='QemuOptsList::merge_lists' data-ref="QemuOptsList::merge_lists">merge_lists</a> = <span class="macro" title="1" data-ref="_M/true">true</span>,</td></tr>
+<tr><th id="130">130</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a> = <a class="macro" href="include/qemu/queue.h.html#351" title="{ ((void*)0), &amp;(empty_opts.head).tqh_first }" data-ref="_M/QTAILQ_HEAD_INITIALIZER">QTAILQ_HEAD_INITIALIZER</a>(<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='m' data-ref="empty_opts">empty_opts</a>.<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a>),</td></tr>
+<tr><th id="131">131</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::desc" title='QemuOptsList::desc' data-ref="QemuOptsList::desc">desc</a> = {</td></tr>
+<tr><th id="132">132</th><td>        <i>/* no elements =&gt; accept any params */</i></td></tr>
+<tr><th id="133">133</th><td>        { <i>/* end of list */</i> }</td></tr>
+<tr><th id="134">134</th><td>    },</td></tr>
+<tr><th id="135">135</th><td>};</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="open_f" title='open_f' data-type='int open_f(BlockBackend * blk, int argc, char ** argv)' data-ref="open_f">open_f</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col3 decl" id="13blk" title='blk' data-type='BlockBackend *' data-ref="13blk">blk</dfn>, <em>int</em> <dfn class="local col4 decl" id="14argc" title='argc' data-type='int' data-ref="14argc">argc</dfn>, <em>char</em> **<dfn class="local col5 decl" id="15argv" title='argv' data-type='char **' data-ref="15argv">argv</dfn>)</td></tr>
+<tr><th id="138">138</th><td>{</td></tr>
+<tr><th id="139">139</th><td>    <em>int</em> <dfn class="local col6 decl" id="16flags" title='flags' data-type='int' data-ref="16flags">flags</dfn> = <a class="macro" href="include/block/block.h.html#96" title="0x4000" data-ref="_M/BDRV_O_UNMAP">BDRV_O_UNMAP</a>;</td></tr>
+<tr><th id="140">140</th><td>    <em>int</em> <dfn class="local col7 decl" id="17readonly" title='readonly' data-type='int' data-ref="17readonly">readonly</dfn> = <var>0</var>;</td></tr>
+<tr><th id="141">141</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="18writethrough" title='writethrough' data-type='_Bool' data-ref="18writethrough">writethrough</dfn> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="142">142</th><td>    <em>int</em> <dfn class="local col9 decl" id="19c" title='c' data-type='int' data-ref="19c">c</dfn>;</td></tr>
+<tr><th id="143">143</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col0 decl" id="20qopts" title='qopts' data-type='QemuOpts *' data-ref="20qopts">qopts</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col1 decl" id="21opts" title='opts' data-type='QDict *' data-ref="21opts">opts</dfn>;</td></tr>
+<tr><th id="145">145</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="22force_share" title='force_share' data-type='_Bool' data-ref="22force_share">force_share</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td>    <b>while</b> ((<a class="local col9 ref" href="#19c" title='c' data-ref="19c">c</a> = <a class="ref" href="../include/getopt.h.html#getopt" title='getopt' data-ref="getopt">getopt</a>(<a class="local col4 ref" href="#14argc" title='argc' data-ref="14argc">argc</a>, <a class="local col5 ref" href="#15argv" title='argv' data-ref="15argv">argv</a>, <q>"snro:kt:d:U"</q>)) != -<var>1</var>) {</td></tr>
+<tr><th id="148">148</th><td>        <b>switch</b> (<a class="local col9 ref" href="#19c" title='c' data-ref="19c">c</a>) {</td></tr>
+<tr><th id="149">149</th><td>        <b>case</b> <kbd>'s'</kbd>:</td></tr>
+<tr><th id="150">150</th><td>            <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a> |= <a class="macro" href="include/block/block.h.html#86" title="0x0008" data-ref="_M/BDRV_O_SNAPSHOT">BDRV_O_SNAPSHOT</a>;</td></tr>
+<tr><th id="151">151</th><td>            <b>break</b>;</td></tr>
+<tr><th id="152">152</th><td>        <b>case</b> <kbd>'n'</kbd>:</td></tr>
+<tr><th id="153">153</th><td>            <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a> |= <a class="macro" href="include/block/block.h.html#88" title="0x0020" data-ref="_M/BDRV_O_NOCACHE">BDRV_O_NOCACHE</a>;</td></tr>
+<tr><th id="154">154</th><td>            <a class="local col8 ref" href="#18writethrough" title='writethrough' data-ref="18writethrough">writethrough</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="155">155</th><td>            <b>break</b>;</td></tr>
+<tr><th id="156">156</th><td>        <b>case</b> <kbd>'r'</kbd>:</td></tr>
+<tr><th id="157">157</th><td>            <a class="local col7 ref" href="#17readonly" title='readonly' data-ref="17readonly">readonly</a> = <var>1</var>;</td></tr>
+<tr><th id="158">158</th><td>            <b>break</b>;</td></tr>
+<tr><th id="159">159</th><td>        <b>case</b> <kbd>'k'</kbd>:</td></tr>
+<tr><th id="160">160</th><td>            <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a> |= <a class="macro" href="include/block/block.h.html#89" title="0x0080" data-ref="_M/BDRV_O_NATIVE_AIO">BDRV_O_NATIVE_AIO</a>;</td></tr>
+<tr><th id="161">161</th><td>            <b>break</b>;</td></tr>
+<tr><th id="162">162</th><td>        <b>case</b> <kbd>'t'</kbd>:</td></tr>
+<tr><th id="163">163</th><td>            <b>if</b> (<a class="ref" href="include/block/block.h.html#bdrv_parse_cache_mode" title='bdrv_parse_cache_mode' data-ref="bdrv_parse_cache_mode">bdrv_parse_cache_mode</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a>, &amp;<a class="local col8 ref" href="#18writethrough" title='writethrough' data-ref="18writethrough">writethrough</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="164">164</th><td>                <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Invalid cache option: %s"</q>, <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="165">165</th><td>                <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="166">166</th><td>                <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="167">167</th><td>            }</td></tr>
+<tr><th id="168">168</th><td>            <b>break</b>;</td></tr>
+<tr><th id="169">169</th><td>        <b>case</b> <kbd>'d'</kbd>:</td></tr>
+<tr><th id="170">170</th><td>            <b>if</b> (<a class="ref" href="include/block/block.h.html#bdrv_parse_discard_flags" title='bdrv_parse_discard_flags' data-ref="bdrv_parse_discard_flags">bdrv_parse_discard_flags</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="171">171</th><td>                <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Invalid discard option: %s"</q>, <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="172">172</th><td>                <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="173">173</th><td>                <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="174">174</th><td>            }</td></tr>
+<tr><th id="175">175</th><td>            <b>break</b>;</td></tr>
+<tr><th id="176">176</th><td>        <b>case</b> <kbd>'o'</kbd>:</td></tr>
+<tr><th id="177">177</th><td>            <b>if</b> (<a class="tu ref" href="#imageOpts" title='imageOpts' data-use='r' data-ref="imageOpts">imageOpts</a>) {</td></tr>
+<tr><th id="178">178</th><td>                <a class="ref" href="../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"--image-opts and 'open -o' are mutually exclusive\n"</q>);</td></tr>
+<tr><th id="179">179</th><td>                <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="180">180</th><td>                <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="181">181</th><td>            }</td></tr>
+<tr><th id="182">182</th><td>            <b>if</b> (!<a class="ref" href="include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>, <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, <span class="macro" title="0" data-ref="_M/false">false</span>)) {</td></tr>
+<tr><th id="183">183</th><td>                <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="184">184</th><td>                <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="185">185</th><td>            }</td></tr>
+<tr><th id="186">186</th><td>            <b>break</b>;</td></tr>
+<tr><th id="187">187</th><td>        <b>case</b> <kbd>'U'</kbd>:</td></tr>
+<tr><th id="188">188</th><td>            <a class="local col2 ref" href="#22force_share" title='force_share' data-ref="22force_share">force_share</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="189">189</th><td>            <b>break</b>;</td></tr>
+<tr><th id="190">190</th><td>        <b>default</b>:</td></tr>
+<tr><th id="191">191</th><td>            <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="192">192</th><td>            <b>return</b> <a class="ref" href="include/qemu-io.h.html#qemuio_command_usage" title='qemuio_command_usage' data-ref="qemuio_command_usage">qemuio_command_usage</a>(&amp;<a class="tu ref" href="#open_cmd" title='open_cmd' data-use='a' data-ref="open_cmd">open_cmd</a>);</td></tr>
+<tr><th id="193">193</th><td>        }</td></tr>
+<tr><th id="194">194</th><td>    }</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td>    <b>if</b> (!<a class="local col7 ref" href="#17readonly" title='readonly' data-ref="17readonly">readonly</a>) {</td></tr>
+<tr><th id="197">197</th><td>        <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a> |= <a class="macro" href="include/block/block.h.html#84" title="0x0002" data-ref="_M/BDRV_O_RDWR">BDRV_O_RDWR</a>;</td></tr>
+<tr><th id="198">198</th><td>    }</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td>    <b>if</b> (<a class="tu ref" href="#imageOpts" title='imageOpts' data-use='r' data-ref="imageOpts">imageOpts</a> &amp;&amp; (<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a> == <a class="local col4 ref" href="#14argc" title='argc' data-ref="14argc">argc</a> - <var>1</var>)) {</td></tr>
+<tr><th id="201">201</th><td>        <b>if</b> (!<a class="ref" href="include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>, <a class="local col5 ref" href="#15argv" title='argv' data-ref="15argv">argv</a>[<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>], <span class="macro" title="0" data-ref="_M/false">false</span>)) {</td></tr>
+<tr><th id="202">202</th><td>            <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="203">203</th><td>            <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="204">204</th><td>        }</td></tr>
+<tr><th id="205">205</th><td>        <a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>++;</td></tr>
+<tr><th id="206">206</th><td>    }</td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td>    <a class="local col0 ref" href="#20qopts" title='qopts' data-ref="20qopts">qopts</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_find" title='qemu_opts_find' data-ref="qemu_opts_find">qemu_opts_find</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="209">209</th><td>    <a class="local col1 ref" href="#21opts" title='opts' data-ref="21opts">opts</a> = <a class="local col0 ref" href="#20qopts" title='qopts' data-ref="20qopts">qopts</a> ? <a class="ref" href="include/qemu/option.h.html#qemu_opts_to_qdict" title='qemu_opts_to_qdict' data-ref="qemu_opts_to_qdict">qemu_opts_to_qdict</a>(<a class="local col0 ref" href="#20qopts" title='qopts' data-ref="20qopts">qopts</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="210">210</th><td>    <a class="ref" href="include/qemu/option.h.html#qemu_opts_reset" title='qemu_opts_reset' data-ref="qemu_opts_reset">qemu_opts_reset</a>(&amp;<a class="tu ref" href="#empty_opts" title='empty_opts' data-use='a' data-ref="empty_opts">empty_opts</a>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>    <b>if</b> (<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a> == <a class="local col4 ref" href="#14argc" title='argc' data-ref="14argc">argc</a> - <var>1</var>) {</td></tr>
+<tr><th id="213">213</th><td>        <a class="tu ref" href="#openfile" title='openfile' data-use='c' data-ref="openfile">openfile</a>(<a class="local col5 ref" href="#15argv" title='argv' data-ref="15argv">argv</a>[<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>], <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a>, <a class="local col8 ref" href="#18writethrough" title='writethrough' data-ref="18writethrough">writethrough</a>, <a class="local col2 ref" href="#22force_share" title='force_share' data-ref="22force_share">force_share</a>, <a class="local col1 ref" href="#21opts" title='opts' data-ref="21opts">opts</a>);</td></tr>
+<tr><th id="214">214</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a> == <a class="local col4 ref" href="#14argc" title='argc' data-ref="14argc">argc</a>) {</td></tr>
+<tr><th id="215">215</th><td>        <a class="tu ref" href="#openfile" title='openfile' data-use='c' data-ref="openfile">openfile</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col6 ref" href="#16flags" title='flags' data-ref="16flags">flags</a>, <a class="local col8 ref" href="#18writethrough" title='writethrough' data-ref="18writethrough">writethrough</a>, <a class="local col2 ref" href="#22force_share" title='force_share' data-ref="22force_share">force_share</a>, <a class="local col1 ref" href="#21opts" title='opts' data-ref="21opts">opts</a>);</td></tr>
+<tr><th id="216">216</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="217">217</th><td>        <a class="macro" href="include/qapi/qmp/qobject.h.html#50" title="qobject_decref(opts ? (&amp;(opts)-&gt;base) : ((void*)0))" data-ref="_M/QDECREF">QDECREF</a>(<a class="local col1 ref" href="#21opts" title='opts' data-ref="21opts">opts</a>);</td></tr>
+<tr><th id="218">218</th><td>        <a class="ref" href="include/qemu-io.h.html#qemuio_command_usage" title='qemuio_command_usage' data-ref="qemuio_command_usage">qemuio_command_usage</a>(&amp;<a class="tu ref" href="#open_cmd" title='open_cmd' data-use='a' data-ref="open_cmd">open_cmd</a>);</td></tr>
+<tr><th id="219">219</th><td>    }</td></tr>
+<tr><th id="220">220</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="221">221</th><td>}</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="quit_f" title='quit_f' data-type='int quit_f(BlockBackend * blk, int argc, char ** argv)' data-ref="quit_f">quit_f</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col3 decl" id="23blk" title='blk' data-type='BlockBackend *' data-ref="23blk">blk</dfn>, <em>int</em> <dfn class="local col4 decl" id="24argc" title='argc' data-type='int' data-ref="24argc">argc</dfn>, <em>char</em> **<dfn class="local col5 decl" id="25argv" title='argv' data-type='char **' data-ref="25argv">argv</dfn>)</td></tr>
+<tr><th id="224">224</th><td>{</td></tr>
+<tr><th id="225">225</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="226">226</th><td>}</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td><em>static</em> <em>const</em> <a class="typedef" href="include/qemu-io.h.html#cmdinfo_t" title='cmdinfo_t' data-type='struct cmdinfo' data-ref="cmdinfo_t">cmdinfo_t</a> <dfn class="tu decl def" id="quit_cmd" title='quit_cmd' data-type='const cmdinfo_t' data-ref="quit_cmd">quit_cmd</dfn> = {</td></tr>
+<tr><th id="229">229</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::name" title='cmdinfo::name' data-ref="cmdinfo::name">name</a>       = <q>"quit"</q>,</td></tr>
+<tr><th id="230">230</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::altname" title='cmdinfo::altname' data-ref="cmdinfo::altname">altname</a>    = <q>"q"</q>,</td></tr>
+<tr><th id="231">231</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::cfunc" title='cmdinfo::cfunc' data-ref="cmdinfo::cfunc">cfunc</a>      = <a class="tu ref" href="#quit_f" title='quit_f' data-ref="quit_f">quit_f</a>,</td></tr>
+<tr><th id="232">232</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::argmin" title='cmdinfo::argmin' data-ref="cmdinfo::argmin">argmin</a>     = -<var>1</var>,</td></tr>
+<tr><th id="233">233</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::argmax" title='cmdinfo::argmax' data-ref="cmdinfo::argmax">argmax</a>     = -<var>1</var>,</td></tr>
+<tr><th id="234">234</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::flags" title='cmdinfo::flags' data-ref="cmdinfo::flags">flags</a>      = <a class="macro" href="include/qemu-io.h.html#23" title="((int)0x80000000)" data-ref="_M/CMD_FLAG_GLOBAL">CMD_FLAG_GLOBAL</a>,</td></tr>
+<tr><th id="235">235</th><td>    .<a class="ref" href="include/qemu-io.h.html#cmdinfo::oneline" title='cmdinfo::oneline' data-ref="cmdinfo::oneline">oneline</a>    = <q>"exit the program"</q>,</td></tr>
+<tr><th id="236">236</th><td>};</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="usage" title='usage' data-type='void usage(const char * name)' data-ref="usage">usage</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="26name" title='name' data-type='const char *' data-ref="26name">name</dfn>)</td></tr>
+<tr><th id="239">239</th><td>{</td></tr>
+<tr><th id="240">240</th><td>    <a class="ref" href="../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(</td></tr>
+<tr><th id="241">241</th><td><q>"Usage: %s [OPTIONS]... [-c STRING]... [file]\n"</q></td></tr>
+<tr><th id="242">242</th><td><q>"QEMU Disk exerciser\n"</q></td></tr>
+<tr><th id="243">243</th><td><q>"\n"</q></td></tr>
+<tr><th id="244">244</th><td><q>"  --object OBJECTDEF   define an object such as 'secret' for\n"</q></td></tr>
+<tr><th id="245">245</th><td><q>"                       passwords and/or encryption keys\n"</q></td></tr>
+<tr><th id="246">246</th><td><q>"  --image-opts         treat file as option string\n"</q></td></tr>
+<tr><th id="247">247</th><td><q>"  -c, --cmd STRING     execute command with its arguments\n"</q></td></tr>
+<tr><th id="248">248</th><td><q>"                       from the given string\n"</q></td></tr>
+<tr><th id="249">249</th><td><q>"  -f, --format FMT     specifies the block driver to use\n"</q></td></tr>
+<tr><th id="250">250</th><td><q>"  -r, --read-only      export read-only\n"</q></td></tr>
+<tr><th id="251">251</th><td><q>"  -s, --snapshot       use snapshot file\n"</q></td></tr>
+<tr><th id="252">252</th><td><q>"  -n, --nocache        disable host cache, short for -t none\n"</q></td></tr>
+<tr><th id="253">253</th><td><q>"  -m, --misalign       misalign allocations for O_DIRECT\n"</q></td></tr>
+<tr><th id="254">254</th><td><q>"  -k, --native-aio     use kernel AIO implementation (on Linux only)\n"</q></td></tr>
+<tr><th id="255">255</th><td><q>"  -t, --cache=MODE     use the given cache mode for the image\n"</q></td></tr>
+<tr><th id="256">256</th><td><q>"  -d, --discard=MODE   use the given discard mode for the image\n"</q></td></tr>
+<tr><th id="257">257</th><td><q>"  -T, --trace [[enable=]&lt;pattern&gt;][,events=&lt;file&gt;][,file=&lt;file&gt;]\n"</q></td></tr>
+<tr><th id="258">258</th><td><q>"                       specify tracing options\n"</q></td></tr>
+<tr><th id="259">259</th><td><q>"                       see qemu-img(1) man page for full description\n"</q></td></tr>
+<tr><th id="260">260</th><td><q>"  -U, --force-share    force shared permissions\n"</q></td></tr>
+<tr><th id="261">261</th><td><q>"  -h, --help           display this help and exit\n"</q></td></tr>
+<tr><th id="262">262</th><td><q>"  -V, --version        output version information and exit\n"</q></td></tr>
+<tr><th id="263">263</th><td><q>"\n"</q></td></tr>
+<tr><th id="264">264</th><td><q>"See '%s -c help' for information on available commands."</q></td></tr>
+<tr><th id="265">265</th><td><q>"\n"</q>,</td></tr>
+<tr><th id="266">266</th><td>    <a class="local col6 ref" href="#26name" title='name' data-ref="26name">name</a>, <a class="local col6 ref" href="#26name" title='name' data-ref="26name">name</a>);</td></tr>
+<tr><th id="267">267</th><td>}</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="get_prompt" title='get_prompt' data-type='char * get_prompt()' data-ref="get_prompt">get_prompt</dfn>(<em>void</em>)</td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>    <em>static</em> <em>char</em> <dfn class="local col7 decl" id="27prompt" title='prompt' data-type='char [4099]' data-ref="27prompt">prompt</dfn>[<a class="macro" href="../include/x86_64-linux-gnu/bits/stdio_lim.h.html#25" title="4096" data-ref="_M/FILENAME_MAX">FILENAME_MAX</a> + <var>2</var> <i>/*"&gt; "*/</i> + <var>1</var> <i>/*"\0"*/</i> ];</td></tr>
+<tr><th id="272">272</th><td></td></tr>
+<tr><th id="273">273</th><td>    <b>if</b> (!<a class="local col7 ref" href="#27prompt" title='prompt' data-ref="27prompt">prompt</a>[<var>0</var>]) {</td></tr>
+<tr><th id="274">274</th><td>        <a class="ref" href="../include/stdio.h.html#snprintf" title='snprintf' data-ref="snprintf">snprintf</a>(<a class="local col7 ref" href="#27prompt" title='prompt' data-ref="27prompt">prompt</a>, <b>sizeof</b>(<a class="local col7 ref" href="#27prompt" title='prompt' data-ref="27prompt">prompt</a>), <q>"%s&gt; "</q>, <a class="tu ref" href="#progname" title='progname' data-use='r' data-ref="progname">progname</a>);</td></tr>
+<tr><th id="275">275</th><td>    }</td></tr>
+<tr><th id="276">276</th><td></td></tr>
+<tr><th id="277">277</th><td>    <b>return</b> <a class="local col7 ref" href="#27prompt" title='prompt' data-ref="27prompt">prompt</a>;</td></tr>
+<tr><th id="278">278</th><td>}</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><em>static</em> <em>void</em> <a class="macro" href="include/qemu/compiler.h.html#100" title="__attribute__((format(printf, 2, 3)))" data-ref="_M/GCC_FMT_ATTR">GCC_FMT_ATTR</a>(<var>2</var>, <var>3</var>) <dfn class="tu decl def" id="readline_printf_func" title='readline_printf_func' data-type='void readline_printf_func(void * opaque, const char * fmt)' data-ref="readline_printf_func">readline_printf_func</dfn>(<em>void</em> *<dfn class="local col8 decl" id="28opaque" title='opaque' data-type='void *' data-ref="28opaque">opaque</dfn>,</td></tr>
+<tr><th id="281">281</th><td>                                                    <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="29fmt" title='fmt' data-type='const char *' data-ref="29fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="282">282</th><td>{</td></tr>
+<tr><th id="283">283</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col0 decl" id="30ap" title='ap' data-type='va_list' data-ref="30ap">ap</dfn>;</td></tr>
+<tr><th id="284">284</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col0 ref" href="#30ap" title='ap' data-ref="30ap">ap</a>, <a class="local col9 ref" href="#29fmt" title='fmt' data-ref="29fmt">fmt</a>);</td></tr>
+<tr><th id="285">285</th><td>    <a class="ref" href="../include/stdio.h.html#vprintf" title='vprintf' data-ref="vprintf">vprintf</a>(<a class="local col9 ref" href="#29fmt" title='fmt' data-ref="29fmt">fmt</a>, <a class="local col0 ref" href="#30ap" title='ap' data-ref="30ap">ap</a>);</td></tr>
+<tr><th id="286">286</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col0 ref" href="#30ap" title='ap' data-ref="30ap">ap</a>);</td></tr>
+<tr><th id="287">287</th><td>}</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="readline_flush_func" title='readline_flush_func' data-type='void readline_flush_func(void * opaque)' data-ref="readline_flush_func">readline_flush_func</dfn>(<em>void</em> *<dfn class="local col1 decl" id="31opaque" title='opaque' data-type='void *' data-ref="31opaque">opaque</dfn>)</td></tr>
+<tr><th id="290">290</th><td>{</td></tr>
+<tr><th id="291">291</th><td>    <a class="ref" href="../include/stdio.h.html#fflush" title='fflush' data-ref="fflush">fflush</a>(<a class="macro" href="../include/stdio.h.html#173" title="stdout" data-ref="_M/stdout">stdout</a>);</td></tr>
+<tr><th id="292">292</th><td>}</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="readline_func" title='readline_func' data-type='void readline_func(void * opaque, const char * str, void * readline_opaque)' data-ref="readline_func">readline_func</dfn>(<em>void</em> *<dfn class="local col2 decl" id="32opaque" title='opaque' data-type='void *' data-ref="32opaque">opaque</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="33str" title='str' data-type='const char *' data-ref="33str">str</dfn>, <em>void</em> *<dfn class="local col4 decl" id="34readline_opaque" title='readline_opaque' data-type='void *' data-ref="34readline_opaque">readline_opaque</dfn>)</td></tr>
+<tr><th id="295">295</th><td>{</td></tr>
+<tr><th id="296">296</th><td>    <em>char</em> **<dfn class="local col5 decl" id="35line" title='line' data-type='char **' data-ref="35line">line</dfn> = <a class="local col4 ref" href="#34readline_opaque" title='readline_opaque' data-ref="34readline_opaque">readline_opaque</a>;</td></tr>
+<tr><th id="297">297</th><td>    *<a class="local col5 ref" href="#35line" title='line' data-ref="35line">line</a> = <a class="ref" href="../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col3 ref" href="#33str" title='str' data-ref="33str">str</a>);</td></tr>
+<tr><th id="298">298</th><td>}</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="completion_match" title='completion_match' data-type='void completion_match(const char * cmd, void * opaque)' data-ref="completion_match">completion_match</dfn>(<em>const</em> <em>char</em> *<dfn class="local col6 decl" id="36cmd" title='cmd' data-type='const char *' data-ref="36cmd">cmd</dfn>, <em>void</em> *<dfn class="local col7 decl" id="37opaque" title='opaque' data-type='void *' data-ref="37opaque">opaque</dfn>)</td></tr>
+<tr><th id="301">301</th><td>{</td></tr>
+<tr><th id="302">302</th><td>    <a class="ref" href="include/qemu/readline.h.html#readline_add_completion" title='readline_add_completion' data-ref="readline_add_completion">readline_add_completion</a>(<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>, <a class="local col6 ref" href="#36cmd" title='cmd' data-ref="36cmd">cmd</a>);</td></tr>
+<tr><th id="303">303</th><td>}</td></tr>
+<tr><th id="304">304</th><td></td></tr>
+<tr><th id="305">305</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="readline_completion_func" title='readline_completion_func' data-type='void readline_completion_func(void * opaque, const char * str)' data-ref="readline_completion_func">readline_completion_func</dfn>(<em>void</em> *<dfn class="local col8 decl" id="38opaque" title='opaque' data-type='void *' data-ref="38opaque">opaque</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="39str" title='str' data-type='const char *' data-ref="39str">str</dfn>)</td></tr>
+<tr><th id="306">306</th><td>{</td></tr>
+<tr><th id="307">307</th><td>    <a class="ref" href="include/qemu/readline.h.html#readline_set_completion_index" title='readline_set_completion_index' data-ref="readline_set_completion_index">readline_set_completion_index</a>(<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>, <a class="ref" href="../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col9 ref" href="#39str" title='str' data-ref="39str">str</a>));</td></tr>
+<tr><th id="308">308</th><td>    <a class="ref" href="include/qemu-io.h.html#qemuio_complete_command" title='qemuio_complete_command' data-ref="qemuio_complete_command">qemuio_complete_command</a>(<a class="local col9 ref" href="#39str" title='str' data-ref="39str">str</a>, <a class="tu ref" href="#completion_match" title='completion_match' data-use='r' data-ref="completion_match">completion_match</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="309">309</th><td>}</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="fetchline_readline" title='fetchline_readline' data-type='char * fetchline_readline()' data-ref="fetchline_readline">fetchline_readline</dfn>(<em>void</em>)</td></tr>
+<tr><th id="312">312</th><td>{</td></tr>
+<tr><th id="313">313</th><td>    <em>char</em> *<dfn class="local col0 decl" id="40line" title='line' data-type='char *' data-ref="40line">line</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="314">314</th><td></td></tr>
+<tr><th id="315">315</th><td>    <a class="ref" href="include/qemu/readline.h.html#readline_start" title='readline_start' data-ref="readline_start">readline_start</a>(<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>, <a class="tu ref" href="#get_prompt" title='get_prompt' data-use='c' data-ref="get_prompt">get_prompt</a>(), <var>0</var>, <a class="tu ref" href="#readline_func" title='readline_func' data-use='r' data-ref="readline_func">readline_func</a>, &amp;<a class="local col0 ref" href="#40line" title='line' data-ref="40line">line</a>);</td></tr>
+<tr><th id="316">316</th><td>    <b>while</b> (!<a class="local col0 ref" href="#40line" title='line' data-ref="40line">line</a>) {</td></tr>
+<tr><th id="317">317</th><td>        <em>int</em> <dfn class="local col1 decl" id="41ch" title='ch' data-type='int' data-ref="41ch">ch</dfn> = <a class="ref" href="../include/stdio.h.html#getchar" title='getchar' data-ref="getchar">getchar</a>();</td></tr>
+<tr><th id="318">318</th><td>        <b>if</b> (<a class="local col1 ref" href="#41ch" title='ch' data-ref="41ch">ch</a> == <a class="macro" href="../include/libio.h.html#62" title="(-1)" data-ref="_M/EOF">EOF</a>) {</td></tr>
+<tr><th id="319">319</th><td>            <b>break</b>;</td></tr>
+<tr><th id="320">320</th><td>        }</td></tr>
+<tr><th id="321">321</th><td>        <a class="ref" href="include/qemu/readline.h.html#readline_handle_byte" title='readline_handle_byte' data-ref="readline_handle_byte">readline_handle_byte</a>(<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>, <a class="local col1 ref" href="#41ch" title='ch' data-ref="41ch">ch</a>);</td></tr>
+<tr><th id="322">322</th><td>    }</td></tr>
+<tr><th id="323">323</th><td>    <b>return</b> <a class="local col0 ref" href="#40line" title='line' data-ref="40line">line</a>;</td></tr>
+<tr><th id="324">324</th><td>}</td></tr>
+<tr><th id="325">325</th><td></td></tr>
+<tr><th id="326">326</th><td><u>#define <dfn class="macro" id="_M/MAXREADLINESZ" data-ref="_M/MAXREADLINESZ">MAXREADLINESZ</dfn> 1024</u></td></tr>
+<tr><th id="327">327</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="fetchline_fgets" title='fetchline_fgets' data-type='char * fetchline_fgets()' data-ref="fetchline_fgets">fetchline_fgets</dfn>(<em>void</em>)</td></tr>
+<tr><th id="328">328</th><td>{</td></tr>
+<tr><th id="329">329</th><td>    <em>char</em> *<dfn class="local col2 decl" id="42p" title='p' data-type='char *' data-ref="42p">p</dfn>, *<dfn class="local col3 decl" id="43line" title='line' data-type='char *' data-ref="43line">line</dfn> = <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_malloc" title='g_malloc' data-ref="g_malloc">g_malloc</a>(<a class="macro" href="#326" title="1024" data-ref="_M/MAXREADLINESZ">MAXREADLINESZ</a>);</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td>    <b>if</b> (!<a class="ref" href="../include/stdio.h.html#fgets" title='fgets' data-ref="fgets">fgets</a>(<a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a>, <a class="macro" href="#326" title="1024" data-ref="_M/MAXREADLINESZ">MAXREADLINESZ</a>, <a class="macro" href="../include/stdio.h.html#172" title="stdin" data-ref="_M/stdin">stdin</a>)) {</td></tr>
+<tr><th id="332">332</th><td>        <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a>);</td></tr>
+<tr><th id="333">333</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="334">334</th><td>    }</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>    <a class="local col2 ref" href="#42p" title='p' data-ref="42p">p</a> = <a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a> + <a class="ref" href="../include/string.h.html#strlen" title='strlen' data-ref="strlen">strlen</a>(<a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a>);</td></tr>
+<tr><th id="337">337</th><td>    <b>if</b> (<a class="local col2 ref" href="#42p" title='p' data-ref="42p">p</a> != <a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a> &amp;&amp; <a class="local col2 ref" href="#42p" title='p' data-ref="42p">p</a>[-<var>1</var>] == <kbd>'\n'</kbd>) {</td></tr>
+<tr><th id="338">338</th><td>        <a class="local col2 ref" href="#42p" title='p' data-ref="42p">p</a>[-<var>1</var>] = <kbd>'\0'</kbd>;</td></tr>
+<tr><th id="339">339</th><td>    }</td></tr>
+<tr><th id="340">340</th><td></td></tr>
+<tr><th id="341">341</th><td>    <b>return</b> <a class="local col3 ref" href="#43line" title='line' data-ref="43line">line</a>;</td></tr>
+<tr><th id="342">342</th><td>}</td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="fetchline" title='fetchline' data-type='char * fetchline()' data-ref="fetchline">fetchline</dfn>(<em>void</em>)</td></tr>
+<tr><th id="345">345</th><td>{</td></tr>
+<tr><th id="346">346</th><td>    <b>if</b> (<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>) {</td></tr>
+<tr><th id="347">347</th><td>        <b>return</b> <a class="tu ref" href="#fetchline_readline" title='fetchline_readline' data-use='c' data-ref="fetchline_readline">fetchline_readline</a>();</td></tr>
+<tr><th id="348">348</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="349">349</th><td>        <b>return</b> <a class="tu ref" href="#fetchline_fgets" title='fetchline_fgets' data-use='c' data-ref="fetchline_fgets">fetchline_fgets</a>();</td></tr>
+<tr><th id="350">350</th><td>    }</td></tr>
+<tr><th id="351">351</th><td>}</td></tr>
+<tr><th id="352">352</th><td></td></tr>
+<tr><th id="353">353</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="prep_fetchline" title='prep_fetchline' data-type='void prep_fetchline(void * opaque)' data-ref="prep_fetchline">prep_fetchline</dfn>(<em>void</em> *<dfn class="local col4 decl" id="44opaque" title='opaque' data-type='void *' data-ref="44opaque">opaque</dfn>)</td></tr>
+<tr><th id="354">354</th><td>{</td></tr>
+<tr><th id="355">355</th><td>    <em>int</em> *<dfn class="local col5 decl" id="45fetchable" title='fetchable' data-type='int *' data-ref="45fetchable">fetchable</dfn> = <a class="local col4 ref" href="#44opaque" title='opaque' data-ref="44opaque">opaque</a>;</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td>    <a class="ref" href="include/qemu/main-loop.h.html#qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="358">358</th><td>    *<a class="local col5 ref" href="#45fetchable" title='fetchable' data-ref="45fetchable">fetchable</a>= <var>1</var>;</td></tr>
+<tr><th id="359">359</th><td>}</td></tr>
+<tr><th id="360">360</th><td></td></tr>
+<tr><th id="361">361</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="command_loop" title='command_loop' data-type='void command_loop()' data-ref="command_loop">command_loop</dfn>(<em>void</em>)</td></tr>
+<tr><th id="362">362</th><td>{</td></tr>
+<tr><th id="363">363</th><td>    <em>int</em> <dfn class="local col6 decl" id="46i" title='i' data-type='int' data-ref="46i">i</dfn>, <dfn class="local col7 decl" id="47done" title='done' data-type='int' data-ref="47done">done</dfn> = <var>0</var>, <dfn class="local col8 decl" id="48fetchable" title='fetchable' data-type='int' data-ref="48fetchable">fetchable</dfn> = <var>0</var>, <dfn class="local col9 decl" id="49prompted" title='prompted' data-type='int' data-ref="49prompted">prompted</dfn> = <var>0</var>;</td></tr>
+<tr><th id="364">364</th><td>    <em>char</em> *<dfn class="local col0 decl" id="50input" title='input' data-type='char *' data-ref="50input">input</dfn>;</td></tr>
+<tr><th id="365">365</th><td></td></tr>
+<tr><th id="366">366</th><td>    <b>for</b> (<a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a> = <var>0</var>; !<a class="local col7 ref" href="#47done" title='done' data-ref="47done">done</a> &amp;&amp; <a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a> &lt; <a class="tu ref" href="#ncmdline" title='ncmdline' data-use='r' data-ref="ncmdline">ncmdline</a>; <a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a>++) {</td></tr>
+<tr><th id="367">367</th><td>        <a class="local col7 ref" href="#47done" title='done' data-ref="47done">done</a> = <a class="ref" href="include/qemu-io.h.html#qemuio_command" title='qemuio_command' data-ref="qemuio_command">qemuio_command</a>(<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>, <a class="tu ref" href="#cmdline" title='cmdline' data-use='r' data-ref="cmdline">cmdline</a>[<a class="local col6 ref" href="#46i" title='i' data-ref="46i">i</a>]);</td></tr>
+<tr><th id="368">368</th><td>    }</td></tr>
+<tr><th id="369">369</th><td>    <b>if</b> (<a class="tu ref" href="#cmdline" title='cmdline' data-use='r' data-ref="cmdline">cmdline</a>) {</td></tr>
+<tr><th id="370">370</th><td>        <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="tu ref" href="#cmdline" title='cmdline' data-use='r' data-ref="cmdline">cmdline</a>);</td></tr>
+<tr><th id="371">371</th><td>        <b>return</b>;</td></tr>
+<tr><th id="372">372</th><td>    }</td></tr>
+<tr><th id="373">373</th><td></td></tr>
+<tr><th id="374">374</th><td>    <b>while</b> (!<a class="local col7 ref" href="#47done" title='done' data-ref="47done">done</a>) {</td></tr>
+<tr><th id="375">375</th><td>        <b>if</b> (!<a class="local col9 ref" href="#49prompted" title='prompted' data-ref="49prompted">prompted</a>) {</td></tr>
+<tr><th id="376">376</th><td>            <a class="ref" href="../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"%s"</q>, <a class="tu ref" href="#get_prompt" title='get_prompt' data-use='c' data-ref="get_prompt">get_prompt</a>());</td></tr>
+<tr><th id="377">377</th><td>            <a class="ref" href="../include/stdio.h.html#fflush" title='fflush' data-ref="fflush">fflush</a>(<a class="macro" href="../include/stdio.h.html#173" title="stdout" data-ref="_M/stdout">stdout</a>);</td></tr>
+<tr><th id="378">378</th><td>            <a class="ref" href="include/qemu/main-loop.h.html#qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>, <a class="tu ref" href="#prep_fetchline" title='prep_fetchline' data-use='r' data-ref="prep_fetchline">prep_fetchline</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, &amp;<a class="local col8 ref" href="#48fetchable" title='fetchable' data-ref="48fetchable">fetchable</a>);</td></tr>
+<tr><th id="379">379</th><td>            <a class="local col9 ref" href="#49prompted" title='prompted' data-ref="49prompted">prompted</a> = <var>1</var>;</td></tr>
+<tr><th id="380">380</th><td>        }</td></tr>
+<tr><th id="381">381</th><td></td></tr>
+<tr><th id="382">382</th><td>        <a class="ref" href="include/qemu/main-loop.h.html#main_loop_wait" title='main_loop_wait' data-ref="main_loop_wait">main_loop_wait</a>(<span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td>        <b>if</b> (!<a class="local col8 ref" href="#48fetchable" title='fetchable' data-ref="48fetchable">fetchable</a>) {</td></tr>
+<tr><th id="385">385</th><td>            <b>continue</b>;</td></tr>
+<tr><th id="386">386</th><td>        }</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td>        <a class="local col0 ref" href="#50input" title='input' data-ref="50input">input</a> = <a class="tu ref" href="#fetchline" title='fetchline' data-use='c' data-ref="fetchline">fetchline</a>();</td></tr>
+<tr><th id="389">389</th><td>        <b>if</b> (<a class="local col0 ref" href="#50input" title='input' data-ref="50input">input</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="390">390</th><td>            <b>break</b>;</td></tr>
+<tr><th id="391">391</th><td>        }</td></tr>
+<tr><th id="392">392</th><td>        <a class="local col7 ref" href="#47done" title='done' data-ref="47done">done</a> = <a class="ref" href="include/qemu-io.h.html#qemuio_command" title='qemuio_command' data-ref="qemuio_command">qemuio_command</a>(<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>, <a class="local col0 ref" href="#50input" title='input' data-ref="50input">input</a>);</td></tr>
+<tr><th id="393">393</th><td>        <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col0 ref" href="#50input" title='input' data-ref="50input">input</a>);</td></tr>
+<tr><th id="394">394</th><td></td></tr>
+<tr><th id="395">395</th><td>        <a class="local col9 ref" href="#49prompted" title='prompted' data-ref="49prompted">prompted</a> = <var>0</var>;</td></tr>
+<tr><th id="396">396</th><td>        <a class="local col8 ref" href="#48fetchable" title='fetchable' data-ref="48fetchable">fetchable</a> = <var>0</var>;</td></tr>
+<tr><th id="397">397</th><td>    }</td></tr>
+<tr><th id="398">398</th><td>    <a class="ref" href="include/qemu/main-loop.h.html#qemu_set_fd_handler" title='qemu_set_fd_handler' data-ref="qemu_set_fd_handler">qemu_set_fd_handler</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="399">399</th><td>}</td></tr>
+<tr><th id="400">400</th><td></td></tr>
+<tr><th id="401">401</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="add_user_command" title='add_user_command' data-type='void add_user_command(char * optarg)' data-ref="add_user_command">add_user_command</dfn>(<em>char</em> *<dfn class="local col1 decl" id="51optarg" title='optarg' data-type='char *' data-ref="51optarg">optarg</dfn>)</td></tr>
+<tr><th id="402">402</th><td>{</td></tr>
+<tr><th id="403">403</th><td>    <a class="tu ref" href="#cmdline" title='cmdline' data-use='w' data-ref="cmdline">cmdline</a> = <a class="macro" href="../include/glib-2.0/glib/gmem.h.html#292" title="((char * *) g_realloc_n (cmdline, (++ncmdline), sizeof (char *)))" data-ref="_M/g_renew">g_renew</a>(<em>char</em> *, <a class="tu ref" href="#cmdline" title='cmdline' data-use='r' data-ref="cmdline">cmdline</a>, ++<a class="tu ref" href="#ncmdline" title='ncmdline' data-use='w' data-ref="ncmdline">ncmdline</a>);</td></tr>
+<tr><th id="404">404</th><td>    <a class="tu ref" href="#cmdline" title='cmdline' data-use='r' data-ref="cmdline">cmdline</a>[<a class="tu ref" href="#ncmdline" title='ncmdline' data-use='r' data-ref="ncmdline">ncmdline</a>-<var>1</var>] = <a class="local col1 ref" href="#51optarg" title='optarg' data-ref="51optarg">optarg</a>;</td></tr>
+<tr><th id="405">405</th><td>}</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="reenable_tty_echo" title='reenable_tty_echo' data-type='void reenable_tty_echo()' data-ref="reenable_tty_echo">reenable_tty_echo</dfn>(<em>void</em>)</td></tr>
+<tr><th id="408">408</th><td>{</td></tr>
+<tr><th id="409">409</th><td>    <a class="ref" href="include/qemu/osdep.h.html#qemu_set_tty_echo" title='qemu_set_tty_echo' data-ref="qemu_set_tty_echo">qemu_set_tty_echo</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="410">410</th><td>}</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td><b>enum</b> {</td></tr>
+<tr><th id="413">413</th><td>    <dfn class="enum" id="OPTION_OBJECT" title='OPTION_OBJECT' data-ref="OPTION_OBJECT">OPTION_OBJECT</dfn> = <var>256</var>,</td></tr>
+<tr><th id="414">414</th><td>    <dfn class="enum" id="OPTION_IMAGE_OPTS" title='OPTION_IMAGE_OPTS' data-ref="OPTION_IMAGE_OPTS">OPTION_IMAGE_OPTS</dfn> = <var>257</var>,</td></tr>
+<tr><th id="415">415</th><td>};</td></tr>
+<tr><th id="416">416</th><td></td></tr>
+<tr><th id="417">417</th><td><em>static</em> <a class="typedef" href="include/qemu/typedefs.h.html#QemuOptsList" title='QemuOptsList' data-type='struct QemuOptsList' data-ref="QemuOptsList">QemuOptsList</a> <dfn class="tu decl def" id="qemu_object_opts" title='qemu_object_opts' data-type='QemuOptsList' data-ref="qemu_object_opts">qemu_object_opts</dfn> = {</td></tr>
+<tr><th id="418">418</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::name" title='QemuOptsList::name' data-ref="QemuOptsList::name">name</a> = <q>"object"</q>,</td></tr>
+<tr><th id="419">419</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::implied_opt_name" title='QemuOptsList::implied_opt_name' data-ref="QemuOptsList::implied_opt_name">implied_opt_name</a> = <q>"qom-type"</q>,</td></tr>
+<tr><th id="420">420</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a> = <a class="macro" href="include/qemu/queue.h.html#351" title="{ ((void*)0), &amp;(qemu_object_opts.head).tqh_first }" data-ref="_M/QTAILQ_HEAD_INITIALIZER">QTAILQ_HEAD_INITIALIZER</a>(<a class="tu ref" href="#qemu_object_opts" title='qemu_object_opts' data-use='m' data-ref="qemu_object_opts">qemu_object_opts</a>.<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a>),</td></tr>
+<tr><th id="421">421</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::desc" title='QemuOptsList::desc' data-ref="QemuOptsList::desc">desc</a> = {</td></tr>
+<tr><th id="422">422</th><td>        { }</td></tr>
+<tr><th id="423">423</th><td>    },</td></tr>
+<tr><th id="424">424</th><td>};</td></tr>
+<tr><th id="425">425</th><td></td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td><em>static</em> <a class="typedef" href="include/qemu/typedefs.h.html#QemuOptsList" title='QemuOptsList' data-type='struct QemuOptsList' data-ref="QemuOptsList">QemuOptsList</a> <dfn class="tu decl def" id="file_opts" title='file_opts' data-type='QemuOptsList' data-ref="file_opts">file_opts</dfn> = {</td></tr>
+<tr><th id="428">428</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::name" title='QemuOptsList::name' data-ref="QemuOptsList::name">name</a> = <q>"file"</q>,</td></tr>
+<tr><th id="429">429</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::implied_opt_name" title='QemuOptsList::implied_opt_name' data-ref="QemuOptsList::implied_opt_name">implied_opt_name</a> = <q>"file"</q>,</td></tr>
+<tr><th id="430">430</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a> = <a class="macro" href="include/qemu/queue.h.html#351" title="{ ((void*)0), &amp;(file_opts.head).tqh_first }" data-ref="_M/QTAILQ_HEAD_INITIALIZER">QTAILQ_HEAD_INITIALIZER</a>(<a class="tu ref" href="#file_opts" title='file_opts' data-use='m' data-ref="file_opts">file_opts</a>.<a class="ref" href="include/qemu/option.h.html#QemuOptsList::head" title='QemuOptsList::head' data-ref="QemuOptsList::head">head</a>),</td></tr>
+<tr><th id="431">431</th><td>    .<a class="ref" href="include/qemu/option.h.html#QemuOptsList::desc" title='QemuOptsList::desc' data-ref="QemuOptsList::desc">desc</a> = {</td></tr>
+<tr><th id="432">432</th><td>        <i>/* no elements =&gt; accept any params */</i></td></tr>
+<tr><th id="433">433</th><td>        { <i>/* end of list */</i> }</td></tr>
+<tr><th id="434">434</th><td>    },</td></tr>
+<tr><th id="435">435</th><td>};</td></tr>
+<tr><th id="436">436</th><td></td></tr>
+<tr><th id="437">437</th><td><em>int</em> <dfn class="decl def" id="main" title='main' data-ref="main">main</dfn>(<em>int</em> <dfn class="local col2 decl" id="52argc" title='argc' data-type='int' data-ref="52argc">argc</dfn>, <em>char</em> **<dfn class="local col3 decl" id="53argv" title='argv' data-type='char **' data-ref="53argv">argv</dfn>)</td></tr>
+<tr><th id="438">438</th><td>{</td></tr>
+<tr><th id="439">439</th><td>    <em>int</em> <dfn class="local col4 decl" id="54readonly" title='readonly' data-type='int' data-ref="54readonly">readonly</dfn> = <var>0</var>;</td></tr>
+<tr><th id="440">440</th><td>    <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="55sopt" title='sopt' data-type='const char *' data-ref="55sopt">sopt</dfn> = <q>"hVc:d:f:rsnmkt:T:U"</q>;</td></tr>
+<tr><th id="441">441</th><td>    <em>const</em> <b>struct</b> <a class="type" href="../include/getopt.h.html#option" title='option' data-ref="option">option</a> <dfn class="local col6 decl" id="56lopt" title='lopt' data-type='const struct option [16]' data-ref="56lopt">lopt</dfn>[] = {</td></tr>
+<tr><th id="442">442</th><td>        { <q>"help"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'h'</kbd> },</td></tr>
+<tr><th id="443">443</th><td>        { <q>"version"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'V'</kbd> },</td></tr>
+<tr><th id="444">444</th><td>        { <q>"cmd"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'c'</kbd> },</td></tr>
+<tr><th id="445">445</th><td>        { <q>"format"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'f'</kbd> },</td></tr>
+<tr><th id="446">446</th><td>        { <q>"read-only"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'r'</kbd> },</td></tr>
+<tr><th id="447">447</th><td>        { <q>"snapshot"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'s'</kbd> },</td></tr>
+<tr><th id="448">448</th><td>        { <q>"nocache"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'n'</kbd> },</td></tr>
+<tr><th id="449">449</th><td>        { <q>"misalign"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'m'</kbd> },</td></tr>
+<tr><th id="450">450</th><td>        { <q>"native-aio"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'k'</kbd> },</td></tr>
+<tr><th id="451">451</th><td>        { <q>"discard"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'d'</kbd> },</td></tr>
+<tr><th id="452">452</th><td>        { <q>"cache"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'t'</kbd> },</td></tr>
+<tr><th id="453">453</th><td>        { <q>"trace"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <kbd>'T'</kbd> },</td></tr>
+<tr><th id="454">454</th><td>        { <q>"object"</q>, <a class="macro" href="../include/getopt.h.html#117" title="1" data-ref="_M/required_argument">required_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="enum" href="#OPTION_OBJECT" title='OPTION_OBJECT' data-ref="OPTION_OBJECT">OPTION_OBJECT</a> },</td></tr>
+<tr><th id="455">455</th><td>        { <q>"image-opts"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="enum" href="#OPTION_IMAGE_OPTS" title='OPTION_IMAGE_OPTS' data-ref="OPTION_IMAGE_OPTS">OPTION_IMAGE_OPTS</a> },</td></tr>
+<tr><th id="456">456</th><td>        { <q>"force-share"</q>, <a class="macro" href="../include/getopt.h.html#116" title="0" data-ref="_M/no_argument">no_argument</a>, <var>0</var>, <kbd>'U'</kbd>},</td></tr>
+<tr><th id="457">457</th><td>        { <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var> }</td></tr>
+<tr><th id="458">458</th><td>    };</td></tr>
+<tr><th id="459">459</th><td>    <em>int</em> <dfn class="local col7 decl" id="57c" title='c' data-type='int' data-ref="57c">c</dfn>;</td></tr>
+<tr><th id="460">460</th><td>    <em>int</em> <dfn class="local col8 decl" id="58opt_index" title='opt_index' data-type='int' data-ref="58opt_index">opt_index</dfn> = <var>0</var>;</td></tr>
+<tr><th id="461">461</th><td>    <em>int</em> <dfn class="local col9 decl" id="59flags" title='flags' data-type='int' data-ref="59flags">flags</dfn> = <a class="macro" href="include/block/block.h.html#96" title="0x4000" data-ref="_M/BDRV_O_UNMAP">BDRV_O_UNMAP</a>;</td></tr>
+<tr><th id="462">462</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="60writethrough" title='writethrough' data-type='_Bool' data-ref="60writethrough">writethrough</dfn> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="463">463</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col1 decl" id="61local_error" title='local_error' data-type='Error *' data-ref="61local_error">local_error</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="464">464</th><td>    <a class="typedef" href="include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col2 decl" id="62opts" title='opts' data-type='QDict *' data-ref="62opts">opts</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="465">465</th><td>    <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="63format" title='format' data-type='const char *' data-ref="63format">format</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="466">466</th><td>    <em>char</em> *<dfn class="local col4 decl" id="64trace_file" title='trace_file' data-type='char *' data-ref="64trace_file">trace_file</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="467">467</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="65force_share" title='force_share' data-type='_Bool' data-ref="65force_share">force_share</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="468">468</th><td></td></tr>
+<tr><th id="469">469</th><td><u>#<span data-ppcond="469">ifdef</span> <a class="macro" href="config-host.h.html#11" data-ref="_M/CONFIG_POSIX">CONFIG_POSIX</a></u></td></tr>
+<tr><th id="470">470</th><td>    <a class="ref" href="../include/signal.h.html#signal" title='signal' data-ref="signal">signal</a>(<a class="macro" href="../include/x86_64-linux-gnu/bits/signum.h.html#45" title="13" data-ref="_M/SIGPIPE">SIGPIPE</a>, <a class="macro" href="../include/x86_64-linux-gnu/bits/signum.h.html#24" title="((__sighandler_t) 1)" data-ref="_M/SIG_IGN">SIG_IGN</a>);</td></tr>
+<tr><th id="471">471</th><td><u>#<span data-ppcond="469">endif</span></u></td></tr>
+<tr><th id="472">472</th><td></td></tr>
+<tr><th id="473">473</th><td>    <a class="ref" href="include/qemu/module.h.html#module_call_init" title='module_call_init' data-ref="module_call_init">module_call_init</a>(<a class="enum" href="include/qemu/module.h.html#MODULE_INIT_TRACE" title='MODULE_INIT_TRACE' data-ref="MODULE_INIT_TRACE">MODULE_INIT_TRACE</a>);</td></tr>
+<tr><th id="474">474</th><td>    <a class="tu ref" href="#progname" title='progname' data-use='w' data-ref="progname">progname</a> = <a class="macro" href="../include/libgen.h.html#35" title="__xpg_basename" data-ref="_M/basename">basename</a>(<a class="local col3 ref" href="#53argv" title='argv' data-ref="53argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="475">475</th><td>    <a class="ref" href="include/qemu/osdep.h.html#qemu_init_exec_dir" title='qemu_init_exec_dir' data-ref="qemu_init_exec_dir">qemu_init_exec_dir</a>(<a class="local col3 ref" href="#53argv" title='argv' data-ref="53argv">argv</a>[<var>0</var>]);</td></tr>
+<tr><th id="476">476</th><td></td></tr>
+<tr><th id="477">477</th><td>    <a class="ref" href="include/crypto/init.h.html#qcrypto_init" title='qcrypto_init' data-ref="qcrypto_init">qcrypto_init</a>(&amp;<a class="ref" href="include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>);</td></tr>
+<tr><th id="478">478</th><td></td></tr>
+<tr><th id="479">479</th><td>    <a class="ref" href="include/qemu/module.h.html#module_call_init" title='module_call_init' data-ref="module_call_init">module_call_init</a>(<a class="enum" href="include/qemu/module.h.html#MODULE_INIT_QOM" title='MODULE_INIT_QOM' data-ref="MODULE_INIT_QOM">MODULE_INIT_QOM</a>);</td></tr>
+<tr><th id="480">480</th><td>    <a class="ref" href="include/qemu/config-file.h.html#qemu_add_opts" title='qemu_add_opts' data-ref="qemu_add_opts">qemu_add_opts</a>(&amp;<a class="tu ref" href="#qemu_object_opts" title='qemu_object_opts' data-use='a' data-ref="qemu_object_opts">qemu_object_opts</a>);</td></tr>
+<tr><th id="481">481</th><td>    <a class="ref" href="include/qemu/config-file.h.html#qemu_add_opts" title='qemu_add_opts' data-ref="qemu_add_opts">qemu_add_opts</a>(&amp;<a class="ref" href="trace/control.h.html#qemu_trace_opts" title='qemu_trace_opts' data-ref="qemu_trace_opts">qemu_trace_opts</a>);</td></tr>
+<tr><th id="482">482</th><td>    <a class="ref" href="include/block/block.h.html#bdrv_init" title='bdrv_init' data-ref="bdrv_init">bdrv_init</a>();</td></tr>
+<tr><th id="483">483</th><td></td></tr>
+<tr><th id="484">484</th><td>    <b>while</b> ((<a class="local col7 ref" href="#57c" title='c' data-ref="57c">c</a> = <a class="ref" href="../include/getopt.h.html#getopt_long" title='getopt_long' data-ref="getopt_long">getopt_long</a>(<a class="local col2 ref" href="#52argc" title='argc' data-ref="52argc">argc</a>, <a class="local col3 ref" href="#53argv" title='argv' data-ref="53argv">argv</a>, <a class="local col5 ref" href="#55sopt" title='sopt' data-ref="55sopt">sopt</a>, <a class="local col6 ref" href="#56lopt" title='lopt' data-ref="56lopt">lopt</a>, &amp;<a class="local col8 ref" href="#58opt_index" title='opt_index' data-ref="58opt_index">opt_index</a>)) != -<var>1</var>) {</td></tr>
+<tr><th id="485">485</th><td>        <b>switch</b> (<a class="local col7 ref" href="#57c" title='c' data-ref="57c">c</a>) {</td></tr>
+<tr><th id="486">486</th><td>        <b>case</b> <kbd>'s'</kbd>:</td></tr>
+<tr><th id="487">487</th><td>            <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a> |= <a class="macro" href="include/block/block.h.html#86" title="0x0008" data-ref="_M/BDRV_O_SNAPSHOT">BDRV_O_SNAPSHOT</a>;</td></tr>
+<tr><th id="488">488</th><td>            <b>break</b>;</td></tr>
+<tr><th id="489">489</th><td>        <b>case</b> <kbd>'n'</kbd>:</td></tr>
+<tr><th id="490">490</th><td>            <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a> |= <a class="macro" href="include/block/block.h.html#88" title="0x0020" data-ref="_M/BDRV_O_NOCACHE">BDRV_O_NOCACHE</a>;</td></tr>
+<tr><th id="491">491</th><td>            <a class="local col0 ref" href="#60writethrough" title='writethrough' data-ref="60writethrough">writethrough</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="492">492</th><td>            <b>break</b>;</td></tr>
+<tr><th id="493">493</th><td>        <b>case</b> <kbd>'d'</kbd>:</td></tr>
+<tr><th id="494">494</th><td>            <b>if</b> (<a class="ref" href="include/block/block.h.html#bdrv_parse_discard_flags" title='bdrv_parse_discard_flags' data-ref="bdrv_parse_discard_flags">bdrv_parse_discard_flags</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="495">495</th><td>                <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Invalid discard option: %s"</q>, <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="496">496</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="497">497</th><td>            }</td></tr>
+<tr><th id="498">498</th><td>            <b>break</b>;</td></tr>
+<tr><th id="499">499</th><td>        <b>case</b> <kbd>'f'</kbd>:</td></tr>
+<tr><th id="500">500</th><td>            <a class="local col3 ref" href="#63format" title='format' data-ref="63format">format</a> = <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>;</td></tr>
+<tr><th id="501">501</th><td>            <b>break</b>;</td></tr>
+<tr><th id="502">502</th><td>        <b>case</b> <kbd>'c'</kbd>:</td></tr>
+<tr><th id="503">503</th><td>            <a class="tu ref" href="#add_user_command" title='add_user_command' data-use='c' data-ref="add_user_command">add_user_command</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="504">504</th><td>            <b>break</b>;</td></tr>
+<tr><th id="505">505</th><td>        <b>case</b> <kbd>'r'</kbd>:</td></tr>
+<tr><th id="506">506</th><td>            <a class="local col4 ref" href="#54readonly" title='readonly' data-ref="54readonly">readonly</a> = <var>1</var>;</td></tr>
+<tr><th id="507">507</th><td>            <b>break</b>;</td></tr>
+<tr><th id="508">508</th><td>        <b>case</b> <kbd>'m'</kbd>:</td></tr>
+<tr><th id="509">509</th><td>            <a class="ref" href="include/qemu-io.h.html#qemuio_misalign" title='qemuio_misalign' data-ref="qemuio_misalign">qemuio_misalign</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="510">510</th><td>            <b>break</b>;</td></tr>
+<tr><th id="511">511</th><td>        <b>case</b> <kbd>'k'</kbd>:</td></tr>
+<tr><th id="512">512</th><td>            <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a> |= <a class="macro" href="include/block/block.h.html#89" title="0x0080" data-ref="_M/BDRV_O_NATIVE_AIO">BDRV_O_NATIVE_AIO</a>;</td></tr>
+<tr><th id="513">513</th><td>            <b>break</b>;</td></tr>
+<tr><th id="514">514</th><td>        <b>case</b> <kbd>'t'</kbd>:</td></tr>
+<tr><th id="515">515</th><td>            <b>if</b> (<a class="ref" href="include/block/block.h.html#bdrv_parse_cache_mode" title='bdrv_parse_cache_mode' data-ref="bdrv_parse_cache_mode">bdrv_parse_cache_mode</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, &amp;<a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a>, &amp;<a class="local col0 ref" href="#60writethrough" title='writethrough' data-ref="60writethrough">writethrough</a>) &lt; <var>0</var>) {</td></tr>
+<tr><th id="516">516</th><td>                <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Invalid cache option: %s"</q>, <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="517">517</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="518">518</th><td>            }</td></tr>
+<tr><th id="519">519</th><td>            <b>break</b>;</td></tr>
+<tr><th id="520">520</th><td>        <b>case</b> <kbd>'T'</kbd>:</td></tr>
+<tr><th id="521">521</th><td>            <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col4 ref" href="#64trace_file" title='trace_file' data-ref="64trace_file">trace_file</a>);</td></tr>
+<tr><th id="522">522</th><td>            <a class="local col4 ref" href="#64trace_file" title='trace_file' data-ref="64trace_file">trace_file</a> = <a class="ref" href="trace/control.h.html#trace_opt_parse" title='trace_opt_parse' data-ref="trace_opt_parse">trace_opt_parse</a>(<a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>);</td></tr>
+<tr><th id="523">523</th><td>            <b>break</b>;</td></tr>
+<tr><th id="524">524</th><td>        <b>case</b> <kbd>'V'</kbd>:</td></tr>
+<tr><th id="525">525</th><td>            <a class="ref" href="../include/stdio.h.html#printf" title='printf' data-ref="printf">printf</a>(<q>"%s version %s\n"</q>, <a class="tu ref" href="#progname" title='progname' data-use='r' data-ref="progname">progname</a>, <a class="macro" href="config-host.h.html#27" title="&quot;2.9.90&quot;" data-ref="_M/QEMU_VERSION">QEMU_VERSION</a>);</td></tr>
+<tr><th id="526">526</th><td>            <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>0</var>);</td></tr>
+<tr><th id="527">527</th><td>        <b>case</b> <kbd>'h'</kbd>:</td></tr>
+<tr><th id="528">528</th><td>            <a class="tu ref" href="#usage" title='usage' data-use='c' data-ref="usage">usage</a>(<a class="tu ref" href="#progname" title='progname' data-use='r' data-ref="progname">progname</a>);</td></tr>
+<tr><th id="529">529</th><td>            <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>0</var>);</td></tr>
+<tr><th id="530">530</th><td>        <b>case</b> <kbd>'U'</kbd>:</td></tr>
+<tr><th id="531">531</th><td>            <a class="local col5 ref" href="#65force_share" title='force_share' data-ref="65force_share">force_share</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="532">532</th><td>            <b>break</b>;</td></tr>
+<tr><th id="533">533</th><td>        <b>case</b> <a class="enum" href="#OPTION_OBJECT" title='OPTION_OBJECT' data-ref="OPTION_OBJECT">OPTION_OBJECT</a>: {</td></tr>
+<tr><th id="534">534</th><td>            <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col6 decl" id="66qopts" title='qopts' data-type='QemuOpts *' data-ref="66qopts">qopts</dfn>;</td></tr>
+<tr><th id="535">535</th><td>            <a class="local col6 ref" href="#66qopts" title='qopts' data-ref="66qopts">qopts</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(&amp;<a class="tu ref" href="#qemu_object_opts" title='qemu_object_opts' data-use='a' data-ref="qemu_object_opts">qemu_object_opts</a>,</td></tr>
+<tr><th id="536">536</th><td>                                            <a class="ref" href="../include/getopt.h.html#optarg" title='optarg' data-ref="optarg">optarg</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="537">537</th><td>            <b>if</b> (!<a class="local col6 ref" href="#66qopts" title='qopts' data-ref="66qopts">qopts</a>) {</td></tr>
+<tr><th id="538">538</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="539">539</th><td>            }</td></tr>
+<tr><th id="540">540</th><td>        }   <b>break</b>;</td></tr>
+<tr><th id="541">541</th><td>        <b>case</b> <a class="enum" href="#OPTION_IMAGE_OPTS" title='OPTION_IMAGE_OPTS' data-ref="OPTION_IMAGE_OPTS">OPTION_IMAGE_OPTS</a>:</td></tr>
+<tr><th id="542">542</th><td>            <a class="tu ref" href="#imageOpts" title='imageOpts' data-use='w' data-ref="imageOpts">imageOpts</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="543">543</th><td>            <b>break</b>;</td></tr>
+<tr><th id="544">544</th><td>        <b>default</b>:</td></tr>
+<tr><th id="545">545</th><td>            <a class="tu ref" href="#usage" title='usage' data-use='c' data-ref="usage">usage</a>(<a class="tu ref" href="#progname" title='progname' data-use='r' data-ref="progname">progname</a>);</td></tr>
+<tr><th id="546">546</th><td>            <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="547">547</th><td>        }</td></tr>
+<tr><th id="548">548</th><td>    }</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td>    <b>if</b> ((<a class="local col2 ref" href="#52argc" title='argc' data-ref="52argc">argc</a> - <a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>) &gt; <var>1</var>) {</td></tr>
+<tr><th id="551">551</th><td>        <a class="tu ref" href="#usage" title='usage' data-use='c' data-ref="usage">usage</a>(<a class="tu ref" href="#progname" title='progname' data-use='r' data-ref="progname">progname</a>);</td></tr>
+<tr><th id="552">552</th><td>        <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="553">553</th><td>    }</td></tr>
+<tr><th id="554">554</th><td></td></tr>
+<tr><th id="555">555</th><td>    <b>if</b> (<a class="local col3 ref" href="#63format" title='format' data-ref="63format">format</a> &amp;&amp; <a class="tu ref" href="#imageOpts" title='imageOpts' data-use='r' data-ref="imageOpts">imageOpts</a>) {</td></tr>
+<tr><th id="556">556</th><td>        <a class="ref" href="include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"--image-opts and -f are mutually exclusive"</q>);</td></tr>
+<tr><th id="557">557</th><td>        <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="558">558</th><td>    }</td></tr>
+<tr><th id="559">559</th><td></td></tr>
+<tr><th id="560">560</th><td>    <b>if</b> (<a class="ref" href="include/qemu/main-loop.h.html#qemu_init_main_loop" title='qemu_init_main_loop' data-ref="qemu_init_main_loop">qemu_init_main_loop</a>(&amp;<a class="local col1 ref" href="#61local_error" title='local_error' data-ref="61local_error">local_error</a>)) {</td></tr>
+<tr><th id="561">561</th><td>        <a class="ref" href="include/qapi/error.h.html#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col1 ref" href="#61local_error" title='local_error' data-ref="61local_error">local_error</a>);</td></tr>
+<tr><th id="562">562</th><td>        <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="563">563</th><td>    }</td></tr>
+<tr><th id="564">564</th><td></td></tr>
+<tr><th id="565">565</th><td>    <b>if</b> (<a class="ref" href="include/qemu/option.h.html#qemu_opts_foreach" title='qemu_opts_foreach' data-ref="qemu_opts_foreach">qemu_opts_foreach</a>(&amp;<a class="tu ref" href="#qemu_object_opts" title='qemu_object_opts' data-use='a' data-ref="qemu_object_opts">qemu_object_opts</a>,</td></tr>
+<tr><th id="566">566</th><td>                          <a class="ref" href="include/qom/object_interfaces.h.html#user_creatable_add_opts_foreach" title='user_creatable_add_opts_foreach' data-ref="user_creatable_add_opts_foreach">user_creatable_add_opts_foreach</a>,</td></tr>
+<tr><th id="567">567</th><td>                          <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>)) {</td></tr>
+<tr><th id="568">568</th><td>        <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="569">569</th><td>    }</td></tr>
+<tr><th id="570">570</th><td></td></tr>
+<tr><th id="571">571</th><td>    <b>if</b> (!<a class="ref" href="trace/control.h.html#trace_init_backends" title='trace_init_backends' data-ref="trace_init_backends">trace_init_backends</a>()) {</td></tr>
+<tr><th id="572">572</th><td>        <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="573">573</th><td>    }</td></tr>
+<tr><th id="574">574</th><td>    <a class="ref" href="trace/control.h.html#trace_init_file" title='trace_init_file' data-ref="trace_init_file">trace_init_file</a>(<a class="local col4 ref" href="#64trace_file" title='trace_file' data-ref="64trace_file">trace_file</a>);</td></tr>
+<tr><th id="575">575</th><td>    <a class="ref" href="include/qemu/log.h.html#qemu_set_log" title='qemu_set_log' data-ref="qemu_set_log">qemu_set_log</a>(<a class="macro" href="include/qemu/log.h.html#44" title="(1 &lt;&lt; 15)" data-ref="_M/LOG_TRACE">LOG_TRACE</a>);</td></tr>
+<tr><th id="576">576</th><td></td></tr>
+<tr><th id="577">577</th><td>    <i>/* initialize commands */</i></td></tr>
+<tr><th id="578">578</th><td>    <a class="ref" href="include/qemu-io.h.html#qemuio_add_command" title='qemuio_add_command' data-ref="qemuio_add_command">qemuio_add_command</a>(&amp;<a class="tu ref" href="#quit_cmd" title='quit_cmd' data-use='a' data-ref="quit_cmd">quit_cmd</a>);</td></tr>
+<tr><th id="579">579</th><td>    <a class="ref" href="include/qemu-io.h.html#qemuio_add_command" title='qemuio_add_command' data-ref="qemuio_add_command">qemuio_add_command</a>(&amp;<a class="tu ref" href="#open_cmd" title='open_cmd' data-use='a' data-ref="open_cmd">open_cmd</a>);</td></tr>
+<tr><th id="580">580</th><td>    <a class="ref" href="include/qemu-io.h.html#qemuio_add_command" title='qemuio_add_command' data-ref="qemuio_add_command">qemuio_add_command</a>(&amp;<a class="tu ref" href="#close_cmd" title='close_cmd' data-use='a' data-ref="close_cmd">close_cmd</a>);</td></tr>
+<tr><th id="581">581</th><td></td></tr>
+<tr><th id="582">582</th><td>    <b>if</b> (<a class="ref" href="../include/unistd.h.html#isatty" title='isatty' data-ref="isatty">isatty</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>)) {</td></tr>
+<tr><th id="583">583</th><td>        <a class="tu ref" href="#readline_state" title='readline_state' data-use='w' data-ref="readline_state">readline_state</a> = <a class="ref" href="include/qemu/readline.h.html#readline_init" title='readline_init' data-ref="readline_init">readline_init</a>(<a class="tu ref" href="#readline_printf_func" title='readline_printf_func' data-use='r' data-ref="readline_printf_func">readline_printf_func</a>,</td></tr>
+<tr><th id="584">584</th><td>                                       <a class="tu ref" href="#readline_flush_func" title='readline_flush_func' data-use='r' data-ref="readline_flush_func">readline_flush_func</a>,</td></tr>
+<tr><th id="585">585</th><td>                                       <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>,</td></tr>
+<tr><th id="586">586</th><td>                                       <a class="tu ref" href="#readline_completion_func" title='readline_completion_func' data-use='r' data-ref="readline_completion_func">readline_completion_func</a>);</td></tr>
+<tr><th id="587">587</th><td>        <a class="ref" href="include/qemu/osdep.h.html#qemu_set_tty_echo" title='qemu_set_tty_echo' data-ref="qemu_set_tty_echo">qemu_set_tty_echo</a>(<a class="macro" href="../include/unistd.h.html#213" title="0" data-ref="_M/STDIN_FILENO">STDIN_FILENO</a>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="588">588</th><td>        <a class="ref" href="../include/stdlib.h.html#atexit" title='atexit' data-ref="atexit">atexit</a>(<a class="tu ref" href="#reenable_tty_echo" title='reenable_tty_echo' data-use='r' data-ref="reenable_tty_echo">reenable_tty_echo</a>);</td></tr>
+<tr><th id="589">589</th><td>    }</td></tr>
+<tr><th id="590">590</th><td></td></tr>
+<tr><th id="591">591</th><td>    <i>/* open the device */</i></td></tr>
+<tr><th id="592">592</th><td>    <b>if</b> (!<a class="local col4 ref" href="#54readonly" title='readonly' data-ref="54readonly">readonly</a>) {</td></tr>
+<tr><th id="593">593</th><td>        <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a> |= <a class="macro" href="include/block/block.h.html#84" title="0x0002" data-ref="_M/BDRV_O_RDWR">BDRV_O_RDWR</a>;</td></tr>
+<tr><th id="594">594</th><td>    }</td></tr>
+<tr><th id="595">595</th><td></td></tr>
+<tr><th id="596">596</th><td>    <b>if</b> ((<a class="local col2 ref" href="#52argc" title='argc' data-ref="52argc">argc</a> - <a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>) == <var>1</var>) {</td></tr>
+<tr><th id="597">597</th><td>        <b>if</b> (<a class="tu ref" href="#imageOpts" title='imageOpts' data-use='r' data-ref="imageOpts">imageOpts</a>) {</td></tr>
+<tr><th id="598">598</th><td>            <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col7 decl" id="67qopts" title='qopts' data-type='QemuOpts *' data-ref="67qopts">qopts</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="599">599</th><td>            <a class="local col7 ref" href="#67qopts" title='qopts' data-ref="67qopts">qopts</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_parse_noisily" title='qemu_opts_parse_noisily' data-ref="qemu_opts_parse_noisily">qemu_opts_parse_noisily</a>(&amp;<a class="tu ref" href="#file_opts" title='file_opts' data-use='a' data-ref="file_opts">file_opts</a>, <a class="local col3 ref" href="#53argv" title='argv' data-ref="53argv">argv</a>[<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>], <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="600">600</th><td>            <b>if</b> (!<a class="local col7 ref" href="#67qopts" title='qopts' data-ref="67qopts">qopts</a>) {</td></tr>
+<tr><th id="601">601</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="602">602</th><td>            }</td></tr>
+<tr><th id="603">603</th><td>            <a class="local col2 ref" href="#62opts" title='opts' data-ref="62opts">opts</a> = <a class="ref" href="include/qemu/option.h.html#qemu_opts_to_qdict" title='qemu_opts_to_qdict' data-ref="qemu_opts_to_qdict">qemu_opts_to_qdict</a>(<a class="local col7 ref" href="#67qopts" title='qopts' data-ref="67qopts">qopts</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="604">604</th><td>            <b>if</b> (<a class="tu ref" href="#openfile" title='openfile' data-use='c' data-ref="openfile">openfile</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a>, <a class="local col0 ref" href="#60writethrough" title='writethrough' data-ref="60writethrough">writethrough</a>, <a class="local col5 ref" href="#65force_share" title='force_share' data-ref="65force_share">force_share</a>, <a class="local col2 ref" href="#62opts" title='opts' data-ref="62opts">opts</a>)) {</td></tr>
+<tr><th id="605">605</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="606">606</th><td>            }</td></tr>
+<tr><th id="607">607</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="608">608</th><td>            <b>if</b> (<a class="local col3 ref" href="#63format" title='format' data-ref="63format">format</a>) {</td></tr>
+<tr><th id="609">609</th><td>                <a class="local col2 ref" href="#62opts" title='opts' data-ref="62opts">opts</a> = <a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_new" title='qdict_new' data-ref="qdict_new">qdict_new</a>();</td></tr>
+<tr><th id="610">610</th><td>                <a class="macro" href="include/qapi/qmp/qdict.h.html#61" title="qdict_put_obj(opts, &quot;driver&quot;, (&amp;(qstring_from_str(format))-&gt;base))" data-ref="_M/qdict_put_str">qdict_put_str</a>(<a class="local col2 ref" href="#62opts" title='opts' data-ref="62opts">opts</a>, <q>"driver"</q>, <a class="local col3 ref" href="#63format" title='format' data-ref="63format">format</a>);</td></tr>
+<tr><th id="611">611</th><td>            }</td></tr>
+<tr><th id="612">612</th><td>            <b>if</b> (<a class="tu ref" href="#openfile" title='openfile' data-use='c' data-ref="openfile">openfile</a>(<a class="local col3 ref" href="#53argv" title='argv' data-ref="53argv">argv</a>[<a class="ref" href="../include/getopt.h.html#optind" title='optind' data-ref="optind">optind</a>], <a class="local col9 ref" href="#59flags" title='flags' data-ref="59flags">flags</a>, <a class="local col0 ref" href="#60writethrough" title='writethrough' data-ref="60writethrough">writethrough</a>,</td></tr>
+<tr><th id="613">613</th><td>                         <a class="local col5 ref" href="#65force_share" title='force_share' data-ref="65force_share">force_share</a>, <a class="local col2 ref" href="#62opts" title='opts' data-ref="62opts">opts</a>)) {</td></tr>
+<tr><th id="614">614</th><td>                <a class="ref" href="../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="615">615</th><td>            }</td></tr>
+<tr><th id="616">616</th><td>        }</td></tr>
+<tr><th id="617">617</th><td>    }</td></tr>
+<tr><th id="618">618</th><td>    <a class="tu ref" href="#command_loop" title='command_loop' data-use='c' data-ref="command_loop">command_loop</a>();</td></tr>
+<tr><th id="619">619</th><td></td></tr>
+<tr><th id="620">620</th><td>    <i>/*</i></td></tr>
+<tr><th id="621">621</th><td><i>     * Make sure all outstanding requests complete before the program exits.</i></td></tr>
+<tr><th id="622">622</th><td><i>     */</i></td></tr>
+<tr><th id="623">623</th><td>    <a class="ref" href="include/block/block.h.html#bdrv_drain_all" title='bdrv_drain_all' data-ref="bdrv_drain_all">bdrv_drain_all</a>();</td></tr>
+<tr><th id="624">624</th><td></td></tr>
+<tr><th id="625">625</th><td>    <a class="ref" href="include/sysemu/block-backend.h.html#blk_unref" title='blk_unref' data-ref="blk_unref">blk_unref</a>(<a class="tu ref" href="#qemuio_blk" title='qemuio_blk' data-use='r' data-ref="qemuio_blk">qemuio_blk</a>);</td></tr>
+<tr><th id="626">626</th><td>    <a class="ref" href="../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="tu ref" href="#readline_state" title='readline_state' data-use='r' data-ref="readline_state">readline_state</a>);</td></tr>
+<tr><th id="627">627</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="628">628</th><td>}</td></tr>
+<tr><th id="629">629</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

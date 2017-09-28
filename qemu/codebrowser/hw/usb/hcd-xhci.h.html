@@ -1,0 +1,245 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hcd-xhci.h source code [codebrowser/hw/usb/hcd-xhci.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TRBCCode,TRBType,XHCIEvent,XHCIInterrupter,XHCIPort,XHCIRing,XHCISlot,XHCIState,xhci_flags "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/usb/hcd-xhci.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>usb</a>/<a href='hcd-xhci.h.html'>hcd-xhci.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * USB xHCI controller emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2011 Securiforest</i></td></tr>
+<tr><th id="5">5</th><td><i> * Date: 2011-05-11 ;  Author: Hector Martin &lt;hector@marcansoft.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Based on usb-ohci.c, emulates Renesas NEC USB 3.0</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="9">9</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="10">10</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="11">11</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="16">16</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="19">19</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/TYPE_XHCI" data-ref="_M/TYPE_XHCI">TYPE_XHCI</dfn> "base-xhci"</u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/TYPE_NEC_XHCI" data-ref="_M/TYPE_NEC_XHCI">TYPE_NEC_XHCI</dfn> "nec-usb-xhci"</u></td></tr>
+<tr><th id="24">24</th><td><u>#define <dfn class="macro" id="_M/TYPE_QEMU_XHCI" data-ref="_M/TYPE_QEMU_XHCI">TYPE_QEMU_XHCI</dfn> "qemu-xhci"</u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#define <dfn class="macro" id="_M/XHCI" data-ref="_M/XHCI">XHCI</dfn>(obj) \</u></td></tr>
+<tr><th id="27">27</th><td><u>    OBJECT_CHECK(XHCIState, (obj), TYPE_XHCI)</u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/MAXPORTS_2" data-ref="_M/MAXPORTS_2">MAXPORTS_2</dfn> 15</u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/MAXPORTS_3" data-ref="_M/MAXPORTS_3">MAXPORTS_3</dfn> 15</u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/MAXPORTS" data-ref="_M/MAXPORTS">MAXPORTS</dfn> (MAXPORTS_2 + MAXPORTS_3)</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/MAXSLOTS" data-ref="_M/MAXSLOTS">MAXSLOTS</dfn> 64</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/MAXINTRS" data-ref="_M/MAXINTRS">MAXINTRS</dfn> 16</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/* Very pessimistic, let's hope it's enough for all cases */</i></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/EV_QUEUE" data-ref="_M/EV_QUEUE">EV_QUEUE</dfn> (((3 * 24) + 16) * MAXSLOTS)</u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#XHCIState" title='XHCIState' data-ref="XHCIState">XHCIState</a> <dfn class="typedef" id="XHCIState" title='XHCIState' data-type='struct XHCIState' data-ref="XHCIState">XHCIState</dfn>;</td></tr>
+<tr><th id="40">40</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="XHCIStreamContext" title='XHCIStreamContext' data-ref="XHCIStreamContext"><a class="type" href="#XHCIStreamContext" title='XHCIStreamContext' data-ref="XHCIStreamContext">XHCIStreamContext</a></dfn> <dfn class="typedef" id="XHCIStreamContext" title='XHCIStreamContext' data-type='struct XHCIStreamContext' data-ref="XHCIStreamContext">XHCIStreamContext</dfn>;</td></tr>
+<tr><th id="41">41</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="XHCIEPContext" title='XHCIEPContext' data-ref="XHCIEPContext"><a class="type" href="#XHCIEPContext" title='XHCIEPContext' data-ref="XHCIEPContext">XHCIEPContext</a></dfn> <dfn class="typedef" id="XHCIEPContext" title='XHCIEPContext' data-type='struct XHCIEPContext' data-ref="XHCIEPContext">XHCIEPContext</dfn>;</td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><b>enum</b> <dfn class="type def" id="xhci_flags" title='xhci_flags' data-ref="xhci_flags">xhci_flags</dfn> {</td></tr>
+<tr><th id="44">44</th><td>    <dfn class="enum" id="xhci_flags::XHCI_FLAG_SS_FIRST" title='xhci_flags::XHCI_FLAG_SS_FIRST' data-ref="xhci_flags::XHCI_FLAG_SS_FIRST">XHCI_FLAG_SS_FIRST</dfn> = <var>1</var>,</td></tr>
+<tr><th id="45">45</th><td>    <dfn class="enum" id="xhci_flags::XHCI_FLAG_FORCE_PCIE_ENDCAP" title='xhci_flags::XHCI_FLAG_FORCE_PCIE_ENDCAP' data-ref="xhci_flags::XHCI_FLAG_FORCE_PCIE_ENDCAP">XHCI_FLAG_FORCE_PCIE_ENDCAP</dfn>,</td></tr>
+<tr><th id="46">46</th><td>    <dfn class="enum" id="xhci_flags::XHCI_FLAG_ENABLE_STREAMS" title='xhci_flags::XHCI_FLAG_ENABLE_STREAMS' data-ref="xhci_flags::XHCI_FLAG_ENABLE_STREAMS">XHCI_FLAG_ENABLE_STREAMS</dfn>,</td></tr>
+<tr><th id="47">47</th><td>};</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="TRBType" title='TRBType' data-ref="TRBType"><a class="type" href="#TRBType" title='TRBType' data-ref="TRBType">TRBType</a></dfn> {</td></tr>
+<tr><th id="50">50</th><td>    <dfn class="enum" id="TRBType::TRB_RESERVED" title='TRBType::TRB_RESERVED' data-ref="TRBType::TRB_RESERVED">TRB_RESERVED</dfn> = <var>0</var>,</td></tr>
+<tr><th id="51">51</th><td>    <dfn class="enum" id="TRBType::TR_NORMAL" title='TRBType::TR_NORMAL' data-ref="TRBType::TR_NORMAL">TR_NORMAL</dfn>,</td></tr>
+<tr><th id="52">52</th><td>    <dfn class="enum" id="TRBType::TR_SETUP" title='TRBType::TR_SETUP' data-ref="TRBType::TR_SETUP">TR_SETUP</dfn>,</td></tr>
+<tr><th id="53">53</th><td>    <dfn class="enum" id="TRBType::TR_DATA" title='TRBType::TR_DATA' data-ref="TRBType::TR_DATA">TR_DATA</dfn>,</td></tr>
+<tr><th id="54">54</th><td>    <dfn class="enum" id="TRBType::TR_STATUS" title='TRBType::TR_STATUS' data-ref="TRBType::TR_STATUS">TR_STATUS</dfn>,</td></tr>
+<tr><th id="55">55</th><td>    <dfn class="enum" id="TRBType::TR_ISOCH" title='TRBType::TR_ISOCH' data-ref="TRBType::TR_ISOCH">TR_ISOCH</dfn>,</td></tr>
+<tr><th id="56">56</th><td>    <dfn class="enum" id="TRBType::TR_LINK" title='TRBType::TR_LINK' data-ref="TRBType::TR_LINK">TR_LINK</dfn>,</td></tr>
+<tr><th id="57">57</th><td>    <dfn class="enum" id="TRBType::TR_EVDATA" title='TRBType::TR_EVDATA' data-ref="TRBType::TR_EVDATA">TR_EVDATA</dfn>,</td></tr>
+<tr><th id="58">58</th><td>    <dfn class="enum" id="TRBType::TR_NOOP" title='TRBType::TR_NOOP' data-ref="TRBType::TR_NOOP">TR_NOOP</dfn>,</td></tr>
+<tr><th id="59">59</th><td>    <dfn class="enum" id="TRBType::CR_ENABLE_SLOT" title='TRBType::CR_ENABLE_SLOT' data-ref="TRBType::CR_ENABLE_SLOT">CR_ENABLE_SLOT</dfn>,</td></tr>
+<tr><th id="60">60</th><td>    <dfn class="enum" id="TRBType::CR_DISABLE_SLOT" title='TRBType::CR_DISABLE_SLOT' data-ref="TRBType::CR_DISABLE_SLOT">CR_DISABLE_SLOT</dfn>,</td></tr>
+<tr><th id="61">61</th><td>    <dfn class="enum" id="TRBType::CR_ADDRESS_DEVICE" title='TRBType::CR_ADDRESS_DEVICE' data-ref="TRBType::CR_ADDRESS_DEVICE">CR_ADDRESS_DEVICE</dfn>,</td></tr>
+<tr><th id="62">62</th><td>    <dfn class="enum" id="TRBType::CR_CONFIGURE_ENDPOINT" title='TRBType::CR_CONFIGURE_ENDPOINT' data-ref="TRBType::CR_CONFIGURE_ENDPOINT">CR_CONFIGURE_ENDPOINT</dfn>,</td></tr>
+<tr><th id="63">63</th><td>    <dfn class="enum" id="TRBType::CR_EVALUATE_CONTEXT" title='TRBType::CR_EVALUATE_CONTEXT' data-ref="TRBType::CR_EVALUATE_CONTEXT">CR_EVALUATE_CONTEXT</dfn>,</td></tr>
+<tr><th id="64">64</th><td>    <dfn class="enum" id="TRBType::CR_RESET_ENDPOINT" title='TRBType::CR_RESET_ENDPOINT' data-ref="TRBType::CR_RESET_ENDPOINT">CR_RESET_ENDPOINT</dfn>,</td></tr>
+<tr><th id="65">65</th><td>    <dfn class="enum" id="TRBType::CR_STOP_ENDPOINT" title='TRBType::CR_STOP_ENDPOINT' data-ref="TRBType::CR_STOP_ENDPOINT">CR_STOP_ENDPOINT</dfn>,</td></tr>
+<tr><th id="66">66</th><td>    <dfn class="enum" id="TRBType::CR_SET_TR_DEQUEUE" title='TRBType::CR_SET_TR_DEQUEUE' data-ref="TRBType::CR_SET_TR_DEQUEUE">CR_SET_TR_DEQUEUE</dfn>,</td></tr>
+<tr><th id="67">67</th><td>    <dfn class="enum" id="TRBType::CR_RESET_DEVICE" title='TRBType::CR_RESET_DEVICE' data-ref="TRBType::CR_RESET_DEVICE">CR_RESET_DEVICE</dfn>,</td></tr>
+<tr><th id="68">68</th><td>    <dfn class="enum" id="TRBType::CR_FORCE_EVENT" title='TRBType::CR_FORCE_EVENT' data-ref="TRBType::CR_FORCE_EVENT">CR_FORCE_EVENT</dfn>,</td></tr>
+<tr><th id="69">69</th><td>    <dfn class="enum" id="TRBType::CR_NEGOTIATE_BW" title='TRBType::CR_NEGOTIATE_BW' data-ref="TRBType::CR_NEGOTIATE_BW">CR_NEGOTIATE_BW</dfn>,</td></tr>
+<tr><th id="70">70</th><td>    <dfn class="enum" id="TRBType::CR_SET_LATENCY_TOLERANCE" title='TRBType::CR_SET_LATENCY_TOLERANCE' data-ref="TRBType::CR_SET_LATENCY_TOLERANCE">CR_SET_LATENCY_TOLERANCE</dfn>,</td></tr>
+<tr><th id="71">71</th><td>    <dfn class="enum" id="TRBType::CR_GET_PORT_BANDWIDTH" title='TRBType::CR_GET_PORT_BANDWIDTH' data-ref="TRBType::CR_GET_PORT_BANDWIDTH">CR_GET_PORT_BANDWIDTH</dfn>,</td></tr>
+<tr><th id="72">72</th><td>    <dfn class="enum" id="TRBType::CR_FORCE_HEADER" title='TRBType::CR_FORCE_HEADER' data-ref="TRBType::CR_FORCE_HEADER">CR_FORCE_HEADER</dfn>,</td></tr>
+<tr><th id="73">73</th><td>    <dfn class="enum" id="TRBType::CR_NOOP" title='TRBType::CR_NOOP' data-ref="TRBType::CR_NOOP">CR_NOOP</dfn>,</td></tr>
+<tr><th id="74">74</th><td>    <dfn class="enum" id="TRBType::ER_TRANSFER" title='TRBType::ER_TRANSFER' data-ref="TRBType::ER_TRANSFER">ER_TRANSFER</dfn> = <var>32</var>,</td></tr>
+<tr><th id="75">75</th><td>    <dfn class="enum" id="TRBType::ER_COMMAND_COMPLETE" title='TRBType::ER_COMMAND_COMPLETE' data-ref="TRBType::ER_COMMAND_COMPLETE">ER_COMMAND_COMPLETE</dfn>,</td></tr>
+<tr><th id="76">76</th><td>    <dfn class="enum" id="TRBType::ER_PORT_STATUS_CHANGE" title='TRBType::ER_PORT_STATUS_CHANGE' data-ref="TRBType::ER_PORT_STATUS_CHANGE">ER_PORT_STATUS_CHANGE</dfn>,</td></tr>
+<tr><th id="77">77</th><td>    <dfn class="enum" id="TRBType::ER_BANDWIDTH_REQUEST" title='TRBType::ER_BANDWIDTH_REQUEST' data-ref="TRBType::ER_BANDWIDTH_REQUEST">ER_BANDWIDTH_REQUEST</dfn>,</td></tr>
+<tr><th id="78">78</th><td>    <dfn class="enum" id="TRBType::ER_DOORBELL" title='TRBType::ER_DOORBELL' data-ref="TRBType::ER_DOORBELL">ER_DOORBELL</dfn>,</td></tr>
+<tr><th id="79">79</th><td>    <dfn class="enum" id="TRBType::ER_HOST_CONTROLLER" title='TRBType::ER_HOST_CONTROLLER' data-ref="TRBType::ER_HOST_CONTROLLER">ER_HOST_CONTROLLER</dfn>,</td></tr>
+<tr><th id="80">80</th><td>    <dfn class="enum" id="TRBType::ER_DEVICE_NOTIFICATION" title='TRBType::ER_DEVICE_NOTIFICATION' data-ref="TRBType::ER_DEVICE_NOTIFICATION">ER_DEVICE_NOTIFICATION</dfn>,</td></tr>
+<tr><th id="81">81</th><td>    <dfn class="enum" id="TRBType::ER_MFINDEX_WRAP" title='TRBType::ER_MFINDEX_WRAP' data-ref="TRBType::ER_MFINDEX_WRAP">ER_MFINDEX_WRAP</dfn>,</td></tr>
+<tr><th id="82">82</th><td>    <i>/* vendor specific bits */</i></td></tr>
+<tr><th id="83">83</th><td>    <dfn class="enum" id="TRBType::CR_VENDOR_NEC_FIRMWARE_REVISION" title='TRBType::CR_VENDOR_NEC_FIRMWARE_REVISION' data-ref="TRBType::CR_VENDOR_NEC_FIRMWARE_REVISION">CR_VENDOR_NEC_FIRMWARE_REVISION</dfn>  = <var>49</var>,</td></tr>
+<tr><th id="84">84</th><td>    <dfn class="enum" id="TRBType::CR_VENDOR_NEC_CHALLENGE_RESPONSE" title='TRBType::CR_VENDOR_NEC_CHALLENGE_RESPONSE' data-ref="TRBType::CR_VENDOR_NEC_CHALLENGE_RESPONSE">CR_VENDOR_NEC_CHALLENGE_RESPONSE</dfn> = <var>50</var>,</td></tr>
+<tr><th id="85">85</th><td>} <dfn class="typedef" id="TRBType" title='TRBType' data-type='enum TRBType' data-ref="TRBType">TRBType</dfn>;</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="TRBCCode" title='TRBCCode' data-ref="TRBCCode"><a class="type" href="#TRBCCode" title='TRBCCode' data-ref="TRBCCode">TRBCCode</a></dfn> {</td></tr>
+<tr><th id="88">88</th><td>    <dfn class="enum" id="TRBCCode::CC_INVALID" title='TRBCCode::CC_INVALID' data-ref="TRBCCode::CC_INVALID">CC_INVALID</dfn> = <var>0</var>,</td></tr>
+<tr><th id="89">89</th><td>    <dfn class="enum" id="TRBCCode::CC_SUCCESS" title='TRBCCode::CC_SUCCESS' data-ref="TRBCCode::CC_SUCCESS">CC_SUCCESS</dfn>,</td></tr>
+<tr><th id="90">90</th><td>    <dfn class="enum" id="TRBCCode::CC_DATA_BUFFER_ERROR" title='TRBCCode::CC_DATA_BUFFER_ERROR' data-ref="TRBCCode::CC_DATA_BUFFER_ERROR">CC_DATA_BUFFER_ERROR</dfn>,</td></tr>
+<tr><th id="91">91</th><td>    <dfn class="enum" id="TRBCCode::CC_BABBLE_DETECTED" title='TRBCCode::CC_BABBLE_DETECTED' data-ref="TRBCCode::CC_BABBLE_DETECTED">CC_BABBLE_DETECTED</dfn>,</td></tr>
+<tr><th id="92">92</th><td>    <dfn class="enum" id="TRBCCode::CC_USB_TRANSACTION_ERROR" title='TRBCCode::CC_USB_TRANSACTION_ERROR' data-ref="TRBCCode::CC_USB_TRANSACTION_ERROR">CC_USB_TRANSACTION_ERROR</dfn>,</td></tr>
+<tr><th id="93">93</th><td>    <dfn class="enum" id="TRBCCode::CC_TRB_ERROR" title='TRBCCode::CC_TRB_ERROR' data-ref="TRBCCode::CC_TRB_ERROR">CC_TRB_ERROR</dfn>,</td></tr>
+<tr><th id="94">94</th><td>    <dfn class="enum" id="TRBCCode::CC_STALL_ERROR" title='TRBCCode::CC_STALL_ERROR' data-ref="TRBCCode::CC_STALL_ERROR">CC_STALL_ERROR</dfn>,</td></tr>
+<tr><th id="95">95</th><td>    <dfn class="enum" id="TRBCCode::CC_RESOURCE_ERROR" title='TRBCCode::CC_RESOURCE_ERROR' data-ref="TRBCCode::CC_RESOURCE_ERROR">CC_RESOURCE_ERROR</dfn>,</td></tr>
+<tr><th id="96">96</th><td>    <dfn class="enum" id="TRBCCode::CC_BANDWIDTH_ERROR" title='TRBCCode::CC_BANDWIDTH_ERROR' data-ref="TRBCCode::CC_BANDWIDTH_ERROR">CC_BANDWIDTH_ERROR</dfn>,</td></tr>
+<tr><th id="97">97</th><td>    <dfn class="enum" id="TRBCCode::CC_NO_SLOTS_ERROR" title='TRBCCode::CC_NO_SLOTS_ERROR' data-ref="TRBCCode::CC_NO_SLOTS_ERROR">CC_NO_SLOTS_ERROR</dfn>,</td></tr>
+<tr><th id="98">98</th><td>    <dfn class="enum" id="TRBCCode::CC_INVALID_STREAM_TYPE_ERROR" title='TRBCCode::CC_INVALID_STREAM_TYPE_ERROR' data-ref="TRBCCode::CC_INVALID_STREAM_TYPE_ERROR">CC_INVALID_STREAM_TYPE_ERROR</dfn>,</td></tr>
+<tr><th id="99">99</th><td>    <dfn class="enum" id="TRBCCode::CC_SLOT_NOT_ENABLED_ERROR" title='TRBCCode::CC_SLOT_NOT_ENABLED_ERROR' data-ref="TRBCCode::CC_SLOT_NOT_ENABLED_ERROR">CC_SLOT_NOT_ENABLED_ERROR</dfn>,</td></tr>
+<tr><th id="100">100</th><td>    <dfn class="enum" id="TRBCCode::CC_EP_NOT_ENABLED_ERROR" title='TRBCCode::CC_EP_NOT_ENABLED_ERROR' data-ref="TRBCCode::CC_EP_NOT_ENABLED_ERROR">CC_EP_NOT_ENABLED_ERROR</dfn>,</td></tr>
+<tr><th id="101">101</th><td>    <dfn class="enum" id="TRBCCode::CC_SHORT_PACKET" title='TRBCCode::CC_SHORT_PACKET' data-ref="TRBCCode::CC_SHORT_PACKET">CC_SHORT_PACKET</dfn>,</td></tr>
+<tr><th id="102">102</th><td>    <dfn class="enum" id="TRBCCode::CC_RING_UNDERRUN" title='TRBCCode::CC_RING_UNDERRUN' data-ref="TRBCCode::CC_RING_UNDERRUN">CC_RING_UNDERRUN</dfn>,</td></tr>
+<tr><th id="103">103</th><td>    <dfn class="enum" id="TRBCCode::CC_RING_OVERRUN" title='TRBCCode::CC_RING_OVERRUN' data-ref="TRBCCode::CC_RING_OVERRUN">CC_RING_OVERRUN</dfn>,</td></tr>
+<tr><th id="104">104</th><td>    <dfn class="enum" id="TRBCCode::CC_VF_ER_FULL" title='TRBCCode::CC_VF_ER_FULL' data-ref="TRBCCode::CC_VF_ER_FULL">CC_VF_ER_FULL</dfn>,</td></tr>
+<tr><th id="105">105</th><td>    <dfn class="enum" id="TRBCCode::CC_PARAMETER_ERROR" title='TRBCCode::CC_PARAMETER_ERROR' data-ref="TRBCCode::CC_PARAMETER_ERROR">CC_PARAMETER_ERROR</dfn>,</td></tr>
+<tr><th id="106">106</th><td>    <dfn class="enum" id="TRBCCode::CC_BANDWIDTH_OVERRUN" title='TRBCCode::CC_BANDWIDTH_OVERRUN' data-ref="TRBCCode::CC_BANDWIDTH_OVERRUN">CC_BANDWIDTH_OVERRUN</dfn>,</td></tr>
+<tr><th id="107">107</th><td>    <dfn class="enum" id="TRBCCode::CC_CONTEXT_STATE_ERROR" title='TRBCCode::CC_CONTEXT_STATE_ERROR' data-ref="TRBCCode::CC_CONTEXT_STATE_ERROR">CC_CONTEXT_STATE_ERROR</dfn>,</td></tr>
+<tr><th id="108">108</th><td>    <dfn class="enum" id="TRBCCode::CC_NO_PING_RESPONSE_ERROR" title='TRBCCode::CC_NO_PING_RESPONSE_ERROR' data-ref="TRBCCode::CC_NO_PING_RESPONSE_ERROR">CC_NO_PING_RESPONSE_ERROR</dfn>,</td></tr>
+<tr><th id="109">109</th><td>    <dfn class="enum" id="TRBCCode::CC_EVENT_RING_FULL_ERROR" title='TRBCCode::CC_EVENT_RING_FULL_ERROR' data-ref="TRBCCode::CC_EVENT_RING_FULL_ERROR">CC_EVENT_RING_FULL_ERROR</dfn>,</td></tr>
+<tr><th id="110">110</th><td>    <dfn class="enum" id="TRBCCode::CC_INCOMPATIBLE_DEVICE_ERROR" title='TRBCCode::CC_INCOMPATIBLE_DEVICE_ERROR' data-ref="TRBCCode::CC_INCOMPATIBLE_DEVICE_ERROR">CC_INCOMPATIBLE_DEVICE_ERROR</dfn>,</td></tr>
+<tr><th id="111">111</th><td>    <dfn class="enum" id="TRBCCode::CC_MISSED_SERVICE_ERROR" title='TRBCCode::CC_MISSED_SERVICE_ERROR' data-ref="TRBCCode::CC_MISSED_SERVICE_ERROR">CC_MISSED_SERVICE_ERROR</dfn>,</td></tr>
+<tr><th id="112">112</th><td>    <dfn class="enum" id="TRBCCode::CC_COMMAND_RING_STOPPED" title='TRBCCode::CC_COMMAND_RING_STOPPED' data-ref="TRBCCode::CC_COMMAND_RING_STOPPED">CC_COMMAND_RING_STOPPED</dfn>,</td></tr>
+<tr><th id="113">113</th><td>    <dfn class="enum" id="TRBCCode::CC_COMMAND_ABORTED" title='TRBCCode::CC_COMMAND_ABORTED' data-ref="TRBCCode::CC_COMMAND_ABORTED">CC_COMMAND_ABORTED</dfn>,</td></tr>
+<tr><th id="114">114</th><td>    <dfn class="enum" id="TRBCCode::CC_STOPPED" title='TRBCCode::CC_STOPPED' data-ref="TRBCCode::CC_STOPPED">CC_STOPPED</dfn>,</td></tr>
+<tr><th id="115">115</th><td>    <dfn class="enum" id="TRBCCode::CC_STOPPED_LENGTH_INVALID" title='TRBCCode::CC_STOPPED_LENGTH_INVALID' data-ref="TRBCCode::CC_STOPPED_LENGTH_INVALID">CC_STOPPED_LENGTH_INVALID</dfn>,</td></tr>
+<tr><th id="116">116</th><td>    <dfn class="enum" id="TRBCCode::CC_MAX_EXIT_LATENCY_TOO_LARGE_ERROR" title='TRBCCode::CC_MAX_EXIT_LATENCY_TOO_LARGE_ERROR' data-ref="TRBCCode::CC_MAX_EXIT_LATENCY_TOO_LARGE_ERROR">CC_MAX_EXIT_LATENCY_TOO_LARGE_ERROR</dfn> = <var>29</var>,</td></tr>
+<tr><th id="117">117</th><td>    <dfn class="enum" id="TRBCCode::CC_ISOCH_BUFFER_OVERRUN" title='TRBCCode::CC_ISOCH_BUFFER_OVERRUN' data-ref="TRBCCode::CC_ISOCH_BUFFER_OVERRUN">CC_ISOCH_BUFFER_OVERRUN</dfn> = <var>31</var>,</td></tr>
+<tr><th id="118">118</th><td>    <dfn class="enum" id="TRBCCode::CC_EVENT_LOST_ERROR" title='TRBCCode::CC_EVENT_LOST_ERROR' data-ref="TRBCCode::CC_EVENT_LOST_ERROR">CC_EVENT_LOST_ERROR</dfn>,</td></tr>
+<tr><th id="119">119</th><td>    <dfn class="enum" id="TRBCCode::CC_UNDEFINED_ERROR" title='TRBCCode::CC_UNDEFINED_ERROR' data-ref="TRBCCode::CC_UNDEFINED_ERROR">CC_UNDEFINED_ERROR</dfn>,</td></tr>
+<tr><th id="120">120</th><td>    <dfn class="enum" id="TRBCCode::CC_INVALID_STREAM_ID_ERROR" title='TRBCCode::CC_INVALID_STREAM_ID_ERROR' data-ref="TRBCCode::CC_INVALID_STREAM_ID_ERROR">CC_INVALID_STREAM_ID_ERROR</dfn>,</td></tr>
+<tr><th id="121">121</th><td>    <dfn class="enum" id="TRBCCode::CC_SECONDARY_BANDWIDTH_ERROR" title='TRBCCode::CC_SECONDARY_BANDWIDTH_ERROR' data-ref="TRBCCode::CC_SECONDARY_BANDWIDTH_ERROR">CC_SECONDARY_BANDWIDTH_ERROR</dfn>,</td></tr>
+<tr><th id="122">122</th><td>    <dfn class="enum" id="TRBCCode::CC_SPLIT_TRANSACTION_ERROR" title='TRBCCode::CC_SPLIT_TRANSACTION_ERROR' data-ref="TRBCCode::CC_SPLIT_TRANSACTION_ERROR">CC_SPLIT_TRANSACTION_ERROR</dfn></td></tr>
+<tr><th id="123">123</th><td>} <dfn class="typedef" id="TRBCCode" title='TRBCCode' data-type='enum TRBCCode' data-ref="TRBCCode">TRBCCode</dfn>;</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="XHCIRing" title='XHCIRing' data-ref="XHCIRing"><a class="type" href="#XHCIRing" title='XHCIRing' data-ref="XHCIRing">XHCIRing</a></dfn> {</td></tr>
+<tr><th id="126">126</th><td>    <a class="typedef" href="../../include/sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="XHCIRing::dequeue" title='XHCIRing::dequeue' data-ref="XHCIRing::dequeue">dequeue</dfn>;</td></tr>
+<tr><th id="127">127</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCIRing::ccs" title='XHCIRing::ccs' data-ref="XHCIRing::ccs">ccs</dfn>;</td></tr>
+<tr><th id="128">128</th><td>} <dfn class="typedef" id="XHCIRing" title='XHCIRing' data-type='struct XHCIRing' data-ref="XHCIRing">XHCIRing</dfn>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="XHCIPort" title='XHCIPort' data-ref="XHCIPort"><a class="type" href="#XHCIPort" title='XHCIPort' data-ref="XHCIPort">XHCIPort</a></dfn> {</td></tr>
+<tr><th id="131">131</th><td>    <a class="typedef" href="#XHCIState" title='XHCIState' data-type='struct XHCIState' data-ref="XHCIState">XHCIState</a> *<dfn class="decl" id="XHCIPort::xhci" title='XHCIPort::xhci' data-ref="XHCIPort::xhci">xhci</dfn>;</td></tr>
+<tr><th id="132">132</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIPort::portsc" title='XHCIPort::portsc' data-ref="XHCIPort::portsc">portsc</dfn>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIPort::portnr" title='XHCIPort::portnr' data-ref="XHCIPort::portnr">portnr</dfn>;</td></tr>
+<tr><th id="134">134</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPort" title='USBPort' data-type='struct USBPort' data-ref="USBPort">USBPort</a>  *<dfn class="decl" id="XHCIPort::uport" title='XHCIPort::uport' data-ref="XHCIPort::uport">uport</dfn>;</td></tr>
+<tr><th id="135">135</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIPort::speedmask" title='XHCIPort::speedmask' data-ref="XHCIPort::speedmask">speedmask</dfn>;</td></tr>
+<tr><th id="136">136</th><td>    <em>char</em> <dfn class="decl" id="XHCIPort::name" title='XHCIPort::name' data-ref="XHCIPort::name">name</dfn>[<var>16</var>];</td></tr>
+<tr><th id="137">137</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIPort::mem" title='XHCIPort::mem' data-ref="XHCIPort::mem">mem</dfn>;</td></tr>
+<tr><th id="138">138</th><td>} <dfn class="typedef" id="XHCIPort" title='XHCIPort' data-type='struct XHCIPort' data-ref="XHCIPort">XHCIPort</dfn>;</td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="XHCISlot" title='XHCISlot' data-ref="XHCISlot"><a class="type" href="#XHCISlot" title='XHCISlot' data-ref="XHCISlot">XHCISlot</a></dfn> {</td></tr>
+<tr><th id="141">141</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCISlot::enabled" title='XHCISlot::enabled' data-ref="XHCISlot::enabled">enabled</dfn>;</td></tr>
+<tr><th id="142">142</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCISlot::addressed" title='XHCISlot::addressed' data-ref="XHCISlot::addressed">addressed</dfn>;</td></tr>
+<tr><th id="143">143</th><td>    <a class="typedef" href="../../include/sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="XHCISlot::ctx" title='XHCISlot::ctx' data-ref="XHCISlot::ctx">ctx</dfn>;</td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPort" title='USBPort' data-type='struct USBPort' data-ref="USBPort">USBPort</a> *<dfn class="decl" id="XHCISlot::uport" title='XHCISlot::uport' data-ref="XHCISlot::uport">uport</dfn>;</td></tr>
+<tr><th id="145">145</th><td>    <a class="typedef" href="#XHCIEPContext" title='XHCIEPContext' data-type='struct XHCIEPContext' data-ref="XHCIEPContext">XHCIEPContext</a> *<dfn class="decl" id="XHCISlot::eps" title='XHCISlot::eps' data-ref="XHCISlot::eps">eps</dfn>[<var>31</var>];</td></tr>
+<tr><th id="146">146</th><td>} <dfn class="typedef" id="XHCISlot" title='XHCISlot' data-type='struct XHCISlot' data-ref="XHCISlot">XHCISlot</dfn>;</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="XHCIEvent" title='XHCIEvent' data-ref="XHCIEvent"><a class="type" href="#XHCIEvent" title='XHCIEvent' data-ref="XHCIEvent">XHCIEvent</a></dfn> {</td></tr>
+<tr><th id="149">149</th><td>    <a class="typedef" href="#TRBType" title='TRBType' data-type='enum TRBType' data-ref="TRBType">TRBType</a> <dfn class="decl" id="XHCIEvent::type" title='XHCIEvent::type' data-ref="XHCIEvent::type">type</dfn>;</td></tr>
+<tr><th id="150">150</th><td>    <a class="typedef" href="#TRBCCode" title='TRBCCode' data-type='enum TRBCCode' data-ref="TRBCCode">TRBCCode</a> <dfn class="decl" id="XHCIEvent::ccode" title='XHCIEvent::ccode' data-ref="XHCIEvent::ccode">ccode</dfn>;</td></tr>
+<tr><th id="151">151</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="XHCIEvent::ptr" title='XHCIEvent::ptr' data-ref="XHCIEvent::ptr">ptr</dfn>;</td></tr>
+<tr><th id="152">152</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIEvent::length" title='XHCIEvent::length' data-ref="XHCIEvent::length">length</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIEvent::flags" title='XHCIEvent::flags' data-ref="XHCIEvent::flags">flags</dfn>;</td></tr>
+<tr><th id="154">154</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="XHCIEvent::slotid" title='XHCIEvent::slotid' data-ref="XHCIEvent::slotid">slotid</dfn>;</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="XHCIEvent::epid" title='XHCIEvent::epid' data-ref="XHCIEvent::epid">epid</dfn>;</td></tr>
+<tr><th id="156">156</th><td>} <dfn class="typedef" id="XHCIEvent" title='XHCIEvent' data-type='struct XHCIEvent' data-ref="XHCIEvent">XHCIEvent</dfn>;</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="XHCIInterrupter" title='XHCIInterrupter' data-ref="XHCIInterrupter"><a class="type" href="#XHCIInterrupter" title='XHCIInterrupter' data-ref="XHCIInterrupter">XHCIInterrupter</a></dfn> {</td></tr>
+<tr><th id="159">159</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::iman" title='XHCIInterrupter::iman' data-ref="XHCIInterrupter::iman">iman</dfn>;</td></tr>
+<tr><th id="160">160</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::imod" title='XHCIInterrupter::imod' data-ref="XHCIInterrupter::imod">imod</dfn>;</td></tr>
+<tr><th id="161">161</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::erstsz" title='XHCIInterrupter::erstsz' data-ref="XHCIInterrupter::erstsz">erstsz</dfn>;</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::erstba_low" title='XHCIInterrupter::erstba_low' data-ref="XHCIInterrupter::erstba_low">erstba_low</dfn>;</td></tr>
+<tr><th id="163">163</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::erstba_high" title='XHCIInterrupter::erstba_high' data-ref="XHCIInterrupter::erstba_high">erstba_high</dfn>;</td></tr>
+<tr><th id="164">164</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::erdp_low" title='XHCIInterrupter::erdp_low' data-ref="XHCIInterrupter::erdp_low">erdp_low</dfn>;</td></tr>
+<tr><th id="165">165</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::erdp_high" title='XHCIInterrupter::erdp_high' data-ref="XHCIInterrupter::erdp_high">erdp_high</dfn>;</td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCIInterrupter::msix_used" title='XHCIInterrupter::msix_used' data-ref="XHCIInterrupter::msix_used">msix_used</dfn>, <dfn class="decl" id="XHCIInterrupter::er_pcs" title='XHCIInterrupter::er_pcs' data-ref="XHCIInterrupter::er_pcs">er_pcs</dfn>;</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <a class="typedef" href="../../include/sysemu/dma.h.html#dma_addr_t" title='dma_addr_t' data-type='uint64_t' data-ref="dma_addr_t">dma_addr_t</a> <dfn class="decl" id="XHCIInterrupter::er_start" title='XHCIInterrupter::er_start' data-ref="XHCIInterrupter::er_start">er_start</dfn>;</td></tr>
+<tr><th id="170">170</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIInterrupter::er_size" title='XHCIInterrupter::er_size' data-ref="XHCIInterrupter::er_size">er_size</dfn>;</td></tr>
+<tr><th id="171">171</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="XHCIInterrupter::er_ep_idx" title='XHCIInterrupter::er_ep_idx' data-ref="XHCIInterrupter::er_ep_idx">er_ep_idx</dfn>;</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td>    <i>/* kept for live migration compat only */</i></td></tr>
+<tr><th id="174">174</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCIInterrupter::er_full_unused" title='XHCIInterrupter::er_full_unused' data-ref="XHCIInterrupter::er_full_unused">er_full_unused</dfn>;</td></tr>
+<tr><th id="175">175</th><td>    <a class="typedef" href="#XHCIEvent" title='XHCIEvent' data-type='struct XHCIEvent' data-ref="XHCIEvent">XHCIEvent</a> <dfn class="decl" id="XHCIInterrupter::ev_buffer" title='XHCIInterrupter::ev_buffer' data-ref="XHCIInterrupter::ev_buffer">ev_buffer</dfn>[<a class="macro" href="#37" title="(((3 * 24) + 16) * 64)" data-ref="_M/EV_QUEUE">EV_QUEUE</a>];</td></tr>
+<tr><th id="176">176</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="XHCIInterrupter::ev_buffer_put" title='XHCIInterrupter::ev_buffer_put' data-ref="XHCIInterrupter::ev_buffer_put">ev_buffer_put</dfn>;</td></tr>
+<tr><th id="177">177</th><td>    <em>unsigned</em> <em>int</em> <dfn class="decl" id="XHCIInterrupter::ev_buffer_get" title='XHCIInterrupter::ev_buffer_get' data-ref="XHCIInterrupter::ev_buffer_get">ev_buffer_get</dfn>;</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>} <dfn class="typedef" id="XHCIInterrupter" title='XHCIInterrupter' data-type='struct XHCIInterrupter' data-ref="XHCIInterrupter">XHCIInterrupter</dfn>;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><b>struct</b> <dfn class="type def" id="XHCIState" title='XHCIState' data-ref="XHCIState">XHCIState</dfn> {</td></tr>
+<tr><th id="182">182</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="183">183</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="XHCIState::parent_obj" title='XHCIState::parent_obj' data-ref="XHCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="184">184</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBBus" title='USBBus' data-type='struct USBBus' data-ref="USBBus">USBBus</a> <dfn class="decl" id="XHCIState::bus" title='XHCIState::bus' data-ref="XHCIState::bus">bus</dfn>;</td></tr>
+<tr><th id="187">187</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIState::mem" title='XHCIState::mem' data-ref="XHCIState::mem">mem</dfn>;</td></tr>
+<tr><th id="188">188</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIState::mem_cap" title='XHCIState::mem_cap' data-ref="XHCIState::mem_cap">mem_cap</dfn>;</td></tr>
+<tr><th id="189">189</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIState::mem_oper" title='XHCIState::mem_oper' data-ref="XHCIState::mem_oper">mem_oper</dfn>;</td></tr>
+<tr><th id="190">190</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIState::mem_runtime" title='XHCIState::mem_runtime' data-ref="XHCIState::mem_runtime">mem_runtime</dfn>;</td></tr>
+<tr><th id="191">191</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="XHCIState::mem_doorbell" title='XHCIState::mem_doorbell' data-ref="XHCIState::mem_doorbell">mem_doorbell</dfn>;</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <i>/* properties */</i></td></tr>
+<tr><th id="194">194</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::numports_2" title='XHCIState::numports_2' data-ref="XHCIState::numports_2">numports_2</dfn>;</td></tr>
+<tr><th id="195">195</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::numports_3" title='XHCIState::numports_3' data-ref="XHCIState::numports_3">numports_3</dfn>;</td></tr>
+<tr><th id="196">196</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::numintrs" title='XHCIState::numintrs' data-ref="XHCIState::numintrs">numintrs</dfn>;</td></tr>
+<tr><th id="197">197</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::numslots" title='XHCIState::numslots' data-ref="XHCIState::numslots">numslots</dfn>;</td></tr>
+<tr><th id="198">198</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::flags" title='XHCIState::flags' data-ref="XHCIState::flags">flags</dfn>;</td></tr>
+<tr><th id="199">199</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::max_pstreams_mask" title='XHCIState::max_pstreams_mask' data-ref="XHCIState::max_pstreams_mask">max_pstreams_mask</dfn>;</td></tr>
+<tr><th id="200">200</th><td>    <a class="typedef" href="../../qapi-types.h.html#OnOffAuto" title='OnOffAuto' data-type='enum OnOffAuto' data-ref="OnOffAuto">OnOffAuto</a> <dfn class="decl" id="XHCIState::msi" title='XHCIState::msi' data-ref="XHCIState::msi">msi</dfn>;</td></tr>
+<tr><th id="201">201</th><td>    <a class="typedef" href="../../qapi-types.h.html#OnOffAuto" title='OnOffAuto' data-type='enum OnOffAuto' data-ref="OnOffAuto">OnOffAuto</a> <dfn class="decl" id="XHCIState::msix" title='XHCIState::msix' data-ref="XHCIState::msix">msix</dfn>;</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td>    <i>/* Operational Registers */</i></td></tr>
+<tr><th id="204">204</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::usbcmd" title='XHCIState::usbcmd' data-ref="XHCIState::usbcmd">usbcmd</dfn>;</td></tr>
+<tr><th id="205">205</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::usbsts" title='XHCIState::usbsts' data-ref="XHCIState::usbsts">usbsts</dfn>;</td></tr>
+<tr><th id="206">206</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::dnctrl" title='XHCIState::dnctrl' data-ref="XHCIState::dnctrl">dnctrl</dfn>;</td></tr>
+<tr><th id="207">207</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::crcr_low" title='XHCIState::crcr_low' data-ref="XHCIState::crcr_low">crcr_low</dfn>;</td></tr>
+<tr><th id="208">208</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::crcr_high" title='XHCIState::crcr_high' data-ref="XHCIState::crcr_high">crcr_high</dfn>;</td></tr>
+<tr><th id="209">209</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::dcbaap_low" title='XHCIState::dcbaap_low' data-ref="XHCIState::dcbaap_low">dcbaap_low</dfn>;</td></tr>
+<tr><th id="210">210</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::dcbaap_high" title='XHCIState::dcbaap_high' data-ref="XHCIState::dcbaap_high">dcbaap_high</dfn>;</td></tr>
+<tr><th id="211">211</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::config" title='XHCIState::config' data-ref="XHCIState::config">config</dfn>;</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>    <a class="typedef" href="../../include/hw/usb.h.html#USBPort" title='USBPort' data-type='struct USBPort' data-ref="USBPort">USBPort</a>  <dfn class="decl" id="XHCIState::uports" title='XHCIState::uports' data-ref="XHCIState::uports">uports</dfn>[<a class="macro" href="../../../include/glib-2.0/glib/gmacros.h.html#288" title="(((15) &gt; (15)) ? (15) : (15))" data-ref="_M/MAX">MAX</a>(<a class="macro" href="#29" title="15" data-ref="_M/MAXPORTS_2">MAXPORTS_2</a>, <a class="macro" href="#30" title="15" data-ref="_M/MAXPORTS_3">MAXPORTS_3</a>)];</td></tr>
+<tr><th id="214">214</th><td>    <a class="typedef" href="#XHCIPort" title='XHCIPort' data-type='struct XHCIPort' data-ref="XHCIPort">XHCIPort</a> <dfn class="decl" id="XHCIState::ports" title='XHCIState::ports' data-ref="XHCIState::ports">ports</dfn>[<a class="macro" href="#32" title="(15 + 15)" data-ref="_M/MAXPORTS">MAXPORTS</a>];</td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="#XHCISlot" title='XHCISlot' data-type='struct XHCISlot' data-ref="XHCISlot">XHCISlot</a> <dfn class="decl" id="XHCIState::slots" title='XHCIState::slots' data-ref="XHCIState::slots">slots</dfn>[<a class="macro" href="#33" title="64" data-ref="_M/MAXSLOTS">MAXSLOTS</a>];</td></tr>
+<tr><th id="216">216</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="XHCIState::numports" title='XHCIState::numports' data-ref="XHCIState::numports">numports</dfn>;</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td>    <i>/* Runtime Registers */</i></td></tr>
+<tr><th id="219">219</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="XHCIState::mfindex_start" title='XHCIState::mfindex_start' data-ref="XHCIState::mfindex_start">mfindex_start</dfn>;</td></tr>
+<tr><th id="220">220</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="XHCIState::mfwrap_timer" title='XHCIState::mfwrap_timer' data-ref="XHCIState::mfwrap_timer">mfwrap_timer</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="#XHCIInterrupter" title='XHCIInterrupter' data-type='struct XHCIInterrupter' data-ref="XHCIInterrupter">XHCIInterrupter</a> <dfn class="decl" id="XHCIState::intr" title='XHCIState::intr' data-ref="XHCIState::intr">intr</dfn>[<a class="macro" href="#34" title="16" data-ref="_M/MAXINTRS">MAXINTRS</a>];</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td>    <a class="typedef" href="#XHCIRing" title='XHCIRing' data-type='struct XHCIRing' data-ref="XHCIRing">XHCIRing</a> <dfn class="decl" id="XHCIState::cmd_ring" title='XHCIState::cmd_ring' data-ref="XHCIState::cmd_ring">cmd_ring</dfn>;</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="XHCIState::nec_quirks" title='XHCIState::nec_quirks' data-ref="XHCIState::nec_quirks">nec_quirks</dfn>;</td></tr>
+<tr><th id="226">226</th><td>};</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='hcd-xhci-nec.c.html'>codebrowser/hw/usb/hcd-xhci-nec.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

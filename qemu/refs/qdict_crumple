@@ -1,0 +1,45 @@
+<dec f='codebrowser/include/qapi/qmp/qdict.h' l='85' type='QObject * qdict_crumple(const QDict * src, Error ** errp)'/>
+<use f='codebrowser/block/nbd.c' l='275' u='c' c='nbd_config'/>
+<use f='codebrowser/block/nfs.c' l='465' u='c' c='nfs_config'/>
+<use f='codebrowser/block/sheepdog.c' l='562' u='c' c='sd_server_config'/>
+<def f='codebrowser/qobject/qdict.c' l='821' ll='930' type='QObject * qdict_crumple(const QDict * src, Error ** errp)'/>
+<use f='codebrowser/qobject/qdict.c' l='879' u='c' c='qdict_crumple'/>
+<doc f='codebrowser/qobject/qdict.c' l='782'>/**
+ * qdict_crumple:
+ * @src: the original flat dictionary (only scalar values) to crumple
+ *
+ * Takes a flat dictionary whose keys use &apos;.&apos; separator to indicate
+ * nesting, and values are scalars, and crumples it into a nested
+ * structure.
+ *
+ * To include a literal &apos;.&apos; in a key name, it must be escaped as &apos;..&apos;
+ *
+ * For example, an input of:
+ *
+ * { &apos;foo.0.bar&apos;: &apos;one&apos;, &apos;foo.0.wizz&apos;: &apos;1&apos;,
+ *   &apos;foo.1.bar&apos;: &apos;two&apos;, &apos;foo.1.wizz&apos;: &apos;2&apos; }
+ *
+ * will result in an output of:
+ *
+ * {
+ *   &apos;foo&apos;: [
+ *      { &apos;bar&apos;: &apos;one&apos;, &apos;wizz&apos;: &apos;1&apos; },
+ *      { &apos;bar&apos;: &apos;two&apos;, &apos;wizz&apos;: &apos;2&apos; }
+ *   ],
+ * }
+ *
+ * The following scenarios in the input dict will result in an
+ * error being returned:
+ *
+ *  - Any values in @src are non-scalar types
+ *  - If keys in @src imply that a particular level is both a
+ *    list and a dict. e.g., &quot;foo.0.bar&quot; and &quot;foo.eek.bar&quot;.
+ *  - If keys in @src imply that a particular level is a list,
+ *    but the indices are non-contiguous. e.g. &quot;foo.0.bar&quot; and
+ *    &quot;foo.2.bar&quot; without any &quot;foo.1.bar&quot; present.
+ *  - If keys in @src represent list indexes, but are not in
+ *    the &quot;%zu&quot; format. e.g. &quot;foo.+0.bar&quot;
+ *
+ * Returns: either a QDict or QList for the nested data structure, or NULL
+ * on error
+ */</doc>

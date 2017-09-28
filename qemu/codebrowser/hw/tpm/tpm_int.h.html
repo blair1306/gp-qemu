@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tpm_int.h source code [codebrowser/hw/tpm/tpm_int.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="TPMState,tpm_req_hdr,tpm_resp_hdr "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/tpm/tpm_int.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>tpm</a>/<a href='tpm_int.h.html'>tpm_int.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * TPM configuration</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2011-2013 IBM Corporation</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Berger    &lt;stefanb@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> */</i></td></tr>
+<tr><th id="12">12</th><td><u>#<span data-ppcond="12">ifndef</span> <span class="macro" data-ref="_M/TPM_TPM_INT_H">TPM_TPM_INT_H</span></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/TPM_TPM_INT_H" data-ref="_M/TPM_TPM_INT_H">TPM_TPM_INT_H</dfn></u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../../include/exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="tpm_tis.h.html">"tpm_tis.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><i>/* overall state of the TPM interface */</i></td></tr>
+<tr><th id="19">19</th><td><b>struct</b> <dfn class="type def" id="TPMState" title='TPMState' data-ref="TPMState">TPMState</dfn> {</td></tr>
+<tr><th id="20">20</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> <dfn class="decl" id="TPMState::busdev" title='TPMState::busdev' data-ref="TPMState::busdev">busdev</dfn>;</td></tr>
+<tr><th id="21">21</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="TPMState::mmio" title='TPMState::mmio' data-ref="TPMState::mmio">mmio</dfn>;</td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td>    <b>union</b> {</td></tr>
+<tr><th id="24">24</th><td>        <a class="typedef" href="tpm_tis.h.html#TPMTISEmuState" title='TPMTISEmuState' data-type='struct TPMTISEmuState' data-ref="TPMTISEmuState">TPMTISEmuState</a> <dfn class="decl" id="TPMState::(anonymous)::tis" title='TPMState::(anonymous union)::tis' data-ref="TPMState::(anonymous)::tis">tis</dfn>;</td></tr>
+<tr><th id="25">25</th><td>    } <dfn class="decl" id="TPMState::s" title='TPMState::s' data-ref="TPMState::s">s</dfn>;</td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>     <dfn class="decl" id="TPMState::locty_number" title='TPMState::locty_number' data-ref="TPMState::locty_number">locty_number</dfn>;</td></tr>
+<tr><th id="28">28</th><td>    <a class="typedef" href="tpm_tis.h.html#TPMLocality" title='TPMLocality' data-type='struct TPMLocality' data-ref="TPMLocality">TPMLocality</a> *<dfn class="decl" id="TPMState::locty_data" title='TPMState::locty_data' data-ref="TPMState::locty_data">locty_data</dfn>;</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td>    <em>char</em> *<dfn class="decl" id="TPMState::backend" title='TPMState::backend' data-ref="TPMState::backend">backend</dfn>;</td></tr>
+<tr><th id="31">31</th><td>    <a class="typedef" href="../../include/sysemu/tpm_backend.h.html#TPMBackend" title='TPMBackend' data-type='struct TPMBackend' data-ref="TPMBackend">TPMBackend</a> *<dfn class="decl" id="TPMState::be_driver" title='TPMState::be_driver' data-ref="TPMState::be_driver">be_driver</dfn>;</td></tr>
+<tr><th id="32">32</th><td>    <a class="typedef" href="../../include/sysemu/tpm.h.html#TPMVersion" title='TPMVersion' data-type='enum TPMVersion' data-ref="TPMVersion">TPMVersion</a> <dfn class="decl" id="TPMState::be_tpm_version" title='TPMState::be_tpm_version' data-ref="TPMState::be_tpm_version">be_tpm_version</dfn>;</td></tr>
+<tr><th id="33">33</th><td>};</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/TPM" data-ref="_M/TPM">TPM</dfn>(obj) OBJECT_CHECK(TPMState, (obj), TYPE_TPM_TIS)</u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/TPM_STANDARD_CMDLINE_OPTS" data-ref="_M/TPM_STANDARD_CMDLINE_OPTS">TPM_STANDARD_CMDLINE_OPTS</dfn> \</u></td></tr>
+<tr><th id="38">38</th><td><u>    { \</u></td></tr>
+<tr><th id="39">39</th><td><u>        .name = "type", \</u></td></tr>
+<tr><th id="40">40</th><td><u>        .type = QEMU_OPT_STRING, \</u></td></tr>
+<tr><th id="41">41</th><td><u>        .help = "Type of TPM backend", \</u></td></tr>
+<tr><th id="42">42</th><td><u>    }</u></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>struct</b> <dfn class="type def" id="tpm_req_hdr" title='tpm_req_hdr' data-ref="tpm_req_hdr">tpm_req_hdr</dfn> {</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="tpm_req_hdr::tag" title='tpm_req_hdr::tag' data-ref="tpm_req_hdr::tag">tag</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tpm_req_hdr::len" title='tpm_req_hdr::len' data-ref="tpm_req_hdr::len">len</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tpm_req_hdr::ordinal" title='tpm_req_hdr::ordinal' data-ref="tpm_req_hdr::ordinal">ordinal</dfn>;</td></tr>
+<tr><th id="48">48</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>struct</b> <dfn class="type def" id="tpm_resp_hdr" title='tpm_resp_hdr' data-ref="tpm_resp_hdr">tpm_resp_hdr</dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="tpm_resp_hdr::tag" title='tpm_resp_hdr::tag' data-ref="tpm_resp_hdr::tag">tag</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tpm_resp_hdr::len" title='tpm_resp_hdr::len' data-ref="tpm_resp_hdr::len">len</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="tpm_resp_hdr::errcode" title='tpm_resp_hdr::errcode' data-ref="tpm_resp_hdr::errcode">errcode</dfn>;</td></tr>
+<tr><th id="54">54</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RQU_COMMAND" data-ref="_M/TPM_TAG_RQU_COMMAND">TPM_TAG_RQU_COMMAND</dfn>       0xc1</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RQU_AUTH1_COMMAND" data-ref="_M/TPM_TAG_RQU_AUTH1_COMMAND">TPM_TAG_RQU_AUTH1_COMMAND</dfn> 0xc2</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RQU_AUTH2_COMMAND" data-ref="_M/TPM_TAG_RQU_AUTH2_COMMAND">TPM_TAG_RQU_AUTH2_COMMAND</dfn> 0xc3</u></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RSP_COMMAND" data-ref="_M/TPM_TAG_RSP_COMMAND">TPM_TAG_RSP_COMMAND</dfn>       0xc4</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RSP_AUTH1_COMMAND" data-ref="_M/TPM_TAG_RSP_AUTH1_COMMAND">TPM_TAG_RSP_AUTH1_COMMAND</dfn> 0xc5</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/TPM_TAG_RSP_AUTH2_COMMAND" data-ref="_M/TPM_TAG_RSP_AUTH2_COMMAND">TPM_TAG_RSP_AUTH2_COMMAND</dfn> 0xc6</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/TPM_FAIL" data-ref="_M/TPM_FAIL">TPM_FAIL</dfn>                  9</u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/TPM_ORD_ContinueSelfTest" data-ref="_M/TPM_ORD_ContinueSelfTest">TPM_ORD_ContinueSelfTest</dfn>  0x53</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/TPM_ORD_GetTicks" data-ref="_M/TPM_ORD_GetTicks">TPM_ORD_GetTicks</dfn>          0xf1</u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>/* TPM2 defines */</i></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/TPM2_ST_NO_SESSIONS" data-ref="_M/TPM2_ST_NO_SESSIONS">TPM2_ST_NO_SESSIONS</dfn>       0x8001</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/TPM2_CC_ReadClock" data-ref="_M/TPM2_CC_ReadClock">TPM2_CC_ReadClock</dfn>         0x00000181</u></td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><u>#<span data-ppcond="12">endif</span> /* TPM_TPM_INT_H */</u></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='tpm_passthrough.c.html'>codebrowser/hw/tpm/tpm_passthrough.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

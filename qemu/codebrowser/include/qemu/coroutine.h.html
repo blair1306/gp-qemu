@@ -1,0 +1,297 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>coroutine.h source code [codebrowser/include/qemu/coroutine.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CoMutex,CoQueue,CoRwlock "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/coroutine.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='coroutine.h.html'>coroutine.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU coroutine implementation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Hajnoczi    &lt;stefanha@linux.vnet.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Kevin Wolf         &lt;kwolf@redhat.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2 or later.</i></td></tr>
+<tr><th id="11">11</th><td><i> * See the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#<span data-ppcond="15">ifndef</span> <span class="macro" data-ref="_M/QEMU_COROUTINE_H">QEMU_COROUTINE_H</span></u></td></tr>
+<tr><th id="16">16</th><td><u>#define <dfn class="macro" id="_M/QEMU_COROUTINE_H" data-ref="_M/QEMU_COROUTINE_H">QEMU_COROUTINE_H</dfn></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> * Coroutines are a mechanism for stack switching and can be used for</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> * cooperative userspace threading.  These functions provide a simple but</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * useful flavor of coroutines that is suitable for writing sequential code,</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * rather than callbacks, for operations that need to give up control while</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * waiting for events to complete.</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> * These functions are re-entrant and may be used outside the global mutex.</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> * Mark a function that executes in coroutine context</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * Functions that execute in coroutine context cannot be called directly from</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * normal functions.  In the future it would be nice to enable compiler or</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * static checker support for catching such errors.  This annotation might make</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * it possible and in the meantime it serves as documentation.</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * For example:</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> *   static void coroutine_fn foo(void) {</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> *       ....</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> *   }</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/coroutine_fn" data-ref="_M/coroutine_fn">coroutine_fn</dfn></u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>typedef</b> <b>struct</b> <a class="type" href="../block/aio.h.html#Coroutine" title='Coroutine' data-ref="Coroutine">Coroutine</a> <dfn class="typedef" id="Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="50">50</th><td><i class="doc"> * Coroutine entry point</i></td></tr>
+<tr><th id="51">51</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * When the coroutine is entered for the first time, opaque is passed in as an</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> * argument.</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> * When this function returns, the coroutine is destroyed automatically and</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * execution continues in the caller who last entered the coroutine.</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="58">58</th><td><b>typedef</b> <em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="typedef" id="CoroutineEntry" title='CoroutineEntry' data-type='void (void *)' data-ref="CoroutineEntry">CoroutineEntry</dfn>(<em>void</em> *<dfn class="local col6 decl" id="7466opaque" title='opaque' data-type='void *' data-ref="7466opaque">opaque</dfn>);</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> * Create a new coroutine</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * Use qemu_coroutine_enter() to actually transfer control to the coroutine.</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> * The opaque argument is passed as the argument to the entry point.</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="66">66</th><td><a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="decl" id="qemu_coroutine_create" title='qemu_coroutine_create' data-ref="qemu_coroutine_create">qemu_coroutine_create</dfn>(<a class="typedef" href="#CoroutineEntry" title='CoroutineEntry' data-type='void (void *)' data-ref="CoroutineEntry">CoroutineEntry</a> *<dfn class="local col7 decl" id="7467entry" title='entry' data-type='CoroutineEntry *' data-ref="7467entry">entry</dfn>, <em>void</em> *<dfn class="local col8 decl" id="7468opaque" title='opaque' data-type='void *' data-ref="7468opaque">opaque</dfn>);</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> * Transfer control to a coroutine</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="71">71</th><td><em>void</em> <dfn class="decl" id="qemu_coroutine_enter" title='qemu_coroutine_enter' data-ref="qemu_coroutine_enter">qemu_coroutine_enter</dfn>(<a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col9 decl" id="7469coroutine" title='coroutine' data-type='Coroutine *' data-ref="7469coroutine">coroutine</dfn>);</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> * Transfer control to a coroutine if it's not active (i.e. part of the call</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> * stack of the running coroutine). Otherwise, do nothing.</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="77">77</th><td><em>void</em> <dfn class="decl" id="qemu_coroutine_enter_if_inactive" title='qemu_coroutine_enter_if_inactive' data-ref="qemu_coroutine_enter_if_inactive">qemu_coroutine_enter_if_inactive</dfn>(<a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col0 decl" id="7470co" title='co' data-type='Coroutine *' data-ref="7470co">co</dfn>);</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> * Transfer control to a coroutine and associate it with ctx</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="82">82</th><td><em>void</em> <dfn class="decl" id="qemu_aio_coroutine_enter" title='qemu_aio_coroutine_enter' data-ref="qemu_aio_coroutine_enter">qemu_aio_coroutine_enter</dfn>(<a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col1 decl" id="7471ctx" title='ctx' data-type='AioContext *' data-ref="7471ctx">ctx</dfn>, <a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col2 decl" id="7472co" title='co' data-type='Coroutine *' data-ref="7472co">co</dfn>);</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="85">85</th><td><i class="doc"> * Transfer control back to a coroutine's caller</i></td></tr>
+<tr><th id="86">86</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> * This function does not return until the coroutine is re-entered using</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> * qemu_coroutine_enter().</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="90">90</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_coroutine_yield" title='qemu_coroutine_yield' data-ref="qemu_coroutine_yield">qemu_coroutine_yield</dfn>(<em>void</em>);</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * Get the currently executing coroutine</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="95">95</th><td><a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_coroutine_self" title='qemu_coroutine_self' data-ref="qemu_coroutine_self">qemu_coroutine_self</dfn>(<em>void</em>);</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> * Return whether or not currently inside a coroutine</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> * This can be used to write functions that work both when in coroutine context</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> * and when not in coroutine context.  Note that such functions cannot use the</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> * coroutine_fn annotation since they work outside coroutine context.</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="104">104</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_in_coroutine" title='qemu_in_coroutine' data-ref="qemu_in_coroutine">qemu_in_coroutine</dfn>(<em>void</em>);</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> * Return true if the coroutine is currently entered</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="109">109</th><td><i class="doc"> * A coroutine is "entered" if it has not yielded from the current</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> * qemu_coroutine_enter() call used to run it.  This does not mean that the</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> * coroutine is currently executing code since it may have transferred control</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> * to another coroutine using qemu_coroutine_enter().</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> * When several coroutines enter each other there may be no way to know which</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> * ones have already been entered.  In such situations this function can be</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> * used to avoid recursively entering coroutines.</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="118">118</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_coroutine_entered" title='qemu_coroutine_entered' data-ref="qemu_coroutine_entered">qemu_coroutine_entered</dfn>(<a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col3 decl" id="7473co" title='co' data-type='Coroutine *' data-ref="7473co">co</dfn>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> * Provides a mutex that can be used to synchronise coroutines</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="123">123</th><td><b>struct</b> <dfn class="type" id="CoWaitRecord" title='CoWaitRecord' data-ref="CoWaitRecord">CoWaitRecord</dfn>;</td></tr>
+<tr><th id="124">124</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CoMutex" title='CoMutex' data-ref="CoMutex"><a class="type" href="#CoMutex" title='CoMutex' data-ref="CoMutex">CoMutex</a></dfn> {</td></tr>
+<tr><th id="125">125</th><td>    <i>/* Count of pending lockers; 0 for a free mutex, 1 for an</i></td></tr>
+<tr><th id="126">126</th><td><i>     * uncontended mutex.</i></td></tr>
+<tr><th id="127">127</th><td><i>     */</i></td></tr>
+<tr><th id="128">128</th><td>    <em>unsigned</em> <dfn class="decl" id="CoMutex::locked" title='CoMutex::locked' data-ref="CoMutex::locked">locked</dfn>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>    <i>/* Context that is holding the lock.  Useful to avoid spinning</i></td></tr>
+<tr><th id="131">131</th><td><i>     * when two coroutines on the same AioContext try to get the lock. :)</i></td></tr>
+<tr><th id="132">132</th><td><i>     */</i></td></tr>
+<tr><th id="133">133</th><td>    <a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl" id="CoMutex::ctx" title='CoMutex::ctx' data-ref="CoMutex::ctx">ctx</dfn>;</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td>    <i>/* A queue of waiters.  Elements are added atomically in front of</i></td></tr>
+<tr><th id="136">136</th><td><i>     * from_push.  to_pop is only populated, and popped from, by whoever</i></td></tr>
+<tr><th id="137">137</th><td><i>     * is in charge of the next wakeup.  This can be an unlocker or,</i></td></tr>
+<tr><th id="138">138</th><td><i>     * through the handoff protocol, a locker that is about to go to sleep.</i></td></tr>
+<tr><th id="139">139</th><td><i>     */</i></td></tr>
+<tr><th id="140">140</th><td>    <a class="macro" href="queue.h.html#170" title="struct { struct CoWaitRecord *slh_first; }" data-ref="_M/QSLIST_HEAD">QSLIST_HEAD</a>(, <a class="type" href="#CoWaitRecord" title='CoWaitRecord' data-ref="CoWaitRecord">CoWaitRecord</a>) <dfn class="decl" id="CoMutex::from_push" title='CoMutex::from_push' data-ref="CoMutex::from_push">from_push</dfn>, <dfn class="decl" id="CoMutex::to_pop" title='CoMutex::to_pop' data-ref="CoMutex::to_pop">to_pop</dfn>;</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td>    <em>unsigned</em> <dfn class="decl" id="CoMutex::handoff" title='CoMutex::handoff' data-ref="CoMutex::handoff">handoff</dfn>, <dfn class="decl" id="CoMutex::sequence" title='CoMutex::sequence' data-ref="CoMutex::sequence">sequence</dfn>;</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td>    <a class="typedef" href="#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="decl" id="CoMutex::holder" title='CoMutex::holder' data-ref="CoMutex::holder">holder</dfn>;</td></tr>
+<tr><th id="145">145</th><td>} <dfn class="typedef" id="CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</dfn>;</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> * Initialises a CoMutex. This must be called before any other operation is used</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * on the CoMutex.</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="151">151</th><td><em>void</em> <dfn class="decl" id="qemu_co_mutex_init" title='qemu_co_mutex_init' data-ref="qemu_co_mutex_init">qemu_co_mutex_init</dfn>(<a class="typedef" href="#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> *<dfn class="local col4 decl" id="7474mutex" title='mutex' data-type='CoMutex *' data-ref="7474mutex">mutex</dfn>);</td></tr>
+<tr><th id="152">152</th><td></td></tr>
+<tr><th id="153">153</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * Locks the mutex. If the lock cannot be taken immediately, control is</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * transferred to the caller of the current coroutine.</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="157">157</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_co_mutex_lock" title='qemu_co_mutex_lock' data-ref="qemu_co_mutex_lock">qemu_co_mutex_lock</dfn>(<a class="typedef" href="#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> *<dfn class="local col5 decl" id="7475mutex" title='mutex' data-type='CoMutex *' data-ref="7475mutex">mutex</dfn>);</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> * Unlocks the mutex and schedules the next coroutine that was waiting for this</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> * lock to be run.</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="163">163</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_co_mutex_unlock" title='qemu_co_mutex_unlock' data-ref="qemu_co_mutex_unlock">qemu_co_mutex_unlock</dfn>(<a class="typedef" href="#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> *<dfn class="local col6 decl" id="7476mutex" title='mutex' data-type='CoMutex *' data-ref="7476mutex">mutex</dfn>);</td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> * CoQueues are a mechanism to queue coroutines in order to continue executing</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> * them later.  They are similar to condition variables, but they need help</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> * from an external mutex in order to maintain thread-safety.</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="171">171</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CoQueue" title='CoQueue' data-ref="CoQueue"><a class="type" href="#CoQueue" title='CoQueue' data-ref="CoQueue">CoQueue</a></dfn> {</td></tr>
+<tr><th id="172">172</th><td>    <a class="macro" href="queue.h.html#240" title="struct { struct Coroutine *sqh_first; struct Coroutine **sqh_last; }" data-ref="_M/QSIMPLEQ_HEAD">QSIMPLEQ_HEAD</a>(, <a class="type" href="../block/aio.h.html#Coroutine" title='Coroutine' data-ref="Coroutine">Coroutine</a>) <dfn class="decl" id="CoQueue::entries" title='CoQueue::entries' data-ref="CoQueue::entries">entries</dfn>;</td></tr>
+<tr><th id="173">173</th><td>} <dfn class="typedef" id="CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</dfn>;</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> * Initialise a CoQueue. This must be called before any other operation is used</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> * on the CoQueue.</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="179">179</th><td><em>void</em> <dfn class="decl" id="qemu_co_queue_init" title='qemu_co_queue_init' data-ref="qemu_co_queue_init">qemu_co_queue_init</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col7 decl" id="7477queue" title='queue' data-type='CoQueue *' data-ref="7477queue">queue</dfn>);</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="182">182</th><td><i class="doc"> * Adds the current coroutine to the CoQueue and transfers control to the</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc"> * caller of the coroutine.  The mutex is unlocked during the wait and</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * locked again afterwards.</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="186">186</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_co_queue_wait" title='qemu_co_queue_wait' data-ref="qemu_co_queue_wait">qemu_co_queue_wait</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col8 decl" id="7478queue" title='queue' data-type='CoQueue *' data-ref="7478queue">queue</dfn>, <a class="typedef" href="#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> *<dfn class="local col9 decl" id="7479mutex" title='mutex' data-type='CoMutex *' data-ref="7479mutex">mutex</dfn>);</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> * Restarts the next coroutine in the CoQueue and removes it from the queue.</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> * Returns true if a coroutine was restarted, false if the queue is empty.</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="193">193</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_co_queue_next" title='qemu_co_queue_next' data-ref="qemu_co_queue_next">qemu_co_queue_next</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col0 decl" id="7480queue" title='queue' data-type='CoQueue *' data-ref="7480queue">queue</dfn>);</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> * Restarts all coroutines in the CoQueue and leaves the queue empty.</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="198">198</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="qemu_co_queue_restart_all" title='qemu_co_queue_restart_all' data-ref="qemu_co_queue_restart_all">qemu_co_queue_restart_all</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col1 decl" id="7481queue" title='queue' data-type='CoQueue *' data-ref="7481queue">queue</dfn>);</td></tr>
+<tr><th id="199">199</th><td></td></tr>
+<tr><th id="200">200</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> * Enter the next coroutine in the queue</i></td></tr>
+<tr><th id="202">202</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="203">203</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_co_enter_next" title='qemu_co_enter_next' data-ref="qemu_co_enter_next">qemu_co_enter_next</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col2 decl" id="7482queue" title='queue' data-type='CoQueue *' data-ref="7482queue">queue</dfn>);</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> * Checks if the CoQueue is empty.</i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="208">208</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_co_queue_empty" title='qemu_co_queue_empty' data-ref="qemu_co_queue_empty">qemu_co_queue_empty</dfn>(<a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> *<dfn class="local col3 decl" id="7483queue" title='queue' data-type='CoQueue *' data-ref="7483queue">queue</dfn>);</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CoRwlock" title='CoRwlock' data-ref="CoRwlock"><a class="type" href="#CoRwlock" title='CoRwlock' data-ref="CoRwlock">CoRwlock</a></dfn> {</td></tr>
+<tr><th id="212">212</th><td>    <em>int</em> <dfn class="decl" id="CoRwlock::pending_writer" title='CoRwlock::pending_writer' data-ref="CoRwlock::pending_writer">pending_writer</dfn>;</td></tr>
+<tr><th id="213">213</th><td>    <em>int</em> <dfn class="decl" id="CoRwlock::reader" title='CoRwlock::reader' data-ref="CoRwlock::reader">reader</dfn>;</td></tr>
+<tr><th id="214">214</th><td>    <a class="typedef" href="#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> <dfn class="decl" id="CoRwlock::mutex" title='CoRwlock::mutex' data-ref="CoRwlock::mutex">mutex</dfn>;</td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="#CoQueue" title='CoQueue' data-type='struct CoQueue' data-ref="CoQueue">CoQueue</a> <dfn class="decl" id="CoRwlock::queue" title='CoRwlock::queue' data-ref="CoRwlock::queue">queue</dfn>;</td></tr>
+<tr><th id="216">216</th><td>} <dfn class="typedef" id="CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</dfn>;</td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="219">219</th><td><i class="doc"> * Initialises a CoRwlock. This must be called before any other operation</i></td></tr>
+<tr><th id="220">220</th><td><i class="doc"> * is used on the CoRwlock</i></td></tr>
+<tr><th id="221">221</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="222">222</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_init" title='qemu_co_rwlock_init' data-ref="qemu_co_rwlock_init">qemu_co_rwlock_init</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col4 decl" id="7484lock" title='lock' data-type='CoRwlock *' data-ref="7484lock">lock</dfn>);</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> * Read locks the CoRwlock. If the lock cannot be taken immediately because</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> * of a parallel writer, control is transferred to the caller of the current</i></td></tr>
+<tr><th id="227">227</th><td><i class="doc"> * coroutine.</i></td></tr>
+<tr><th id="228">228</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="229">229</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_rdlock" title='qemu_co_rwlock_rdlock' data-ref="qemu_co_rwlock_rdlock">qemu_co_rwlock_rdlock</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col5 decl" id="7485lock" title='lock' data-type='CoRwlock *' data-ref="7485lock">lock</dfn>);</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="232">232</th><td><i class="doc"> * Write Locks the CoRwlock from a reader.  This is a bit more efficient than</i></td></tr>
+<tr><th id="233">233</th><td><i class="doc"> *<span class="command"> @qemu</span>_co_rwlock_unlock followed by a separate<span class="command"> @qemu</span>_co_rwlock_wrlock.</i></td></tr>
+<tr><th id="234">234</th><td><i class="doc"> * However, if the lock cannot be upgraded immediately, control is transferred</i></td></tr>
+<tr><th id="235">235</th><td><i class="doc"> * to the caller of the current coroutine.  Also,<span class="command"> @qemu</span>_co_rwlock_upgrade</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc"> * only overrides CoRwlock fairness if there are no concurrent readers, so</i></td></tr>
+<tr><th id="237">237</th><td><i class="doc"> * another writer might run while<span class="command"> @qemu</span>_co_rwlock_upgrade blocks.</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="239">239</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_upgrade" title='qemu_co_rwlock_upgrade' data-ref="qemu_co_rwlock_upgrade">qemu_co_rwlock_upgrade</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col6 decl" id="7486lock" title='lock' data-type='CoRwlock *' data-ref="7486lock">lock</dfn>);</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="242">242</th><td><i class="doc"> * Downgrades a write-side critical section to a reader.  Downgrading with</i></td></tr>
+<tr><th id="243">243</th><td><i class="doc"> *<span class="command"> @qemu</span>_co_rwlock_downgrade never blocks, unlike<span class="command"> @qemu</span>_co_rwlock_unlock</i></td></tr>
+<tr><th id="244">244</th><td><i class="doc"> * followed by<span class="command"> @qemu</span>_co_rwlock_rdlock.  This makes it more efficient, but</i></td></tr>
+<tr><th id="245">245</th><td><i class="doc"> * may also sometimes be necessary for correctness.</i></td></tr>
+<tr><th id="246">246</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="247">247</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_downgrade" title='qemu_co_rwlock_downgrade' data-ref="qemu_co_rwlock_downgrade">qemu_co_rwlock_downgrade</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col7 decl" id="7487lock" title='lock' data-type='CoRwlock *' data-ref="7487lock">lock</dfn>);</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc"> * Write Locks the mutex. If the lock cannot be taken immediately because</i></td></tr>
+<tr><th id="251">251</th><td><i class="doc"> * of a parallel reader, control is transferred to the caller of the current</i></td></tr>
+<tr><th id="252">252</th><td><i class="doc"> * coroutine.</i></td></tr>
+<tr><th id="253">253</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="254">254</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_wrlock" title='qemu_co_rwlock_wrlock' data-ref="qemu_co_rwlock_wrlock">qemu_co_rwlock_wrlock</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col8 decl" id="7488lock" title='lock' data-type='CoRwlock *' data-ref="7488lock">lock</dfn>);</td></tr>
+<tr><th id="255">255</th><td></td></tr>
+<tr><th id="256">256</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="257">257</th><td><i class="doc"> * Unlocks the read/write lock and schedules the next coroutine that was</i></td></tr>
+<tr><th id="258">258</th><td><i class="doc"> * waiting for this lock to be run.</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="260">260</th><td><em>void</em> <dfn class="decl" id="qemu_co_rwlock_unlock" title='qemu_co_rwlock_unlock' data-ref="qemu_co_rwlock_unlock">qemu_co_rwlock_unlock</dfn>(<a class="typedef" href="#CoRwlock" title='CoRwlock' data-type='struct CoRwlock' data-ref="CoRwlock">CoRwlock</a> *<dfn class="local col9 decl" id="7489lock" title='lock' data-type='CoRwlock *' data-ref="7489lock">lock</dfn>);</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="263">263</th><td><i class="doc"> * Yield the coroutine for a given duration</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> * Behaves similarly to co_sleep_ns(), but the sleeping coroutine will be</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> * resumed when using aio_poll().</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="268">268</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="co_aio_sleep_ns" title='co_aio_sleep_ns' data-ref="co_aio_sleep_ns">co_aio_sleep_ns</dfn>(<a class="typedef" href="typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col0 decl" id="7490ctx" title='ctx' data-type='AioContext *' data-ref="7490ctx">ctx</dfn>, <a class="typedef" href="timer.h.html#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col1 decl" id="7491type" title='type' data-type='QEMUClockType' data-ref="7491type">type</dfn>,</td></tr>
+<tr><th id="269">269</th><td>                                  <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col2 decl" id="7492ns" title='ns' data-type='int64_t' data-ref="7492ns">ns</dfn>);</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="272">272</th><td><i class="doc"> * Yield until a file descriptor becomes readable</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> * Note that this function clobbers the handlers for the file descriptor.</i></td></tr>
+<tr><th id="275">275</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="276">276</th><td><em>void</em> <a class="macro" href="#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl" id="yield_until_fd_readable" title='yield_until_fd_readable' data-ref="yield_until_fd_readable">yield_until_fd_readable</dfn>(<em>int</em> <dfn class="local col3 decl" id="7493fd" title='fd' data-type='int' data-ref="7493fd">fd</dfn>);</td></tr>
+<tr><th id="277">277</th><td></td></tr>
+<tr><th id="278">278</th><td><u>#<span data-ppcond="15">endif</span> /* QEMU_COROUTINE_H */</u></td></tr>
+<tr><th id="279">279</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

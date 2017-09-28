@@ -1,0 +1,26 @@
+<dec f='codebrowser/include/qemu/thread.h' l='146' type='void qemu_lockcnt_inc(QemuLockCnt * lockcnt)'/>
+<doc f='codebrowser/include/qemu/thread.h' l='126'>/**
+ * qemu_lockcnt_inc: increment a QemuLockCnt&apos;s counter
+ * @lockcnt: the lockcnt to operate on
+ *
+ * If the lockcnt&apos;s count is zero, wait for critical sections
+ * to finish and increment lockcnt&apos;s count to 1.  If the count
+ * is not zero, just increment it.
+ *
+ * Because this function can wait on the mutex, it must not be
+ * called while the lockcnt&apos;s mutex is held by the current thread.
+ * For the same reason, qemu_lockcnt_inc can also contribute to
+ * AB-BA deadlocks.  This is a sample deadlock scenario:
+ *
+ *            thread 1                      thread 2
+ *            -------------------------------------------------------
+ *            qemu_lockcnt_lock(&amp;lc1);
+ *                                          qemu_lockcnt_lock(&amp;lc2);
+ *            qemu_lockcnt_inc(&amp;lc2);
+ *                                          qemu_lockcnt_inc(&amp;lc1);
+ */</doc>
+<use f='codebrowser/util/aio-posix.c' l='323' u='c' c='poll_set_started'/>
+<use f='codebrowser/util/aio-posix.c' l='362' u='c' c='aio_pending'/>
+<use f='codebrowser/util/aio-posix.c' l='428' u='c' c='aio_dispatch'/>
+<use f='codebrowser/util/aio-posix.c' l='589' u='c' c='aio_poll'/>
+<def f='codebrowser/util/lockcnt.c' l='111' ll='141' type='void qemu_lockcnt_inc(QemuLockCnt * lockcnt)'/>

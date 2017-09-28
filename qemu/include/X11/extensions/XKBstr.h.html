@@ -1,0 +1,661 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>XKBstr.h source code [include/X11/extensions/XKBstr.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="_XkbAction,_XkbAnyAction,_XkbBehavior,_XkbChanges,_XkbClientMapRec,_XkbCompatChanges,_XkbCompatMapRec,_XkbComponentList,_XkbComponentName,_XkbComponentNames,_XkbControls,_XkbControlsChanges,_XkbCtrlsAction,_XkbDesc,_XkbDeviceBtnAction,_XkbDeviceChanges,_XkbDeviceInfo,_XkbDeviceLedChanges,_XkbDeviceLedInfo,_XkbDeviceValuatorAction,_XkbGroupAction,_XkbISOAction,_XkbIndicatorChanges,_XkbIndicatorMapRec,_XkbIndicatorRec,_XkbKTMapEntry,_XkbKeyAliasRec,_XkbKeyNameRec,_XkbKeyType,_XkbMapChanges,_XkbMessageAction,_XkbModAction,_XkbMods,_XkbNameChanges,_XkbNamesRec,_XkbPtrAction,_XkbPtrBtnAction,_XkbPtrDfltAction,_XkbRedirectKeyAction,_XkbServerMapRec,_XkbStateRec,_XkbSwitchScreenAction,_XkbSymInterpretRec,_XkbSymMapRec "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'include/X11/extensions/XKBstr.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>include</a>/<a href='..'>X11</a>/<a href='./'>extensions</a>/<a href='XKBstr.h.html'>XKBstr.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/************************************************************</i></td></tr>
+<tr><th id="2">2</th><td><i>Copyright (c) 1993 by Silicon Graphics Computer Systems, Inc.</i></td></tr>
+<tr><th id="3">3</th><td><i></i></td></tr>
+<tr><th id="4">4</th><td><i>Permission to use, copy, modify, and distribute this</i></td></tr>
+<tr><th id="5">5</th><td><i>software and its documentation for any purpose and without</i></td></tr>
+<tr><th id="6">6</th><td><i>fee is hereby granted, provided that the above copyright</i></td></tr>
+<tr><th id="7">7</th><td><i>notice appear in all copies and that both that copyright</i></td></tr>
+<tr><th id="8">8</th><td><i>notice and this permission notice appear in supporting</i></td></tr>
+<tr><th id="9">9</th><td><i>documentation, and that the name of Silicon Graphics not be </i></td></tr>
+<tr><th id="10">10</th><td><i>used in advertising or publicity pertaining to distribution </i></td></tr>
+<tr><th id="11">11</th><td><i>of the software without specific prior written permission.</i></td></tr>
+<tr><th id="12">12</th><td><i>Silicon Graphics makes no representation about the suitability </i></td></tr>
+<tr><th id="13">13</th><td><i>of this software for any purpose. It is provided "as is"</i></td></tr>
+<tr><th id="14">14</th><td><i>without any express or implied warranty.</i></td></tr>
+<tr><th id="15">15</th><td><i></i></td></tr>
+<tr><th id="16">16</th><td><i>SILICON GRAPHICS DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS </i></td></tr>
+<tr><th id="17">17</th><td><i>SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY </i></td></tr>
+<tr><th id="18">18</th><td><i>AND FITNESS FOR A PARTICULAR PURPOSE. IN NO EVENT SHALL SILICON</i></td></tr>
+<tr><th id="19">19</th><td><i>GRAPHICS BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL </i></td></tr>
+<tr><th id="20">20</th><td><i>DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, </i></td></tr>
+<tr><th id="21">21</th><td><i>DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE </i></td></tr>
+<tr><th id="22">22</th><td><i>OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION  WITH</i></td></tr>
+<tr><th id="23">23</th><td><i>THE USE OR PERFORMANCE OF THIS SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i></i></td></tr>
+<tr><th id="25">25</th><td><i>********************************************************/</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#<span data-ppcond="27">ifndef</span> <span class="macro" data-ref="_M/_XKBSTR_H_">_XKBSTR_H_</span></u></td></tr>
+<tr><th id="28">28</th><td><u>#define	<dfn class="macro" id="_M/_XKBSTR_H_" data-ref="_M/_XKBSTR_H_">_XKBSTR_H_</dfn></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="XKB.h.html">&lt;X11/extensions/XKB.h&gt;</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><u>#define	<dfn class="macro" id="_M/XkbCharToInt" data-ref="_M/XkbCharToInt">XkbCharToInt</dfn>(v)		((v)&amp;0x80?(int)((v)|(~0xff)):(int)((v)&amp;0x7f))</u></td></tr>
+<tr><th id="33">33</th><td><u>#define	<dfn class="macro" id="_M/XkbIntTo2Chars" data-ref="_M/XkbIntTo2Chars">XkbIntTo2Chars</dfn>(i,h,l)	(((h)=((i&gt;&gt;8)&amp;0xff)),((l)=((i)&amp;0xff)))</u></td></tr>
+<tr><th id="34">34</th><td><u>#define	<dfn class="macro" id="_M/Xkb2CharsToInt" data-ref="_M/Xkb2CharsToInt">Xkb2CharsToInt</dfn>(h,l)	((short)(((h)&lt;&lt;8)|(l)))</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/*</i></td></tr>
+<tr><th id="37">37</th><td><i> * The Xkb structs are full of implicit padding to properly align members.</i></td></tr>
+<tr><th id="38">38</th><td><i> * We can't clean that up without breaking ABI, so tell clang not to bother</i></td></tr>
+<tr><th id="39">39</th><td><i> * complaining about it.</i></td></tr>
+<tr><th id="40">40</th><td><i> */</i></td></tr>
+<tr><th id="41">41</th><td><u>#<span data-ppcond="41">ifdef</span> <span class="macro" data-ref="_M/__clang__">__clang__</span></u></td></tr>
+<tr><th id="42">42</th><td><u>#pragma clang diagnostic push</u></td></tr>
+<tr><th id="43">43</th><td><u>#pragma clang diagnostic ignored "-Wpadded"</u></td></tr>
+<tr><th id="44">44</th><td><u>#<span data-ppcond="41">endif</span></u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td>	<i>/*</i></td></tr>
+<tr><th id="47">47</th><td><i>	 * Common data structures and access macros</i></td></tr>
+<tr><th id="48">48</th><td><i>	 */</i></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbStateRec" title='_XkbStateRec' data-ref="_XkbStateRec"><a class="type" href="#_XkbStateRec" title='_XkbStateRec' data-ref="_XkbStateRec"><a class="type" href="#_XkbStateRec" title='_XkbStateRec' data-ref="_XkbStateRec">_XkbStateRec</a></a></dfn> {</td></tr>
+<tr><th id="51">51</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::group" title='_XkbStateRec::group' data-ref="_XkbStateRec::group">group</dfn>;</td></tr>
+<tr><th id="52">52</th><td>	<em>unsigned</em> <em>char</em>   <dfn class="decl" id="_XkbStateRec::locked_group" title='_XkbStateRec::locked_group' data-ref="_XkbStateRec::locked_group">locked_group</dfn>;</td></tr>
+<tr><th id="53">53</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbStateRec::base_group" title='_XkbStateRec::base_group' data-ref="_XkbStateRec::base_group">base_group</dfn>;</td></tr>
+<tr><th id="54">54</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbStateRec::latched_group" title='_XkbStateRec::latched_group' data-ref="_XkbStateRec::latched_group">latched_group</dfn>;</td></tr>
+<tr><th id="55">55</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::mods" title='_XkbStateRec::mods' data-ref="_XkbStateRec::mods">mods</dfn>;</td></tr>
+<tr><th id="56">56</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::base_mods" title='_XkbStateRec::base_mods' data-ref="_XkbStateRec::base_mods">base_mods</dfn>;</td></tr>
+<tr><th id="57">57</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::latched_mods" title='_XkbStateRec::latched_mods' data-ref="_XkbStateRec::latched_mods">latched_mods</dfn>;</td></tr>
+<tr><th id="58">58</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::locked_mods" title='_XkbStateRec::locked_mods' data-ref="_XkbStateRec::locked_mods">locked_mods</dfn>;</td></tr>
+<tr><th id="59">59</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::compat_state" title='_XkbStateRec::compat_state' data-ref="_XkbStateRec::compat_state">compat_state</dfn>;</td></tr>
+<tr><th id="60">60</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::grab_mods" title='_XkbStateRec::grab_mods' data-ref="_XkbStateRec::grab_mods">grab_mods</dfn>;</td></tr>
+<tr><th id="61">61</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::compat_grab_mods" title='_XkbStateRec::compat_grab_mods' data-ref="_XkbStateRec::compat_grab_mods">compat_grab_mods</dfn>;</td></tr>
+<tr><th id="62">62</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::lookup_mods" title='_XkbStateRec::lookup_mods' data-ref="_XkbStateRec::lookup_mods">lookup_mods</dfn>;</td></tr>
+<tr><th id="63">63</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbStateRec::compat_lookup_mods" title='_XkbStateRec::compat_lookup_mods' data-ref="_XkbStateRec::compat_lookup_mods">compat_lookup_mods</dfn>;</td></tr>
+<tr><th id="64">64</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbStateRec::ptr_buttons" title='_XkbStateRec::ptr_buttons' data-ref="_XkbStateRec::ptr_buttons">ptr_buttons</dfn>;</td></tr>
+<tr><th id="65">65</th><td>} <dfn class="typedef" id="XkbStateRec" title='XkbStateRec' data-type='struct _XkbStateRec' data-ref="XkbStateRec">XkbStateRec</dfn>,*<dfn class="typedef" id="XkbStatePtr" title='XkbStatePtr' data-type='struct _XkbStateRec *' data-ref="XkbStatePtr">XkbStatePtr</dfn>;</td></tr>
+<tr><th id="66">66</th><td><u>#define	<dfn class="macro" id="_M/XkbModLocks" data-ref="_M/XkbModLocks">XkbModLocks</dfn>(s)	 ((s)-&gt;locked_mods)</u></td></tr>
+<tr><th id="67">67</th><td><u>#define	<dfn class="macro" id="_M/XkbStateMods" data-ref="_M/XkbStateMods">XkbStateMods</dfn>(s)	 ((s)-&gt;base_mods|(s)-&gt;latched_mods|XkbModLocks(s))</u></td></tr>
+<tr><th id="68">68</th><td><u>#define	<dfn class="macro" id="_M/XkbGroupLock" data-ref="_M/XkbGroupLock">XkbGroupLock</dfn>(s)	 ((s)-&gt;locked_group)</u></td></tr>
+<tr><th id="69">69</th><td><u>#define	<dfn class="macro" id="_M/XkbStateGroup" data-ref="_M/XkbStateGroup">XkbStateGroup</dfn>(s) ((s)-&gt;base_group+(s)-&gt;latched_group+XkbGroupLock(s))</u></td></tr>
+<tr><th id="70">70</th><td><u>#define	<dfn class="macro" id="_M/XkbStateFieldFromRec" data-ref="_M/XkbStateFieldFromRec">XkbStateFieldFromRec</dfn>(s)	XkbBuildCoreState((s)-&gt;lookup_mods,(s)-&gt;group)</u></td></tr>
+<tr><th id="71">71</th><td><u>#define	<dfn class="macro" id="_M/XkbGrabStateFromRec" data-ref="_M/XkbGrabStateFromRec">XkbGrabStateFromRec</dfn>(s)	XkbBuildCoreState((s)-&gt;grab_mods,(s)-&gt;group)</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbMods" title='_XkbMods' data-ref="_XkbMods"><a class="type" href="#_XkbMods" title='_XkbMods' data-ref="_XkbMods"><a class="type" href="#_XkbMods" title='_XkbMods' data-ref="_XkbMods">_XkbMods</a></a></dfn> {</td></tr>
+<tr><th id="74">74</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbMods::mask" title='_XkbMods::mask' data-ref="_XkbMods::mask">mask</dfn>;	<i>/* effective mods */</i></td></tr>
+<tr><th id="75">75</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbMods::real_mods" title='_XkbMods::real_mods' data-ref="_XkbMods::real_mods">real_mods</dfn>;</td></tr>
+<tr><th id="76">76</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbMods::vmods" title='_XkbMods::vmods' data-ref="_XkbMods::vmods">vmods</dfn>;</td></tr>
+<tr><th id="77">77</th><td>} <dfn class="typedef" id="XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</dfn>,*<dfn class="typedef" id="XkbModsPtr" title='XkbModsPtr' data-type='struct _XkbMods *' data-ref="XkbModsPtr">XkbModsPtr</dfn>;</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbKTMapEntry" title='_XkbKTMapEntry' data-ref="_XkbKTMapEntry"><a class="type" href="#_XkbKTMapEntry" title='_XkbKTMapEntry' data-ref="_XkbKTMapEntry"><a class="type" href="#_XkbKTMapEntry" title='_XkbKTMapEntry' data-ref="_XkbKTMapEntry">_XkbKTMapEntry</a></a></dfn> {</td></tr>
+<tr><th id="80">80</th><td>	<a class="macro" href="../Xlib.h.html#82" title="int" data-ref="_M/Bool">Bool</a>		<dfn class="decl" id="_XkbKTMapEntry::active" title='_XkbKTMapEntry::active' data-ref="_XkbKTMapEntry::active">active</dfn>;</td></tr>
+<tr><th id="81">81</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbKTMapEntry::level" title='_XkbKTMapEntry::level' data-ref="_XkbKTMapEntry::level">level</dfn>;</td></tr>
+<tr><th id="82">82</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>	<dfn class="decl" id="_XkbKTMapEntry::mods" title='_XkbKTMapEntry::mods' data-ref="_XkbKTMapEntry::mods">mods</dfn>;</td></tr>
+<tr><th id="83">83</th><td>} <dfn class="typedef" id="XkbKTMapEntryRec" title='XkbKTMapEntryRec' data-type='struct _XkbKTMapEntry' data-ref="XkbKTMapEntryRec">XkbKTMapEntryRec</dfn>,*<dfn class="typedef" id="XkbKTMapEntryPtr" title='XkbKTMapEntryPtr' data-type='struct _XkbKTMapEntry *' data-ref="XkbKTMapEntryPtr">XkbKTMapEntryPtr</dfn>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbKeyType" title='_XkbKeyType' data-ref="_XkbKeyType"><a class="type" href="#_XkbKeyType" title='_XkbKeyType' data-ref="_XkbKeyType"><a class="type" href="#_XkbKeyType" title='_XkbKeyType' data-ref="_XkbKeyType">_XkbKeyType</a></a></dfn> {</td></tr>
+<tr><th id="86">86</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>		<dfn class="decl" id="_XkbKeyType::mods" title='_XkbKeyType::mods' data-ref="_XkbKeyType::mods">mods</dfn>;</td></tr>
+<tr><th id="87">87</th><td>	<em>unsigned</em> <em>char</em>	  	<dfn class="decl" id="_XkbKeyType::num_levels" title='_XkbKeyType::num_levels' data-ref="_XkbKeyType::num_levels">num_levels</dfn>;</td></tr>
+<tr><th id="88">88</th><td>	<em>unsigned</em> <em>char</em>	  	<dfn class="decl" id="_XkbKeyType::map_count" title='_XkbKeyType::map_count' data-ref="_XkbKeyType::map_count">map_count</dfn>;</td></tr>
+<tr><th id="89">89</th><td>	<i>/* map is an array of map_count XkbKTMapEntryRec structs */</i></td></tr>
+<tr><th id="90">90</th><td>	<a class="typedef" href="#XkbKTMapEntryPtr" title='XkbKTMapEntryPtr' data-type='struct _XkbKTMapEntry *' data-ref="XkbKTMapEntryPtr">XkbKTMapEntryPtr</a>  	<dfn class="decl" id="_XkbKeyType::map" title='_XkbKeyType::map' data-ref="_XkbKeyType::map">map</dfn>;</td></tr>
+<tr><th id="91">91</th><td>	<i>/* preserve is an array of map_count XkbModsRec structs */</i></td></tr>
+<tr><th id="92">92</th><td>	<a class="typedef" href="#XkbModsPtr" title='XkbModsPtr' data-type='struct _XkbMods *' data-ref="XkbModsPtr">XkbModsPtr</a>  		<dfn class="decl" id="_XkbKeyType::preserve" title='_XkbKeyType::preserve' data-ref="_XkbKeyType::preserve">preserve</dfn>;</td></tr>
+<tr><th id="93">93</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  	<dfn class="decl" id="_XkbKeyType::name" title='_XkbKeyType::name' data-ref="_XkbKeyType::name">name</dfn>;</td></tr>
+<tr><th id="94">94</th><td>	<i>/* level_names is an array of num_levels Atoms */</i></td></tr>
+<tr><th id="95">95</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a> *			<dfn class="decl" id="_XkbKeyType::level_names" title='_XkbKeyType::level_names' data-ref="_XkbKeyType::level_names">level_names</dfn>;</td></tr>
+<tr><th id="96">96</th><td>} <dfn class="typedef" id="XkbKeyTypeRec" title='XkbKeyTypeRec' data-type='struct _XkbKeyType' data-ref="XkbKeyTypeRec">XkbKeyTypeRec</dfn>, *<dfn class="typedef" id="XkbKeyTypePtr" title='XkbKeyTypePtr' data-type='struct _XkbKeyType *' data-ref="XkbKeyTypePtr">XkbKeyTypePtr</dfn>;</td></tr>
+<tr><th id="97">97</th><td></td></tr>
+<tr><th id="98">98</th><td><u>#define	<dfn class="macro" id="_M/XkbNumGroups" data-ref="_M/XkbNumGroups">XkbNumGroups</dfn>(g)			((g)&amp;0x0f)</u></td></tr>
+<tr><th id="99">99</th><td><u>#define	<dfn class="macro" id="_M/XkbOutOfRangeGroupInfo" data-ref="_M/XkbOutOfRangeGroupInfo">XkbOutOfRangeGroupInfo</dfn>(g)	((g)&amp;0xf0)</u></td></tr>
+<tr><th id="100">100</th><td><u>#define	<dfn class="macro" id="_M/XkbOutOfRangeGroupAction" data-ref="_M/XkbOutOfRangeGroupAction">XkbOutOfRangeGroupAction</dfn>(g)	((g)&amp;0xc0)</u></td></tr>
+<tr><th id="101">101</th><td><u>#define	<dfn class="macro" id="_M/XkbOutOfRangeGroupNumber" data-ref="_M/XkbOutOfRangeGroupNumber">XkbOutOfRangeGroupNumber</dfn>(g)	(((g)&amp;0x30)&gt;&gt;4)</u></td></tr>
+<tr><th id="102">102</th><td><u>#define	<dfn class="macro" id="_M/XkbSetGroupInfo" data-ref="_M/XkbSetGroupInfo">XkbSetGroupInfo</dfn>(g,w,n)	(((w)&amp;0xc0)|(((n)&amp;3)&lt;&lt;4)|((g)&amp;0x0f))</u></td></tr>
+<tr><th id="103">103</th><td><u>#define	<dfn class="macro" id="_M/XkbSetNumGroups" data-ref="_M/XkbSetNumGroups">XkbSetNumGroups</dfn>(g,n)	(((g)&amp;0xf0)|((n)&amp;0x0f))</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>	<i>/*</i></td></tr>
+<tr><th id="106">106</th><td><i>	 * Structures and access macros used primarily by the server</i></td></tr>
+<tr><th id="107">107</th><td><i>	 */</i></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbBehavior" title='_XkbBehavior' data-ref="_XkbBehavior"><a class="type" href="#_XkbBehavior" title='_XkbBehavior' data-ref="_XkbBehavior">_XkbBehavior</a></dfn> {</td></tr>
+<tr><th id="110">110</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbBehavior::type" title='_XkbBehavior::type' data-ref="_XkbBehavior::type">type</dfn>;</td></tr>
+<tr><th id="111">111</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbBehavior::data" title='_XkbBehavior::data' data-ref="_XkbBehavior::data">data</dfn>;</td></tr>
+<tr><th id="112">112</th><td>} <dfn class="typedef" id="XkbBehavior" title='XkbBehavior' data-type='struct _XkbBehavior' data-ref="XkbBehavior">XkbBehavior</dfn>;</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><u>#define	<dfn class="macro" id="_M/XkbAnyActionDataSize" data-ref="_M/XkbAnyActionDataSize">XkbAnyActionDataSize</dfn> 7</u></td></tr>
+<tr><th id="115">115</th><td><b>typedef</b>	<b>struct</b> <dfn class="type def" id="_XkbAnyAction" title='_XkbAnyAction' data-ref="_XkbAnyAction"><a class="type" href="#_XkbAnyAction" title='_XkbAnyAction' data-ref="_XkbAnyAction">_XkbAnyAction</a></dfn> {</td></tr>
+<tr><th id="116">116</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbAnyAction::type" title='_XkbAnyAction::type' data-ref="_XkbAnyAction::type">type</dfn>;</td></tr>
+<tr><th id="117">117</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbAnyAction::data" title='_XkbAnyAction::data' data-ref="_XkbAnyAction::data">data</dfn>[<a class="macro" href="#114" title="7" data-ref="_M/XkbAnyActionDataSize">XkbAnyActionDataSize</a>];</td></tr>
+<tr><th id="118">118</th><td>} <dfn class="typedef" id="XkbAnyAction" title='XkbAnyAction' data-type='struct _XkbAnyAction' data-ref="XkbAnyAction">XkbAnyAction</dfn>;</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbModAction" title='_XkbModAction' data-ref="_XkbModAction"><a class="type" href="#_XkbModAction" title='_XkbModAction' data-ref="_XkbModAction">_XkbModAction</a></dfn> {</td></tr>
+<tr><th id="121">121</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::type" title='_XkbModAction::type' data-ref="_XkbModAction::type">type</dfn>;</td></tr>
+<tr><th id="122">122</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::flags" title='_XkbModAction::flags' data-ref="_XkbModAction::flags">flags</dfn>;</td></tr>
+<tr><th id="123">123</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::mask" title='_XkbModAction::mask' data-ref="_XkbModAction::mask">mask</dfn>;</td></tr>
+<tr><th id="124">124</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::real_mods" title='_XkbModAction::real_mods' data-ref="_XkbModAction::real_mods">real_mods</dfn>;</td></tr>
+<tr><th id="125">125</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::vmods1" title='_XkbModAction::vmods1' data-ref="_XkbModAction::vmods1">vmods1</dfn>;</td></tr>
+<tr><th id="126">126</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbModAction::vmods2" title='_XkbModAction::vmods2' data-ref="_XkbModAction::vmods2">vmods2</dfn>;</td></tr>
+<tr><th id="127">127</th><td>} <dfn class="typedef" id="XkbModAction" title='XkbModAction' data-type='struct _XkbModAction' data-ref="XkbModAction">XkbModAction</dfn>;</td></tr>
+<tr><th id="128">128</th><td><u>#define	<dfn class="macro" id="_M/XkbModActionVMods" data-ref="_M/XkbModActionVMods">XkbModActionVMods</dfn>(a)      \</u></td></tr>
+<tr><th id="129">129</th><td><u>	((short)(((a)-&gt;vmods1&lt;&lt;8)|((a)-&gt;vmods2)))</u></td></tr>
+<tr><th id="130">130</th><td><u>#define	<dfn class="macro" id="_M/XkbSetModActionVMods" data-ref="_M/XkbSetModActionVMods">XkbSetModActionVMods</dfn>(a,v) \</u></td></tr>
+<tr><th id="131">131</th><td><u>	(((a)-&gt;vmods1=(((v)&gt;&gt;8)&amp;0xff)),(a)-&gt;vmods2=((v)&amp;0xff))</u></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbGroupAction" title='_XkbGroupAction' data-ref="_XkbGroupAction"><a class="type" href="#_XkbGroupAction" title='_XkbGroupAction' data-ref="_XkbGroupAction">_XkbGroupAction</a></dfn> {</td></tr>
+<tr><th id="134">134</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbGroupAction::type" title='_XkbGroupAction::type' data-ref="_XkbGroupAction::type">type</dfn>;</td></tr>
+<tr><th id="135">135</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbGroupAction::flags" title='_XkbGroupAction::flags' data-ref="_XkbGroupAction::flags">flags</dfn>;</td></tr>
+<tr><th id="136">136</th><td>	<em>char</em>		<dfn class="decl" id="_XkbGroupAction::group_XXX" title='_XkbGroupAction::group_XXX' data-ref="_XkbGroupAction::group_XXX">group_XXX</dfn>;</td></tr>
+<tr><th id="137">137</th><td>} <dfn class="typedef" id="XkbGroupAction" title='XkbGroupAction' data-type='struct _XkbGroupAction' data-ref="XkbGroupAction">XkbGroupAction</dfn>;</td></tr>
+<tr><th id="138">138</th><td><u>#define	<dfn class="macro" id="_M/XkbSAGroup" data-ref="_M/XkbSAGroup">XkbSAGroup</dfn>(a)		(XkbCharToInt((a)-&gt;group_XXX))</u></td></tr>
+<tr><th id="139">139</th><td><u>#define	<dfn class="macro" id="_M/XkbSASetGroup" data-ref="_M/XkbSASetGroup">XkbSASetGroup</dfn>(a,g)	((a)-&gt;group_XXX=(g))</u></td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbISOAction" title='_XkbISOAction' data-ref="_XkbISOAction"><a class="type" href="#_XkbISOAction" title='_XkbISOAction' data-ref="_XkbISOAction">_XkbISOAction</a></dfn> {</td></tr>
+<tr><th id="142">142</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::type" title='_XkbISOAction::type' data-ref="_XkbISOAction::type">type</dfn>;</td></tr>
+<tr><th id="143">143</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::flags" title='_XkbISOAction::flags' data-ref="_XkbISOAction::flags">flags</dfn>;</td></tr>
+<tr><th id="144">144</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::mask" title='_XkbISOAction::mask' data-ref="_XkbISOAction::mask">mask</dfn>;</td></tr>
+<tr><th id="145">145</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::real_mods" title='_XkbISOAction::real_mods' data-ref="_XkbISOAction::real_mods">real_mods</dfn>;</td></tr>
+<tr><th id="146">146</th><td>	<em>char</em>		<dfn class="decl" id="_XkbISOAction::group_XXX" title='_XkbISOAction::group_XXX' data-ref="_XkbISOAction::group_XXX">group_XXX</dfn>;</td></tr>
+<tr><th id="147">147</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::affect" title='_XkbISOAction::affect' data-ref="_XkbISOAction::affect">affect</dfn>;</td></tr>
+<tr><th id="148">148</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::vmods1" title='_XkbISOAction::vmods1' data-ref="_XkbISOAction::vmods1">vmods1</dfn>;</td></tr>
+<tr><th id="149">149</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbISOAction::vmods2" title='_XkbISOAction::vmods2' data-ref="_XkbISOAction::vmods2">vmods2</dfn>;</td></tr>
+<tr><th id="150">150</th><td>} <dfn class="typedef" id="XkbISOAction" title='XkbISOAction' data-type='struct _XkbISOAction' data-ref="XkbISOAction">XkbISOAction</dfn>;</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbPtrAction" title='_XkbPtrAction' data-ref="_XkbPtrAction"><a class="type" href="#_XkbPtrAction" title='_XkbPtrAction' data-ref="_XkbPtrAction">_XkbPtrAction</a></dfn> {</td></tr>
+<tr><th id="153">153</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::type" title='_XkbPtrAction::type' data-ref="_XkbPtrAction::type">type</dfn>;</td></tr>
+<tr><th id="154">154</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::flags" title='_XkbPtrAction::flags' data-ref="_XkbPtrAction::flags">flags</dfn>;</td></tr>
+<tr><th id="155">155</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::high_XXX" title='_XkbPtrAction::high_XXX' data-ref="_XkbPtrAction::high_XXX">high_XXX</dfn>;</td></tr>
+<tr><th id="156">156</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::low_XXX" title='_XkbPtrAction::low_XXX' data-ref="_XkbPtrAction::low_XXX">low_XXX</dfn>;</td></tr>
+<tr><th id="157">157</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::high_YYY" title='_XkbPtrAction::high_YYY' data-ref="_XkbPtrAction::high_YYY">high_YYY</dfn>;</td></tr>
+<tr><th id="158">158</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrAction::low_YYY" title='_XkbPtrAction::low_YYY' data-ref="_XkbPtrAction::low_YYY">low_YYY</dfn>;</td></tr>
+<tr><th id="159">159</th><td>} <dfn class="typedef" id="XkbPtrAction" title='XkbPtrAction' data-type='struct _XkbPtrAction' data-ref="XkbPtrAction">XkbPtrAction</dfn>;</td></tr>
+<tr><th id="160">160</th><td><u>#define	<dfn class="macro" id="_M/XkbPtrActionX" data-ref="_M/XkbPtrActionX">XkbPtrActionX</dfn>(a)      (Xkb2CharsToInt((a)-&gt;high_XXX,(a)-&gt;low_XXX))</u></td></tr>
+<tr><th id="161">161</th><td><u>#define	<dfn class="macro" id="_M/XkbPtrActionY" data-ref="_M/XkbPtrActionY">XkbPtrActionY</dfn>(a)      (Xkb2CharsToInt((a)-&gt;high_YYY,(a)-&gt;low_YYY))</u></td></tr>
+<tr><th id="162">162</th><td><u>#define	<dfn class="macro" id="_M/XkbSetPtrActionX" data-ref="_M/XkbSetPtrActionX">XkbSetPtrActionX</dfn>(a,x) (XkbIntTo2Chars(x,(a)-&gt;high_XXX,(a)-&gt;low_XXX))</u></td></tr>
+<tr><th id="163">163</th><td><u>#define	<dfn class="macro" id="_M/XkbSetPtrActionY" data-ref="_M/XkbSetPtrActionY">XkbSetPtrActionY</dfn>(a,y) (XkbIntTo2Chars(y,(a)-&gt;high_YYY,(a)-&gt;low_YYY))</u></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+<tr><th id="165">165</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbPtrBtnAction" title='_XkbPtrBtnAction' data-ref="_XkbPtrBtnAction"><a class="type" href="#_XkbPtrBtnAction" title='_XkbPtrBtnAction' data-ref="_XkbPtrBtnAction">_XkbPtrBtnAction</a></dfn> {</td></tr>
+<tr><th id="166">166</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrBtnAction::type" title='_XkbPtrBtnAction::type' data-ref="_XkbPtrBtnAction::type">type</dfn>;</td></tr>
+<tr><th id="167">167</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrBtnAction::flags" title='_XkbPtrBtnAction::flags' data-ref="_XkbPtrBtnAction::flags">flags</dfn>;</td></tr>
+<tr><th id="168">168</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrBtnAction::count" title='_XkbPtrBtnAction::count' data-ref="_XkbPtrBtnAction::count">count</dfn>;</td></tr>
+<tr><th id="169">169</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrBtnAction::button" title='_XkbPtrBtnAction::button' data-ref="_XkbPtrBtnAction::button">button</dfn>;</td></tr>
+<tr><th id="170">170</th><td>} <dfn class="typedef" id="XkbPtrBtnAction" title='XkbPtrBtnAction' data-type='struct _XkbPtrBtnAction' data-ref="XkbPtrBtnAction">XkbPtrBtnAction</dfn>;</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbPtrDfltAction" title='_XkbPtrDfltAction' data-ref="_XkbPtrDfltAction"><a class="type" href="#_XkbPtrDfltAction" title='_XkbPtrDfltAction' data-ref="_XkbPtrDfltAction">_XkbPtrDfltAction</a></dfn> {</td></tr>
+<tr><th id="173">173</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrDfltAction::type" title='_XkbPtrDfltAction::type' data-ref="_XkbPtrDfltAction::type">type</dfn>;</td></tr>
+<tr><th id="174">174</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrDfltAction::flags" title='_XkbPtrDfltAction::flags' data-ref="_XkbPtrDfltAction::flags">flags</dfn>;</td></tr>
+<tr><th id="175">175</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbPtrDfltAction::affect" title='_XkbPtrDfltAction::affect' data-ref="_XkbPtrDfltAction::affect">affect</dfn>;</td></tr>
+<tr><th id="176">176</th><td>	<em>char</em>		<dfn class="decl" id="_XkbPtrDfltAction::valueXXX" title='_XkbPtrDfltAction::valueXXX' data-ref="_XkbPtrDfltAction::valueXXX">valueXXX</dfn>;</td></tr>
+<tr><th id="177">177</th><td>} <dfn class="typedef" id="XkbPtrDfltAction" title='XkbPtrDfltAction' data-type='struct _XkbPtrDfltAction' data-ref="XkbPtrDfltAction">XkbPtrDfltAction</dfn>;</td></tr>
+<tr><th id="178">178</th><td><u>#define	<dfn class="macro" id="_M/XkbSAPtrDfltValue" data-ref="_M/XkbSAPtrDfltValue">XkbSAPtrDfltValue</dfn>(a)		(XkbCharToInt((a)-&gt;valueXXX))</u></td></tr>
+<tr><th id="179">179</th><td><u>#define	<dfn class="macro" id="_M/XkbSASetPtrDfltValue" data-ref="_M/XkbSASetPtrDfltValue">XkbSASetPtrDfltValue</dfn>(a,c)	((a)-&gt;valueXXX= ((c)&amp;0xff))</u></td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbSwitchScreenAction" title='_XkbSwitchScreenAction' data-ref="_XkbSwitchScreenAction"><a class="type" href="#_XkbSwitchScreenAction" title='_XkbSwitchScreenAction' data-ref="_XkbSwitchScreenAction">_XkbSwitchScreenAction</a></dfn> {</td></tr>
+<tr><th id="182">182</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSwitchScreenAction::type" title='_XkbSwitchScreenAction::type' data-ref="_XkbSwitchScreenAction::type">type</dfn>;</td></tr>
+<tr><th id="183">183</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSwitchScreenAction::flags" title='_XkbSwitchScreenAction::flags' data-ref="_XkbSwitchScreenAction::flags">flags</dfn>;</td></tr>
+<tr><th id="184">184</th><td>	<em>char</em>		<dfn class="decl" id="_XkbSwitchScreenAction::screenXXX" title='_XkbSwitchScreenAction::screenXXX' data-ref="_XkbSwitchScreenAction::screenXXX">screenXXX</dfn>;</td></tr>
+<tr><th id="185">185</th><td>} <dfn class="typedef" id="XkbSwitchScreenAction" title='XkbSwitchScreenAction' data-type='struct _XkbSwitchScreenAction' data-ref="XkbSwitchScreenAction">XkbSwitchScreenAction</dfn>;</td></tr>
+<tr><th id="186">186</th><td><u>#define	<dfn class="macro" id="_M/XkbSAScreen" data-ref="_M/XkbSAScreen">XkbSAScreen</dfn>(a)			(XkbCharToInt((a)-&gt;screenXXX))</u></td></tr>
+<tr><th id="187">187</th><td><u>#define	<dfn class="macro" id="_M/XkbSASetScreen" data-ref="_M/XkbSASetScreen">XkbSASetScreen</dfn>(a,s)		((a)-&gt;screenXXX= ((s)&amp;0xff))</u></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbCtrlsAction" title='_XkbCtrlsAction' data-ref="_XkbCtrlsAction"><a class="type" href="#_XkbCtrlsAction" title='_XkbCtrlsAction' data-ref="_XkbCtrlsAction">_XkbCtrlsAction</a></dfn> {</td></tr>
+<tr><th id="190">190</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::type" title='_XkbCtrlsAction::type' data-ref="_XkbCtrlsAction::type">type</dfn>;</td></tr>
+<tr><th id="191">191</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::flags" title='_XkbCtrlsAction::flags' data-ref="_XkbCtrlsAction::flags">flags</dfn>;</td></tr>
+<tr><th id="192">192</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::ctrls3" title='_XkbCtrlsAction::ctrls3' data-ref="_XkbCtrlsAction::ctrls3">ctrls3</dfn>;</td></tr>
+<tr><th id="193">193</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::ctrls2" title='_XkbCtrlsAction::ctrls2' data-ref="_XkbCtrlsAction::ctrls2">ctrls2</dfn>;</td></tr>
+<tr><th id="194">194</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::ctrls1" title='_XkbCtrlsAction::ctrls1' data-ref="_XkbCtrlsAction::ctrls1">ctrls1</dfn>;</td></tr>
+<tr><th id="195">195</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbCtrlsAction::ctrls0" title='_XkbCtrlsAction::ctrls0' data-ref="_XkbCtrlsAction::ctrls0">ctrls0</dfn>;</td></tr>
+<tr><th id="196">196</th><td>} <dfn class="typedef" id="XkbCtrlsAction" title='XkbCtrlsAction' data-type='struct _XkbCtrlsAction' data-ref="XkbCtrlsAction">XkbCtrlsAction</dfn>;</td></tr>
+<tr><th id="197">197</th><td><u>#define	<dfn class="macro" id="_M/XkbActionSetCtrls" data-ref="_M/XkbActionSetCtrls">XkbActionSetCtrls</dfn>(a,c)	(((a)-&gt;ctrls3=(((c)&gt;&gt;24)&amp;0xff)),\</u></td></tr>
+<tr><th id="198">198</th><td><u>					((a)-&gt;ctrls2=(((c)&gt;&gt;16)&amp;0xff)),\</u></td></tr>
+<tr><th id="199">199</th><td><u>					((a)-&gt;ctrls1=(((c)&gt;&gt;8)&amp;0xff)),\</u></td></tr>
+<tr><th id="200">200</th><td><u>					((a)-&gt;ctrls0=((c)&amp;0xff)))</u></td></tr>
+<tr><th id="201">201</th><td><u>#define	<dfn class="macro" id="_M/XkbActionCtrls" data-ref="_M/XkbActionCtrls">XkbActionCtrls</dfn>(a) ((((unsigned int)(a)-&gt;ctrls3)&lt;&lt;24)|\</u></td></tr>
+<tr><th id="202">202</th><td><u>			   (((unsigned int)(a)-&gt;ctrls2)&lt;&lt;16)|\</u></td></tr>
+<tr><th id="203">203</th><td><u>			   (((unsigned int)(a)-&gt;ctrls1)&lt;&lt;8)|\</u></td></tr>
+<tr><th id="204">204</th><td><u>			   ((unsigned int)((a)-&gt;ctrls0)))</u></td></tr>
+<tr><th id="205">205</th><td></td></tr>
+<tr><th id="206">206</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbMessageAction" title='_XkbMessageAction' data-ref="_XkbMessageAction"><a class="type" href="#_XkbMessageAction" title='_XkbMessageAction' data-ref="_XkbMessageAction">_XkbMessageAction</a></dfn> {</td></tr>
+<tr><th id="207">207</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbMessageAction::type" title='_XkbMessageAction::type' data-ref="_XkbMessageAction::type">type</dfn>;</td></tr>
+<tr><th id="208">208</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbMessageAction::flags" title='_XkbMessageAction::flags' data-ref="_XkbMessageAction::flags">flags</dfn>;</td></tr>
+<tr><th id="209">209</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbMessageAction::message" title='_XkbMessageAction::message' data-ref="_XkbMessageAction::message">message</dfn>[<var>6</var>];</td></tr>
+<tr><th id="210">210</th><td>} <dfn class="typedef" id="XkbMessageAction" title='XkbMessageAction' data-type='struct _XkbMessageAction' data-ref="XkbMessageAction">XkbMessageAction</dfn>;</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><b>typedef</b> <b>struct</b>	<dfn class="type def" id="_XkbRedirectKeyAction" title='_XkbRedirectKeyAction' data-ref="_XkbRedirectKeyAction"><a class="type" href="#_XkbRedirectKeyAction" title='_XkbRedirectKeyAction' data-ref="_XkbRedirectKeyAction">_XkbRedirectKeyAction</a></dfn> {</td></tr>
+<tr><th id="213">213</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::type" title='_XkbRedirectKeyAction::type' data-ref="_XkbRedirectKeyAction::type">type</dfn>;</td></tr>
+<tr><th id="214">214</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::new_key" title='_XkbRedirectKeyAction::new_key' data-ref="_XkbRedirectKeyAction::new_key">new_key</dfn>;</td></tr>
+<tr><th id="215">215</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::mods_mask" title='_XkbRedirectKeyAction::mods_mask' data-ref="_XkbRedirectKeyAction::mods_mask">mods_mask</dfn>;</td></tr>
+<tr><th id="216">216</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::mods" title='_XkbRedirectKeyAction::mods' data-ref="_XkbRedirectKeyAction::mods">mods</dfn>;</td></tr>
+<tr><th id="217">217</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::vmods_mask0" title='_XkbRedirectKeyAction::vmods_mask0' data-ref="_XkbRedirectKeyAction::vmods_mask0">vmods_mask0</dfn>;</td></tr>
+<tr><th id="218">218</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::vmods_mask1" title='_XkbRedirectKeyAction::vmods_mask1' data-ref="_XkbRedirectKeyAction::vmods_mask1">vmods_mask1</dfn>;</td></tr>
+<tr><th id="219">219</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::vmods0" title='_XkbRedirectKeyAction::vmods0' data-ref="_XkbRedirectKeyAction::vmods0">vmods0</dfn>;</td></tr>
+<tr><th id="220">220</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbRedirectKeyAction::vmods1" title='_XkbRedirectKeyAction::vmods1' data-ref="_XkbRedirectKeyAction::vmods1">vmods1</dfn>;</td></tr>
+<tr><th id="221">221</th><td>} <dfn class="typedef" id="XkbRedirectKeyAction" title='XkbRedirectKeyAction' data-type='struct _XkbRedirectKeyAction' data-ref="XkbRedirectKeyAction">XkbRedirectKeyAction</dfn>;</td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><u>#define	<dfn class="macro" id="_M/XkbSARedirectVMods" data-ref="_M/XkbSARedirectVMods">XkbSARedirectVMods</dfn>(a)		((((unsigned int)(a)-&gt;vmods1)&lt;&lt;8)|\</u></td></tr>
+<tr><th id="224">224</th><td><u>					((unsigned int)(a)-&gt;vmods0))</u></td></tr>
+<tr><th id="225">225</th><td><u>#define	<dfn class="macro" id="_M/XkbSARedirectSetVMods" data-ref="_M/XkbSARedirectSetVMods">XkbSARedirectSetVMods</dfn>(a,m)	(((a)-&gt;vmods1=(((m)&gt;&gt;8)&amp;0xff)),\</u></td></tr>
+<tr><th id="226">226</th><td><u>					 ((a)-&gt;vmods0=((m)&amp;0xff)))</u></td></tr>
+<tr><th id="227">227</th><td><u>#define	<dfn class="macro" id="_M/XkbSARedirectVModsMask" data-ref="_M/XkbSARedirectVModsMask">XkbSARedirectVModsMask</dfn>(a)	((((unsigned int)(a)-&gt;vmods_mask1)&lt;&lt;8)|\</u></td></tr>
+<tr><th id="228">228</th><td><u>					((unsigned int)(a)-&gt;vmods_mask0))</u></td></tr>
+<tr><th id="229">229</th><td><u>#define	<dfn class="macro" id="_M/XkbSARedirectSetVModsMask" data-ref="_M/XkbSARedirectSetVModsMask">XkbSARedirectSetVModsMask</dfn>(a,m)	(((a)-&gt;vmods_mask1=(((m)&gt;&gt;8)&amp;0xff)),\</u></td></tr>
+<tr><th id="230">230</th><td><u>					 ((a)-&gt;vmods_mask0=((m)&amp;0xff)))</u></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceBtnAction" title='_XkbDeviceBtnAction' data-ref="_XkbDeviceBtnAction"><a class="type" href="#_XkbDeviceBtnAction" title='_XkbDeviceBtnAction' data-ref="_XkbDeviceBtnAction">_XkbDeviceBtnAction</a></dfn> {</td></tr>
+<tr><th id="233">233</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceBtnAction::type" title='_XkbDeviceBtnAction::type' data-ref="_XkbDeviceBtnAction::type">type</dfn>;</td></tr>
+<tr><th id="234">234</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceBtnAction::flags" title='_XkbDeviceBtnAction::flags' data-ref="_XkbDeviceBtnAction::flags">flags</dfn>;</td></tr>
+<tr><th id="235">235</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceBtnAction::count" title='_XkbDeviceBtnAction::count' data-ref="_XkbDeviceBtnAction::count">count</dfn>;</td></tr>
+<tr><th id="236">236</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceBtnAction::button" title='_XkbDeviceBtnAction::button' data-ref="_XkbDeviceBtnAction::button">button</dfn>;</td></tr>
+<tr><th id="237">237</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceBtnAction::device" title='_XkbDeviceBtnAction::device' data-ref="_XkbDeviceBtnAction::device">device</dfn>;</td></tr>
+<tr><th id="238">238</th><td>} <dfn class="typedef" id="XkbDeviceBtnAction" title='XkbDeviceBtnAction' data-type='struct _XkbDeviceBtnAction' data-ref="XkbDeviceBtnAction">XkbDeviceBtnAction</dfn>;</td></tr>
+<tr><th id="239">239</th><td></td></tr>
+<tr><th id="240">240</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceValuatorAction" title='_XkbDeviceValuatorAction' data-ref="_XkbDeviceValuatorAction"><a class="type" href="#_XkbDeviceValuatorAction" title='_XkbDeviceValuatorAction' data-ref="_XkbDeviceValuatorAction">_XkbDeviceValuatorAction</a></dfn> {</td></tr>
+<tr><th id="241">241</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::type" title='_XkbDeviceValuatorAction::type' data-ref="_XkbDeviceValuatorAction::type">type</dfn>;</td></tr>
+<tr><th id="242">242</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::device" title='_XkbDeviceValuatorAction::device' data-ref="_XkbDeviceValuatorAction::device">device</dfn>;</td></tr>
+<tr><th id="243">243</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v1_what" title='_XkbDeviceValuatorAction::v1_what' data-ref="_XkbDeviceValuatorAction::v1_what">v1_what</dfn>;</td></tr>
+<tr><th id="244">244</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v1_ndx" title='_XkbDeviceValuatorAction::v1_ndx' data-ref="_XkbDeviceValuatorAction::v1_ndx">v1_ndx</dfn>;</td></tr>
+<tr><th id="245">245</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v1_value" title='_XkbDeviceValuatorAction::v1_value' data-ref="_XkbDeviceValuatorAction::v1_value">v1_value</dfn>;</td></tr>
+<tr><th id="246">246</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v2_what" title='_XkbDeviceValuatorAction::v2_what' data-ref="_XkbDeviceValuatorAction::v2_what">v2_what</dfn>;</td></tr>
+<tr><th id="247">247</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v2_ndx" title='_XkbDeviceValuatorAction::v2_ndx' data-ref="_XkbDeviceValuatorAction::v2_ndx">v2_ndx</dfn>;</td></tr>
+<tr><th id="248">248</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbDeviceValuatorAction::v2_value" title='_XkbDeviceValuatorAction::v2_value' data-ref="_XkbDeviceValuatorAction::v2_value">v2_value</dfn>;</td></tr>
+<tr><th id="249">249</th><td>} <dfn class="typedef" id="XkbDeviceValuatorAction" title='XkbDeviceValuatorAction' data-type='struct _XkbDeviceValuatorAction' data-ref="XkbDeviceValuatorAction">XkbDeviceValuatorAction</dfn>;</td></tr>
+<tr><th id="250">250</th><td></td></tr>
+<tr><th id="251">251</th><td><b>typedef</b>	<b>union</b> <dfn class="type def" id="_XkbAction" title='_XkbAction' data-ref="_XkbAction"><a class="type" href="#_XkbAction" title='_XkbAction' data-ref="_XkbAction">_XkbAction</a></dfn> {</td></tr>
+<tr><th id="252">252</th><td>	<a class="typedef" href="#XkbAnyAction" title='XkbAnyAction' data-type='struct _XkbAnyAction' data-ref="XkbAnyAction">XkbAnyAction</a>		<dfn class="decl" id="_XkbAction::any" title='_XkbAction::any' data-ref="_XkbAction::any">any</dfn>;</td></tr>
+<tr><th id="253">253</th><td>	<a class="typedef" href="#XkbModAction" title='XkbModAction' data-type='struct _XkbModAction' data-ref="XkbModAction">XkbModAction</a>		<dfn class="decl" id="_XkbAction::mods" title='_XkbAction::mods' data-ref="_XkbAction::mods">mods</dfn>;</td></tr>
+<tr><th id="254">254</th><td>	<a class="typedef" href="#XkbGroupAction" title='XkbGroupAction' data-type='struct _XkbGroupAction' data-ref="XkbGroupAction">XkbGroupAction</a>		<dfn class="decl" id="_XkbAction::group" title='_XkbAction::group' data-ref="_XkbAction::group">group</dfn>;</td></tr>
+<tr><th id="255">255</th><td>	<a class="typedef" href="#XkbISOAction" title='XkbISOAction' data-type='struct _XkbISOAction' data-ref="XkbISOAction">XkbISOAction</a>		<dfn class="decl" id="_XkbAction::iso" title='_XkbAction::iso' data-ref="_XkbAction::iso">iso</dfn>;</td></tr>
+<tr><th id="256">256</th><td>	<a class="typedef" href="#XkbPtrAction" title='XkbPtrAction' data-type='struct _XkbPtrAction' data-ref="XkbPtrAction">XkbPtrAction</a>		<dfn class="decl" id="_XkbAction::ptr" title='_XkbAction::ptr' data-ref="_XkbAction::ptr">ptr</dfn>;</td></tr>
+<tr><th id="257">257</th><td>	<a class="typedef" href="#XkbPtrBtnAction" title='XkbPtrBtnAction' data-type='struct _XkbPtrBtnAction' data-ref="XkbPtrBtnAction">XkbPtrBtnAction</a>		<dfn class="decl" id="_XkbAction::btn" title='_XkbAction::btn' data-ref="_XkbAction::btn">btn</dfn>;</td></tr>
+<tr><th id="258">258</th><td>	<a class="typedef" href="#XkbPtrDfltAction" title='XkbPtrDfltAction' data-type='struct _XkbPtrDfltAction' data-ref="XkbPtrDfltAction">XkbPtrDfltAction</a>	<dfn class="decl" id="_XkbAction::dflt" title='_XkbAction::dflt' data-ref="_XkbAction::dflt">dflt</dfn>;</td></tr>
+<tr><th id="259">259</th><td>	<a class="typedef" href="#XkbSwitchScreenAction" title='XkbSwitchScreenAction' data-type='struct _XkbSwitchScreenAction' data-ref="XkbSwitchScreenAction">XkbSwitchScreenAction</a>	<dfn class="decl" id="_XkbAction::screen" title='_XkbAction::screen' data-ref="_XkbAction::screen">screen</dfn>;</td></tr>
+<tr><th id="260">260</th><td>	<a class="typedef" href="#XkbCtrlsAction" title='XkbCtrlsAction' data-type='struct _XkbCtrlsAction' data-ref="XkbCtrlsAction">XkbCtrlsAction</a>		<dfn class="decl" id="_XkbAction::ctrls" title='_XkbAction::ctrls' data-ref="_XkbAction::ctrls">ctrls</dfn>;</td></tr>
+<tr><th id="261">261</th><td>	<a class="typedef" href="#XkbMessageAction" title='XkbMessageAction' data-type='struct _XkbMessageAction' data-ref="XkbMessageAction">XkbMessageAction</a>	<dfn class="decl" id="_XkbAction::msg" title='_XkbAction::msg' data-ref="_XkbAction::msg">msg</dfn>;</td></tr>
+<tr><th id="262">262</th><td>	<a class="typedef" href="#XkbRedirectKeyAction" title='XkbRedirectKeyAction' data-type='struct _XkbRedirectKeyAction' data-ref="XkbRedirectKeyAction">XkbRedirectKeyAction</a>	<dfn class="decl" id="_XkbAction::redirect" title='_XkbAction::redirect' data-ref="_XkbAction::redirect">redirect</dfn>;</td></tr>
+<tr><th id="263">263</th><td>	<a class="typedef" href="#XkbDeviceBtnAction" title='XkbDeviceBtnAction' data-type='struct _XkbDeviceBtnAction' data-ref="XkbDeviceBtnAction">XkbDeviceBtnAction</a>	<dfn class="decl" id="_XkbAction::devbtn" title='_XkbAction::devbtn' data-ref="_XkbAction::devbtn">devbtn</dfn>;</td></tr>
+<tr><th id="264">264</th><td>	<a class="typedef" href="#XkbDeviceValuatorAction" title='XkbDeviceValuatorAction' data-type='struct _XkbDeviceValuatorAction' data-ref="XkbDeviceValuatorAction">XkbDeviceValuatorAction</a>	<dfn class="decl" id="_XkbAction::devval" title='_XkbAction::devval' data-ref="_XkbAction::devval">devval</dfn>;</td></tr>
+<tr><th id="265">265</th><td>	<em>unsigned</em> <em>char</em> 		<dfn class="decl" id="_XkbAction::type" title='_XkbAction::type' data-ref="_XkbAction::type">type</dfn>;</td></tr>
+<tr><th id="266">266</th><td>} <dfn class="typedef" id="XkbAction" title='XkbAction' data-type='union _XkbAction' data-ref="XkbAction">XkbAction</dfn>;</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><b>typedef</b>	<b>struct</b> <dfn class="type def" id="_XkbControls" title='_XkbControls' data-ref="_XkbControls"><a class="type" href="#_XkbControls" title='_XkbControls' data-ref="_XkbControls"><a class="type" href="#_XkbControls" title='_XkbControls' data-ref="_XkbControls">_XkbControls</a></a></dfn> {</td></tr>
+<tr><th id="269">269</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbControls::mk_dflt_btn" title='_XkbControls::mk_dflt_btn' data-ref="_XkbControls::mk_dflt_btn">mk_dflt_btn</dfn>;</td></tr>
+<tr><th id="270">270</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbControls::num_groups" title='_XkbControls::num_groups' data-ref="_XkbControls::num_groups">num_groups</dfn>;</td></tr>
+<tr><th id="271">271</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbControls::groups_wrap" title='_XkbControls::groups_wrap' data-ref="_XkbControls::groups_wrap">groups_wrap</dfn>;</td></tr>
+<tr><th id="272">272</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>	<dfn class="decl" id="_XkbControls::internal" title='_XkbControls::internal' data-ref="_XkbControls::internal">internal</dfn>;</td></tr>
+<tr><th id="273">273</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>	<dfn class="decl" id="_XkbControls::ignore_lock" title='_XkbControls::ignore_lock' data-ref="_XkbControls::ignore_lock">ignore_lock</dfn>;</td></tr>
+<tr><th id="274">274</th><td>	<em>unsigned</em> <em>int</em>	<dfn class="decl" id="_XkbControls::enabled_ctrls" title='_XkbControls::enabled_ctrls' data-ref="_XkbControls::enabled_ctrls">enabled_ctrls</dfn>;</td></tr>
+<tr><th id="275">275</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::repeat_delay" title='_XkbControls::repeat_delay' data-ref="_XkbControls::repeat_delay">repeat_delay</dfn>;</td></tr>
+<tr><th id="276">276</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::repeat_interval" title='_XkbControls::repeat_interval' data-ref="_XkbControls::repeat_interval">repeat_interval</dfn>;</td></tr>
+<tr><th id="277">277</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::slow_keys_delay" title='_XkbControls::slow_keys_delay' data-ref="_XkbControls::slow_keys_delay">slow_keys_delay</dfn>;</td></tr>
+<tr><th id="278">278</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::debounce_delay" title='_XkbControls::debounce_delay' data-ref="_XkbControls::debounce_delay">debounce_delay</dfn>;</td></tr>
+<tr><th id="279">279</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::mk_delay" title='_XkbControls::mk_delay' data-ref="_XkbControls::mk_delay">mk_delay</dfn>;</td></tr>
+<tr><th id="280">280</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::mk_interval" title='_XkbControls::mk_interval' data-ref="_XkbControls::mk_interval">mk_interval</dfn>;</td></tr>
+<tr><th id="281">281</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::mk_time_to_max" title='_XkbControls::mk_time_to_max' data-ref="_XkbControls::mk_time_to_max">mk_time_to_max</dfn>;</td></tr>
+<tr><th id="282">282</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::mk_max_speed" title='_XkbControls::mk_max_speed' data-ref="_XkbControls::mk_max_speed">mk_max_speed</dfn>;</td></tr>
+<tr><th id="283">283</th><td>		 <em>short</em>	<dfn class="decl" id="_XkbControls::mk_curve" title='_XkbControls::mk_curve' data-ref="_XkbControls::mk_curve">mk_curve</dfn>;</td></tr>
+<tr><th id="284">284</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::ax_options" title='_XkbControls::ax_options' data-ref="_XkbControls::ax_options">ax_options</dfn>;</td></tr>
+<tr><th id="285">285</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::ax_timeout" title='_XkbControls::ax_timeout' data-ref="_XkbControls::ax_timeout">ax_timeout</dfn>;</td></tr>
+<tr><th id="286">286</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::axt_opts_mask" title='_XkbControls::axt_opts_mask' data-ref="_XkbControls::axt_opts_mask">axt_opts_mask</dfn>;</td></tr>
+<tr><th id="287">287</th><td>	<em>unsigned</em> <em>short</em>	<dfn class="decl" id="_XkbControls::axt_opts_values" title='_XkbControls::axt_opts_values' data-ref="_XkbControls::axt_opts_values">axt_opts_values</dfn>;</td></tr>
+<tr><th id="288">288</th><td>	<em>unsigned</em> <em>int</em>	<dfn class="decl" id="_XkbControls::axt_ctrls_mask" title='_XkbControls::axt_ctrls_mask' data-ref="_XkbControls::axt_ctrls_mask">axt_ctrls_mask</dfn>;</td></tr>
+<tr><th id="289">289</th><td>	<em>unsigned</em> <em>int</em>	<dfn class="decl" id="_XkbControls::axt_ctrls_values" title='_XkbControls::axt_ctrls_values' data-ref="_XkbControls::axt_ctrls_values">axt_ctrls_values</dfn>;</td></tr>
+<tr><th id="290">290</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbControls::per_key_repeat" title='_XkbControls::per_key_repeat' data-ref="_XkbControls::per_key_repeat">per_key_repeat</dfn>[<a class="macro" href="XKB.h.html#547" title="((255+1)/8)" data-ref="_M/XkbPerKeyBitArraySize">XkbPerKeyBitArraySize</a>];</td></tr>
+<tr><th id="291">291</th><td>} <dfn class="typedef" id="XkbControlsRec" title='XkbControlsRec' data-type='struct _XkbControls' data-ref="XkbControlsRec">XkbControlsRec</dfn>, *<dfn class="typedef" id="XkbControlsPtr" title='XkbControlsPtr' data-type='struct _XkbControls *' data-ref="XkbControlsPtr">XkbControlsPtr</dfn>;</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_AnyFeedback" data-ref="_M/XkbAX_AnyFeedback">XkbAX_AnyFeedback</dfn>(c)	((c)-&gt;enabled_ctrls&amp;XkbAccessXFeedbackMask)</u></td></tr>
+<tr><th id="294">294</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_NeedOption" data-ref="_M/XkbAX_NeedOption">XkbAX_NeedOption</dfn>(c,w)	((c)-&gt;ax_options&amp;(w))</u></td></tr>
+<tr><th id="295">295</th><td><u>#define	<dfn class="macro" id="_M/XkbAX_NeedFeedback" data-ref="_M/XkbAX_NeedFeedback">XkbAX_NeedFeedback</dfn>(c,w)	(XkbAX_AnyFeedback(c)&amp;&amp;XkbAX_NeedOption(c,w))</u></td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbServerMapRec" title='_XkbServerMapRec' data-ref="_XkbServerMapRec"><a class="type" href="#_XkbServerMapRec" title='_XkbServerMapRec' data-ref="_XkbServerMapRec"><a class="type" href="#_XkbServerMapRec" title='_XkbServerMapRec' data-ref="_XkbServerMapRec">_XkbServerMapRec</a></a></dfn> {</td></tr>
+<tr><th id="298">298</th><td>	<i>/* acts is an array of XkbActions structs, with size_acts entries</i></td></tr>
+<tr><th id="299">299</th><td><i>	   allocated, and num_acts entries used. */</i></td></tr>
+<tr><th id="300">300</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbServerMapRec::num_acts" title='_XkbServerMapRec::num_acts' data-ref="_XkbServerMapRec::num_acts">num_acts</dfn>;</td></tr>
+<tr><th id="301">301</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbServerMapRec::size_acts" title='_XkbServerMapRec::size_acts' data-ref="_XkbServerMapRec::size_acts">size_acts</dfn>;</td></tr>
+<tr><th id="302">302</th><td>	<a class="typedef" href="#XkbAction" title='XkbAction' data-type='union _XkbAction' data-ref="XkbAction">XkbAction</a>		*<dfn class="decl" id="_XkbServerMapRec::acts" title='_XkbServerMapRec::acts' data-ref="_XkbServerMapRec::acts">acts</dfn>;</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td>	<i>/* behaviors, key_acts, explicit, &amp; vmodmap are all arrays with</i></td></tr>
+<tr><th id="305">305</th><td><i>	   (xkb-&gt;max_key_code + 1) entries allocated for each. */</i></td></tr>
+<tr><th id="306">306</th><td>	<a class="typedef" href="#XkbBehavior" title='XkbBehavior' data-type='struct _XkbBehavior' data-ref="XkbBehavior">XkbBehavior</a>		*<dfn class="decl" id="_XkbServerMapRec::behaviors" title='_XkbServerMapRec::behaviors' data-ref="_XkbServerMapRec::behaviors">behaviors</dfn>;</td></tr>
+<tr><th id="307">307</th><td>	<em>unsigned</em> <em>short</em>		*<dfn class="decl" id="_XkbServerMapRec::key_acts" title='_XkbServerMapRec::key_acts' data-ref="_XkbServerMapRec::key_acts">key_acts</dfn>;</td></tr>
+<tr><th id="308">308</th><td><u>#<span data-ppcond="308">if</span> defined(<span class="macro" data-ref="_M/__cplusplus">__cplusplus</span>) || defined(<span class="macro" data-ref="_M/c_plusplus">c_plusplus</span>)</u></td></tr>
+<tr><th id="309">309</th><td>	<i>/* explicit is a C++ reserved word */</i></td></tr>
+<tr><th id="310">310</th><td>	<em>unsigned</em> <em>char</em>		*c_explicit;</td></tr>
+<tr><th id="311">311</th><td><u>#<span data-ppcond="308">else</span></u></td></tr>
+<tr><th id="312">312</th><td>	<em>unsigned</em> <em>char</em>		*<dfn class="decl" id="_XkbServerMapRec::explicit" title='_XkbServerMapRec::explicit' data-ref="_XkbServerMapRec::explicit">explicit</dfn>;</td></tr>
+<tr><th id="313">313</th><td><u>#<span data-ppcond="308">endif</span></u></td></tr>
+<tr><th id="314">314</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbServerMapRec::vmods" title='_XkbServerMapRec::vmods' data-ref="_XkbServerMapRec::vmods">vmods</dfn>[<a class="macro" href="XKB.h.html#555" title="16" data-ref="_M/XkbNumVirtualMods">XkbNumVirtualMods</a>];</td></tr>
+<tr><th id="315">315</th><td>	<em>unsigned</em> <em>short</em>		*<dfn class="decl" id="_XkbServerMapRec::vmodmap" title='_XkbServerMapRec::vmodmap' data-ref="_XkbServerMapRec::vmodmap">vmodmap</dfn>;</td></tr>
+<tr><th id="316">316</th><td>} <dfn class="typedef" id="XkbServerMapRec" title='XkbServerMapRec' data-type='struct _XkbServerMapRec' data-ref="XkbServerMapRec">XkbServerMapRec</dfn>, *<dfn class="typedef" id="XkbServerMapPtr" title='XkbServerMapPtr' data-type='struct _XkbServerMapRec *' data-ref="XkbServerMapPtr">XkbServerMapPtr</dfn>;</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td><u>#define	<dfn class="macro" id="_M/XkbSMKeyActionsPtr" data-ref="_M/XkbSMKeyActionsPtr">XkbSMKeyActionsPtr</dfn>(m,k) (&amp;(m)-&gt;acts[(m)-&gt;key_acts[k]])</u></td></tr>
+<tr><th id="319">319</th><td></td></tr>
+<tr><th id="320">320</th><td>	<i>/*</i></td></tr>
+<tr><th id="321">321</th><td><i>	 * Structures and access macros used primarily by clients</i></td></tr>
+<tr><th id="322">322</th><td><i>	 */</i></td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><b>typedef</b>	<b>struct</b> <dfn class="type def" id="_XkbSymMapRec" title='_XkbSymMapRec' data-ref="_XkbSymMapRec"><a class="type" href="#_XkbSymMapRec" title='_XkbSymMapRec' data-ref="_XkbSymMapRec"><a class="type" href="#_XkbSymMapRec" title='_XkbSymMapRec' data-ref="_XkbSymMapRec">_XkbSymMapRec</a></a></dfn> {</td></tr>
+<tr><th id="325">325</th><td>	<em>unsigned</em> <em>char</em>	 <dfn class="decl" id="_XkbSymMapRec::kt_index" title='_XkbSymMapRec::kt_index' data-ref="_XkbSymMapRec::kt_index">kt_index</dfn>[<a class="macro" href="XKB.h.html#348" title="4" data-ref="_M/XkbNumKbdGroups">XkbNumKbdGroups</a>];</td></tr>
+<tr><th id="326">326</th><td>	<em>unsigned</em> <em>char</em>	 <dfn class="decl" id="_XkbSymMapRec::group_info" title='_XkbSymMapRec::group_info' data-ref="_XkbSymMapRec::group_info">group_info</dfn>;</td></tr>
+<tr><th id="327">327</th><td>	<em>unsigned</em> <em>char</em>	 <dfn class="decl" id="_XkbSymMapRec::width" title='_XkbSymMapRec::width' data-ref="_XkbSymMapRec::width">width</dfn>;</td></tr>
+<tr><th id="328">328</th><td>	<em>unsigned</em> <em>short</em>	 <dfn class="decl" id="_XkbSymMapRec::offset" title='_XkbSymMapRec::offset' data-ref="_XkbSymMapRec::offset">offset</dfn>;</td></tr>
+<tr><th id="329">329</th><td>} <dfn class="typedef" id="XkbSymMapRec" title='XkbSymMapRec' data-type='struct _XkbSymMapRec' data-ref="XkbSymMapRec">XkbSymMapRec</dfn>, *<dfn class="typedef" id="XkbSymMapPtr" title='XkbSymMapPtr' data-type='struct _XkbSymMapRec *' data-ref="XkbSymMapPtr">XkbSymMapPtr</dfn>;</td></tr>
+<tr><th id="330">330</th><td></td></tr>
+<tr><th id="331">331</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbClientMapRec" title='_XkbClientMapRec' data-ref="_XkbClientMapRec"><a class="type" href="#_XkbClientMapRec" title='_XkbClientMapRec' data-ref="_XkbClientMapRec"><a class="type" href="#_XkbClientMapRec" title='_XkbClientMapRec' data-ref="_XkbClientMapRec">_XkbClientMapRec</a></a></dfn> {</td></tr>
+<tr><th id="332">332</th><td>	<i>/* types is an array of XkbKeyTypeRec structs, with size_types entries</i></td></tr>
+<tr><th id="333">333</th><td><i>	   allocated, and num_types entries used. */</i></td></tr>
+<tr><th id="334">334</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbClientMapRec::size_types" title='_XkbClientMapRec::size_types' data-ref="_XkbClientMapRec::size_types">size_types</dfn>;</td></tr>
+<tr><th id="335">335</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbClientMapRec::num_types" title='_XkbClientMapRec::num_types' data-ref="_XkbClientMapRec::num_types">num_types</dfn>;</td></tr>
+<tr><th id="336">336</th><td>	<a class="typedef" href="#XkbKeyTypePtr" title='XkbKeyTypePtr' data-type='struct _XkbKeyType *' data-ref="XkbKeyTypePtr">XkbKeyTypePtr</a>		 <dfn class="decl" id="_XkbClientMapRec::types" title='_XkbClientMapRec::types' data-ref="_XkbClientMapRec::types">types</dfn>;</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>	<i>/* syms is an array of size_syms KeySyms, in which num_syms are used */</i></td></tr>
+<tr><th id="339">339</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbClientMapRec::size_syms" title='_XkbClientMapRec::size_syms' data-ref="_XkbClientMapRec::size_syms">size_syms</dfn>;</td></tr>
+<tr><th id="340">340</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbClientMapRec::num_syms" title='_XkbClientMapRec::num_syms' data-ref="_XkbClientMapRec::num_syms">num_syms</dfn>;</td></tr>
+<tr><th id="341">341</th><td>	<a class="typedef" href="../X.h.html#KeySym" title='KeySym' data-type='XID' data-ref="KeySym">KeySym</a>			*<dfn class="decl" id="_XkbClientMapRec::syms" title='_XkbClientMapRec::syms' data-ref="_XkbClientMapRec::syms">syms</dfn>;</td></tr>
+<tr><th id="342">342</th><td>	<i>/* key_sym_map is an array of (max_key_code + 1) XkbSymMapRec structs */</i></td></tr>
+<tr><th id="343">343</th><td>	<a class="typedef" href="#XkbSymMapPtr" title='XkbSymMapPtr' data-type='struct _XkbSymMapRec *' data-ref="XkbSymMapPtr">XkbSymMapPtr</a>		 <dfn class="decl" id="_XkbClientMapRec::key_sym_map" title='_XkbClientMapRec::key_sym_map' data-ref="_XkbClientMapRec::key_sym_map">key_sym_map</dfn>;</td></tr>
+<tr><th id="344">344</th><td></td></tr>
+<tr><th id="345">345</th><td>	<i>/* modmap is an array of (max_key_code + 1) unsigned chars */</i></td></tr>
+<tr><th id="346">346</th><td>	<em>unsigned</em> <em>char</em>		*<dfn class="decl" id="_XkbClientMapRec::modmap" title='_XkbClientMapRec::modmap' data-ref="_XkbClientMapRec::modmap">modmap</dfn>;</td></tr>
+<tr><th id="347">347</th><td>} <dfn class="typedef" id="XkbClientMapRec" title='XkbClientMapRec' data-type='struct _XkbClientMapRec' data-ref="XkbClientMapRec">XkbClientMapRec</dfn>, *<dfn class="typedef" id="XkbClientMapPtr" title='XkbClientMapPtr' data-type='struct _XkbClientMapRec *' data-ref="XkbClientMapPtr">XkbClientMapPtr</dfn>;</td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyGroupInfo" data-ref="_M/XkbCMKeyGroupInfo">XkbCMKeyGroupInfo</dfn>(m,k)  ((m)-&gt;key_sym_map[k].group_info)</u></td></tr>
+<tr><th id="350">350</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyNumGroups" data-ref="_M/XkbCMKeyNumGroups">XkbCMKeyNumGroups</dfn>(m,k)	 (XkbNumGroups((m)-&gt;key_sym_map[k].group_info))</u></td></tr>
+<tr><th id="351">351</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyGroupWidth" data-ref="_M/XkbCMKeyGroupWidth">XkbCMKeyGroupWidth</dfn>(m,k,g) (XkbCMKeyType(m,k,g)-&gt;num_levels)</u></td></tr>
+<tr><th id="352">352</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyGroupsWidth" data-ref="_M/XkbCMKeyGroupsWidth">XkbCMKeyGroupsWidth</dfn>(m,k) ((m)-&gt;key_sym_map[k].width)</u></td></tr>
+<tr><th id="353">353</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyTypeIndex" data-ref="_M/XkbCMKeyTypeIndex">XkbCMKeyTypeIndex</dfn>(m,k,g) ((m)-&gt;key_sym_map[k].kt_index[g&amp;0x3])</u></td></tr>
+<tr><th id="354">354</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyType" data-ref="_M/XkbCMKeyType">XkbCMKeyType</dfn>(m,k,g)	 (&amp;(m)-&gt;types[XkbCMKeyTypeIndex(m,k,g)])</u></td></tr>
+<tr><th id="355">355</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeyNumSyms" data-ref="_M/XkbCMKeyNumSyms">XkbCMKeyNumSyms</dfn>(m,k) (XkbCMKeyGroupsWidth(m,k)*XkbCMKeyNumGroups(m,k))</u></td></tr>
+<tr><th id="356">356</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeySymsOffset" data-ref="_M/XkbCMKeySymsOffset">XkbCMKeySymsOffset</dfn>(m,k)	((m)-&gt;key_sym_map[k].offset)</u></td></tr>
+<tr><th id="357">357</th><td><u>#define	<dfn class="macro" id="_M/XkbCMKeySymsPtr" data-ref="_M/XkbCMKeySymsPtr">XkbCMKeySymsPtr</dfn>(m,k)	(&amp;(m)-&gt;syms[XkbCMKeySymsOffset(m,k)])</u></td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td>	<i>/*</i></td></tr>
+<tr><th id="360">360</th><td><i>	 * Compatibility structures and access macros</i></td></tr>
+<tr><th id="361">361</th><td><i>	 */</i></td></tr>
+<tr><th id="362">362</th><td></td></tr>
+<tr><th id="363">363</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbSymInterpretRec" title='_XkbSymInterpretRec' data-ref="_XkbSymInterpretRec"><a class="type" href="#_XkbSymInterpretRec" title='_XkbSymInterpretRec' data-ref="_XkbSymInterpretRec"><a class="type" href="#_XkbSymInterpretRec" title='_XkbSymInterpretRec' data-ref="_XkbSymInterpretRec">_XkbSymInterpretRec</a></a></dfn> {</td></tr>
+<tr><th id="364">364</th><td>	<a class="typedef" href="../X.h.html#KeySym" title='KeySym' data-type='XID' data-ref="KeySym">KeySym</a>		<dfn class="decl" id="_XkbSymInterpretRec::sym" title='_XkbSymInterpretRec::sym' data-ref="_XkbSymInterpretRec::sym">sym</dfn>;</td></tr>
+<tr><th id="365">365</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSymInterpretRec::flags" title='_XkbSymInterpretRec::flags' data-ref="_XkbSymInterpretRec::flags">flags</dfn>;</td></tr>
+<tr><th id="366">366</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSymInterpretRec::match" title='_XkbSymInterpretRec::match' data-ref="_XkbSymInterpretRec::match">match</dfn>;</td></tr>
+<tr><th id="367">367</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSymInterpretRec::mods" title='_XkbSymInterpretRec::mods' data-ref="_XkbSymInterpretRec::mods">mods</dfn>;</td></tr>
+<tr><th id="368">368</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbSymInterpretRec::virtual_mod" title='_XkbSymInterpretRec::virtual_mod' data-ref="_XkbSymInterpretRec::virtual_mod">virtual_mod</dfn>;</td></tr>
+<tr><th id="369">369</th><td>	<a class="typedef" href="#XkbAnyAction" title='XkbAnyAction' data-type='struct _XkbAnyAction' data-ref="XkbAnyAction">XkbAnyAction</a>	<dfn class="decl" id="_XkbSymInterpretRec::act" title='_XkbSymInterpretRec::act' data-ref="_XkbSymInterpretRec::act">act</dfn>;</td></tr>
+<tr><th id="370">370</th><td>} <dfn class="typedef" id="XkbSymInterpretRec" title='XkbSymInterpretRec' data-type='struct _XkbSymInterpretRec' data-ref="XkbSymInterpretRec">XkbSymInterpretRec</dfn>,*<dfn class="typedef" id="XkbSymInterpretPtr" title='XkbSymInterpretPtr' data-type='struct _XkbSymInterpretRec *' data-ref="XkbSymInterpretPtr">XkbSymInterpretPtr</dfn>;</td></tr>
+<tr><th id="371">371</th><td></td></tr>
+<tr><th id="372">372</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbCompatMapRec" title='_XkbCompatMapRec' data-ref="_XkbCompatMapRec"><a class="type" href="#_XkbCompatMapRec" title='_XkbCompatMapRec' data-ref="_XkbCompatMapRec"><a class="type" href="#_XkbCompatMapRec" title='_XkbCompatMapRec' data-ref="_XkbCompatMapRec">_XkbCompatMapRec</a></a></dfn> {</td></tr>
+<tr><th id="373">373</th><td>	<i>/* sym_interpret is an array of XkbSymInterpretRec structs,</i></td></tr>
+<tr><th id="374">374</th><td><i>	   in which size_si are allocated &amp; num_si are used. */</i></td></tr>
+<tr><th id="375">375</th><td>	<a class="typedef" href="#XkbSymInterpretPtr" title='XkbSymInterpretPtr' data-type='struct _XkbSymInterpretRec *' data-ref="XkbSymInterpretPtr">XkbSymInterpretPtr</a>	 <dfn class="decl" id="_XkbCompatMapRec::sym_interpret" title='_XkbCompatMapRec::sym_interpret' data-ref="_XkbCompatMapRec::sym_interpret">sym_interpret</dfn>;</td></tr>
+<tr><th id="376">376</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>		 <dfn class="decl" id="_XkbCompatMapRec::groups" title='_XkbCompatMapRec::groups' data-ref="_XkbCompatMapRec::groups">groups</dfn>[<a class="macro" href="XKB.h.html#348" title="4" data-ref="_M/XkbNumKbdGroups">XkbNumKbdGroups</a>];</td></tr>
+<tr><th id="377">377</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbCompatMapRec::num_si" title='_XkbCompatMapRec::num_si' data-ref="_XkbCompatMapRec::num_si">num_si</dfn>;</td></tr>
+<tr><th id="378">378</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbCompatMapRec::size_si" title='_XkbCompatMapRec::size_si' data-ref="_XkbCompatMapRec::size_si">size_si</dfn>;</td></tr>
+<tr><th id="379">379</th><td>} <dfn class="typedef" id="XkbCompatMapRec" title='XkbCompatMapRec' data-type='struct _XkbCompatMapRec' data-ref="XkbCompatMapRec">XkbCompatMapRec</dfn>, *<dfn class="typedef" id="XkbCompatMapPtr" title='XkbCompatMapPtr' data-type='struct _XkbCompatMapRec *' data-ref="XkbCompatMapPtr">XkbCompatMapPtr</dfn>;</td></tr>
+<tr><th id="380">380</th><td></td></tr>
+<tr><th id="381">381</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbIndicatorMapRec" title='_XkbIndicatorMapRec' data-ref="_XkbIndicatorMapRec"><a class="type" href="#_XkbIndicatorMapRec" title='_XkbIndicatorMapRec' data-ref="_XkbIndicatorMapRec"><a class="type" href="#_XkbIndicatorMapRec" title='_XkbIndicatorMapRec' data-ref="_XkbIndicatorMapRec">_XkbIndicatorMapRec</a></a></dfn> {</td></tr>
+<tr><th id="382">382</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbIndicatorMapRec::flags" title='_XkbIndicatorMapRec::flags' data-ref="_XkbIndicatorMapRec::flags">flags</dfn>;</td></tr>
+<tr><th id="383">383</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbIndicatorMapRec::which_groups" title='_XkbIndicatorMapRec::which_groups' data-ref="_XkbIndicatorMapRec::which_groups">which_groups</dfn>;</td></tr>
+<tr><th id="384">384</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbIndicatorMapRec::groups" title='_XkbIndicatorMapRec::groups' data-ref="_XkbIndicatorMapRec::groups">groups</dfn>;</td></tr>
+<tr><th id="385">385</th><td>	<em>unsigned</em> <em>char</em>	<dfn class="decl" id="_XkbIndicatorMapRec::which_mods" title='_XkbIndicatorMapRec::which_mods' data-ref="_XkbIndicatorMapRec::which_mods">which_mods</dfn>;</td></tr>
+<tr><th id="386">386</th><td>	<a class="typedef" href="#XkbModsRec" title='XkbModsRec' data-type='struct _XkbMods' data-ref="XkbModsRec">XkbModsRec</a>	<dfn class="decl" id="_XkbIndicatorMapRec::mods" title='_XkbIndicatorMapRec::mods' data-ref="_XkbIndicatorMapRec::mods">mods</dfn>;</td></tr>
+<tr><th id="387">387</th><td>	<em>unsigned</em> <em>int</em>	<dfn class="decl" id="_XkbIndicatorMapRec::ctrls" title='_XkbIndicatorMapRec::ctrls' data-ref="_XkbIndicatorMapRec::ctrls">ctrls</dfn>;</td></tr>
+<tr><th id="388">388</th><td>} <dfn class="typedef" id="XkbIndicatorMapRec" title='XkbIndicatorMapRec' data-type='struct _XkbIndicatorMapRec' data-ref="XkbIndicatorMapRec">XkbIndicatorMapRec</dfn>, *<dfn class="typedef" id="XkbIndicatorMapPtr" title='XkbIndicatorMapPtr' data-type='struct _XkbIndicatorMapRec *' data-ref="XkbIndicatorMapPtr">XkbIndicatorMapPtr</dfn>;</td></tr>
+<tr><th id="389">389</th><td></td></tr>
+<tr><th id="390">390</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_IsAuto" data-ref="_M/XkbIM_IsAuto">XkbIM_IsAuto</dfn>(i)	((((i)-&gt;flags&amp;XkbIM_NoAutomatic)==0)&amp;&amp;\</u></td></tr>
+<tr><th id="391">391</th><td><u>			    (((i)-&gt;which_groups&amp;&amp;(i)-&gt;groups)||\</u></td></tr>
+<tr><th id="392">392</th><td><u>			     ((i)-&gt;which_mods&amp;&amp;(i)-&gt;mods.mask)||\</u></td></tr>
+<tr><th id="393">393</th><td><u>			     ((i)-&gt;ctrls)))</u></td></tr>
+<tr><th id="394">394</th><td><u>#define	<dfn class="macro" id="_M/XkbIM_InUse" data-ref="_M/XkbIM_InUse">XkbIM_InUse</dfn>(i)	(((i)-&gt;flags)||((i)-&gt;which_groups)||\</u></td></tr>
+<tr><th id="395">395</th><td><u>					((i)-&gt;which_mods)||((i)-&gt;ctrls))</u></td></tr>
+<tr><th id="396">396</th><td>	</td></tr>
+<tr><th id="397">397</th><td></td></tr>
+<tr><th id="398">398</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbIndicatorRec" title='_XkbIndicatorRec' data-ref="_XkbIndicatorRec"><a class="type" href="#_XkbIndicatorRec" title='_XkbIndicatorRec' data-ref="_XkbIndicatorRec"><a class="type" href="#_XkbIndicatorRec" title='_XkbIndicatorRec' data-ref="_XkbIndicatorRec">_XkbIndicatorRec</a></a></dfn> {</td></tr>
+<tr><th id="399">399</th><td>	<em>unsigned</em> <em>long</em>	  	<dfn class="decl" id="_XkbIndicatorRec::phys_indicators" title='_XkbIndicatorRec::phys_indicators' data-ref="_XkbIndicatorRec::phys_indicators">phys_indicators</dfn>;</td></tr>
+<tr><th id="400">400</th><td>	<a class="typedef" href="#XkbIndicatorMapRec" title='XkbIndicatorMapRec' data-type='struct _XkbIndicatorMapRec' data-ref="XkbIndicatorMapRec">XkbIndicatorMapRec</a>	<dfn class="decl" id="_XkbIndicatorRec::maps" title='_XkbIndicatorRec::maps' data-ref="_XkbIndicatorRec::maps">maps</dfn>[<a class="macro" href="XKB.h.html#556" title="32" data-ref="_M/XkbNumIndicators">XkbNumIndicators</a>];</td></tr>
+<tr><th id="401">401</th><td>} <dfn class="typedef" id="XkbIndicatorRec" title='XkbIndicatorRec' data-type='struct _XkbIndicatorRec' data-ref="XkbIndicatorRec">XkbIndicatorRec</dfn>,*<dfn class="typedef" id="XkbIndicatorPtr" title='XkbIndicatorPtr' data-type='struct _XkbIndicatorRec *' data-ref="XkbIndicatorPtr">XkbIndicatorPtr</dfn>;</td></tr>
+<tr><th id="402">402</th><td></td></tr>
+<tr><th id="403">403</th><td><b>typedef</b>	<b>struct</b> <dfn class="type def" id="_XkbKeyNameRec" title='_XkbKeyNameRec' data-ref="_XkbKeyNameRec"><a class="type" href="#_XkbKeyNameRec" title='_XkbKeyNameRec' data-ref="_XkbKeyNameRec"><a class="type" href="#_XkbKeyNameRec" title='_XkbKeyNameRec' data-ref="_XkbKeyNameRec">_XkbKeyNameRec</a></a></dfn> {</td></tr>
+<tr><th id="404">404</th><td>	<em>char</em>	<dfn class="decl" id="_XkbKeyNameRec::name" title='_XkbKeyNameRec::name' data-ref="_XkbKeyNameRec::name">name</dfn>[<a class="macro" href="XKB.h.html#564" title="4" data-ref="_M/XkbKeyNameLength">XkbKeyNameLength</a>];</td></tr>
+<tr><th id="405">405</th><td>} <dfn class="typedef" id="XkbKeyNameRec" title='XkbKeyNameRec' data-type='struct _XkbKeyNameRec' data-ref="XkbKeyNameRec">XkbKeyNameRec</dfn>,*<dfn class="typedef" id="XkbKeyNamePtr" title='XkbKeyNamePtr' data-type='struct _XkbKeyNameRec *' data-ref="XkbKeyNamePtr">XkbKeyNamePtr</dfn>;</td></tr>
+<tr><th id="406">406</th><td></td></tr>
+<tr><th id="407">407</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbKeyAliasRec" title='_XkbKeyAliasRec' data-ref="_XkbKeyAliasRec"><a class="type" href="#_XkbKeyAliasRec" title='_XkbKeyAliasRec' data-ref="_XkbKeyAliasRec"><a class="type" href="#_XkbKeyAliasRec" title='_XkbKeyAliasRec' data-ref="_XkbKeyAliasRec">_XkbKeyAliasRec</a></a></dfn> {</td></tr>
+<tr><th id="408">408</th><td>	<em>char</em>	<dfn class="decl" id="_XkbKeyAliasRec::real" title='_XkbKeyAliasRec::real' data-ref="_XkbKeyAliasRec::real">real</dfn>[<a class="macro" href="XKB.h.html#564" title="4" data-ref="_M/XkbKeyNameLength">XkbKeyNameLength</a>];</td></tr>
+<tr><th id="409">409</th><td>	<em>char</em>	<dfn class="decl" id="_XkbKeyAliasRec::alias" title='_XkbKeyAliasRec::alias' data-ref="_XkbKeyAliasRec::alias">alias</dfn>[<a class="macro" href="XKB.h.html#564" title="4" data-ref="_M/XkbKeyNameLength">XkbKeyNameLength</a>];</td></tr>
+<tr><th id="410">410</th><td>} <dfn class="typedef" id="XkbKeyAliasRec" title='XkbKeyAliasRec' data-type='struct _XkbKeyAliasRec' data-ref="XkbKeyAliasRec">XkbKeyAliasRec</dfn>,*<dfn class="typedef" id="XkbKeyAliasPtr" title='XkbKeyAliasPtr' data-type='struct _XkbKeyAliasRec *' data-ref="XkbKeyAliasPtr">XkbKeyAliasPtr</dfn>;</td></tr>
+<tr><th id="411">411</th><td></td></tr>
+<tr><th id="412">412</th><td>	<i>/*</i></td></tr>
+<tr><th id="413">413</th><td><i>	 * Names for everything </i></td></tr>
+<tr><th id="414">414</th><td><i>	 */</i></td></tr>
+<tr><th id="415">415</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbNamesRec" title='_XkbNamesRec' data-ref="_XkbNamesRec"><a class="type" href="#_XkbNamesRec" title='_XkbNamesRec' data-ref="_XkbNamesRec"><a class="type" href="#_XkbNamesRec" title='_XkbNamesRec' data-ref="_XkbNamesRec">_XkbNamesRec</a></a></dfn> {</td></tr>
+<tr><th id="416">416</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::keycodes" title='_XkbNamesRec::keycodes' data-ref="_XkbNamesRec::keycodes">keycodes</dfn>;</td></tr>
+<tr><th id="417">417</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::geometry" title='_XkbNamesRec::geometry' data-ref="_XkbNamesRec::geometry">geometry</dfn>;</td></tr>
+<tr><th id="418">418</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::symbols" title='_XkbNamesRec::symbols' data-ref="_XkbNamesRec::symbols">symbols</dfn>;</td></tr>
+<tr><th id="419">419</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>              <dfn class="decl" id="_XkbNamesRec::types" title='_XkbNamesRec::types' data-ref="_XkbNamesRec::types">types</dfn>;</td></tr>
+<tr><th id="420">420</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::compat" title='_XkbNamesRec::compat' data-ref="_XkbNamesRec::compat">compat</dfn>;</td></tr>
+<tr><th id="421">421</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::vmods" title='_XkbNamesRec::vmods' data-ref="_XkbNamesRec::vmods">vmods</dfn>[<a class="macro" href="XKB.h.html#555" title="16" data-ref="_M/XkbNumVirtualMods">XkbNumVirtualMods</a>];</td></tr>
+<tr><th id="422">422</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::indicators" title='_XkbNamesRec::indicators' data-ref="_XkbNamesRec::indicators">indicators</dfn>[<a class="macro" href="XKB.h.html#556" title="32" data-ref="_M/XkbNumIndicators">XkbNumIndicators</a>];</td></tr>
+<tr><th id="423">423</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::groups" title='_XkbNamesRec::groups' data-ref="_XkbNamesRec::groups">groups</dfn>[<a class="macro" href="XKB.h.html#348" title="4" data-ref="_M/XkbNumKbdGroups">XkbNumKbdGroups</a>];</td></tr>
+<tr><th id="424">424</th><td>	<i>/* keys is an array of (xkb-&gt;max_key_code + 1) XkbKeyNameRec entries */</i></td></tr>
+<tr><th id="425">425</th><td>	<a class="typedef" href="#XkbKeyNamePtr" title='XkbKeyNamePtr' data-type='struct _XkbKeyNameRec *' data-ref="XkbKeyNamePtr">XkbKeyNamePtr</a>	  <dfn class="decl" id="_XkbNamesRec::keys" title='_XkbNamesRec::keys' data-ref="_XkbNamesRec::keys">keys</dfn>;</td></tr>
+<tr><th id="426">426</th><td>	<i>/* key_aliases is an array of num_key_aliases XkbKeyAliasRec entries */</i></td></tr>
+<tr><th id="427">427</th><td>	<a class="typedef" href="#XkbKeyAliasPtr" title='XkbKeyAliasPtr' data-type='struct _XkbKeyAliasRec *' data-ref="XkbKeyAliasPtr">XkbKeyAliasPtr</a>	  <dfn class="decl" id="_XkbNamesRec::key_aliases" title='_XkbNamesRec::key_aliases' data-ref="_XkbNamesRec::key_aliases">key_aliases</dfn>;</td></tr>
+<tr><th id="428">428</th><td>	<i>/* radio_groups is an array of num_rg Atoms */</i></td></tr>
+<tr><th id="429">429</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		 *<dfn class="decl" id="_XkbNamesRec::radio_groups" title='_XkbNamesRec::radio_groups' data-ref="_XkbNamesRec::radio_groups">radio_groups</dfn>;</td></tr>
+<tr><th id="430">430</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>		  <dfn class="decl" id="_XkbNamesRec::phys_symbols" title='_XkbNamesRec::phys_symbols' data-ref="_XkbNamesRec::phys_symbols">phys_symbols</dfn>;</td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td>	<i>/* num_keys seems to be unused in libX11 */</i></td></tr>
+<tr><th id="433">433</th><td>	<em>unsigned</em> <em>char</em>	  <dfn class="decl" id="_XkbNamesRec::num_keys" title='_XkbNamesRec::num_keys' data-ref="_XkbNamesRec::num_keys">num_keys</dfn>;</td></tr>
+<tr><th id="434">434</th><td>	<em>unsigned</em> <em>char</em>	  <dfn class="decl" id="_XkbNamesRec::num_key_aliases" title='_XkbNamesRec::num_key_aliases' data-ref="_XkbNamesRec::num_key_aliases">num_key_aliases</dfn>;</td></tr>
+<tr><th id="435">435</th><td>	<em>unsigned</em> <em>short</em>	  <dfn class="decl" id="_XkbNamesRec::num_rg" title='_XkbNamesRec::num_rg' data-ref="_XkbNamesRec::num_rg">num_rg</dfn>;</td></tr>
+<tr><th id="436">436</th><td>} <dfn class="typedef" id="XkbNamesRec" title='XkbNamesRec' data-type='struct _XkbNamesRec' data-ref="XkbNamesRec">XkbNamesRec</dfn>,*<dfn class="typedef" id="XkbNamesPtr" title='XkbNamesPtr' data-type='struct _XkbNamesRec *' data-ref="XkbNamesPtr">XkbNamesPtr</dfn>;</td></tr>
+<tr><th id="437">437</th><td></td></tr>
+<tr><th id="438">438</th><td><b>typedef</b>	<b>struct</b> <dfn class="type" id="_XkbGeometry" title='_XkbGeometry' data-ref="_XkbGeometry"><a class="type" href="#_XkbGeometry" title='_XkbGeometry' data-ref="_XkbGeometry">_XkbGeometry</a></dfn>	*<dfn class="typedef" id="XkbGeometryPtr" title='XkbGeometryPtr' data-type='struct _XkbGeometry *' data-ref="XkbGeometryPtr">XkbGeometryPtr</dfn>;</td></tr>
+<tr><th id="439">439</th><td>	<i>/*</i></td></tr>
+<tr><th id="440">440</th><td><i>	 * Tie it all together into one big keyboard description</i></td></tr>
+<tr><th id="441">441</th><td><i>	 */</i></td></tr>
+<tr><th id="442">442</th><td><b>typedef</b>	<b>struct</b> <dfn class="type def" id="_XkbDesc" title='_XkbDesc' data-ref="_XkbDesc"><a class="type" href="#_XkbDesc" title='_XkbDesc' data-ref="_XkbDesc"><a class="type" href="#_XkbDesc" title='_XkbDesc' data-ref="_XkbDesc">_XkbDesc</a></a></dfn> {</td></tr>
+<tr><th id="443">443</th><td>	<b>struct</b> <a class="type" href="../Xlib.h.html#_XDisplay" title='_XDisplay' data-ref="_XDisplay">_XDisplay</a> *	<dfn class="decl" id="_XkbDesc::dpy" title='_XkbDesc::dpy' data-ref="_XkbDesc::dpy">dpy</dfn>;</td></tr>
+<tr><th id="444">444</th><td>	<em>unsigned</em> <em>short</em>	 	<dfn class="decl" id="_XkbDesc::flags" title='_XkbDesc::flags' data-ref="_XkbDesc::flags">flags</dfn>;</td></tr>
+<tr><th id="445">445</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDesc::device_spec" title='_XkbDesc::device_spec' data-ref="_XkbDesc::device_spec">device_spec</dfn>;</td></tr>
+<tr><th id="446">446</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			<dfn class="decl" id="_XkbDesc::min_key_code" title='_XkbDesc::min_key_code' data-ref="_XkbDesc::min_key_code">min_key_code</dfn>;</td></tr>
+<tr><th id="447">447</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			<dfn class="decl" id="_XkbDesc::max_key_code" title='_XkbDesc::max_key_code' data-ref="_XkbDesc::max_key_code">max_key_code</dfn>;</td></tr>
+<tr><th id="448">448</th><td></td></tr>
+<tr><th id="449">449</th><td>	<a class="typedef" href="#XkbControlsPtr" title='XkbControlsPtr' data-type='struct _XkbControls *' data-ref="XkbControlsPtr">XkbControlsPtr</a>		<dfn class="decl" id="_XkbDesc::ctrls" title='_XkbDesc::ctrls' data-ref="_XkbDesc::ctrls">ctrls</dfn>;</td></tr>
+<tr><th id="450">450</th><td>	<a class="typedef" href="#XkbServerMapPtr" title='XkbServerMapPtr' data-type='struct _XkbServerMapRec *' data-ref="XkbServerMapPtr">XkbServerMapPtr</a>		<dfn class="decl" id="_XkbDesc::server" title='_XkbDesc::server' data-ref="_XkbDesc::server">server</dfn>;</td></tr>
+<tr><th id="451">451</th><td>	<a class="typedef" href="#XkbClientMapPtr" title='XkbClientMapPtr' data-type='struct _XkbClientMapRec *' data-ref="XkbClientMapPtr">XkbClientMapPtr</a>		<dfn class="decl" id="_XkbDesc::map" title='_XkbDesc::map' data-ref="_XkbDesc::map">map</dfn>;</td></tr>
+<tr><th id="452">452</th><td>	<a class="typedef" href="#XkbIndicatorPtr" title='XkbIndicatorPtr' data-type='struct _XkbIndicatorRec *' data-ref="XkbIndicatorPtr">XkbIndicatorPtr</a>		<dfn class="decl" id="_XkbDesc::indicators" title='_XkbDesc::indicators' data-ref="_XkbDesc::indicators">indicators</dfn>;</td></tr>
+<tr><th id="453">453</th><td>	<a class="typedef" href="#XkbNamesPtr" title='XkbNamesPtr' data-type='struct _XkbNamesRec *' data-ref="XkbNamesPtr">XkbNamesPtr</a>		<dfn class="decl" id="_XkbDesc::names" title='_XkbDesc::names' data-ref="_XkbDesc::names">names</dfn>;</td></tr>
+<tr><th id="454">454</th><td>	<a class="typedef" href="#XkbCompatMapPtr" title='XkbCompatMapPtr' data-type='struct _XkbCompatMapRec *' data-ref="XkbCompatMapPtr">XkbCompatMapPtr</a>		<dfn class="decl" id="_XkbDesc::compat" title='_XkbDesc::compat' data-ref="_XkbDesc::compat">compat</dfn>;</td></tr>
+<tr><th id="455">455</th><td>	<a class="typedef" href="#XkbGeometryPtr" title='XkbGeometryPtr' data-type='struct _XkbGeometry *' data-ref="XkbGeometryPtr">XkbGeometryPtr</a>		<dfn class="decl" id="_XkbDesc::geom" title='_XkbDesc::geom' data-ref="_XkbDesc::geom">geom</dfn>;</td></tr>
+<tr><th id="456">456</th><td>} <dfn class="typedef" id="XkbDescRec" title='XkbDescRec' data-type='struct _XkbDesc' data-ref="XkbDescRec">XkbDescRec</dfn>, *<dfn class="typedef" id="XkbDescPtr" title='XkbDescPtr' data-type='struct _XkbDesc *' data-ref="XkbDescPtr">XkbDescPtr</dfn>;</td></tr>
+<tr><th id="457">457</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyKeyTypeIndex" data-ref="_M/XkbKeyKeyTypeIndex">XkbKeyKeyTypeIndex</dfn>(d,k,g)	(XkbCMKeyTypeIndex((d)-&gt;map,k,g))</u></td></tr>
+<tr><th id="458">458</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyKeyType" data-ref="_M/XkbKeyKeyType">XkbKeyKeyType</dfn>(d,k,g)		(XkbCMKeyType((d)-&gt;map,k,g))</u></td></tr>
+<tr><th id="459">459</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyGroupWidth" data-ref="_M/XkbKeyGroupWidth">XkbKeyGroupWidth</dfn>(d,k,g)		(XkbCMKeyGroupWidth((d)-&gt;map,k,g))</u></td></tr>
+<tr><th id="460">460</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyGroupsWidth" data-ref="_M/XkbKeyGroupsWidth">XkbKeyGroupsWidth</dfn>(d,k)		(XkbCMKeyGroupsWidth((d)-&gt;map,k))</u></td></tr>
+<tr><th id="461">461</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyGroupInfo" data-ref="_M/XkbKeyGroupInfo">XkbKeyGroupInfo</dfn>(d,k)		(XkbCMKeyGroupInfo((d)-&gt;map,(k)))</u></td></tr>
+<tr><th id="462">462</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyNumGroups" data-ref="_M/XkbKeyNumGroups">XkbKeyNumGroups</dfn>(d,k)		(XkbCMKeyNumGroups((d)-&gt;map,(k)))</u></td></tr>
+<tr><th id="463">463</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyNumSyms" data-ref="_M/XkbKeyNumSyms">XkbKeyNumSyms</dfn>(d,k)		(XkbCMKeyNumSyms((d)-&gt;map,(k)))</u></td></tr>
+<tr><th id="464">464</th><td><u>#define	<dfn class="macro" id="_M/XkbKeySymsPtr" data-ref="_M/XkbKeySymsPtr">XkbKeySymsPtr</dfn>(d,k)		(XkbCMKeySymsPtr((d)-&gt;map,(k)))</u></td></tr>
+<tr><th id="465">465</th><td><u>#define	<dfn class="macro" id="_M/XkbKeySym" data-ref="_M/XkbKeySym">XkbKeySym</dfn>(d,k,n)		(XkbKeySymsPtr(d,k)[n])</u></td></tr>
+<tr><th id="466">466</th><td><u>#define	<dfn class="macro" id="_M/XkbKeySymEntry" data-ref="_M/XkbKeySymEntry">XkbKeySymEntry</dfn>(d,k,sl,g) \</u></td></tr>
+<tr><th id="467">467</th><td><u>	(XkbKeySym(d,k,((XkbKeyGroupsWidth(d,k)*(g))+(sl))))</u></td></tr>
+<tr><th id="468">468</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyAction" data-ref="_M/XkbKeyAction">XkbKeyAction</dfn>(d,k,n) \</u></td></tr>
+<tr><th id="469">469</th><td><u>	(XkbKeyHasActions(d,k)?&amp;XkbKeyActionsPtr(d,k)[n]:NULL)</u></td></tr>
+<tr><th id="470">470</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyActionEntry" data-ref="_M/XkbKeyActionEntry">XkbKeyActionEntry</dfn>(d,k,sl,g) \</u></td></tr>
+<tr><th id="471">471</th><td><u>	(XkbKeyHasActions(d,k)?\</u></td></tr>
+<tr><th id="472">472</th><td><u>		XkbKeyAction(d,k,((XkbKeyGroupsWidth(d,k)*(g))+(sl))):NULL)</u></td></tr>
+<tr><th id="473">473</th><td></td></tr>
+<tr><th id="474">474</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyHasActions" data-ref="_M/XkbKeyHasActions">XkbKeyHasActions</dfn>(d,k)	((d)-&gt;server-&gt;key_acts[k]!=0)</u></td></tr>
+<tr><th id="475">475</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyNumActions" data-ref="_M/XkbKeyNumActions">XkbKeyNumActions</dfn>(d,k)	(XkbKeyHasActions(d,k)?XkbKeyNumSyms(d,k):1)</u></td></tr>
+<tr><th id="476">476</th><td><u>#define	<dfn class="macro" id="_M/XkbKeyActionsPtr" data-ref="_M/XkbKeyActionsPtr">XkbKeyActionsPtr</dfn>(d,k)	(XkbSMKeyActionsPtr((d)-&gt;server,k))</u></td></tr>
+<tr><th id="477">477</th><td><u>#define	<dfn class="macro" id="_M/XkbKeycodeInRange" data-ref="_M/XkbKeycodeInRange">XkbKeycodeInRange</dfn>(d,k)	(((k)&gt;=(d)-&gt;min_key_code)&amp;&amp;\</u></td></tr>
+<tr><th id="478">478</th><td><u>				 ((k)&lt;=(d)-&gt;max_key_code))</u></td></tr>
+<tr><th id="479">479</th><td><u>#define	<dfn class="macro" id="_M/XkbNumKeys" data-ref="_M/XkbNumKeys">XkbNumKeys</dfn>(d)		((d)-&gt;max_key_code-(d)-&gt;min_key_code+1)</u></td></tr>
+<tr><th id="480">480</th><td></td></tr>
+<tr><th id="481">481</th><td></td></tr>
+<tr><th id="482">482</th><td>	<i>/*</i></td></tr>
+<tr><th id="483">483</th><td><i>	 * The following structures can be used to track changes</i></td></tr>
+<tr><th id="484">484</th><td><i>	 * to a keyboard device</i></td></tr>
+<tr><th id="485">485</th><td><i>	 */</i></td></tr>
+<tr><th id="486">486</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbMapChanges" title='_XkbMapChanges' data-ref="_XkbMapChanges"><a class="type" href="#_XkbMapChanges" title='_XkbMapChanges' data-ref="_XkbMapChanges"><a class="type" href="#_XkbMapChanges" title='_XkbMapChanges' data-ref="_XkbMapChanges">_XkbMapChanges</a></a></dfn> {</td></tr>
+<tr><th id="487">487</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbMapChanges::changed" title='_XkbMapChanges::changed' data-ref="_XkbMapChanges::changed">changed</dfn>;</td></tr>
+<tr><th id="488">488</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::min_key_code" title='_XkbMapChanges::min_key_code' data-ref="_XkbMapChanges::min_key_code">min_key_code</dfn>;</td></tr>
+<tr><th id="489">489</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::max_key_code" title='_XkbMapChanges::max_key_code' data-ref="_XkbMapChanges::max_key_code">max_key_code</dfn>;</td></tr>
+<tr><th id="490">490</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::first_type" title='_XkbMapChanges::first_type' data-ref="_XkbMapChanges::first_type">first_type</dfn>;</td></tr>
+<tr><th id="491">491</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_types" title='_XkbMapChanges::num_types' data-ref="_XkbMapChanges::num_types">num_types</dfn>;</td></tr>
+<tr><th id="492">492</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::first_key_sym" title='_XkbMapChanges::first_key_sym' data-ref="_XkbMapChanges::first_key_sym">first_key_sym</dfn>;</td></tr>
+<tr><th id="493">493</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_key_syms" title='_XkbMapChanges::num_key_syms' data-ref="_XkbMapChanges::num_key_syms">num_key_syms</dfn>;</td></tr>
+<tr><th id="494">494</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::first_key_act" title='_XkbMapChanges::first_key_act' data-ref="_XkbMapChanges::first_key_act">first_key_act</dfn>;</td></tr>
+<tr><th id="495">495</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_key_acts" title='_XkbMapChanges::num_key_acts' data-ref="_XkbMapChanges::num_key_acts">num_key_acts</dfn>;</td></tr>
+<tr><th id="496">496</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::first_key_behavior" title='_XkbMapChanges::first_key_behavior' data-ref="_XkbMapChanges::first_key_behavior">first_key_behavior</dfn>;</td></tr>
+<tr><th id="497">497</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_key_behaviors" title='_XkbMapChanges::num_key_behaviors' data-ref="_XkbMapChanges::num_key_behaviors">num_key_behaviors</dfn>;</td></tr>
+<tr><th id="498">498</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a> 		 <dfn class="decl" id="_XkbMapChanges::first_key_explicit" title='_XkbMapChanges::first_key_explicit' data-ref="_XkbMapChanges::first_key_explicit">first_key_explicit</dfn>;</td></tr>
+<tr><th id="499">499</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_key_explicit" title='_XkbMapChanges::num_key_explicit' data-ref="_XkbMapChanges::num_key_explicit">num_key_explicit</dfn>;</td></tr>
+<tr><th id="500">500</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::first_modmap_key" title='_XkbMapChanges::first_modmap_key' data-ref="_XkbMapChanges::first_modmap_key">first_modmap_key</dfn>;</td></tr>
+<tr><th id="501">501</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_modmap_keys" title='_XkbMapChanges::num_modmap_keys' data-ref="_XkbMapChanges::num_modmap_keys">num_modmap_keys</dfn>;</td></tr>
+<tr><th id="502">502</th><td>	<a class="typedef" href="../X.h.html#KeyCode" title='KeyCode' data-type='unsigned char' data-ref="KeyCode">KeyCode</a>			 <dfn class="decl" id="_XkbMapChanges::first_vmodmap_key" title='_XkbMapChanges::first_vmodmap_key' data-ref="_XkbMapChanges::first_vmodmap_key">first_vmodmap_key</dfn>;</td></tr>
+<tr><th id="503">503</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::num_vmodmap_keys" title='_XkbMapChanges::num_vmodmap_keys' data-ref="_XkbMapChanges::num_vmodmap_keys">num_vmodmap_keys</dfn>;</td></tr>
+<tr><th id="504">504</th><td>	<em>unsigned</em> <em>char</em>		 <dfn class="decl" id="_XkbMapChanges::pad" title='_XkbMapChanges::pad' data-ref="_XkbMapChanges::pad">pad</dfn>;</td></tr>
+<tr><th id="505">505</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbMapChanges::vmods" title='_XkbMapChanges::vmods' data-ref="_XkbMapChanges::vmods">vmods</dfn>;</td></tr>
+<tr><th id="506">506</th><td>} <dfn class="typedef" id="XkbMapChangesRec" title='XkbMapChangesRec' data-type='struct _XkbMapChanges' data-ref="XkbMapChangesRec">XkbMapChangesRec</dfn>,*<dfn class="typedef" id="XkbMapChangesPtr" title='XkbMapChangesPtr' data-type='struct _XkbMapChanges *' data-ref="XkbMapChangesPtr">XkbMapChangesPtr</dfn>;</td></tr>
+<tr><th id="507">507</th><td></td></tr>
+<tr><th id="508">508</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbControlsChanges" title='_XkbControlsChanges' data-ref="_XkbControlsChanges"><a class="type" href="#_XkbControlsChanges" title='_XkbControlsChanges' data-ref="_XkbControlsChanges"><a class="type" href="#_XkbControlsChanges" title='_XkbControlsChanges' data-ref="_XkbControlsChanges">_XkbControlsChanges</a></a></dfn> {</td></tr>
+<tr><th id="509">509</th><td>	<em>unsigned</em> <em>int</em> 		 <dfn class="decl" id="_XkbControlsChanges::changed_ctrls" title='_XkbControlsChanges::changed_ctrls' data-ref="_XkbControlsChanges::changed_ctrls">changed_ctrls</dfn>;</td></tr>
+<tr><th id="510">510</th><td>	<em>unsigned</em> <em>int</em>		 <dfn class="decl" id="_XkbControlsChanges::enabled_ctrls_changes" title='_XkbControlsChanges::enabled_ctrls_changes' data-ref="_XkbControlsChanges::enabled_ctrls_changes">enabled_ctrls_changes</dfn>;</td></tr>
+<tr><th id="511">511</th><td>	<a class="macro" href="../Xlib.h.html#82" title="int" data-ref="_M/Bool">Bool</a>			 <dfn class="decl" id="_XkbControlsChanges::num_groups_changed" title='_XkbControlsChanges::num_groups_changed' data-ref="_XkbControlsChanges::num_groups_changed">num_groups_changed</dfn>;</td></tr>
+<tr><th id="512">512</th><td>} <dfn class="typedef" id="XkbControlsChangesRec" title='XkbControlsChangesRec' data-type='struct _XkbControlsChanges' data-ref="XkbControlsChangesRec">XkbControlsChangesRec</dfn>,*<dfn class="typedef" id="XkbControlsChangesPtr" title='XkbControlsChangesPtr' data-type='struct _XkbControlsChanges *' data-ref="XkbControlsChangesPtr">XkbControlsChangesPtr</dfn>;</td></tr>
+<tr><th id="513">513</th><td></td></tr>
+<tr><th id="514">514</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbIndicatorChanges" title='_XkbIndicatorChanges' data-ref="_XkbIndicatorChanges"><a class="type" href="#_XkbIndicatorChanges" title='_XkbIndicatorChanges' data-ref="_XkbIndicatorChanges"><a class="type" href="#_XkbIndicatorChanges" title='_XkbIndicatorChanges' data-ref="_XkbIndicatorChanges">_XkbIndicatorChanges</a></a></dfn> {</td></tr>
+<tr><th id="515">515</th><td>	<em>unsigned</em> <em>int</em>		 <dfn class="decl" id="_XkbIndicatorChanges::state_changes" title='_XkbIndicatorChanges::state_changes' data-ref="_XkbIndicatorChanges::state_changes">state_changes</dfn>;</td></tr>
+<tr><th id="516">516</th><td>	<em>unsigned</em> <em>int</em>		 <dfn class="decl" id="_XkbIndicatorChanges::map_changes" title='_XkbIndicatorChanges::map_changes' data-ref="_XkbIndicatorChanges::map_changes">map_changes</dfn>;</td></tr>
+<tr><th id="517">517</th><td>} <dfn class="typedef" id="XkbIndicatorChangesRec" title='XkbIndicatorChangesRec' data-type='struct _XkbIndicatorChanges' data-ref="XkbIndicatorChangesRec">XkbIndicatorChangesRec</dfn>,*<dfn class="typedef" id="XkbIndicatorChangesPtr" title='XkbIndicatorChangesPtr' data-type='struct _XkbIndicatorChanges *' data-ref="XkbIndicatorChangesPtr">XkbIndicatorChangesPtr</dfn>;</td></tr>
+<tr><th id="518">518</th><td></td></tr>
+<tr><th id="519">519</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbNameChanges" title='_XkbNameChanges' data-ref="_XkbNameChanges"><a class="type" href="#_XkbNameChanges" title='_XkbNameChanges' data-ref="_XkbNameChanges"><a class="type" href="#_XkbNameChanges" title='_XkbNameChanges' data-ref="_XkbNameChanges">_XkbNameChanges</a></a></dfn> {</td></tr>
+<tr><th id="520">520</th><td>	<em>unsigned</em> <em>int</em> 		<dfn class="decl" id="_XkbNameChanges::changed" title='_XkbNameChanges::changed' data-ref="_XkbNameChanges::changed">changed</dfn>;</td></tr>
+<tr><th id="521">521</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::first_type" title='_XkbNameChanges::first_type' data-ref="_XkbNameChanges::first_type">first_type</dfn>;</td></tr>
+<tr><th id="522">522</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::num_types" title='_XkbNameChanges::num_types' data-ref="_XkbNameChanges::num_types">num_types</dfn>;</td></tr>
+<tr><th id="523">523</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::first_lvl" title='_XkbNameChanges::first_lvl' data-ref="_XkbNameChanges::first_lvl">first_lvl</dfn>;</td></tr>
+<tr><th id="524">524</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::num_lvls" title='_XkbNameChanges::num_lvls' data-ref="_XkbNameChanges::num_lvls">num_lvls</dfn>;</td></tr>
+<tr><th id="525">525</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::num_aliases" title='_XkbNameChanges::num_aliases' data-ref="_XkbNameChanges::num_aliases">num_aliases</dfn>;</td></tr>
+<tr><th id="526">526</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::num_rg" title='_XkbNameChanges::num_rg' data-ref="_XkbNameChanges::num_rg">num_rg</dfn>;</td></tr>
+<tr><th id="527">527</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::first_key" title='_XkbNameChanges::first_key' data-ref="_XkbNameChanges::first_key">first_key</dfn>;</td></tr>
+<tr><th id="528">528</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::num_keys" title='_XkbNameChanges::num_keys' data-ref="_XkbNameChanges::num_keys">num_keys</dfn>;</td></tr>
+<tr><th id="529">529</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbNameChanges::changed_vmods" title='_XkbNameChanges::changed_vmods' data-ref="_XkbNameChanges::changed_vmods">changed_vmods</dfn>;</td></tr>
+<tr><th id="530">530</th><td>	<em>unsigned</em> <em>long</em>		<dfn class="decl" id="_XkbNameChanges::changed_indicators" title='_XkbNameChanges::changed_indicators' data-ref="_XkbNameChanges::changed_indicators">changed_indicators</dfn>;</td></tr>
+<tr><th id="531">531</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbNameChanges::changed_groups" title='_XkbNameChanges::changed_groups' data-ref="_XkbNameChanges::changed_groups">changed_groups</dfn>;</td></tr>
+<tr><th id="532">532</th><td>} <dfn class="typedef" id="XkbNameChangesRec" title='XkbNameChangesRec' data-type='struct _XkbNameChanges' data-ref="XkbNameChangesRec">XkbNameChangesRec</dfn>,*<dfn class="typedef" id="XkbNameChangesPtr" title='XkbNameChangesPtr' data-type='struct _XkbNameChanges *' data-ref="XkbNameChangesPtr">XkbNameChangesPtr</dfn>;</td></tr>
+<tr><th id="533">533</th><td></td></tr>
+<tr><th id="534">534</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbCompatChanges" title='_XkbCompatChanges' data-ref="_XkbCompatChanges"><a class="type" href="#_XkbCompatChanges" title='_XkbCompatChanges' data-ref="_XkbCompatChanges"><a class="type" href="#_XkbCompatChanges" title='_XkbCompatChanges' data-ref="_XkbCompatChanges">_XkbCompatChanges</a></a></dfn> {</td></tr>
+<tr><th id="535">535</th><td>	<em>unsigned</em> <em>char</em>		<dfn class="decl" id="_XkbCompatChanges::changed_groups" title='_XkbCompatChanges::changed_groups' data-ref="_XkbCompatChanges::changed_groups">changed_groups</dfn>;</td></tr>
+<tr><th id="536">536</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbCompatChanges::first_si" title='_XkbCompatChanges::first_si' data-ref="_XkbCompatChanges::first_si">first_si</dfn>;</td></tr>
+<tr><th id="537">537</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbCompatChanges::num_si" title='_XkbCompatChanges::num_si' data-ref="_XkbCompatChanges::num_si">num_si</dfn>;</td></tr>
+<tr><th id="538">538</th><td>} <dfn class="typedef" id="XkbCompatChangesRec" title='XkbCompatChangesRec' data-type='struct _XkbCompatChanges' data-ref="XkbCompatChangesRec">XkbCompatChangesRec</dfn>,*<dfn class="typedef" id="XkbCompatChangesPtr" title='XkbCompatChangesPtr' data-type='struct _XkbCompatChanges *' data-ref="XkbCompatChangesPtr">XkbCompatChangesPtr</dfn>;</td></tr>
+<tr><th id="539">539</th><td></td></tr>
+<tr><th id="540">540</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbChanges" title='_XkbChanges' data-ref="_XkbChanges"><a class="type" href="#_XkbChanges" title='_XkbChanges' data-ref="_XkbChanges"><a class="type" href="#_XkbChanges" title='_XkbChanges' data-ref="_XkbChanges">_XkbChanges</a></a></dfn> {</td></tr>
+<tr><th id="541">541</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbChanges::device_spec" title='_XkbChanges::device_spec' data-ref="_XkbChanges::device_spec">device_spec</dfn>;</td></tr>
+<tr><th id="542">542</th><td>	<em>unsigned</em> <em>short</em>		 <dfn class="decl" id="_XkbChanges::state_changes" title='_XkbChanges::state_changes' data-ref="_XkbChanges::state_changes">state_changes</dfn>;</td></tr>
+<tr><th id="543">543</th><td>	<a class="typedef" href="#XkbMapChangesRec" title='XkbMapChangesRec' data-type='struct _XkbMapChanges' data-ref="XkbMapChangesRec">XkbMapChangesRec</a>	 <dfn class="decl" id="_XkbChanges::map" title='_XkbChanges::map' data-ref="_XkbChanges::map">map</dfn>;</td></tr>
+<tr><th id="544">544</th><td>	<a class="typedef" href="#XkbControlsChangesRec" title='XkbControlsChangesRec' data-type='struct _XkbControlsChanges' data-ref="XkbControlsChangesRec">XkbControlsChangesRec</a>	 <dfn class="decl" id="_XkbChanges::ctrls" title='_XkbChanges::ctrls' data-ref="_XkbChanges::ctrls">ctrls</dfn>;</td></tr>
+<tr><th id="545">545</th><td>	<a class="typedef" href="#XkbIndicatorChangesRec" title='XkbIndicatorChangesRec' data-type='struct _XkbIndicatorChanges' data-ref="XkbIndicatorChangesRec">XkbIndicatorChangesRec</a>	 <dfn class="decl" id="_XkbChanges::indicators" title='_XkbChanges::indicators' data-ref="_XkbChanges::indicators">indicators</dfn>;</td></tr>
+<tr><th id="546">546</th><td>	<a class="typedef" href="#XkbNameChangesRec" title='XkbNameChangesRec' data-type='struct _XkbNameChanges' data-ref="XkbNameChangesRec">XkbNameChangesRec</a>	 <dfn class="decl" id="_XkbChanges::names" title='_XkbChanges::names' data-ref="_XkbChanges::names">names</dfn>;</td></tr>
+<tr><th id="547">547</th><td>	<a class="typedef" href="#XkbCompatChangesRec" title='XkbCompatChangesRec' data-type='struct _XkbCompatChanges' data-ref="XkbCompatChangesRec">XkbCompatChangesRec</a>	 <dfn class="decl" id="_XkbChanges::compat" title='_XkbChanges::compat' data-ref="_XkbChanges::compat">compat</dfn>;</td></tr>
+<tr><th id="548">548</th><td>} <dfn class="typedef" id="XkbChangesRec" title='XkbChangesRec' data-type='struct _XkbChanges' data-ref="XkbChangesRec">XkbChangesRec</dfn>, *<dfn class="typedef" id="XkbChangesPtr" title='XkbChangesPtr' data-type='struct _XkbChanges *' data-ref="XkbChangesPtr">XkbChangesPtr</dfn>;</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td>	<i>/*</i></td></tr>
+<tr><th id="551">551</th><td><i>	 * These data structures are used to construct a keymap from </i></td></tr>
+<tr><th id="552">552</th><td><i>	 * a set of components or to list components in the server</i></td></tr>
+<tr><th id="553">553</th><td><i>	 * database.</i></td></tr>
+<tr><th id="554">554</th><td><i>	 */</i></td></tr>
+<tr><th id="555">555</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbComponentNames" title='_XkbComponentNames' data-ref="_XkbComponentNames"><a class="type" href="#_XkbComponentNames" title='_XkbComponentNames' data-ref="_XkbComponentNames"><a class="type" href="#_XkbComponentNames" title='_XkbComponentNames' data-ref="_XkbComponentNames">_XkbComponentNames</a></a></dfn> {</td></tr>
+<tr><th id="556">556</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::keymap" title='_XkbComponentNames::keymap' data-ref="_XkbComponentNames::keymap">keymap</dfn>;</td></tr>
+<tr><th id="557">557</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::keycodes" title='_XkbComponentNames::keycodes' data-ref="_XkbComponentNames::keycodes">keycodes</dfn>;</td></tr>
+<tr><th id="558">558</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::types" title='_XkbComponentNames::types' data-ref="_XkbComponentNames::types">types</dfn>;</td></tr>
+<tr><th id="559">559</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::compat" title='_XkbComponentNames::compat' data-ref="_XkbComponentNames::compat">compat</dfn>;</td></tr>
+<tr><th id="560">560</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::symbols" title='_XkbComponentNames::symbols' data-ref="_XkbComponentNames::symbols">symbols</dfn>;</td></tr>
+<tr><th id="561">561</th><td>	<em>char</em> *			 <dfn class="decl" id="_XkbComponentNames::geometry" title='_XkbComponentNames::geometry' data-ref="_XkbComponentNames::geometry">geometry</dfn>;</td></tr>
+<tr><th id="562">562</th><td>} <dfn class="typedef" id="XkbComponentNamesRec" title='XkbComponentNamesRec' data-type='struct _XkbComponentNames' data-ref="XkbComponentNamesRec">XkbComponentNamesRec</dfn>, *<dfn class="typedef" id="XkbComponentNamesPtr" title='XkbComponentNamesPtr' data-type='struct _XkbComponentNames *' data-ref="XkbComponentNamesPtr">XkbComponentNamesPtr</dfn>;</td></tr>
+<tr><th id="563">563</th><td></td></tr>
+<tr><th id="564">564</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbComponentName" title='_XkbComponentName' data-ref="_XkbComponentName"><a class="type" href="#_XkbComponentName" title='_XkbComponentName' data-ref="_XkbComponentName"><a class="type" href="#_XkbComponentName" title='_XkbComponentName' data-ref="_XkbComponentName">_XkbComponentName</a></a></dfn> {</td></tr>
+<tr><th id="565">565</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbComponentName::flags" title='_XkbComponentName::flags' data-ref="_XkbComponentName::flags">flags</dfn>;</td></tr>
+<tr><th id="566">566</th><td>	<em>char</em> *			<dfn class="decl" id="_XkbComponentName::name" title='_XkbComponentName::name' data-ref="_XkbComponentName::name">name</dfn>;</td></tr>
+<tr><th id="567">567</th><td>} <dfn class="typedef" id="XkbComponentNameRec" title='XkbComponentNameRec' data-type='struct _XkbComponentName' data-ref="XkbComponentNameRec">XkbComponentNameRec</dfn>,*<dfn class="typedef" id="XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</dfn>;</td></tr>
+<tr><th id="568">568</th><td></td></tr>
+<tr><th id="569">569</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbComponentList" title='_XkbComponentList' data-ref="_XkbComponentList"><a class="type" href="#_XkbComponentList" title='_XkbComponentList' data-ref="_XkbComponentList"><a class="type" href="#_XkbComponentList" title='_XkbComponentList' data-ref="_XkbComponentList">_XkbComponentList</a></a></dfn> {</td></tr>
+<tr><th id="570">570</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_keymaps" title='_XkbComponentList::num_keymaps' data-ref="_XkbComponentList::num_keymaps">num_keymaps</dfn>;</td></tr>
+<tr><th id="571">571</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_keycodes" title='_XkbComponentList::num_keycodes' data-ref="_XkbComponentList::num_keycodes">num_keycodes</dfn>;</td></tr>
+<tr><th id="572">572</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_types" title='_XkbComponentList::num_types' data-ref="_XkbComponentList::num_types">num_types</dfn>;</td></tr>
+<tr><th id="573">573</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_compat" title='_XkbComponentList::num_compat' data-ref="_XkbComponentList::num_compat">num_compat</dfn>;</td></tr>
+<tr><th id="574">574</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_symbols" title='_XkbComponentList::num_symbols' data-ref="_XkbComponentList::num_symbols">num_symbols</dfn>;</td></tr>
+<tr><th id="575">575</th><td>	<em>int</em>			<dfn class="decl" id="_XkbComponentList::num_geometry" title='_XkbComponentList::num_geometry' data-ref="_XkbComponentList::num_geometry">num_geometry</dfn>;</td></tr>
+<tr><th id="576">576</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a>	<dfn class="decl" id="_XkbComponentList::keymaps" title='_XkbComponentList::keymaps' data-ref="_XkbComponentList::keymaps">keymaps</dfn>;</td></tr>
+<tr><th id="577">577</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a> 	<dfn class="decl" id="_XkbComponentList::keycodes" title='_XkbComponentList::keycodes' data-ref="_XkbComponentList::keycodes">keycodes</dfn>;</td></tr>
+<tr><th id="578">578</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a>	<dfn class="decl" id="_XkbComponentList::types" title='_XkbComponentList::types' data-ref="_XkbComponentList::types">types</dfn>;</td></tr>
+<tr><th id="579">579</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a>	<dfn class="decl" id="_XkbComponentList::compat" title='_XkbComponentList::compat' data-ref="_XkbComponentList::compat">compat</dfn>;</td></tr>
+<tr><th id="580">580</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a>	<dfn class="decl" id="_XkbComponentList::symbols" title='_XkbComponentList::symbols' data-ref="_XkbComponentList::symbols">symbols</dfn>;</td></tr>
+<tr><th id="581">581</th><td>	<a class="typedef" href="#XkbComponentNamePtr" title='XkbComponentNamePtr' data-type='struct _XkbComponentName *' data-ref="XkbComponentNamePtr">XkbComponentNamePtr</a>	<dfn class="decl" id="_XkbComponentList::geometry" title='_XkbComponentList::geometry' data-ref="_XkbComponentList::geometry">geometry</dfn>;</td></tr>
+<tr><th id="582">582</th><td>} <dfn class="typedef" id="XkbComponentListRec" title='XkbComponentListRec' data-type='struct _XkbComponentList' data-ref="XkbComponentListRec">XkbComponentListRec</dfn>, *<dfn class="typedef" id="XkbComponentListPtr" title='XkbComponentListPtr' data-type='struct _XkbComponentList *' data-ref="XkbComponentListPtr">XkbComponentListPtr</dfn>;</td></tr>
+<tr><th id="583">583</th><td></td></tr>
+<tr><th id="584">584</th><td>	<i>/*</i></td></tr>
+<tr><th id="585">585</th><td><i>	 * The following data structures describe and track changes to a </i></td></tr>
+<tr><th id="586">586</th><td><i>	 * non-keyboard extension device </i></td></tr>
+<tr><th id="587">587</th><td><i>	 */</i></td></tr>
+<tr><th id="588">588</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceLedInfo" title='_XkbDeviceLedInfo' data-ref="_XkbDeviceLedInfo"><a class="type" href="#_XkbDeviceLedInfo" title='_XkbDeviceLedInfo' data-ref="_XkbDeviceLedInfo"><a class="type" href="#_XkbDeviceLedInfo" title='_XkbDeviceLedInfo' data-ref="_XkbDeviceLedInfo">_XkbDeviceLedInfo</a></a></dfn> {</td></tr>
+<tr><th id="589">589</th><td>	<em>unsigned</em> <em>short</em>			<dfn class="decl" id="_XkbDeviceLedInfo::led_class" title='_XkbDeviceLedInfo::led_class' data-ref="_XkbDeviceLedInfo::led_class">led_class</dfn>;</td></tr>
+<tr><th id="590">590</th><td>	<em>unsigned</em> <em>short</em>			<dfn class="decl" id="_XkbDeviceLedInfo::led_id" title='_XkbDeviceLedInfo::led_id' data-ref="_XkbDeviceLedInfo::led_id">led_id</dfn>;</td></tr>
+<tr><th id="591">591</th><td>	<em>unsigned</em> <em>int</em>			<dfn class="decl" id="_XkbDeviceLedInfo::phys_indicators" title='_XkbDeviceLedInfo::phys_indicators' data-ref="_XkbDeviceLedInfo::phys_indicators">phys_indicators</dfn>;</td></tr>
+<tr><th id="592">592</th><td>	<em>unsigned</em> <em>int</em>			<dfn class="decl" id="_XkbDeviceLedInfo::maps_present" title='_XkbDeviceLedInfo::maps_present' data-ref="_XkbDeviceLedInfo::maps_present">maps_present</dfn>;</td></tr>
+<tr><th id="593">593</th><td>	<em>unsigned</em> <em>int</em>			<dfn class="decl" id="_XkbDeviceLedInfo::names_present" title='_XkbDeviceLedInfo::names_present' data-ref="_XkbDeviceLedInfo::names_present">names_present</dfn>;</td></tr>
+<tr><th id="594">594</th><td>	<em>unsigned</em> <em>int</em>			<dfn class="decl" id="_XkbDeviceLedInfo::state" title='_XkbDeviceLedInfo::state' data-ref="_XkbDeviceLedInfo::state">state</dfn>;</td></tr>
+<tr><th id="595">595</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a> 				<dfn class="decl" id="_XkbDeviceLedInfo::names" title='_XkbDeviceLedInfo::names' data-ref="_XkbDeviceLedInfo::names">names</dfn>[<a class="macro" href="XKB.h.html#556" title="32" data-ref="_M/XkbNumIndicators">XkbNumIndicators</a>];</td></tr>
+<tr><th id="596">596</th><td>	<a class="typedef" href="#XkbIndicatorMapRec" title='XkbIndicatorMapRec' data-type='struct _XkbIndicatorMapRec' data-ref="XkbIndicatorMapRec">XkbIndicatorMapRec</a>		<dfn class="decl" id="_XkbDeviceLedInfo::maps" title='_XkbDeviceLedInfo::maps' data-ref="_XkbDeviceLedInfo::maps">maps</dfn>[<a class="macro" href="XKB.h.html#556" title="32" data-ref="_M/XkbNumIndicators">XkbNumIndicators</a>];</td></tr>
+<tr><th id="597">597</th><td>} <dfn class="typedef" id="XkbDeviceLedInfoRec" title='XkbDeviceLedInfoRec' data-type='struct _XkbDeviceLedInfo' data-ref="XkbDeviceLedInfoRec">XkbDeviceLedInfoRec</dfn>,*<dfn class="typedef" id="XkbDeviceLedInfoPtr" title='XkbDeviceLedInfoPtr' data-type='struct _XkbDeviceLedInfo *' data-ref="XkbDeviceLedInfoPtr">XkbDeviceLedInfoPtr</dfn>;</td></tr>
+<tr><th id="598">598</th><td></td></tr>
+<tr><th id="599">599</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceInfo" title='_XkbDeviceInfo' data-ref="_XkbDeviceInfo"><a class="type" href="#_XkbDeviceInfo" title='_XkbDeviceInfo' data-ref="_XkbDeviceInfo"><a class="type" href="#_XkbDeviceInfo" title='_XkbDeviceInfo' data-ref="_XkbDeviceInfo">_XkbDeviceInfo</a></a></dfn> {</td></tr>
+<tr><th id="600">600</th><td>	<em>char</em> *			<dfn class="decl" id="_XkbDeviceInfo::name" title='_XkbDeviceInfo::name' data-ref="_XkbDeviceInfo::name">name</dfn>;</td></tr>
+<tr><th id="601">601</th><td>	<a class="typedef" href="../X.h.html#Atom" title='Atom' data-type='unsigned long' data-ref="Atom">Atom</a>			<dfn class="decl" id="_XkbDeviceInfo::type" title='_XkbDeviceInfo::type' data-ref="_XkbDeviceInfo::type">type</dfn>;</td></tr>
+<tr><th id="602">602</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::device_spec" title='_XkbDeviceInfo::device_spec' data-ref="_XkbDeviceInfo::device_spec">device_spec</dfn>;</td></tr>
+<tr><th id="603">603</th><td>	<a class="macro" href="../Xlib.h.html#82" title="int" data-ref="_M/Bool">Bool</a>			<dfn class="decl" id="_XkbDeviceInfo::has_own_state" title='_XkbDeviceInfo::has_own_state' data-ref="_XkbDeviceInfo::has_own_state">has_own_state</dfn>;</td></tr>
+<tr><th id="604">604</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::supported" title='_XkbDeviceInfo::supported' data-ref="_XkbDeviceInfo::supported">supported</dfn>;</td></tr>
+<tr><th id="605">605</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::unsupported" title='_XkbDeviceInfo::unsupported' data-ref="_XkbDeviceInfo::unsupported">unsupported</dfn>;</td></tr>
+<tr><th id="606">606</th><td></td></tr>
+<tr><th id="607">607</th><td>	<i>/* btn_acts is an array of num_btn XkbAction entries */</i></td></tr>
+<tr><th id="608">608</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::num_btns" title='_XkbDeviceInfo::num_btns' data-ref="_XkbDeviceInfo::num_btns">num_btns</dfn>;</td></tr>
+<tr><th id="609">609</th><td>	<a class="typedef" href="#XkbAction" title='XkbAction' data-type='union _XkbAction' data-ref="XkbAction">XkbAction</a> *		<dfn class="decl" id="_XkbDeviceInfo::btn_acts" title='_XkbDeviceInfo::btn_acts' data-ref="_XkbDeviceInfo::btn_acts">btn_acts</dfn>;</td></tr>
+<tr><th id="610">610</th><td></td></tr>
+<tr><th id="611">611</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::sz_leds" title='_XkbDeviceInfo::sz_leds' data-ref="_XkbDeviceInfo::sz_leds">sz_leds</dfn>;</td></tr>
+<tr><th id="612">612</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::num_leds" title='_XkbDeviceInfo::num_leds' data-ref="_XkbDeviceInfo::num_leds">num_leds</dfn>;</td></tr>
+<tr><th id="613">613</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::dflt_kbd_fb" title='_XkbDeviceInfo::dflt_kbd_fb' data-ref="_XkbDeviceInfo::dflt_kbd_fb">dflt_kbd_fb</dfn>;</td></tr>
+<tr><th id="614">614</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceInfo::dflt_led_fb" title='_XkbDeviceInfo::dflt_led_fb' data-ref="_XkbDeviceInfo::dflt_led_fb">dflt_led_fb</dfn>;</td></tr>
+<tr><th id="615">615</th><td>	<i>/* leds is an array of XkbDeviceLedInfoRec in which</i></td></tr>
+<tr><th id="616">616</th><td><i>	   sz_leds entries are allocated and num_leds entries are used */</i></td></tr>
+<tr><th id="617">617</th><td>	<a class="typedef" href="#XkbDeviceLedInfoPtr" title='XkbDeviceLedInfoPtr' data-type='struct _XkbDeviceLedInfo *' data-ref="XkbDeviceLedInfoPtr">XkbDeviceLedInfoPtr</a>	<dfn class="decl" id="_XkbDeviceInfo::leds" title='_XkbDeviceInfo::leds' data-ref="_XkbDeviceInfo::leds">leds</dfn>;</td></tr>
+<tr><th id="618">618</th><td>} <dfn class="typedef" id="XkbDeviceInfoRec" title='XkbDeviceInfoRec' data-type='struct _XkbDeviceInfo' data-ref="XkbDeviceInfoRec">XkbDeviceInfoRec</dfn>,*<dfn class="typedef" id="XkbDeviceInfoPtr" title='XkbDeviceInfoPtr' data-type='struct _XkbDeviceInfo *' data-ref="XkbDeviceInfoPtr">XkbDeviceInfoPtr</dfn>;</td></tr>
+<tr><th id="619">619</th><td></td></tr>
+<tr><th id="620">620</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_DevHasBtnActs" data-ref="_M/XkbXI_DevHasBtnActs">XkbXI_DevHasBtnActs</dfn>(d)	(((d)-&gt;num_btns&gt;0)&amp;&amp;((d)-&gt;btn_acts!=NULL))</u></td></tr>
+<tr><th id="621">621</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_LegalDevBtn" data-ref="_M/XkbXI_LegalDevBtn">XkbXI_LegalDevBtn</dfn>(d,b)	(XkbXI_DevHasBtnActs(d)&amp;&amp;((b)&lt;(d)-&gt;num_btns))</u></td></tr>
+<tr><th id="622">622</th><td><u>#define	<dfn class="macro" id="_M/XkbXI_DevHasLeds" data-ref="_M/XkbXI_DevHasLeds">XkbXI_DevHasLeds</dfn>(d)	(((d)-&gt;num_leds&gt;0)&amp;&amp;((d)-&gt;leds!=NULL))</u></td></tr>
+<tr><th id="623">623</th><td></td></tr>
+<tr><th id="624">624</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceLedChanges" title='_XkbDeviceLedChanges' data-ref="_XkbDeviceLedChanges"><a class="type" href="#_XkbDeviceLedChanges" title='_XkbDeviceLedChanges' data-ref="_XkbDeviceLedChanges"><a class="type" href="#_XkbDeviceLedChanges" title='_XkbDeviceLedChanges' data-ref="_XkbDeviceLedChanges">_XkbDeviceLedChanges</a></a></dfn> {</td></tr>
+<tr><th id="625">625</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceLedChanges::led_class" title='_XkbDeviceLedChanges::led_class' data-ref="_XkbDeviceLedChanges::led_class">led_class</dfn>;</td></tr>
+<tr><th id="626">626</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceLedChanges::led_id" title='_XkbDeviceLedChanges::led_id' data-ref="_XkbDeviceLedChanges::led_id">led_id</dfn>;</td></tr>
+<tr><th id="627">627</th><td>	<em>unsigned</em> <em>int</em>		<dfn class="decl" id="_XkbDeviceLedChanges::defined" title='_XkbDeviceLedChanges::defined' data-ref="_XkbDeviceLedChanges::defined">defined</dfn>; <i>/* names or maps changed */</i></td></tr>
+<tr><th id="628">628</th><td>	<b>struct</b> <a class="type" href="#_XkbDeviceLedChanges" title='_XkbDeviceLedChanges' data-ref="_XkbDeviceLedChanges">_XkbDeviceLedChanges</a> *<dfn class="decl" id="_XkbDeviceLedChanges::next" title='_XkbDeviceLedChanges::next' data-ref="_XkbDeviceLedChanges::next">next</dfn>;</td></tr>
+<tr><th id="629">629</th><td>} <dfn class="typedef" id="XkbDeviceLedChangesRec" title='XkbDeviceLedChangesRec' data-type='struct _XkbDeviceLedChanges' data-ref="XkbDeviceLedChangesRec">XkbDeviceLedChangesRec</dfn>,*<dfn class="typedef" id="XkbDeviceLedChangesPtr" title='XkbDeviceLedChangesPtr' data-type='struct _XkbDeviceLedChanges *' data-ref="XkbDeviceLedChangesPtr">XkbDeviceLedChangesPtr</dfn>;</td></tr>
+<tr><th id="630">630</th><td></td></tr>
+<tr><th id="631">631</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="_XkbDeviceChanges" title='_XkbDeviceChanges' data-ref="_XkbDeviceChanges"><a class="type" href="#_XkbDeviceChanges" title='_XkbDeviceChanges' data-ref="_XkbDeviceChanges"><a class="type" href="#_XkbDeviceChanges" title='_XkbDeviceChanges' data-ref="_XkbDeviceChanges">_XkbDeviceChanges</a></a></dfn> {</td></tr>
+<tr><th id="632">632</th><td>	<em>unsigned</em> <em>int</em>		<dfn class="decl" id="_XkbDeviceChanges::changed" title='_XkbDeviceChanges::changed' data-ref="_XkbDeviceChanges::changed">changed</dfn>;</td></tr>
+<tr><th id="633">633</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceChanges::first_btn" title='_XkbDeviceChanges::first_btn' data-ref="_XkbDeviceChanges::first_btn">first_btn</dfn>;</td></tr>
+<tr><th id="634">634</th><td>	<em>unsigned</em> <em>short</em>		<dfn class="decl" id="_XkbDeviceChanges::num_btns" title='_XkbDeviceChanges::num_btns' data-ref="_XkbDeviceChanges::num_btns">num_btns</dfn>;</td></tr>
+<tr><th id="635">635</th><td>	<a class="typedef" href="#XkbDeviceLedChangesRec" title='XkbDeviceLedChangesRec' data-type='struct _XkbDeviceLedChanges' data-ref="XkbDeviceLedChangesRec">XkbDeviceLedChangesRec</a> 	<dfn class="decl" id="_XkbDeviceChanges::leds" title='_XkbDeviceChanges::leds' data-ref="_XkbDeviceChanges::leds">leds</dfn>;</td></tr>
+<tr><th id="636">636</th><td>} <dfn class="typedef" id="XkbDeviceChangesRec" title='XkbDeviceChangesRec' data-type='struct _XkbDeviceChanges' data-ref="XkbDeviceChangesRec">XkbDeviceChangesRec</dfn>,*<dfn class="typedef" id="XkbDeviceChangesPtr" title='XkbDeviceChangesPtr' data-type='struct _XkbDeviceChanges *' data-ref="XkbDeviceChangesPtr">XkbDeviceChangesPtr</dfn>;</td></tr>
+<tr><th id="637">637</th><td></td></tr>
+<tr><th id="638">638</th><td><u>#<span data-ppcond="638">ifdef</span> <span class="macro" data-ref="_M/__clang__">__clang__</span></u></td></tr>
+<tr><th id="639">639</th><td><u>#pragma clang diagnostic pop</u></td></tr>
+<tr><th id="640">640</th><td><u>#<span data-ppcond="638">endif</span></u></td></tr>
+<tr><th id="641">641</th><td></td></tr>
+<tr><th id="642">642</th><td><u>#<span data-ppcond="27">endif</span> /* _XKBSTR_H_ */</u></td></tr>
+<tr><th id="643">643</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../codebrowser/ui/sdl.c.html'>codebrowser/ui/sdl.c</a><br/>Generated on <em>2017-Aug-28</em> from project include<br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

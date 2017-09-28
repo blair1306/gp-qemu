@@ -1,0 +1,374 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>hbitmap.h source code [codebrowser/include/qemu/hbitmap.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="HBitmapIter "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/hbitmap.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='hbitmap.h.html'>hbitmap.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Hierarchical Bitmap Data Type</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Red Hat, Inc., 2012</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Author: Paolo Bonzini &lt;pbonzini@redhat.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="9">9</th><td><i> * later.  See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#<span data-ppcond="12">ifndef</span> <span class="macro" data-ref="_M/HBITMAP_H">HBITMAP_H</span></u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/HBITMAP_H" data-ref="_M/HBITMAP_H">HBITMAP_H</dfn></u></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="bitops.h.html">"bitops.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="host-utils.h.html">"host-utils.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="HBitmap" title='HBitmap' data-ref="HBitmap"><a class="type" href="#HBitmap" title='HBitmap' data-ref="HBitmap">HBitmap</a></dfn> <dfn class="typedef" id="HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</dfn>;</td></tr>
+<tr><th id="19">19</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#HBitmapIter" title='HBitmapIter' data-ref="HBitmapIter">HBitmapIter</a> <dfn class="typedef" id="HBitmapIter" title='HBitmapIter' data-type='struct HBitmapIter' data-ref="HBitmapIter">HBitmapIter</dfn>;</td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/BITS_PER_LEVEL" data-ref="_M/BITS_PER_LEVEL">BITS_PER_LEVEL</dfn>         (BITS_PER_LONG == 32 ? 5 : 6)</u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i>/* For 32-bit, the largest that fits in a 4 GiB address space.</i></td></tr>
+<tr><th id="24">24</th><td><i> * For 64-bit, the number of sectors in 1 PiB.  Good luck, in</i></td></tr>
+<tr><th id="25">25</th><td><i> * either case... :)</i></td></tr>
+<tr><th id="26">26</th><td><i> */</i></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/HBITMAP_LOG_MAX_SIZE" data-ref="_M/HBITMAP_LOG_MAX_SIZE">HBITMAP_LOG_MAX_SIZE</dfn>   (BITS_PER_LONG == 32 ? 34 : 41)</u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i>/* We need to place a sentinel in level 0 to speed up iteration.  Thus,</i></td></tr>
+<tr><th id="30">30</th><td><i> * we do this instead of HBITMAP_LOG_MAX_SIZE / BITS_PER_LEVEL.  The</i></td></tr>
+<tr><th id="31">31</th><td><i> * difference is that it allocates an extra level when HBITMAP_LOG_MAX_SIZE</i></td></tr>
+<tr><th id="32">32</th><td><i> * is an exact multiple of BITS_PER_LEVEL.</i></td></tr>
+<tr><th id="33">33</th><td><i> */</i></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/HBITMAP_LEVELS" data-ref="_M/HBITMAP_LEVELS">HBITMAP_LEVELS</dfn>         ((HBITMAP_LOG_MAX_SIZE / BITS_PER_LEVEL) + 1)</u></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><b>struct</b> <dfn class="type def" id="HBitmapIter" title='HBitmapIter' data-ref="HBitmapIter">HBitmapIter</dfn> {</td></tr>
+<tr><th id="37">37</th><td>    <em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="decl" id="HBitmapIter::hb" title='HBitmapIter::hb' data-ref="HBitmapIter::hb">hb</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <i>/* Copied from hb for access in the inline functions (hb is opaque).  */</i></td></tr>
+<tr><th id="40">40</th><td>    <em>int</em> <dfn class="decl" id="HBitmapIter::granularity" title='HBitmapIter::granularity' data-ref="HBitmapIter::granularity">granularity</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>    <i>/* Entry offset into the last-level array of longs.  */</i></td></tr>
+<tr><th id="43">43</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="HBitmapIter::pos" title='HBitmapIter::pos' data-ref="HBitmapIter::pos">pos</dfn>;</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <i>/* The currently-active path in the tree.  Each item of cur[i] stores</i></td></tr>
+<tr><th id="46">46</th><td><i>     * the bits (i.e. the subtrees) yet to be processed under that node.</i></td></tr>
+<tr><th id="47">47</th><td><i>     */</i></td></tr>
+<tr><th id="48">48</th><td>    <em>unsigned</em> <em>long</em> <dfn class="decl" id="HBitmapIter::cur" title='HBitmapIter::cur' data-ref="HBitmapIter::cur">cur</dfn>[<a class="macro" href="#34" title="((((sizeof (unsigned long) * 8) == 32 ? 34 : 41) / ((sizeof (unsigned long) * 8) == 32 ? 5 : 6)) + 1)" data-ref="_M/HBITMAP_LEVELS">HBITMAP_LEVELS</a>];</td></tr>
+<tr><th id="49">49</th><td>};</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="52">52</th><td><i class="doc"> * hbitmap_alloc:</i></td></tr>
+<tr><th id="53">53</th><td><i class="doc"> *<span class="command"> @size</span>: Number of bits in the bitmap.</i></td></tr>
+<tr><th id="54">54</th><td><i class="doc"> *<span class="command"> @granularity</span>: Granularity of the bitmap.  Aligned groups of 2<span class="command">^@granularity</span></i></td></tr>
+<tr><th id="55">55</th><td><i class="doc"> * bits will be represented by a single bit.  Each operation on a</i></td></tr>
+<tr><th id="56">56</th><td><i class="doc"> * range of bits first rounds the bits to determine which group they land</i></td></tr>
+<tr><th id="57">57</th><td><i class="doc"> * in, and then affect the entire set; iteration will only visit the first</i></td></tr>
+<tr><th id="58">58</th><td><i class="doc"> * bit of each group.</i></td></tr>
+<tr><th id="59">59</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="60">60</th><td><i class="doc"> * Allocate a new HBitmap.</i></td></tr>
+<tr><th id="61">61</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="62">62</th><td><a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="decl" id="hbitmap_alloc" title='hbitmap_alloc' data-ref="hbitmap_alloc">hbitmap_alloc</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="7529size" title='size' data-type='uint64_t' data-ref="7529size">size</dfn>, <em>int</em> <dfn class="local col0 decl" id="7530granularity" title='granularity' data-type='int' data-ref="7530granularity">granularity</dfn>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * hbitmap_truncate:</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> The bitmap to change the size of.</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> *<span class="command"> @size</span>: The number of elements to change the bitmap to accommodate.</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> * truncate or grow an existing bitmap to accommodate a new number of elements.</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> * This may invalidate existing HBitmapIterators.</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="72">72</th><td><em>void</em> <dfn class="decl" id="hbitmap_truncate" title='hbitmap_truncate' data-ref="hbitmap_truncate">hbitmap_truncate</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col1 decl" id="7531hb" title='hb' data-type='HBitmap *' data-ref="7531hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="7532size" title='size' data-type='uint64_t' data-ref="7532size">size</dfn>);</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="75">75</th><td><i class="doc"> * hbitmap_merge:</i></td></tr>
+<tr><th id="76">76</th><td><i class="doc"> *<span class="command"> @a</span><span class="arg">:</span> The bitmap to store the result in.</i></td></tr>
+<tr><th id="77">77</th><td><i class="doc"> *<span class="command"> @b</span><span class="arg">:</span> The bitmap to merge into<span class="command"> @a</span><span class="arg">.</span></i></td></tr>
+<tr><th id="78">78</th><td><i class="doc"> * <span class="command">@return</span> true if the merge was successful,</i></td></tr>
+<tr><th id="79">79</th><td><i class="doc"> *         false if it was not attempted.</i></td></tr>
+<tr><th id="80">80</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="81">81</th><td><i class="doc"> * Merge two bitmaps together.</i></td></tr>
+<tr><th id="82">82</th><td><i class="doc"> * A := A (BITOR) B.</i></td></tr>
+<tr><th id="83">83</th><td><i class="doc"> * B is left unmodified.</i></td></tr>
+<tr><th id="84">84</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="85">85</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="hbitmap_merge" title='hbitmap_merge' data-ref="hbitmap_merge">hbitmap_merge</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col3 decl" id="7533a" title='a' data-type='HBitmap *' data-ref="7533a">a</dfn>, <em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col4 decl" id="7534b" title='b' data-type='const HBitmap *' data-ref="7534b">b</dfn>);</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> * hbitmap_empty:</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> * Return whether the bitmap is empty.</i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="93">93</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="hbitmap_empty" title='hbitmap_empty' data-ref="hbitmap_empty">hbitmap_empty</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col5 decl" id="7535hb" title='hb' data-type='const HBitmap *' data-ref="7535hb">hb</dfn>);</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> * hbitmap_granularity:</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> * Return the granularity of the HBitmap.</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="101">101</th><td><em>int</em> <dfn class="decl" id="hbitmap_granularity" title='hbitmap_granularity' data-ref="hbitmap_granularity">hbitmap_granularity</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col6 decl" id="7536hb" title='hb' data-type='const HBitmap *' data-ref="7536hb">hb</dfn>);</td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * hbitmap_count:</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> * Return the number of bits set in the HBitmap.</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="109">109</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="hbitmap_count" title='hbitmap_count' data-ref="hbitmap_count">hbitmap_count</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col7 decl" id="7537hb" title='hb' data-type='const HBitmap *' data-ref="7537hb">hb</dfn>);</td></tr>
+<tr><th id="110">110</th><td></td></tr>
+<tr><th id="111">111</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> * hbitmap_set:</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to set (0-based).</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to set.</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> * Set a consecutive range of bits in an HBitmap.</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="119">119</th><td><em>void</em> <dfn class="decl" id="hbitmap_set" title='hbitmap_set' data-ref="hbitmap_set">hbitmap_set</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col8 decl" id="7538hb" title='hb' data-type='HBitmap *' data-ref="7538hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="7539start" title='start' data-type='uint64_t' data-ref="7539start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="7540count" title='count' data-type='uint64_t' data-ref="7540count">count</dfn>);</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * hbitmap_reset:</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to reset (0-based).</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to reset.</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> * Reset a consecutive range of bits in an HBitmap.</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="129">129</th><td><em>void</em> <dfn class="decl" id="hbitmap_reset" title='hbitmap_reset' data-ref="hbitmap_reset">hbitmap_reset</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col1 decl" id="7541hb" title='hb' data-type='HBitmap *' data-ref="7541hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="7542start" title='start' data-type='uint64_t' data-ref="7542start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="7543count" title='count' data-type='uint64_t' data-ref="7543count">count</dfn>);</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * hbitmap_reset_all:</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> * Reset all bits in an HBitmap.</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="137">137</th><td><em>void</em> <dfn class="decl" id="hbitmap_reset_all" title='hbitmap_reset_all' data-ref="hbitmap_reset_all">hbitmap_reset_all</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col4 decl" id="7544hb" title='hb' data-type='HBitmap *' data-ref="7544hb">hb</dfn>);</td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="140">140</th><td><i class="doc"> * hbitmap_get:</i></td></tr>
+<tr><th id="141">141</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"> *<span class="command"> @item</span>: Bit to query (0-based).</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> * Return whether the<span class="command"> @item</span>-th bit in an HBitmap is set.</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="146">146</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="hbitmap_get" title='hbitmap_get' data-ref="hbitmap_get">hbitmap_get</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col5 decl" id="7545hb" title='hb' data-type='const HBitmap *' data-ref="7545hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="7546item" title='item' data-type='uint64_t' data-ref="7546item">item</dfn>);</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * hbitmap_is_serializable:</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap which should be (de-)serialized.</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> * Returns whether the bitmap can actually be (de-)serialized. Other</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * (de-)serialization functions may only be invoked if this function returns</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * true.</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> * Calling (de-)serialization functions does not affect a bitmap's</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> * (de-)serializability.</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="159">159</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="hbitmap_is_serializable" title='hbitmap_is_serializable' data-ref="hbitmap_is_serializable">hbitmap_is_serializable</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col7 decl" id="7547hb" title='hb' data-type='const HBitmap *' data-ref="7547hb">hb</dfn>);</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> * hbitmap_serialization_granularity:</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * Granularity of serialization chunks, used by other serialization functions.</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> * For every chunk:</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> * 1. Chunk start should be aligned to this granularity.</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> * 2. Chunk size should be aligned too, except for last chunk (for which</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> *      start + count == hb-&gt;size)</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="171">171</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="hbitmap_serialization_granularity" title='hbitmap_serialization_granularity' data-ref="hbitmap_serialization_granularity">hbitmap_serialization_granularity</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col8 decl" id="7548hb" title='hb' data-type='const HBitmap *' data-ref="7548hb">hb</dfn>);</td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * hbitmap_serialization_size:</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> *<span class="command"> @start</span>: Starting bit</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> * Return number of bytes hbitmap_(de)serialize_part needs</i></td></tr>
+<tr><th id="180">180</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="181">181</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="hbitmap_serialization_size" title='hbitmap_serialization_size' data-ref="hbitmap_serialization_size">hbitmap_serialization_size</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col9 decl" id="7549hb" title='hb' data-type='const HBitmap *' data-ref="7549hb">hb</dfn>,</td></tr>
+<tr><th id="182">182</th><td>                                    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="7550start" title='start' data-type='uint64_t' data-ref="7550start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="7551count" title='count' data-type='uint64_t' data-ref="7551count">count</dfn>);</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> * hbitmap_serialize_part</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> * <span class="command">@buf</span>: Buffer to store serialized bitmap.</i></td></tr>
+<tr><th id="188">188</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to store.</i></td></tr>
+<tr><th id="189">189</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to store.</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> * Stores HBitmap data corresponding to given region. The format of saved data</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> * is linear sequence of bits, so it can be used by hbitmap_deserialize_part</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> * independently of endianness and size of HBitmap level array elements</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="195">195</th><td><em>void</em> <dfn class="decl" id="hbitmap_serialize_part" title='hbitmap_serialize_part' data-ref="hbitmap_serialize_part">hbitmap_serialize_part</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col2 decl" id="7552hb" title='hb' data-type='const HBitmap *' data-ref="7552hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col3 decl" id="7553buf" title='buf' data-type='uint8_t *' data-ref="7553buf">buf</dfn>,</td></tr>
+<tr><th id="196">196</th><td>                            <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="7554start" title='start' data-type='uint64_t' data-ref="7554start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="7555count" title='count' data-type='uint64_t' data-ref="7555count">count</dfn>);</td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> * hbitmap_deserialize_part</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> * <span class="command">@buf</span>: Buffer to restore bitmap data from.</i></td></tr>
+<tr><th id="202">202</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to restore.</i></td></tr>
+<tr><th id="203">203</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to restore.</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> *<span class="command"> @finish</span>: Whether to call hbitmap_deserialize_finish automatically.</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> * Restores HBitmap data corresponding to given region. The format is the same</i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> * as for hbitmap_serialize_part.</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> * If<span class="command"> @finish</span> is false, caller must call hbitmap_serialize_finish before using</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> * the bitmap.</i></td></tr>
+<tr><th id="211">211</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="212">212</th><td><em>void</em> <dfn class="decl" id="hbitmap_deserialize_part" title='hbitmap_deserialize_part' data-ref="hbitmap_deserialize_part">hbitmap_deserialize_part</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col6 decl" id="7556hb" title='hb' data-type='HBitmap *' data-ref="7556hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="7557buf" title='buf' data-type='uint8_t *' data-ref="7557buf">buf</dfn>,</td></tr>
+<tr><th id="213">213</th><td>                              <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="7558start" title='start' data-type='uint64_t' data-ref="7558start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="7559count" title='count' data-type='uint64_t' data-ref="7559count">count</dfn>,</td></tr>
+<tr><th id="214">214</th><td>                              <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="7560finish" title='finish' data-type='_Bool' data-ref="7560finish">finish</dfn>);</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> * hbitmap_deserialize_zeroes</i></td></tr>
+<tr><th id="218">218</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="219">219</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to restore.</i></td></tr>
+<tr><th id="220">220</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to restore.</i></td></tr>
+<tr><th id="221">221</th><td><i class="doc"> *<span class="command"> @finish</span>: Whether to call hbitmap_deserialize_finish automatically.</i></td></tr>
+<tr><th id="222">222</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="223">223</th><td><i class="doc"> * Fills the bitmap with zeroes.</i></td></tr>
+<tr><th id="224">224</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> * If<span class="command"> @finish</span> is false, caller must call hbitmap_serialize_finish before using</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> * the bitmap.</i></td></tr>
+<tr><th id="227">227</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="228">228</th><td><em>void</em> <dfn class="decl" id="hbitmap_deserialize_zeroes" title='hbitmap_deserialize_zeroes' data-ref="hbitmap_deserialize_zeroes">hbitmap_deserialize_zeroes</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col1 decl" id="7561hb" title='hb' data-type='HBitmap *' data-ref="7561hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="7562start" title='start' data-type='uint64_t' data-ref="7562start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="7563count" title='count' data-type='uint64_t' data-ref="7563count">count</dfn>,</td></tr>
+<tr><th id="229">229</th><td>                                <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col4 decl" id="7564finish" title='finish' data-type='_Bool' data-ref="7564finish">finish</dfn>);</td></tr>
+<tr><th id="230">230</th><td></td></tr>
+<tr><th id="231">231</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="232">232</th><td><i class="doc"> * hbitmap_deserialize_ones</i></td></tr>
+<tr><th id="233">233</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="234">234</th><td><i class="doc"> *<span class="command"> @start</span>: First bit to restore.</i></td></tr>
+<tr><th id="235">235</th><td><i class="doc"> *<span class="command"> @count</span>: Number of bits to restore.</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc"> *<span class="command"> @finish</span>: Whether to call hbitmap_deserialize_finish automatically.</i></td></tr>
+<tr><th id="237">237</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> * Fills the bitmap with ones.</i></td></tr>
+<tr><th id="239">239</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="240">240</th><td><i class="doc"> * If<span class="command"> @finish</span> is false, caller must call hbitmap_serialize_finish before using</i></td></tr>
+<tr><th id="241">241</th><td><i class="doc"> * the bitmap.</i></td></tr>
+<tr><th id="242">242</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="243">243</th><td><em>void</em> <dfn class="decl" id="hbitmap_deserialize_ones" title='hbitmap_deserialize_ones' data-ref="hbitmap_deserialize_ones">hbitmap_deserialize_ones</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col5 decl" id="7565hb" title='hb' data-type='HBitmap *' data-ref="7565hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="7566start" title='start' data-type='uint64_t' data-ref="7566start">start</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="7567count" title='count' data-type='uint64_t' data-ref="7567count">count</dfn>,</td></tr>
+<tr><th id="244">244</th><td>                              <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="7568finish" title='finish' data-type='_Bool' data-ref="7568finish">finish</dfn>);</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="247">247</th><td><i class="doc"> * hbitmap_deserialize_finish</i></td></tr>
+<tr><th id="248">248</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="249">249</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc"> * Repair HBitmap after calling hbitmap_deserialize_data. Actually, all HBitmap</i></td></tr>
+<tr><th id="251">251</th><td><i class="doc"> * layers are restored here.</i></td></tr>
+<tr><th id="252">252</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="253">253</th><td><em>void</em> <dfn class="decl" id="hbitmap_deserialize_finish" title='hbitmap_deserialize_finish' data-ref="hbitmap_deserialize_finish">hbitmap_deserialize_finish</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col9 decl" id="7569hb" title='hb' data-type='HBitmap *' data-ref="7569hb">hb</dfn>);</td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="256">256</th><td><i class="doc"> * hbitmap_sha256:</i></td></tr>
+<tr><th id="257">257</th><td><i class="doc"> *<span class="command"> @bitmap</span>: HBitmap to operate on.</i></td></tr>
+<tr><th id="258">258</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc"> * Returns SHA256 hash of the last level.</i></td></tr>
+<tr><th id="260">260</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="261">261</th><td><em>char</em> *<dfn class="decl" id="hbitmap_sha256" title='hbitmap_sha256' data-ref="hbitmap_sha256">hbitmap_sha256</dfn>(<em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col0 decl" id="7570bitmap" title='bitmap' data-type='const HBitmap *' data-ref="7570bitmap">bitmap</dfn>, <a class="typedef" href="typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="7571errp" title='errp' data-type='Error **' data-ref="7571errp">errp</dfn>);</td></tr>
+<tr><th id="262">262</th><td></td></tr>
+<tr><th id="263">263</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> * hbitmap_free:</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to operate on.</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> * Free an HBitmap and all of its associated memory.</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="269">269</th><td><em>void</em> <dfn class="decl" id="hbitmap_free" title='hbitmap_free' data-ref="hbitmap_free">hbitmap_free</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col2 decl" id="7572hb" title='hb' data-type='HBitmap *' data-ref="7572hb">hb</dfn>);</td></tr>
+<tr><th id="270">270</th><td></td></tr>
+<tr><th id="271">271</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="272">272</th><td><i class="doc"> * hbitmap_iter_init:</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> *<span class="command"> @hbi</span>: HBitmapIter to initialize.</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> *<span class="command"> @hb</span><span class="arg">:</span> HBitmap to iterate on.</i></td></tr>
+<tr><th id="275">275</th><td><i class="doc"> *<span class="command"> @first</span>: First bit to visit (0-based, must be strictly less than the</i></td></tr>
+<tr><th id="276">276</th><td><i class="doc"> * size of the bitmap).</i></td></tr>
+<tr><th id="277">277</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="278">278</th><td><i class="doc"> * Set up<span class="command"> @hbi</span> to iterate on the HBitmap<span class="command"> @hb</span><span class="arg">.</span>  hbitmap_iter_next will return</i></td></tr>
+<tr><th id="279">279</th><td><i class="doc"> * the lowest-numbered bit that is set in<span class="command"> @hb</span><span class="arg">,</span> starting at<span class="command"> @first</span>.</i></td></tr>
+<tr><th id="280">280</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="281">281</th><td><i class="doc"> * Concurrent setting of bits is acceptable, and will at worst cause the</i></td></tr>
+<tr><th id="282">282</th><td><i class="doc"> * iteration to miss some of those bits.</i></td></tr>
+<tr><th id="283">283</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="284">284</th><td><i class="doc"> * The concurrent resetting of bits is OK.</i></td></tr>
+<tr><th id="285">285</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="286">286</th><td><em>void</em> <dfn class="decl" id="hbitmap_iter_init" title='hbitmap_iter_init' data-ref="hbitmap_iter_init">hbitmap_iter_init</dfn>(<a class="typedef" href="#HBitmapIter" title='HBitmapIter' data-type='struct HBitmapIter' data-ref="HBitmapIter">HBitmapIter</a> *<dfn class="local col3 decl" id="7573hbi" title='hbi' data-type='HBitmapIter *' data-ref="7573hbi">hbi</dfn>, <em>const</em> <a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col4 decl" id="7574hb" title='hb' data-type='const HBitmap *' data-ref="7574hb">hb</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="7575first" title='first' data-type='uint64_t' data-ref="7575first">first</dfn>);</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><i>/* hbitmap_iter_skip_words:</i></td></tr>
+<tr><th id="289">289</th><td><i> * @hbi: HBitmapIter to operate on.</i></td></tr>
+<tr><th id="290">290</th><td><i> *</i></td></tr>
+<tr><th id="291">291</th><td><i> * Internal function used by hbitmap_iter_next and hbitmap_iter_next_word.</i></td></tr>
+<tr><th id="292">292</th><td><i> */</i></td></tr>
+<tr><th id="293">293</th><td><em>unsigned</em> <em>long</em> <dfn class="decl" id="hbitmap_iter_skip_words" title='hbitmap_iter_skip_words' data-ref="hbitmap_iter_skip_words">hbitmap_iter_skip_words</dfn>(<a class="typedef" href="#HBitmapIter" title='HBitmapIter' data-type='struct HBitmapIter' data-ref="HBitmapIter">HBitmapIter</a> *<dfn class="local col6 decl" id="7576hbi" title='hbi' data-type='HBitmapIter *' data-ref="7576hbi">hbi</dfn>);</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td><i>/* hbitmap_create_meta:</i></td></tr>
+<tr><th id="296">296</th><td><i> * Create a "meta" hbitmap to track dirtiness of the bits in this HBitmap.</i></td></tr>
+<tr><th id="297">297</th><td><i> * The caller owns the created bitmap and must call hbitmap_free_meta(hb) to</i></td></tr>
+<tr><th id="298">298</th><td><i> * free it.</i></td></tr>
+<tr><th id="299">299</th><td><i> *</i></td></tr>
+<tr><th id="300">300</th><td><i> * Currently, we only guarantee that if a bit in the hbitmap is changed it</i></td></tr>
+<tr><th id="301">301</th><td><i> * will be reflected in the meta bitmap, but we do not yet guarantee the</i></td></tr>
+<tr><th id="302">302</th><td><i> * opposite.</i></td></tr>
+<tr><th id="303">303</th><td><i> *</i></td></tr>
+<tr><th id="304">304</th><td><i> * @hb: The HBitmap to operate on.</i></td></tr>
+<tr><th id="305">305</th><td><i> * @chunk_size: How many bits in @hb does one bit in the meta track.</i></td></tr>
+<tr><th id="306">306</th><td><i> */</i></td></tr>
+<tr><th id="307">307</th><td><a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="decl" id="hbitmap_create_meta" title='hbitmap_create_meta' data-ref="hbitmap_create_meta">hbitmap_create_meta</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col7 decl" id="7577hb" title='hb' data-type='HBitmap *' data-ref="7577hb">hb</dfn>, <em>int</em> <dfn class="local col8 decl" id="7578chunk_size" title='chunk_size' data-type='int' data-ref="7578chunk_size">chunk_size</dfn>);</td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td><i>/* hbitmap_free_meta:</i></td></tr>
+<tr><th id="310">310</th><td><i> * Free the meta bitmap of @hb.</i></td></tr>
+<tr><th id="311">311</th><td><i> *</i></td></tr>
+<tr><th id="312">312</th><td><i> * @hb: The HBitmap whose meta bitmap should be freed.</i></td></tr>
+<tr><th id="313">313</th><td><i> */</i></td></tr>
+<tr><th id="314">314</th><td><em>void</em> <dfn class="decl" id="hbitmap_free_meta" title='hbitmap_free_meta' data-ref="hbitmap_free_meta">hbitmap_free_meta</dfn>(<a class="typedef" href="#HBitmap" title='HBitmap' data-type='struct HBitmap' data-ref="HBitmap">HBitmap</a> *<dfn class="local col9 decl" id="7579hb" title='hb' data-type='HBitmap *' data-ref="7579hb">hb</dfn>);</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="317">317</th><td><i class="doc"> * hbitmap_iter_next:</i></td></tr>
+<tr><th id="318">318</th><td><i class="doc"> *<span class="command"> @hbi</span>: HBitmapIter to operate on.</i></td></tr>
+<tr><th id="319">319</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="320">320</th><td><i class="doc"> * Return the next bit that is set in<span class="command"> @hbi</span>'s associated HBitmap,</i></td></tr>
+<tr><th id="321">321</th><td><i class="doc"> * or -1 if all remaining bits are zero.</i></td></tr>
+<tr><th id="322">322</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="323">323</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="hbitmap_iter_next" title='hbitmap_iter_next' data-ref="hbitmap_iter_next">hbitmap_iter_next</dfn>(<a class="typedef" href="#HBitmapIter" title='HBitmapIter' data-type='struct HBitmapIter' data-ref="HBitmapIter">HBitmapIter</a> *<dfn class="local col0 decl" id="7580hbi" title='hbi' data-type='HBitmapIter *' data-ref="7580hbi">hbi</dfn>);</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="326">326</th><td><i class="doc"> * hbitmap_iter_next_word:</i></td></tr>
+<tr><th id="327">327</th><td><i class="doc"> *<span class="command"> @hbi</span>: HBitmapIter to operate on.</i></td></tr>
+<tr><th id="328">328</th><td><i class="doc"> *<span class="command"> @p</span><span class="arg">_cur:</span> Location where to store the next non-zero word.</i></td></tr>
+<tr><th id="329">329</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="330">330</th><td><i class="doc"> * Return the index of the next nonzero word that is set in<span class="command"> @hbi</span>'s</i></td></tr>
+<tr><th id="331">331</th><td><i class="doc"> * associated HBitmap, and set *p_cur to the content of that word</i></td></tr>
+<tr><th id="332">332</th><td><i class="doc"> * (bits before the index that was passed to hbitmap_iter_init are</i></td></tr>
+<tr><th id="333">333</th><td><i class="doc"> * trimmed on the first call).  Return -1, and set *p_cur to zero,</i></td></tr>
+<tr><th id="334">334</th><td><i class="doc"> * if all remaining words are zero.</i></td></tr>
+<tr><th id="335">335</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="336">336</th><td><em>static</em> <b>inline</b> <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl def" id="hbitmap_iter_next_word" title='hbitmap_iter_next_word' data-ref="hbitmap_iter_next_word">hbitmap_iter_next_word</dfn>(<a class="typedef" href="#HBitmapIter" title='HBitmapIter' data-type='struct HBitmapIter' data-ref="HBitmapIter">HBitmapIter</a> *<dfn class="local col1 decl" id="7581hbi" title='hbi' data-type='HBitmapIter *' data-ref="7581hbi">hbi</dfn>, <em>unsigned</em> <em>long</em> *<dfn class="local col2 decl" id="7582p_cur" title='p_cur' data-type='unsigned long *' data-ref="7582p_cur">p_cur</dfn>)</td></tr>
+<tr><th id="337">337</th><td>{</td></tr>
+<tr><th id="338">338</th><td>    <em>unsigned</em> <em>long</em> <dfn class="local col3 decl" id="7583cur" title='cur' data-type='unsigned long' data-ref="7583cur">cur</dfn> = <a class="local col1 ref" href="#7581hbi" title='hbi' data-ref="7581hbi">hbi</a>-&gt;<a class="ref" href="#HBitmapIter::cur" title='HBitmapIter::cur' data-ref="HBitmapIter::cur">cur</a>[<a class="macro" href="#34" title="((((sizeof (unsigned long) * 8) == 32 ? 34 : 41) / ((sizeof (unsigned long) * 8) == 32 ? 5 : 6)) + 1)" data-ref="_M/HBITMAP_LEVELS">HBITMAP_LEVELS</a> - <var>1</var>];</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td>    <b>if</b> (<a class="local col3 ref" href="#7583cur" title='cur' data-ref="7583cur">cur</a> == <var>0</var>) {</td></tr>
+<tr><th id="341">341</th><td>        <a class="local col3 ref" href="#7583cur" title='cur' data-ref="7583cur">cur</a> = <a class="ref" href="#hbitmap_iter_skip_words" title='hbitmap_iter_skip_words' data-ref="hbitmap_iter_skip_words">hbitmap_iter_skip_words</a>(<a class="local col1 ref" href="#7581hbi" title='hbi' data-ref="7581hbi">hbi</a>);</td></tr>
+<tr><th id="342">342</th><td>        <b>if</b> (<a class="local col3 ref" href="#7583cur" title='cur' data-ref="7583cur">cur</a> == <var>0</var>) {</td></tr>
+<tr><th id="343">343</th><td>            *<a class="local col2 ref" href="#7582p_cur" title='p_cur' data-ref="7582p_cur">p_cur</a> = <var>0</var>;</td></tr>
+<tr><th id="344">344</th><td>            <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="345">345</th><td>        }</td></tr>
+<tr><th id="346">346</th><td>    }</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td>    <i>/* The next call will resume work from the next word.  */</i></td></tr>
+<tr><th id="349">349</th><td>    <a class="local col1 ref" href="#7581hbi" title='hbi' data-ref="7581hbi">hbi</a>-&gt;<a class="ref" href="#HBitmapIter::cur" title='HBitmapIter::cur' data-ref="HBitmapIter::cur">cur</a>[<a class="macro" href="#34" title="((((sizeof (unsigned long) * 8) == 32 ? 34 : 41) / ((sizeof (unsigned long) * 8) == 32 ? 5 : 6)) + 1)" data-ref="_M/HBITMAP_LEVELS">HBITMAP_LEVELS</a> - <var>1</var>] = <var>0</var>;</td></tr>
+<tr><th id="350">350</th><td>    *<a class="local col2 ref" href="#7582p_cur" title='p_cur' data-ref="7582p_cur">p_cur</a> = <a class="local col3 ref" href="#7583cur" title='cur' data-ref="7583cur">cur</a>;</td></tr>
+<tr><th id="351">351</th><td>    <b>return</b> <a class="local col1 ref" href="#7581hbi" title='hbi' data-ref="7581hbi">hbi</a>-&gt;<a class="ref" href="#HBitmapIter::pos" title='HBitmapIter::pos' data-ref="HBitmapIter::pos">pos</a>;</td></tr>
+<tr><th id="352">352</th><td>}</td></tr>
+<tr><th id="353">353</th><td></td></tr>
+<tr><th id="354">354</th><td></td></tr>
+<tr><th id="355">355</th><td><u>#<span data-ppcond="12">endif</span></u></td></tr>
+<tr><th id="356">356</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

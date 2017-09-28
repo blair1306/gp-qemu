@@ -1,0 +1,215 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>q35.h source code [codebrowser/include/hw/pci-host/q35.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="MCHPCIState,Q35PCIHost "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/pci-host/q35.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>pci-host</a>/<a href='q35.h.html'>q35.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * q35.h</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2009 Isaku Yamahata &lt;yamahata at valinux co jp&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *                    VA Linux Systems Japan K.K.</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2012 Jason Baron &lt;jbaron@redhat.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="9">9</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="10">10</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="11">11</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="16">16</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i> *</i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="19">19</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;</i></td></tr>
+<tr><th id="20">20</th><td><i> */</i></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><u>#<span data-ppcond="22">ifndef</span> <span class="macro" data-ref="_M/HW_Q35_H">HW_Q35_H</span></u></td></tr>
+<tr><th id="23">23</th><td><u>#define <dfn class="macro" id="_M/HW_Q35_H" data-ref="_M/HW_Q35_H">HW_Q35_H</dfn></u></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../i386/pc.h.html">"hw/i386/pc.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../isa/apm.h.html">"hw/isa/apm.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../pci/pcie_host.h.html">"hw/pci/pcie_host.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../acpi/acpi.h.html">"hw/acpi/acpi.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../acpi/ich9.h.html">"hw/acpi/ich9.h"</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="pam.h.html">"hw/pci-host/pam.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../i386/intel_iommu.h.html">"hw/i386/intel_iommu.h"</a></u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/TYPE_Q35_HOST_DEVICE" data-ref="_M/TYPE_Q35_HOST_DEVICE">TYPE_Q35_HOST_DEVICE</dfn> "q35-pcihost"</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/Q35_HOST_DEVICE" data-ref="_M/Q35_HOST_DEVICE">Q35_HOST_DEVICE</dfn>(obj) \</u></td></tr>
+<tr><th id="39">39</th><td><u>     OBJECT_CHECK(Q35PCIHost, (obj), TYPE_Q35_HOST_DEVICE)</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/TYPE_MCH_PCI_DEVICE" data-ref="_M/TYPE_MCH_PCI_DEVICE">TYPE_MCH_PCI_DEVICE</dfn> "mch"</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/MCH_PCI_DEVICE" data-ref="_M/MCH_PCI_DEVICE">MCH_PCI_DEVICE</dfn>(obj) \</u></td></tr>
+<tr><th id="43">43</th><td><u>     OBJECT_CHECK(MCHPCIState, (obj), TYPE_MCH_PCI_DEVICE)</u></td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="MCHPCIState" title='MCHPCIState' data-ref="MCHPCIState"><a class="type" href="#MCHPCIState" title='MCHPCIState' data-ref="MCHPCIState">MCHPCIState</a></dfn> {</td></tr>
+<tr><th id="46">46</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="MCHPCIState::parent_obj" title='MCHPCIState::parent_obj' data-ref="MCHPCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="MCHPCIState::ram_memory" title='MCHPCIState::ram_memory' data-ref="MCHPCIState::ram_memory">ram_memory</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="MCHPCIState::pci_address_space" title='MCHPCIState::pci_address_space' data-ref="MCHPCIState::pci_address_space">pci_address_space</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="MCHPCIState::system_memory" title='MCHPCIState::system_memory' data-ref="MCHPCIState::system_memory">system_memory</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> *<dfn class="decl" id="MCHPCIState::address_space_io" title='MCHPCIState::address_space_io' data-ref="MCHPCIState::address_space_io">address_space_io</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="pam.h.html#PAMMemoryRegion" title='PAMMemoryRegion' data-type='struct PAMMemoryRegion' data-ref="PAMMemoryRegion">PAMMemoryRegion</a> <dfn class="decl" id="MCHPCIState::pam_regions" title='MCHPCIState::pam_regions' data-ref="MCHPCIState::pam_regions">pam_regions</dfn>[<var>13</var>];</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="MCHPCIState::smram_region" title='MCHPCIState::smram_region' data-ref="MCHPCIState::smram_region">smram_region</dfn>, <dfn class="decl" id="MCHPCIState::open_high_smram" title='MCHPCIState::open_high_smram' data-ref="MCHPCIState::open_high_smram">open_high_smram</dfn>;</td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="MCHPCIState::smram" title='MCHPCIState::smram' data-ref="MCHPCIState::smram">smram</dfn>, <dfn class="decl" id="MCHPCIState::low_smram" title='MCHPCIState::low_smram' data-ref="MCHPCIState::low_smram">low_smram</dfn>, <dfn class="decl" id="MCHPCIState::high_smram" title='MCHPCIState::high_smram' data-ref="MCHPCIState::high_smram">high_smram</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="MCHPCIState::tseg_blackhole" title='MCHPCIState::tseg_blackhole' data-ref="MCHPCIState::tseg_blackhole">tseg_blackhole</dfn>, <dfn class="decl" id="MCHPCIState::tseg_window" title='MCHPCIState::tseg_window' data-ref="MCHPCIState::tseg_window">tseg_window</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> <dfn class="decl" id="MCHPCIState::pci_hole" title='MCHPCIState::pci_hole' data-ref="MCHPCIState::pci_hole">pci_hole</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="MCHPCIState::below_4g_mem_size" title='MCHPCIState::below_4g_mem_size' data-ref="MCHPCIState::below_4g_mem_size">below_4g_mem_size</dfn>;</td></tr>
+<tr><th id="60">60</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="MCHPCIState::above_4g_mem_size" title='MCHPCIState::above_4g_mem_size' data-ref="MCHPCIState::above_4g_mem_size">above_4g_mem_size</dfn>;</td></tr>
+<tr><th id="61">61</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="MCHPCIState::pci_hole64_size" title='MCHPCIState::pci_hole64_size' data-ref="MCHPCIState::pci_hole64_size">pci_hole64_size</dfn>;</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="MCHPCIState::short_root_bus" title='MCHPCIState::short_root_bus' data-ref="MCHPCIState::short_root_bus">short_root_bus</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="MCHPCIState::ext_tseg_mbytes" title='MCHPCIState::ext_tseg_mbytes' data-ref="MCHPCIState::ext_tseg_mbytes">ext_tseg_mbytes</dfn>;</td></tr>
+<tr><th id="64">64</th><td>} <dfn class="typedef" id="MCHPCIState" title='MCHPCIState' data-type='struct MCHPCIState' data-ref="MCHPCIState">MCHPCIState</dfn>;</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="Q35PCIHost" title='Q35PCIHost' data-ref="Q35PCIHost"><a class="type" href="#Q35PCIHost" title='Q35PCIHost' data-ref="Q35PCIHost">Q35PCIHost</a></dfn> {</td></tr>
+<tr><th id="67">67</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#PCIExpressHost" title='PCIExpressHost' data-type='struct PCIExpressHost' data-ref="PCIExpressHost">PCIExpressHost</a> <dfn class="decl" id="Q35PCIHost::parent_obj" title='Q35PCIHost::parent_obj' data-ref="Q35PCIHost::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="#MCHPCIState" title='MCHPCIState' data-type='struct MCHPCIState' data-ref="MCHPCIState">MCHPCIState</a> <dfn class="decl" id="Q35PCIHost::mch" title='Q35PCIHost::mch' data-ref="Q35PCIHost::mch">mch</dfn>;</td></tr>
+<tr><th id="72">72</th><td>} <dfn class="typedef" id="Q35PCIHost" title='Q35PCIHost' data-type='struct Q35PCIHost' data-ref="Q35PCIHost">Q35PCIHost</dfn>;</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/Q35_MASK" data-ref="_M/Q35_MASK">Q35_MASK</dfn>(bit, ms_bit, ls_bit) \</u></td></tr>
+<tr><th id="75">75</th><td><u>((uint##bit##_t)(((1ULL &lt;&lt; ((ms_bit) + 1)) - 1) &amp; ~((1ULL &lt;&lt; ls_bit) - 1)))</u></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>/*</i></td></tr>
+<tr><th id="78">78</th><td><i> * gmch part</i></td></tr>
+<tr><th id="79">79</th><td><i> */</i></td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_PROP_RAM_MEM" data-ref="_M/MCH_HOST_PROP_RAM_MEM">MCH_HOST_PROP_RAM_MEM</dfn> "ram-mem"</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_PROP_PCI_MEM" data-ref="_M/MCH_HOST_PROP_PCI_MEM">MCH_HOST_PROP_PCI_MEM</dfn> "pci-mem"</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_PROP_SYSTEM_MEM" data-ref="_M/MCH_HOST_PROP_SYSTEM_MEM">MCH_HOST_PROP_SYSTEM_MEM</dfn> "system-mem"</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_PROP_IO_MEM" data-ref="_M/MCH_HOST_PROP_IO_MEM">MCH_HOST_PROP_IO_MEM</dfn> "io-mem"</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><i>/* PCI configuration */</i></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE" data-ref="_M/MCH_HOST_BRIDGE">MCH_HOST_BRIDGE</dfn>                        "MCH"</u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_CONFIG_ADDR" data-ref="_M/MCH_HOST_BRIDGE_CONFIG_ADDR">MCH_HOST_BRIDGE_CONFIG_ADDR</dfn>            0xcf8</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_CONFIG_DATA" data-ref="_M/MCH_HOST_BRIDGE_CONFIG_DATA">MCH_HOST_BRIDGE_CONFIG_DATA</dfn>            0xcfc</u></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i>/* D0:F0 configuration space */</i></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_REVISION_DEFAULT" data-ref="_M/MCH_HOST_BRIDGE_REVISION_DEFAULT">MCH_HOST_BRIDGE_REVISION_DEFAULT</dfn>       0x0</u></td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES" data-ref="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES">MCH_HOST_BRIDGE_EXT_TSEG_MBYTES</dfn>        0x50</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE" data-ref="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE">MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_SIZE</dfn>   2</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY" data-ref="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY">MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_QUERY</dfn>  0xffff</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX" data-ref="_M/MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX">MCH_HOST_BRIDGE_EXT_TSEG_MBYTES_MAX</dfn>    0xfff</u></td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR">MCH_HOST_BRIDGE_PCIEXBAR</dfn>               0x60    /* 64bit register */</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_SIZE" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_SIZE">MCH_HOST_BRIDGE_PCIEXBAR_SIZE</dfn>          8       /* 64bit register */</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT">MCH_HOST_BRIDGE_PCIEXBAR_DEFAULT</dfn>       0xb0000000</u></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_MAX" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_MAX">MCH_HOST_BRIDGE_PCIEXBAR_MAX</dfn>           (0x10000000) /* 256M */</u></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_ADMSK" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_ADMSK">MCH_HOST_BRIDGE_PCIEXBAR_ADMSK</dfn>         Q35_MASK(64, 35, 28)</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_128ADMSK" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_128ADMSK">MCH_HOST_BRIDGE_PCIEXBAR_128ADMSK</dfn>      ((uint64_t)(1 &lt;&lt; 26))</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_64ADMSK" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_64ADMSK">MCH_HOST_BRIDGE_PCIEXBAR_64ADMSK</dfn>       ((uint64_t)(1 &lt;&lt; 25))</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_MASK" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_MASK">MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_MASK</dfn>   ((uint64_t)(0x3 &lt;&lt; 1))</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_256M" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_256M">MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_256M</dfn>   ((uint64_t)(0x0 &lt;&lt; 1))</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_128M" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_128M">MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_128M</dfn>   ((uint64_t)(0x1 &lt;&lt; 1))</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_64M" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_64M">MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_64M</dfn>    ((uint64_t)(0x2 &lt;&lt; 1))</u></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_RVD" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_RVD">MCH_HOST_BRIDGE_PCIEXBAR_LENGTH_RVD</dfn>    ((uint64_t)(0x3 &lt;&lt; 1))</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PCIEXBAREN" data-ref="_M/MCH_HOST_BRIDGE_PCIEXBAREN">MCH_HOST_BRIDGE_PCIEXBAREN</dfn>             ((uint64_t)1)</u></td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_NB" data-ref="_M/MCH_HOST_BRIDGE_PAM_NB">MCH_HOST_BRIDGE_PAM_NB</dfn>                 7</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_SIZE" data-ref="_M/MCH_HOST_BRIDGE_PAM_SIZE">MCH_HOST_BRIDGE_PAM_SIZE</dfn>               7</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM0" data-ref="_M/MCH_HOST_BRIDGE_PAM0">MCH_HOST_BRIDGE_PAM0</dfn>                   0x90</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_BIOS_AREA" data-ref="_M/MCH_HOST_BRIDGE_PAM_BIOS_AREA">MCH_HOST_BRIDGE_PAM_BIOS_AREA</dfn>          0xf0000</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_AREA_SIZE" data-ref="_M/MCH_HOST_BRIDGE_PAM_AREA_SIZE">MCH_HOST_BRIDGE_PAM_AREA_SIZE</dfn>          0x10000 /* 16KB */</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM1" data-ref="_M/MCH_HOST_BRIDGE_PAM1">MCH_HOST_BRIDGE_PAM1</dfn>                   0x91</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_EXPAN_AREA" data-ref="_M/MCH_HOST_BRIDGE_PAM_EXPAN_AREA">MCH_HOST_BRIDGE_PAM_EXPAN_AREA</dfn>         0xc0000</u></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_EXPAN_SIZE" data-ref="_M/MCH_HOST_BRIDGE_PAM_EXPAN_SIZE">MCH_HOST_BRIDGE_PAM_EXPAN_SIZE</dfn>         0x04000</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM2" data-ref="_M/MCH_HOST_BRIDGE_PAM2">MCH_HOST_BRIDGE_PAM2</dfn>                   0x92</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM3" data-ref="_M/MCH_HOST_BRIDGE_PAM3">MCH_HOST_BRIDGE_PAM3</dfn>                   0x93</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM4" data-ref="_M/MCH_HOST_BRIDGE_PAM4">MCH_HOST_BRIDGE_PAM4</dfn>                   0x94</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_EXBIOS_AREA" data-ref="_M/MCH_HOST_BRIDGE_PAM_EXBIOS_AREA">MCH_HOST_BRIDGE_PAM_EXBIOS_AREA</dfn>        0xe0000</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_EXBIOS_SIZE" data-ref="_M/MCH_HOST_BRIDGE_PAM_EXBIOS_SIZE">MCH_HOST_BRIDGE_PAM_EXBIOS_SIZE</dfn>        0x04000</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM5" data-ref="_M/MCH_HOST_BRIDGE_PAM5">MCH_HOST_BRIDGE_PAM5</dfn>                   0x95</u></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM6" data-ref="_M/MCH_HOST_BRIDGE_PAM6">MCH_HOST_BRIDGE_PAM6</dfn>                   0x96</u></td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_WE_HI" data-ref="_M/MCH_HOST_BRIDGE_PAM_WE_HI">MCH_HOST_BRIDGE_PAM_WE_HI</dfn>              ((uint8_t)(0x2 &lt;&lt; 4))</u></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_RE_HI" data-ref="_M/MCH_HOST_BRIDGE_PAM_RE_HI">MCH_HOST_BRIDGE_PAM_RE_HI</dfn>              ((uint8_t)(0x1 &lt;&lt; 4))</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_HI_MASK" data-ref="_M/MCH_HOST_BRIDGE_PAM_HI_MASK">MCH_HOST_BRIDGE_PAM_HI_MASK</dfn>            ((uint8_t)(0x3 &lt;&lt; 4))</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_WE_LO" data-ref="_M/MCH_HOST_BRIDGE_PAM_WE_LO">MCH_HOST_BRIDGE_PAM_WE_LO</dfn>              ((uint8_t)0x2)</u></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_RE_LO" data-ref="_M/MCH_HOST_BRIDGE_PAM_RE_LO">MCH_HOST_BRIDGE_PAM_RE_LO</dfn>              ((uint8_t)0x1)</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_LO_MASK" data-ref="_M/MCH_HOST_BRIDGE_PAM_LO_MASK">MCH_HOST_BRIDGE_PAM_LO_MASK</dfn>            ((uint8_t)0x3)</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_WE" data-ref="_M/MCH_HOST_BRIDGE_PAM_WE">MCH_HOST_BRIDGE_PAM_WE</dfn>                 ((uint8_t)0x2)</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_RE" data-ref="_M/MCH_HOST_BRIDGE_PAM_RE">MCH_HOST_BRIDGE_PAM_RE</dfn>                 ((uint8_t)0x1)</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_PAM_MASK" data-ref="_M/MCH_HOST_BRIDGE_PAM_MASK">MCH_HOST_BRIDGE_PAM_MASK</dfn>               ((uint8_t)0x3)</u></td></tr>
+<tr><th id="138">138</th><td></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM" data-ref="_M/MCH_HOST_BRIDGE_SMRAM">MCH_HOST_BRIDGE_SMRAM</dfn>                  0x9d</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_SIZE" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_SIZE">MCH_HOST_BRIDGE_SMRAM_SIZE</dfn>             2</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_D_OPEN" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_D_OPEN">MCH_HOST_BRIDGE_SMRAM_D_OPEN</dfn>           ((uint8_t)(1 &lt;&lt; 6))</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_D_CLS" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_D_CLS">MCH_HOST_BRIDGE_SMRAM_D_CLS</dfn>            ((uint8_t)(1 &lt;&lt; 5))</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_D_LCK" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_D_LCK">MCH_HOST_BRIDGE_SMRAM_D_LCK</dfn>            ((uint8_t)(1 &lt;&lt; 4))</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_G_SMRAME" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_G_SMRAME">MCH_HOST_BRIDGE_SMRAM_G_SMRAME</dfn>         ((uint8_t)(1 &lt;&lt; 3))</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG_MASK" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG_MASK">MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG_MASK</dfn>  ((uint8_t)0x7)</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG">MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG</dfn>       ((uint8_t)0x2)  /* hardwired to b010 */</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_C_BASE">MCH_HOST_BRIDGE_SMRAM_C_BASE</dfn>           0xa0000</u></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_C_END" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_C_END">MCH_HOST_BRIDGE_SMRAM_C_END</dfn>            0xc0000</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_C_SIZE" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_C_SIZE">MCH_HOST_BRIDGE_SMRAM_C_SIZE</dfn>           0x20000</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_UPPER_SYSTEM_BIOS_END" data-ref="_M/MCH_HOST_BRIDGE_UPPER_SYSTEM_BIOS_END">MCH_HOST_BRIDGE_UPPER_SYSTEM_BIOS_END</dfn>  0x100000</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_DEFAULT" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_DEFAULT">MCH_HOST_BRIDGE_SMRAM_DEFAULT</dfn>           \</u></td></tr>
+<tr><th id="152">152</th><td><u>    MCH_HOST_BRIDGE_SMRAM_C_BASE_SEG</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_WMASK" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_WMASK">MCH_HOST_BRIDGE_SMRAM_WMASK</dfn>             \</u></td></tr>
+<tr><th id="154">154</th><td><u>    (MCH_HOST_BRIDGE_SMRAM_D_OPEN |             \</u></td></tr>
+<tr><th id="155">155</th><td><u>     MCH_HOST_BRIDGE_SMRAM_D_CLS |              \</u></td></tr>
+<tr><th id="156">156</th><td><u>     MCH_HOST_BRIDGE_SMRAM_D_LCK |              \</u></td></tr>
+<tr><th id="157">157</th><td><u>     MCH_HOST_BRIDGE_SMRAM_G_SMRAME)</u></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_SMRAM_WMASK_LCK" data-ref="_M/MCH_HOST_BRIDGE_SMRAM_WMASK_LCK">MCH_HOST_BRIDGE_SMRAM_WMASK_LCK</dfn>         \</u></td></tr>
+<tr><th id="159">159</th><td><u>    MCH_HOST_BRIDGE_SMRAM_D_CLS</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC">MCH_HOST_BRIDGE_ESMRAMC</dfn>                0x9e</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_H_SMRAME" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_H_SMRAME">MCH_HOST_BRIDGE_ESMRAMC_H_SMRAME</dfn>       ((uint8_t)(1 &lt;&lt; 7))</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_E_SMERR" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_E_SMERR">MCH_HOST_BRIDGE_ESMRAMC_E_SMERR</dfn>        ((uint8_t)(1 &lt;&lt; 6))</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_CACHE" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_CACHE">MCH_HOST_BRIDGE_ESMRAMC_SM_CACHE</dfn>       ((uint8_t)(1 &lt;&lt; 5))</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_L1" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_L1">MCH_HOST_BRIDGE_ESMRAMC_SM_L1</dfn>          ((uint8_t)(1 &lt;&lt; 4))</u></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_L2" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_SM_L2">MCH_HOST_BRIDGE_ESMRAMC_SM_L2</dfn>          ((uint8_t)(1 &lt;&lt; 3))</u></td></tr>
+<tr><th id="167">167</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_MASK" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_MASK">MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_MASK</dfn>   ((uint8_t)(0x3 &lt;&lt; 1))</u></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_1MB" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_1MB">MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_1MB</dfn>    ((uint8_t)(0x0 &lt;&lt; 1))</u></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_2MB" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_2MB">MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_2MB</dfn>    ((uint8_t)(0x1 &lt;&lt; 1))</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_8MB" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_8MB">MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_8MB</dfn>    ((uint8_t)(0x2 &lt;&lt; 1))</u></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_T_EN" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_T_EN">MCH_HOST_BRIDGE_ESMRAMC_T_EN</dfn>           ((uint8_t)1)</u></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_DEFAULT" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_DEFAULT">MCH_HOST_BRIDGE_ESMRAMC_DEFAULT</dfn> \</u></td></tr>
+<tr><th id="173">173</th><td><u>    (MCH_HOST_BRIDGE_ESMRAMC_SM_CACHE | \</u></td></tr>
+<tr><th id="174">174</th><td><u>     MCH_HOST_BRIDGE_ESMRAMC_SM_L1 |    \</u></td></tr>
+<tr><th id="175">175</th><td><u>     MCH_HOST_BRIDGE_ESMRAMC_SM_L2)</u></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_WMASK" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_WMASK">MCH_HOST_BRIDGE_ESMRAMC_WMASK</dfn>               \</u></td></tr>
+<tr><th id="177">177</th><td><u>    (MCH_HOST_BRIDGE_ESMRAMC_H_SMRAME |             \</u></td></tr>
+<tr><th id="178">178</th><td><u>     MCH_HOST_BRIDGE_ESMRAMC_TSEG_SZ_MASK |         \</u></td></tr>
+<tr><th id="179">179</th><td><u>     MCH_HOST_BRIDGE_ESMRAMC_T_EN)</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/MCH_HOST_BRIDGE_ESMRAMC_WMASK_LCK" data-ref="_M/MCH_HOST_BRIDGE_ESMRAMC_WMASK_LCK">MCH_HOST_BRIDGE_ESMRAMC_WMASK_LCK</dfn>     0</u></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><i>/* D1:F0 PCIE* port*/</i></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/MCH_PCIE_DEV" data-ref="_M/MCH_PCIE_DEV">MCH_PCIE_DEV</dfn>                           1</u></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/MCH_PCIE_FUNC" data-ref="_M/MCH_PCIE_FUNC">MCH_PCIE_FUNC</dfn>                          0</u></td></tr>
+<tr><th id="185">185</th><td></td></tr>
+<tr><th id="186">186</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="mch_mcfg_base" title='mch_mcfg_base' data-ref="mch_mcfg_base">mch_mcfg_base</dfn>(<em>void</em>);</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><i>/*</i></td></tr>
+<tr><th id="189">189</th><td><i> * Arbitrary but unique BNF number for IOAPIC device.</i></td></tr>
+<tr><th id="190">190</th><td><i> *</i></td></tr>
+<tr><th id="191">191</th><td><i> * TODO: make sure there would have no conflict with real PCI bus</i></td></tr>
+<tr><th id="192">192</th><td><i> */</i></td></tr>
+<tr><th id="193">193</th><td><u>#define <dfn class="macro" id="_M/Q35_PSEUDO_BUS_PLATFORM" data-ref="_M/Q35_PSEUDO_BUS_PLATFORM">Q35_PSEUDO_BUS_PLATFORM</dfn>         (0xff)</u></td></tr>
+<tr><th id="194">194</th><td><u>#define <dfn class="macro" id="_M/Q35_PSEUDO_DEVFN_IOAPIC" data-ref="_M/Q35_PSEUDO_DEVFN_IOAPIC">Q35_PSEUDO_DEVFN_IOAPIC</dfn>         (0x00)</u></td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><u>#<span data-ppcond="22">endif</span> /* HW_Q35_H */</u></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/acpi-build.c.html'>codebrowser/hw/i386/acpi-build.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

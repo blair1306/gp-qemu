@@ -1,0 +1,334 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>tap-linux.c source code [codebrowser/net/tap-linux.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/net/tap-linux.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>net</a>/<a href='tap-linux.c.html'>tap-linux.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2009 Red Hat, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="8">8</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="9">9</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="10">10</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="11">11</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="12">12</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="15">15</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="18">18</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="19">19</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="21">21</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="22">22</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="23">23</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i> */</i></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="tap_int.h.html">"tap_int.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="tap-linux.h.html">"tap-linux.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/net/tap.h.html">"net/tap.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../include/net/if.h.html">&lt;net/if.h&gt;</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="36">36</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/qemu/cutils.h.html">"qemu/cutils.h"</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/PATH_NET_TUN" data-ref="_M/PATH_NET_TUN">PATH_NET_TUN</dfn> "/dev/net/tun"</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>int</em> <dfn class="decl def" id="tap_open" title='tap_open' data-ref="tap_open">tap_open</dfn>(<em>char</em> *<dfn class="local col3 decl" id="33ifname" title='ifname' data-type='char *' data-ref="33ifname">ifname</dfn>, <em>int</em> <dfn class="local col4 decl" id="34ifname_size" title='ifname_size' data-type='int' data-ref="34ifname_size">ifname_size</dfn>, <em>int</em> *<dfn class="local col5 decl" id="35vnet_hdr" title='vnet_hdr' data-type='int *' data-ref="35vnet_hdr">vnet_hdr</dfn>,</td></tr>
+<tr><th id="42">42</th><td>             <em>int</em> <dfn class="local col6 decl" id="36vnet_hdr_required" title='vnet_hdr_required' data-type='int' data-ref="36vnet_hdr_required">vnet_hdr_required</dfn>, <em>int</em> <dfn class="local col7 decl" id="37mq_required" title='mq_required' data-type='int' data-ref="37mq_required">mq_required</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="38errp" title='errp' data-type='Error **' data-ref="38errp">errp</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <b>struct</b> <a class="type" href="../../include/net/if.h.html#ifreq" title='ifreq' data-ref="ifreq">ifreq</a> <dfn class="local col9 decl" id="39ifr" title='ifr' data-type='struct ifreq' data-ref="39ifr">ifr</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <em>int</em> <dfn class="local col0 decl" id="40fd" title='fd' data-type='int' data-ref="40fd">fd</dfn>, <dfn class="local col1 decl" id="41ret" title='ret' data-type='int' data-ref="41ret">ret</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <em>int</em> <dfn class="local col2 decl" id="42len" title='len' data-type='int' data-ref="42len">len</dfn> = <b>sizeof</b>(<b>struct</b> <a class="type" href="../include/standard-headers/linux/virtio_net.h.html#virtio_net_hdr" title='virtio_net_hdr' data-ref="virtio_net_hdr">virtio_net_hdr</a>);</td></tr>
+<tr><th id="47">47</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col3 decl" id="43features" title='features' data-type='unsigned int' data-ref="43features">features</dfn>;</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td>    <a class="macro" href="../include/qemu-common.h.html#17" title="do { if ((fd = open(&quot;/dev/net/tun&quot;, 02)) != -1) break; } while ((*__errno_location ()) == 4)" data-ref="_M/TFR">TFR</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a> = <a class="ref" href="../../include/fcntl.h.html#159" title='open' data-ref="open64">open</a>(<a class="macro" href="#39" title="&quot;/dev/net/tun&quot;" data-ref="_M/PATH_NET_TUN">PATH_NET_TUN</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#45" title="02" data-ref="_M/O_RDWR">O_RDWR</a>));</td></tr>
+<tr><th id="50">50</th><td>    <b>if</b> (<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="51">51</th><td>        <a class="macro" href="../include/qapi/error.h.html#176" title="error_setg_errno_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 51, __func__, ((*__errno_location ())), (&quot;could not open %s&quot;), &quot;/dev/net/tun&quot;)" data-ref="_M/error_setg_errno">error_setg_errno</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>, <q>"could not open %s"</q>, PATH_NET_TUN);</td></tr>
+<tr><th id="52">52</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="53">53</th><td>    }</td></tr>
+<tr><th id="54">54</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>, <var>0</var>, <b>sizeof</b>(<a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>));</td></tr>
+<tr><th id="55">55</th><td>    <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> = <a class="macro" href="tap-linux.h.html#38" title="0x0002" data-ref="_M/IFF_TAP">IFF_TAP</a> | <a class="macro" href="tap-linux.h.html#39" title="0x1000" data-ref="_M/IFF_NO_PI">IFF_NO_PI</a>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>, <a class="macro" href="tap-linux.h.html#25" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((207)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNGETFEATURES">TUNGETFEATURES</a>, &amp;<a class="local col3 ref" href="#43features" title='features' data-ref="43features">features</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="58">58</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#warn_report" title='warn_report' data-ref="warn_report">warn_report</a>(<q>"TUNGETFEATURES failed: %s"</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="59">59</th><td>        <a class="local col3 ref" href="#43features" title='features' data-ref="43features">features</a> = <var>0</var>;</td></tr>
+<tr><th id="60">60</th><td>    }</td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td>    <b>if</b> (<a class="local col3 ref" href="#43features" title='features' data-ref="43features">features</a> &amp; <a class="macro" href="tap-linux.h.html#40" title="0x2000" data-ref="_M/IFF_ONE_QUEUE">IFF_ONE_QUEUE</a>) {</td></tr>
+<tr><th id="63">63</th><td>        <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> |= <a class="macro" href="tap-linux.h.html#40" title="0x2000" data-ref="_M/IFF_ONE_QUEUE">IFF_ONE_QUEUE</a>;</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <b>if</b> (*<a class="local col5 ref" href="#35vnet_hdr" title='vnet_hdr' data-ref="35vnet_hdr">vnet_hdr</a>) {</td></tr>
+<tr><th id="67">67</th><td>        <b>if</b> (<a class="local col3 ref" href="#43features" title='features' data-ref="43features">features</a> &amp; <a class="macro" href="tap-linux.h.html#41" title="0x4000" data-ref="_M/IFF_VNET_HDR">IFF_VNET_HDR</a>) {</td></tr>
+<tr><th id="68">68</th><td>            *<a class="local col5 ref" href="#35vnet_hdr" title='vnet_hdr' data-ref="35vnet_hdr">vnet_hdr</a> = <var>1</var>;</td></tr>
+<tr><th id="69">69</th><td>            <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> |= <a class="macro" href="tap-linux.h.html#41" title="0x4000" data-ref="_M/IFF_VNET_HDR">IFF_VNET_HDR</a>;</td></tr>
+<tr><th id="70">70</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="71">71</th><td>            *<a class="local col5 ref" href="#35vnet_hdr" title='vnet_hdr' data-ref="35vnet_hdr">vnet_hdr</a> = <var>0</var>;</td></tr>
+<tr><th id="72">72</th><td>        }</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>        <b>if</b> (<a class="local col6 ref" href="#36vnet_hdr_required" title='vnet_hdr_required' data-ref="36vnet_hdr_required">vnet_hdr_required</a> &amp;&amp; !*<a class="local col5 ref" href="#35vnet_hdr" title='vnet_hdr' data-ref="35vnet_hdr">vnet_hdr</a>) {</td></tr>
+<tr><th id="75">75</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 76, __func__, (&quot;vnet_hdr=1 requested, but no kernel &quot; &quot;support for IFF_VNET_HDR available&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <q>"vnet_hdr=1 requested, but no kernel "</q></td></tr>
+<tr><th id="76">76</th><td>                       <q>"support for IFF_VNET_HDR available"</q>);</td></tr>
+<tr><th id="77">77</th><td>            <a class="ref" href="../../include/unistd.h.html#close" title='close' data-ref="close">close</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>);</td></tr>
+<tr><th id="78">78</th><td>            <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="79">79</th><td>        }</td></tr>
+<tr><th id="80">80</th><td>        <i>/*</i></td></tr>
+<tr><th id="81">81</th><td><i>         * Make sure vnet header size has the default value: for a persistent</i></td></tr>
+<tr><th id="82">82</th><td><i>         * tap it might have been modified e.g. by another instance of qemu.</i></td></tr>
+<tr><th id="83">83</th><td><i>         * Ignore errors since old kernels do not support this ioctl: in this</i></td></tr>
+<tr><th id="84">84</th><td><i>         * case the header size implicitly has the correct value.</i></td></tr>
+<tr><th id="85">85</th><td><i>         */</i></td></tr>
+<tr><th id="86">86</th><td>        <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>, <a class="macro" href="tap-linux.h.html#30" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((216)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETHDRSZ">TUNSETVNETHDRSZ</a>, &amp;<a class="local col2 ref" href="#42len" title='len' data-ref="42len">len</a>);</td></tr>
+<tr><th id="87">87</th><td>    }</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>if</b> (<a class="local col7 ref" href="#37mq_required" title='mq_required' data-ref="37mq_required">mq_required</a>) {</td></tr>
+<tr><th id="90">90</th><td>        <b>if</b> (!(<a class="local col3 ref" href="#43features" title='features' data-ref="43features">features</a> &amp; <a class="macro" href="tap-linux.h.html#42" title="0x0100" data-ref="_M/IFF_MULTI_QUEUE">IFF_MULTI_QUEUE</a>)) {</td></tr>
+<tr><th id="91">91</th><td>            <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 92, __func__, (&quot;multiqueue required, but no kernel &quot; &quot;support for IFF_MULTI_QUEUE available&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <q>"multiqueue required, but no kernel "</q></td></tr>
+<tr><th id="92">92</th><td>                       <q>"support for IFF_MULTI_QUEUE available"</q>);</td></tr>
+<tr><th id="93">93</th><td>            <a class="ref" href="../../include/unistd.h.html#close" title='close' data-ref="close">close</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>);</td></tr>
+<tr><th id="94">94</th><td>            <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="95">95</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="96">96</th><td>            <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> |= <a class="macro" href="tap-linux.h.html#42" title="0x0100" data-ref="_M/IFF_MULTI_QUEUE">IFF_MULTI_QUEUE</a>;</td></tr>
+<tr><th id="97">97</th><td>        }</td></tr>
+<tr><th id="98">98</th><td>    }</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <b>if</b> (<a class="local col3 ref" href="#33ifname" title='ifname' data-ref="33ifname">ifname</a>[<var>0</var>] != <kbd>'\0'</kbd>)</td></tr>
+<tr><th id="101">101</th><td>        <a class="ref" href="../include/qemu/cutils.h.html#pstrcpy" title='pstrcpy' data-ref="pstrcpy">pstrcpy</a>(<a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#151" title="ifr_ifrn.ifrn_name" data-ref="_M/ifr_name">ifr_name</a>, <a class="macro" href="../../include/net/if.h.html#129" title="16" data-ref="_M/IFNAMSIZ">IFNAMSIZ</a>, <a class="local col3 ref" href="#33ifname" title='ifname' data-ref="33ifname">ifname</a>);</td></tr>
+<tr><th id="102">102</th><td>    <b>else</b></td></tr>
+<tr><th id="103">103</th><td>        <a class="ref" href="../include/qemu/cutils.h.html#pstrcpy" title='pstrcpy' data-ref="pstrcpy">pstrcpy</a>(<a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#151" title="ifr_ifrn.ifrn_name" data-ref="_M/ifr_name">ifr_name</a>, <a class="macro" href="../../include/net/if.h.html#129" title="16" data-ref="_M/IFNAMSIZ">IFNAMSIZ</a>, <q>"tap%d"</q>);</td></tr>
+<tr><th id="104">104</th><td>    <a class="local col1 ref" href="#41ret" title='ret' data-ref="41ret">ret</a> = <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>, <a class="macro" href="tap-linux.h.html#24" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((202)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETIFF">TUNSETIFF</a>, (<em>void</em> *) &amp;<a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>);</td></tr>
+<tr><th id="105">105</th><td>    <b>if</b> (<a class="local col1 ref" href="#41ret" title='ret' data-ref="41ret">ret</a> != <var>0</var>) {</td></tr>
+<tr><th id="106">106</th><td>        <b>if</b> (<a class="local col3 ref" href="#33ifname" title='ifname' data-ref="33ifname">ifname</a>[<var>0</var>] != <kbd>'\0'</kbd>) {</td></tr>
+<tr><th id="107">107</th><td>            <a class="macro" href="../include/qapi/error.h.html#176" title="error_setg_errno_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 108, __func__, ((*__errno_location ())), (&quot;could not configure %s (%s)&quot;), &quot;/dev/net/tun&quot;, ifr.ifr_ifrn.ifrn_name)" data-ref="_M/error_setg_errno">error_setg_errno</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>, <q>"could not configure %s (%s)"</q>,</td></tr>
+<tr><th id="108">108</th><td>                             PATH_NET_TUN, <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.ifr_name);</td></tr>
+<tr><th id="109">109</th><td>        } <b>else</b> {</td></tr>
+<tr><th id="110">110</th><td>            <a class="macro" href="../include/qapi/error.h.html#176" title="error_setg_errno_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 111, __func__, ((*__errno_location ())), (&quot;could not configure %s&quot;), &quot;/dev/net/tun&quot;)" data-ref="_M/error_setg_errno">error_setg_errno</a>(<a class="local col8 ref" href="#38errp" title='errp' data-ref="38errp">errp</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>, <q>"could not configure %s"</q>,</td></tr>
+<tr><th id="111">111</th><td>                             PATH_NET_TUN);</td></tr>
+<tr><th id="112">112</th><td>        }</td></tr>
+<tr><th id="113">113</th><td>        <a class="ref" href="../../include/unistd.h.html#close" title='close' data-ref="close">close</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>);</td></tr>
+<tr><th id="114">114</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td>    <a class="ref" href="../include/qemu/cutils.h.html#pstrcpy" title='pstrcpy' data-ref="pstrcpy">pstrcpy</a>(<a class="local col3 ref" href="#33ifname" title='ifname' data-ref="33ifname">ifname</a>, <a class="local col4 ref" href="#34ifname_size" title='ifname_size' data-ref="34ifname_size">ifname_size</a>, <a class="local col9 ref" href="#39ifr" title='ifr' data-ref="39ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#151" title="ifr_ifrn.ifrn_name" data-ref="_M/ifr_name">ifr_name</a>);</td></tr>
+<tr><th id="117">117</th><td>    <a class="ref" href="../../include/fcntl.h.html#fcntl" title='fcntl' data-ref="fcntl">fcntl</a>(<a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#171" title="4" data-ref="_M/F_SETFL">F_SETFL</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#62" title="04000" data-ref="_M/O_NONBLOCK">O_NONBLOCK</a>);</td></tr>
+<tr><th id="118">118</th><td>    <b>return</b> <a class="local col0 ref" href="#40fd" title='fd' data-ref="40fd">fd</a>;</td></tr>
+<tr><th id="119">119</th><td>}</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i>/* sndbuf implements a kind of flow control for tap.</i></td></tr>
+<tr><th id="122">122</th><td><i> * Unfortunately when it's enabled, and packets are sent</i></td></tr>
+<tr><th id="123">123</th><td><i> * to other guests on the same host, the receiver</i></td></tr>
+<tr><th id="124">124</th><td><i> * can lock up the transmitter indefinitely.</i></td></tr>
+<tr><th id="125">125</th><td><i> *</i></td></tr>
+<tr><th id="126">126</th><td><i> * To avoid packet loss, sndbuf should be set to a value lower than the tx</i></td></tr>
+<tr><th id="127">127</th><td><i> * queue capacity of any destination network interface.</i></td></tr>
+<tr><th id="128">128</th><td><i> * Ethernet NICs generally have txqueuelen=1000, so 1Mb is</i></td></tr>
+<tr><th id="129">129</th><td><i> * a good value, given a 1500 byte MTU.</i></td></tr>
+<tr><th id="130">130</th><td><i> */</i></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/TAP_DEFAULT_SNDBUF" data-ref="_M/TAP_DEFAULT_SNDBUF">TAP_DEFAULT_SNDBUF</dfn> 0</u></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><em>void</em> <dfn class="decl def" id="tap_set_sndbuf" title='tap_set_sndbuf' data-ref="tap_set_sndbuf">tap_set_sndbuf</dfn>(<em>int</em> <dfn class="local col4 decl" id="44fd" title='fd' data-type='int' data-ref="44fd">fd</dfn>, <em>const</em> <a class="typedef" href="../qapi-types.h.html#NetdevTapOptions" title='NetdevTapOptions' data-type='struct NetdevTapOptions' data-ref="NetdevTapOptions">NetdevTapOptions</a> *<dfn class="local col5 decl" id="45tap" title='tap' data-type='const NetdevTapOptions *' data-ref="45tap">tap</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="46errp" title='errp' data-type='Error **' data-ref="46errp">errp</dfn>)</td></tr>
+<tr><th id="134">134</th><td>{</td></tr>
+<tr><th id="135">135</th><td>    <em>int</em> <dfn class="local col7 decl" id="47sndbuf" title='sndbuf' data-type='int' data-ref="47sndbuf">sndbuf</dfn>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <a class="local col7 ref" href="#47sndbuf" title='sndbuf' data-ref="47sndbuf">sndbuf</a> = !<a class="local col5 ref" href="#45tap" title='tap' data-ref="45tap">tap</a>-&gt;<a class="ref" href="../qapi-types.h.html#NetdevTapOptions::has_sndbuf" title='NetdevTapOptions::has_sndbuf' data-ref="NetdevTapOptions::has_sndbuf">has_sndbuf</a>       ? <a class="macro" href="#131" title="0" data-ref="_M/TAP_DEFAULT_SNDBUF">TAP_DEFAULT_SNDBUF</a> :</td></tr>
+<tr><th id="138">138</th><td>             <a class="local col5 ref" href="#45tap" title='tap' data-ref="45tap">tap</a>-&gt;<a class="ref" href="../qapi-types.h.html#NetdevTapOptions::sndbuf" title='NetdevTapOptions::sndbuf' data-ref="NetdevTapOptions::sndbuf">sndbuf</a> &gt; <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span>  ? <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span> :</td></tr>
+<tr><th id="139">139</th><td>             <a class="local col5 ref" href="#45tap" title='tap' data-ref="45tap">tap</a>-&gt;<a class="ref" href="../qapi-types.h.html#NetdevTapOptions::sndbuf" title='NetdevTapOptions::sndbuf' data-ref="NetdevTapOptions::sndbuf">sndbuf</a>;</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td>    <b>if</b> (!<a class="local col7 ref" href="#47sndbuf" title='sndbuf' data-ref="47sndbuf">sndbuf</a>) {</td></tr>
+<tr><th id="142">142</th><td>        <a class="local col7 ref" href="#47sndbuf" title='sndbuf' data-ref="47sndbuf">sndbuf</a> = <span class="macro" title="2147483647" data-ref="_M/INT_MAX">INT_MAX</span>;</td></tr>
+<tr><th id="143">143</th><td>    }</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col4 ref" href="#44fd" title='fd' data-ref="44fd">fd</a>, <a class="macro" href="tap-linux.h.html#28" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((212)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETSNDBUF">TUNSETSNDBUF</a>, &amp;<a class="local col7 ref" href="#47sndbuf" title='sndbuf' data-ref="47sndbuf">sndbuf</a>) == -<var>1</var> &amp;&amp; <a class="local col5 ref" href="#45tap" title='tap' data-ref="45tap">tap</a>-&gt;<a class="ref" href="../qapi-types.h.html#NetdevTapOptions::has_sndbuf" title='NetdevTapOptions::has_sndbuf' data-ref="NetdevTapOptions::has_sndbuf">has_sndbuf</a>) {</td></tr>
+<tr><th id="146">146</th><td>        <a class="macro" href="../include/qapi/error.h.html#176" title="error_setg_errno_internal((errp), &quot;/home/jon/workspace/qemu/net/tap-linux.c&quot;, 146, __func__, ((*__errno_location ())), (&quot;TUNSETSNDBUF ioctl failed&quot;))" data-ref="_M/error_setg_errno">error_setg_errno</a>(<a class="local col6 ref" href="#46errp" title='errp' data-ref="46errp">errp</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>, <q>"TUNSETSNDBUF ioctl failed"</q>);</td></tr>
+<tr><th id="147">147</th><td>    }</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><em>int</em> <dfn class="decl def" id="tap_probe_vnet_hdr" title='tap_probe_vnet_hdr' data-ref="tap_probe_vnet_hdr">tap_probe_vnet_hdr</dfn>(<em>int</em> <dfn class="local col8 decl" id="48fd" title='fd' data-type='int' data-ref="48fd">fd</dfn>)</td></tr>
+<tr><th id="151">151</th><td>{</td></tr>
+<tr><th id="152">152</th><td>    <b>struct</b> <a class="type" href="../../include/net/if.h.html#ifreq" title='ifreq' data-ref="ifreq">ifreq</a> <dfn class="local col9 decl" id="49ifr" title='ifr' data-type='struct ifreq' data-ref="49ifr">ifr</dfn>;</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col8 ref" href="#48fd" title='fd' data-ref="48fd">fd</a>, <a class="macro" href="tap-linux.h.html#27" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((210)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNGETIFF">TUNGETIFF</a>, &amp;<a class="local col9 ref" href="#49ifr" title='ifr' data-ref="49ifr">ifr</a>) != <var>0</var>) {</td></tr>
+<tr><th id="155">155</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"TUNGETIFF ioctl() failed: %s"</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="156">156</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="157">157</th><td>    }</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>    <b>return</b> <a class="local col9 ref" href="#49ifr" title='ifr' data-ref="49ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> &amp; <a class="macro" href="tap-linux.h.html#41" title="0x4000" data-ref="_M/IFF_VNET_HDR">IFF_VNET_HDR</a>;</td></tr>
+<tr><th id="160">160</th><td>}</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><em>int</em> <dfn class="decl def" id="tap_probe_has_ufo" title='tap_probe_has_ufo' data-ref="tap_probe_has_ufo">tap_probe_has_ufo</dfn>(<em>int</em> <dfn class="local col0 decl" id="50fd" title='fd' data-type='int' data-ref="50fd">fd</dfn>)</td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>    <em>unsigned</em> <dfn class="local col1 decl" id="51offload" title='offload' data-type='unsigned int' data-ref="51offload">offload</dfn>;</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>    <a class="local col1 ref" href="#51offload" title='offload' data-ref="51offload">offload</a> = <a class="macro" href="tap-linux.h.html#47" title="0x01" data-ref="_M/TUN_F_CSUM">TUN_F_CSUM</a> | <a class="macro" href="tap-linux.h.html#51" title="0x10" data-ref="_M/TUN_F_UFO">TUN_F_UFO</a>;</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#50fd" title='fd' data-ref="50fd">fd</a>, <a class="macro" href="tap-linux.h.html#26" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((208)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETOFFLOAD">TUNSETOFFLOAD</a>, <a class="local col1 ref" href="#51offload" title='offload' data-ref="51offload">offload</a>) &lt; <var>0</var>)</td></tr>
+<tr><th id="169">169</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="172">172</th><td>}</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><i>/* Verify that we can assign given length */</i></td></tr>
+<tr><th id="175">175</th><td><em>int</em> <dfn class="decl def" id="tap_probe_vnet_hdr_len" title='tap_probe_vnet_hdr_len' data-ref="tap_probe_vnet_hdr_len">tap_probe_vnet_hdr_len</dfn>(<em>int</em> <dfn class="local col2 decl" id="52fd" title='fd' data-type='int' data-ref="52fd">fd</dfn>, <em>int</em> <dfn class="local col3 decl" id="53len" title='len' data-type='int' data-ref="53len">len</dfn>)</td></tr>
+<tr><th id="176">176</th><td>{</td></tr>
+<tr><th id="177">177</th><td>    <em>int</em> <dfn class="local col4 decl" id="54orig" title='orig' data-type='int' data-ref="54orig">orig</dfn>;</td></tr>
+<tr><th id="178">178</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col2 ref" href="#52fd" title='fd' data-ref="52fd">fd</a>, <a class="macro" href="tap-linux.h.html#29" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((215)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNGETVNETHDRSZ">TUNGETVNETHDRSZ</a>, &amp;<a class="local col4 ref" href="#54orig" title='orig' data-ref="54orig">orig</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="179">179</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="180">180</th><td>    }</td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col2 ref" href="#52fd" title='fd' data-ref="52fd">fd</a>, <a class="macro" href="tap-linux.h.html#30" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((216)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETHDRSZ">TUNSETVNETHDRSZ</a>, &amp;<a class="local col3 ref" href="#53len" title='len' data-ref="53len">len</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="182">182</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="183">183</th><td>    }</td></tr>
+<tr><th id="184">184</th><td>    <i>/* Restore original length: we can't handle failure. */</i></td></tr>
+<tr><th id="185">185</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col2 ref" href="#52fd" title='fd' data-ref="52fd">fd</a>, <a class="macro" href="tap-linux.h.html#30" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((216)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETHDRSZ">TUNSETVNETHDRSZ</a>, &amp;<a class="local col4 ref" href="#54orig" title='orig' data-ref="54orig">orig</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="186">186</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"TUNGETVNETHDRSZ ioctl() failed: %s. Exiting.\n"</q>,</td></tr>
+<tr><th id="187">187</th><td>                <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="188">188</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="189">189</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="190">190</th><td>    }</td></tr>
+<tr><th id="191">191</th><td>    <b>return</b> <var>1</var>;</td></tr>
+<tr><th id="192">192</th><td>}</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><em>void</em> <dfn class="decl def" id="tap_fd_set_vnet_hdr_len" title='tap_fd_set_vnet_hdr_len' data-ref="tap_fd_set_vnet_hdr_len">tap_fd_set_vnet_hdr_len</dfn>(<em>int</em> <dfn class="local col5 decl" id="55fd" title='fd' data-type='int' data-ref="55fd">fd</dfn>, <em>int</em> <dfn class="local col6 decl" id="56len" title='len' data-type='int' data-ref="56len">len</dfn>)</td></tr>
+<tr><th id="195">195</th><td>{</td></tr>
+<tr><th id="196">196</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col5 ref" href="#55fd" title='fd' data-ref="55fd">fd</a>, <a class="macro" href="tap-linux.h.html#30" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((216)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETHDRSZ">TUNSETVNETHDRSZ</a>, &amp;<a class="local col6 ref" href="#56len" title='len' data-ref="56len">len</a>) == -<var>1</var>) {</td></tr>
+<tr><th id="197">197</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"TUNSETVNETHDRSZ ioctl() failed: %s. Exiting.\n"</q>,</td></tr>
+<tr><th id="198">198</th><td>                <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="199">199</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="200">200</th><td>    }</td></tr>
+<tr><th id="201">201</th><td>}</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><em>int</em> <dfn class="decl def" id="tap_fd_set_vnet_le" title='tap_fd_set_vnet_le' data-ref="tap_fd_set_vnet_le">tap_fd_set_vnet_le</dfn>(<em>int</em> <dfn class="local col7 decl" id="57fd" title='fd' data-type='int' data-ref="57fd">fd</dfn>, <em>int</em> <dfn class="local col8 decl" id="58is_le" title='is_le' data-type='int' data-ref="58is_le">is_le</dfn>)</td></tr>
+<tr><th id="204">204</th><td>{</td></tr>
+<tr><th id="205">205</th><td>    <em>int</em> <dfn class="local col9 decl" id="59arg" title='arg' data-type='int' data-ref="59arg">arg</dfn> = <a class="local col8 ref" href="#58is_le" title='is_le' data-ref="58is_le">is_le</a> ? <var>1</var> : <var>0</var>;</td></tr>
+<tr><th id="206">206</th><td></td></tr>
+<tr><th id="207">207</th><td>    <b>if</b> (!<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col7 ref" href="#57fd" title='fd' data-ref="57fd">fd</a>, <a class="macro" href="tap-linux.h.html#32" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((220)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETLE">TUNSETVNETLE</a>, &amp;<a class="local col9 ref" href="#59arg" title='arg' data-ref="59arg">arg</a>)) {</td></tr>
+<tr><th id="208">208</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="209">209</th><td>    }</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td>    <i>/* Check if our kernel supports TUNSETVNETLE */</i></td></tr>
+<tr><th id="212">212</th><td>    <b>if</b> (<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>) {</td></tr>
+<tr><th id="213">213</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="214">214</th><td>    }</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"TUNSETVNETLE ioctl() failed: %s."</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="217">217</th><td>    <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="218">218</th><td>}</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><em>int</em> <dfn class="decl def" id="tap_fd_set_vnet_be" title='tap_fd_set_vnet_be' data-ref="tap_fd_set_vnet_be">tap_fd_set_vnet_be</dfn>(<em>int</em> <dfn class="local col0 decl" id="60fd" title='fd' data-type='int' data-ref="60fd">fd</dfn>, <em>int</em> <dfn class="local col1 decl" id="61is_be" title='is_be' data-type='int' data-ref="61is_be">is_be</dfn>)</td></tr>
+<tr><th id="221">221</th><td>{</td></tr>
+<tr><th id="222">222</th><td>    <em>int</em> <dfn class="local col2 decl" id="62arg" title='arg' data-type='int' data-ref="62arg">arg</dfn> = <a class="local col1 ref" href="#61is_be" title='is_be' data-ref="61is_be">is_be</a> ? <var>1</var> : <var>0</var>;</td></tr>
+<tr><th id="223">223</th><td></td></tr>
+<tr><th id="224">224</th><td>    <b>if</b> (!<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#60fd" title='fd' data-ref="60fd">fd</a>, <a class="macro" href="tap-linux.h.html#33" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((222)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETVNETBE">TUNSETVNETBE</a>, &amp;<a class="local col2 ref" href="#62arg" title='arg' data-ref="62arg">arg</a>)) {</td></tr>
+<tr><th id="225">225</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="226">226</th><td>    }</td></tr>
+<tr><th id="227">227</th><td></td></tr>
+<tr><th id="228">228</th><td>    <i>/* Check if our kernel supports TUNSETVNETBE */</i></td></tr>
+<tr><th id="229">229</th><td>    <b>if</b> (<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>) {</td></tr>
+<tr><th id="230">230</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="231">231</th><td>    }</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"TUNSETVNETBE ioctl() failed: %s."</q>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="234">234</th><td>    <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="235">235</th><td>}</td></tr>
+<tr><th id="236">236</th><td></td></tr>
+<tr><th id="237">237</th><td><em>void</em> <dfn class="decl def" id="tap_fd_set_offload" title='tap_fd_set_offload' data-ref="tap_fd_set_offload">tap_fd_set_offload</dfn>(<em>int</em> <dfn class="local col3 decl" id="63fd" title='fd' data-type='int' data-ref="63fd">fd</dfn>, <em>int</em> <dfn class="local col4 decl" id="64csum" title='csum' data-type='int' data-ref="64csum">csum</dfn>, <em>int</em> <dfn class="local col5 decl" id="65tso4" title='tso4' data-type='int' data-ref="65tso4">tso4</dfn>,</td></tr>
+<tr><th id="238">238</th><td>                        <em>int</em> <dfn class="local col6 decl" id="66tso6" title='tso6' data-type='int' data-ref="66tso6">tso6</dfn>, <em>int</em> <dfn class="local col7 decl" id="67ecn" title='ecn' data-type='int' data-ref="67ecn">ecn</dfn>, <em>int</em> <dfn class="local col8 decl" id="68ufo" title='ufo' data-type='int' data-ref="68ufo">ufo</dfn>)</td></tr>
+<tr><th id="239">239</th><td>{</td></tr>
+<tr><th id="240">240</th><td>    <em>unsigned</em> <em>int</em> <dfn class="local col9 decl" id="69offload" title='offload' data-type='unsigned int' data-ref="69offload">offload</dfn> = <var>0</var>;</td></tr>
+<tr><th id="241">241</th><td></td></tr>
+<tr><th id="242">242</th><td>    <i>/* Check if our kernel supports TUNSETOFFLOAD */</i></td></tr>
+<tr><th id="243">243</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col3 ref" href="#63fd" title='fd' data-ref="63fd">fd</a>, <a class="macro" href="tap-linux.h.html#26" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((208)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETOFFLOAD">TUNSETOFFLOAD</a>, <var>0</var>) != <var>0</var> &amp;&amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> == <a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>) {</td></tr>
+<tr><th id="244">244</th><td>        <b>return</b>;</td></tr>
+<tr><th id="245">245</th><td>    }</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td>    <b>if</b> (<a class="local col4 ref" href="#64csum" title='csum' data-ref="64csum">csum</a>) {</td></tr>
+<tr><th id="248">248</th><td>        <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> |= <a class="macro" href="tap-linux.h.html#47" title="0x01" data-ref="_M/TUN_F_CSUM">TUN_F_CSUM</a>;</td></tr>
+<tr><th id="249">249</th><td>        <b>if</b> (<a class="local col5 ref" href="#65tso4" title='tso4' data-ref="65tso4">tso4</a>)</td></tr>
+<tr><th id="250">250</th><td>            <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> |= <a class="macro" href="tap-linux.h.html#48" title="0x02" data-ref="_M/TUN_F_TSO4">TUN_F_TSO4</a>;</td></tr>
+<tr><th id="251">251</th><td>        <b>if</b> (<a class="local col6 ref" href="#66tso6" title='tso6' data-ref="66tso6">tso6</a>)</td></tr>
+<tr><th id="252">252</th><td>            <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> |= <a class="macro" href="tap-linux.h.html#49" title="0x04" data-ref="_M/TUN_F_TSO6">TUN_F_TSO6</a>;</td></tr>
+<tr><th id="253">253</th><td>        <b>if</b> ((<a class="local col5 ref" href="#65tso4" title='tso4' data-ref="65tso4">tso4</a> || <a class="local col6 ref" href="#66tso6" title='tso6' data-ref="66tso6">tso6</a>) &amp;&amp; <a class="local col7 ref" href="#67ecn" title='ecn' data-ref="67ecn">ecn</a>)</td></tr>
+<tr><th id="254">254</th><td>            <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> |= <a class="macro" href="tap-linux.h.html#50" title="0x08" data-ref="_M/TUN_F_TSO_ECN">TUN_F_TSO_ECN</a>;</td></tr>
+<tr><th id="255">255</th><td>        <b>if</b> (<a class="local col8 ref" href="#68ufo" title='ufo' data-ref="68ufo">ufo</a>)</td></tr>
+<tr><th id="256">256</th><td>            <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> |= <a class="macro" href="tap-linux.h.html#51" title="0x10" data-ref="_M/TUN_F_UFO">TUN_F_UFO</a>;</td></tr>
+<tr><th id="257">257</th><td>    }</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col3 ref" href="#63fd" title='fd' data-ref="63fd">fd</a>, <a class="macro" href="tap-linux.h.html#26" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((208)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETOFFLOAD">TUNSETOFFLOAD</a>, <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a>) != <var>0</var>) {</td></tr>
+<tr><th id="260">260</th><td>        <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a> &amp;= ~<a class="macro" href="tap-linux.h.html#51" title="0x10" data-ref="_M/TUN_F_UFO">TUN_F_UFO</a>;</td></tr>
+<tr><th id="261">261</th><td>        <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col3 ref" href="#63fd" title='fd' data-ref="63fd">fd</a>, <a class="macro" href="tap-linux.h.html#26" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((208)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETOFFLOAD">TUNSETOFFLOAD</a>, <a class="local col9 ref" href="#69offload" title='offload' data-ref="69offload">offload</a>) != <var>0</var>) {</td></tr>
+<tr><th id="262">262</th><td>            <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"TUNSETOFFLOAD ioctl() failed: %s\n"</q>,</td></tr>
+<tr><th id="263">263</th><td>                    <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="264">264</th><td>        }</td></tr>
+<tr><th id="265">265</th><td>    }</td></tr>
+<tr><th id="266">266</th><td>}</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td><i>/* Enable a specific queue of tap. */</i></td></tr>
+<tr><th id="269">269</th><td><em>int</em> <dfn class="decl def" id="tap_fd_enable" title='tap_fd_enable' data-ref="tap_fd_enable">tap_fd_enable</dfn>(<em>int</em> <dfn class="local col0 decl" id="70fd" title='fd' data-type='int' data-ref="70fd">fd</dfn>)</td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>    <b>struct</b> <a class="type" href="../../include/net/if.h.html#ifreq" title='ifreq' data-ref="ifreq">ifreq</a> <dfn class="local col1 decl" id="71ifr" title='ifr' data-type='struct ifreq' data-ref="71ifr">ifr</dfn>;</td></tr>
+<tr><th id="272">272</th><td>    <em>int</em> <dfn class="local col2 decl" id="72ret" title='ret' data-type='int' data-ref="72ret">ret</dfn>;</td></tr>
+<tr><th id="273">273</th><td></td></tr>
+<tr><th id="274">274</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col1 ref" href="#71ifr" title='ifr' data-ref="71ifr">ifr</a>, <var>0</var>, <b>sizeof</b>(<a class="local col1 ref" href="#71ifr" title='ifr' data-ref="71ifr">ifr</a>));</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>    <a class="local col1 ref" href="#71ifr" title='ifr' data-ref="71ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> = <a class="macro" href="tap-linux.h.html#43" title="0x0200" data-ref="_M/IFF_ATTACH_QUEUE">IFF_ATTACH_QUEUE</a>;</td></tr>
+<tr><th id="277">277</th><td>    <a class="local col2 ref" href="#72ret" title='ret' data-ref="72ret">ret</a> = <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col0 ref" href="#70fd" title='fd' data-ref="70fd">fd</a>, <a class="macro" href="tap-linux.h.html#31" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((217)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETQUEUE">TUNSETQUEUE</a>, (<em>void</em> *) &amp;<a class="local col1 ref" href="#71ifr" title='ifr' data-ref="71ifr">ifr</a>);</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>    <b>if</b> (<a class="local col2 ref" href="#72ret" title='ret' data-ref="72ret">ret</a> != <var>0</var>) {</td></tr>
+<tr><th id="280">280</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"could not enable queue"</q>);</td></tr>
+<tr><th id="281">281</th><td>    }</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>    <b>return</b> <a class="local col2 ref" href="#72ret" title='ret' data-ref="72ret">ret</a>;</td></tr>
+<tr><th id="284">284</th><td>}</td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td><i>/* Disable a specific queue of tap/ */</i></td></tr>
+<tr><th id="287">287</th><td><em>int</em> <dfn class="decl def" id="tap_fd_disable" title='tap_fd_disable' data-ref="tap_fd_disable">tap_fd_disable</dfn>(<em>int</em> <dfn class="local col3 decl" id="73fd" title='fd' data-type='int' data-ref="73fd">fd</dfn>)</td></tr>
+<tr><th id="288">288</th><td>{</td></tr>
+<tr><th id="289">289</th><td>    <b>struct</b> <a class="type" href="../../include/net/if.h.html#ifreq" title='ifreq' data-ref="ifreq">ifreq</a> <dfn class="local col4 decl" id="74ifr" title='ifr' data-type='struct ifreq' data-ref="74ifr">ifr</dfn>;</td></tr>
+<tr><th id="290">290</th><td>    <em>int</em> <dfn class="local col5 decl" id="75ret" title='ret' data-type='int' data-ref="75ret">ret</dfn>;</td></tr>
+<tr><th id="291">291</th><td></td></tr>
+<tr><th id="292">292</th><td>    <a class="ref" href="../../include/string.h.html#memset" title='memset' data-ref="memset">memset</a>(&amp;<a class="local col4 ref" href="#74ifr" title='ifr' data-ref="74ifr">ifr</a>, <var>0</var>, <b>sizeof</b>(<a class="local col4 ref" href="#74ifr" title='ifr' data-ref="74ifr">ifr</a>));</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td>    <a class="local col4 ref" href="#74ifr" title='ifr' data-ref="74ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#157" title="ifr_ifru.ifru_flags" data-ref="_M/ifr_flags">ifr_flags</a> = <a class="macro" href="tap-linux.h.html#44" title="0x0400" data-ref="_M/IFF_DETACH_QUEUE">IFF_DETACH_QUEUE</a>;</td></tr>
+<tr><th id="295">295</th><td>    <a class="local col5 ref" href="#75ret" title='ret' data-ref="75ret">ret</a> = <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col3 ref" href="#73fd" title='fd' data-ref="73fd">fd</a>, <a class="macro" href="tap-linux.h.html#31" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((217)) &lt;&lt; 0) | ((((sizeof(int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNSETQUEUE">TUNSETQUEUE</a>, (<em>void</em> *) &amp;<a class="local col4 ref" href="#74ifr" title='ifr' data-ref="74ifr">ifr</a>);</td></tr>
+<tr><th id="296">296</th><td></td></tr>
+<tr><th id="297">297</th><td>    <b>if</b> (<a class="local col5 ref" href="#75ret" title='ret' data-ref="75ret">ret</a> != <var>0</var>) {</td></tr>
+<tr><th id="298">298</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"could not disable queue"</q>);</td></tr>
+<tr><th id="299">299</th><td>    }</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td>    <b>return</b> <a class="local col5 ref" href="#75ret" title='ret' data-ref="75ret">ret</a>;</td></tr>
+<tr><th id="302">302</th><td>}</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td><em>int</em> <dfn class="decl def" id="tap_fd_get_ifname" title='tap_fd_get_ifname' data-ref="tap_fd_get_ifname">tap_fd_get_ifname</dfn>(<em>int</em> <dfn class="local col6 decl" id="76fd" title='fd' data-type='int' data-ref="76fd">fd</dfn>, <em>char</em> *<dfn class="local col7 decl" id="77ifname" title='ifname' data-type='char *' data-ref="77ifname">ifname</dfn>)</td></tr>
+<tr><th id="305">305</th><td>{</td></tr>
+<tr><th id="306">306</th><td>    <b>struct</b> <a class="type" href="../../include/net/if.h.html#ifreq" title='ifreq' data-ref="ifreq">ifreq</a> <dfn class="local col8 decl" id="78ifr" title='ifr' data-type='struct ifreq' data-ref="78ifr">ifr</dfn>;</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td>    <b>if</b> (<a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col6 ref" href="#76fd" title='fd' data-ref="76fd">fd</a>, <a class="macro" href="tap-linux.h.html#27" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((&apos;T&apos;)) &lt;&lt; (0+8)) | (((210)) &lt;&lt; 0) | ((((sizeof(unsigned int)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/TUNGETIFF">TUNGETIFF</a>, &amp;<a class="local col8 ref" href="#78ifr" title='ifr' data-ref="78ifr">ifr</a>) != <var>0</var>) {</td></tr>
+<tr><th id="309">309</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"TUNGETIFF ioctl() failed: %s"</q>,</td></tr>
+<tr><th id="310">310</th><td>                     <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="311">311</th><td>        <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="312">312</th><td>    }</td></tr>
+<tr><th id="313">313</th><td></td></tr>
+<tr><th id="314">314</th><td>    <a class="ref" href="../include/qemu/cutils.h.html#pstrcpy" title='pstrcpy' data-ref="pstrcpy">pstrcpy</a>(<a class="local col7 ref" href="#77ifname" title='ifname' data-ref="77ifname">ifname</a>, <b>sizeof</b>(<a class="local col8 ref" href="#78ifr" title='ifr' data-ref="78ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#151" title="ifr_ifrn.ifrn_name" data-ref="_M/ifr_name">ifr_name</a>), <a class="local col8 ref" href="#78ifr" title='ifr' data-ref="78ifr">ifr</a>.<a class="macro" href="../../include/net/if.h.html#151" title="ifr_ifrn.ifrn_name" data-ref="_M/ifr_name">ifr_name</a>);</td></tr>
+<tr><th id="315">315</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="316">316</th><td>}</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

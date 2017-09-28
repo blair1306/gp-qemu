@@ -1,0 +1,33 @@
+<def f='codebrowser/ui/vnc-enc-zywrle.h' l='412' ll='441' type='void filter_wavelet_square(int * buf, int width, int height, int level, int l)'/>
+<use f='codebrowser/ui/vnc-enc-zywrle.h' l='465' u='c' c='wavelet'/>
+<doc f='codebrowser/ui/vnc-enc-zywrle.h' l='381'>/*
+ Type B:Non liner quantization filter.
+
+ Coefficients have Gaussian curve and smaller value which is
+ large part of coefficients isn&apos;t more important than larger value.
+ So, I use filter of Non liner quantize/dequantize table.
+ In general, Non liner quantize formula is explained as following.
+
+    y=f(x)   = sign(x)*round( ((abs(x)/(2^7))^ r   )* 2^(bo-1) )*2^(8-bo)
+    x=f-1(y) = sign(y)*round( ((abs(y)/(2^7))^(1/r))* 2^(bi-1) )*2^(8-bi)
+ ( r:power coefficient  bi:effective MSB in input  bo:effective MSB in output )
+
+   r &lt; 1.0 : Smaller value is more important than larger value.
+   r &gt; 1.0 : Larger value is more important than smaller value.
+   r = 1.0 : Liner quantization which is same with EZW style.
+
+ r = 0.75 is famous non liner quantization used in MP3 audio codec.
+ In contrast to audio data, larger value is important in wavelet coefficients.
+ So, I select r = 2.0 table( quantize is x^2, dequantize sqrt(x) ).
+
+ As compared with EZW style liner quantization, this filter tended to be
+ more sharp edge and be more compression rate but be more blocking noise and be
+ less quality. Especially, the surface of graphic objects has distinguishable
+ noise in middle quality mode.
+
+ We need only quantized-dequantized(filtered) value rather than quantized value
+ itself because all values are packed or palette-lized in later ZRLE section.
+ This lead us not to need to modify client decoder when we change
+ the filtering procedure in future.
+ Client only decodes coefficients given by encoder.
+*/</doc>

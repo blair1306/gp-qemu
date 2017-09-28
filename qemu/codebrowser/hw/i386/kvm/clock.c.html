@@ -1,0 +1,337 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>clock.c source code [codebrowser/hw/i386/kvm/clock.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="KVMClockState,pvclock_vcpu_time_info "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/i386/kvm/clock.c'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>hw</a>/<a href='..'>i386</a>/<a href='./'>kvm</a>/<a href='clock.c.html'>clock.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU KVM support, paravirtual clock device</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2011 Siemens AG</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Jan Kiszka        &lt;jan.kiszka@siemens.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL version 2.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * Contributions after 2012-01-13 are licensed under the terms of the</i></td></tr>
+<tr><th id="13">13</th><td><i> * GNU GPL, version 2 or (at your option) any later version.</i></td></tr>
+<tr><th id="14">14</th><td><i> */</i></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../../../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../../../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../../../target/i386/cpu.h.html">"cpu.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../../../include/qemu/host-utils.h.html">"qemu/host-utils.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../../../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../../../include/sysemu/kvm.h.html">"sysemu/kvm.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../../../include/sysemu/hw_accel.h.html">"sysemu/hw_accel.h"</a></u></td></tr>
+<tr><th id="23">23</th><td><u>#include <a href="../../../target/i386/kvm_i386.h.html">"kvm_i386.h"</a></u></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../../include/hw/sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../../include/hw/kvm/clock.h.html">"hw/kvm/clock.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../../linux-headers/linux/kvm.h.html">&lt;linux/kvm.h&gt;</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../../linux-headers/linux/kvm_para.h.html">&lt;linux/kvm_para.h&gt;</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/TYPE_KVM_CLOCK" data-ref="_M/TYPE_KVM_CLOCK">TYPE_KVM_CLOCK</dfn> "kvmclock"</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/KVM_CLOCK" data-ref="_M/KVM_CLOCK">KVM_CLOCK</dfn>(obj) OBJECT_CHECK(<a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a>, (obj), TYPE_KVM_CLOCK)</u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="KVMClockState" title='KVMClockState' data-ref="KVMClockState"><a class="type" href="#KVMClockState" title='KVMClockState' data-ref="KVMClockState">KVMClockState</a></dfn> {</td></tr>
+<tr><th id="35">35</th><td>    <i  data-doc="KVMClockState::busdev">/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="36">36</th><td>    <a class="typedef" href="../../../include/hw/sysbus.h.html#SysBusDevice" title='SysBusDevice' data-type='struct SysBusDevice' data-ref="SysBusDevice">SysBusDevice</a> <dfn class="tu decl" id="KVMClockState::busdev" title='KVMClockState::busdev' data-type='SysBusDevice' data-ref="KVMClockState::busdev">busdev</dfn>;</td></tr>
+<tr><th id="37">37</th><td>    <i  data-doc="KVMClockState::clock">/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="tu decl" id="KVMClockState::clock" title='KVMClockState::clock' data-type='uint64_t' data-ref="KVMClockState::clock">clock</dfn>;</td></tr>
+<tr><th id="40">40</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="KVMClockState::clock_valid" title='KVMClockState::clock_valid' data-type='_Bool' data-ref="KVMClockState::clock_valid">clock_valid</dfn>;</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td>    <i>/* whether machine type supports reliable KVM_GET_CLOCK */</i></td></tr>
+<tr><th id="43">43</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="KVMClockState::mach_use_reliable_get_clock" title='KVMClockState::mach_use_reliable_get_clock' data-type='_Bool' data-ref="KVMClockState::mach_use_reliable_get_clock">mach_use_reliable_get_clock</dfn>;</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <i>/* whether the 'clock' value was obtained in a host with</i></td></tr>
+<tr><th id="46">46</th><td><i>     * reliable KVM_GET_CLOCK */</i></td></tr>
+<tr><th id="47">47</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="KVMClockState::clock_is_reliable" title='KVMClockState::clock_is_reliable' data-type='_Bool' data-ref="KVMClockState::clock_is_reliable">clock_is_reliable</dfn>;</td></tr>
+<tr><th id="48">48</th><td>} <dfn class="typedef" id="KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</dfn>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><b>struct</b> <dfn class="type def" id="pvclock_vcpu_time_info" title='pvclock_vcpu_time_info' data-ref="pvclock_vcpu_time_info">pvclock_vcpu_time_info</dfn> {</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>   <dfn class="tu decl" id="pvclock_vcpu_time_info::version" title='pvclock_vcpu_time_info::version' data-type='uint32_t' data-ref="pvclock_vcpu_time_info::version">version</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>   <dfn class="tu decl" id="pvclock_vcpu_time_info::pad0" title='pvclock_vcpu_time_info::pad0' data-type='uint32_t' data-ref="pvclock_vcpu_time_info::pad0">pad0</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>   <dfn class="tu decl" id="pvclock_vcpu_time_info::tsc_timestamp" title='pvclock_vcpu_time_info::tsc_timestamp' data-type='uint64_t' data-ref="pvclock_vcpu_time_info::tsc_timestamp">tsc_timestamp</dfn>;</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>   <dfn class="tu decl" id="pvclock_vcpu_time_info::system_time" title='pvclock_vcpu_time_info::system_time' data-type='uint64_t' data-ref="pvclock_vcpu_time_info::system_time">system_time</dfn>;</td></tr>
+<tr><th id="55">55</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>   <dfn class="tu decl" id="pvclock_vcpu_time_info::tsc_to_system_mul" title='pvclock_vcpu_time_info::tsc_to_system_mul' data-type='uint32_t' data-ref="pvclock_vcpu_time_info::tsc_to_system_mul">tsc_to_system_mul</dfn>;</td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int8_t" title='int8_t' data-type='signed char' data-ref="int8_t">int8_t</a>     <dfn class="tu decl" id="pvclock_vcpu_time_info::tsc_shift" title='pvclock_vcpu_time_info::tsc_shift' data-type='int8_t' data-ref="pvclock_vcpu_time_info::tsc_shift">tsc_shift</dfn>;</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>    <dfn class="tu decl" id="pvclock_vcpu_time_info::flags" title='pvclock_vcpu_time_info::flags' data-type='uint8_t' data-ref="pvclock_vcpu_time_info::flags">flags</dfn>;</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>    <dfn class="tu decl" id="pvclock_vcpu_time_info::pad" title='pvclock_vcpu_time_info::pad' data-type='uint8_t [2]' data-ref="pvclock_vcpu_time_info::pad">pad</dfn>[<var>2</var>];</td></tr>
+<tr><th id="59">59</th><td>} <b>__attribute__</b>((__packed__)); <i>/* 32 bytes */</i></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><em>static</em> <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="tu decl def" id="kvmclock_current_nsec" title='kvmclock_current_nsec' data-type='uint64_t kvmclock_current_nsec(KVMClockState * s)' data-ref="kvmclock_current_nsec">kvmclock_current_nsec</dfn>(<a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='KVMClockState *' data-ref="1s">s</dfn>)</td></tr>
+<tr><th id="62">62</th><td>{</td></tr>
+<tr><th id="63">63</th><td>    <a class="typedef" href="../../../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="2cpu" title='cpu' data-type='CPUState *' data-ref="2cpu">cpu</dfn> = <a class="macro" href="../../../include/qom/cpu.h.html#420" title="((&amp;cpus)-&gt;tqh_first)" data-ref="_M/first_cpu">first_cpu</a>;</td></tr>
+<tr><th id="64">64</th><td>    <a class="typedef" href="../../../target/i386/cpu.h.html#CPUX86State" title='CPUX86State' data-type='struct CPUX86State' data-ref="CPUX86State">CPUX86State</a> *<dfn class="local col3 decl" id="3env" title='env' data-type='CPUX86State *' data-ref="3env">env</dfn> = <a class="local col2 ref" href="#2cpu" title='cpu' data-ref="2cpu">cpu</a>-&gt;<a class="ref" href="../../../include/qom/cpu.h.html#CPUState::env_ptr" title='CPUState::env_ptr' data-ref="CPUState::env_ptr">env_ptr</a>;</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col4 decl" id="4kvmclock_struct_pa" title='kvmclock_struct_pa' data-type='hwaddr' data-ref="4kvmclock_struct_pa">kvmclock_struct_pa</dfn> = <a class="local col3 ref" href="#3env" title='env' data-ref="3env">env</a>-&gt;<a class="ref" href="../../../target/i386/cpu.h.html#CPUX86State::system_time_msr" title='CPUX86State::system_time_msr' data-ref="CPUX86State::system_time_msr">system_time_msr</a> &amp; ~<var>1ULL</var>;</td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="5migration_tsc" title='migration_tsc' data-type='uint64_t' data-ref="5migration_tsc">migration_tsc</dfn> = <a class="local col3 ref" href="#3env" title='env' data-ref="3env">env</a>-&gt;<a class="ref" href="../../../target/i386/cpu.h.html#CPUX86State::tsc" title='CPUX86State::tsc' data-ref="CPUX86State::tsc">tsc</a>;</td></tr>
+<tr><th id="67">67</th><td>    <b>struct</b> <a class="type" href="#pvclock_vcpu_time_info" title='pvclock_vcpu_time_info' data-ref="pvclock_vcpu_time_info">pvclock_vcpu_time_info</a> <dfn class="local col6 decl" id="6time" title='time' data-type='struct pvclock_vcpu_time_info' data-ref="6time">time</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="7delta" title='delta' data-type='uint64_t' data-ref="7delta">delta</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="8nsec_lo" title='nsec_lo' data-type='uint64_t' data-ref="8nsec_lo">nsec_lo</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="9nsec_hi" title='nsec_hi' data-type='uint64_t' data-ref="9nsec_hi">nsec_hi</dfn>;</td></tr>
+<tr><th id="71">71</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="10nsec" title='nsec' data-type='uint64_t' data-ref="10nsec">nsec</dfn>;</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td>    <a class="ref" href="../../../include/sysemu/hw_accel.h.html#cpu_synchronize_state" title='cpu_synchronize_state' data-ref="cpu_synchronize_state">cpu_synchronize_state</a>(<a class="local col2 ref" href="#2cpu" title='cpu' data-ref="2cpu">cpu</a>);</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <b>if</b> (!(<a class="local col3 ref" href="#3env" title='env' data-ref="3env">env</a>-&gt;<a class="ref" href="../../../target/i386/cpu.h.html#CPUX86State::system_time_msr" title='CPUX86State::system_time_msr' data-ref="CPUX86State::system_time_msr">system_time_msr</a> &amp; <var>1ULL</var>)) {</td></tr>
+<tr><th id="76">76</th><td>        <i>/* KVM clock not active */</i></td></tr>
+<tr><th id="77">77</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="78">78</th><td>    }</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>    <a class="ref" href="../../../include/exec/cpu-common.h.html#cpu_physical_memory_read" title='cpu_physical_memory_read' data-ref="cpu_physical_memory_read">cpu_physical_memory_read</a>(<a class="local col4 ref" href="#4kvmclock_struct_pa" title='kvmclock_struct_pa' data-ref="4kvmclock_struct_pa">kvmclock_struct_pa</a>, &amp;<a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>, <b>sizeof</b>(<a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>));</td></tr>
+<tr><th id="81">81</th><td></td></tr>
+<tr><th id="82">82</th><td>    <a class="macro" href="../../../../include/assert.h.html#88" title="((time.tsc_timestamp &lt;= migration_tsc) ? (void) (0) : __assert_fail (&quot;time.tsc_timestamp &lt;= migration_tsc&quot;, &quot;/home/jon/workspace/qemu/hw/i386/kvm/clock.c&quot;, 82, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_timestamp" title='pvclock_vcpu_time_info::tsc_timestamp' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_timestamp">tsc_timestamp</a> &lt;= <a class="local col5 ref" href="#5migration_tsc" title='migration_tsc' data-ref="5migration_tsc">migration_tsc</a>);</td></tr>
+<tr><th id="83">83</th><td>    <a class="local col7 ref" href="#7delta" title='delta' data-ref="7delta">delta</a> = <a class="local col5 ref" href="#5migration_tsc" title='migration_tsc' data-ref="5migration_tsc">migration_tsc</a> - <a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_timestamp" title='pvclock_vcpu_time_info::tsc_timestamp' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_timestamp">tsc_timestamp</a>;</td></tr>
+<tr><th id="84">84</th><td>    <b>if</b> (<a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_shift" title='pvclock_vcpu_time_info::tsc_shift' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_shift">tsc_shift</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="85">85</th><td>        <a class="local col7 ref" href="#7delta" title='delta' data-ref="7delta">delta</a> &gt;&gt;= -<a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_shift" title='pvclock_vcpu_time_info::tsc_shift' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_shift">tsc_shift</a>;</td></tr>
+<tr><th id="86">86</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="87">87</th><td>        <a class="local col7 ref" href="#7delta" title='delta' data-ref="7delta">delta</a> &lt;&lt;= <a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_shift" title='pvclock_vcpu_time_info::tsc_shift' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_shift">tsc_shift</a>;</td></tr>
+<tr><th id="88">88</th><td>    }</td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td>    <a class="ref" href="../../../include/qemu/host-utils.h.html#mulu64" title='mulu64' data-ref="mulu64">mulu64</a>(&amp;<a class="local col8 ref" href="#8nsec_lo" title='nsec_lo' data-ref="8nsec_lo">nsec_lo</a>, &amp;<a class="local col9 ref" href="#9nsec_hi" title='nsec_hi' data-ref="9nsec_hi">nsec_hi</a>, <a class="local col7 ref" href="#7delta" title='delta' data-ref="7delta">delta</a>, <a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::tsc_to_system_mul" title='pvclock_vcpu_time_info::tsc_to_system_mul' data-use='r' data-ref="pvclock_vcpu_time_info::tsc_to_system_mul">tsc_to_system_mul</a>);</td></tr>
+<tr><th id="91">91</th><td>    <a class="local col0 ref" href="#10nsec" title='nsec' data-ref="10nsec">nsec</a> = (<a class="local col8 ref" href="#8nsec_lo" title='nsec_lo' data-ref="8nsec_lo">nsec_lo</a> &gt;&gt; <var>32</var>) | (<a class="local col9 ref" href="#9nsec_hi" title='nsec_hi' data-ref="9nsec_hi">nsec_hi</a> &lt;&lt; <var>32</var>);</td></tr>
+<tr><th id="92">92</th><td>    <b>return</b> <a class="local col0 ref" href="#10nsec" title='nsec' data-ref="10nsec">nsec</a> + <a class="local col6 ref" href="#6time" title='time' data-ref="6time">time</a>.<a class="tu ref" href="#pvclock_vcpu_time_info::system_time" title='pvclock_vcpu_time_info::system_time' data-use='r' data-ref="pvclock_vcpu_time_info::system_time">system_time</a>;</td></tr>
+<tr><th id="93">93</th><td>}</td></tr>
+<tr><th id="94">94</th><td></td></tr>
+<tr><th id="95">95</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvm_update_clock" title='kvm_update_clock' data-type='void kvm_update_clock(KVMClockState * s)' data-ref="kvm_update_clock">kvm_update_clock</dfn>(<a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col1 decl" id="11s" title='s' data-type='KVMClockState *' data-ref="11s">s</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <b>struct</b> <a class="type" href="../../../linux-headers/linux/kvm.h.html#kvm_clock_data" title='kvm_clock_data' data-ref="kvm_clock_data">kvm_clock_data</a> <dfn class="local col2 decl" id="12data" title='data' data-type='struct kvm_clock_data' data-ref="12data">data</dfn>;</td></tr>
+<tr><th id="98">98</th><td>    <em>int</em> <dfn class="local col3 decl" id="13ret" title='ret' data-type='int' data-ref="13ret">ret</dfn>;</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td>    <a class="local col3 ref" href="#13ret" title='ret' data-ref="13ret">ret</a> = <a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_vm_ioctl" title='kvm_vm_ioctl' data-ref="kvm_vm_ioctl">kvm_vm_ioctl</a>(<a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_state" title='kvm_state' data-ref="kvm_state">kvm_state</a>, <a class="macro" href="../../../linux-headers/linux/kvm.h.html#1225" title="(((2U) &lt;&lt; (((0+8)+8)+14)) | (((0xAE)) &lt;&lt; (0+8)) | (((0x7c)) &lt;&lt; 0) | ((((sizeof(struct kvm_clock_data)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/KVM_GET_CLOCK">KVM_GET_CLOCK</a>, &amp;<a class="local col2 ref" href="#12data" title='data' data-ref="12data">data</a>);</td></tr>
+<tr><th id="101">101</th><td>    <b>if</b> (<a class="local col3 ref" href="#13ret" title='ret' data-ref="13ret">ret</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="102">102</th><td>        <a class="ref" href="../../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"KVM_GET_CLOCK failed: %s\n"</q>, <a class="ref" href="../../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="local col3 ref" href="#13ret" title='ret' data-ref="13ret">ret</a>));</td></tr>
+<tr><th id="103">103</th><td>                <a class="ref" href="../../../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="104">104</th><td>    }</td></tr>
+<tr><th id="105">105</th><td>    <a class="local col1 ref" href="#11s" title='s' data-ref="11s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock" title='KVMClockState::clock' data-use='w' data-ref="KVMClockState::clock">clock</a> = <a class="local col2 ref" href="#12data" title='data' data-ref="12data">data</a>.<a class="ref" href="../../../linux-headers/linux/kvm.h.html#kvm_clock_data::clock" title='kvm_clock_data::clock' data-ref="kvm_clock_data::clock">clock</a>;</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td>    <i>/* If kvm_has_adjust_clock_stable() is false, KVM_GET_CLOCK returns</i></td></tr>
+<tr><th id="108">108</th><td><i>     * essentially CLOCK_MONOTONIC plus a guest-specific adjustment.  This</i></td></tr>
+<tr><th id="109">109</th><td><i>     * can drift from the TSC-based value that is computed by the guest,</i></td></tr>
+<tr><th id="110">110</th><td><i>     * so we need to go through kvmclock_current_nsec().  If</i></td></tr>
+<tr><th id="111">111</th><td><i>     * kvm_has_adjust_clock_stable() is true, and the flags contain</i></td></tr>
+<tr><th id="112">112</th><td><i>     * KVM_CLOCK_TSC_STABLE, then KVM_GET_CLOCK returns a TSC-based value</i></td></tr>
+<tr><th id="113">113</th><td><i>     * and kvmclock_current_nsec() is not necessary.</i></td></tr>
+<tr><th id="114">114</th><td><i>     *</i></td></tr>
+<tr><th id="115">115</th><td><i>     * Here, however, we need not check KVM_CLOCK_TSC_STABLE.  This is because:</i></td></tr>
+<tr><th id="116">116</th><td><i>     *</i></td></tr>
+<tr><th id="117">117</th><td><i>     * - if the host has disabled the kvmclock master clock, the guest already</i></td></tr>
+<tr><th id="118">118</th><td><i>     *   has protection against time going backwards.  This "safety net" is only</i></td></tr>
+<tr><th id="119">119</th><td><i>     *   absent when kvmclock is stable;</i></td></tr>
+<tr><th id="120">120</th><td><i>     *</i></td></tr>
+<tr><th id="121">121</th><td><i>     * - therefore, we can replace a check like</i></td></tr>
+<tr><th id="122">122</th><td><i>     *</i></td></tr>
+<tr><th id="123">123</th><td><i>     *       if last KVM_GET_CLOCK was not reliable then</i></td></tr>
+<tr><th id="124">124</th><td><i>     *               read from memory</i></td></tr>
+<tr><th id="125">125</th><td><i>     *</i></td></tr>
+<tr><th id="126">126</th><td><i>     *   with</i></td></tr>
+<tr><th id="127">127</th><td><i>     *</i></td></tr>
+<tr><th id="128">128</th><td><i>     *       if last KVM_GET_CLOCK was not reliable &amp;&amp; masterclock is enabled</i></td></tr>
+<tr><th id="129">129</th><td><i>     *               read from memory</i></td></tr>
+<tr><th id="130">130</th><td><i>     *</i></td></tr>
+<tr><th id="131">131</th><td><i>     * However:</i></td></tr>
+<tr><th id="132">132</th><td><i>     *</i></td></tr>
+<tr><th id="133">133</th><td><i>     * - if kvm_has_adjust_clock_stable() returns false, the left side is</i></td></tr>
+<tr><th id="134">134</th><td><i>     *   always true (KVM_GET_CLOCK is never reliable), and the right side is</i></td></tr>
+<tr><th id="135">135</th><td><i>     *   unknown (because we don't have data.flags).  We must assume it's true</i></td></tr>
+<tr><th id="136">136</th><td><i>     *   and read from memory.</i></td></tr>
+<tr><th id="137">137</th><td><i>     *</i></td></tr>
+<tr><th id="138">138</th><td><i>     * - if kvm_has_adjust_clock_stable() returns true, the result of the &amp;&amp;</i></td></tr>
+<tr><th id="139">139</th><td><i>     *   is always false (masterclock is enabled iff KVM_GET_CLOCK is reliable)</i></td></tr>
+<tr><th id="140">140</th><td><i>     *</i></td></tr>
+<tr><th id="141">141</th><td><i>     * So we can just use this instead:</i></td></tr>
+<tr><th id="142">142</th><td><i>     *</i></td></tr>
+<tr><th id="143">143</th><td><i>     *       if !kvm_has_adjust_clock_stable() then</i></td></tr>
+<tr><th id="144">144</th><td><i>     *               read from memory</i></td></tr>
+<tr><th id="145">145</th><td><i>     */</i></td></tr>
+<tr><th id="146">146</th><td>    <a class="local col1 ref" href="#11s" title='s' data-ref="11s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock_is_reliable" title='KVMClockState::clock_is_reliable' data-use='w' data-ref="KVMClockState::clock_is_reliable">clock_is_reliable</a> = <a class="ref" href="../../../target/i386/kvm_i386.h.html#kvm_has_adjust_clock_stable" title='kvm_has_adjust_clock_stable' data-ref="kvm_has_adjust_clock_stable">kvm_has_adjust_clock_stable</a>();</td></tr>
+<tr><th id="147">147</th><td>}</td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvmclock_vm_state_change" title='kvmclock_vm_state_change' data-type='void kvmclock_vm_state_change(void * opaque, int running, RunState state)' data-ref="kvmclock_vm_state_change">kvmclock_vm_state_change</dfn>(<em>void</em> *<dfn class="local col4 decl" id="14opaque" title='opaque' data-type='void *' data-ref="14opaque">opaque</dfn>, <em>int</em> <dfn class="local col5 decl" id="15running" title='running' data-type='int' data-ref="15running">running</dfn>,</td></tr>
+<tr><th id="150">150</th><td>                                     <a class="typedef" href="../../../qapi-types.h.html#RunState" title='RunState' data-type='enum RunState' data-ref="RunState">RunState</a> <dfn class="local col6 decl" id="16state" title='state' data-type='RunState' data-ref="16state">state</dfn>)</td></tr>
+<tr><th id="151">151</th><td>{</td></tr>
+<tr><th id="152">152</th><td>    <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col7 decl" id="17s" title='s' data-type='KVMClockState *' data-ref="17s">s</dfn> = <a class="local col4 ref" href="#14opaque" title='opaque' data-ref="14opaque">opaque</a>;</td></tr>
+<tr><th id="153">153</th><td>    <a class="typedef" href="../../../include/qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col8 decl" id="18cpu" title='cpu' data-type='CPUState *' data-ref="18cpu">cpu</dfn>;</td></tr>
+<tr><th id="154">154</th><td>    <em>int</em> <dfn class="local col9 decl" id="19cap_clock_ctrl" title='cap_clock_ctrl' data-type='int' data-ref="19cap_clock_ctrl">cap_clock_ctrl</dfn> = <a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_check_extension" title='kvm_check_extension' data-ref="kvm_check_extension">kvm_check_extension</a>(<a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_state" title='kvm_state' data-ref="kvm_state">kvm_state</a>, <a class="macro" href="../../../linux-headers/linux/kvm.h.html#858" title="76" data-ref="_M/KVM_CAP_KVMCLOCK_CTRL">KVM_CAP_KVMCLOCK_CTRL</a>);</td></tr>
+<tr><th id="155">155</th><td>    <em>int</em> <dfn class="local col0 decl" id="20ret" title='ret' data-type='int' data-ref="20ret">ret</dfn>;</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td>    <b>if</b> (<a class="local col5 ref" href="#15running" title='running' data-ref="15running">running</a>) {</td></tr>
+<tr><th id="158">158</th><td>        <b>struct</b> <a class="type" href="../../../linux-headers/linux/kvm.h.html#kvm_clock_data" title='kvm_clock_data' data-ref="kvm_clock_data">kvm_clock_data</a> <dfn class="local col1 decl" id="21data" title='data' data-type='struct kvm_clock_data' data-ref="21data">data</dfn> = {};</td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>        <i>/*</i></td></tr>
+<tr><th id="161">161</th><td><i>         * If the host where s-&gt;clock was read did not support reliable</i></td></tr>
+<tr><th id="162">162</th><td><i>         * KVM_GET_CLOCK, read kvmclock value from memory.</i></td></tr>
+<tr><th id="163">163</th><td><i>         */</i></td></tr>
+<tr><th id="164">164</th><td>        <b>if</b> (!<a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock_is_reliable" title='KVMClockState::clock_is_reliable' data-use='r' data-ref="KVMClockState::clock_is_reliable">clock_is_reliable</a>) {</td></tr>
+<tr><th id="165">165</th><td>            <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="22pvclock_via_mem" title='pvclock_via_mem' data-type='uint64_t' data-ref="22pvclock_via_mem">pvclock_via_mem</dfn> = <a class="tu ref" href="#kvmclock_current_nsec" title='kvmclock_current_nsec' data-use='c' data-ref="kvmclock_current_nsec">kvmclock_current_nsec</a>(<a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>);</td></tr>
+<tr><th id="166">166</th><td>            <i>/* We can't rely on the saved clock value, just discard it */</i></td></tr>
+<tr><th id="167">167</th><td>            <b>if</b> (<a class="local col2 ref" href="#22pvclock_via_mem" title='pvclock_via_mem' data-ref="22pvclock_via_mem">pvclock_via_mem</a>) {</td></tr>
+<tr><th id="168">168</th><td>                <a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock" title='KVMClockState::clock' data-use='w' data-ref="KVMClockState::clock">clock</a> = <a class="local col2 ref" href="#22pvclock_via_mem" title='pvclock_via_mem' data-ref="22pvclock_via_mem">pvclock_via_mem</a>;</td></tr>
+<tr><th id="169">169</th><td>            }</td></tr>
+<tr><th id="170">170</th><td>        }</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td>        <a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock_valid" title='KVMClockState::clock_valid' data-use='w' data-ref="KVMClockState::clock_valid">clock_valid</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td>        <a class="local col1 ref" href="#21data" title='data' data-ref="21data">data</a>.<a class="ref" href="../../../linux-headers/linux/kvm.h.html#kvm_clock_data::clock" title='kvm_clock_data::clock' data-ref="kvm_clock_data::clock">clock</a> = <a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock" title='KVMClockState::clock' data-use='r' data-ref="KVMClockState::clock">clock</a>;</td></tr>
+<tr><th id="175">175</th><td>        <a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a> = <a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_vm_ioctl" title='kvm_vm_ioctl' data-ref="kvm_vm_ioctl">kvm_vm_ioctl</a>(<a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_state" title='kvm_state' data-ref="kvm_state">kvm_state</a>, <a class="macro" href="../../../linux-headers/linux/kvm.h.html#1224" title="(((1U) &lt;&lt; (((0+8)+8)+14)) | (((0xAE)) &lt;&lt; (0+8)) | (((0x7b)) &lt;&lt; 0) | ((((sizeof(struct kvm_clock_data)))) &lt;&lt; ((0+8)+8)))" data-ref="_M/KVM_SET_CLOCK">KVM_SET_CLOCK</a>, &amp;<a class="local col1 ref" href="#21data" title='data' data-ref="21data">data</a>);</td></tr>
+<tr><th id="176">176</th><td>        <b>if</b> (<a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="177">177</th><td>            <a class="ref" href="../../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"KVM_SET_CLOCK failed: %s\n"</q>, <a class="ref" href="../../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a>));</td></tr>
+<tr><th id="178">178</th><td>            <a class="ref" href="../../../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="179">179</th><td>        }</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>        <b>if</b> (!<a class="local col9 ref" href="#19cap_clock_ctrl" title='cap_clock_ctrl' data-ref="19cap_clock_ctrl">cap_clock_ctrl</a>) {</td></tr>
+<tr><th id="182">182</th><td>            <b>return</b>;</td></tr>
+<tr><th id="183">183</th><td>        }</td></tr>
+<tr><th id="184">184</th><td>        <a class="macro" href="../../../include/qom/cpu.h.html#415" title="for ((cpu) = ((&amp;cpus)-&gt;tqh_first); (cpu); (cpu) = ((cpu)-&gt;node.tqe_next))" data-ref="_M/CPU_FOREACH">CPU_FOREACH</a>(<a class="local col8 ref" href="#18cpu" title='cpu' data-ref="18cpu">cpu</a>) {</td></tr>
+<tr><th id="185">185</th><td>            <a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a> = <a class="ref" href="../../../include/sysemu/kvm.h.html#kvm_vcpu_ioctl" title='kvm_vcpu_ioctl' data-ref="kvm_vcpu_ioctl">kvm_vcpu_ioctl</a>(<a class="local col8 ref" href="#18cpu" title='cpu' data-ref="18cpu">cpu</a>, <a class="macro" href="../../../linux-headers/linux/kvm.h.html#1339" title="(((0U) &lt;&lt; (((0+8)+8)+14)) | (((0xAE)) &lt;&lt; (0+8)) | (((0xad)) &lt;&lt; 0) | ((0) &lt;&lt; ((0+8)+8)))" data-ref="_M/KVM_KVMCLOCK_CTRL">KVM_KVMCLOCK_CTRL</a>, <var>0</var>);</td></tr>
+<tr><th id="186">186</th><td>            <b>if</b> (<a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a>) {</td></tr>
+<tr><th id="187">187</th><td>                <b>if</b> (<a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a> != -<a class="macro" href="../../../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>) {</td></tr>
+<tr><th id="188">188</th><td>                    <a class="ref" href="../../../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"%s: %s\n"</q>, <b>__func__</b>, <a class="ref" href="../../../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(-<a class="local col0 ref" href="#20ret" title='ret' data-ref="20ret">ret</a>));</td></tr>
+<tr><th id="189">189</th><td>                }</td></tr>
+<tr><th id="190">190</th><td>                <b>return</b>;</td></tr>
+<tr><th id="191">191</th><td>            }</td></tr>
+<tr><th id="192">192</th><td>        }</td></tr>
+<tr><th id="193">193</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>        <b>if</b> (<a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock_valid" title='KVMClockState::clock_valid' data-use='r' data-ref="KVMClockState::clock_valid">clock_valid</a>) {</td></tr>
+<tr><th id="196">196</th><td>            <b>return</b>;</td></tr>
+<tr><th id="197">197</th><td>        }</td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td>        <a class="ref" href="../../../target/i386/kvm_i386.h.html#kvm_synchronize_all_tsc" title='kvm_synchronize_all_tsc' data-ref="kvm_synchronize_all_tsc">kvm_synchronize_all_tsc</a>();</td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td>        <a class="tu ref" href="#kvm_update_clock" title='kvm_update_clock' data-use='c' data-ref="kvm_update_clock">kvm_update_clock</a>(<a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>);</td></tr>
+<tr><th id="202">202</th><td>        <i>/*</i></td></tr>
+<tr><th id="203">203</th><td><i>         * If the VM is stopped, declare the clock state valid to</i></td></tr>
+<tr><th id="204">204</th><td><i>         * avoid re-reading it on next vmsave (which would return</i></td></tr>
+<tr><th id="205">205</th><td><i>         * a different value). Will be reset when the VM is continued.</i></td></tr>
+<tr><th id="206">206</th><td><i>         */</i></td></tr>
+<tr><th id="207">207</th><td>        <a class="local col7 ref" href="#17s" title='s' data-ref="17s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::clock_valid" title='KVMClockState::clock_valid' data-use='w' data-ref="KVMClockState::clock_valid">clock_valid</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="208">208</th><td>    }</td></tr>
+<tr><th id="209">209</th><td>}</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvmclock_realize" title='kvmclock_realize' data-type='void kvmclock_realize(DeviceState * dev, Error ** errp)' data-ref="kvmclock_realize">kvmclock_realize</dfn>(<a class="typedef" href="../../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col3 decl" id="23dev" title='dev' data-type='DeviceState *' data-ref="23dev">dev</dfn>, <a class="typedef" href="../../../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="24errp" title='errp' data-type='Error **' data-ref="24errp">errp</dfn>)</td></tr>
+<tr><th id="212">212</th><td>{</td></tr>
+<tr><th id="213">213</th><td>    <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col5 decl" id="25s" title='s' data-type='KVMClockState *' data-ref="25s">s</dfn> = <a class="macro" href="#32" title="((KVMClockState *)object_dynamic_cast_assert(((Object *)((dev))), (&quot;kvmclock&quot;), &quot;/home/jon/workspace/qemu/hw/i386/kvm/clock.c&quot;, 213, __func__))" data-ref="_M/KVM_CLOCK">KVM_CLOCK</a>(<a class="local col3 ref" href="#23dev" title='dev' data-ref="23dev">dev</a>);</td></tr>
+<tr><th id="214">214</th><td></td></tr>
+<tr><th id="215">215</th><td>    <b>if</b> (!<a class="macro" href="../../../include/sysemu/kvm.h.html#50" title="(kvm_allowed)" data-ref="_M/kvm_enabled">kvm_enabled</a>()) {</td></tr>
+<tr><th id="216">216</th><td>        <a class="macro" href="../../../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/hw/i386/kvm/clock.c&quot;, 216, __func__, (&quot;kvmclock device requires KVM&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col4 ref" href="#24errp" title='errp' data-ref="24errp">errp</a>, <q>"kvmclock device requires KVM"</q>);</td></tr>
+<tr><th id="217">217</th><td>        <b>return</b>;</td></tr>
+<tr><th id="218">218</th><td>    }</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td>    <a class="tu ref" href="#kvm_update_clock" title='kvm_update_clock' data-use='c' data-ref="kvm_update_clock">kvm_update_clock</a>(<a class="local col5 ref" href="#25s" title='s' data-ref="25s">s</a>);</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>    <a class="ref" href="../../../include/sysemu/sysemu.h.html#qemu_add_vm_change_state_handler" title='qemu_add_vm_change_state_handler' data-ref="qemu_add_vm_change_state_handler">qemu_add_vm_change_state_handler</a>(<a class="tu ref" href="#kvmclock_vm_state_change" title='kvmclock_vm_state_change' data-use='r' data-ref="kvmclock_vm_state_change">kvmclock_vm_state_change</a>, <a class="local col5 ref" href="#25s" title='s' data-ref="25s">s</a>);</td></tr>
+<tr><th id="223">223</th><td>}</td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="kvmclock_clock_is_reliable_needed" title='kvmclock_clock_is_reliable_needed' data-type='_Bool kvmclock_clock_is_reliable_needed(void * opaque)' data-ref="kvmclock_clock_is_reliable_needed">kvmclock_clock_is_reliable_needed</dfn>(<em>void</em> *<dfn class="local col6 decl" id="26opaque" title='opaque' data-type='void *' data-ref="26opaque">opaque</dfn>)</td></tr>
+<tr><th id="226">226</th><td>{</td></tr>
+<tr><th id="227">227</th><td>    <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col7 decl" id="27s" title='s' data-type='KVMClockState *' data-ref="27s">s</dfn> = <a class="local col6 ref" href="#26opaque" title='opaque' data-ref="26opaque">opaque</a>;</td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td>    <b>return</b> <a class="local col7 ref" href="#27s" title='s' data-ref="27s">s</a>-&gt;<a class="tu ref" href="#KVMClockState::mach_use_reliable_get_clock" title='KVMClockState::mach_use_reliable_get_clock' data-use='r' data-ref="KVMClockState::mach_use_reliable_get_clock">mach_use_reliable_get_clock</a>;</td></tr>
+<tr><th id="230">230</th><td>}</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="kvmclock_reliable_get_clock" title='kvmclock_reliable_get_clock' data-type='const VMStateDescription' data-ref="kvmclock_reliable_get_clock">kvmclock_reliable_get_clock</dfn> = {</td></tr>
+<tr><th id="233">233</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <q>"kvmclock/clock_is_reliable"</q>,</td></tr>
+<tr><th id="234">234</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="235">235</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::minimum_version_id" title='VMStateDescription::minimum_version_id' data-ref="VMStateDescription::minimum_version_id">minimum_version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="236">236</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::needed" title='VMStateDescription::needed' data-ref="VMStateDescription::needed">needed</a> = <a class="tu ref" href="#kvmclock_clock_is_reliable_needed" title='kvmclock_clock_is_reliable_needed' data-use='r' data-ref="kvmclock_clock_is_reliable_needed">kvmclock_clock_is_reliable_needed</a>,</td></tr>
+<tr><th id="237">237</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="238">238</th><td>        <a class="macro" href="../../../include/migration/vmstate.h.html#757" title="{ .name = (&quot;clock_is_reliable&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(_Bool), .info = &amp;(vmstate_info_bool), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(KVMClockState, clock_is_reliable) + ((_Bool*)0 - (typeof(((KVMClockState *)0)-&gt;clock_is_reliable)*)0)), }" data-ref="_M/VMSTATE_BOOL">VMSTATE_BOOL</a>(<a class="tu ref" href="#KVMClockState::clock_is_reliable" title='KVMClockState::clock_is_reliable' data-use='r' data-ref="KVMClockState::clock_is_reliable">clock_is_reliable</a>, <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a>),</td></tr>
+<tr><th id="239">239</th><td>        <a class="macro" href="../../../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>()</td></tr>
+<tr><th id="240">240</th><td>    }</td></tr>
+<tr><th id="241">241</th><td>};</td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td><i  data-doc="kvmclock_pre_save">/*</i></td></tr>
+<tr><th id="244">244</th><td><i  data-doc="kvmclock_pre_save"> * When migrating, read the clock just before migration,</i></td></tr>
+<tr><th id="245">245</th><td><i  data-doc="kvmclock_pre_save"> * so that the guest clock counts during the events</i></td></tr>
+<tr><th id="246">246</th><td><i  data-doc="kvmclock_pre_save"> * between:</i></td></tr>
+<tr><th id="247">247</th><td><i  data-doc="kvmclock_pre_save"> *</i></td></tr>
+<tr><th id="248">248</th><td><i  data-doc="kvmclock_pre_save"> *  * vm_stop()</i></td></tr>
+<tr><th id="249">249</th><td><i  data-doc="kvmclock_pre_save"> *  *</i></td></tr>
+<tr><th id="250">250</th><td><i  data-doc="kvmclock_pre_save"> *  * pre_save()</i></td></tr>
+<tr><th id="251">251</th><td><i  data-doc="kvmclock_pre_save"> *</i></td></tr>
+<tr><th id="252">252</th><td><i  data-doc="kvmclock_pre_save"> *  This reduces kvmclock difference on migration from 5s</i></td></tr>
+<tr><th id="253">253</th><td><i  data-doc="kvmclock_pre_save"> *  to 0.1s (when max_downtime == 5s), because sending the</i></td></tr>
+<tr><th id="254">254</th><td><i  data-doc="kvmclock_pre_save"> *  final pages of memory (which happens between vm_stop()</i></td></tr>
+<tr><th id="255">255</th><td><i  data-doc="kvmclock_pre_save"> *  and pre_save()) takes max_downtime.</i></td></tr>
+<tr><th id="256">256</th><td><i  data-doc="kvmclock_pre_save"> */</i></td></tr>
+<tr><th id="257">257</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvmclock_pre_save" title='kvmclock_pre_save' data-type='void kvmclock_pre_save(void * opaque)' data-ref="kvmclock_pre_save">kvmclock_pre_save</dfn>(<em>void</em> *<dfn class="local col8 decl" id="28opaque" title='opaque' data-type='void *' data-ref="28opaque">opaque</dfn>)</td></tr>
+<tr><th id="258">258</th><td>{</td></tr>
+<tr><th id="259">259</th><td>    <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a> *<dfn class="local col9 decl" id="29s" title='s' data-type='KVMClockState *' data-ref="29s">s</dfn> = <a class="local col8 ref" href="#28opaque" title='opaque' data-ref="28opaque">opaque</a>;</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>    <a class="tu ref" href="#kvm_update_clock" title='kvm_update_clock' data-use='c' data-ref="kvm_update_clock">kvm_update_clock</a>(<a class="local col9 ref" href="#29s" title='s' data-ref="29s">s</a>);</td></tr>
+<tr><th id="262">262</th><td>}</td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="kvmclock_vmsd" title='kvmclock_vmsd' data-type='const VMStateDescription' data-ref="kvmclock_vmsd">kvmclock_vmsd</dfn> = {</td></tr>
+<tr><th id="265">265</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <q>"kvmclock"</q>,</td></tr>
+<tr><th id="266">266</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="267">267</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::minimum_version_id" title='VMStateDescription::minimum_version_id' data-ref="VMStateDescription::minimum_version_id">minimum_version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="268">268</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::pre_save" title='VMStateDescription::pre_save' data-ref="VMStateDescription::pre_save">pre_save</a> = <a class="tu ref" href="#kvmclock_pre_save" title='kvmclock_pre_save' data-ref="kvmclock_pre_save">kvmclock_pre_save</a>,</td></tr>
+<tr><th id="269">269</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../../../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="270">270</th><td>        <a class="macro" href="../../../include/migration/vmstate.h.html#775" title="{ .name = (&quot;clock&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(uint64_t), .info = &amp;(vmstate_info_uint64), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(KVMClockState, clock) + ((uint64_t*)0 - (typeof(((KVMClockState *)0)-&gt;clock)*)0)), }" data-ref="_M/VMSTATE_UINT64">VMSTATE_UINT64</a>(<a class="tu ref" href="#KVMClockState::clock" title='KVMClockState::clock' data-use='r' data-ref="KVMClockState::clock">clock</a>, <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a>),</td></tr>
+<tr><th id="271">271</th><td>        <a class="macro" href="../../../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>()</td></tr>
+<tr><th id="272">272</th><td>    },</td></tr>
+<tr><th id="273">273</th><td>    .<a class="ref" href="../../../include/migration/vmstate.h.html#VMStateDescription::subsections" title='VMStateDescription::subsections' data-ref="VMStateDescription::subsections">subsections</a> = (<em>const</em> <a class="typedef" href="../../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> * []) {</td></tr>
+<tr><th id="274">274</th><td>        &amp;<a class="tu ref" href="#kvmclock_reliable_get_clock" title='kvmclock_reliable_get_clock' data-use='a' data-ref="kvmclock_reliable_get_clock">kvmclock_reliable_get_clock</a>,</td></tr>
+<tr><th id="275">275</th><td>        <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span></td></tr>
+<tr><th id="276">276</th><td>    }</td></tr>
+<tr><th id="277">277</th><td>};</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td><em>static</em> <a class="typedef" href="../../../include/qemu/typedefs.h.html#Property" title='Property' data-type='struct Property' data-ref="Property">Property</a> <dfn class="tu decl def" id="kvmclock_properties" title='kvmclock_properties' data-type='Property [2]' data-ref="kvmclock_properties">kvmclock_properties</dfn>[] = {</td></tr>
+<tr><th id="280">280</th><td>    <a class="macro" href="../../../include/hw/qdev-properties.h.html#95" title="{ .name = (&quot;x-mach-use-reliable-get-clock&quot;), .info = &amp;(qdev_prop_bool), .offset = __builtin_offsetof(KVMClockState, mach_use_reliable_get_clock) + ((_Bool*)0 - (typeof(((KVMClockState *)0)-&gt;mach_use_reliable_get_clock)*)0), .set_default = 1, .defval.u = (_Bool)1, }" data-ref="_M/DEFINE_PROP_BOOL">DEFINE_PROP_BOOL</a>(<q>"x-mach-use-reliable-get-clock"</q>, <a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a>,</td></tr>
+<tr><th id="281">281</th><td>                      <a class="tu ref" href="#KVMClockState::mach_use_reliable_get_clock" title='KVMClockState::mach_use_reliable_get_clock' data-use='r' data-ref="KVMClockState::mach_use_reliable_get_clock">mach_use_reliable_get_clock</a>, <span class="macro" title="1" data-ref="_M/true">true</span>),</td></tr>
+<tr><th id="282">282</th><td>    <a class="macro" href="../../../include/hw/qdev-properties.h.html#216" title="{}" data-ref="_M/DEFINE_PROP_END_OF_LIST">DEFINE_PROP_END_OF_LIST</a>(),</td></tr>
+<tr><th id="283">283</th><td>};</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvmclock_class_init" title='kvmclock_class_init' data-type='void kvmclock_class_init(ObjectClass * klass, void * data)' data-ref="kvmclock_class_init">kvmclock_class_init</dfn>(<a class="typedef" href="../../../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col0 decl" id="30klass" title='klass' data-type='ObjectClass *' data-ref="30klass">klass</dfn>, <em>void</em> *<dfn class="local col1 decl" id="31data" title='data' data-type='void *' data-ref="31data">data</dfn>)</td></tr>
+<tr><th id="286">286</th><td>{</td></tr>
+<tr><th id="287">287</th><td>    <a class="typedef" href="../../../include/hw/qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> *<dfn class="local col2 decl" id="32dc" title='dc' data-type='DeviceClass *' data-ref="32dc">dc</dfn> = <a class="macro" href="../../../include/hw/qdev-core.h.html#17" title="((DeviceClass *)object_class_dynamic_cast_assert(((ObjectClass *)((klass))), (&quot;device&quot;), &quot;/home/jon/workspace/qemu/hw/i386/kvm/clock.c&quot;, 287, __func__))" data-ref="_M/DEVICE_CLASS">DEVICE_CLASS</a>(<a class="local col0 ref" href="#30klass" title='klass' data-ref="30klass">klass</a>);</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td>    <a class="local col2 ref" href="#32dc" title='dc' data-ref="32dc">dc</a>-&gt;<a class="ref" href="../../../include/hw/qdev-core.h.html#DeviceClass::realize" title='DeviceClass::realize' data-ref="DeviceClass::realize">realize</a> = <a class="tu ref" href="#kvmclock_realize" title='kvmclock_realize' data-use='r' data-ref="kvmclock_realize">kvmclock_realize</a>;</td></tr>
+<tr><th id="290">290</th><td>    <a class="local col2 ref" href="#32dc" title='dc' data-ref="32dc">dc</a>-&gt;<a class="ref" href="../../../include/hw/qdev-core.h.html#DeviceClass::vmsd" title='DeviceClass::vmsd' data-ref="DeviceClass::vmsd">vmsd</a> = &amp;<a class="tu ref" href="#kvmclock_vmsd" title='kvmclock_vmsd' data-use='a' data-ref="kvmclock_vmsd">kvmclock_vmsd</a>;</td></tr>
+<tr><th id="291">291</th><td>    <a class="local col2 ref" href="#32dc" title='dc' data-ref="32dc">dc</a>-&gt;<a class="ref" href="../../../include/hw/qdev-core.h.html#DeviceClass::props" title='DeviceClass::props' data-ref="DeviceClass::props">props</a> = <a class="tu ref" href="#kvmclock_properties" title='kvmclock_properties' data-use='r' data-ref="kvmclock_properties">kvmclock_properties</a>;</td></tr>
+<tr><th id="292">292</th><td>}</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td><em>static</em> <em>const</em> <a class="typedef" href="../../../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="kvmclock_info" title='kvmclock_info' data-type='const TypeInfo' data-ref="kvmclock_info">kvmclock_info</dfn> = {</td></tr>
+<tr><th id="295">295</th><td>    .<a class="ref" href="../../../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a>          = <a class="macro" href="#31" title="&quot;kvmclock&quot;" data-ref="_M/TYPE_KVM_CLOCK">TYPE_KVM_CLOCK</a>,</td></tr>
+<tr><th id="296">296</th><td>    .<a class="ref" href="../../../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a>        = <a class="macro" href="../../../include/hw/sysbus.h.html#17" title="&quot;sys-bus-device&quot;" data-ref="_M/TYPE_SYS_BUS_DEVICE">TYPE_SYS_BUS_DEVICE</a>,</td></tr>
+<tr><th id="297">297</th><td>    .<a class="ref" href="../../../include/qom/object.h.html#TypeInfo::instance_size" title='TypeInfo::instance_size' data-ref="TypeInfo::instance_size">instance_size</a> = <b>sizeof</b>(<a class="typedef" href="#KVMClockState" title='KVMClockState' data-type='struct KVMClockState' data-ref="KVMClockState">KVMClockState</a>),</td></tr>
+<tr><th id="298">298</th><td>    .<a class="ref" href="../../../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a>    = <a class="tu ref" href="#kvmclock_class_init" title='kvmclock_class_init' data-ref="kvmclock_class_init">kvmclock_class_init</a>,</td></tr>
+<tr><th id="299">299</th><td>};</td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><i>/* Note: Must be called after VCPU initialization. */</i></td></tr>
+<tr><th id="302">302</th><td><em>void</em> <dfn class="decl def" id="kvmclock_create" title='kvmclock_create' data-ref="kvmclock_create">kvmclock_create</dfn>(<em>void</em>)</td></tr>
+<tr><th id="303">303</th><td>{</td></tr>
+<tr><th id="304">304</th><td>    <a class="typedef" href="../../../target/i386/cpu-qom.h.html#X86CPU" title='X86CPU' data-type='struct X86CPU' data-ref="X86CPU">X86CPU</a> *<dfn class="local col3 decl" id="33cpu" title='cpu' data-type='X86CPU *' data-ref="33cpu">cpu</dfn> = <a class="macro" href="../../../target/i386/cpu-qom.h.html#34" title="((X86CPU *)object_dynamic_cast_assert(((Object *)((((&amp;cpus)-&gt;tqh_first)))), (&quot;x86_64-cpu&quot;), &quot;/home/jon/workspace/qemu/hw/i386/kvm/clock.c&quot;, 304, __func__))" data-ref="_M/X86_CPU">X86_CPU</a>(<a class="macro" href="../../../include/qom/cpu.h.html#420" title="((&amp;cpus)-&gt;tqh_first)" data-ref="_M/first_cpu">first_cpu</a>);</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td>    <b>if</b> (<a class="macro" href="../../../include/sysemu/kvm.h.html#50" title="(kvm_allowed)" data-ref="_M/kvm_enabled">kvm_enabled</a>() &amp;&amp;</td></tr>
+<tr><th id="307">307</th><td>        <a class="local col3 ref" href="#33cpu" title='cpu' data-ref="33cpu">cpu</a>-&gt;<a class="ref" href="../../../target/i386/cpu.h.html#X86CPU::env" title='X86CPU::env' data-ref="X86CPU::env">env</a>.<a class="ref" href="../../../target/i386/cpu.h.html#CPUX86State::features" title='CPUX86State::features' data-ref="CPUX86State::features">features</a>[<a class="enum" href="../../../target/i386/cpu.h.html#FeatureWord::FEAT_KVM" title='FeatureWord::FEAT_KVM' data-ref="FeatureWord::FEAT_KVM">FEAT_KVM</a>] &amp; ((<var>1ULL</var> &lt;&lt; <a class="macro" href="../../../linux-headers/asm-x86/kvm_para.h.html#16" title="0" data-ref="_M/KVM_FEATURE_CLOCKSOURCE">KVM_FEATURE_CLOCKSOURCE</a>) |</td></tr>
+<tr><th id="308">308</th><td>                                       (<var>1ULL</var> &lt;&lt; <a class="macro" href="../../../linux-headers/asm-x86/kvm_para.h.html#22" title="3" data-ref="_M/KVM_FEATURE_CLOCKSOURCE2">KVM_FEATURE_CLOCKSOURCE2</a>))) {</td></tr>
+<tr><th id="309">309</th><td>        <a class="ref" href="../../../include/hw/sysbus.h.html#sysbus_create_simple" title='sysbus_create_simple' data-ref="sysbus_create_simple">sysbus_create_simple</a>(<a class="macro" href="#31" title="&quot;kvmclock&quot;" data-ref="_M/TYPE_KVM_CLOCK">TYPE_KVM_CLOCK</a>, -<var>1</var>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="310">310</th><td>    }</td></tr>
+<tr><th id="311">311</th><td>}</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="kvmclock_register_types" title='kvmclock_register_types' data-type='void kvmclock_register_types()' data-ref="kvmclock_register_types">kvmclock_register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="314">314</th><td>{</td></tr>
+<tr><th id="315">315</th><td>    <a class="ref" href="../../../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#kvmclock_info" title='kvmclock_info' data-use='a' data-ref="kvmclock_info">kvmclock_info</a>);</td></tr>
+<tr><th id="316">316</th><td>}</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td><a class="macro" href="../../../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_kvmclock_register_types(void) { register_module_init(kvmclock_register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#kvmclock_register_types" title='kvmclock_register_types' data-use='r' data-ref="kvmclock_register_types">kvmclock_register_types</a>)</td></tr>
+<tr><th id="319">319</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

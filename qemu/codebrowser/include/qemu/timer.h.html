@@ -1,0 +1,1058 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>timer.h source code [codebrowser/include/qemu/timer.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QEMUTimer,QEMUTimerListGroup "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/timer.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='timer.h.html'>timer.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_TIMER_H">QEMU_TIMER_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_TIMER_H" data-ref="_M/QEMU_TIMER_H">QEMU_TIMER_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="../qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="notify.h.html">"qemu/notify.h"</a></u></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="host-utils.h.html">"qemu/host-utils.h"</a></u></td></tr>
+<tr><th id="7">7</th><td></td></tr>
+<tr><th id="8">8</th><td><u>#define <dfn class="macro" id="_M/NANOSECONDS_PER_SECOND" data-ref="_M/NANOSECONDS_PER_SECOND">NANOSECONDS_PER_SECOND</dfn> 1000000000LL</u></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><i>/* timers */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/SCALE_MS" data-ref="_M/SCALE_MS">SCALE_MS</dfn> 1000000</u></td></tr>
+<tr><th id="13">13</th><td><u>#define <dfn class="macro" id="_M/SCALE_US" data-ref="_M/SCALE_US">SCALE_US</dfn> 1000</u></td></tr>
+<tr><th id="14">14</th><td><u>#define <dfn class="macro" id="_M/SCALE_NS" data-ref="_M/SCALE_NS">SCALE_NS</dfn> 1</u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="17">17</th><td><i class="doc"> * QEMUClockType:</i></td></tr>
+<tr><th id="18">18</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="19">19</th><td><i class="doc"> * The following clock types are available:</i></td></tr>
+<tr><th id="20">20</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="21">21</th><td><i class="doc"> *<span class="command"> @QEMU</span>_CLOCK_REALTIME: Real time clock</i></td></tr>
+<tr><th id="22">22</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> * The real time clock should be used only for stuff which does not</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * change the virtual machine state, as it runs even if the virtual</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> * machine is stopped.</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *<span class="command"> @QEMU</span>_CLOCK_VIRTUAL: virtual clock</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> * The virtual clock only runs during the emulation. It stops</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> * when the virtual machine is stopped.</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> *<span class="command"> @QEMU</span>_CLOCK_HOST: host clock</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * The host clock should be used for device models that emulate accurate</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * real time sources. It will continue to run when the virtual machine</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * is suspended, and it will reflect system time changes the host may</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * undergo (e.g. due to NTP).</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> *<span class="command"> @QEMU</span>_CLOCK_VIRTUAL_RT: realtime clock used for icount warp</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * Outside icount mode, this clock is the same as<span class="command"> @QEMU</span>_CLOCK_VIRTUAL.</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> * In icount mode, this clock counts nanoseconds while the virtual</i></td></tr>
+<tr><th id="43">43</th><td><i class="doc"> * machine is running.  It is used to increase<span class="command"> @QEMU</span>_CLOCK_VIRTUAL</i></td></tr>
+<tr><th id="44">44</th><td><i class="doc"> * while the CPUs are sleeping and thus not executing instructions.</i></td></tr>
+<tr><th id="45">45</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><b>typedef</b> <b>enum</b> {</td></tr>
+<tr><th id="48">48</th><td>    <dfn class="enum" id="QEMU_CLOCK_REALTIME" title='QEMU_CLOCK_REALTIME' data-ref="QEMU_CLOCK_REALTIME">QEMU_CLOCK_REALTIME</dfn> = <var>0</var>,</td></tr>
+<tr><th id="49">49</th><td>    <dfn class="enum" id="QEMU_CLOCK_VIRTUAL" title='QEMU_CLOCK_VIRTUAL' data-ref="QEMU_CLOCK_VIRTUAL">QEMU_CLOCK_VIRTUAL</dfn> = <var>1</var>,</td></tr>
+<tr><th id="50">50</th><td>    <dfn class="enum" id="QEMU_CLOCK_HOST" title='QEMU_CLOCK_HOST' data-ref="QEMU_CLOCK_HOST">QEMU_CLOCK_HOST</dfn> = <var>2</var>,</td></tr>
+<tr><th id="51">51</th><td>    <dfn class="enum" id="QEMU_CLOCK_VIRTUAL_RT" title='QEMU_CLOCK_VIRTUAL_RT' data-ref="QEMU_CLOCK_VIRTUAL_RT">QEMU_CLOCK_VIRTUAL_RT</dfn> = <var>3</var>,</td></tr>
+<tr><th id="52">52</th><td>    <dfn class="enum" id="QEMU_CLOCK_MAX" title='QEMU_CLOCK_MAX' data-ref="QEMU_CLOCK_MAX">QEMU_CLOCK_MAX</dfn></td></tr>
+<tr><th id="53">53</th><td>} <dfn class="typedef" id="QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</dfn>;</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="QEMUTimerList" title='QEMUTimerList' data-ref="QEMUTimerList"><a class="type" href="#QEMUTimerList" title='QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a></dfn> <dfn class="typedef" id="QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</dfn>;</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><b>struct</b> <dfn class="type def" id="QEMUTimerListGroup" title='QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</dfn> {</td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="decl" id="QEMUTimerListGroup::tl" title='QEMUTimerListGroup::tl' data-ref="QEMUTimerListGroup::tl">tl</dfn>[<a class="enum" href="#QEMU_CLOCK_MAX" title='QEMU_CLOCK_MAX' data-ref="QEMU_CLOCK_MAX">QEMU_CLOCK_MAX</a>];</td></tr>
+<tr><th id="59">59</th><td>};</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</dfn>(<em>void</em> *<dfn class="local col0 decl" id="7180opaque" title='opaque' data-type='void *' data-ref="7180opaque">opaque</dfn>);</td></tr>
+<tr><th id="62">62</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="QEMUTimerListNotifyCB" title='QEMUTimerListNotifyCB' data-type='void (void *, QEMUClockType)' data-ref="QEMUTimerListNotifyCB">QEMUTimerListNotifyCB</dfn>(<em>void</em> *<dfn class="local col1 decl" id="7181opaque" title='opaque' data-type='void *' data-ref="7181opaque">opaque</dfn>, <a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col2 decl" id="7182type" title='type' data-type='QEMUClockType' data-ref="7182type">type</dfn>);</td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><b>struct</b> <dfn class="type def" id="QEMUTimer" title='QEMUTimer' data-ref="QEMUTimer">QEMUTimer</dfn> {</td></tr>
+<tr><th id="65">65</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="QEMUTimer::expire_time" title='QEMUTimer::expire_time' data-ref="QEMUTimer::expire_time">expire_time</dfn>;        <i>/* in nanoseconds */</i></td></tr>
+<tr><th id="66">66</th><td>    <a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="decl" id="QEMUTimer::timer_list" title='QEMUTimer::timer_list' data-ref="QEMUTimer::timer_list">timer_list</dfn>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="decl" id="QEMUTimer::cb" title='QEMUTimer::cb' data-ref="QEMUTimer::cb">cb</dfn>;</td></tr>
+<tr><th id="68">68</th><td>    <em>void</em> *<dfn class="decl" id="QEMUTimer::opaque" title='QEMUTimer::opaque' data-ref="QEMUTimer::opaque">opaque</dfn>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="QEMUTimer::next" title='QEMUTimer::next' data-ref="QEMUTimer::next">next</dfn>;</td></tr>
+<tr><th id="70">70</th><td>    <em>int</em> <dfn class="decl" id="QEMUTimer::scale" title='QEMUTimer::scale' data-ref="QEMUTimer::scale">scale</dfn>;</td></tr>
+<tr><th id="71">71</th><td>};</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><b>extern</b> <a class="typedef" href="typedefs.h.html#QEMUTimerListGroup" title='QEMUTimerListGroup' data-type='struct QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</a> <dfn class="decl" id="main_loop_tlg" title='main_loop_tlg' data-ref="main_loop_tlg">main_loop_tlg</dfn>;</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td><i>/*</i></td></tr>
+<tr><th id="76">76</th><td><i> * qemu_clock_get_ns;</i></td></tr>
+<tr><th id="77">77</th><td><i> * @type: the clock type</i></td></tr>
+<tr><th id="78">78</th><td><i> *</i></td></tr>
+<tr><th id="79">79</th><td><i> * Get the nanosecond value of a clock with</i></td></tr>
+<tr><th id="80">80</th><td><i> * type @type</i></td></tr>
+<tr><th id="81">81</th><td><i> *</i></td></tr>
+<tr><th id="82">82</th><td><i> * Returns: the clock value in nanoseconds</i></td></tr>
+<tr><th id="83">83</th><td><i> */</i></td></tr>
+<tr><th id="84">84</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="qemu_clock_get_ns" title='qemu_clock_get_ns' data-ref="qemu_clock_get_ns">qemu_clock_get_ns</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col3 decl" id="7183type" title='type' data-type='QEMUClockType' data-ref="7183type">type</dfn>);</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="87">87</th><td><i class="doc"> * qemu_clock_get_ms;</i></td></tr>
+<tr><th id="88">88</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="89">89</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="90">90</th><td><i class="doc"> * Get the millisecond value of a clock with</i></td></tr>
+<tr><th id="91">91</th><td><i class="doc"> * type<span class="command"> @type</span></i></td></tr>
+<tr><th id="92">92</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * Returns: the clock value in milliseconds</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="95">95</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="qemu_clock_get_ms" title='qemu_clock_get_ms' data-ref="qemu_clock_get_ms">qemu_clock_get_ms</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col4 decl" id="7184type" title='type' data-type='QEMUClockType' data-ref="7184type">type</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <b>return</b> <a class="ref" href="#qemu_clock_get_ns" title='qemu_clock_get_ns' data-ref="qemu_clock_get_ns">qemu_clock_get_ns</a>(<a class="local col4 ref" href="#7184type" title='type' data-ref="7184type">type</a>) / <a class="macro" href="#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>;</td></tr>
+<tr><th id="98">98</th><td>}</td></tr>
+<tr><th id="99">99</th><td></td></tr>
+<tr><th id="100">100</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> * qemu_clock_get_us;</i></td></tr>
+<tr><th id="102">102</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="103">103</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="104">104</th><td><i class="doc"> * Get the microsecond value of a clock with</i></td></tr>
+<tr><th id="105">105</th><td><i class="doc"> * type<span class="command"> @type</span></i></td></tr>
+<tr><th id="106">106</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="107">107</th><td><i class="doc"> * Returns: the clock value in microseconds</i></td></tr>
+<tr><th id="108">108</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="109">109</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="qemu_clock_get_us" title='qemu_clock_get_us' data-ref="qemu_clock_get_us">qemu_clock_get_us</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col5 decl" id="7185type" title='type' data-type='QEMUClockType' data-ref="7185type">type</dfn>)</td></tr>
+<tr><th id="110">110</th><td>{</td></tr>
+<tr><th id="111">111</th><td>    <b>return</b> <a class="ref" href="#qemu_clock_get_ns" title='qemu_clock_get_ns' data-ref="qemu_clock_get_ns">qemu_clock_get_ns</a>(<a class="local col5 ref" href="#7185type" title='type' data-ref="7185type">type</a>) / <a class="macro" href="#13" title="1000" data-ref="_M/SCALE_US">SCALE_US</a>;</td></tr>
+<tr><th id="112">112</th><td>}</td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> * qemu_clock_has_timers:</i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> * Determines whether a clock's default timer list</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> * has timers attached</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> * Note that this function should not be used when other threads also access</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * the timer list.  The return value may be outdated by the time it is acted</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> * upon.</i></td></tr>
+<tr><th id="124">124</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="125">125</th><td><i class="doc"> * Returns: true if the clock's default timer list</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> * has timers attached</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="128">128</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_clock_has_timers" title='qemu_clock_has_timers' data-ref="qemu_clock_has_timers">qemu_clock_has_timers</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col6 decl" id="7186type" title='type' data-type='QEMUClockType' data-ref="7186type">type</dfn>);</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> * qemu_clock_expired:</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> * Determines whether a clock's default timer list</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> * has an expired timer.</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"> * Returns: true if the clock's default timer list has</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> * an expired timer</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="140">140</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_clock_expired" title='qemu_clock_expired' data-ref="qemu_clock_expired">qemu_clock_expired</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col7 decl" id="7187type" title='type' data-type='QEMUClockType' data-ref="7187type">type</dfn>);</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"> * qemu_clock_use_for_deadline:</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> * Determine whether a clock should be used for deadline</i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> * calculations. Some clocks, for instance vm_clock with</i></td></tr>
+<tr><th id="148">148</th><td><i class="doc"> * use_icount set, do not count in nanoseconds. Such clocks</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * are not used for deadline calculations, and are presumed</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> * to interrupt any poll using qemu_notify/aio_notify</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> * etc.</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> * Returns: true if the clock runs in nanoseconds and</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> * should be used for a deadline.</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="156">156</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_clock_use_for_deadline" title='qemu_clock_use_for_deadline' data-ref="qemu_clock_use_for_deadline">qemu_clock_use_for_deadline</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col8 decl" id="7188type" title='type' data-type='QEMUClockType' data-ref="7188type">type</dfn>);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> * qemu_clock_deadline_ns_all:</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="162">162</th><td><i class="doc"> * Calculate the deadline across all timer lists associated</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> * with a clock (as opposed to just the default one)</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> * in nanoseconds, or -1 if no timer is set to expire.</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> * Returns: time until expiry in nanoseconds or -1</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="168">168</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="qemu_clock_deadline_ns_all" title='qemu_clock_deadline_ns_all' data-ref="qemu_clock_deadline_ns_all">qemu_clock_deadline_ns_all</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col9 decl" id="7189type" title='type' data-type='QEMUClockType' data-ref="7189type">type</dfn>);</td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> * qemu_clock_get_main_loop_timerlist:</i></td></tr>
+<tr><th id="172">172</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="173">173</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * Return the default timer list associated with a clock.</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> * Returns: the default timer list</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="178">178</th><td><a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="decl" id="qemu_clock_get_main_loop_timerlist" title='qemu_clock_get_main_loop_timerlist' data-ref="qemu_clock_get_main_loop_timerlist">qemu_clock_get_main_loop_timerlist</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col0 decl" id="7190type" title='type' data-type='QEMUClockType' data-ref="7190type">type</dfn>);</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="181">181</th><td><i class="doc"> * qemu_clock_nofify:</i></td></tr>
+<tr><th id="182">182</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * Call the notifier callback connected with the default timer</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> * list linked to the clock, or qemu_notify() if none.</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="187">187</th><td><em>void</em> <dfn class="decl" id="qemu_clock_notify" title='qemu_clock_notify' data-ref="qemu_clock_notify">qemu_clock_notify</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col1 decl" id="7191type" title='type' data-type='QEMUClockType' data-ref="7191type">type</dfn>);</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="190">190</th><td><i class="doc"> * qemu_clock_enable:</i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> *<span class="command"> @enabled</span>: true to enable, false to disable</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> * Enable or disable a clock</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> * Disabling the clock will wait for related timerlists to stop</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> * executing qemu_run_timers.  Thus, this functions should not</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> * be used from the callback of a timer that is based on<span class="command"> @clock</span>.</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> * Doing so would cause a deadlock.</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> * Caller should hold BQL.</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="202">202</th><td><em>void</em> <dfn class="decl" id="qemu_clock_enable" title='qemu_clock_enable' data-ref="qemu_clock_enable">qemu_clock_enable</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col2 decl" id="7192type" title='type' data-type='QEMUClockType' data-ref="7192type">type</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col3 decl" id="7193enabled" title='enabled' data-type='_Bool' data-ref="7193enabled">enabled</dfn>);</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> * qemu_start_warp_timer:</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> * Starts a timer for virtual clock update</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="209">209</th><td><em>void</em> <dfn class="decl" id="qemu_start_warp_timer" title='qemu_start_warp_timer' data-ref="qemu_start_warp_timer">qemu_start_warp_timer</dfn>(<em>void</em>);</td></tr>
+<tr><th id="210">210</th><td></td></tr>
+<tr><th id="211">211</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="212">212</th><td><i class="doc"> * qemu_clock_register_reset_notifier:</i></td></tr>
+<tr><th id="213">213</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="214">214</th><td><i class="doc"> *<span class="command"> @notifier</span>: the notifier function</i></td></tr>
+<tr><th id="215">215</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="216">216</th><td><i class="doc"> * Register a notifier function to call when the clock</i></td></tr>
+<tr><th id="217">217</th><td><i class="doc"> * concerned is reset.</i></td></tr>
+<tr><th id="218">218</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="219">219</th><td><em>void</em> <dfn class="decl" id="qemu_clock_register_reset_notifier" title='qemu_clock_register_reset_notifier' data-ref="qemu_clock_register_reset_notifier">qemu_clock_register_reset_notifier</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col4 decl" id="7194type" title='type' data-type='QEMUClockType' data-ref="7194type">type</dfn>,</td></tr>
+<tr><th id="220">220</th><td>                                        <a class="typedef" href="notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col5 decl" id="7195notifier" title='notifier' data-type='Notifier *' data-ref="7195notifier">notifier</dfn>);</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="223">223</th><td><i class="doc"> * qemu_clock_unregister_reset_notifier:</i></td></tr>
+<tr><th id="224">224</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type</i></td></tr>
+<tr><th id="225">225</th><td><i class="doc"> *<span class="command"> @notifier</span>: the notifier function</i></td></tr>
+<tr><th id="226">226</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="227">227</th><td><i class="doc"> * Unregister a notifier function to call when the clock</i></td></tr>
+<tr><th id="228">228</th><td><i class="doc"> * concerned is reset.</i></td></tr>
+<tr><th id="229">229</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="230">230</th><td><em>void</em> <dfn class="decl" id="qemu_clock_unregister_reset_notifier" title='qemu_clock_unregister_reset_notifier' data-ref="qemu_clock_unregister_reset_notifier">qemu_clock_unregister_reset_notifier</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col6 decl" id="7196type" title='type' data-type='QEMUClockType' data-ref="7196type">type</dfn>,</td></tr>
+<tr><th id="231">231</th><td>                                          <a class="typedef" href="notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col7 decl" id="7197notifier" title='notifier' data-type='Notifier *' data-ref="7197notifier">notifier</dfn>);</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="234">234</th><td><i class="doc"> * qemu_clock_run_timers:</i></td></tr>
+<tr><th id="235">235</th><td><i class="doc"> *<span class="command"> @type</span>: clock on which to operate</i></td></tr>
+<tr><th id="236">236</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="237">237</th><td><i class="doc"> * Run all the timers associated with the default timer list</i></td></tr>
+<tr><th id="238">238</th><td><i class="doc"> * of a clock.</i></td></tr>
+<tr><th id="239">239</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="240">240</th><td><i class="doc"> * Returns: true if any timer ran.</i></td></tr>
+<tr><th id="241">241</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="242">242</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_clock_run_timers" title='qemu_clock_run_timers' data-ref="qemu_clock_run_timers">qemu_clock_run_timers</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col8 decl" id="7198type" title='type' data-type='QEMUClockType' data-ref="7198type">type</dfn>);</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="245">245</th><td><i class="doc"> * qemu_clock_run_all_timers:</i></td></tr>
+<tr><th id="246">246</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="247">247</th><td><i class="doc"> * Run all the timers associated with the default timer list</i></td></tr>
+<tr><th id="248">248</th><td><i class="doc"> * of every clock.</i></td></tr>
+<tr><th id="249">249</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="250">250</th><td><i class="doc"> * Returns: true if any timer ran.</i></td></tr>
+<tr><th id="251">251</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="252">252</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_clock_run_all_timers" title='qemu_clock_run_all_timers' data-ref="qemu_clock_run_all_timers">qemu_clock_run_all_timers</dfn>(<em>void</em>);</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td><i>/*</i></td></tr>
+<tr><th id="255">255</th><td><i> * QEMUTimerList</i></td></tr>
+<tr><th id="256">256</th><td><i> */</i></td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="259">259</th><td><i class="doc"> * timerlist_new:</i></td></tr>
+<tr><th id="260">260</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type to associate with the timerlist</i></td></tr>
+<tr><th id="261">261</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call on notification</i></td></tr>
+<tr><th id="262">262</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="263">263</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="264">264</th><td><i class="doc"> * Create a new timerlist associated with the clock of</i></td></tr>
+<tr><th id="265">265</th><td><i class="doc"> * type<span class="command"> @type</span>.</i></td></tr>
+<tr><th id="266">266</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="267">267</th><td><i class="doc"> * Returns: a pointer to the QEMUTimerList created</i></td></tr>
+<tr><th id="268">268</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="269">269</th><td><a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="decl" id="timerlist_new" title='timerlist_new' data-ref="timerlist_new">timerlist_new</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col9 decl" id="7199type" title='type' data-type='QEMUClockType' data-ref="7199type">type</dfn>,</td></tr>
+<tr><th id="270">270</th><td>                             <a class="typedef" href="#QEMUTimerListNotifyCB" title='QEMUTimerListNotifyCB' data-type='void (void *, QEMUClockType)' data-ref="QEMUTimerListNotifyCB">QEMUTimerListNotifyCB</a> *<dfn class="local col0 decl" id="7200cb" title='cb' data-type='QEMUTimerListNotifyCB *' data-ref="7200cb">cb</dfn>, <em>void</em> *<dfn class="local col1 decl" id="7201opaque" title='opaque' data-type='void *' data-ref="7201opaque">opaque</dfn>);</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="273">273</th><td><i class="doc"> * timerlist_free:</i></td></tr>
+<tr><th id="274">274</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to free</i></td></tr>
+<tr><th id="275">275</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="276">276</th><td><i class="doc"> * Frees a timer_list. It must have no active timers.</i></td></tr>
+<tr><th id="277">277</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="278">278</th><td><em>void</em> <dfn class="decl" id="timerlist_free" title='timerlist_free' data-ref="timerlist_free">timerlist_free</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col2 decl" id="7202timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7202timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="281">281</th><td><i class="doc"> * timerlist_has_timers:</i></td></tr>
+<tr><th id="282">282</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to operate on</i></td></tr>
+<tr><th id="283">283</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="284">284</th><td><i class="doc"> * Determine whether a timer list has active timers</i></td></tr>
+<tr><th id="285">285</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="286">286</th><td><i class="doc"> * Note that this function should not be used when other threads also access</i></td></tr>
+<tr><th id="287">287</th><td><i class="doc"> * the timer list.  The return value may be outdated by the time it is acted</i></td></tr>
+<tr><th id="288">288</th><td><i class="doc"> * upon.</i></td></tr>
+<tr><th id="289">289</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="290">290</th><td><i class="doc"> * Returns: true if the timer list has timers.</i></td></tr>
+<tr><th id="291">291</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="292">292</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timerlist_has_timers" title='timerlist_has_timers' data-ref="timerlist_has_timers">timerlist_has_timers</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col3 decl" id="7203timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7203timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="293">293</th><td></td></tr>
+<tr><th id="294">294</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="295">295</th><td><i class="doc"> * timerlist_expired:</i></td></tr>
+<tr><th id="296">296</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to operate on</i></td></tr>
+<tr><th id="297">297</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="298">298</th><td><i class="doc"> * Determine whether a timer list has any timers which</i></td></tr>
+<tr><th id="299">299</th><td><i class="doc"> * are expired.</i></td></tr>
+<tr><th id="300">300</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="301">301</th><td><i class="doc"> * Returns: true if the timer list has timers which</i></td></tr>
+<tr><th id="302">302</th><td><i class="doc"> * have expired.</i></td></tr>
+<tr><th id="303">303</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="304">304</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timerlist_expired" title='timerlist_expired' data-ref="timerlist_expired">timerlist_expired</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col4 decl" id="7204timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7204timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="307">307</th><td><i class="doc"> * timerlist_deadline_ns:</i></td></tr>
+<tr><th id="308">308</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to operate on</i></td></tr>
+<tr><th id="309">309</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc"> * Determine the deadline for a timer_list, i.e.</i></td></tr>
+<tr><th id="311">311</th><td><i class="doc"> * the number of nanoseconds until the first timer</i></td></tr>
+<tr><th id="312">312</th><td><i class="doc"> * expires. Return -1 if there are no timers.</i></td></tr>
+<tr><th id="313">313</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="314">314</th><td><i class="doc"> * Returns: the number of nanoseconds until the earliest</i></td></tr>
+<tr><th id="315">315</th><td><i class="doc"> * timer expires -1 if none</i></td></tr>
+<tr><th id="316">316</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="317">317</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="timerlist_deadline_ns" title='timerlist_deadline_ns' data-ref="timerlist_deadline_ns">timerlist_deadline_ns</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col5 decl" id="7205timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7205timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="320">320</th><td><i class="doc"> * timerlist_get_clock:</i></td></tr>
+<tr><th id="321">321</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to operate on</i></td></tr>
+<tr><th id="322">322</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="323">323</th><td><i class="doc"> * Determine the clock type associated with a timer list.</i></td></tr>
+<tr><th id="324">324</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="325">325</th><td><i class="doc"> * Returns: the clock type associated with the</i></td></tr>
+<tr><th id="326">326</th><td><i class="doc"> * timer list.</i></td></tr>
+<tr><th id="327">327</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="328">328</th><td><a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="decl" id="timerlist_get_clock" title='timerlist_get_clock' data-ref="timerlist_get_clock">timerlist_get_clock</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col6 decl" id="7206timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7206timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="331">331</th><td><i class="doc"> * timerlist_run_timers:</i></td></tr>
+<tr><th id="332">332</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to use</i></td></tr>
+<tr><th id="333">333</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="334">334</th><td><i class="doc"> * Call all expired timers associated with the timer list.</i></td></tr>
+<tr><th id="335">335</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="336">336</th><td><i class="doc"> * Returns: true if any timer expired</i></td></tr>
+<tr><th id="337">337</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="338">338</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timerlist_run_timers" title='timerlist_run_timers' data-ref="timerlist_run_timers">timerlist_run_timers</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col7 decl" id="7207timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7207timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="339">339</th><td></td></tr>
+<tr><th id="340">340</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="341">341</th><td><i class="doc"> * timerlist_notify:</i></td></tr>
+<tr><th id="342">342</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to use</i></td></tr>
+<tr><th id="343">343</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="344">344</th><td><i class="doc"> * call the notifier callback associated with the timer list.</i></td></tr>
+<tr><th id="345">345</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="346">346</th><td><em>void</em> <dfn class="decl" id="timerlist_notify" title='timerlist_notify' data-ref="timerlist_notify">timerlist_notify</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col8 decl" id="7208timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7208timer_list">timer_list</dfn>);</td></tr>
+<tr><th id="347">347</th><td></td></tr>
+<tr><th id="348">348</th><td><i>/*</i></td></tr>
+<tr><th id="349">349</th><td><i> * QEMUTimerListGroup</i></td></tr>
+<tr><th id="350">350</th><td><i> */</i></td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="353">353</th><td><i class="doc"> * timerlistgroup_init:</i></td></tr>
+<tr><th id="354">354</th><td><i class="doc"> *<span class="command"> @tlg</span>: the timer list group</i></td></tr>
+<tr><th id="355">355</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when a notify is required</i></td></tr>
+<tr><th id="356">356</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to be passed to the callback.</i></td></tr>
+<tr><th id="357">357</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="358">358</th><td><i class="doc"> * Initialise a timer list group. This must already be</i></td></tr>
+<tr><th id="359">359</th><td><i class="doc"> * allocated in memory and zeroed. The notifier callback is</i></td></tr>
+<tr><th id="360">360</th><td><i class="doc"> * called whenever a clock in the timer list group is</i></td></tr>
+<tr><th id="361">361</th><td><i class="doc"> * reenabled or whenever a timer associated with any timer</i></td></tr>
+<tr><th id="362">362</th><td><i class="doc"> * list is modified. If<span class="command"> @cb</span> is specified as null, qemu_notify()</i></td></tr>
+<tr><th id="363">363</th><td><i class="doc"> * is used instead.</i></td></tr>
+<tr><th id="364">364</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="365">365</th><td><em>void</em> <dfn class="decl" id="timerlistgroup_init" title='timerlistgroup_init' data-ref="timerlistgroup_init">timerlistgroup_init</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimerListGroup" title='QEMUTimerListGroup' data-type='struct QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</a> *<dfn class="local col9 decl" id="7209tlg" title='tlg' data-type='QEMUTimerListGroup *' data-ref="7209tlg">tlg</dfn>,</td></tr>
+<tr><th id="366">366</th><td>                         <a class="typedef" href="#QEMUTimerListNotifyCB" title='QEMUTimerListNotifyCB' data-type='void (void *, QEMUClockType)' data-ref="QEMUTimerListNotifyCB">QEMUTimerListNotifyCB</a> *<dfn class="local col0 decl" id="7210cb" title='cb' data-type='QEMUTimerListNotifyCB *' data-ref="7210cb">cb</dfn>, <em>void</em> *<dfn class="local col1 decl" id="7211opaque" title='opaque' data-type='void *' data-ref="7211opaque">opaque</dfn>);</td></tr>
+<tr><th id="367">367</th><td></td></tr>
+<tr><th id="368">368</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="369">369</th><td><i class="doc"> * timerlistgroup_deinit:</i></td></tr>
+<tr><th id="370">370</th><td><i class="doc"> *<span class="command"> @tlg</span>: the timer list group</i></td></tr>
+<tr><th id="371">371</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="372">372</th><td><i class="doc"> * Deinitialise a timer list group. This must already be</i></td></tr>
+<tr><th id="373">373</th><td><i class="doc"> * initialised. Note the memory is not freed.</i></td></tr>
+<tr><th id="374">374</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="375">375</th><td><em>void</em> <dfn class="decl" id="timerlistgroup_deinit" title='timerlistgroup_deinit' data-ref="timerlistgroup_deinit">timerlistgroup_deinit</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimerListGroup" title='QEMUTimerListGroup' data-type='struct QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</a> *<dfn class="local col2 decl" id="7212tlg" title='tlg' data-type='QEMUTimerListGroup *' data-ref="7212tlg">tlg</dfn>);</td></tr>
+<tr><th id="376">376</th><td></td></tr>
+<tr><th id="377">377</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="378">378</th><td><i class="doc"> * timerlistgroup_run_timers:</i></td></tr>
+<tr><th id="379">379</th><td><i class="doc"> *<span class="command"> @tlg</span>: the timer list group</i></td></tr>
+<tr><th id="380">380</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="381">381</th><td><i class="doc"> * Run the timers associated with a timer list group.</i></td></tr>
+<tr><th id="382">382</th><td><i class="doc"> * This will run timers on multiple clocks.</i></td></tr>
+<tr><th id="383">383</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="384">384</th><td><i class="doc"> * Returns: true if any timer callback ran</i></td></tr>
+<tr><th id="385">385</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="386">386</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timerlistgroup_run_timers" title='timerlistgroup_run_timers' data-ref="timerlistgroup_run_timers">timerlistgroup_run_timers</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimerListGroup" title='QEMUTimerListGroup' data-type='struct QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</a> *<dfn class="local col3 decl" id="7213tlg" title='tlg' data-type='QEMUTimerListGroup *' data-ref="7213tlg">tlg</dfn>);</td></tr>
+<tr><th id="387">387</th><td></td></tr>
+<tr><th id="388">388</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="389">389</th><td><i class="doc"> * timerlistgroup_deadline_ns:</i></td></tr>
+<tr><th id="390">390</th><td><i class="doc"> *<span class="command"> @tlg</span>: the timer list group</i></td></tr>
+<tr><th id="391">391</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="392">392</th><td><i class="doc"> * Determine the deadline of the soonest timer to</i></td></tr>
+<tr><th id="393">393</th><td><i class="doc"> * expire associated with any timer list linked to</i></td></tr>
+<tr><th id="394">394</th><td><i class="doc"> * the timer list group. Only clocks suitable for</i></td></tr>
+<tr><th id="395">395</th><td><i class="doc"> * deadline calculation are included.</i></td></tr>
+<tr><th id="396">396</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="397">397</th><td><i class="doc"> * Returns: the deadline in nanoseconds or -1 if no</i></td></tr>
+<tr><th id="398">398</th><td><i class="doc"> * timers are to expire.</i></td></tr>
+<tr><th id="399">399</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="400">400</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="timerlistgroup_deadline_ns" title='timerlistgroup_deadline_ns' data-ref="timerlistgroup_deadline_ns">timerlistgroup_deadline_ns</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimerListGroup" title='QEMUTimerListGroup' data-type='struct QEMUTimerListGroup' data-ref="QEMUTimerListGroup">QEMUTimerListGroup</a> *<dfn class="local col4 decl" id="7214tlg" title='tlg' data-type='QEMUTimerListGroup *' data-ref="7214tlg">tlg</dfn>);</td></tr>
+<tr><th id="401">401</th><td></td></tr>
+<tr><th id="402">402</th><td><i>/*</i></td></tr>
+<tr><th id="403">403</th><td><i> * QEMUTimer</i></td></tr>
+<tr><th id="404">404</th><td><i> */</i></td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="407">407</th><td><i class="doc"> * timer_init_tl:</i></td></tr>
+<tr><th id="408">408</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be initialised</i></td></tr>
+<tr><th id="409">409</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to attach the timer to</i></td></tr>
+<tr><th id="410">410</th><td><i class="doc"> *<span class="command"> @scale</span>: the scale value for the timer</i></td></tr>
+<tr><th id="411">411</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to be called when the timer expires</i></td></tr>
+<tr><th id="412">412</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to be passed to the callback</i></td></tr>
+<tr><th id="413">413</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="414">414</th><td><i class="doc"> * Initialise a new timer and associate it with<span class="command"> @timer</span>_list.</i></td></tr>
+<tr><th id="415">415</th><td><i class="doc"> * The caller is responsible for allocating the memory.</i></td></tr>
+<tr><th id="416">416</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="417">417</th><td><i class="doc"> * You need not call an explicit deinit call. Simply make</i></td></tr>
+<tr><th id="418">418</th><td><i class="doc"> * sure it is not on a list with timer_del.</i></td></tr>
+<tr><th id="419">419</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="420">420</th><td><em>void</em> <dfn class="decl" id="timer_init_tl" title='timer_init_tl' data-ref="timer_init_tl">timer_init_tl</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col5 decl" id="7215ts" title='ts' data-type='QEMUTimer *' data-ref="7215ts">ts</dfn>,</td></tr>
+<tr><th id="421">421</th><td>                   <a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col6 decl" id="7216timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7216timer_list">timer_list</dfn>, <em>int</em> <dfn class="local col7 decl" id="7217scale" title='scale' data-type='int' data-ref="7217scale">scale</dfn>,</td></tr>
+<tr><th id="422">422</th><td>                   <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col8 decl" id="7218cb" title='cb' data-type='QEMUTimerCB *' data-ref="7218cb">cb</dfn>, <em>void</em> *<dfn class="local col9 decl" id="7219opaque" title='opaque' data-type='void *' data-ref="7219opaque">opaque</dfn>);</td></tr>
+<tr><th id="423">423</th><td></td></tr>
+<tr><th id="424">424</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="425">425</th><td><i class="doc"> * timer_init:</i></td></tr>
+<tr><th id="426">426</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be initialised</i></td></tr>
+<tr><th id="427">427</th><td><i class="doc"> *<span class="command"> @type</span>: the clock to associate with the timer</i></td></tr>
+<tr><th id="428">428</th><td><i class="doc"> *<span class="command"> @scale</span>: the scale value for the timer</i></td></tr>
+<tr><th id="429">429</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="430">430</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="431">431</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="432">432</th><td><i class="doc"> * Initialize a timer with the given scale on the default timer list</i></td></tr>
+<tr><th id="433">433</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="434">434</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="435">435</th><td><i class="doc"> * You need not call an explicit deinit call. Simply make</i></td></tr>
+<tr><th id="436">436</th><td><i class="doc"> * sure it is not on a list with timer_del.</i></td></tr>
+<tr><th id="437">437</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="438">438</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="timer_init" title='timer_init' data-ref="timer_init">timer_init</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col0 decl" id="7220ts" title='ts' data-type='QEMUTimer *' data-ref="7220ts">ts</dfn>, <a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col1 decl" id="7221type" title='type' data-type='QEMUClockType' data-ref="7221type">type</dfn>, <em>int</em> <dfn class="local col2 decl" id="7222scale" title='scale' data-type='int' data-ref="7222scale">scale</dfn>,</td></tr>
+<tr><th id="439">439</th><td>                              <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col3 decl" id="7223cb" title='cb' data-type='QEMUTimerCB *' data-ref="7223cb">cb</dfn>, <em>void</em> *<dfn class="local col4 decl" id="7224opaque" title='opaque' data-type='void *' data-ref="7224opaque">opaque</dfn>)</td></tr>
+<tr><th id="440">440</th><td>{</td></tr>
+<tr><th id="441">441</th><td>    <a class="ref" href="#timer_init_tl" title='timer_init_tl' data-ref="timer_init_tl">timer_init_tl</a>(<a class="local col0 ref" href="#7220ts" title='ts' data-ref="7220ts">ts</a>, <a class="ref" href="#main_loop_tlg" title='main_loop_tlg' data-ref="main_loop_tlg">main_loop_tlg</a>.<a class="ref" href="#QEMUTimerListGroup::tl" title='QEMUTimerListGroup::tl' data-ref="QEMUTimerListGroup::tl">tl</a>[<a class="local col1 ref" href="#7221type" title='type' data-ref="7221type">type</a>], <a class="local col2 ref" href="#7222scale" title='scale' data-ref="7222scale">scale</a>, <a class="local col3 ref" href="#7223cb" title='cb' data-ref="7223cb">cb</a>, <a class="local col4 ref" href="#7224opaque" title='opaque' data-ref="7224opaque">opaque</a>);</td></tr>
+<tr><th id="442">442</th><td>}</td></tr>
+<tr><th id="443">443</th><td></td></tr>
+<tr><th id="444">444</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="445">445</th><td><i class="doc"> * timer_init_ns:</i></td></tr>
+<tr><th id="446">446</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be initialised</i></td></tr>
+<tr><th id="447">447</th><td><i class="doc"> *<span class="command"> @type</span>: the clock to associate with the timer</i></td></tr>
+<tr><th id="448">448</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="449">449</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="450">450</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="451">451</th><td><i class="doc"> * Initialize a timer with nanosecond scale on the default timer list</i></td></tr>
+<tr><th id="452">452</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="453">453</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="454">454</th><td><i class="doc"> * You need not call an explicit deinit call. Simply make</i></td></tr>
+<tr><th id="455">455</th><td><i class="doc"> * sure it is not on a list with timer_del.</i></td></tr>
+<tr><th id="456">456</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="457">457</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="timer_init_ns" title='timer_init_ns' data-ref="timer_init_ns">timer_init_ns</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col5 decl" id="7225ts" title='ts' data-type='QEMUTimer *' data-ref="7225ts">ts</dfn>, <a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col6 decl" id="7226type" title='type' data-type='QEMUClockType' data-ref="7226type">type</dfn>,</td></tr>
+<tr><th id="458">458</th><td>                                 <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col7 decl" id="7227cb" title='cb' data-type='QEMUTimerCB *' data-ref="7227cb">cb</dfn>, <em>void</em> *<dfn class="local col8 decl" id="7228opaque" title='opaque' data-type='void *' data-ref="7228opaque">opaque</dfn>)</td></tr>
+<tr><th id="459">459</th><td>{</td></tr>
+<tr><th id="460">460</th><td>    <a class="ref" href="#timer_init" title='timer_init' data-ref="timer_init">timer_init</a>(<a class="local col5 ref" href="#7225ts" title='ts' data-ref="7225ts">ts</a>, <a class="local col6 ref" href="#7226type" title='type' data-ref="7226type">type</a>, <a class="macro" href="#14" title="1" data-ref="_M/SCALE_NS">SCALE_NS</a>, <a class="local col7 ref" href="#7227cb" title='cb' data-ref="7227cb">cb</a>, <a class="local col8 ref" href="#7228opaque" title='opaque' data-ref="7228opaque">opaque</a>);</td></tr>
+<tr><th id="461">461</th><td>}</td></tr>
+<tr><th id="462">462</th><td></td></tr>
+<tr><th id="463">463</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="464">464</th><td><i class="doc"> * timer_init_us:</i></td></tr>
+<tr><th id="465">465</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be initialised</i></td></tr>
+<tr><th id="466">466</th><td><i class="doc"> *<span class="command"> @type</span>: the clock to associate with the timer</i></td></tr>
+<tr><th id="467">467</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="468">468</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="469">469</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="470">470</th><td><i class="doc"> * Initialize a timer with microsecond scale on the default timer list</i></td></tr>
+<tr><th id="471">471</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="472">472</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="473">473</th><td><i class="doc"> * You need not call an explicit deinit call. Simply make</i></td></tr>
+<tr><th id="474">474</th><td><i class="doc"> * sure it is not on a list with timer_del.</i></td></tr>
+<tr><th id="475">475</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="476">476</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="timer_init_us" title='timer_init_us' data-ref="timer_init_us">timer_init_us</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col9 decl" id="7229ts" title='ts' data-type='QEMUTimer *' data-ref="7229ts">ts</dfn>, <a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col0 decl" id="7230type" title='type' data-type='QEMUClockType' data-ref="7230type">type</dfn>,</td></tr>
+<tr><th id="477">477</th><td>                                 <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col1 decl" id="7231cb" title='cb' data-type='QEMUTimerCB *' data-ref="7231cb">cb</dfn>, <em>void</em> *<dfn class="local col2 decl" id="7232opaque" title='opaque' data-type='void *' data-ref="7232opaque">opaque</dfn>)</td></tr>
+<tr><th id="478">478</th><td>{</td></tr>
+<tr><th id="479">479</th><td>    <a class="ref" href="#timer_init" title='timer_init' data-ref="timer_init">timer_init</a>(<a class="local col9 ref" href="#7229ts" title='ts' data-ref="7229ts">ts</a>, <a class="local col0 ref" href="#7230type" title='type' data-ref="7230type">type</a>, <a class="macro" href="#13" title="1000" data-ref="_M/SCALE_US">SCALE_US</a>, <a class="local col1 ref" href="#7231cb" title='cb' data-ref="7231cb">cb</a>, <a class="local col2 ref" href="#7232opaque" title='opaque' data-ref="7232opaque">opaque</a>);</td></tr>
+<tr><th id="480">480</th><td>}</td></tr>
+<tr><th id="481">481</th><td></td></tr>
+<tr><th id="482">482</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="483">483</th><td><i class="doc"> * timer_init_ms:</i></td></tr>
+<tr><th id="484">484</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be initialised</i></td></tr>
+<tr><th id="485">485</th><td><i class="doc"> *<span class="command"> @type</span>: the clock to associate with the timer</i></td></tr>
+<tr><th id="486">486</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="487">487</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="488">488</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="489">489</th><td><i class="doc"> * Initialize a timer with millisecond scale on the default timer list</i></td></tr>
+<tr><th id="490">490</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="491">491</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="492">492</th><td><i class="doc"> * You need not call an explicit deinit call. Simply make</i></td></tr>
+<tr><th id="493">493</th><td><i class="doc"> * sure it is not on a list with timer_del.</i></td></tr>
+<tr><th id="494">494</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="495">495</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="timer_init_ms" title='timer_init_ms' data-ref="timer_init_ms">timer_init_ms</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col3 decl" id="7233ts" title='ts' data-type='QEMUTimer *' data-ref="7233ts">ts</dfn>, <a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col4 decl" id="7234type" title='type' data-type='QEMUClockType' data-ref="7234type">type</dfn>,</td></tr>
+<tr><th id="496">496</th><td>                                 <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col5 decl" id="7235cb" title='cb' data-type='QEMUTimerCB *' data-ref="7235cb">cb</dfn>, <em>void</em> *<dfn class="local col6 decl" id="7236opaque" title='opaque' data-type='void *' data-ref="7236opaque">opaque</dfn>)</td></tr>
+<tr><th id="497">497</th><td>{</td></tr>
+<tr><th id="498">498</th><td>    <a class="ref" href="#timer_init" title='timer_init' data-ref="timer_init">timer_init</a>(<a class="local col3 ref" href="#7233ts" title='ts' data-ref="7233ts">ts</a>, <a class="local col4 ref" href="#7234type" title='type' data-ref="7234type">type</a>, <a class="macro" href="#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>, <a class="local col5 ref" href="#7235cb" title='cb' data-ref="7235cb">cb</a>, <a class="local col6 ref" href="#7236opaque" title='opaque' data-ref="7236opaque">opaque</a>);</td></tr>
+<tr><th id="499">499</th><td>}</td></tr>
+<tr><th id="500">500</th><td></td></tr>
+<tr><th id="501">501</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="502">502</th><td><i class="doc"> * timer_new_tl:</i></td></tr>
+<tr><th id="503">503</th><td><i class="doc"> *<span class="command"> @timer</span>_list: the timer list to attach the timer to</i></td></tr>
+<tr><th id="504">504</th><td><i class="doc"> *<span class="command"> @scale</span>: the scale value for the timer</i></td></tr>
+<tr><th id="505">505</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to be called when the timer expires</i></td></tr>
+<tr><th id="506">506</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to be passed to the callback</i></td></tr>
+<tr><th id="507">507</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="508">508</th><td><i class="doc"> * Create a new timer and associate it with<span class="command"> @timer</span>_list.</i></td></tr>
+<tr><th id="509">509</th><td><i class="doc"> * The memory is allocated by the function.</i></td></tr>
+<tr><th id="510">510</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="511">511</th><td><i class="doc"> * This is not the preferred interface unless you know you</i></td></tr>
+<tr><th id="512">512</th><td><i class="doc"> * are going to call timer_free. Use timer_init instead.</i></td></tr>
+<tr><th id="513">513</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="514">514</th><td><i class="doc"> * Returns: a pointer to the timer</i></td></tr>
+<tr><th id="515">515</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="516">516</th><td><em>static</em> <b>inline</b> <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl def" id="timer_new_tl" title='timer_new_tl' data-ref="timer_new_tl">timer_new_tl</dfn>(<a class="typedef" href="#QEMUTimerList" title='QEMUTimerList' data-type='struct QEMUTimerList' data-ref="QEMUTimerList">QEMUTimerList</a> *<dfn class="local col7 decl" id="7237timer_list" title='timer_list' data-type='QEMUTimerList *' data-ref="7237timer_list">timer_list</dfn>,</td></tr>
+<tr><th id="517">517</th><td>                                      <em>int</em> <dfn class="local col8 decl" id="7238scale" title='scale' data-type='int' data-ref="7238scale">scale</dfn>,</td></tr>
+<tr><th id="518">518</th><td>                                      <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col9 decl" id="7239cb" title='cb' data-type='QEMUTimerCB *' data-ref="7239cb">cb</dfn>,</td></tr>
+<tr><th id="519">519</th><td>                                      <em>void</em> *<dfn class="local col0 decl" id="7240opaque" title='opaque' data-type='void *' data-ref="7240opaque">opaque</dfn>)</td></tr>
+<tr><th id="520">520</th><td>{</td></tr>
+<tr><th id="521">521</th><td>    <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col1 decl" id="7241ts" title='ts' data-type='QEMUTimer *' data-ref="7241ts">ts</dfn> = <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a>));</td></tr>
+<tr><th id="522">522</th><td>    <a class="ref" href="#timer_init_tl" title='timer_init_tl' data-ref="timer_init_tl">timer_init_tl</a>(<a class="local col1 ref" href="#7241ts" title='ts' data-ref="7241ts">ts</a>, <a class="local col7 ref" href="#7237timer_list" title='timer_list' data-ref="7237timer_list">timer_list</a>, <a class="local col8 ref" href="#7238scale" title='scale' data-ref="7238scale">scale</a>, <a class="local col9 ref" href="#7239cb" title='cb' data-ref="7239cb">cb</a>, <a class="local col0 ref" href="#7240opaque" title='opaque' data-ref="7240opaque">opaque</a>);</td></tr>
+<tr><th id="523">523</th><td>    <b>return</b> <a class="local col1 ref" href="#7241ts" title='ts' data-ref="7241ts">ts</a>;</td></tr>
+<tr><th id="524">524</th><td>}</td></tr>
+<tr><th id="525">525</th><td></td></tr>
+<tr><th id="526">526</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="527">527</th><td><i class="doc"> * timer_new:</i></td></tr>
+<tr><th id="528">528</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type to use</i></td></tr>
+<tr><th id="529">529</th><td><i class="doc"> *<span class="command"> @scale</span>: the scale value for the timer</i></td></tr>
+<tr><th id="530">530</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to be called when the timer expires</i></td></tr>
+<tr><th id="531">531</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to be passed to the callback</i></td></tr>
+<tr><th id="532">532</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="533">533</th><td><i class="doc"> * Create a new timer and associate it with the default</i></td></tr>
+<tr><th id="534">534</th><td><i class="doc"> * timer list for the clock type<span class="command"> @type</span>.</i></td></tr>
+<tr><th id="535">535</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="536">536</th><td><i class="doc"> * The default timer list has one special feature: in icount mode,</i></td></tr>
+<tr><th id="537">537</th><td><i class="doc"> * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is</i></td></tr>
+<tr><th id="538">538</th><td><i class="doc"> * not true of other timer lists, which are typically associated</i></td></tr>
+<tr><th id="539">539</th><td><i class="doc"> * with an AioContext---each of them runs its timer callbacks in its own</i></td></tr>
+<tr><th id="540">540</th><td><i class="doc"> * AioContext thread.</i></td></tr>
+<tr><th id="541">541</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="542">542</th><td><i class="doc"> * Returns: a pointer to the timer</i></td></tr>
+<tr><th id="543">543</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="544">544</th><td><em>static</em> <b>inline</b> <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl def" id="timer_new" title='timer_new' data-ref="timer_new">timer_new</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col2 decl" id="7242type" title='type' data-type='QEMUClockType' data-ref="7242type">type</dfn>, <em>int</em> <dfn class="local col3 decl" id="7243scale" title='scale' data-type='int' data-ref="7243scale">scale</dfn>,</td></tr>
+<tr><th id="545">545</th><td>                                   <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col4 decl" id="7244cb" title='cb' data-type='QEMUTimerCB *' data-ref="7244cb">cb</dfn>, <em>void</em> *<dfn class="local col5 decl" id="7245opaque" title='opaque' data-type='void *' data-ref="7245opaque">opaque</dfn>)</td></tr>
+<tr><th id="546">546</th><td>{</td></tr>
+<tr><th id="547">547</th><td>    <b>return</b> <a class="ref" href="#timer_new_tl" title='timer_new_tl' data-ref="timer_new_tl">timer_new_tl</a>(<a class="ref" href="#main_loop_tlg" title='main_loop_tlg' data-ref="main_loop_tlg">main_loop_tlg</a>.<a class="ref" href="#QEMUTimerListGroup::tl" title='QEMUTimerListGroup::tl' data-ref="QEMUTimerListGroup::tl">tl</a>[<a class="local col2 ref" href="#7242type" title='type' data-ref="7242type">type</a>], <a class="local col3 ref" href="#7243scale" title='scale' data-ref="7243scale">scale</a>, <a class="local col4 ref" href="#7244cb" title='cb' data-ref="7244cb">cb</a>, <a class="local col5 ref" href="#7245opaque" title='opaque' data-ref="7245opaque">opaque</a>);</td></tr>
+<tr><th id="548">548</th><td>}</td></tr>
+<tr><th id="549">549</th><td></td></tr>
+<tr><th id="550">550</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="551">551</th><td><i class="doc"> * timer_new_ns:</i></td></tr>
+<tr><th id="552">552</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type to associate with the timer</i></td></tr>
+<tr><th id="553">553</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="554">554</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="555">555</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="556">556</th><td><i class="doc"> * Create a new timer with nanosecond scale on the default timer list</i></td></tr>
+<tr><th id="557">557</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="558">558</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="559">559</th><td><i class="doc"> * The default timer list has one special feature: in icount mode,</i></td></tr>
+<tr><th id="560">560</th><td><i class="doc"> * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is</i></td></tr>
+<tr><th id="561">561</th><td><i class="doc"> * not true of other timer lists, which are typically associated</i></td></tr>
+<tr><th id="562">562</th><td><i class="doc"> * with an AioContext---each of them runs its timer callbacks in its own</i></td></tr>
+<tr><th id="563">563</th><td><i class="doc"> * AioContext thread.</i></td></tr>
+<tr><th id="564">564</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="565">565</th><td><i class="doc"> * Returns: a pointer to the newly created timer</i></td></tr>
+<tr><th id="566">566</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="567">567</th><td><em>static</em> <b>inline</b> <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl def" id="timer_new_ns" title='timer_new_ns' data-ref="timer_new_ns">timer_new_ns</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col6 decl" id="7246type" title='type' data-type='QEMUClockType' data-ref="7246type">type</dfn>, <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col7 decl" id="7247cb" title='cb' data-type='QEMUTimerCB *' data-ref="7247cb">cb</dfn>,</td></tr>
+<tr><th id="568">568</th><td>                                      <em>void</em> *<dfn class="local col8 decl" id="7248opaque" title='opaque' data-type='void *' data-ref="7248opaque">opaque</dfn>)</td></tr>
+<tr><th id="569">569</th><td>{</td></tr>
+<tr><th id="570">570</th><td>    <b>return</b> <a class="ref" href="#timer_new" title='timer_new' data-ref="timer_new">timer_new</a>(<a class="local col6 ref" href="#7246type" title='type' data-ref="7246type">type</a>, <a class="macro" href="#14" title="1" data-ref="_M/SCALE_NS">SCALE_NS</a>, <a class="local col7 ref" href="#7247cb" title='cb' data-ref="7247cb">cb</a>, <a class="local col8 ref" href="#7248opaque" title='opaque' data-ref="7248opaque">opaque</a>);</td></tr>
+<tr><th id="571">571</th><td>}</td></tr>
+<tr><th id="572">572</th><td></td></tr>
+<tr><th id="573">573</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="574">574</th><td><i class="doc"> * timer_new_us:</i></td></tr>
+<tr><th id="575">575</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type to associate with the timer</i></td></tr>
+<tr><th id="576">576</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="577">577</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="578">578</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="579">579</th><td><i class="doc"> * The default timer list has one special feature: in icount mode,</i></td></tr>
+<tr><th id="580">580</th><td><i class="doc"> * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is</i></td></tr>
+<tr><th id="581">581</th><td><i class="doc"> * not true of other timer lists, which are typically associated</i></td></tr>
+<tr><th id="582">582</th><td><i class="doc"> * with an AioContext---each of them runs its timer callbacks in its own</i></td></tr>
+<tr><th id="583">583</th><td><i class="doc"> * AioContext thread.</i></td></tr>
+<tr><th id="584">584</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="585">585</th><td><i class="doc"> * Create a new timer with microsecond scale on the default timer list</i></td></tr>
+<tr><th id="586">586</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="587">587</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="588">588</th><td><i class="doc"> * Returns: a pointer to the newly created timer</i></td></tr>
+<tr><th id="589">589</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="590">590</th><td><em>static</em> <b>inline</b> <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl def" id="timer_new_us" title='timer_new_us' data-ref="timer_new_us">timer_new_us</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col9 decl" id="7249type" title='type' data-type='QEMUClockType' data-ref="7249type">type</dfn>, <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col0 decl" id="7250cb" title='cb' data-type='QEMUTimerCB *' data-ref="7250cb">cb</dfn>,</td></tr>
+<tr><th id="591">591</th><td>                                      <em>void</em> *<dfn class="local col1 decl" id="7251opaque" title='opaque' data-type='void *' data-ref="7251opaque">opaque</dfn>)</td></tr>
+<tr><th id="592">592</th><td>{</td></tr>
+<tr><th id="593">593</th><td>    <b>return</b> <a class="ref" href="#timer_new" title='timer_new' data-ref="timer_new">timer_new</a>(<a class="local col9 ref" href="#7249type" title='type' data-ref="7249type">type</a>, <a class="macro" href="#13" title="1000" data-ref="_M/SCALE_US">SCALE_US</a>, <a class="local col0 ref" href="#7250cb" title='cb' data-ref="7250cb">cb</a>, <a class="local col1 ref" href="#7251opaque" title='opaque' data-ref="7251opaque">opaque</a>);</td></tr>
+<tr><th id="594">594</th><td>}</td></tr>
+<tr><th id="595">595</th><td></td></tr>
+<tr><th id="596">596</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="597">597</th><td><i class="doc"> * timer_new_ms:</i></td></tr>
+<tr><th id="598">598</th><td><i class="doc"> *<span class="command"> @type</span>: the clock type to associate with the timer</i></td></tr>
+<tr><th id="599">599</th><td><i class="doc"> *<span class="command"> @cb</span>: the callback to call when the timer expires</i></td></tr>
+<tr><th id="600">600</th><td><i class="doc"> *<span class="command"> @opaque</span>: the opaque pointer to pass to the callback</i></td></tr>
+<tr><th id="601">601</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="602">602</th><td><i class="doc"> * The default timer list has one special feature: in icount mode,</i></td></tr>
+<tr><th id="603">603</th><td><i class="doc"> * %QEMU_CLOCK_VIRTUAL timers are run in the vCPU thread.  This is</i></td></tr>
+<tr><th id="604">604</th><td><i class="doc"> * not true of other timer lists, which are typically associated</i></td></tr>
+<tr><th id="605">605</th><td><i class="doc"> * with an AioContext---each of them runs its timer callbacks in its own</i></td></tr>
+<tr><th id="606">606</th><td><i class="doc"> * AioContext thread.</i></td></tr>
+<tr><th id="607">607</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="608">608</th><td><i class="doc"> * Create a new timer with millisecond scale on the default timer list</i></td></tr>
+<tr><th id="609">609</th><td><i class="doc"> * associated with the clock.</i></td></tr>
+<tr><th id="610">610</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="611">611</th><td><i class="doc"> * Returns: a pointer to the newly created timer</i></td></tr>
+<tr><th id="612">612</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="613">613</th><td><em>static</em> <b>inline</b> <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl def" id="timer_new_ms" title='timer_new_ms' data-ref="timer_new_ms">timer_new_ms</dfn>(<a class="typedef" href="#QEMUClockType" title='QEMUClockType' data-type='enum QEMUClockType' data-ref="QEMUClockType">QEMUClockType</a> <dfn class="local col2 decl" id="7252type" title='type' data-type='QEMUClockType' data-ref="7252type">type</dfn>, <a class="typedef" href="#QEMUTimerCB" title='QEMUTimerCB' data-type='void (void *)' data-ref="QEMUTimerCB">QEMUTimerCB</a> *<dfn class="local col3 decl" id="7253cb" title='cb' data-type='QEMUTimerCB *' data-ref="7253cb">cb</dfn>,</td></tr>
+<tr><th id="614">614</th><td>                                      <em>void</em> *<dfn class="local col4 decl" id="7254opaque" title='opaque' data-type='void *' data-ref="7254opaque">opaque</dfn>)</td></tr>
+<tr><th id="615">615</th><td>{</td></tr>
+<tr><th id="616">616</th><td>    <b>return</b> <a class="ref" href="#timer_new" title='timer_new' data-ref="timer_new">timer_new</a>(<a class="local col2 ref" href="#7252type" title='type' data-ref="7252type">type</a>, <a class="macro" href="#12" title="1000000" data-ref="_M/SCALE_MS">SCALE_MS</a>, <a class="local col3 ref" href="#7253cb" title='cb' data-ref="7253cb">cb</a>, <a class="local col4 ref" href="#7254opaque" title='opaque' data-ref="7254opaque">opaque</a>);</td></tr>
+<tr><th id="617">617</th><td>}</td></tr>
+<tr><th id="618">618</th><td></td></tr>
+<tr><th id="619">619</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="620">620</th><td><i class="doc"> * timer_deinit:</i></td></tr>
+<tr><th id="621">621</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer to be de-initialised</i></td></tr>
+<tr><th id="622">622</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="623">623</th><td><i class="doc"> * Deassociate the timer from any timerlist.  You should</i></td></tr>
+<tr><th id="624">624</th><td><i class="doc"> * call timer_del before.  After this call, any further</i></td></tr>
+<tr><th id="625">625</th><td><i class="doc"> * timer_del call cannot cause dangling pointer accesses</i></td></tr>
+<tr><th id="626">626</th><td><i class="doc"> * even if the previously used timerlist is freed.</i></td></tr>
+<tr><th id="627">627</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="628">628</th><td><em>void</em> <dfn class="decl" id="timer_deinit" title='timer_deinit' data-ref="timer_deinit">timer_deinit</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col5 decl" id="7255ts" title='ts' data-type='QEMUTimer *' data-ref="7255ts">ts</dfn>);</td></tr>
+<tr><th id="629">629</th><td></td></tr>
+<tr><th id="630">630</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="631">631</th><td><i class="doc"> * timer_free:</i></td></tr>
+<tr><th id="632">632</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="633">633</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="634">634</th><td><i class="doc"> * Free a timer (it must not be on the active list)</i></td></tr>
+<tr><th id="635">635</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="636">636</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="timer_free" title='timer_free' data-ref="timer_free">timer_free</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col6 decl" id="7256ts" title='ts' data-type='QEMUTimer *' data-ref="7256ts">ts</dfn>)</td></tr>
+<tr><th id="637">637</th><td>{</td></tr>
+<tr><th id="638">638</th><td>    <a class="ref" href="../../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col6 ref" href="#7256ts" title='ts' data-ref="7256ts">ts</a>);</td></tr>
+<tr><th id="639">639</th><td>}</td></tr>
+<tr><th id="640">640</th><td></td></tr>
+<tr><th id="641">641</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="642">642</th><td><i class="doc"> * timer_del:</i></td></tr>
+<tr><th id="643">643</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="644">644</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="645">645</th><td><i class="doc"> * Delete a timer from the active list.</i></td></tr>
+<tr><th id="646">646</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="647">647</th><td><i class="doc"> * This function is thread-safe but the timer and its timer list must not be</i></td></tr>
+<tr><th id="648">648</th><td><i class="doc"> * freed while this function is running.</i></td></tr>
+<tr><th id="649">649</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="650">650</th><td><em>void</em> <dfn class="decl" id="timer_del" title='timer_del' data-ref="timer_del">timer_del</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col7 decl" id="7257ts" title='ts' data-type='QEMUTimer *' data-ref="7257ts">ts</dfn>);</td></tr>
+<tr><th id="651">651</th><td></td></tr>
+<tr><th id="652">652</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="653">653</th><td><i class="doc"> * timer_mod_ns:</i></td></tr>
+<tr><th id="654">654</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="655">655</th><td><i class="doc"> *<span class="command"> @expire</span>_time: the expiry time in nanoseconds</i></td></tr>
+<tr><th id="656">656</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="657">657</th><td><i class="doc"> * Modify a timer to expire at<span class="command"> @expire</span>_time</i></td></tr>
+<tr><th id="658">658</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="659">659</th><td><i class="doc"> * This function is thread-safe but the timer and its timer list must not be</i></td></tr>
+<tr><th id="660">660</th><td><i class="doc"> * freed while this function is running.</i></td></tr>
+<tr><th id="661">661</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="662">662</th><td><em>void</em> <dfn class="decl" id="timer_mod_ns" title='timer_mod_ns' data-ref="timer_mod_ns">timer_mod_ns</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col8 decl" id="7258ts" title='ts' data-type='QEMUTimer *' data-ref="7258ts">ts</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col9 decl" id="7259expire_time" title='expire_time' data-type='int64_t' data-ref="7259expire_time">expire_time</dfn>);</td></tr>
+<tr><th id="663">663</th><td></td></tr>
+<tr><th id="664">664</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="665">665</th><td><i class="doc"> * timer_mod_anticipate_ns:</i></td></tr>
+<tr><th id="666">666</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="667">667</th><td><i class="doc"> *<span class="command"> @expire</span>_time: the expiry time in nanoseconds</i></td></tr>
+<tr><th id="668">668</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="669">669</th><td><i class="doc"> * Modify a timer to expire at<span class="command"> @expire</span>_time or the current time,</i></td></tr>
+<tr><th id="670">670</th><td><i class="doc"> * whichever comes earlier.</i></td></tr>
+<tr><th id="671">671</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="672">672</th><td><i class="doc"> * This function is thread-safe but the timer and its timer list must not be</i></td></tr>
+<tr><th id="673">673</th><td><i class="doc"> * freed while this function is running.</i></td></tr>
+<tr><th id="674">674</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="675">675</th><td><em>void</em> <dfn class="decl" id="timer_mod_anticipate_ns" title='timer_mod_anticipate_ns' data-ref="timer_mod_anticipate_ns">timer_mod_anticipate_ns</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col0 decl" id="7260ts" title='ts' data-type='QEMUTimer *' data-ref="7260ts">ts</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="7261expire_time" title='expire_time' data-type='int64_t' data-ref="7261expire_time">expire_time</dfn>);</td></tr>
+<tr><th id="676">676</th><td></td></tr>
+<tr><th id="677">677</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="678">678</th><td><i class="doc"> * timer_mod:</i></td></tr>
+<tr><th id="679">679</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="680">680</th><td><i class="doc"> *<span class="command"> @expire</span>_time: the expire time in the units associated with the timer</i></td></tr>
+<tr><th id="681">681</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="682">682</th><td><i class="doc"> * Modify a timer to expiry at<span class="command"> @expire</span>_time, taking into</i></td></tr>
+<tr><th id="683">683</th><td><i class="doc"> * account the scale associated with the timer.</i></td></tr>
+<tr><th id="684">684</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="685">685</th><td><i class="doc"> * This function is thread-safe but the timer and its timer list must not be</i></td></tr>
+<tr><th id="686">686</th><td><i class="doc"> * freed while this function is running.</i></td></tr>
+<tr><th id="687">687</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="688">688</th><td><em>void</em> <dfn class="decl" id="timer_mod" title='timer_mod' data-ref="timer_mod">timer_mod</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col2 decl" id="7262ts" title='ts' data-type='QEMUTimer *' data-ref="7262ts">ts</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col3 decl" id="7263expire_timer" title='expire_timer' data-type='int64_t' data-ref="7263expire_timer">expire_timer</dfn>);</td></tr>
+<tr><th id="689">689</th><td></td></tr>
+<tr><th id="690">690</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="691">691</th><td><i class="doc"> * timer_mod_anticipate:</i></td></tr>
+<tr><th id="692">692</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="693">693</th><td><i class="doc"> *<span class="command"> @expire</span>_time: the expiry time in nanoseconds</i></td></tr>
+<tr><th id="694">694</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="695">695</th><td><i class="doc"> * Modify a timer to expire at<span class="command"> @expire</span>_time or the current time, whichever</i></td></tr>
+<tr><th id="696">696</th><td><i class="doc"> * comes earlier, taking into account the scale associated with the timer.</i></td></tr>
+<tr><th id="697">697</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="698">698</th><td><i class="doc"> * This function is thread-safe but the timer and its timer list must not be</i></td></tr>
+<tr><th id="699">699</th><td><i class="doc"> * freed while this function is running.</i></td></tr>
+<tr><th id="700">700</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="701">701</th><td><em>void</em> <dfn class="decl" id="timer_mod_anticipate" title='timer_mod_anticipate' data-ref="timer_mod_anticipate">timer_mod_anticipate</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col4 decl" id="7264ts" title='ts' data-type='QEMUTimer *' data-ref="7264ts">ts</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col5 decl" id="7265expire_time" title='expire_time' data-type='int64_t' data-ref="7265expire_time">expire_time</dfn>);</td></tr>
+<tr><th id="702">702</th><td></td></tr>
+<tr><th id="703">703</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="704">704</th><td><i class="doc"> * timer_pending:</i></td></tr>
+<tr><th id="705">705</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="706">706</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="707">707</th><td><i class="doc"> * Determines whether a timer is pending (i.e. is on the</i></td></tr>
+<tr><th id="708">708</th><td><i class="doc"> * active list of timers, whether or not it has not yet expired).</i></td></tr>
+<tr><th id="709">709</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="710">710</th><td><i class="doc"> * Returns: true if the timer is pending</i></td></tr>
+<tr><th id="711">711</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="712">712</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timer_pending" title='timer_pending' data-ref="timer_pending">timer_pending</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col6 decl" id="7266ts" title='ts' data-type='QEMUTimer *' data-ref="7266ts">ts</dfn>);</td></tr>
+<tr><th id="713">713</th><td></td></tr>
+<tr><th id="714">714</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="715">715</th><td><i class="doc"> * timer_expired:</i></td></tr>
+<tr><th id="716">716</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="717">717</th><td><i class="doc"> *<span class="command"> @current</span>_time: the current time</i></td></tr>
+<tr><th id="718">718</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="719">719</th><td><i class="doc"> * Determines whether a timer has expired.</i></td></tr>
+<tr><th id="720">720</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="721">721</th><td><i class="doc"> * Returns: true if the timer has expired</i></td></tr>
+<tr><th id="722">722</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="723">723</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="timer_expired" title='timer_expired' data-ref="timer_expired">timer_expired</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col7 decl" id="7267timer_head" title='timer_head' data-type='QEMUTimer *' data-ref="7267timer_head">timer_head</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col8 decl" id="7268current_time" title='current_time' data-type='int64_t' data-ref="7268current_time">current_time</dfn>);</td></tr>
+<tr><th id="724">724</th><td></td></tr>
+<tr><th id="725">725</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="726">726</th><td><i class="doc"> * timer_expire_time_ns:</i></td></tr>
+<tr><th id="727">727</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="728">728</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="729">729</th><td><i class="doc"> * Determine the expiry time of a timer</i></td></tr>
+<tr><th id="730">730</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="731">731</th><td><i class="doc"> * Returns: the expiry time in nanoseconds</i></td></tr>
+<tr><th id="732">732</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="733">733</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="timer_expire_time_ns" title='timer_expire_time_ns' data-ref="timer_expire_time_ns">timer_expire_time_ns</dfn>(<a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col9 decl" id="7269ts" title='ts' data-type='QEMUTimer *' data-ref="7269ts">ts</dfn>);</td></tr>
+<tr><th id="734">734</th><td></td></tr>
+<tr><th id="735">735</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="736">736</th><td><i class="doc"> * timer_get:</i></td></tr>
+<tr><th id="737">737</th><td><i class="doc"> *<span class="command"> @f</span>: the file</i></td></tr>
+<tr><th id="738">738</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="739">739</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="740">740</th><td><i class="doc"> * Read a timer<span class="command"> @ts</span> from a file<span class="command"> @f</span></i></td></tr>
+<tr><th id="741">741</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="742">742</th><td><em>void</em> <dfn class="decl" id="timer_get" title='timer_get' data-ref="timer_get">timer_get</dfn>(<a class="typedef" href="typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col0 decl" id="7270f" title='f' data-type='QEMUFile *' data-ref="7270f">f</dfn>, <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col1 decl" id="7271ts" title='ts' data-type='QEMUTimer *' data-ref="7271ts">ts</dfn>);</td></tr>
+<tr><th id="743">743</th><td></td></tr>
+<tr><th id="744">744</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="745">745</th><td><i class="doc"> * timer_put:</i></td></tr>
+<tr><th id="746">746</th><td><i class="doc"> *<span class="command"> @f</span>: the file</i></td></tr>
+<tr><th id="747">747</th><td><i class="doc"> *<span class="command"> @ts</span>: the timer</i></td></tr>
+<tr><th id="748">748</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="749">749</th><td><em>void</em> <dfn class="decl" id="timer_put" title='timer_put' data-ref="timer_put">timer_put</dfn>(<a class="typedef" href="typedefs.h.html#QEMUFile" title='QEMUFile' data-type='struct QEMUFile' data-ref="QEMUFile">QEMUFile</a> *<dfn class="local col2 decl" id="7272f" title='f' data-type='QEMUFile *' data-ref="7272f">f</dfn>, <a class="typedef" href="typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="local col3 decl" id="7273ts" title='ts' data-type='QEMUTimer *' data-ref="7273ts">ts</dfn>);</td></tr>
+<tr><th id="750">750</th><td></td></tr>
+<tr><th id="751">751</th><td><i>/*</i></td></tr>
+<tr><th id="752">752</th><td><i> * General utility functions</i></td></tr>
+<tr><th id="753">753</th><td><i> */</i></td></tr>
+<tr><th id="754">754</th><td></td></tr>
+<tr><th id="755">755</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="756">756</th><td><i class="doc"> * qemu_timeout_ns_to_ms:</i></td></tr>
+<tr><th id="757">757</th><td><i class="doc"> *<span class="command"> @ns</span>: nanosecond timeout value</i></td></tr>
+<tr><th id="758">758</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="759">759</th><td><i class="doc"> * Convert a nanosecond timeout value (or -1) to</i></td></tr>
+<tr><th id="760">760</th><td><i class="doc"> * a millisecond value (or -1), always rounding up.</i></td></tr>
+<tr><th id="761">761</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="762">762</th><td><i class="doc"> * Returns: millisecond timeout value</i></td></tr>
+<tr><th id="763">763</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="764">764</th><td><em>int</em> <dfn class="decl" id="qemu_timeout_ns_to_ms" title='qemu_timeout_ns_to_ms' data-ref="qemu_timeout_ns_to_ms">qemu_timeout_ns_to_ms</dfn>(<a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col4 decl" id="7274ns" title='ns' data-type='int64_t' data-ref="7274ns">ns</dfn>);</td></tr>
+<tr><th id="765">765</th><td></td></tr>
+<tr><th id="766">766</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="767">767</th><td><i class="doc"> * qemu_poll_ns:</i></td></tr>
+<tr><th id="768">768</th><td><i class="doc"> *<span class="command"> @fds</span>: Array of file descriptors</i></td></tr>
+<tr><th id="769">769</th><td><i class="doc"> *<span class="command"> @nfds</span>: number of file descriptors</i></td></tr>
+<tr><th id="770">770</th><td><i class="doc"> *<span class="command"> @timeout</span>: timeout in nanoseconds</i></td></tr>
+<tr><th id="771">771</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="772">772</th><td><i class="doc"> * Perform a poll like g_poll but with a timeout in nanoseconds.</i></td></tr>
+<tr><th id="773">773</th><td><i class="doc"> * See g_poll documentation for further details.</i></td></tr>
+<tr><th id="774">774</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="775">775</th><td><i class="doc"> * Returns: number of fds ready</i></td></tr>
+<tr><th id="776">776</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="777">777</th><td><em>int</em> <dfn class="decl" id="qemu_poll_ns" title='qemu_poll_ns' data-ref="qemu_poll_ns">qemu_poll_ns</dfn>(<a class="typedef" href="../../../include/glib-2.0/glib/gpoll.h.html#GPollFD" title='GPollFD' data-type='struct _GPollFD' data-ref="GPollFD">GPollFD</a> *<dfn class="local col5 decl" id="7275fds" title='fds' data-type='GPollFD *' data-ref="7275fds">fds</dfn>, <a class="typedef" href="../../../include/glib-2.0/glib/gtypes.h.html#guint" title='guint' data-type='unsigned int' data-ref="guint">guint</a> <dfn class="local col6 decl" id="7276nfds" title='nfds' data-type='guint' data-ref="7276nfds">nfds</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col7 decl" id="7277timeout" title='timeout' data-type='int64_t' data-ref="7277timeout">timeout</dfn>);</td></tr>
+<tr><th id="778">778</th><td></td></tr>
+<tr><th id="779">779</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="780">780</th><td><i class="doc"> * qemu_soonest_timeout:</i></td></tr>
+<tr><th id="781">781</th><td><i class="doc"> *<span class="command"> @timeout1</span>: first timeout in nanoseconds (or -1 for infinite)</i></td></tr>
+<tr><th id="782">782</th><td><i class="doc"> *<span class="command"> @timeout2</span>: second timeout in nanoseconds (or -1 for infinite)</i></td></tr>
+<tr><th id="783">783</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="784">784</th><td><i class="doc"> * Calculates the soonest of two timeout values. -1 means infinite, which</i></td></tr>
+<tr><th id="785">785</th><td><i class="doc"> * is later than any other value.</i></td></tr>
+<tr><th id="786">786</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="787">787</th><td><i class="doc"> * Returns: soonest timeout value in nanoseconds (or -1 for infinite)</i></td></tr>
+<tr><th id="788">788</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="789">789</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="qemu_soonest_timeout" title='qemu_soonest_timeout' data-ref="qemu_soonest_timeout">qemu_soonest_timeout</dfn>(<a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col8 decl" id="7278timeout1" title='timeout1' data-type='int64_t' data-ref="7278timeout1">timeout1</dfn>, <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col9 decl" id="7279timeout2" title='timeout2' data-type='int64_t' data-ref="7279timeout2">timeout2</dfn>)</td></tr>
+<tr><th id="790">790</th><td>{</td></tr>
+<tr><th id="791">791</th><td>    <i>/* we can abuse the fact that -1 (which means infinite) is a maximal</i></td></tr>
+<tr><th id="792">792</th><td><i>     * value when cast to unsigned. As this is disgusting, it's kept in</i></td></tr>
+<tr><th id="793">793</th><td><i>     * one inline function.</i></td></tr>
+<tr><th id="794">794</th><td><i>     */</i></td></tr>
+<tr><th id="795">795</th><td>    <b>return</b> ((<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col8 ref" href="#7278timeout1" title='timeout1' data-ref="7278timeout1">timeout1</a> &lt; (<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>) <a class="local col9 ref" href="#7279timeout2" title='timeout2' data-ref="7279timeout2">timeout2</a>) ? <a class="local col8 ref" href="#7278timeout1" title='timeout1' data-ref="7278timeout1">timeout1</a> : <a class="local col9 ref" href="#7279timeout2" title='timeout2' data-ref="7279timeout2">timeout2</a>;</td></tr>
+<tr><th id="796">796</th><td>}</td></tr>
+<tr><th id="797">797</th><td></td></tr>
+<tr><th id="798">798</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="799">799</th><td><i class="doc"> * initclocks:</i></td></tr>
+<tr><th id="800">800</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="801">801</th><td><i class="doc"> * Initialise the clock &amp; timer infrastructure</i></td></tr>
+<tr><th id="802">802</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="803">803</th><td><em>void</em> <dfn class="decl" id="init_clocks" title='init_clocks' data-ref="init_clocks">init_clocks</dfn>(<a class="typedef" href="#QEMUTimerListNotifyCB" title='QEMUTimerListNotifyCB' data-type='void (void *, QEMUClockType)' data-ref="QEMUTimerListNotifyCB">QEMUTimerListNotifyCB</a> *<dfn class="local col0 decl" id="7280notify_cb" title='notify_cb' data-type='QEMUTimerListNotifyCB *' data-ref="7280notify_cb">notify_cb</dfn>);</td></tr>
+<tr><th id="804">804</th><td></td></tr>
+<tr><th id="805">805</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="cpu_get_ticks" title='cpu_get_ticks' data-ref="cpu_get_ticks">cpu_get_ticks</dfn>(<em>void</em>);</td></tr>
+<tr><th id="806">806</th><td><i>/* Caller must hold BQL */</i></td></tr>
+<tr><th id="807">807</th><td><em>void</em> <dfn class="decl" id="cpu_enable_ticks" title='cpu_enable_ticks' data-ref="cpu_enable_ticks">cpu_enable_ticks</dfn>(<em>void</em>);</td></tr>
+<tr><th id="808">808</th><td><i>/* Caller must hold BQL */</i></td></tr>
+<tr><th id="809">809</th><td><em>void</em> <dfn class="decl" id="cpu_disable_ticks" title='cpu_disable_ticks' data-ref="cpu_disable_ticks">cpu_disable_ticks</dfn>(<em>void</em>);</td></tr>
+<tr><th id="810">810</th><td></td></tr>
+<tr><th id="811">811</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="get_max_clock_jump" title='get_max_clock_jump' data-ref="get_max_clock_jump">get_max_clock_jump</dfn>(<em>void</em>)</td></tr>
+<tr><th id="812">812</th><td>{</td></tr>
+<tr><th id="813">813</th><td>    <i>/* This should be small enough to prevent excessive interrupts from being</i></td></tr>
+<tr><th id="814">814</th><td><i>     * generated by the RTC on clock jumps, but large enough to avoid frequent</i></td></tr>
+<tr><th id="815">815</th><td><i>     * unnecessary resets in idle VMs.</i></td></tr>
+<tr><th id="816">816</th><td><i>     */</i></td></tr>
+<tr><th id="817">817</th><td>    <b>return</b> <var>60</var> * <a class="macro" href="#8" title="1000000000LL" data-ref="_M/NANOSECONDS_PER_SECOND">NANOSECONDS_PER_SECOND</a>;</td></tr>
+<tr><th id="818">818</th><td>}</td></tr>
+<tr><th id="819">819</th><td></td></tr>
+<tr><th id="820">820</th><td><i>/*</i></td></tr>
+<tr><th id="821">821</th><td><i> * Low level clock functions</i></td></tr>
+<tr><th id="822">822</th><td><i> */</i></td></tr>
+<tr><th id="823">823</th><td></td></tr>
+<tr><th id="824">824</th><td><i>/* get host real time in nanosecond */</i></td></tr>
+<tr><th id="825">825</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="get_clock_realtime" title='get_clock_realtime' data-ref="get_clock_realtime">get_clock_realtime</dfn>(<em>void</em>)</td></tr>
+<tr><th id="826">826</th><td>{</td></tr>
+<tr><th id="827">827</th><td>    <b>struct</b> <a class="type" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval" title='timeval' data-ref="timeval">timeval</a> <dfn class="local col1 decl" id="7281tv" title='tv' data-type='struct timeval' data-ref="7281tv">tv</dfn>;</td></tr>
+<tr><th id="828">828</th><td></td></tr>
+<tr><th id="829">829</th><td>    <a class="ref" href="../../../include/x86_64-linux-gnu/sys/time.h.html#gettimeofday" title='gettimeofday' data-ref="gettimeofday">gettimeofday</a>(&amp;<a class="local col1 ref" href="#7281tv" title='tv' data-ref="7281tv">tv</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="830">830</th><td>    <b>return</b> <a class="local col1 ref" href="#7281tv" title='tv' data-ref="7281tv">tv</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval::tv_sec" title='timeval::tv_sec' data-ref="timeval::tv_sec">tv_sec</a> * <var>1000000000LL</var> + (<a class="local col1 ref" href="#7281tv" title='tv' data-ref="7281tv">tv</a>.<a class="ref" href="../../../include/x86_64-linux-gnu/bits/time.h.html#timeval::tv_usec" title='timeval::tv_usec' data-ref="timeval::tv_usec">tv_usec</a> * <var>1000</var>);</td></tr>
+<tr><th id="831">831</th><td>}</td></tr>
+<tr><th id="832">832</th><td></td></tr>
+<tr><th id="833">833</th><td><i>/* Warning: don't insert tracepoints into these functions, they are</i></td></tr>
+<tr><th id="834">834</th><td><i>   also used by simpletrace backend and tracepoints would cause</i></td></tr>
+<tr><th id="835">835</th><td><i>   an infinite recursion! */</i></td></tr>
+<tr><th id="836">836</th><td><u>#<span data-ppcond="836">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="837">837</th><td><b>extern</b> int64_t clock_freq;</td></tr>
+<tr><th id="838">838</th><td></td></tr>
+<tr><th id="839">839</th><td><em>static</em> <b>inline</b> int64_t get_clock(<em>void</em>)</td></tr>
+<tr><th id="840">840</th><td>{</td></tr>
+<tr><th id="841">841</th><td>    LARGE_INTEGER ti;</td></tr>
+<tr><th id="842">842</th><td>    QueryPerformanceCounter(&amp;ti);</td></tr>
+<tr><th id="843">843</th><td>    <b>return</b> muldiv64(ti.QuadPart, NANOSECONDS_PER_SECOND, clock_freq);</td></tr>
+<tr><th id="844">844</th><td>}</td></tr>
+<tr><th id="845">845</th><td></td></tr>
+<tr><th id="846">846</th><td><u>#<span data-ppcond="836">else</span></u></td></tr>
+<tr><th id="847">847</th><td></td></tr>
+<tr><th id="848">848</th><td><b>extern</b> <em>int</em> <dfn class="decl" id="use_rt_clock" title='use_rt_clock' data-ref="use_rt_clock">use_rt_clock</dfn>;</td></tr>
+<tr><th id="849">849</th><td></td></tr>
+<tr><th id="850">850</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="get_clock" title='get_clock' data-ref="get_clock">get_clock</dfn>(<em>void</em>)</td></tr>
+<tr><th id="851">851</th><td>{</td></tr>
+<tr><th id="852">852</th><td><u>#<span data-ppcond="852">ifdef</span> <a class="macro" href="../../../include/x86_64-linux-gnu/bits/time.h.html#63" data-ref="_M/CLOCK_MONOTONIC">CLOCK_MONOTONIC</a></u></td></tr>
+<tr><th id="853">853</th><td>    <b>if</b> (<a class="ref" href="#use_rt_clock" title='use_rt_clock' data-ref="use_rt_clock">use_rt_clock</a>) {</td></tr>
+<tr><th id="854">854</th><td>        <b>struct</b> <a class="type" href="../../../include/time.h.html#timespec" title='timespec' data-ref="timespec">timespec</a> <dfn class="local col2 decl" id="7282ts" title='ts' data-type='struct timespec' data-ref="7282ts">ts</dfn>;</td></tr>
+<tr><th id="855">855</th><td>        <a class="ref" href="../../../include/time.h.html#clock_gettime" title='clock_gettime' data-ref="clock_gettime">clock_gettime</a>(<a class="macro" href="../../../include/x86_64-linux-gnu/bits/time.h.html#63" title="1" data-ref="_M/CLOCK_MONOTONIC">CLOCK_MONOTONIC</a>, &amp;<a class="local col2 ref" href="#7282ts" title='ts' data-ref="7282ts">ts</a>);</td></tr>
+<tr><th id="856">856</th><td>        <b>return</b> <a class="local col2 ref" href="#7282ts" title='ts' data-ref="7282ts">ts</a>.<a class="ref" href="../../../include/time.h.html#timespec::tv_sec" title='timespec::tv_sec' data-ref="timespec::tv_sec">tv_sec</a> * <var>1000000000LL</var> + <a class="local col2 ref" href="#7282ts" title='ts' data-ref="7282ts">ts</a>.<a class="ref" href="../../../include/time.h.html#timespec::tv_nsec" title='timespec::tv_nsec' data-ref="timespec::tv_nsec">tv_nsec</a>;</td></tr>
+<tr><th id="857">857</th><td>    } <b>else</b></td></tr>
+<tr><th id="858">858</th><td><u>#<span data-ppcond="852">endif</span></u></td></tr>
+<tr><th id="859">859</th><td>    {</td></tr>
+<tr><th id="860">860</th><td>        <i>/* XXX: using gettimeofday leads to problems if the date</i></td></tr>
+<tr><th id="861">861</th><td><i>           changes, so it should be avoided. */</i></td></tr>
+<tr><th id="862">862</th><td>        <b>return</b> <a class="ref" href="#get_clock_realtime" title='get_clock_realtime' data-ref="get_clock_realtime">get_clock_realtime</a>();</td></tr>
+<tr><th id="863">863</th><td>    }</td></tr>
+<tr><th id="864">864</th><td>}</td></tr>
+<tr><th id="865">865</th><td><u>#<span data-ppcond="836">endif</span></u></td></tr>
+<tr><th id="866">866</th><td></td></tr>
+<tr><th id="867">867</th><td><i>/* icount */</i></td></tr>
+<tr><th id="868">868</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="cpu_get_icount_raw" title='cpu_get_icount_raw' data-ref="cpu_get_icount_raw">cpu_get_icount_raw</dfn>(<em>void</em>);</td></tr>
+<tr><th id="869">869</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="cpu_get_icount" title='cpu_get_icount' data-ref="cpu_get_icount">cpu_get_icount</dfn>(<em>void</em>);</td></tr>
+<tr><th id="870">870</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="cpu_get_clock" title='cpu_get_clock' data-ref="cpu_get_clock">cpu_get_clock</dfn>(<em>void</em>);</td></tr>
+<tr><th id="871">871</th><td><a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="cpu_icount_to_ns" title='cpu_icount_to_ns' data-ref="cpu_icount_to_ns">cpu_icount_to_ns</dfn>(<a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col3 decl" id="7283icount" title='icount' data-type='int64_t' data-ref="7283icount">icount</dfn>);</td></tr>
+<tr><th id="872">872</th><td><em>void</em>    <dfn class="decl" id="cpu_update_icount" title='cpu_update_icount' data-ref="cpu_update_icount">cpu_update_icount</dfn>(<a class="typedef" href="typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col4 decl" id="7284cpu" title='cpu' data-type='CPUState *' data-ref="7284cpu">cpu</dfn>);</td></tr>
+<tr><th id="873">873</th><td></td></tr>
+<tr><th id="874">874</th><td><i>/*******************************************/</i></td></tr>
+<tr><th id="875">875</th><td><i>/* host CPU ticks (if available) */</i></td></tr>
+<tr><th id="876">876</th><td></td></tr>
+<tr><th id="877">877</th><td><u>#<span data-ppcond="877">if</span> defined(<span class="macro" data-ref="_M/_ARCH_PPC">_ARCH_PPC</span>)</u></td></tr>
+<tr><th id="878">878</th><td></td></tr>
+<tr><th id="879">879</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="880">880</th><td>{</td></tr>
+<tr><th id="881">881</th><td>    int64_t retval;</td></tr>
+<tr><th id="882">882</th><td><u>#ifdef _ARCH_PPC64</u></td></tr>
+<tr><th id="883">883</th><td>    <i>/* This reads timebase in one 64bit go and includes Cell workaround from:</i></td></tr>
+<tr><th id="884">884</th><td><i>       <a href="http://ozlabs.org/pipermail/linuxppc-dev/2006-October/027052.html">http://ozlabs.org/pipermail/linuxppc-dev/2006-October/027052.html</a></i></td></tr>
+<tr><th id="885">885</th><td><i>    */</i></td></tr>
+<tr><th id="886">886</th><td>    <b>__asm__</b> <em>__volatile__</em> (<q>"mftb    %0\n\t"</q></td></tr>
+<tr><th id="887">887</th><td>                          <q>"cmpwi   %0,0\n\t"</q></td></tr>
+<tr><th id="888">888</th><td>                          <q>"beq-    $-8"</q></td></tr>
+<tr><th id="889">889</th><td>                          : <q>"=r"</q> (retval));</td></tr>
+<tr><th id="890">890</th><td><u>#else</u></td></tr>
+<tr><th id="891">891</th><td>    <i>/* <a href="http://ozlabs.org/pipermail/linuxppc-dev/1999-October/003889.html">http://ozlabs.org/pipermail/linuxppc-dev/1999-October/003889.html</a> */</i></td></tr>
+<tr><th id="892">892</th><td>    <em>unsigned</em> <em>long</em> junk;</td></tr>
+<tr><th id="893">893</th><td>    <b>__asm__</b> <em>__volatile__</em> (<q>"mfspr   %1,269\n\t"</q>  <i>/* mftbu */</i></td></tr>
+<tr><th id="894">894</th><td>                          <q>"mfspr   %L0,268\n\t"</q> <i>/* mftb */</i></td></tr>
+<tr><th id="895">895</th><td>                          <q>"mfspr   %0,269\n\t"</q>  <i>/* mftbu */</i></td></tr>
+<tr><th id="896">896</th><td>                          <q>"cmpw    %0,%1\n\t"</q></td></tr>
+<tr><th id="897">897</th><td>                          <q>"bne     $-16"</q></td></tr>
+<tr><th id="898">898</th><td>                          : <q>"=r"</q> (retval), <q>"=r"</q> (junk));</td></tr>
+<tr><th id="899">899</th><td><u>#endif</u></td></tr>
+<tr><th id="900">900</th><td>    <b>return</b> retval;</td></tr>
+<tr><th id="901">901</th><td>}</td></tr>
+<tr><th id="902">902</th><td></td></tr>
+<tr><th id="903">903</th><td><u>#<span data-ppcond="877">elif</span> defined(<span class="macro" data-ref="_M/__i386__">__i386__</span>)</u></td></tr>
+<tr><th id="904">904</th><td></td></tr>
+<tr><th id="905">905</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="906">906</th><td>{</td></tr>
+<tr><th id="907">907</th><td>    int64_t val;</td></tr>
+<tr><th id="908">908</th><td>    <b>asm</b> <em>volatile</em> (<q>"rdtsc"</q> : <q>"=A"</q> (val));</td></tr>
+<tr><th id="909">909</th><td>    <b>return</b> val;</td></tr>
+<tr><th id="910">910</th><td>}</td></tr>
+<tr><th id="911">911</th><td></td></tr>
+<tr><th id="912">912</th><td><u>#<span data-ppcond="877">elif</span> defined(<span class="macro" data-ref="_M/__x86_64__">__x86_64__</span>)</u></td></tr>
+<tr><th id="913">913</th><td></td></tr>
+<tr><th id="914">914</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl def" id="cpu_get_host_ticks" title='cpu_get_host_ticks' data-ref="cpu_get_host_ticks">cpu_get_host_ticks</dfn>(<em>void</em>)</td></tr>
+<tr><th id="915">915</th><td>{</td></tr>
+<tr><th id="916">916</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="7285low" title='low' data-type='uint32_t' data-ref="7285low">low</dfn>,<dfn class="local col6 decl" id="7286high" title='high' data-type='uint32_t' data-ref="7286high">high</dfn>;</td></tr>
+<tr><th id="917">917</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col7 decl" id="7287val" title='val' data-type='int64_t' data-ref="7287val">val</dfn>;</td></tr>
+<tr><th id="918">918</th><td>    <b>asm</b> <em>volatile</em>(<q>"rdtsc"</q> : <q>"=a"</q> (<a class="local col5 ref" href="#7285low" title='low' data-ref="7285low">low</a>), <q>"=d"</q> (<a class="local col6 ref" href="#7286high" title='high' data-ref="7286high">high</a>));</td></tr>
+<tr><th id="919">919</th><td>    <a class="local col7 ref" href="#7287val" title='val' data-ref="7287val">val</a> = <a class="local col6 ref" href="#7286high" title='high' data-ref="7286high">high</a>;</td></tr>
+<tr><th id="920">920</th><td>    <a class="local col7 ref" href="#7287val" title='val' data-ref="7287val">val</a> &lt;&lt;= <var>32</var>;</td></tr>
+<tr><th id="921">921</th><td>    <a class="local col7 ref" href="#7287val" title='val' data-ref="7287val">val</a> |= <a class="local col5 ref" href="#7285low" title='low' data-ref="7285low">low</a>;</td></tr>
+<tr><th id="922">922</th><td>    <b>return</b> <a class="local col7 ref" href="#7287val" title='val' data-ref="7287val">val</a>;</td></tr>
+<tr><th id="923">923</th><td>}</td></tr>
+<tr><th id="924">924</th><td></td></tr>
+<tr><th id="925">925</th><td><u>#<span data-ppcond="877">elif</span> defined(__hppa__)</u></td></tr>
+<tr><th id="926">926</th><td></td></tr>
+<tr><th id="927">927</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="928">928</th><td>{</td></tr>
+<tr><th id="929">929</th><td>    <em>int</em> val;</td></tr>
+<tr><th id="930">930</th><td>    <b>asm</b> <em>volatile</em> (<q>"mfctl %%cr16, %0"</q> : <q>"=r"</q>(val));</td></tr>
+<tr><th id="931">931</th><td>    <b>return</b> val;</td></tr>
+<tr><th id="932">932</th><td>}</td></tr>
+<tr><th id="933">933</th><td></td></tr>
+<tr><th id="934">934</th><td><u>#elif defined(__ia64)</u></td></tr>
+<tr><th id="935">935</th><td></td></tr>
+<tr><th id="936">936</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="937">937</th><td>{</td></tr>
+<tr><th id="938">938</th><td>    int64_t val;</td></tr>
+<tr><th id="939">939</th><td>    <b>asm</b> <em>volatile</em> (<q>"mov %0 = ar.itc"</q> : <q>"=r"</q>(val) :: <q>"memory"</q>);</td></tr>
+<tr><th id="940">940</th><td>    <b>return</b> val;</td></tr>
+<tr><th id="941">941</th><td>}</td></tr>
+<tr><th id="942">942</th><td></td></tr>
+<tr><th id="943">943</th><td><u>#elif defined(__s390__)</u></td></tr>
+<tr><th id="944">944</th><td></td></tr>
+<tr><th id="945">945</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="946">946</th><td>{</td></tr>
+<tr><th id="947">947</th><td>    int64_t val;</td></tr>
+<tr><th id="948">948</th><td>    <b>asm</b> <em>volatile</em>(<q>"stck 0(%1)"</q> : <q>"=m"</q> (val) : <q>"a"</q> (&amp;val) : <q>"cc"</q>);</td></tr>
+<tr><th id="949">949</th><td>    <b>return</b> val;</td></tr>
+<tr><th id="950">950</th><td>}</td></tr>
+<tr><th id="951">951</th><td></td></tr>
+<tr><th id="952">952</th><td><u>#elif defined(__sparc__)</u></td></tr>
+<tr><th id="953">953</th><td></td></tr>
+<tr><th id="954">954</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks (<em>void</em>)</td></tr>
+<tr><th id="955">955</th><td>{</td></tr>
+<tr><th id="956">956</th><td><u>#if defined(_LP64)</u></td></tr>
+<tr><th id="957">957</th><td>    uint64_t        rval;</td></tr>
+<tr><th id="958">958</th><td>    <b>asm</b> <em>volatile</em>(<q>"rd %%tick,%0"</q> : <q>"=r"</q>(rval));</td></tr>
+<tr><th id="959">959</th><td>    <b>return</b> rval;</td></tr>
+<tr><th id="960">960</th><td><u>#else</u></td></tr>
+<tr><th id="961">961</th><td>    <i>/* We need an %o or %g register for this.  For recent enough gcc</i></td></tr>
+<tr><th id="962">962</th><td><i>       there is an "h" constraint for that.  Don't bother with that.  */</i></td></tr>
+<tr><th id="963">963</th><td>    <b>union</b> {</td></tr>
+<tr><th id="964">964</th><td>        uint64_t i64;</td></tr>
+<tr><th id="965">965</th><td>        <b>struct</b> {</td></tr>
+<tr><th id="966">966</th><td>            uint32_t high;</td></tr>
+<tr><th id="967">967</th><td>            uint32_t low;</td></tr>
+<tr><th id="968">968</th><td>        }       i32;</td></tr>
+<tr><th id="969">969</th><td>    } rval;</td></tr>
+<tr><th id="970">970</th><td>    <b>asm</b> <em>volatile</em>(<q>"rd %%tick,%%g1; srlx %%g1,32,%0; mov %%g1,%1"</q></td></tr>
+<tr><th id="971">971</th><td>                 : <q>"=r"</q>(rval.i32.high), <q>"=r"</q>(rval.i32.low) : : <q>"g1"</q>);</td></tr>
+<tr><th id="972">972</th><td>    <b>return</b> rval.i64;</td></tr>
+<tr><th id="973">973</th><td><u>#endif</u></td></tr>
+<tr><th id="974">974</th><td>}</td></tr>
+<tr><th id="975">975</th><td></td></tr>
+<tr><th id="976">976</th><td><u>#elif defined(__mips__) &amp;&amp; \</u></td></tr>
+<tr><th id="977">977</th><td><u>    ((defined(__mips_isa_rev) &amp;&amp; __mips_isa_rev &gt;= 2) || defined(__linux__))</u></td></tr>
+<tr><th id="978">978</th><td><i>/*</i></td></tr>
+<tr><th id="979">979</th><td><i> * binutils wants to use rdhwr only on mips32r2</i></td></tr>
+<tr><th id="980">980</th><td><i> * but as linux kernel emulate it, it's fine</i></td></tr>
+<tr><th id="981">981</th><td><i> * to use it.</i></td></tr>
+<tr><th id="982">982</th><td><i> *</i></td></tr>
+<tr><th id="983">983</th><td><i> */</i></td></tr>
+<tr><th id="984">984</th><td><u>#define MIPS_RDHWR(rd, value) {                         \</u></td></tr>
+<tr><th id="985">985</th><td><u>        __asm__ __volatile__ (".set   push\n\t"         \</u></td></tr>
+<tr><th id="986">986</th><td><u>                              ".set mips32r2\n\t"       \</u></td></tr>
+<tr><th id="987">987</th><td><u>                              "rdhwr  %0, "rd"\n\t"     \</u></td></tr>
+<tr><th id="988">988</th><td><u>                              ".set   pop"              \</u></td></tr>
+<tr><th id="989">989</th><td><u>                              : "=r" (value));          \</u></td></tr>
+<tr><th id="990">990</th><td><u>    }</u></td></tr>
+<tr><th id="991">991</th><td></td></tr>
+<tr><th id="992">992</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="993">993</th><td>{</td></tr>
+<tr><th id="994">994</th><td>    <i>/* On kernels &gt;= 2.6.25 rdhwr &lt;reg&gt;, $2 and $3 are emulated */</i></td></tr>
+<tr><th id="995">995</th><td>    uint32_t count;</td></tr>
+<tr><th id="996">996</th><td>    <em>static</em> uint32_t cyc_per_count = <var>0</var>;</td></tr>
+<tr><th id="997">997</th><td></td></tr>
+<tr><th id="998">998</th><td>    <b>if</b> (!cyc_per_count) {</td></tr>
+<tr><th id="999">999</th><td>        MIPS_RDHWR(<q>"$3"</q>, cyc_per_count);</td></tr>
+<tr><th id="1000">1000</th><td>    }</td></tr>
+<tr><th id="1001">1001</th><td></td></tr>
+<tr><th id="1002">1002</th><td>    MIPS_RDHWR(<q>"$2"</q>, count);</td></tr>
+<tr><th id="1003">1003</th><td>    <b>return</b> (int64_t)(count * cyc_per_count);</td></tr>
+<tr><th id="1004">1004</th><td>}</td></tr>
+<tr><th id="1005">1005</th><td></td></tr>
+<tr><th id="1006">1006</th><td><u>#elif defined(__alpha__)</u></td></tr>
+<tr><th id="1007">1007</th><td></td></tr>
+<tr><th id="1008">1008</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="1009">1009</th><td>{</td></tr>
+<tr><th id="1010">1010</th><td>    uint64_t cc;</td></tr>
+<tr><th id="1011">1011</th><td>    uint32_t cur, ofs;</td></tr>
+<tr><th id="1012">1012</th><td></td></tr>
+<tr><th id="1013">1013</th><td>    <b>asm</b> <em>volatile</em>(<q>"rpcc %0"</q> : <q>"=r"</q>(cc));</td></tr>
+<tr><th id="1014">1014</th><td>    cur = cc;</td></tr>
+<tr><th id="1015">1015</th><td>    ofs = cc &gt;&gt; <var>32</var>;</td></tr>
+<tr><th id="1016">1016</th><td>    <b>return</b> cur - ofs;</td></tr>
+<tr><th id="1017">1017</th><td>}</td></tr>
+<tr><th id="1018">1018</th><td></td></tr>
+<tr><th id="1019">1019</th><td><u>#else</u></td></tr>
+<tr><th id="1020">1020</th><td><i>/* The host CPU doesn't have an easily accessible cycle counter.</i></td></tr>
+<tr><th id="1021">1021</th><td><i>   Just return a monotonically increasing value.  This will be</i></td></tr>
+<tr><th id="1022">1022</th><td><i>   totally wrong, but hopefully better than nothing.  */</i></td></tr>
+<tr><th id="1023">1023</th><td><em>static</em> <b>inline</b> int64_t cpu_get_host_ticks(<em>void</em>)</td></tr>
+<tr><th id="1024">1024</th><td>{</td></tr>
+<tr><th id="1025">1025</th><td>    <b>return</b> get_clock();</td></tr>
+<tr><th id="1026">1026</th><td>}</td></tr>
+<tr><th id="1027">1027</th><td><u>#<span data-ppcond="877">endif</span></u></td></tr>
+<tr><th id="1028">1028</th><td></td></tr>
+<tr><th id="1029">1029</th><td><u>#<span data-ppcond="1029">ifdef</span> <span class="macro" data-ref="_M/CONFIG_PROFILER">CONFIG_PROFILER</span></u></td></tr>
+<tr><th id="1030">1030</th><td><em>static</em> <b>inline</b> int64_t profile_getclock(<em>void</em>)</td></tr>
+<tr><th id="1031">1031</th><td>{</td></tr>
+<tr><th id="1032">1032</th><td>    <b>return</b> get_clock();</td></tr>
+<tr><th id="1033">1033</th><td>}</td></tr>
+<tr><th id="1034">1034</th><td></td></tr>
+<tr><th id="1035">1035</th><td><b>extern</b> int64_t tcg_time;</td></tr>
+<tr><th id="1036">1036</th><td><b>extern</b> int64_t dev_time;</td></tr>
+<tr><th id="1037">1037</th><td><u>#<span data-ppcond="1029">endif</span></u></td></tr>
+<tr><th id="1038">1038</th><td></td></tr>
+<tr><th id="1039">1039</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="1040">1040</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

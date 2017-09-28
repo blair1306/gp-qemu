@@ -1,0 +1,16 @@
+<dec f='codebrowser/slirp/tcp_var.h' l='158'/>
+<doc f='codebrowser/slirp/tcp_var.h' l='145'>/*
+ * The initial retransmission should happen at rtt + 4 * rttvar.
+ * Because of the way we do the smoothing, srtt and rttvar
+ * will each average +1/2 tick of bias.  When we compute
+ * the retransmit timer, we want 1/2 tick of rounding and
+ * 1 extra tick because of +-1/2 tick uncertainty in the
+ * firing of the timer.  The bias will give us exactly the
+ * 1.5 tick we need.  But, because the bias is
+ * statistical, we have to test that we don&apos;t drop below
+ * the minimum feasible timer (which is 2 ticks).
+ * This macro assumes that the value of TCP_RTTVAR_SCALE
+ * is the same as the multiplier for rttvar.
+ */</doc>
+<use f='codebrowser/slirp/tcp_input.c' l='1548' u='c'/>
+<use f='codebrowser/slirp/tcp_timer.c' l='190' u='c'/>

@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ip6_output.c source code [codebrowser/slirp/ip6_output.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/ip6_output.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='ip6_output.c.html'>ip6_output.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 2013</i></td></tr>
+<tr><th id="3">3</th><td><i> * Guillaume Subiron, Yann Bordenave, Serigne Modou Wagne.</i></td></tr>
+<tr><th id="4">4</th><td><i> */</i></td></tr>
+<tr><th id="5">5</th><td></td></tr>
+<tr><th id="6">6</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="7">7</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="8">8</th><td><u>#include <a href="slirp.h.html">"slirp.h"</a></u></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><i>/* Number of packets queued before we start sending</i></td></tr>
+<tr><th id="11">11</th><td><i> * (to prevent allocing too many mbufs) */</i></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/IF6_THRESH" data-ref="_M/IF6_THRESH">IF6_THRESH</dfn> 10</u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><i>/*</i></td></tr>
+<tr><th id="15">15</th><td><i> * IPv6 output. The packet in mbuf chain m contains a IP header</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td><em>int</em> <dfn class="decl def" id="ip6_output" title='ip6_output' data-ref="ip6_output">ip6_output</dfn>(<b>struct</b> <a class="type" href="socket.h.html#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col1 decl" id="1so" title='so' data-type='struct socket *' data-ref="1so">so</dfn>, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="local col2 decl" id="2m" title='m' data-type='struct mbuf *' data-ref="2m">m</dfn>, <em>int</em> <dfn class="local col3 decl" id="3fast" title='fast' data-type='int' data-ref="3fast">fast</dfn>)</td></tr>
+<tr><th id="18">18</th><td>{</td></tr>
+<tr><th id="19">19</th><td>    <b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a> *<dfn class="local col4 decl" id="4ip" title='ip' data-type='struct ip6 *' data-ref="4ip">ip</dfn> = <a class="macro" href="mbuf.h.html#42" title="((struct ip6 *)(m)-&gt;m_data)" data-ref="_M/mtod">mtod</a>(<a class="local col2 ref" href="#2m" title='m' data-ref="2m">m</a>, <b>struct</b> <a class="type" href="ip6.h.html#ip6" title='ip6' data-ref="ip6">ip6</a> *);</td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td>    <a class="macro" href="debug.h.html#28" title="" data-ref="_M/DEBUG_CALL">DEBUG_CALL</a>(<q>"ip6_output"</q>);</td></tr>
+<tr><th id="22">22</th><td>    <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"so = %lx"</q>, (<em>long</em>)so);</td></tr>
+<tr><th id="23">23</th><td>    <a class="macro" href="debug.h.html#29" title="" data-ref="_M/DEBUG_ARG">DEBUG_ARG</a>(<q>"m = %lx"</q>, (<em>long</em>)m);</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td>    <i>/* Fill IPv6 header */</i></td></tr>
+<tr><th id="26">26</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_v" title='ip6::ip_v' data-ref="ip6::ip_v">ip_v</a> = <a class="macro" href="ip6.h.html#109" title="6" data-ref="_M/IP6VERSION">IP6VERSION</a>;</td></tr>
+<tr><th id="27">27</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_hl" title='ip6::ip_hl' data-ref="ip6::ip_hl">ip_hl</a> = <a class="macro" href="ip6.h.html#110" title="255" data-ref="_M/IP6_HOP_LIMIT">IP6_HOP_LIMIT</a>;</td></tr>
+<tr><th id="28">28</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_tc_hi" title='ip6::ip_tc_hi' data-ref="ip6::ip_tc_hi">ip_tc_hi</a> = <var>0</var>;</td></tr>
+<tr><th id="29">29</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_tc_lo" title='ip6::ip_tc_lo' data-ref="ip6::ip_tc_lo">ip_tc_lo</a> = <var>0</var>;</td></tr>
+<tr><th id="30">30</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_fl_hi" title='ip6::ip_fl_hi' data-ref="ip6::ip_fl_hi">ip_fl_hi</a> = <var>0</var>;</td></tr>
+<tr><th id="31">31</th><td>    <a class="local col4 ref" href="#4ip" title='ip' data-ref="4ip">ip</a>-&gt;<a class="ref" href="ip6.h.html#ip6::ip_fl_lo" title='ip6::ip_fl_lo' data-ref="ip6::ip_fl_lo">ip_fl_lo</a> = <var>0</var>;</td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>    <b>if</b> (<a class="local col3 ref" href="#3fast" title='fast' data-ref="3fast">fast</a>) {</td></tr>
+<tr><th id="34">34</th><td>        <a class="ref" href="main.h.html#if_encap" title='if_encap' data-ref="if_encap">if_encap</a>(<a class="local col2 ref" href="#2m" title='m' data-ref="2m">m</a>-&gt;<a class="ref" href="mbuf.h.html#mbuf::slirp" title='mbuf::slirp' data-ref="mbuf::slirp">slirp</a>, <a class="local col2 ref" href="#2m" title='m' data-ref="2m">m</a>);</td></tr>
+<tr><th id="35">35</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="36">36</th><td>        <a class="ref" href="slirp.h.html#if_output" title='if_output' data-ref="if_output">if_output</a>(<a class="local col1 ref" href="#1so" title='so' data-ref="1so">so</a>, <a class="local col2 ref" href="#2m" title='m' data-ref="2m">m</a>);</td></tr>
+<tr><th id="37">37</th><td>    }</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="40">40</th><td>}</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

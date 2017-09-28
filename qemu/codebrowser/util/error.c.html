@@ -1,0 +1,313 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>error.c source code [codebrowser/util/error.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="Error "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/error.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='error.c.html'>error.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU Error Objects</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2011-2015 Red Hat, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Authors:</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *  Markus Armbruster &lt;armbru@redhat.com&gt;,</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2.  See</i></td></tr>
+<tr><th id="12">12</th><td><i> * the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>struct</b> <dfn class="type def" id="Error" title='Error' data-ref="Error">Error</dfn></td></tr>
+<tr><th id="21">21</th><td>{</td></tr>
+<tr><th id="22">22</th><td>    <em>char</em> *<dfn class="decl" id="Error::msg" title='Error::msg' data-ref="Error::msg">msg</dfn>;</td></tr>
+<tr><th id="23">23</th><td>    <a class="typedef" href="../include/qapi/error.h.html#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="decl" id="Error::err_class" title='Error::err_class' data-ref="Error::err_class">err_class</dfn>;</td></tr>
+<tr><th id="24">24</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="Error::src" title='Error::src' data-ref="Error::src">src</dfn>, *<dfn class="decl" id="Error::func" title='Error::func' data-ref="Error::func">func</dfn>;</td></tr>
+<tr><th id="25">25</th><td>    <em>int</em> <dfn class="decl" id="Error::line" title='Error::line' data-ref="Error::line">line</dfn>;</td></tr>
+<tr><th id="26">26</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gstring.h.html#GString" title='GString' data-type='struct _GString' data-ref="GString">GString</a> *<dfn class="decl" id="Error::hint" title='Error::hint' data-ref="Error::hint">hint</dfn>;</td></tr>
+<tr><th id="27">27</th><td>};</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl def" id="error_abort" title='error_abort' data-ref="error_abort">error_abort</dfn>;</td></tr>
+<tr><th id="30">30</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl def" id="error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</dfn>;</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="error_handle_fatal" title='error_handle_fatal' data-type='void error_handle_fatal(Error ** errp, Error * err)' data-ref="error_handle_fatal">error_handle_fatal</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="1errp" title='errp' data-type='Error **' data-ref="1errp">errp</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col2 decl" id="2err" title='err' data-type='Error *' data-ref="2err">err</dfn>)</td></tr>
+<tr><th id="33">33</th><td>{</td></tr>
+<tr><th id="34">34</th><td>    <b>if</b> (<a class="local col1 ref" href="#1errp" title='errp' data-ref="1errp">errp</a> == &amp;<a class="ref" href="../include/qapi/error.h.html#error_abort" title='error_abort' data-ref="error_abort">error_abort</a>) {</td></tr>
+<tr><th id="35">35</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Unexpected error in %s() at %s:%d:\n"</q>,</td></tr>
+<tr><th id="36">36</th><td>                <a class="local col2 ref" href="#2err" title='err' data-ref="2err">err</a>-&gt;<a class="ref" href="#Error::func" title='Error::func' data-ref="Error::func">func</a>, <a class="local col2 ref" href="#2err" title='err' data-ref="2err">err</a>-&gt;<a class="ref" href="#Error::src" title='Error::src' data-ref="Error::src">src</a>, <a class="local col2 ref" href="#2err" title='err' data-ref="2err">err</a>-&gt;<a class="ref" href="#Error::line" title='Error::line' data-ref="Error::line">line</a>);</td></tr>
+<tr><th id="37">37</th><td>        <a class="ref" href="#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col2 ref" href="#2err" title='err' data-ref="2err">err</a>);</td></tr>
+<tr><th id="38">38</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="39">39</th><td>    }</td></tr>
+<tr><th id="40">40</th><td>    <b>if</b> (<a class="local col1 ref" href="#1errp" title='errp' data-ref="1errp">errp</a> == &amp;<a class="ref" href="../include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>) {</td></tr>
+<tr><th id="41">41</th><td>        <a class="ref" href="#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col2 ref" href="#2err" title='err' data-ref="2err">err</a>);</td></tr>
+<tr><th id="42">42</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="43">43</th><td>    }</td></tr>
+<tr><th id="44">44</th><td>}</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="error_setv" title='error_setv' data-type='void error_setv(Error ** errp, const char * src, int line, const char * func, ErrorClass err_class, const char * fmt, struct __va_list_tag * ap, const char * suffix)' data-ref="error_setv">error_setv</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="3errp" title='errp' data-type='Error **' data-ref="3errp">errp</dfn>,</td></tr>
+<tr><th id="47">47</th><td>                       <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="4src" title='src' data-type='const char *' data-ref="4src">src</dfn>, <em>int</em> <dfn class="local col5 decl" id="5line" title='line' data-type='int' data-ref="5line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="6func" title='func' data-type='const char *' data-ref="6func">func</dfn>,</td></tr>
+<tr><th id="48">48</th><td>                       <a class="typedef" href="../include/qapi/error.h.html#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="local col7 decl" id="7err_class" title='err_class' data-type='ErrorClass' data-ref="7err_class">err_class</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="8fmt" title='fmt' data-type='const char *' data-ref="8fmt">fmt</dfn>, <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col9 decl" id="9ap" title='ap' data-type='struct __va_list_tag *' data-ref="9ap">ap</dfn>,</td></tr>
+<tr><th id="49">49</th><td>                       <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="10suffix" title='suffix' data-type='const char *' data-ref="10suffix">suffix</dfn>)</td></tr>
+<tr><th id="50">50</th><td>{</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col1 decl" id="11err" title='err' data-type='Error *' data-ref="11err">err</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <em>int</em> <dfn class="local col2 decl" id="12saved_errno" title='saved_errno' data-type='int' data-ref="12saved_errno">saved_errno</dfn> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>    <b>if</b> (<a class="local col3 ref" href="#3errp" title='errp' data-ref="3errp">errp</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="55">55</th><td>        <b>return</b>;</td></tr>
+<tr><th id="56">56</th><td>    }</td></tr>
+<tr><th id="57">57</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((*errp == ((void*)0)) ? (void) (0) : __assert_fail (&quot;*errp == NULL&quot;, &quot;/home/jon/workspace/qemu/util/error.c&quot;, 57, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(*<a class="local col3 ref" href="#3errp" title='errp' data-ref="3errp">errp</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(*<a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>));</td></tr>
+<tr><th id="60">60</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_vprintf" title='g_strdup_vprintf' data-ref="g_strdup_vprintf">g_strdup_vprintf</a>(<a class="local col8 ref" href="#8fmt" title='fmt' data-ref="8fmt">fmt</a>, <a class="local col9 ref" href="#9ap" title='ap' data-ref="9ap">ap</a>);</td></tr>
+<tr><th id="61">61</th><td>    <b>if</b> (<a class="local col0 ref" href="#10suffix" title='suffix' data-ref="10suffix">suffix</a>) {</td></tr>
+<tr><th id="62">62</th><td>        <em>char</em> *<dfn class="local col3 decl" id="13msg" title='msg' data-type='char *' data-ref="13msg">msg</dfn> = <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>;</td></tr>
+<tr><th id="63">63</th><td>        <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup_printf" title='g_strdup_printf' data-ref="g_strdup_printf">g_strdup_printf</a>(<q>"%s: %s"</q>, <a class="local col3 ref" href="#13msg" title='msg' data-ref="13msg">msg</a>, <a class="local col0 ref" href="#10suffix" title='suffix' data-ref="10suffix">suffix</a>);</td></tr>
+<tr><th id="64">64</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col3 ref" href="#13msg" title='msg' data-ref="13msg">msg</a>);</td></tr>
+<tr><th id="65">65</th><td>    }</td></tr>
+<tr><th id="66">66</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::err_class" title='Error::err_class' data-ref="Error::err_class">err_class</a> = <a class="local col7 ref" href="#7err_class" title='err_class' data-ref="7err_class">err_class</a>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::src" title='Error::src' data-ref="Error::src">src</a> = <a class="local col4 ref" href="#4src" title='src' data-ref="4src">src</a>;</td></tr>
+<tr><th id="68">68</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::line" title='Error::line' data-ref="Error::line">line</a> = <a class="local col5 ref" href="#5line" title='line' data-ref="5line">line</a>;</td></tr>
+<tr><th id="69">69</th><td>    <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>-&gt;<a class="ref" href="#Error::func" title='Error::func' data-ref="Error::func">func</a> = <a class="local col6 ref" href="#6func" title='func' data-ref="6func">func</a>;</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td>    <a class="tu ref" href="#error_handle_fatal" title='error_handle_fatal' data-use='c' data-ref="error_handle_fatal">error_handle_fatal</a>(<a class="local col3 ref" href="#3errp" title='errp' data-ref="3errp">errp</a>, <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>);</td></tr>
+<tr><th id="72">72</th><td>    *<a class="local col3 ref" href="#3errp" title='errp' data-ref="3errp">errp</a> = <a class="local col1 ref" href="#11err" title='err' data-ref="11err">err</a>;</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td>    <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> = <a class="local col2 ref" href="#12saved_errno" title='saved_errno' data-ref="12saved_errno">saved_errno</a>;</td></tr>
+<tr><th id="75">75</th><td>}</td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><em>void</em> <dfn class="decl def" id="error_set_internal" title='error_set_internal' data-ref="error_set_internal">error_set_internal</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="14errp" title='errp' data-type='Error **' data-ref="14errp">errp</dfn>,</td></tr>
+<tr><th id="78">78</th><td>                        <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="15src" title='src' data-type='const char *' data-ref="15src">src</dfn>, <em>int</em> <dfn class="local col6 decl" id="16line" title='line' data-type='int' data-ref="16line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="17func" title='func' data-type='const char *' data-ref="17func">func</dfn>,</td></tr>
+<tr><th id="79">79</th><td>                        <a class="typedef" href="../include/qapi/error.h.html#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="local col8 decl" id="18err_class" title='err_class' data-type='ErrorClass' data-ref="18err_class">err_class</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="19fmt" title='fmt' data-type='const char *' data-ref="19fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="80">80</th><td>{</td></tr>
+<tr><th id="81">81</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col0 decl" id="20ap" title='ap' data-type='va_list' data-ref="20ap">ap</dfn>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col0 ref" href="#20ap" title='ap' data-ref="20ap">ap</a>, <a class="local col9 ref" href="#19fmt" title='fmt' data-ref="19fmt">fmt</a>);</td></tr>
+<tr><th id="84">84</th><td>    <a class="tu ref" href="#error_setv" title='error_setv' data-use='c' data-ref="error_setv">error_setv</a>(<a class="local col4 ref" href="#14errp" title='errp' data-ref="14errp">errp</a>, <a class="local col5 ref" href="#15src" title='src' data-ref="15src">src</a>, <a class="local col6 ref" href="#16line" title='line' data-ref="16line">line</a>, <a class="local col7 ref" href="#17func" title='func' data-ref="17func">func</a>, <a class="local col8 ref" href="#18err_class" title='err_class' data-ref="18err_class">err_class</a>, <a class="local col9 ref" href="#19fmt" title='fmt' data-ref="19fmt">fmt</a>, <a class="local col0 ref" href="#20ap" title='ap' data-ref="20ap">ap</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="85">85</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col0 ref" href="#20ap" title='ap' data-ref="20ap">ap</a>);</td></tr>
+<tr><th id="86">86</th><td>}</td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><em>void</em> <dfn class="decl def" id="error_setg_internal" title='error_setg_internal' data-ref="error_setg_internal">error_setg_internal</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="21errp" title='errp' data-type='Error **' data-ref="21errp">errp</dfn>,</td></tr>
+<tr><th id="89">89</th><td>                         <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="22src" title='src' data-type='const char *' data-ref="22src">src</dfn>, <em>int</em> <dfn class="local col3 decl" id="23line" title='line' data-type='int' data-ref="23line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col4 decl" id="24func" title='func' data-type='const char *' data-ref="24func">func</dfn>,</td></tr>
+<tr><th id="90">90</th><td>                         <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="25fmt" title='fmt' data-type='const char *' data-ref="25fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="91">91</th><td>{</td></tr>
+<tr><th id="92">92</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col6 decl" id="26ap" title='ap' data-type='va_list' data-ref="26ap">ap</dfn>;</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col6 ref" href="#26ap" title='ap' data-ref="26ap">ap</a>, <a class="local col5 ref" href="#25fmt" title='fmt' data-ref="25fmt">fmt</a>);</td></tr>
+<tr><th id="95">95</th><td>    <a class="tu ref" href="#error_setv" title='error_setv' data-use='c' data-ref="error_setv">error_setv</a>(<a class="local col1 ref" href="#21errp" title='errp' data-ref="21errp">errp</a>, <a class="local col2 ref" href="#22src" title='src' data-ref="22src">src</a>, <a class="local col3 ref" href="#23line" title='line' data-ref="23line">line</a>, <a class="local col4 ref" href="#24func" title='func' data-ref="24func">func</a>, <a class="enum" href="../include/qapi/error.h.html#ErrorClass::ERROR_CLASS_GENERIC_ERROR" title='ErrorClass::ERROR_CLASS_GENERIC_ERROR' data-ref="ErrorClass::ERROR_CLASS_GENERIC_ERROR">ERROR_CLASS_GENERIC_ERROR</a>, <a class="local col5 ref" href="#25fmt" title='fmt' data-ref="25fmt">fmt</a>, <a class="local col6 ref" href="#26ap" title='ap' data-ref="26ap">ap</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="96">96</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col6 ref" href="#26ap" title='ap' data-ref="26ap">ap</a>);</td></tr>
+<tr><th id="97">97</th><td>}</td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><em>void</em> <dfn class="decl def" id="error_setg_errno_internal" title='error_setg_errno_internal' data-ref="error_setg_errno_internal">error_setg_errno_internal</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="27errp" title='errp' data-type='Error **' data-ref="27errp">errp</dfn>,</td></tr>
+<tr><th id="100">100</th><td>                               <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="28src" title='src' data-type='const char *' data-ref="28src">src</dfn>, <em>int</em> <dfn class="local col9 decl" id="29line" title='line' data-type='int' data-ref="29line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="30func" title='func' data-type='const char *' data-ref="30func">func</dfn>,</td></tr>
+<tr><th id="101">101</th><td>                               <em>int</em> <dfn class="local col1 decl" id="31os_errno" title='os_errno' data-type='int' data-ref="31os_errno">os_errno</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="32fmt" title='fmt' data-type='const char *' data-ref="32fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col3 decl" id="33ap" title='ap' data-type='va_list' data-ref="33ap">ap</dfn>;</td></tr>
+<tr><th id="104">104</th><td>    <em>int</em> <dfn class="local col4 decl" id="34saved_errno" title='saved_errno' data-type='int' data-ref="34saved_errno">saved_errno</dfn> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <b>if</b> (<a class="local col7 ref" href="#27errp" title='errp' data-ref="27errp">errp</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="107">107</th><td>        <b>return</b>;</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col3 ref" href="#33ap" title='ap' data-ref="33ap">ap</a>, <a class="local col2 ref" href="#32fmt" title='fmt' data-ref="32fmt">fmt</a>);</td></tr>
+<tr><th id="111">111</th><td>    <a class="tu ref" href="#error_setv" title='error_setv' data-use='c' data-ref="error_setv">error_setv</a>(<a class="local col7 ref" href="#27errp" title='errp' data-ref="27errp">errp</a>, <a class="local col8 ref" href="#28src" title='src' data-ref="28src">src</a>, <a class="local col9 ref" href="#29line" title='line' data-ref="29line">line</a>, <a class="local col0 ref" href="#30func" title='func' data-ref="30func">func</a>, <a class="enum" href="../include/qapi/error.h.html#ErrorClass::ERROR_CLASS_GENERIC_ERROR" title='ErrorClass::ERROR_CLASS_GENERIC_ERROR' data-ref="ErrorClass::ERROR_CLASS_GENERIC_ERROR">ERROR_CLASS_GENERIC_ERROR</a>, <a class="local col2 ref" href="#32fmt" title='fmt' data-ref="32fmt">fmt</a>, <a class="local col3 ref" href="#33ap" title='ap' data-ref="33ap">ap</a>,</td></tr>
+<tr><th id="112">112</th><td>               <a class="local col1 ref" href="#31os_errno" title='os_errno' data-ref="31os_errno">os_errno</a> != <var>0</var> ? <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="local col1 ref" href="#31os_errno" title='os_errno' data-ref="31os_errno">os_errno</a>) : <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="113">113</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col3 ref" href="#33ap" title='ap' data-ref="33ap">ap</a>);</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td>    <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> = <a class="local col4 ref" href="#34saved_errno" title='saved_errno' data-ref="34saved_errno">saved_errno</a>;</td></tr>
+<tr><th id="116">116</th><td>}</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><em>void</em> <dfn class="decl def" id="error_setg_file_open_internal" title='error_setg_file_open_internal' data-ref="error_setg_file_open_internal">error_setg_file_open_internal</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="35errp" title='errp' data-type='Error **' data-ref="35errp">errp</dfn>,</td></tr>
+<tr><th id="119">119</th><td>                                   <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="36src" title='src' data-type='const char *' data-ref="36src">src</dfn>, <em>int</em> <dfn class="local col7 decl" id="37line" title='line' data-type='int' data-ref="37line">line</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="38func" title='func' data-type='const char *' data-ref="38func">func</dfn>,</td></tr>
+<tr><th id="120">120</th><td>                                   <em>int</em> <dfn class="local col9 decl" id="39os_errno" title='os_errno' data-type='int' data-ref="39os_errno">os_errno</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="40filename" title='filename' data-type='const char *' data-ref="40filename">filename</dfn>)</td></tr>
+<tr><th id="121">121</th><td>{</td></tr>
+<tr><th id="122">122</th><td>    <a class="ref" href="#error_setg_errno_internal" title='error_setg_errno_internal' data-ref="error_setg_errno_internal">error_setg_errno_internal</a>(<a class="local col5 ref" href="#35errp" title='errp' data-ref="35errp">errp</a>, <a class="local col6 ref" href="#36src" title='src' data-ref="36src">src</a>, <a class="local col7 ref" href="#37line" title='line' data-ref="37line">line</a>, <a class="local col8 ref" href="#38func" title='func' data-ref="38func">func</a>, <a class="local col9 ref" href="#39os_errno" title='os_errno' data-ref="39os_errno">os_errno</a>,</td></tr>
+<tr><th id="123">123</th><td>                              <q>"Could not open '%s'"</q>, <a class="local col0 ref" href="#40filename" title='filename' data-ref="40filename">filename</a>);</td></tr>
+<tr><th id="124">124</th><td>}</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><em>void</em> <dfn class="decl def" id="error_vprepend" title='error_vprepend' data-ref="error_vprepend">error_vprepend</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col1 decl" id="41errp" title='errp' data-type='Error **' data-ref="41errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col2 decl" id="42fmt" title='fmt' data-type='const char *' data-ref="42fmt">fmt</dfn>, <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col3 decl" id="43ap" title='ap' data-type='struct __va_list_tag *' data-ref="43ap">ap</dfn>)</td></tr>
+<tr><th id="127">127</th><td>{</td></tr>
+<tr><th id="128">128</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gstring.h.html#GString" title='GString' data-type='struct _GString' data-ref="GString">GString</a> *<dfn class="local col4 decl" id="44newmsg" title='newmsg' data-type='GString *' data-ref="44newmsg">newmsg</dfn>;</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (!<a class="local col1 ref" href="#41errp" title='errp' data-ref="41errp">errp</a>) {</td></tr>
+<tr><th id="131">131</th><td>        <b>return</b>;</td></tr>
+<tr><th id="132">132</th><td>    }</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <a class="local col4 ref" href="#44newmsg" title='newmsg' data-ref="44newmsg">newmsg</a> = <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_new" title='g_string_new' data-ref="g_string_new">g_string_new</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="135">135</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_vprintf" title='g_string_vprintf' data-ref="g_string_vprintf">g_string_vprintf</a>(<a class="local col4 ref" href="#44newmsg" title='newmsg' data-ref="44newmsg">newmsg</a>, <a class="local col2 ref" href="#42fmt" title='fmt' data-ref="42fmt">fmt</a>, <a class="local col3 ref" href="#43ap" title='ap' data-ref="43ap">ap</a>);</td></tr>
+<tr><th id="136">136</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_append" title='g_string_append' data-ref="g_string_append">g_string_append</a>(<a class="local col4 ref" href="#44newmsg" title='newmsg' data-ref="44newmsg">newmsg</a>, (*<a class="local col1 ref" href="#41errp" title='errp' data-ref="41errp">errp</a>)-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>);</td></tr>
+<tr><th id="137">137</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>((*<a class="local col1 ref" href="#41errp" title='errp' data-ref="41errp">errp</a>)-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>);</td></tr>
+<tr><th id="138">138</th><td>    (*<a class="local col1 ref" href="#41errp" title='errp' data-ref="41errp">errp</a>)-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a> = <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_free" title='g_string_free' data-ref="g_string_free">g_string_free</a>(<a class="local col4 ref" href="#44newmsg" title='newmsg' data-ref="44newmsg">newmsg</a>, <var>0</var>);</td></tr>
+<tr><th id="139">139</th><td>}</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><em>void</em> <dfn class="decl def" id="error_prepend" title='error_prepend' data-ref="error_prepend">error_prepend</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col5 decl" id="45errp" title='errp' data-type='Error **' data-ref="45errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="46fmt" title='fmt' data-type='const char *' data-ref="46fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col7 decl" id="47ap" title='ap' data-type='va_list' data-ref="47ap">ap</dfn>;</td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col7 ref" href="#47ap" title='ap' data-ref="47ap">ap</a>, <a class="local col6 ref" href="#46fmt" title='fmt' data-ref="46fmt">fmt</a>);</td></tr>
+<tr><th id="146">146</th><td>    <a class="ref" href="#error_vprepend" title='error_vprepend' data-ref="error_vprepend">error_vprepend</a>(<a class="local col5 ref" href="#45errp" title='errp' data-ref="45errp">errp</a>, <a class="local col6 ref" href="#46fmt" title='fmt' data-ref="46fmt">fmt</a>, <a class="local col7 ref" href="#47ap" title='ap' data-ref="47ap">ap</a>);</td></tr>
+<tr><th id="147">147</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col7 ref" href="#47ap" title='ap' data-ref="47ap">ap</a>);</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><em>void</em> <dfn class="decl def" id="error_append_hint" title='error_append_hint' data-ref="error_append_hint">error_append_hint</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col8 decl" id="48errp" title='errp' data-type='Error **' data-ref="48errp">errp</dfn>, <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="49fmt" title='fmt' data-type='const char *' data-ref="49fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="151">151</th><td>{</td></tr>
+<tr><th id="152">152</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col0 decl" id="50ap" title='ap' data-type='va_list' data-ref="50ap">ap</dfn>;</td></tr>
+<tr><th id="153">153</th><td>    <em>int</em> <dfn class="local col1 decl" id="51saved_errno" title='saved_errno' data-type='int' data-ref="51saved_errno">saved_errno</dfn> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>;</td></tr>
+<tr><th id="154">154</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col2 decl" id="52err" title='err' data-type='Error *' data-ref="52err">err</dfn>;</td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td>    <b>if</b> (!<a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>) {</td></tr>
+<tr><th id="157">157</th><td>        <b>return</b>;</td></tr>
+<tr><th id="158">158</th><td>    }</td></tr>
+<tr><th id="159">159</th><td>    <a class="local col2 ref" href="#52err" title='err' data-ref="52err">err</a> = *<a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a>;</td></tr>
+<tr><th id="160">160</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((err &amp;&amp; errp != &amp;error_abort &amp;&amp; errp != &amp;error_fatal) ? (void) (0) : __assert_fail (&quot;err &amp;&amp; errp != &amp;error_abort &amp;&amp; errp != &amp;error_fatal&quot;, &quot;/home/jon/workspace/qemu/util/error.c&quot;, 160, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col2 ref" href="#52err" title='err' data-ref="52err">err</a> &amp;&amp; <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a> != &amp;<a class="ref" href="../include/qapi/error.h.html#error_abort" title='error_abort' data-ref="error_abort">error_abort</a> &amp;&amp; <a class="local col8 ref" href="#48errp" title='errp' data-ref="48errp">errp</a> != &amp;<a class="ref" href="../include/qapi/error.h.html#error_fatal" title='error_fatal' data-ref="error_fatal">error_fatal</a>);</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td>    <b>if</b> (!<a class="local col2 ref" href="#52err" title='err' data-ref="52err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>) {</td></tr>
+<tr><th id="163">163</th><td>        <a class="local col2 ref" href="#52err" title='err' data-ref="52err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a> = <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_new" title='g_string_new' data-ref="g_string_new">g_string_new</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>);</td></tr>
+<tr><th id="164">164</th><td>    }</td></tr>
+<tr><th id="165">165</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col0 ref" href="#50ap" title='ap' data-ref="50ap">ap</a>, <a class="local col9 ref" href="#49fmt" title='fmt' data-ref="49fmt">fmt</a>);</td></tr>
+<tr><th id="166">166</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_append_vprintf" title='g_string_append_vprintf' data-ref="g_string_append_vprintf">g_string_append_vprintf</a>(<a class="local col2 ref" href="#52err" title='err' data-ref="52err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>, <a class="local col9 ref" href="#49fmt" title='fmt' data-ref="49fmt">fmt</a>, <a class="local col0 ref" href="#50ap" title='ap' data-ref="50ap">ap</a>);</td></tr>
+<tr><th id="167">167</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col0 ref" href="#50ap" title='ap' data-ref="50ap">ap</a>);</td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td>    <a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a> = <a class="local col1 ref" href="#51saved_errno" title='saved_errno' data-ref="51saved_errno">saved_errno</a>;</td></tr>
+<tr><th id="170">170</th><td>}</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><u>#<span data-ppcond="172">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><em>void</em> error_setg_win32_internal(Error **errp,</td></tr>
+<tr><th id="175">175</th><td>                               <em>const</em> <em>char</em> *src, <em>int</em> line, <em>const</em> <em>char</em> *func,</td></tr>
+<tr><th id="176">176</th><td>                               <em>int</em> win32_err, <em>const</em> <em>char</em> *fmt, ...)</td></tr>
+<tr><th id="177">177</th><td>{</td></tr>
+<tr><th id="178">178</th><td>    va_list ap;</td></tr>
+<tr><th id="179">179</th><td>    <em>char</em> *suffix = NULL;</td></tr>
+<tr><th id="180">180</th><td></td></tr>
+<tr><th id="181">181</th><td>    <b>if</b> (errp == NULL) {</td></tr>
+<tr><th id="182">182</th><td>        <b>return</b>;</td></tr>
+<tr><th id="183">183</th><td>    }</td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td>    <b>if</b> (win32_err != <var>0</var>) {</td></tr>
+<tr><th id="186">186</th><td>        suffix = g_win32_error_message(win32_err);</td></tr>
+<tr><th id="187">187</th><td>    }</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    va_start(ap, fmt);</td></tr>
+<tr><th id="190">190</th><td>    error_setv(errp, src, line, func, ERROR_CLASS_GENERIC_ERROR,</td></tr>
+<tr><th id="191">191</th><td>               fmt, ap, suffix);</td></tr>
+<tr><th id="192">192</th><td>    va_end(ap);</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td>    g_free(suffix);</td></tr>
+<tr><th id="195">195</th><td>}</td></tr>
+<tr><th id="196">196</th><td></td></tr>
+<tr><th id="197">197</th><td><u>#<span data-ppcond="172">endif</span></u></td></tr>
+<tr><th id="198">198</th><td></td></tr>
+<tr><th id="199">199</th><td><a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl def" id="error_copy" title='error_copy' data-ref="error_copy">error_copy</dfn>(<em>const</em> <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col3 decl" id="53err" title='err' data-type='const Error *' data-ref="53err">err</dfn>)</td></tr>
+<tr><th id="200">200</th><td>{</td></tr>
+<tr><th id="201">201</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col4 decl" id="54err_new" title='err_new' data-type='Error *' data-ref="54err_new">err_new</dfn>;</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(*<a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>));</td></tr>
+<tr><th id="204">204</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>);</td></tr>
+<tr><th id="205">205</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::err_class" title='Error::err_class' data-ref="Error::err_class">err_class</a> = <a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::err_class" title='Error::err_class' data-ref="Error::err_class">err_class</a>;</td></tr>
+<tr><th id="206">206</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::src" title='Error::src' data-ref="Error::src">src</a> = <a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::src" title='Error::src' data-ref="Error::src">src</a>;</td></tr>
+<tr><th id="207">207</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::line" title='Error::line' data-ref="Error::line">line</a> = <a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::line" title='Error::line' data-ref="Error::line">line</a>;</td></tr>
+<tr><th id="208">208</th><td>    <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::func" title='Error::func' data-ref="Error::func">func</a> = <a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::func" title='Error::func' data-ref="Error::func">func</a>;</td></tr>
+<tr><th id="209">209</th><td>    <b>if</b> (<a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>) {</td></tr>
+<tr><th id="210">210</th><td>        <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a> = <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_new" title='g_string_new' data-ref="g_string_new">g_string_new</a>(<a class="local col3 ref" href="#53err" title='err' data-ref="53err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#_GString::str" title='_GString::str' data-ref="_GString::str">str</a>);</td></tr>
+<tr><th id="211">211</th><td>    }</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td>    <b>return</b> <a class="local col4 ref" href="#54err_new" title='err_new' data-ref="54err_new">err_new</a>;</td></tr>
+<tr><th id="214">214</th><td>}</td></tr>
+<tr><th id="215">215</th><td></td></tr>
+<tr><th id="216">216</th><td><a class="typedef" href="../include/qapi/error.h.html#ErrorClass" title='ErrorClass' data-type='enum ErrorClass' data-ref="ErrorClass">ErrorClass</a> <dfn class="decl def" id="error_get_class" title='error_get_class' data-ref="error_get_class">error_get_class</dfn>(<em>const</em> <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col5 decl" id="55err" title='err' data-type='const Error *' data-ref="55err">err</dfn>)</td></tr>
+<tr><th id="217">217</th><td>{</td></tr>
+<tr><th id="218">218</th><td>    <b>return</b> <a class="local col5 ref" href="#55err" title='err' data-ref="55err">err</a>-&gt;<a class="ref" href="#Error::err_class" title='Error::err_class' data-ref="Error::err_class">err_class</a>;</td></tr>
+<tr><th id="219">219</th><td>}</td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><em>const</em> <em>char</em> *<dfn class="decl def" id="error_get_pretty" title='error_get_pretty' data-ref="error_get_pretty">error_get_pretty</dfn>(<em>const</em> <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col6 decl" id="56err" title='err' data-type='const Error *' data-ref="56err">err</dfn>)</td></tr>
+<tr><th id="222">222</th><td>{</td></tr>
+<tr><th id="223">223</th><td>    <b>return</b> <a class="local col6 ref" href="#56err" title='err' data-ref="56err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>;</td></tr>
+<tr><th id="224">224</th><td>}</td></tr>
+<tr><th id="225">225</th><td></td></tr>
+<tr><th id="226">226</th><td><em>void</em> <dfn class="decl def" id="error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col7 decl" id="57err" title='err' data-type='Error *' data-ref="57err">err</dfn>)</td></tr>
+<tr><th id="227">227</th><td>{</td></tr>
+<tr><th id="228">228</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"%s"</q>, <a class="ref" href="#error_get_pretty" title='error_get_pretty' data-ref="error_get_pretty">error_get_pretty</a>(<a class="local col7 ref" href="#57err" title='err' data-ref="57err">err</a>));</td></tr>
+<tr><th id="229">229</th><td>    <b>if</b> (<a class="local col7 ref" href="#57err" title='err' data-ref="57err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>) {</td></tr>
+<tr><th id="230">230</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_printf_unless_qmp" title='error_printf_unless_qmp' data-ref="error_printf_unless_qmp">error_printf_unless_qmp</a>(<q>"%s"</q>, <a class="local col7 ref" href="#57err" title='err' data-ref="57err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#_GString::str" title='_GString::str' data-ref="_GString::str">str</a>);</td></tr>
+<tr><th id="231">231</th><td>    }</td></tr>
+<tr><th id="232">232</th><td>    <a class="ref" href="#error_free" title='error_free' data-ref="error_free">error_free</a>(<a class="local col7 ref" href="#57err" title='err' data-ref="57err">err</a>);</td></tr>
+<tr><th id="233">233</th><td>}</td></tr>
+<tr><th id="234">234</th><td></td></tr>
+<tr><th id="235">235</th><td><em>void</em> <dfn class="decl def" id="warn_report_err" title='warn_report_err' data-ref="warn_report_err">warn_report_err</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col8 decl" id="58err" title='err' data-type='Error *' data-ref="58err">err</dfn>)</td></tr>
+<tr><th id="236">236</th><td>{</td></tr>
+<tr><th id="237">237</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#warn_report" title='warn_report' data-ref="warn_report">warn_report</a>(<q>"%s"</q>, <a class="ref" href="#error_get_pretty" title='error_get_pretty' data-ref="error_get_pretty">error_get_pretty</a>(<a class="local col8 ref" href="#58err" title='err' data-ref="58err">err</a>));</td></tr>
+<tr><th id="238">238</th><td>    <b>if</b> (<a class="local col8 ref" href="#58err" title='err' data-ref="58err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>) {</td></tr>
+<tr><th id="239">239</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_printf_unless_qmp" title='error_printf_unless_qmp' data-ref="error_printf_unless_qmp">error_printf_unless_qmp</a>(<q>"%s"</q>, <a class="local col8 ref" href="#58err" title='err' data-ref="58err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#_GString::str" title='_GString::str' data-ref="_GString::str">str</a>);</td></tr>
+<tr><th id="240">240</th><td>    }</td></tr>
+<tr><th id="241">241</th><td>    <a class="ref" href="#error_free" title='error_free' data-ref="error_free">error_free</a>(<a class="local col8 ref" href="#58err" title='err' data-ref="58err">err</a>);</td></tr>
+<tr><th id="242">242</th><td>}</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td><em>void</em> <dfn class="decl def" id="error_reportf_err" title='error_reportf_err' data-ref="error_reportf_err">error_reportf_err</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col9 decl" id="59err" title='err' data-type='Error *' data-ref="59err">err</dfn>, <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="60fmt" title='fmt' data-type='const char *' data-ref="60fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="245">245</th><td>{</td></tr>
+<tr><th id="246">246</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col1 decl" id="61ap" title='ap' data-type='va_list' data-ref="61ap">ap</dfn>;</td></tr>
+<tr><th id="247">247</th><td></td></tr>
+<tr><th id="248">248</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col1 ref" href="#61ap" title='ap' data-ref="61ap">ap</a>, <a class="local col0 ref" href="#60fmt" title='fmt' data-ref="60fmt">fmt</a>);</td></tr>
+<tr><th id="249">249</th><td>    <a class="ref" href="#error_vprepend" title='error_vprepend' data-ref="error_vprepend">error_vprepend</a>(&amp;<a class="local col9 ref" href="#59err" title='err' data-ref="59err">err</a>, <a class="local col0 ref" href="#60fmt" title='fmt' data-ref="60fmt">fmt</a>, <a class="local col1 ref" href="#61ap" title='ap' data-ref="61ap">ap</a>);</td></tr>
+<tr><th id="250">250</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col1 ref" href="#61ap" title='ap' data-ref="61ap">ap</a>);</td></tr>
+<tr><th id="251">251</th><td>    <a class="ref" href="#error_report_err" title='error_report_err' data-ref="error_report_err">error_report_err</a>(<a class="local col9 ref" href="#59err" title='err' data-ref="59err">err</a>);</td></tr>
+<tr><th id="252">252</th><td>}</td></tr>
+<tr><th id="253">253</th><td></td></tr>
+<tr><th id="254">254</th><td></td></tr>
+<tr><th id="255">255</th><td><em>void</em> <dfn class="decl def" id="warn_reportf_err" title='warn_reportf_err' data-ref="warn_reportf_err">warn_reportf_err</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col2 decl" id="62err" title='err' data-type='Error *' data-ref="62err">err</dfn>, <em>const</em> <em>char</em> *<dfn class="local col3 decl" id="63fmt" title='fmt' data-type='const char *' data-ref="63fmt">fmt</dfn>, ...)</td></tr>
+<tr><th id="256">256</th><td>{</td></tr>
+<tr><th id="257">257</th><td>    <span class='typedef' title='va_list' data-type='__gnuc_va_list' data-ref="va_list">va_list</span> <dfn class="local col4 decl" id="64ap" title='ap' data-type='va_list' data-ref="64ap">ap</dfn>;</td></tr>
+<tr><th id="258">258</th><td></td></tr>
+<tr><th id="259">259</th><td>    <span class="macro" title="__builtin_va_start(ap, fmt)" data-ref="_M/va_start">va_start</span>(<a class="local col4 ref" href="#64ap" title='ap' data-ref="64ap">ap</a>, <a class="local col3 ref" href="#63fmt" title='fmt' data-ref="63fmt">fmt</a>);</td></tr>
+<tr><th id="260">260</th><td>    <a class="ref" href="#error_vprepend" title='error_vprepend' data-ref="error_vprepend">error_vprepend</a>(&amp;<a class="local col2 ref" href="#62err" title='err' data-ref="62err">err</a>, <a class="local col3 ref" href="#63fmt" title='fmt' data-ref="63fmt">fmt</a>, <a class="local col4 ref" href="#64ap" title='ap' data-ref="64ap">ap</a>);</td></tr>
+<tr><th id="261">261</th><td>    <span class="macro" title="__builtin_va_end(ap)" data-ref="_M/va_end">va_end</span>(<a class="local col4 ref" href="#64ap" title='ap' data-ref="64ap">ap</a>);</td></tr>
+<tr><th id="262">262</th><td>    <a class="ref" href="#warn_report_err" title='warn_report_err' data-ref="warn_report_err">warn_report_err</a>(<a class="local col2 ref" href="#62err" title='err' data-ref="62err">err</a>);</td></tr>
+<tr><th id="263">263</th><td>}</td></tr>
+<tr><th id="264">264</th><td></td></tr>
+<tr><th id="265">265</th><td><em>void</em> <dfn class="decl def" id="error_free" title='error_free' data-ref="error_free">error_free</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col5 decl" id="65err" title='err' data-type='Error *' data-ref="65err">err</dfn>)</td></tr>
+<tr><th id="266">266</th><td>{</td></tr>
+<tr><th id="267">267</th><td>    <b>if</b> (<a class="local col5 ref" href="#65err" title='err' data-ref="65err">err</a>) {</td></tr>
+<tr><th id="268">268</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col5 ref" href="#65err" title='err' data-ref="65err">err</a>-&gt;<a class="ref" href="#Error::msg" title='Error::msg' data-ref="Error::msg">msg</a>);</td></tr>
+<tr><th id="269">269</th><td>        <b>if</b> (<a class="local col5 ref" href="#65err" title='err' data-ref="65err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>) {</td></tr>
+<tr><th id="270">270</th><td>            <a class="ref" href="../../include/glib-2.0/glib/gstring.h.html#g_string_free" title='g_string_free' data-ref="g_string_free">g_string_free</a>(<a class="local col5 ref" href="#65err" title='err' data-ref="65err">err</a>-&gt;<a class="ref" href="#Error::hint" title='Error::hint' data-ref="Error::hint">hint</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="271">271</th><td>        }</td></tr>
+<tr><th id="272">272</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col5 ref" href="#65err" title='err' data-ref="65err">err</a>);</td></tr>
+<tr><th id="273">273</th><td>    }</td></tr>
+<tr><th id="274">274</th><td>}</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td><em>void</em> <dfn class="decl def" id="error_free_or_abort" title='error_free_or_abort' data-ref="error_free_or_abort">error_free_or_abort</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col6 decl" id="66errp" title='errp' data-type='Error **' data-ref="66errp">errp</dfn>)</td></tr>
+<tr><th id="277">277</th><td>{</td></tr>
+<tr><th id="278">278</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((errp &amp;&amp; *errp) ? (void) (0) : __assert_fail (&quot;errp &amp;&amp; *errp&quot;, &quot;/home/jon/workspace/qemu/util/error.c&quot;, 278, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col6 ref" href="#66errp" title='errp' data-ref="66errp">errp</a> &amp;&amp; *<a class="local col6 ref" href="#66errp" title='errp' data-ref="66errp">errp</a>);</td></tr>
+<tr><th id="279">279</th><td>    <a class="ref" href="#error_free" title='error_free' data-ref="error_free">error_free</a>(*<a class="local col6 ref" href="#66errp" title='errp' data-ref="66errp">errp</a>);</td></tr>
+<tr><th id="280">280</th><td>    *<a class="local col6 ref" href="#66errp" title='errp' data-ref="66errp">errp</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="281">281</th><td>}</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td><em>void</em> <dfn class="decl def" id="error_propagate" title='error_propagate' data-ref="error_propagate">error_propagate</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="67dst_errp" title='dst_errp' data-type='Error **' data-ref="67dst_errp">dst_errp</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col8 decl" id="68local_err" title='local_err' data-type='Error *' data-ref="68local_err">local_err</dfn>)</td></tr>
+<tr><th id="284">284</th><td>{</td></tr>
+<tr><th id="285">285</th><td>    <b>if</b> (!<a class="local col8 ref" href="#68local_err" title='local_err' data-ref="68local_err">local_err</a>) {</td></tr>
+<tr><th id="286">286</th><td>        <b>return</b>;</td></tr>
+<tr><th id="287">287</th><td>    }</td></tr>
+<tr><th id="288">288</th><td>    <a class="tu ref" href="#error_handle_fatal" title='error_handle_fatal' data-use='c' data-ref="error_handle_fatal">error_handle_fatal</a>(<a class="local col7 ref" href="#67dst_errp" title='dst_errp' data-ref="67dst_errp">dst_errp</a>, <a class="local col8 ref" href="#68local_err" title='local_err' data-ref="68local_err">local_err</a>);</td></tr>
+<tr><th id="289">289</th><td>    <b>if</b> (<a class="local col7 ref" href="#67dst_errp" title='dst_errp' data-ref="67dst_errp">dst_errp</a> &amp;&amp; !*<a class="local col7 ref" href="#67dst_errp" title='dst_errp' data-ref="67dst_errp">dst_errp</a>) {</td></tr>
+<tr><th id="290">290</th><td>        *<a class="local col7 ref" href="#67dst_errp" title='dst_errp' data-ref="67dst_errp">dst_errp</a> = <a class="local col8 ref" href="#68local_err" title='local_err' data-ref="68local_err">local_err</a>;</td></tr>
+<tr><th id="291">291</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="292">292</th><td>        <a class="ref" href="#error_free" title='error_free' data-ref="error_free">error_free</a>(<a class="local col8 ref" href="#68local_err" title='local_err' data-ref="68local_err">local_err</a>);</td></tr>
+<tr><th id="293">293</th><td>    }</td></tr>
+<tr><th id="294">294</th><td>}</td></tr>
+<tr><th id="295">295</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

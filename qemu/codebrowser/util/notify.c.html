@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>notify.c source code [codebrowser/util/notify.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/notify.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='notify.c.html'>notify.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Notifier lists</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2010</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Anthony Liguori   &lt;aliguori@us.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2.  See</i></td></tr>
+<tr><th id="10">10</th><td><i> * the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * Contributions after 2012-01-13 are licensed under the terms of the</i></td></tr>
+<tr><th id="13">13</th><td><i> * GNU GPL, version 2 or (at your option) any later version.</i></td></tr>
+<tr><th id="14">14</th><td><i> */</i></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/notify.h.html">"qemu/notify.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><em>void</em> <dfn class="decl def" id="notifier_list_init" title='notifier_list_init' data-ref="notifier_list_init">notifier_list_init</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierList" title='NotifierList' data-type='struct NotifierList' data-ref="NotifierList">NotifierList</a> *<dfn class="local col1 decl" id="1list" title='list' data-type='NotifierList *' data-ref="1list">list</dfn>)</td></tr>
+<tr><th id="21">21</th><td>{</td></tr>
+<tr><th id="22">22</th><td>    <a class="macro" href="../include/qemu/queue.h.html#103" title="do { (&amp;list-&gt;notifiers)-&gt;lh_first = ((void*)0); } while ( 0)" data-ref="_M/QLIST_INIT">QLIST_INIT</a>(&amp;<a class="local col1 ref" href="#1list" title='list' data-ref="1list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierList::notifiers" title='NotifierList::notifiers' data-ref="NotifierList::notifiers">notifiers</a>);</td></tr>
+<tr><th id="23">23</th><td>}</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><em>void</em> <dfn class="decl def" id="notifier_list_add" title='notifier_list_add' data-ref="notifier_list_add">notifier_list_add</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierList" title='NotifierList' data-type='struct NotifierList' data-ref="NotifierList">NotifierList</a> *<dfn class="local col2 decl" id="2list" title='list' data-type='NotifierList *' data-ref="2list">list</dfn>, <a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col3 decl" id="3notifier" title='notifier' data-type='Notifier *' data-ref="3notifier">notifier</dfn>)</td></tr>
+<tr><th id="26">26</th><td>{</td></tr>
+<tr><th id="27">27</th><td>    <a class="macro" href="../include/qemu/queue.h.html#135" title="do { if (((notifier)-&gt;node.le_next = (&amp;list-&gt;notifiers)-&gt;lh_first) != ((void*)0)) (&amp;list-&gt;notifiers)-&gt;lh_first-&gt;node.le_prev = &amp;(notifier)-&gt;node.le_next; (&amp;list-&gt;notifiers)-&gt;lh_first = (notifier); (notifier)-&gt;node.le_prev = &amp;(&amp;list-&gt;notifiers)-&gt;lh_first; } while ( 0)" data-ref="_M/QLIST_INSERT_HEAD">QLIST_INSERT_HEAD</a>(&amp;<a class="local col2 ref" href="#2list" title='list' data-ref="2list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierList::notifiers" title='NotifierList::notifiers' data-ref="NotifierList::notifiers">notifiers</a>, <a class="local col3 ref" href="#3notifier" title='notifier' data-ref="3notifier">notifier</a>, <a class="ref" href="../include/qemu/notify.h.html#Notifier::node" title='Notifier::node' data-ref="Notifier::node">node</a>);</td></tr>
+<tr><th id="28">28</th><td>}</td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><em>void</em> <dfn class="decl def" id="notifier_remove" title='notifier_remove' data-ref="notifier_remove">notifier_remove</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col4 decl" id="4notifier" title='notifier' data-type='Notifier *' data-ref="4notifier">notifier</dfn>)</td></tr>
+<tr><th id="31">31</th><td>{</td></tr>
+<tr><th id="32">32</th><td>    <a class="macro" href="../include/qemu/queue.h.html#142" title="do { if ((notifier)-&gt;node.le_next != ((void*)0)) (notifier)-&gt;node.le_next-&gt;node.le_prev = (notifier)-&gt;node.le_prev; *(notifier)-&gt;node.le_prev = (notifier)-&gt;node.le_next; } while ( 0)" data-ref="_M/QLIST_REMOVE">QLIST_REMOVE</a>(<a class="local col4 ref" href="#4notifier" title='notifier' data-ref="4notifier">notifier</a>, <a class="ref" href="../include/qemu/notify.h.html#Notifier::node" title='Notifier::node' data-ref="Notifier::node">node</a>);</td></tr>
+<tr><th id="33">33</th><td>}</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>void</em> <dfn class="decl def" id="notifier_list_notify" title='notifier_list_notify' data-ref="notifier_list_notify">notifier_list_notify</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierList" title='NotifierList' data-type='struct NotifierList' data-ref="NotifierList">NotifierList</a> *<dfn class="local col5 decl" id="5list" title='list' data-type='NotifierList *' data-ref="5list">list</dfn>, <em>void</em> *<dfn class="local col6 decl" id="6data" title='data' data-type='void *' data-ref="6data">data</dfn>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col7 decl" id="7notifier" title='notifier' data-type='Notifier *' data-ref="7notifier">notifier</dfn>, *<dfn class="local col8 decl" id="8next" title='next' data-type='Notifier *' data-ref="8next">next</dfn>;</td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td>    <a class="macro" href="../include/qemu/queue.h.html#154" title="for ((notifier) = ((&amp;list-&gt;notifiers)-&gt;lh_first); (notifier) &amp;&amp; ((next) = ((notifier)-&gt;node.le_next), 1); (notifier) = (next))" data-ref="_M/QLIST_FOREACH_SAFE">QLIST_FOREACH_SAFE</a>(<a class="local col7 ref" href="#7notifier" title='notifier' data-ref="7notifier">notifier</a>, &amp;<a class="local col5 ref" href="#5list" title='list' data-ref="5list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierList::notifiers" title='NotifierList::notifiers' data-ref="NotifierList::notifiers">notifiers</a>, <a class="ref" href="../include/qemu/notify.h.html#Notifier::node" title='Notifier::node' data-ref="Notifier::node">node</a>, <a class="local col8 ref" href="#8next" title='next' data-ref="8next">next</a>) {</td></tr>
+<tr><th id="40">40</th><td>        <a class="local col7 ref" href="#7notifier" title='notifier' data-ref="7notifier">notifier</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#Notifier::notify" title='Notifier::notify' data-ref="Notifier::notify">notify</a>(<a class="local col7 ref" href="#7notifier" title='notifier' data-ref="7notifier">notifier</a>, <a class="local col6 ref" href="#6data" title='data' data-ref="6data">data</a>);</td></tr>
+<tr><th id="41">41</th><td>    }</td></tr>
+<tr><th id="42">42</th><td>}</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><em>void</em> <dfn class="decl def" id="notifier_with_return_list_init" title='notifier_with_return_list_init' data-ref="notifier_with_return_list_init">notifier_with_return_list_init</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturnList" title='NotifierWithReturnList' data-type='struct NotifierWithReturnList' data-ref="NotifierWithReturnList">NotifierWithReturnList</a> *<dfn class="local col9 decl" id="9list" title='list' data-type='NotifierWithReturnList *' data-ref="9list">list</dfn>)</td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>    <a class="macro" href="../include/qemu/queue.h.html#103" title="do { (&amp;list-&gt;notifiers)-&gt;lh_first = ((void*)0); } while ( 0)" data-ref="_M/QLIST_INIT">QLIST_INIT</a>(&amp;<a class="local col9 ref" href="#9list" title='list' data-ref="9list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturnList::notifiers" title='NotifierWithReturnList::notifiers' data-ref="NotifierWithReturnList::notifiers">notifiers</a>);</td></tr>
+<tr><th id="47">47</th><td>}</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><em>void</em> <dfn class="decl def" id="notifier_with_return_list_add" title='notifier_with_return_list_add' data-ref="notifier_with_return_list_add">notifier_with_return_list_add</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturnList" title='NotifierWithReturnList' data-type='struct NotifierWithReturnList' data-ref="NotifierWithReturnList">NotifierWithReturnList</a> *<dfn class="local col0 decl" id="10list" title='list' data-type='NotifierWithReturnList *' data-ref="10list">list</dfn>,</td></tr>
+<tr><th id="50">50</th><td>                                   <a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturn" title='NotifierWithReturn' data-type='struct NotifierWithReturn' data-ref="NotifierWithReturn">NotifierWithReturn</a> *<dfn class="local col1 decl" id="11notifier" title='notifier' data-type='NotifierWithReturn *' data-ref="11notifier">notifier</dfn>)</td></tr>
+<tr><th id="51">51</th><td>{</td></tr>
+<tr><th id="52">52</th><td>    <a class="macro" href="../include/qemu/queue.h.html#135" title="do { if (((notifier)-&gt;node.le_next = (&amp;list-&gt;notifiers)-&gt;lh_first) != ((void*)0)) (&amp;list-&gt;notifiers)-&gt;lh_first-&gt;node.le_prev = &amp;(notifier)-&gt;node.le_next; (&amp;list-&gt;notifiers)-&gt;lh_first = (notifier); (notifier)-&gt;node.le_prev = &amp;(&amp;list-&gt;notifiers)-&gt;lh_first; } while ( 0)" data-ref="_M/QLIST_INSERT_HEAD">QLIST_INSERT_HEAD</a>(&amp;<a class="local col0 ref" href="#10list" title='list' data-ref="10list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturnList::notifiers" title='NotifierWithReturnList::notifiers' data-ref="NotifierWithReturnList::notifiers">notifiers</a>, <a class="local col1 ref" href="#11notifier" title='notifier' data-ref="11notifier">notifier</a>, <a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturn::node" title='NotifierWithReturn::node' data-ref="NotifierWithReturn::node">node</a>);</td></tr>
+<tr><th id="53">53</th><td>}</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>void</em> <dfn class="decl def" id="notifier_with_return_remove" title='notifier_with_return_remove' data-ref="notifier_with_return_remove">notifier_with_return_remove</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturn" title='NotifierWithReturn' data-type='struct NotifierWithReturn' data-ref="NotifierWithReturn">NotifierWithReturn</a> *<dfn class="local col2 decl" id="12notifier" title='notifier' data-type='NotifierWithReturn *' data-ref="12notifier">notifier</dfn>)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>    <a class="macro" href="../include/qemu/queue.h.html#142" title="do { if ((notifier)-&gt;node.le_next != ((void*)0)) (notifier)-&gt;node.le_next-&gt;node.le_prev = (notifier)-&gt;node.le_prev; *(notifier)-&gt;node.le_prev = (notifier)-&gt;node.le_next; } while ( 0)" data-ref="_M/QLIST_REMOVE">QLIST_REMOVE</a>(<a class="local col2 ref" href="#12notifier" title='notifier' data-ref="12notifier">notifier</a>, <a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturn::node" title='NotifierWithReturn::node' data-ref="NotifierWithReturn::node">node</a>);</td></tr>
+<tr><th id="58">58</th><td>}</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td><em>int</em> <dfn class="decl def" id="notifier_with_return_list_notify" title='notifier_with_return_list_notify' data-ref="notifier_with_return_list_notify">notifier_with_return_list_notify</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturnList" title='NotifierWithReturnList' data-type='struct NotifierWithReturnList' data-ref="NotifierWithReturnList">NotifierWithReturnList</a> *<dfn class="local col3 decl" id="13list" title='list' data-type='NotifierWithReturnList *' data-ref="13list">list</dfn>, <em>void</em> *<dfn class="local col4 decl" id="14data" title='data' data-type='void *' data-ref="14data">data</dfn>)</td></tr>
+<tr><th id="61">61</th><td>{</td></tr>
+<tr><th id="62">62</th><td>    <a class="typedef" href="../include/qemu/notify.h.html#NotifierWithReturn" title='NotifierWithReturn' data-type='struct NotifierWithReturn' data-ref="NotifierWithReturn">NotifierWithReturn</a> *<dfn class="local col5 decl" id="15notifier" title='notifier' data-type='NotifierWithReturn *' data-ref="15notifier">notifier</dfn>, *<dfn class="local col6 decl" id="16next" title='next' data-type='NotifierWithReturn *' data-ref="16next">next</dfn>;</td></tr>
+<tr><th id="63">63</th><td>    <em>int</em> <dfn class="local col7 decl" id="17ret" title='ret' data-type='int' data-ref="17ret">ret</dfn> = <var>0</var>;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <a class="macro" href="../include/qemu/queue.h.html#154" title="for ((notifier) = ((&amp;list-&gt;notifiers)-&gt;lh_first); (notifier) &amp;&amp; ((next) = ((notifier)-&gt;node.le_next), 1); (notifier) = (next))" data-ref="_M/QLIST_FOREACH_SAFE">QLIST_FOREACH_SAFE</a>(<a class="local col5 ref" href="#15notifier" title='notifier' data-ref="15notifier">notifier</a>, &amp;<a class="local col3 ref" href="#13list" title='list' data-ref="13list">list</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturnList::notifiers" title='NotifierWithReturnList::notifiers' data-ref="NotifierWithReturnList::notifiers">notifiers</a>, <a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturn::node" title='NotifierWithReturn::node' data-ref="NotifierWithReturn::node">node</a>, <a class="local col6 ref" href="#16next" title='next' data-ref="16next">next</a>) {</td></tr>
+<tr><th id="66">66</th><td>        <a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> = <a class="local col5 ref" href="#15notifier" title='notifier' data-ref="15notifier">notifier</a>-&gt;<a class="ref" href="../include/qemu/notify.h.html#NotifierWithReturn::notify" title='NotifierWithReturn::notify' data-ref="NotifierWithReturn::notify">notify</a>(<a class="local col5 ref" href="#15notifier" title='notifier' data-ref="15notifier">notifier</a>, <a class="local col4 ref" href="#14data" title='data' data-ref="14data">data</a>);</td></tr>
+<tr><th id="67">67</th><td>        <b>if</b> (<a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a> != <var>0</var>) {</td></tr>
+<tr><th id="68">68</th><td>            <b>break</b>;</td></tr>
+<tr><th id="69">69</th><td>        }</td></tr>
+<tr><th id="70">70</th><td>    }</td></tr>
+<tr><th id="71">71</th><td>    <b>return</b> <a class="local col7 ref" href="#17ret" title='ret' data-ref="17ret">ret</a>;</td></tr>
+<tr><th id="72">72</th><td>}</td></tr>
+<tr><th id="73">73</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

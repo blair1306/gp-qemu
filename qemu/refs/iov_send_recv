@@ -1,0 +1,22 @@
+<dec f='codebrowser/include/qemu/iov.h' l='102' type='ssize_t iov_send_recv(int sockfd, const struct iovec * iov, unsigned int iov_cnt, size_t offset, size_t bytes, _Bool do_send)'/>
+<doc f='codebrowser/include/qemu/iov.h' l='84'>/*
+ * Send/recv data from/to iovec buffers directly
+ *
+ * `offset&apos; bytes in the beginning of iovec buffer are skipped and
+ * next `bytes&apos; bytes are used, which must be within data of iovec.
+ *
+ *   r = iov_send_recv(sockfd, iov, iovcnt, offset, bytes, true);
+ *
+ * is logically equivalent to
+ *
+ *   char *buf = malloc(bytes);
+ *   iov_to_buf(iov, iovcnt, offset, buf, bytes);
+ *   r = send(sockfd, buf, bytes, 0);
+ *   free(buf);
+ *
+ * For iov_send_recv() _whole_ area being sent or received
+ * should be within the iovec, not only beginning of it.
+ */</doc>
+<use f='codebrowser/net/socket.c' l='98' macro='1' u='c'/>
+<def f='codebrowser/util/iov.c' l='139' ll='224' type='ssize_t iov_send_recv(int sockfd, const struct iovec * _iov, unsigned int iov_cnt, size_t offset, size_t bytes, _Bool do_send)'/>
+<use f='codebrowser/util/qemu-coroutine-io.c' l='39' u='c' c='qemu_co_sendv_recvv'/>

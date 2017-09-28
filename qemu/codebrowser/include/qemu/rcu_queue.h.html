@@ -1,0 +1,152 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>rcu_queue.h source code [codebrowser/include/qemu/rcu_queue.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/rcu_queue.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='rcu_queue.h.html'>rcu_queue.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_RCU_QUEUE_H">QEMU_RCU_QUEUE_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_RCU_QUEUE_H" data-ref="_M/QEMU_RCU_QUEUE_H">QEMU_RCU_QUEUE_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><i>/*</i></td></tr>
+<tr><th id="5">5</th><td><i> * rcu_queue.h</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * RCU-friendly versions of the queue.h primitives.</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="10">10</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="11">11</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="12">12</th><td><i> * version 2.1 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="15">15</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="16">16</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="17">17</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="20">20</th><td><i> * License along with this library; if not, write to the Free Software</i></td></tr>
+<tr><th id="21">21</th><td><i> * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA</i></td></tr>
+<tr><th id="22">22</th><td><i> *</i></td></tr>
+<tr><th id="23">23</th><td><i> * Copyright (c) 2013 Mike D. Day, IBM Corporation.</i></td></tr>
+<tr><th id="24">24</th><td><i> *</i></td></tr>
+<tr><th id="25">25</th><td><i> * IBM's contributions to this file may be relicensed under LGPLv2 or later.</i></td></tr>
+<tr><th id="26">26</th><td><i> */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="31">ifdef</span> <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="32">32</th><td><b>extern</b> <q>"C"</q> {</td></tr>
+<tr><th id="33">33</th><td><u>#<span data-ppcond="31">endif</span></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i>/*</i></td></tr>
+<tr><th id="37">37</th><td><i> * List access methods.</i></td></tr>
+<tr><th id="38">38</th><td><i> */</i></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/QLIST_EMPTY_RCU" data-ref="_M/QLIST_EMPTY_RCU">QLIST_EMPTY_RCU</dfn>(head) (atomic_rcu_read(&amp;(head)-&gt;lh_first) == NULL)</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/QLIST_FIRST_RCU" data-ref="_M/QLIST_FIRST_RCU">QLIST_FIRST_RCU</dfn>(head) (atomic_rcu_read(&amp;(head)-&gt;lh_first))</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/QLIST_NEXT_RCU" data-ref="_M/QLIST_NEXT_RCU">QLIST_NEXT_RCU</dfn>(elm, field) (atomic_rcu_read(&amp;(elm)-&gt;field.le_next))</u></td></tr>
+<tr><th id="42">42</th><td></td></tr>
+<tr><th id="43">43</th><td><i>/*</i></td></tr>
+<tr><th id="44">44</th><td><i> * List functions.</i></td></tr>
+<tr><th id="45">45</th><td><i> */</i></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td><i>/*</i></td></tr>
+<tr><th id="49">49</th><td><i> *  The difference between atomic_read/set and atomic_rcu_read/set</i></td></tr>
+<tr><th id="50">50</th><td><i> *  is in the including of a read/write memory barrier to the volatile</i></td></tr>
+<tr><th id="51">51</th><td><i> *  access. atomic_rcu_* macros include the memory barrier, the</i></td></tr>
+<tr><th id="52">52</th><td><i> *  plain atomic macros do not. Therefore, it should be correct to</i></td></tr>
+<tr><th id="53">53</th><td><i> *  issue a series of reads or writes to the same element using only</i></td></tr>
+<tr><th id="54">54</th><td><i> *  the atomic_* macro, until the last read or write, which should be</i></td></tr>
+<tr><th id="55">55</th><td><i> *  atomic_rcu_* to introduce a read or write memory barrier as</i></td></tr>
+<tr><th id="56">56</th><td><i> *  appropriate.</i></td></tr>
+<tr><th id="57">57</th><td><i> */</i></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><i>/* Upon publication of the listelm-&gt;next value, list readers</i></td></tr>
+<tr><th id="60">60</th><td><i> * will see the new node when following next pointers from</i></td></tr>
+<tr><th id="61">61</th><td><i> * antecedent nodes, but may not see the new node when following</i></td></tr>
+<tr><th id="62">62</th><td><i> * prev pointers from subsequent nodes until after the RCU grace</i></td></tr>
+<tr><th id="63">63</th><td><i> * period expires.</i></td></tr>
+<tr><th id="64">64</th><td><i> * see linux/include/rculist.h __list_add_rcu(new, prev, next)</i></td></tr>
+<tr><th id="65">65</th><td><i> */</i></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/QLIST_INSERT_AFTER_RCU" data-ref="_M/QLIST_INSERT_AFTER_RCU">QLIST_INSERT_AFTER_RCU</dfn>(listelm, elm, field) do {    \</u></td></tr>
+<tr><th id="67">67</th><td><u>    (elm)-&gt;field.le_next = (listelm)-&gt;field.le_next;        \</u></td></tr>
+<tr><th id="68">68</th><td><u>    (elm)-&gt;field.le_prev = &amp;(listelm)-&gt;field.le_next;       \</u></td></tr>
+<tr><th id="69">69</th><td><u>    atomic_rcu_set(&amp;(listelm)-&gt;field.le_next, (elm));       \</u></td></tr>
+<tr><th id="70">70</th><td><u>    if ((elm)-&gt;field.le_next != NULL) {                     \</u></td></tr>
+<tr><th id="71">71</th><td><u>       (elm)-&gt;field.le_next-&gt;field.le_prev =                \</u></td></tr>
+<tr><th id="72">72</th><td><u>        &amp;(elm)-&gt;field.le_next;                              \</u></td></tr>
+<tr><th id="73">73</th><td><u>    }                                                       \</u></td></tr>
+<tr><th id="74">74</th><td><u>} while (/*CONSTCOND*/0)</u></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><i>/* Upon publication of the listelm-&gt;prev-&gt;next value, list</i></td></tr>
+<tr><th id="77">77</th><td><i> * readers will see the new element when following prev pointers</i></td></tr>
+<tr><th id="78">78</th><td><i> * from subsequent elements, but may not see the new element</i></td></tr>
+<tr><th id="79">79</th><td><i> * when following next pointers from antecedent elements</i></td></tr>
+<tr><th id="80">80</th><td><i> * until after the RCU grace period expires.</i></td></tr>
+<tr><th id="81">81</th><td><i> */</i></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/QLIST_INSERT_BEFORE_RCU" data-ref="_M/QLIST_INSERT_BEFORE_RCU">QLIST_INSERT_BEFORE_RCU</dfn>(listelm, elm, field) do {   \</u></td></tr>
+<tr><th id="83">83</th><td><u>    (elm)-&gt;field.le_prev = (listelm)-&gt;field.le_prev;        \</u></td></tr>
+<tr><th id="84">84</th><td><u>    (elm)-&gt;field.le_next = (listelm);                       \</u></td></tr>
+<tr><th id="85">85</th><td><u>    atomic_rcu_set((listelm)-&gt;field.le_prev, (elm));        \</u></td></tr>
+<tr><th id="86">86</th><td><u>    (listelm)-&gt;field.le_prev = &amp;(elm)-&gt;field.le_next;       \</u></td></tr>
+<tr><th id="87">87</th><td><u>} while (/*CONSTCOND*/0)</u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><i>/* Upon publication of the head-&gt;first value, list readers</i></td></tr>
+<tr><th id="90">90</th><td><i> * will see the new element when following the head, but may</i></td></tr>
+<tr><th id="91">91</th><td><i> * not see the new element when following prev pointers from</i></td></tr>
+<tr><th id="92">92</th><td><i> * subsequent elements until after the RCU grace period has</i></td></tr>
+<tr><th id="93">93</th><td><i> * expired.</i></td></tr>
+<tr><th id="94">94</th><td><i> */</i></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/QLIST_INSERT_HEAD_RCU" data-ref="_M/QLIST_INSERT_HEAD_RCU">QLIST_INSERT_HEAD_RCU</dfn>(head, elm, field) do {    \</u></td></tr>
+<tr><th id="96">96</th><td><u>    (elm)-&gt;field.le_prev = &amp;(head)-&gt;lh_first;           \</u></td></tr>
+<tr><th id="97">97</th><td><u>    (elm)-&gt;field.le_next = (head)-&gt;lh_first;            \</u></td></tr>
+<tr><th id="98">98</th><td><u>    atomic_rcu_set((&amp;(head)-&gt;lh_first), (elm));         \</u></td></tr>
+<tr><th id="99">99</th><td><u>    if ((elm)-&gt;field.le_next != NULL) {                 \</u></td></tr>
+<tr><th id="100">100</th><td><u>       (elm)-&gt;field.le_next-&gt;field.le_prev =            \</u></td></tr>
+<tr><th id="101">101</th><td><u>        &amp;(elm)-&gt;field.le_next;                          \</u></td></tr>
+<tr><th id="102">102</th><td><u>    }                                                   \</u></td></tr>
+<tr><th id="103">103</th><td><u>} while (/*CONSTCOND*/0)</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><i>/* prior to publication of the elm-&gt;prev-&gt;next value, some list</i></td></tr>
+<tr><th id="107">107</th><td><i> * readers may still see the removed element when following</i></td></tr>
+<tr><th id="108">108</th><td><i> * the antecedent's next pointer.</i></td></tr>
+<tr><th id="109">109</th><td><i> */</i></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/QLIST_REMOVE_RCU" data-ref="_M/QLIST_REMOVE_RCU">QLIST_REMOVE_RCU</dfn>(elm, field) do {           \</u></td></tr>
+<tr><th id="111">111</th><td><u>    if ((elm)-&gt;field.le_next != NULL) {             \</u></td></tr>
+<tr><th id="112">112</th><td><u>       (elm)-&gt;field.le_next-&gt;field.le_prev =        \</u></td></tr>
+<tr><th id="113">113</th><td><u>        (elm)-&gt;field.le_prev;                       \</u></td></tr>
+<tr><th id="114">114</th><td><u>    }                                               \</u></td></tr>
+<tr><th id="115">115</th><td><u>    *(elm)-&gt;field.le_prev =  (elm)-&gt;field.le_next;  \</u></td></tr>
+<tr><th id="116">116</th><td><u>} while (/*CONSTCOND*/0)</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><i>/* List traversal must occur within an RCU critical section.  */</i></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/QLIST_FOREACH_RCU" data-ref="_M/QLIST_FOREACH_RCU">QLIST_FOREACH_RCU</dfn>(var, head, field)                 \</u></td></tr>
+<tr><th id="120">120</th><td><u>        for ((var) = atomic_rcu_read(&amp;(head)-&gt;lh_first);    \</u></td></tr>
+<tr><th id="121">121</th><td><u>                (var);                                      \</u></td></tr>
+<tr><th id="122">122</th><td><u>                (var) = atomic_rcu_read(&amp;(var)-&gt;field.le_next))</u></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><i>/* List traversal must occur within an RCU critical section.  */</i></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/QLIST_FOREACH_SAFE_RCU" data-ref="_M/QLIST_FOREACH_SAFE_RCU">QLIST_FOREACH_SAFE_RCU</dfn>(var, head, field, next_var)           \</u></td></tr>
+<tr><th id="126">126</th><td><u>    for ((var) = (atomic_rcu_read(&amp;(head)-&gt;lh_first));               \</u></td></tr>
+<tr><th id="127">127</th><td><u>      (var) &amp;&amp;                                                       \</u></td></tr>
+<tr><th id="128">128</th><td><u>          ((next_var) = atomic_rcu_read(&amp;(var)-&gt;field.le_next), 1);  \</u></td></tr>
+<tr><th id="129">129</th><td><u>           (var) = (next_var))</u></td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td><u>#<span data-ppcond="131">ifdef</span> <span class="macro" data-ref="_M/__cplusplus">__cplusplus</span></u></td></tr>
+<tr><th id="132">132</th><td>}</td></tr>
+<tr><th id="133">133</th><td><u>#<span data-ppcond="131">endif</span></u></td></tr>
+<tr><th id="134">134</th><td><u>#<span data-ppcond="1">endif</span> /* QEMU_RCU_QUEUE_H */</u></td></tr>
+<tr><th id="135">135</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>colo-comm.c source code [codebrowser/migration/colo-comm.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/migration/colo-comm.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>migration</a>/<a href='colo-comm.c.html'>colo-comm.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * COarse-grain LOck-stepping Virtual Machines for Non-stop Service (COLO)</i></td></tr>
+<tr><th id="3">3</th><td><i> * (a.k.a. Fault Tolerance or Continuous Replication)</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2016 HUAWEI TECHNOLOGIES CO., LTD.</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (c) 2016 FUJITSU LIMITED</i></td></tr>
+<tr><th id="7">7</th><td><i> * Copyright (c) 2016 Intel Corporation</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or</i></td></tr>
+<tr><th id="10">10</th><td><i> * later. See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="migration.h.html">"migration.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/migration/colo.h.html">"migration/colo.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/migration/vmstate.h.html">"migration/vmstate.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="trace.h.html">"trace.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="21">21</th><td>     <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl" id="(anonymous)::colo_requested" title='(anonymous struct)::colo_requested' data-type='_Bool' data-ref="(anonymous)::colo_requested">colo_requested</dfn>;</td></tr>
+<tr><th id="22">22</th><td>} <dfn class="typedef" id="COLOInfo" title='COLOInfo' data-type='struct COLOInfo' data-ref="COLOInfo">COLOInfo</dfn>;</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><em>static</em> <a class="typedef" href="#COLOInfo" title='COLOInfo' data-type='struct COLOInfo' data-ref="COLOInfo">COLOInfo</a> <dfn class="tu decl def" id="colo_info" title='colo_info' data-type='COLOInfo' data-ref="colo_info">colo_info</dfn>;</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><a class="typedef" href="../qapi-types.h.html#COLOMode" title='COLOMode' data-type='enum COLOMode' data-ref="COLOMode">COLOMode</a> <dfn class="decl def" id="get_colo_mode" title='get_colo_mode' data-ref="get_colo_mode">get_colo_mode</dfn>(<em>void</em>)</td></tr>
+<tr><th id="27">27</th><td>{</td></tr>
+<tr><th id="28">28</th><td>    <b>if</b> (<a class="ref" href="../include/migration/colo.h.html#migration_in_colo_state" title='migration_in_colo_state' data-ref="migration_in_colo_state">migration_in_colo_state</a>()) {</td></tr>
+<tr><th id="29">29</th><td>        <b>return</b> <a class="enum" href="../qapi-types.h.html#COLOMode::COLO_MODE_PRIMARY" title='COLOMode::COLO_MODE_PRIMARY' data-ref="COLOMode::COLO_MODE_PRIMARY">COLO_MODE_PRIMARY</a>;</td></tr>
+<tr><th id="30">30</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/migration/colo.h.html#migration_incoming_in_colo_state" title='migration_incoming_in_colo_state' data-ref="migration_incoming_in_colo_state">migration_incoming_in_colo_state</a>()) {</td></tr>
+<tr><th id="31">31</th><td>        <b>return</b> <a class="enum" href="../qapi-types.h.html#COLOMode::COLO_MODE_SECONDARY" title='COLOMode::COLO_MODE_SECONDARY' data-ref="COLOMode::COLO_MODE_SECONDARY">COLO_MODE_SECONDARY</a>;</td></tr>
+<tr><th id="32">32</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="33">33</th><td>        <b>return</b> <a class="enum" href="../qapi-types.h.html#COLOMode::COLO_MODE_UNKNOWN" title='COLOMode::COLO_MODE_UNKNOWN' data-ref="COLOMode::COLO_MODE_UNKNOWN">COLO_MODE_UNKNOWN</a>;</td></tr>
+<tr><th id="34">34</th><td>    }</td></tr>
+<tr><th id="35">35</th><td>}</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="colo_info_pre_save" title='colo_info_pre_save' data-type='void colo_info_pre_save(void * opaque)' data-ref="colo_info_pre_save">colo_info_pre_save</dfn>(<em>void</em> *<dfn class="local col5 decl" id="5opaque" title='opaque' data-type='void *' data-ref="5opaque">opaque</dfn>)</td></tr>
+<tr><th id="38">38</th><td>{</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="#COLOInfo" title='COLOInfo' data-type='struct COLOInfo' data-ref="COLOInfo">COLOInfo</a> *<dfn class="local col6 decl" id="6s" title='s' data-type='COLOInfo *' data-ref="6s">s</dfn> = <a class="local col5 ref" href="#5opaque" title='opaque' data-ref="5opaque">opaque</a>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <a class="local col6 ref" href="#6s" title='s' data-ref="6s">s</a>-&gt;<a class="tu ref" href="#(anonymous)::colo_requested" title='(anonymous struct)::colo_requested' data-use='w' data-ref="(anonymous)::colo_requested">colo_requested</a> = <a class="ref" href="migration.h.html#migrate_colo_enabled" title='migrate_colo_enabled' data-ref="migrate_colo_enabled">migrate_colo_enabled</a>();</td></tr>
+<tr><th id="42">42</th><td>}</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="colo_info_need" title='colo_info_need' data-type='_Bool colo_info_need(void * opaque)' data-ref="colo_info_need">colo_info_need</dfn>(<em>void</em> *<dfn class="local col7 decl" id="7opaque" title='opaque' data-type='void *' data-ref="7opaque">opaque</dfn>)</td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>   <b>return</b> <a class="ref" href="migration.h.html#migrate_colo_enabled" title='migrate_colo_enabled' data-ref="migrate_colo_enabled">migrate_colo_enabled</a>();</td></tr>
+<tr><th id="47">47</th><td>}</td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><em>static</em> <em>const</em> <a class="typedef" href="../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="tu decl def" id="colo_state" title='colo_state' data-type='const VMStateDescription' data-ref="colo_state">colo_state</dfn> = {</td></tr>
+<tr><th id="50">50</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::name" title='VMStateDescription::name' data-ref="VMStateDescription::name">name</a> = <q>"COLOState"</q>,</td></tr>
+<tr><th id="51">51</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::version_id" title='VMStateDescription::version_id' data-ref="VMStateDescription::version_id">version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="52">52</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::minimum_version_id" title='VMStateDescription::minimum_version_id' data-ref="VMStateDescription::minimum_version_id">minimum_version_id</a> = <var>1</var>,</td></tr>
+<tr><th id="53">53</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::pre_save" title='VMStateDescription::pre_save' data-ref="VMStateDescription::pre_save">pre_save</a> = <a class="tu ref" href="#colo_info_pre_save" title='colo_info_pre_save' data-use='r' data-ref="colo_info_pre_save">colo_info_pre_save</a>,</td></tr>
+<tr><th id="54">54</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::needed" title='VMStateDescription::needed' data-ref="VMStateDescription::needed">needed</a> = <a class="tu ref" href="#colo_info_need" title='colo_info_need' data-use='r' data-ref="colo_info_need">colo_info_need</a>,</td></tr>
+<tr><th id="55">55</th><td>    .<a class="ref" href="../include/migration/vmstate.h.html#VMStateDescription::fields" title='VMStateDescription::fields' data-ref="VMStateDescription::fields">fields</a> = (<a class="typedef" href="../include/migration/vmstate.h.html#VMStateField" title='VMStateField' data-type='struct VMStateField' data-ref="VMStateField">VMStateField</a>[]) {</td></tr>
+<tr><th id="56">56</th><td>        <a class="macro" href="../include/migration/vmstate.h.html#757" title="{ .name = (&quot;colo_requested&quot;), .version_id = (0), .field_exists = (((void*)0)), .size = sizeof(_Bool), .info = &amp;(vmstate_info_bool), .flags = VMS_SINGLE, .offset = (__builtin_offsetof(COLOInfo, colo_requested) + ((_Bool*)0 - (typeof(((COLOInfo *)0)-&gt;colo_requested)*)0)), }" data-ref="_M/VMSTATE_BOOL">VMSTATE_BOOL</a>(<a class="tu ref" href="#(anonymous)::colo_requested" title='(anonymous struct)::colo_requested' data-use='r' data-ref="(anonymous)::colo_requested">colo_requested</a>, <a class="typedef" href="#COLOInfo" title='COLOInfo' data-type='struct COLOInfo' data-ref="COLOInfo">COLOInfo</a>),</td></tr>
+<tr><th id="57">57</th><td>        <a class="macro" href="../include/migration/vmstate.h.html#992" title="{}" data-ref="_M/VMSTATE_END_OF_LIST">VMSTATE_END_OF_LIST</a>()</td></tr>
+<tr><th id="58">58</th><td>    },</td></tr>
+<tr><th id="59">59</th><td>};</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><em>void</em> <dfn class="decl def" id="colo_info_init" title='colo_info_init' data-ref="colo_info_init">colo_info_init</dfn>(<em>void</em>)</td></tr>
+<tr><th id="62">62</th><td>{</td></tr>
+<tr><th id="63">63</th><td>    <a class="ref" href="../include/migration/vmstate.h.html#vmstate_register" title='vmstate_register' data-ref="vmstate_register">vmstate_register</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>, &amp;<a class="tu ref" href="#colo_state" title='colo_state' data-use='a' data-ref="colo_state">colo_state</a>, &amp;<a class="tu ref" href="#colo_info" title='colo_info' data-use='a' data-ref="colo_info">colo_info</a>);</td></tr>
+<tr><th id="64">64</th><td>}</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="migration_incoming_enable_colo" title='migration_incoming_enable_colo' data-ref="migration_incoming_enable_colo">migration_incoming_enable_colo</dfn>(<em>void</em>)</td></tr>
+<tr><th id="67">67</th><td>{</td></tr>
+<tr><th id="68">68</th><td>    <b>return</b> <a class="tu ref" href="#colo_info" title='colo_info' data-use='m' data-ref="colo_info">colo_info</a>.<a class="tu ref" href="#(anonymous)::colo_requested" title='(anonymous struct)::colo_requested' data-use='r' data-ref="(anonymous)::colo_requested">colo_requested</a>;</td></tr>
+<tr><th id="69">69</th><td>}</td></tr>
+<tr><th id="70">70</th><td></td></tr>
+<tr><th id="71">71</th><td><em>void</em> <dfn class="decl def" id="migration_incoming_exit_colo" title='migration_incoming_exit_colo' data-ref="migration_incoming_exit_colo">migration_incoming_exit_colo</dfn>(<em>void</em>)</td></tr>
+<tr><th id="72">72</th><td>{</td></tr>
+<tr><th id="73">73</th><td>    <a class="tu ref" href="#colo_info" title='colo_info' data-use='m' data-ref="colo_info">colo_info</a>.<a class="tu ref" href="#(anonymous)::colo_requested" title='(anonymous struct)::colo_requested' data-use='w' data-ref="(anonymous)::colo_requested">colo_requested</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="74">74</th><td>}</td></tr>
+<tr><th id="75">75</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

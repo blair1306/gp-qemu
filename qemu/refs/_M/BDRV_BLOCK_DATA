@@ -1,0 +1,59 @@
+<dec f='codebrowser/include/block/block.h' l='156'/>
+<doc f='codebrowser/include/block/block.h' l='123'>/*
+ * Allocation status flags for bdrv_get_block_status() and friends.
+ *
+ * Public flags:
+ * BDRV_BLOCK_DATA: allocation for data at offset is tied to this layer
+ * BDRV_BLOCK_ZERO: offset reads as zero
+ * BDRV_BLOCK_OFFSET_VALID: an associated offset exists for accessing raw data
+ * BDRV_BLOCK_ALLOCATED: the content of the block is determined by this
+ *                       layer (short for DATA || ZERO), set by block layer
+ * BDRV_BLOCK_EOF: the returned pnum covers through end of file for this layer
+ *
+ * Internal flag:
+ * BDRV_BLOCK_RAW: for use by passthrough drivers, such as raw, to request
+ *                 that the block layer recompute the answer from the returned
+ *                 BDS; must be accompanied by just BDRV_BLOCK_OFFSET_VALID.
+ *
+ * If BDRV_BLOCK_OFFSET_VALID is set, bits 9-62 (BDRV_BLOCK_OFFSET_MASK)
+ * represent the offset in the returned BDS that is allocated for the
+ * corresponding raw data; however, whether that offset actually contains
+ * data also depends on BDRV_BLOCK_DATA and BDRV_BLOCK_ZERO, as follows:
+ *
+ * DATA ZERO OFFSET_VALID
+ *  t    t        t       sectors read as zero, returned file is zero at offset
+ *  t    f        t       sectors read as valid from file at offset
+ *  f    t        t       sectors preallocated, read as zero, returned file not
+ *                        necessarily zero at offset
+ *  f    f        t       sectors preallocated but read from backing_hd,
+ *                        returned file contains garbage at offset
+ *  t    t        f       sectors preallocated, read as zero, unknown offset
+ *  t    f        f       sectors read from unknown file or offset
+ *  f    t        f       not allocated or unknown offset, read as zero
+ *  f    f        f       not allocated or unknown offset, read from backing_hd
+ */</doc>
+<use f='codebrowser/block/file-posix.c' l='2152' u='c'/>
+<use f='codebrowser/block/file-posix.c' l='2157' u='c'/>
+<use f='codebrowser/block/io.c' l='1763' u='c'/>
+<use f='codebrowser/block/io.c' l='1789' u='c'/>
+<use f='codebrowser/block/io.c' l='1804' u='c'/>
+<use f='codebrowser/block/io.c' l='1865' u='c'/>
+<use f='codebrowser/block/iscsi.c' l='697' u='c'/>
+<use f='codebrowser/block/iscsi.c' l='757' u='c'/>
+<use f='codebrowser/block/mirror.c' l='412' u='c'/>
+<use f='codebrowser/block/mirror.c' l='419' u='c'/>
+<use f='codebrowser/block/parallels.c' l='293' u='c'/>
+<use f='codebrowser/block/qcow.c' l='508' u='c'/>
+<use f='codebrowser/block/qcow.c' l='512' u='c'/>
+<use f='codebrowser/block/qcow2.c' l='1670' u='c'/>
+<use f='codebrowser/block/qcow2.c' l='3689' u='c'/>
+<use f='codebrowser/block/qcow2.c' l='3690' u='c'/>
+<use f='codebrowser/block/qed.c' l='709' u='c'/>
+<use f='codebrowser/block/sheepdog.c' l='3003' u='c'/>
+<use f='codebrowser/block/vdi.c' l='531' u='c'/>
+<use f='codebrowser/block/vmdk.c' l='1336' u='c'/>
+<use f='codebrowser/block/vpc.c' l='739' u='c'/>
+<use f='codebrowser/block/vvfat.c' l='3102' u='c'/>
+<use f='codebrowser/qemu-img.c' l='1618' u='c'/>
+<use f='codebrowser/qemu-img.c' l='2697' u='c'/>
+<use f='codebrowser/qemu-img.c' l='2714' u='c'/>

@@ -1,0 +1,178 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>socket.h source code [codebrowser/slirp/socket.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="slirp_sockaddr,socket "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/slirp/socket.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>slirp</a>/<a href='socket.h.html'>socket.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Copyright (c) 1995 Danny Gasparovski.</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Please read the file COPYRIGHT for the</i></td></tr>
+<tr><th id="5">5</th><td><i> * terms and conditions of the copyright.</i></td></tr>
+<tr><th id="6">6</th><td><i> */</i></td></tr>
+<tr><th id="7">7</th><td></td></tr>
+<tr><th id="8">8</th><td><u>#<span data-ppcond="8">ifndef</span> <span class="macro" data-ref="_M/SLIRP_SOCKET_H">SLIRP_SOCKET_H</span></u></td></tr>
+<tr><th id="9">9</th><td><u>#define <dfn class="macro" id="_M/SLIRP_SOCKET_H" data-ref="_M/SLIRP_SOCKET_H">SLIRP_SOCKET_H</dfn></u></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#define <dfn class="macro" id="_M/SO_EXPIRE" data-ref="_M/SO_EXPIRE">SO_EXPIRE</dfn> 240000</u></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/SO_EXPIREFAST" data-ref="_M/SO_EXPIREFAST">SO_EXPIREFAST</dfn> 10000</u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><i>/*</i></td></tr>
+<tr><th id="15">15</th><td><i> * Our socket structure</i></td></tr>
+<tr><th id="16">16</th><td><i> */</i></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><b>union</b> <dfn class="type def" id="slirp_sockaddr" title='slirp_sockaddr' data-ref="slirp_sockaddr">slirp_sockaddr</dfn> {</td></tr>
+<tr><th id="19">19</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> <dfn class="decl" id="slirp_sockaddr::ss" title='slirp_sockaddr::ss' data-ref="slirp_sockaddr::ss">ss</dfn>;</td></tr>
+<tr><th id="20">20</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> <dfn class="decl" id="slirp_sockaddr::sin" title='slirp_sockaddr::sin' data-ref="slirp_sockaddr::sin">sin</dfn>;</td></tr>
+<tr><th id="21">21</th><td>    <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> <dfn class="decl" id="slirp_sockaddr::sin6" title='slirp_sockaddr::sin6' data-ref="slirp_sockaddr::sin6">sin6</dfn>;</td></tr>
+<tr><th id="22">22</th><td>};</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><b>struct</b> <dfn class="type def" id="socket" title='socket' data-ref="socket">socket</dfn> {</td></tr>
+<tr><th id="25">25</th><td>  <b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="socket::so_next" title='socket::so_next' data-ref="socket::so_next">so_next</dfn>,*<dfn class="decl" id="socket::so_prev" title='socket::so_prev' data-ref="socket::so_prev">so_prev</dfn>;      <i>/* For a linked list of sockets */</i></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td>  <em>int</em> <dfn class="decl" id="socket::s" title='socket::s' data-ref="socket::s">s</dfn>;                           <i>/* The actual socket */</i></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td>  <em>int</em> <dfn class="decl" id="socket::pollfds_idx" title='socket::pollfds_idx' data-ref="socket::pollfds_idx">pollfds_idx</dfn>;                 <i>/* GPollFD GArray index */</i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td>  <a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *<dfn class="decl" id="socket::slirp" title='socket::slirp' data-ref="socket::slirp">slirp</dfn>;			   <i>/* managing slirp instance */</i></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td>			<i>/* XXX union these with not-yet-used sbuf params */</i></td></tr>
+<tr><th id="34">34</th><td>  <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *<dfn class="decl" id="socket::so_m" title='socket::so_m' data-ref="socket::so_m">so_m</dfn>;	           <i>/* Pointer to the original SYN packet,</i></td></tr>
+<tr><th id="35">35</th><td><i>				    * for non-blocking connect()'s, and</i></td></tr>
+<tr><th id="36">36</th><td><i>				    * PING reply's */</i></td></tr>
+<tr><th id="37">37</th><td>  <b>struct</b> <a class="type" href="tcpip.h.html#tcpiphdr" title='tcpiphdr' data-ref="tcpiphdr">tcpiphdr</a> *<dfn class="decl" id="socket::so_ti" title='socket::so_ti' data-ref="socket::so_ti">so_ti</dfn>;	   <i>/* Pointer to the original ti within</i></td></tr>
+<tr><th id="38">38</th><td><i>				    * so_mconn, for non-blocking connections */</i></td></tr>
+<tr><th id="39">39</th><td>  <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>      <dfn class="decl" id="socket::so_urgc" title='socket::so_urgc' data-ref="socket::so_urgc">so_urgc</dfn>;</td></tr>
+<tr><th id="40">40</th><td>  <b>union</b> <a class="type" href="#slirp_sockaddr" title='slirp_sockaddr' data-ref="slirp_sockaddr">slirp_sockaddr</a> <dfn class="decl" id="socket::fhost" title='socket::fhost' data-ref="socket::fhost">fhost</dfn>;      <i>/* Foreign host */</i></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/so_faddr" data-ref="_M/so_faddr">so_faddr</dfn> fhost.sin.sin_addr</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/so_fport" data-ref="_M/so_fport">so_fport</dfn> fhost.sin.sin_port</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/so_faddr6" data-ref="_M/so_faddr6">so_faddr6</dfn> fhost.sin6.sin6_addr</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/so_fport6" data-ref="_M/so_fport6">so_fport6</dfn> fhost.sin6.sin6_port</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/so_ffamily" data-ref="_M/so_ffamily">so_ffamily</dfn> fhost.ss.ss_family</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td>  <b>union</b> <a class="type" href="#slirp_sockaddr" title='slirp_sockaddr' data-ref="slirp_sockaddr">slirp_sockaddr</a> <dfn class="decl" id="socket::lhost" title='socket::lhost' data-ref="socket::lhost">lhost</dfn>;      <i>/* Local host */</i></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/so_laddr" data-ref="_M/so_laddr">so_laddr</dfn> lhost.sin.sin_addr</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/so_lport" data-ref="_M/so_lport">so_lport</dfn> lhost.sin.sin_port</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/so_laddr6" data-ref="_M/so_laddr6">so_laddr6</dfn> lhost.sin6.sin6_addr</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/so_lport6" data-ref="_M/so_lport6">so_lport6</dfn> lhost.sin6.sin6_port</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/so_lfamily" data-ref="_M/so_lfamily">so_lfamily</dfn> lhost.ss.ss_family</u></td></tr>
+<tr><th id="53">53</th><td></td></tr>
+<tr><th id="54">54</th><td>  <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>	<dfn class="decl" id="socket::so_iptos" title='socket::so_iptos' data-ref="socket::so_iptos">so_iptos</dfn>;	<i>/* Type of service */</i></td></tr>
+<tr><th id="55">55</th><td>  <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>	<dfn class="decl" id="socket::so_emu" title='socket::so_emu' data-ref="socket::so_emu">so_emu</dfn>;		<i>/* Is the socket emulated? */</i></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td>  <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a>       <dfn class="decl" id="socket::so_type" title='socket::so_type' data-ref="socket::so_type">so_type</dfn>;        <i>/* Type of socket, UDP or TCP */</i></td></tr>
+<tr><th id="58">58</th><td>  <a class="typedef" href="../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a>       <dfn class="decl" id="socket::so_state" title='socket::so_state' data-ref="socket::so_state">so_state</dfn>;       <i>/* internal state flags SS_*, below */</i></td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>  <b>struct</b> 	<a class="type" href="tcp_var.h.html#tcpcb" title='tcpcb' data-ref="tcpcb">tcpcb</a> *<dfn class="decl" id="socket::so_tcpcb" title='socket::so_tcpcb' data-ref="socket::so_tcpcb">so_tcpcb</dfn>;	<i>/* pointer to TCP protocol control block */</i></td></tr>
+<tr><th id="61">61</th><td>  <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a>	<dfn class="decl" id="socket::so_expire" title='socket::so_expire' data-ref="socket::so_expire">so_expire</dfn>;		<i>/* When the socket will expire */</i></td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td>  <em>int</em>	<dfn class="decl" id="socket::so_queued" title='socket::so_queued' data-ref="socket::so_queued">so_queued</dfn>;		<i>/* Number of packets queued from this socket */</i></td></tr>
+<tr><th id="64">64</th><td>  <em>int</em>	<dfn class="decl" id="socket::so_nqueued" title='socket::so_nqueued' data-ref="socket::so_nqueued">so_nqueued</dfn>;		<i>/* Number of packets queued in a row</i></td></tr>
+<tr><th id="65">65</th><td><i>				 * Used to determine when to "downgrade" a session</i></td></tr>
+<tr><th id="66">66</th><td><i>					 * from fastq to batchq */</i></td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td>  <b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> <dfn class="decl" id="socket::so_rcv" title='socket::so_rcv' data-ref="socket::so_rcv">so_rcv</dfn>;		<i>/* Receive buffer */</i></td></tr>
+<tr><th id="69">69</th><td>  <b>struct</b> <a class="type" href="sbuf.h.html#sbuf" title='sbuf' data-ref="sbuf">sbuf</a> <dfn class="decl" id="socket::so_snd" title='socket::so_snd' data-ref="socket::so_snd">so_snd</dfn>;		<i>/* Send buffer */</i></td></tr>
+<tr><th id="70">70</th><td>  <em>void</em> * <dfn class="decl" id="socket::extra" title='socket::extra' data-ref="socket::extra">extra</dfn>;			<i>/* Extra pointer */</i></td></tr>
+<tr><th id="71">71</th><td>};</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><i>/*</i></td></tr>
+<tr><th id="75">75</th><td><i> * Socket state bits. (peer means the host on the Internet,</i></td></tr>
+<tr><th id="76">76</th><td><i> * local host means the host on the other end of the modem)</i></td></tr>
+<tr><th id="77">77</th><td><i> */</i></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/SS_NOFDREF" data-ref="_M/SS_NOFDREF">SS_NOFDREF</dfn>		0x001	/* No fd reference */</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/SS_ISFCONNECTING" data-ref="_M/SS_ISFCONNECTING">SS_ISFCONNECTING</dfn>	0x002	/* Socket is connecting to peer (non-blocking connect()'s) */</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/SS_ISFCONNECTED" data-ref="_M/SS_ISFCONNECTED">SS_ISFCONNECTED</dfn>		0x004	/* Socket is connected to peer */</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/SS_FCANTRCVMORE" data-ref="_M/SS_FCANTRCVMORE">SS_FCANTRCVMORE</dfn>		0x008	/* Socket can't receive more from peer (for half-closes) */</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/SS_FCANTSENDMORE" data-ref="_M/SS_FCANTSENDMORE">SS_FCANTSENDMORE</dfn>	0x010	/* Socket can't send more to peer (for half-closes) */</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/SS_FWDRAIN" data-ref="_M/SS_FWDRAIN">SS_FWDRAIN</dfn>		0x040	/* We received a FIN, drain data and set SS_FCANTSENDMORE */</u></td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/SS_CTL" data-ref="_M/SS_CTL">SS_CTL</dfn>			0x080</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/SS_FACCEPTCONN" data-ref="_M/SS_FACCEPTCONN">SS_FACCEPTCONN</dfn>		0x100	/* Socket is accepting connections from a host on the internet */</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/SS_FACCEPTONCE" data-ref="_M/SS_FACCEPTONCE">SS_FACCEPTONCE</dfn>		0x200	/* If set, the SS_FACCEPTCONN socket will die after one accept */</u></td></tr>
+<tr><th id="89">89</th><td></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/SS_PERSISTENT_MASK" data-ref="_M/SS_PERSISTENT_MASK">SS_PERSISTENT_MASK</dfn>	0xf000	/* Unremovable state bits */</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/SS_HOSTFWD" data-ref="_M/SS_HOSTFWD">SS_HOSTFWD</dfn>		0x1000	/* Socket describes host-&gt;guest forwarding */</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/SS_INCOMING" data-ref="_M/SS_INCOMING">SS_INCOMING</dfn>		0x2000	/* Connection was initiated by a host on the internet */</u></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="sockaddr_equal" title='sockaddr_equal' data-ref="sockaddr_equal">sockaddr_equal</dfn>(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *<dfn class="local col4 decl" id="164a" title='a' data-type='struct sockaddr_storage *' data-ref="164a">a</dfn>,</td></tr>
+<tr><th id="95">95</th><td>        <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *<dfn class="local col5 decl" id="165b" title='b' data-type='struct sockaddr_storage *' data-ref="165b">b</dfn>)</td></tr>
+<tr><th id="96">96</th><td>{</td></tr>
+<tr><th id="97">97</th><td>    <b>if</b> (<a class="local col4 ref" href="#164a" title='a' data-ref="164a">a</a>-&gt;<a class="ref" href="../../include/x86_64-linux-gnu/bits/socket.h.html#168" title='sockaddr_storage::ss_family' data-ref="sockaddr_storage::ss_family">ss_family</a> != <a class="local col5 ref" href="#165b" title='b' data-ref="165b">b</a>-&gt;<a class="ref" href="../../include/x86_64-linux-gnu/bits/socket.h.html#168" title='sockaddr_storage::ss_family' data-ref="sockaddr_storage::ss_family">ss_family</a>) {</td></tr>
+<tr><th id="98">98</th><td>        <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="99">99</th><td>    }</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td>    <b>switch</b> (<a class="local col4 ref" href="#164a" title='a' data-ref="164a">a</a>-&gt;<a class="ref" href="../../include/x86_64-linux-gnu/bits/socket.h.html#168" title='sockaddr_storage::ss_family' data-ref="sockaddr_storage::ss_family">ss_family</a>) {</td></tr>
+<tr><th id="102">102</th><td>    <b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>:</td></tr>
+<tr><th id="103">103</th><td>    {</td></tr>
+<tr><th id="104">104</th><td>        <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> *<dfn class="local col6 decl" id="166a4" title='a4' data-type='struct sockaddr_in *' data-ref="166a4">a4</dfn> = (<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> *) <a class="local col4 ref" href="#164a" title='a' data-ref="164a">a</a>;</td></tr>
+<tr><th id="105">105</th><td>        <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> *<dfn class="local col7 decl" id="167b4" title='b4' data-type='struct sockaddr_in *' data-ref="167b4">b4</dfn> = (<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a> *) <a class="local col5 ref" href="#165b" title='b' data-ref="165b">b</a>;</td></tr>
+<tr><th id="106">106</th><td>        <b>return</b> <a class="local col6 ref" href="#166a4" title='a4' data-ref="166a4">a4</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_addr" title='sockaddr_in::sin_addr' data-ref="sockaddr_in::sin_addr">sin_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a> == <a class="local col7 ref" href="#167b4" title='b4' data-ref="167b4">b4</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_addr" title='sockaddr_in::sin_addr' data-ref="sockaddr_in::sin_addr">sin_addr</a>.<a class="ref" href="../../include/netinet/in.h.html#in_addr::s_addr" title='in_addr::s_addr' data-ref="in_addr::s_addr">s_addr</a></td></tr>
+<tr><th id="107">107</th><td>               &amp;&amp; <a class="local col6 ref" href="#166a4" title='a4' data-ref="166a4">a4</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_port" title='sockaddr_in::sin_port' data-ref="sockaddr_in::sin_port">sin_port</a> == <a class="local col7 ref" href="#167b4" title='b4' data-ref="167b4">b4</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in::sin_port" title='sockaddr_in::sin_port' data-ref="sockaddr_in::sin_port">sin_port</a>;</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td>    <b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#100" title="10" data-ref="_M/AF_INET6">AF_INET6</a>:</td></tr>
+<tr><th id="110">110</th><td>    {</td></tr>
+<tr><th id="111">111</th><td>        <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *<dfn class="local col8 decl" id="168a6" title='a6' data-type='struct sockaddr_in6 *' data-ref="168a6">a6</dfn> = (<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *) <a class="local col4 ref" href="#164a" title='a' data-ref="164a">a</a>;</td></tr>
+<tr><th id="112">112</th><td>        <b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *<dfn class="local col9 decl" id="169b6" title='b6' data-type='struct sockaddr_in6 *' data-ref="169b6">b6</dfn> = (<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a> *) <a class="local col5 ref" href="#165b" title='b' data-ref="165b">b</a>;</td></tr>
+<tr><th id="113">113</th><td>        <b>return</b> (<a class="ref" href="ip6.h.html#in6_equal" title='in6_equal' data-ref="in6_equal">in6_equal</a>(&amp;<a class="local col8 ref" href="#168a6" title='a6' data-ref="168a6">a6</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_addr" title='sockaddr_in6::sin6_addr' data-ref="sockaddr_in6::sin6_addr">sin6_addr</a>, &amp;<a class="local col9 ref" href="#169b6" title='b6' data-ref="169b6">b6</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_addr" title='sockaddr_in6::sin6_addr' data-ref="sockaddr_in6::sin6_addr">sin6_addr</a>)</td></tr>
+<tr><th id="114">114</th><td>                &amp;&amp; <a class="local col8 ref" href="#168a6" title='a6' data-ref="168a6">a6</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_port" title='sockaddr_in6::sin6_port' data-ref="sockaddr_in6::sin6_port">sin6_port</a> == <a class="local col9 ref" href="#169b6" title='b6' data-ref="169b6">b6</a>-&gt;<a class="ref" href="../../include/netinet/in.h.html#sockaddr_in6::sin6_port" title='sockaddr_in6::sin6_port' data-ref="sockaddr_in6::sin6_port">sin6_port</a>);</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td>    <b>default</b>:</td></tr>
+<tr><th id="117">117</th><td>        <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/slirp/socket.h&quot;, 117, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="118">118</th><td>    }</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../include/unistd.h.html#socklen_t" title='socklen_t' data-type='__socklen_t' data-ref="socklen_t">socklen_t</a> <dfn class="decl def" id="sockaddr_size" title='sockaddr_size' data-ref="sockaddr_size">sockaddr_size</dfn>(<b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *<dfn class="local col0 decl" id="170a" title='a' data-type='struct sockaddr_storage *' data-ref="170a">a</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    <b>switch</b> (<a class="local col0 ref" href="#170a" title='a' data-ref="170a">a</a>-&gt;<a class="ref" href="../../include/x86_64-linux-gnu/bits/socket.h.html#168" title='sockaddr_storage::ss_family' data-ref="sockaddr_storage::ss_family">ss_family</a>) {</td></tr>
+<tr><th id="126">126</th><td>    <b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#92" title="2" data-ref="_M/AF_INET">AF_INET</a>:</td></tr>
+<tr><th id="127">127</th><td>        <b>return</b> <b>sizeof</b>(<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in" title='sockaddr_in' data-ref="sockaddr_in">sockaddr_in</a>);</td></tr>
+<tr><th id="128">128</th><td>    <b>case</b> <a class="macro" href="../../include/x86_64-linux-gnu/bits/socket.h.html#100" title="10" data-ref="_M/AF_INET6">AF_INET6</a>:</td></tr>
+<tr><th id="129">129</th><td>        <b>return</b> <b>sizeof</b>(<b>struct</b> <a class="type" href="../../include/netinet/in.h.html#sockaddr_in6" title='sockaddr_in6' data-ref="sockaddr_in6">sockaddr_in6</a>);</td></tr>
+<tr><th id="130">130</th><td>    <b>default</b>:</td></tr>
+<tr><th id="131">131</th><td>        <a class="macro" href="../../include/glib-2.0/glib/gtestutils.h.html#114" title="do { g_assertion_message_expr (((gchar*) 0), &quot;/home/jon/workspace/qemu/slirp/socket.h&quot;, 131, ((const char*) (__func__)), ((void*)0)); } while (0)" data-ref="_M/g_assert_not_reached">g_assert_not_reached</a>();</td></tr>
+<tr><th id="132">132</th><td>    }</td></tr>
+<tr><th id="133">133</th><td>}</td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="solookup" title='solookup' data-ref="solookup">solookup</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> **, <b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *,</td></tr>
+<tr><th id="136">136</th><td>        <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *, <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *);</td></tr>
+<tr><th id="137">137</th><td><b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *<dfn class="decl" id="socreate" title='socreate' data-ref="socreate">socreate</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *);</td></tr>
+<tr><th id="138">138</th><td><em>void</em> <dfn class="decl" id="sofree" title='sofree' data-ref="sofree">sofree</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="139">139</th><td><em>int</em> <dfn class="decl" id="soread" title='soread' data-ref="soread">soread</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="140">140</th><td><em>int</em> <dfn class="decl" id="sorecvoob" title='sorecvoob' data-ref="sorecvoob">sorecvoob</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="141">141</th><td><em>int</em> <dfn class="decl" id="sosendoob" title='sosendoob' data-ref="sosendoob">sosendoob</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="142">142</th><td><em>int</em> <dfn class="decl" id="sowrite" title='sowrite' data-ref="sowrite">sowrite</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="143">143</th><td><em>void</em> <dfn class="decl" id="sorecvfrom" title='sorecvfrom' data-ref="sorecvfrom">sorecvfrom</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="144">144</th><td><em>int</em> <dfn class="decl" id="sosendto" title='sosendto' data-ref="sosendto">sosendto</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="mbuf.h.html#mbuf" title='mbuf' data-ref="mbuf">mbuf</a> *);</td></tr>
+<tr><th id="145">145</th><td><b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> * <dfn class="decl" id="tcp_listen" title='tcp_listen' data-ref="tcp_listen">tcp_listen</dfn>(<a class="typedef" href="libslirp.h.html#Slirp" title='Slirp' data-type='struct Slirp' data-ref="Slirp">Slirp</a> *, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a>, <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>, <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#u_int" title='u_int' data-type='__u_int' data-ref="u_int">u_int</a>,</td></tr>
+<tr><th id="146">146</th><td>                               <em>int</em>);</td></tr>
+<tr><th id="147">147</th><td><em>void</em> <dfn class="decl" id="soisfconnecting" title='soisfconnecting' data-ref="soisfconnecting">soisfconnecting</dfn>(<em>register</em> <b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="148">148</th><td><em>void</em> <dfn class="decl" id="soisfconnected" title='soisfconnected' data-ref="soisfconnected">soisfconnected</dfn>(<em>register</em> <b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="149">149</th><td><em>void</em> <dfn class="decl" id="sofwdrain" title='sofwdrain' data-ref="sofwdrain">sofwdrain</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="150">150</th><td><b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec" id="iovec">iovec</a>; <i>/* For win32 */</i></td></tr>
+<tr><th id="151">151</th><td><span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="sopreprbuf" title='sopreprbuf' data-ref="sopreprbuf">sopreprbuf</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col1 decl" id="171so" title='so' data-type='struct socket *' data-ref="171so">so</dfn>, <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> *<dfn class="local col2 decl" id="172iov" title='iov' data-type='struct iovec *' data-ref="172iov">iov</dfn>, <em>int</em> *<dfn class="local col3 decl" id="173np" title='np' data-type='int *' data-ref="173np">np</dfn>);</td></tr>
+<tr><th id="152">152</th><td><em>int</em> <dfn class="decl" id="soreadbuf" title='soreadbuf' data-ref="soreadbuf">soreadbuf</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *<dfn class="local col4 decl" id="174so" title='so' data-type='struct socket *' data-ref="174so">so</dfn>, <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="175buf" title='buf' data-type='const char *' data-ref="175buf">buf</dfn>, <em>int</em> <dfn class="local col6 decl" id="176size" title='size' data-type='int' data-ref="176size">size</dfn>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><em>void</em> <dfn class="decl" id="sotranslate_out" title='sotranslate_out' data-ref="sotranslate_out">sotranslate_out</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *);</td></tr>
+<tr><th id="155">155</th><td><em>void</em> <dfn class="decl" id="sotranslate_in" title='sotranslate_in' data-ref="sotranslate_in">sotranslate_in</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *, <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/socket.h.html#sockaddr_storage" title='sockaddr_storage' data-ref="sockaddr_storage">sockaddr_storage</a> *);</td></tr>
+<tr><th id="156">156</th><td><em>void</em> <dfn class="decl" id="sotranslate_accept" title='sotranslate_accept' data-ref="sotranslate_accept">sotranslate_accept</dfn>(<b>struct</b> <a class="type" href="#socket" title='socket' data-ref="socket">socket</a> *);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="8">endif</span> /* SLIRP_SOCKET_H */</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../net/colo-compare.c.html'>codebrowser/net/colo-compare.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>char-serial.c source code [codebrowser/chardev/char-serial.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/chardev/char-serial.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>chardev</a>/<a href='char-serial.c.html'>char-serial.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU System Emulator</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2003-2008 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../include/qemu/sockets.h.html">"qemu/sockets.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../include/io/channel-file.h.html">"io/channel-file.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#<span data-ppcond="29">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="30">30</th><td><u>#include "chardev/char-win.h"</u></td></tr>
+<tr><th id="31">31</th><td><u>#<span data-ppcond="29">else</span></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="../../include/termios.h.html">&lt;termios.h&gt;</a></u></td></tr>
+<tr><th id="34">34</th><td><u>#include <a href="../include/chardev/char-fd.h.html">"chardev/char-fd.h"</a></u></td></tr>
+<tr><th id="35">35</th><td><u>#<span data-ppcond="29">endif</span></u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><u>#include <a href="../include/chardev/char-serial.h.html">"chardev/char-serial.h"</a></u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#<span data-ppcond="39">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>static</em> <em>void</em> qmp_chardev_open_serial(Chardev *chr,</td></tr>
+<tr><th id="42">42</th><td>                                    ChardevBackend *backend,</td></tr>
+<tr><th id="43">43</th><td>                                    bool *be_opened,</td></tr>
+<tr><th id="44">44</th><td>                                    Error **errp)</td></tr>
+<tr><th id="45">45</th><td>{</td></tr>
+<tr><th id="46">46</th><td>    ChardevHostdev *serial = backend-&gt;u.serial.data;</td></tr>
+<tr><th id="47">47</th><td></td></tr>
+<tr><th id="48">48</th><td>    win_chr_serial_init(chr, serial-&gt;device, errp);</td></tr>
+<tr><th id="49">49</th><td>}</td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><u>#<span data-ppcond="39">elif</span> defined(<span class="macro" data-ref="_M/__linux__">__linux__</span>) || defined(<span class="macro" data-ref="_M/__sun__">__sun__</span>) || defined(<span class="macro" data-ref="_M/__FreeBSD__">__FreeBSD__</span>)      \</u></td></tr>
+<tr><th id="52">52</th><td><u>    || defined(<span class="macro" data-ref="_M/__NetBSD__">__NetBSD__</span>) || defined(<span class="macro" data-ref="_M/__OpenBSD__">__OpenBSD__</span>) || defined(<span class="macro" data-ref="_M/__DragonFly__">__DragonFly__</span>) \</u></td></tr>
+<tr><th id="53">53</th><td><u>    || defined(<a class="macro" href="../../include/features.h.html#358" data-ref="_M/__GLIBC__">__GLIBC__</a>)</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="tty_serial_init" title='tty_serial_init' data-type='void tty_serial_init(int fd, int speed, int parity, int data_bits, int stop_bits)' data-ref="tty_serial_init">tty_serial_init</dfn>(<em>int</em> <dfn class="local col3 decl" id="23fd" title='fd' data-type='int' data-ref="23fd">fd</dfn>, <em>int</em> <dfn class="local col4 decl" id="24speed" title='speed' data-type='int' data-ref="24speed">speed</dfn>,</td></tr>
+<tr><th id="56">56</th><td>                            <em>int</em> <dfn class="local col5 decl" id="25parity" title='parity' data-type='int' data-ref="25parity">parity</dfn>, <em>int</em> <dfn class="local col6 decl" id="26data_bits" title='data_bits' data-type='int' data-ref="26data_bits">data_bits</dfn>, <em>int</em> <dfn class="local col7 decl" id="27stop_bits" title='stop_bits' data-type='int' data-ref="27stop_bits">stop_bits</dfn>)</td></tr>
+<tr><th id="57">57</th><td>{</td></tr>
+<tr><th id="58">58</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios" title='termios' data-ref="termios">termios</a> <dfn class="local col8 decl" id="28tty" title='tty' data-type='struct termios' data-ref="28tty">tty</dfn>;</td></tr>
+<tr><th id="59">59</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/bits/termios.h.html#speed_t" title='speed_t' data-type='unsigned int' data-ref="speed_t">speed_t</a> <dfn class="local col9 decl" id="29spd" title='spd' data-type='speed_t' data-ref="29spd">spd</dfn>;</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><u>#<span data-ppcond="61">if</span> 0</u></td></tr>
+<tr><th id="62">62</th><td>    printf(<q>"tty_serial_init: speed=%d parity=%c data=%d stop=%d\n"</q>,</td></tr>
+<tr><th id="63">63</th><td>           speed, parity, data_bits, stop_bits);</td></tr>
+<tr><th id="64">64</th><td><u>#<span data-ppcond="61">endif</span></u></td></tr>
+<tr><th id="65">65</th><td>    <a class="ref" href="../../include/termios.h.html#tcgetattr" title='tcgetattr' data-ref="tcgetattr">tcgetattr</a>(<a class="local col3 ref" href="#23fd" title='fd' data-ref="23fd">fd</a>, &amp;<a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>);</td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/check_speed" data-ref="_M/check_speed">check_speed</dfn>(val) if (<a class="local col4 ref" href="#24speed" title='speed' data-ref="24speed">speed</a> &lt;= val) { <a class="local col9 ref" href="#29spd" title='spd' data-ref="29spd">spd</a> = B##val; break; }</u></td></tr>
+<tr><th id="68">68</th><td>    <a class="local col4 ref" href="#24speed" title='speed' data-ref="24speed">speed</a> = <a class="local col4 ref" href="#24speed" title='speed' data-ref="24speed">speed</a> * <var>10</var> / <var>11</var>;</td></tr>
+<tr><th id="69">69</th><td>    <b>do</b> {</td></tr>
+<tr><th id="70">70</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 50) { spd = 0000001; break; }" data-ref="_M/check_speed">check_speed</a>(<var>50</var>);</td></tr>
+<tr><th id="71">71</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 75) { spd = 0000002; break; }" data-ref="_M/check_speed">check_speed</a>(<var>75</var>);</td></tr>
+<tr><th id="72">72</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 110) { spd = 0000003; break; }" data-ref="_M/check_speed">check_speed</a>(<var>110</var>);</td></tr>
+<tr><th id="73">73</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 134) { spd = 0000004; break; }" data-ref="_M/check_speed">check_speed</a>(<var>134</var>);</td></tr>
+<tr><th id="74">74</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 150) { spd = 0000005; break; }" data-ref="_M/check_speed">check_speed</a>(<var>150</var>);</td></tr>
+<tr><th id="75">75</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 200) { spd = 0000006; break; }" data-ref="_M/check_speed">check_speed</a>(<var>200</var>);</td></tr>
+<tr><th id="76">76</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 300) { spd = 0000007; break; }" data-ref="_M/check_speed">check_speed</a>(<var>300</var>);</td></tr>
+<tr><th id="77">77</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 600) { spd = 0000010; break; }" data-ref="_M/check_speed">check_speed</a>(<var>600</var>);</td></tr>
+<tr><th id="78">78</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 1200) { spd = 0000011; break; }" data-ref="_M/check_speed">check_speed</a>(<var>1200</var>);</td></tr>
+<tr><th id="79">79</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 1800) { spd = 0000012; break; }" data-ref="_M/check_speed">check_speed</a>(<var>1800</var>);</td></tr>
+<tr><th id="80">80</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 2400) { spd = 0000013; break; }" data-ref="_M/check_speed">check_speed</a>(<var>2400</var>);</td></tr>
+<tr><th id="81">81</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 4800) { spd = 0000014; break; }" data-ref="_M/check_speed">check_speed</a>(<var>4800</var>);</td></tr>
+<tr><th id="82">82</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 9600) { spd = 0000015; break; }" data-ref="_M/check_speed">check_speed</a>(<var>9600</var>);</td></tr>
+<tr><th id="83">83</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 19200) { spd = 0000016; break; }" data-ref="_M/check_speed">check_speed</a>(<var>19200</var>);</td></tr>
+<tr><th id="84">84</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 38400) { spd = 0000017; break; }" data-ref="_M/check_speed">check_speed</a>(<var>38400</var>);</td></tr>
+<tr><th id="85">85</th><td>        <i>/* Non-Posix values follow. They may be unsupported on some systems. */</i></td></tr>
+<tr><th id="86">86</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 57600) { spd = 0010001; break; }" data-ref="_M/check_speed">check_speed</a>(<var>57600</var>);</td></tr>
+<tr><th id="87">87</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 115200) { spd = 0010002; break; }" data-ref="_M/check_speed">check_speed</a>(<var>115200</var>);</td></tr>
+<tr><th id="88">88</th><td><u>#<span data-ppcond="88">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#157" data-ref="_M/B230400">B230400</a></u></td></tr>
+<tr><th id="89">89</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 230400) { spd = 0010003; break; }" data-ref="_M/check_speed">check_speed</a>(<var>230400</var>);</td></tr>
+<tr><th id="90">90</th><td><u>#<span data-ppcond="88">endif</span></u></td></tr>
+<tr><th id="91">91</th><td><u>#<span data-ppcond="91">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#158" data-ref="_M/B460800">B460800</a></u></td></tr>
+<tr><th id="92">92</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 460800) { spd = 0010004; break; }" data-ref="_M/check_speed">check_speed</a>(<var>460800</var>);</td></tr>
+<tr><th id="93">93</th><td><u>#<span data-ppcond="91">endif</span></u></td></tr>
+<tr><th id="94">94</th><td><u>#<span data-ppcond="94">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#159" data-ref="_M/B500000">B500000</a></u></td></tr>
+<tr><th id="95">95</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 500000) { spd = 0010005; break; }" data-ref="_M/check_speed">check_speed</a>(<var>500000</var>);</td></tr>
+<tr><th id="96">96</th><td><u>#<span data-ppcond="94">endif</span></u></td></tr>
+<tr><th id="97">97</th><td><u>#<span data-ppcond="97">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#160" data-ref="_M/B576000">B576000</a></u></td></tr>
+<tr><th id="98">98</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 576000) { spd = 0010006; break; }" data-ref="_M/check_speed">check_speed</a>(<var>576000</var>);</td></tr>
+<tr><th id="99">99</th><td><u>#<span data-ppcond="97">endif</span></u></td></tr>
+<tr><th id="100">100</th><td><u>#<span data-ppcond="100">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#161" data-ref="_M/B921600">B921600</a></u></td></tr>
+<tr><th id="101">101</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 921600) { spd = 0010007; break; }" data-ref="_M/check_speed">check_speed</a>(<var>921600</var>);</td></tr>
+<tr><th id="102">102</th><td><u>#<span data-ppcond="100">endif</span></u></td></tr>
+<tr><th id="103">103</th><td><u>#<span data-ppcond="103">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#162" data-ref="_M/B1000000">B1000000</a></u></td></tr>
+<tr><th id="104">104</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 1000000) { spd = 0010010; break; }" data-ref="_M/check_speed">check_speed</a>(<var>1000000</var>);</td></tr>
+<tr><th id="105">105</th><td><u>#<span data-ppcond="103">endif</span></u></td></tr>
+<tr><th id="106">106</th><td><u>#<span data-ppcond="106">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#163" data-ref="_M/B1152000">B1152000</a></u></td></tr>
+<tr><th id="107">107</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 1152000) { spd = 0010011; break; }" data-ref="_M/check_speed">check_speed</a>(<var>1152000</var>);</td></tr>
+<tr><th id="108">108</th><td><u>#<span data-ppcond="106">endif</span></u></td></tr>
+<tr><th id="109">109</th><td><u>#<span data-ppcond="109">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#164" data-ref="_M/B1500000">B1500000</a></u></td></tr>
+<tr><th id="110">110</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 1500000) { spd = 0010012; break; }" data-ref="_M/check_speed">check_speed</a>(<var>1500000</var>);</td></tr>
+<tr><th id="111">111</th><td><u>#<span data-ppcond="109">endif</span></u></td></tr>
+<tr><th id="112">112</th><td><u>#<span data-ppcond="112">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#165" data-ref="_M/B2000000">B2000000</a></u></td></tr>
+<tr><th id="113">113</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 2000000) { spd = 0010013; break; }" data-ref="_M/check_speed">check_speed</a>(<var>2000000</var>);</td></tr>
+<tr><th id="114">114</th><td><u>#<span data-ppcond="112">endif</span></u></td></tr>
+<tr><th id="115">115</th><td><u>#<span data-ppcond="115">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#166" data-ref="_M/B2500000">B2500000</a></u></td></tr>
+<tr><th id="116">116</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 2500000) { spd = 0010014; break; }" data-ref="_M/check_speed">check_speed</a>(<var>2500000</var>);</td></tr>
+<tr><th id="117">117</th><td><u>#<span data-ppcond="115">endif</span></u></td></tr>
+<tr><th id="118">118</th><td><u>#<span data-ppcond="118">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#167" data-ref="_M/B3000000">B3000000</a></u></td></tr>
+<tr><th id="119">119</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 3000000) { spd = 0010015; break; }" data-ref="_M/check_speed">check_speed</a>(<var>3000000</var>);</td></tr>
+<tr><th id="120">120</th><td><u>#<span data-ppcond="118">endif</span></u></td></tr>
+<tr><th id="121">121</th><td><u>#<span data-ppcond="121">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#168" data-ref="_M/B3500000">B3500000</a></u></td></tr>
+<tr><th id="122">122</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 3500000) { spd = 0010016; break; }" data-ref="_M/check_speed">check_speed</a>(<var>3500000</var>);</td></tr>
+<tr><th id="123">123</th><td><u>#<span data-ppcond="121">endif</span></u></td></tr>
+<tr><th id="124">124</th><td><u>#<span data-ppcond="124">ifdef</span> <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#169" data-ref="_M/B4000000">B4000000</a></u></td></tr>
+<tr><th id="125">125</th><td>        <a class="macro" href="#67" title="if (speed &lt;= 4000000) { spd = 0010017; break; }" data-ref="_M/check_speed">check_speed</a>(<var>4000000</var>);</td></tr>
+<tr><th id="126">126</th><td><u>#<span data-ppcond="124">endif</span></u></td></tr>
+<tr><th id="127">127</th><td>        <a class="local col9 ref" href="#29spd" title='spd' data-ref="29spd">spd</a> = <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#156" title="0010002" data-ref="_M/B115200">B115200</a>;</td></tr>
+<tr><th id="128">128</th><td>    } <b>while</b> (<var>0</var>);</td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td>    <a class="ref" href="../../include/termios.h.html#cfsetispeed" title='cfsetispeed' data-ref="cfsetispeed">cfsetispeed</a>(&amp;<a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>, <a class="local col9 ref" href="#29spd" title='spd' data-ref="29spd">spd</a>);</td></tr>
+<tr><th id="131">131</th><td>    <a class="ref" href="../../include/termios.h.html#cfsetospeed" title='cfsetospeed' data-ref="cfsetospeed">cfsetospeed</a>(&amp;<a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>, <a class="local col9 ref" href="#29spd" title='spd' data-ref="29spd">spd</a>);</td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td>    <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_iflag" title='termios::c_iflag' data-ref="termios::c_iflag">c_iflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#62" title="0000001" data-ref="_M/IGNBRK">IGNBRK</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#63" title="0000002" data-ref="_M/BRKINT">BRKINT</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#65" title="0000010" data-ref="_M/PARMRK">PARMRK</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#67" title="0000040" data-ref="_M/ISTRIP">ISTRIP</a></td></tr>
+<tr><th id="134">134</th><td>                     | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#68" title="0000100" data-ref="_M/INLCR">INLCR</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#69" title="0000200" data-ref="_M/IGNCR">IGNCR</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#70" title="0000400" data-ref="_M/ICRNL">ICRNL</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#72" title="0002000" data-ref="_M/IXON">IXON</a>);</td></tr>
+<tr><th id="135">135</th><td>    <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_oflag" title='termios::c_oflag' data-ref="termios::c_oflag">c_oflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#79" title="0000001" data-ref="_M/OPOST">OPOST</a>;</td></tr>
+<tr><th id="136">136</th><td>    <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_lflag" title='termios::c_lflag' data-ref="termios::c_lflag">c_lflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#183" title="0000010" data-ref="_M/ECHO">ECHO</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#186" title="0000100" data-ref="_M/ECHONL">ECHONL</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#179" title="0000002" data-ref="_M/ICANON">ICANON</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#196" title="0100000" data-ref="_M/IEXTEN">IEXTEN</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#178" title="0000001" data-ref="_M/ISIG">ISIG</a>);</td></tr>
+<tr><th id="137">137</th><td>    <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> &amp;= ~(<a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#141" title="0000060" data-ref="_M/CSIZE">CSIZE</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#148" title="0000400" data-ref="_M/PARENB">PARENB</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#149" title="0001000" data-ref="_M/PARODD">PARODD</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#174" title="020000000000" data-ref="_M/CRTSCTS">CRTSCTS</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#146" title="0000100" data-ref="_M/CSTOPB">CSTOPB</a>);</td></tr>
+<tr><th id="138">138</th><td>    <b>switch</b> (<a class="local col6 ref" href="#26data_bits" title='data_bits' data-ref="26data_bits">data_bits</a>) {</td></tr>
+<tr><th id="139">139</th><td>    <b>default</b>:</td></tr>
+<tr><th id="140">140</th><td>    <b>case</b> <var>8</var>:</td></tr>
+<tr><th id="141">141</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#145" title="0000060" data-ref="_M/CS8">CS8</a>;</td></tr>
+<tr><th id="142">142</th><td>        <b>break</b>;</td></tr>
+<tr><th id="143">143</th><td>    <b>case</b> <var>7</var>:</td></tr>
+<tr><th id="144">144</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#144" title="0000040" data-ref="_M/CS7">CS7</a>;</td></tr>
+<tr><th id="145">145</th><td>        <b>break</b>;</td></tr>
+<tr><th id="146">146</th><td>    <b>case</b> <var>6</var>:</td></tr>
+<tr><th id="147">147</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#143" title="0000020" data-ref="_M/CS6">CS6</a>;</td></tr>
+<tr><th id="148">148</th><td>        <b>break</b>;</td></tr>
+<tr><th id="149">149</th><td>    <b>case</b> <var>5</var>:</td></tr>
+<tr><th id="150">150</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#142" title="0000000" data-ref="_M/CS5">CS5</a>;</td></tr>
+<tr><th id="151">151</th><td>        <b>break</b>;</td></tr>
+<tr><th id="152">152</th><td>    }</td></tr>
+<tr><th id="153">153</th><td>    <b>switch</b> (<a class="local col5 ref" href="#25parity" title='parity' data-ref="25parity">parity</a>) {</td></tr>
+<tr><th id="154">154</th><td>    <b>default</b>:</td></tr>
+<tr><th id="155">155</th><td>    <b>case</b> <kbd>'N'</kbd>:</td></tr>
+<tr><th id="156">156</th><td>        <b>break</b>;</td></tr>
+<tr><th id="157">157</th><td>    <b>case</b> <kbd>'E'</kbd>:</td></tr>
+<tr><th id="158">158</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#148" title="0000400" data-ref="_M/PARENB">PARENB</a>;</td></tr>
+<tr><th id="159">159</th><td>        <b>break</b>;</td></tr>
+<tr><th id="160">160</th><td>    <b>case</b> <kbd>'O'</kbd>:</td></tr>
+<tr><th id="161">161</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#148" title="0000400" data-ref="_M/PARENB">PARENB</a> | <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#149" title="0001000" data-ref="_M/PARODD">PARODD</a>;</td></tr>
+<tr><th id="162">162</th><td>        <b>break</b>;</td></tr>
+<tr><th id="163">163</th><td>    }</td></tr>
+<tr><th id="164">164</th><td>    <b>if</b> (<a class="local col7 ref" href="#27stop_bits" title='stop_bits' data-ref="27stop_bits">stop_bits</a> == <var>2</var>) {</td></tr>
+<tr><th id="165">165</th><td>        <a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>.<a class="ref" href="../../include/x86_64-linux-gnu/bits/termios.h.html#termios::c_cflag" title='termios::c_cflag' data-ref="termios::c_cflag">c_cflag</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#146" title="0000100" data-ref="_M/CSTOPB">CSTOPB</a>;</td></tr>
+<tr><th id="166">166</th><td>    }</td></tr>
+<tr><th id="167">167</th><td></td></tr>
+<tr><th id="168">168</th><td>    <a class="ref" href="../../include/termios.h.html#tcsetattr" title='tcsetattr' data-ref="tcsetattr">tcsetattr</a>(<a class="local col3 ref" href="#23fd" title='fd' data-ref="23fd">fd</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/termios.h.html#213" title="0" data-ref="_M/TCSANOW">TCSANOW</a>, &amp;<a class="local col8 ref" href="#28tty" title='tty' data-ref="28tty">tty</a>);</td></tr>
+<tr><th id="169">169</th><td>}</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="tty_serial_ioctl" title='tty_serial_ioctl' data-type='int tty_serial_ioctl(Chardev * chr, int cmd, void * arg)' data-ref="tty_serial_ioctl">tty_serial_ioctl</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col0 decl" id="30chr" title='chr' data-type='Chardev *' data-ref="30chr">chr</dfn>, <em>int</em> <dfn class="local col1 decl" id="31cmd" title='cmd' data-type='int' data-ref="31cmd">cmd</dfn>, <em>void</em> *<dfn class="local col2 decl" id="32arg" title='arg' data-type='void *' data-ref="32arg">arg</dfn>)</td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>    <a class="typedef" href="../include/chardev/char-fd.h.html#FDChardev" title='FDChardev' data-type='struct FDChardev' data-ref="FDChardev">FDChardev</a> *<dfn class="local col3 decl" id="33s" title='s' data-type='FDChardev *' data-ref="33s">s</dfn> = <a class="macro" href="../include/chardev/char-fd.h.html#39" title="((FDChardev *)object_dynamic_cast_assert(((Object *)((chr))), (&quot;chardev-fd&quot;), &quot;/home/jon/workspace/qemu/chardev/char-serial.c&quot;, 173, __func__))" data-ref="_M/FD_CHARDEV">FD_CHARDEV</a>(<a class="local col0 ref" href="#30chr" title='chr' data-ref="30chr">chr</a>);</td></tr>
+<tr><th id="174">174</th><td>    <a class="typedef" href="../include/io/channel-file.h.html#QIOChannelFile" title='QIOChannelFile' data-type='struct QIOChannelFile' data-ref="QIOChannelFile">QIOChannelFile</a> *<dfn class="local col4 decl" id="34fioc" title='fioc' data-type='QIOChannelFile *' data-ref="34fioc">fioc</dfn> = <a class="macro" href="../include/io/channel-file.h.html#27" title="((QIOChannelFile *)object_dynamic_cast_assert(((Object *)((s-&gt;ioc_in))), (&quot;qio-channel-file&quot;), &quot;/home/jon/workspace/qemu/chardev/char-serial.c&quot;, 174, __func__))" data-ref="_M/QIO_CHANNEL_FILE">QIO_CHANNEL_FILE</a>(<a class="local col3 ref" href="#33s" title='s' data-ref="33s">s</a>-&gt;<a class="ref" href="../include/chardev/char-fd.h.html#FDChardev::ioc_in" title='FDChardev::ioc_in' data-ref="FDChardev::ioc_in">ioc_in</a>);</td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td>    <b>switch</b> (<a class="local col1 ref" href="#31cmd" title='cmd' data-ref="31cmd">cmd</a>) {</td></tr>
+<tr><th id="177">177</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-serial.h.html#29" title="1" data-ref="_M/CHR_IOCTL_SERIAL_SET_PARAMS">CHR_IOCTL_SERIAL_SET_PARAMS</a>:</td></tr>
+<tr><th id="178">178</th><td>        {</td></tr>
+<tr><th id="179">179</th><td>            <a class="typedef" href="../include/chardev/char-serial.h.html#QEMUSerialSetParams" title='QEMUSerialSetParams' data-type='struct QEMUSerialSetParams' data-ref="QEMUSerialSetParams">QEMUSerialSetParams</a> *<dfn class="local col5 decl" id="35ssp" title='ssp' data-type='QEMUSerialSetParams *' data-ref="35ssp">ssp</dfn> = <a class="local col2 ref" href="#32arg" title='arg' data-ref="32arg">arg</a>;</td></tr>
+<tr><th id="180">180</th><td>            <a class="tu ref" href="#tty_serial_init" title='tty_serial_init' data-use='c' data-ref="tty_serial_init">tty_serial_init</a>(<a class="local col4 ref" href="#34fioc" title='fioc' data-ref="34fioc">fioc</a>-&gt;<a class="ref" href="../include/io/channel-file.h.html#QIOChannelFile::fd" title='QIOChannelFile::fd' data-ref="QIOChannelFile::fd">fd</a>,</td></tr>
+<tr><th id="181">181</th><td>                            <a class="local col5 ref" href="#35ssp" title='ssp' data-ref="35ssp">ssp</a>-&gt;<a class="ref" href="../include/chardev/char-serial.h.html#(anonymous)::speed" title='(anonymous struct)::speed' data-ref="(anonymous)::speed">speed</a>, <a class="local col5 ref" href="#35ssp" title='ssp' data-ref="35ssp">ssp</a>-&gt;<a class="ref" href="../include/chardev/char-serial.h.html#(anonymous)::parity" title='(anonymous struct)::parity' data-ref="(anonymous)::parity">parity</a>,</td></tr>
+<tr><th id="182">182</th><td>                            <a class="local col5 ref" href="#35ssp" title='ssp' data-ref="35ssp">ssp</a>-&gt;<a class="ref" href="../include/chardev/char-serial.h.html#(anonymous)::data_bits" title='(anonymous struct)::data_bits' data-ref="(anonymous)::data_bits">data_bits</a>, <a class="local col5 ref" href="#35ssp" title='ssp' data-ref="35ssp">ssp</a>-&gt;<a class="ref" href="../include/chardev/char-serial.h.html#(anonymous)::stop_bits" title='(anonymous struct)::stop_bits' data-ref="(anonymous)::stop_bits">stop_bits</a>);</td></tr>
+<tr><th id="183">183</th><td>        }</td></tr>
+<tr><th id="184">184</th><td>        <b>break</b>;</td></tr>
+<tr><th id="185">185</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-serial.h.html#37" title="2" data-ref="_M/CHR_IOCTL_SERIAL_SET_BREAK">CHR_IOCTL_SERIAL_SET_BREAK</a>:</td></tr>
+<tr><th id="186">186</th><td>        {</td></tr>
+<tr><th id="187">187</th><td>            <em>int</em> <dfn class="local col6 decl" id="36enable" title='enable' data-type='int' data-ref="36enable">enable</dfn> = *(<em>int</em> *)<a class="local col2 ref" href="#32arg" title='arg' data-ref="32arg">arg</a>;</td></tr>
+<tr><th id="188">188</th><td>            <b>if</b> (<a class="local col6 ref" href="#36enable" title='enable' data-ref="36enable">enable</a>) {</td></tr>
+<tr><th id="189">189</th><td>                <a class="ref" href="../../include/termios.h.html#tcsendbreak" title='tcsendbreak' data-ref="tcsendbreak">tcsendbreak</a>(<a class="local col4 ref" href="#34fioc" title='fioc' data-ref="34fioc">fioc</a>-&gt;<a class="ref" href="../include/io/channel-file.h.html#QIOChannelFile::fd" title='QIOChannelFile::fd' data-ref="QIOChannelFile::fd">fd</a>, <var>1</var>);</td></tr>
+<tr><th id="190">190</th><td>            }</td></tr>
+<tr><th id="191">191</th><td>        }</td></tr>
+<tr><th id="192">192</th><td>        <b>break</b>;</td></tr>
+<tr><th id="193">193</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-serial.h.html#40" title="14" data-ref="_M/CHR_IOCTL_SERIAL_GET_TIOCM">CHR_IOCTL_SERIAL_GET_TIOCM</a>:</td></tr>
+<tr><th id="194">194</th><td>        {</td></tr>
+<tr><th id="195">195</th><td>            <em>int</em> <dfn class="local col7 decl" id="37sarg" title='sarg' data-type='int' data-ref="37sarg">sarg</dfn> = <var>0</var>;</td></tr>
+<tr><th id="196">196</th><td>            <em>int</em> *<dfn class="local col8 decl" id="38targ" title='targ' data-type='int *' data-ref="38targ">targ</dfn> = (<em>int</em> *)<a class="local col2 ref" href="#32arg" title='arg' data-ref="32arg">arg</a>;</td></tr>
+<tr><th id="197">197</th><td>            <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col4 ref" href="#34fioc" title='fioc' data-ref="34fioc">fioc</a>-&gt;<a class="ref" href="../include/io/channel-file.h.html#QIOChannelFile::fd" title='QIOChannelFile::fd' data-ref="QIOChannelFile::fd">fd</a>, <a class="macro" href="../../include/asm-generic/ioctls.h.html#39" title="0x5415" data-ref="_M/TIOCMGET">TIOCMGET</a>, &amp;<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a>);</td></tr>
+<tr><th id="198">198</th><td>            *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> = <var>0</var>;</td></tr>
+<tr><th id="199">199</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#52" title="0x020" data-ref="_M/TIOCM_CTS">TIOCM_CTS</a>) {</td></tr>
+<tr><th id="200">200</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#42" title="0x020" data-ref="_M/CHR_TIOCM_CTS">CHR_TIOCM_CTS</a>;</td></tr>
+<tr><th id="201">201</th><td>            }</td></tr>
+<tr><th id="202">202</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#53" title="0x040" data-ref="_M/TIOCM_CAR">TIOCM_CAR</a>) {</td></tr>
+<tr><th id="203">203</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#43" title="0x040" data-ref="_M/CHR_TIOCM_CAR">CHR_TIOCM_CAR</a>;</td></tr>
+<tr><th id="204">204</th><td>            }</td></tr>
+<tr><th id="205">205</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#55" title="0x100" data-ref="_M/TIOCM_DSR">TIOCM_DSR</a>) {</td></tr>
+<tr><th id="206">206</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#44" title="0x100" data-ref="_M/CHR_TIOCM_DSR">CHR_TIOCM_DSR</a>;</td></tr>
+<tr><th id="207">207</th><td>            }</td></tr>
+<tr><th id="208">208</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#57" title="0x080" data-ref="_M/TIOCM_RI">TIOCM_RI</a>) {</td></tr>
+<tr><th id="209">209</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#45" title="0x080" data-ref="_M/CHR_TIOCM_RI">CHR_TIOCM_RI</a>;</td></tr>
+<tr><th id="210">210</th><td>            }</td></tr>
+<tr><th id="211">211</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#48" title="0x002" data-ref="_M/TIOCM_DTR">TIOCM_DTR</a>) {</td></tr>
+<tr><th id="212">212</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#46" title="0x002" data-ref="_M/CHR_TIOCM_DTR">CHR_TIOCM_DTR</a>;</td></tr>
+<tr><th id="213">213</th><td>            }</td></tr>
+<tr><th id="214">214</th><td>            <b>if</b> (<a class="local col7 ref" href="#37sarg" title='sarg' data-ref="37sarg">sarg</a> &amp; <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#49" title="0x004" data-ref="_M/TIOCM_RTS">TIOCM_RTS</a>) {</td></tr>
+<tr><th id="215">215</th><td>                *<a class="local col8 ref" href="#38targ" title='targ' data-ref="38targ">targ</a> |= <a class="macro" href="../include/chardev/char-serial.h.html#47" title="0x004" data-ref="_M/CHR_TIOCM_RTS">CHR_TIOCM_RTS</a>;</td></tr>
+<tr><th id="216">216</th><td>            }</td></tr>
+<tr><th id="217">217</th><td>        }</td></tr>
+<tr><th id="218">218</th><td>        <b>break</b>;</td></tr>
+<tr><th id="219">219</th><td>    <b>case</b> <a class="macro" href="../include/chardev/char-serial.h.html#39" title="13" data-ref="_M/CHR_IOCTL_SERIAL_SET_TIOCM">CHR_IOCTL_SERIAL_SET_TIOCM</a>:</td></tr>
+<tr><th id="220">220</th><td>        {</td></tr>
+<tr><th id="221">221</th><td>            <em>int</em> <dfn class="local col9 decl" id="39sarg" title='sarg' data-type='int' data-ref="39sarg">sarg</dfn> = *(<em>int</em> *)<a class="local col2 ref" href="#32arg" title='arg' data-ref="32arg">arg</a>;</td></tr>
+<tr><th id="222">222</th><td>            <em>int</em> <dfn class="local col0 decl" id="40targ" title='targ' data-type='int' data-ref="40targ">targ</dfn> = <var>0</var>;</td></tr>
+<tr><th id="223">223</th><td>            <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col4 ref" href="#34fioc" title='fioc' data-ref="34fioc">fioc</a>-&gt;<a class="ref" href="../include/io/channel-file.h.html#QIOChannelFile::fd" title='QIOChannelFile::fd' data-ref="QIOChannelFile::fd">fd</a>, <a class="macro" href="../../include/asm-generic/ioctls.h.html#39" title="0x5415" data-ref="_M/TIOCMGET">TIOCMGET</a>, &amp;<a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a>);</td></tr>
+<tr><th id="224">224</th><td>            <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> &amp;= ~(<a class="macro" href="../include/chardev/char-serial.h.html#42" title="0x020" data-ref="_M/CHR_TIOCM_CTS">CHR_TIOCM_CTS</a> | <a class="macro" href="../include/chardev/char-serial.h.html#43" title="0x040" data-ref="_M/CHR_TIOCM_CAR">CHR_TIOCM_CAR</a> | <a class="macro" href="../include/chardev/char-serial.h.html#44" title="0x100" data-ref="_M/CHR_TIOCM_DSR">CHR_TIOCM_DSR</a></td></tr>
+<tr><th id="225">225</th><td>                     | <a class="macro" href="../include/chardev/char-serial.h.html#45" title="0x080" data-ref="_M/CHR_TIOCM_RI">CHR_TIOCM_RI</a> | <a class="macro" href="../include/chardev/char-serial.h.html#46" title="0x002" data-ref="_M/CHR_TIOCM_DTR">CHR_TIOCM_DTR</a> | <a class="macro" href="../include/chardev/char-serial.h.html#47" title="0x004" data-ref="_M/CHR_TIOCM_RTS">CHR_TIOCM_RTS</a>);</td></tr>
+<tr><th id="226">226</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#42" title="0x020" data-ref="_M/CHR_TIOCM_CTS">CHR_TIOCM_CTS</a>) {</td></tr>
+<tr><th id="227">227</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#52" title="0x020" data-ref="_M/TIOCM_CTS">TIOCM_CTS</a>;</td></tr>
+<tr><th id="228">228</th><td>            }</td></tr>
+<tr><th id="229">229</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#43" title="0x040" data-ref="_M/CHR_TIOCM_CAR">CHR_TIOCM_CAR</a>) {</td></tr>
+<tr><th id="230">230</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#53" title="0x040" data-ref="_M/TIOCM_CAR">TIOCM_CAR</a>;</td></tr>
+<tr><th id="231">231</th><td>            }</td></tr>
+<tr><th id="232">232</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#44" title="0x100" data-ref="_M/CHR_TIOCM_DSR">CHR_TIOCM_DSR</a>) {</td></tr>
+<tr><th id="233">233</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#55" title="0x100" data-ref="_M/TIOCM_DSR">TIOCM_DSR</a>;</td></tr>
+<tr><th id="234">234</th><td>            }</td></tr>
+<tr><th id="235">235</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#45" title="0x080" data-ref="_M/CHR_TIOCM_RI">CHR_TIOCM_RI</a>) {</td></tr>
+<tr><th id="236">236</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#57" title="0x080" data-ref="_M/TIOCM_RI">TIOCM_RI</a>;</td></tr>
+<tr><th id="237">237</th><td>            }</td></tr>
+<tr><th id="238">238</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#46" title="0x002" data-ref="_M/CHR_TIOCM_DTR">CHR_TIOCM_DTR</a>) {</td></tr>
+<tr><th id="239">239</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#48" title="0x002" data-ref="_M/TIOCM_DTR">TIOCM_DTR</a>;</td></tr>
+<tr><th id="240">240</th><td>            }</td></tr>
+<tr><th id="241">241</th><td>            <b>if</b> (<a class="local col9 ref" href="#39sarg" title='sarg' data-ref="39sarg">sarg</a> &amp; <a class="macro" href="../include/chardev/char-serial.h.html#47" title="0x004" data-ref="_M/CHR_TIOCM_RTS">CHR_TIOCM_RTS</a>) {</td></tr>
+<tr><th id="242">242</th><td>                <a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a> |= <a class="macro" href="../../include/x86_64-linux-gnu/bits/ioctl-types.h.html#49" title="0x004" data-ref="_M/TIOCM_RTS">TIOCM_RTS</a>;</td></tr>
+<tr><th id="243">243</th><td>            }</td></tr>
+<tr><th id="244">244</th><td>            <a class="ref" href="../../include/x86_64-linux-gnu/sys/ioctl.h.html#ioctl" title='ioctl' data-ref="ioctl">ioctl</a>(<a class="local col4 ref" href="#34fioc" title='fioc' data-ref="34fioc">fioc</a>-&gt;<a class="ref" href="../include/io/channel-file.h.html#QIOChannelFile::fd" title='QIOChannelFile::fd' data-ref="QIOChannelFile::fd">fd</a>, <a class="macro" href="../../include/asm-generic/ioctls.h.html#42" title="0x5418" data-ref="_M/TIOCMSET">TIOCMSET</a>, &amp;<a class="local col0 ref" href="#40targ" title='targ' data-ref="40targ">targ</a>);</td></tr>
+<tr><th id="245">245</th><td>        }</td></tr>
+<tr><th id="246">246</th><td>        <b>break</b>;</td></tr>
+<tr><th id="247">247</th><td>    <b>default</b>:</td></tr>
+<tr><th id="248">248</th><td>        <b>return</b> -<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#27" title="95" data-ref="_M/ENOTSUP">ENOTSUP</a>;</td></tr>
+<tr><th id="249">249</th><td>    }</td></tr>
+<tr><th id="250">250</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="251">251</th><td>}</td></tr>
+<tr><th id="252">252</th><td></td></tr>
+<tr><th id="253">253</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qmp_chardev_open_serial" title='qmp_chardev_open_serial' data-type='void qmp_chardev_open_serial(Chardev * chr, ChardevBackend * backend, _Bool * be_opened, Error ** errp)' data-ref="qmp_chardev_open_serial">qmp_chardev_open_serial</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col1 decl" id="41chr" title='chr' data-type='Chardev *' data-ref="41chr">chr</dfn>,</td></tr>
+<tr><th id="254">254</th><td>                                    <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col2 decl" id="42backend" title='backend' data-type='ChardevBackend *' data-ref="42backend">backend</dfn>,</td></tr>
+<tr><th id="255">255</th><td>                                    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> *<dfn class="local col3 decl" id="43be_opened" title='be_opened' data-type='_Bool *' data-ref="43be_opened">be_opened</dfn>,</td></tr>
+<tr><th id="256">256</th><td>                                    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col4 decl" id="44errp" title='errp' data-type='Error **' data-ref="44errp">errp</dfn>)</td></tr>
+<tr><th id="257">257</th><td>{</td></tr>
+<tr><th id="258">258</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a> *<dfn class="local col5 decl" id="45serial" title='serial' data-type='ChardevHostdev *' data-ref="45serial">serial</dfn> = <a class="local col2 ref" href="#42backend" title='backend' data-ref="42backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::serial" title='ChardevBackend::(anonymous union)::serial' data-ref="ChardevBackend::(anonymous)::serial">serial</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevHostdev_wrapper::data" title='q_obj_ChardevHostdev_wrapper::data' data-ref="q_obj_ChardevHostdev_wrapper::data">data</a>;</td></tr>
+<tr><th id="259">259</th><td>    <em>int</em> <dfn class="local col6 decl" id="46fd" title='fd' data-type='int' data-ref="46fd">fd</dfn>;</td></tr>
+<tr><th id="260">260</th><td></td></tr>
+<tr><th id="261">261</th><td>    <a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a> = <a class="ref" href="../include/chardev/char-fd.h.html#qmp_chardev_open_file_source" title='qmp_chardev_open_file_source' data-ref="qmp_chardev_open_file_source">qmp_chardev_open_file_source</a>(<a class="local col5 ref" href="#45serial" title='serial' data-ref="45serial">serial</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevHostdev::device" title='ChardevHostdev::device' data-ref="ChardevHostdev::device">device</a>, <a class="macro" href="../../include/x86_64-linux-gnu/bits/fcntl-linux.h.html#45" title="02" data-ref="_M/O_RDWR">O_RDWR</a>, <a class="local col4 ref" href="#44errp" title='errp' data-ref="44errp">errp</a>);</td></tr>
+<tr><th id="262">262</th><td>    <b>if</b> (<a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="263">263</th><td>        <b>return</b>;</td></tr>
+<tr><th id="264">264</th><td>    }</td></tr>
+<tr><th id="265">265</th><td>    <a class="ref" href="../include/qemu/sockets.h.html#qemu_set_nonblock" title='qemu_set_nonblock' data-ref="qemu_set_nonblock">qemu_set_nonblock</a>(<a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a>);</td></tr>
+<tr><th id="266">266</th><td>    <a class="tu ref" href="#tty_serial_init" title='tty_serial_init' data-use='c' data-ref="tty_serial_init">tty_serial_init</a>(<a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a>, <var>115200</var>, <kbd>'N'</kbd>, <var>8</var>, <var>1</var>);</td></tr>
+<tr><th id="267">267</th><td></td></tr>
+<tr><th id="268">268</th><td>    <a class="ref" href="../include/chardev/char-fd.h.html#qemu_chr_open_fd" title='qemu_chr_open_fd' data-ref="qemu_chr_open_fd">qemu_chr_open_fd</a>(<a class="local col1 ref" href="#41chr" title='chr' data-ref="41chr">chr</a>, <a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a>, <a class="local col6 ref" href="#46fd" title='fd' data-ref="46fd">fd</a>);</td></tr>
+<tr><th id="269">269</th><td>}</td></tr>
+<tr><th id="270">270</th><td><u>#<span data-ppcond="39">endif</span> /* __linux__ || __sun__ */</u></td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td><u>#<span data-ppcond="272">ifdef</span> <a class="macro" href="../include/qemu/osdep.h.html#292" data-ref="_M/HAVE_CHARDEV_SERIAL">HAVE_CHARDEV_SERIAL</a></u></td></tr>
+<tr><th id="273">273</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="qemu_chr_parse_serial" title='qemu_chr_parse_serial' data-type='void qemu_chr_parse_serial(QemuOpts * opts, ChardevBackend * backend, Error ** errp)' data-ref="qemu_chr_parse_serial">qemu_chr_parse_serial</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col7 decl" id="47opts" title='opts' data-type='QemuOpts *' data-ref="47opts">opts</dfn>, <a class="typedef" href="../qapi-types.h.html#ChardevBackend" title='ChardevBackend' data-type='struct ChardevBackend' data-ref="ChardevBackend">ChardevBackend</a> *<dfn class="local col8 decl" id="48backend" title='backend' data-type='ChardevBackend *' data-ref="48backend">backend</dfn>,</td></tr>
+<tr><th id="274">274</th><td>                                  <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col9 decl" id="49errp" title='errp' data-type='Error **' data-ref="49errp">errp</dfn>)</td></tr>
+<tr><th id="275">275</th><td>{</td></tr>
+<tr><th id="276">276</th><td>    <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="50device" title='device' data-type='const char *' data-ref="50device">device</dfn> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col7 ref" href="#47opts" title='opts' data-ref="47opts">opts</a>, <q>"path"</q>);</td></tr>
+<tr><th id="277">277</th><td>    <a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a> *<dfn class="local col1 decl" id="51serial" title='serial' data-type='ChardevHostdev *' data-ref="51serial">serial</dfn>;</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>    <b>if</b> (<a class="local col0 ref" href="#50device" title='device' data-ref="50device">device</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="280">280</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/chardev/char-serial.c&quot;, 280, __func__, (&quot;chardev: serial/tty: no device path given&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col9 ref" href="#49errp" title='errp' data-ref="49errp">errp</a>, <q>"chardev: serial/tty: no device path given"</q>);</td></tr>
+<tr><th id="281">281</th><td>        <b>return</b>;</td></tr>
+<tr><th id="282">282</th><td>    }</td></tr>
+<tr><th id="283">283</th><td>    <a class="local col8 ref" href="#48backend" title='backend' data-ref="48backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::type" title='ChardevBackend::type' data-ref="ChardevBackend::type">type</a> = <a class="enum" href="../qapi-types.h.html#ChardevBackendKind::CHARDEV_BACKEND_KIND_SERIAL" title='ChardevBackendKind::CHARDEV_BACKEND_KIND_SERIAL' data-ref="ChardevBackendKind::CHARDEV_BACKEND_KIND_SERIAL">CHARDEV_BACKEND_KIND_SERIAL</a>;</td></tr>
+<tr><th id="284">284</th><td>    <a class="local col1 ref" href="#51serial" title='serial' data-ref="51serial">serial</a> = <a class="local col8 ref" href="#48backend" title='backend' data-ref="48backend">backend</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevBackend::u" title='ChardevBackend::u' data-ref="ChardevBackend::u">u</a>.<a class="ref" href="../qapi-types.h.html#ChardevBackend::(anonymous)::serial" title='ChardevBackend::(anonymous union)::serial' data-ref="ChardevBackend::(anonymous)::serial">serial</a>.<a class="ref" href="../qapi-types.h.html#q_obj_ChardevHostdev_wrapper::data" title='q_obj_ChardevHostdev_wrapper::data' data-ref="q_obj_ChardevHostdev_wrapper::data">data</a> = <a class="macro" href="../../include/glib-2.0/glib/gmem.h.html#278" title="((ChardevHostdev *) g_malloc0_n ((1), sizeof (ChardevHostdev)))" data-ref="_M/g_new0">g_new0</a>(<a class="typedef" href="../qapi-types.h.html#ChardevHostdev" title='ChardevHostdev' data-type='struct ChardevHostdev' data-ref="ChardevHostdev">ChardevHostdev</a>, <var>1</var>);</td></tr>
+<tr><th id="285">285</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_parse_common" title='qemu_chr_parse_common' data-ref="qemu_chr_parse_common">qemu_chr_parse_common</a>(<a class="local col7 ref" href="#47opts" title='opts' data-ref="47opts">opts</a>, <a class="ref" href="../qapi-types.h.html#qapi_ChardevHostdev_base" title='qapi_ChardevHostdev_base' data-ref="qapi_ChardevHostdev_base">qapi_ChardevHostdev_base</a>(<a class="local col1 ref" href="#51serial" title='serial' data-ref="51serial">serial</a>));</td></tr>
+<tr><th id="286">286</th><td>    <a class="local col1 ref" href="#51serial" title='serial' data-ref="51serial">serial</a>-&gt;<a class="ref" href="../qapi-types.h.html#ChardevHostdev::device" title='ChardevHostdev::device' data-ref="ChardevHostdev::device">device</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col0 ref" href="#50device" title='device' data-ref="50device">device</a>);</td></tr>
+<tr><th id="287">287</th><td>}</td></tr>
+<tr><th id="288">288</th><td></td></tr>
+<tr><th id="289">289</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="char_serial_class_init" title='char_serial_class_init' data-type='void char_serial_class_init(ObjectClass * oc, void * data)' data-ref="char_serial_class_init">char_serial_class_init</dfn>(<a class="typedef" href="../include/qom/object.h.html#ObjectClass" title='ObjectClass' data-type='struct ObjectClass' data-ref="ObjectClass">ObjectClass</a> *<dfn class="local col2 decl" id="52oc" title='oc' data-type='ObjectClass *' data-ref="52oc">oc</dfn>, <em>void</em> *<dfn class="local col3 decl" id="53data" title='data' data-type='void *' data-ref="53data">data</dfn>)</td></tr>
+<tr><th id="290">290</th><td>{</td></tr>
+<tr><th id="291">291</th><td>    <a class="typedef" href="../include/chardev/char.h.html#ChardevClass" title='ChardevClass' data-type='struct ChardevClass' data-ref="ChardevClass">ChardevClass</a> *<dfn class="local col4 decl" id="54cc" title='cc' data-type='ChardevClass *' data-ref="54cc">cc</dfn> = <a class="macro" href="../include/chardev/char.h.html#192" title="((ChardevClass *)object_class_dynamic_cast_assert(((ObjectClass *)((oc))), (&quot;chardev&quot;), &quot;/home/jon/workspace/qemu/chardev/char-serial.c&quot;, 291, __func__))" data-ref="_M/CHARDEV_CLASS">CHARDEV_CLASS</a>(<a class="local col2 ref" href="#52oc" title='oc' data-ref="52oc">oc</a>);</td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td>    <a class="local col4 ref" href="#54cc" title='cc' data-ref="54cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::parse" title='ChardevClass::parse' data-ref="ChardevClass::parse">parse</a> = <a class="tu ref" href="#qemu_chr_parse_serial" title='qemu_chr_parse_serial' data-use='r' data-ref="qemu_chr_parse_serial">qemu_chr_parse_serial</a>;</td></tr>
+<tr><th id="294">294</th><td>    <a class="local col4 ref" href="#54cc" title='cc' data-ref="54cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::open" title='ChardevClass::open' data-ref="ChardevClass::open">open</a> = <a class="tu ref" href="#qmp_chardev_open_serial" title='qmp_chardev_open_serial' data-use='r' data-ref="qmp_chardev_open_serial">qmp_chardev_open_serial</a>;</td></tr>
+<tr><th id="295">295</th><td><u>#<span data-ppcond="295">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="296">296</th><td>    <a class="local col4 ref" href="#54cc" title='cc' data-ref="54cc">cc</a>-&gt;<a class="ref" href="../include/chardev/char.h.html#ChardevClass::chr_ioctl" title='ChardevClass::chr_ioctl' data-ref="ChardevClass::chr_ioctl">chr_ioctl</a> = <a class="tu ref" href="#tty_serial_ioctl" title='tty_serial_ioctl' data-use='r' data-ref="tty_serial_ioctl">tty_serial_ioctl</a>;</td></tr>
+<tr><th id="297">297</th><td><u>#<span data-ppcond="295">endif</span></u></td></tr>
+<tr><th id="298">298</th><td>}</td></tr>
+<tr><th id="299">299</th><td></td></tr>
+<tr><th id="300">300</th><td></td></tr>
+<tr><th id="301">301</th><td><em>static</em> <em>const</em> <a class="typedef" href="../include/qom/object.h.html#TypeInfo" title='TypeInfo' data-type='struct TypeInfo' data-ref="TypeInfo">TypeInfo</a> <dfn class="tu decl def" id="char_serial_type_info" title='char_serial_type_info' data-type='const TypeInfo' data-ref="char_serial_type_info">char_serial_type_info</dfn> = {</td></tr>
+<tr><th id="302">302</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::name" title='TypeInfo::name' data-ref="TypeInfo::name">name</a> = <a class="macro" href="../include/chardev/char.h.html#207" title="&quot;chardev-serial&quot;" data-ref="_M/TYPE_CHARDEV_SERIAL">TYPE_CHARDEV_SERIAL</a>,</td></tr>
+<tr><th id="303">303</th><td><u>#<span data-ppcond="303">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="304">304</th><td>    .parent = TYPE_CHARDEV_WIN,</td></tr>
+<tr><th id="305">305</th><td><u>#<span data-ppcond="303">else</span></u></td></tr>
+<tr><th id="306">306</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::parent" title='TypeInfo::parent' data-ref="TypeInfo::parent">parent</a> = <a class="macro" href="../include/chardev/char-fd.h.html#37" title="&quot;chardev-fd&quot;" data-ref="_M/TYPE_CHARDEV_FD">TYPE_CHARDEV_FD</a>,</td></tr>
+<tr><th id="307">307</th><td><u>#<span data-ppcond="303">endif</span></u></td></tr>
+<tr><th id="308">308</th><td>    .<a class="ref" href="../include/qom/object.h.html#TypeInfo::class_init" title='TypeInfo::class_init' data-ref="TypeInfo::class_init">class_init</a> = <a class="tu ref" href="#char_serial_class_init" title='char_serial_class_init' data-use='r' data-ref="char_serial_class_init">char_serial_class_init</a>,</td></tr>
+<tr><th id="309">309</th><td>};</td></tr>
+<tr><th id="310">310</th><td></td></tr>
+<tr><th id="311">311</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="register_types" title='register_types' data-type='void register_types()' data-ref="register_types">register_types</dfn>(<em>void</em>)</td></tr>
+<tr><th id="312">312</th><td>{</td></tr>
+<tr><th id="313">313</th><td>    <a class="ref" href="../include/qom/object.h.html#type_register_static" title='type_register_static' data-ref="type_register_static">type_register_static</a>(&amp;<a class="tu ref" href="#char_serial_type_info" title='char_serial_type_info' data-use='a' data-ref="char_serial_type_info">char_serial_type_info</a>);</td></tr>
+<tr><th id="314">314</th><td>}</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td><a class="macro" href="../include/qemu/module.h.html#52" title="static void __attribute__((constructor)) do_qemu_init_register_types(void) { register_module_init(register_types, MODULE_INIT_QOM); }" data-ref="_M/type_init">type_init</a>(<a class="tu ref" href="#register_types" title='register_types' data-use='r' data-ref="register_types">register_types</a>);</td></tr>
+<tr><th id="317">317</th><td></td></tr>
+<tr><th id="318">318</th><td><u>#<span data-ppcond="272">endif</span></u></td></tr>
+<tr><th id="319">319</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

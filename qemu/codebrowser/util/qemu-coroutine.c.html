@@ -1,0 +1,196 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>qemu-coroutine.c source code [codebrowser/util/qemu-coroutine.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/util/qemu-coroutine.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>util</a>/<a href='qemu-coroutine.c.html'>qemu-coroutine.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU coroutines</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright IBM, Corp. 2011</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Hajnoczi    &lt;stefanha@linux.vnet.ibm.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *  Kevin Wolf         &lt;kwolf@redhat.com&gt;</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> * This work is licensed under the terms of the GNU LGPL, version 2 or later.</i></td></tr>
+<tr><th id="11">11</th><td><i> * See the COPYING.LIB file in the top-level directory.</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> */</i></td></tr>
+<tr><th id="14">14</th><td></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="trace.h.html">"trace.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../include/qemu/atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/qemu/coroutine.h.html">"qemu/coroutine.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/qemu/coroutine_int.h.html">"qemu/coroutine_int.h"</a></u></td></tr>
+<tr><th id="22">22</th><td><u>#include <a href="../include/block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><b>enum</b> {</td></tr>
+<tr><th id="25">25</th><td>    <dfn class="enum" id="POOL_BATCH_SIZE" title='POOL_BATCH_SIZE' data-ref="POOL_BATCH_SIZE">POOL_BATCH_SIZE</dfn> = <var>64</var>,</td></tr>
+<tr><th id="26">26</th><td>};</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i class="doc" data-doc="release_pool">/** Free list to speed up creation */</i></td></tr>
+<tr><th id="29">29</th><td><em>static</em> <a class="macro" href="../include/qemu/queue.h.html#170" title="struct { struct Coroutine *slh_first; }" data-ref="_M/QSLIST_HEAD">QSLIST_HEAD</a>(, <a class="type" href="../include/qemu/coroutine_int.h.html#Coroutine" title='Coroutine' data-ref="Coroutine">Coroutine</a>) <dfn class="tu decl def" id="release_pool" title='release_pool' data-type='struct (anonymous struct at /home/jon/workspace/qemu/util/qemu-coroutine.c:29:8)' data-ref="release_pool">release_pool</dfn> = <a class="macro" href="../include/qemu/queue.h.html#175" title="{ ((void*)0) }" data-ref="_M/QSLIST_HEAD_INITIALIZER">QSLIST_HEAD_INITIALIZER</a>(pool);</td></tr>
+<tr><th id="30">30</th><td><em>static</em> <em>unsigned</em> <em>int</em> <dfn class="tu decl def" id="release_pool_size" title='release_pool_size' data-type='unsigned int' data-ref="release_pool_size">release_pool_size</dfn>;</td></tr>
+<tr><th id="31">31</th><td><em>static</em> <b>__thread</b> <a class="macro" href="../include/qemu/queue.h.html#170" title="struct { struct Coroutine *slh_first; }" data-ref="_M/QSLIST_HEAD">QSLIST_HEAD</a>(, <a class="type" href="../include/qemu/coroutine_int.h.html#Coroutine" title='Coroutine' data-ref="Coroutine">Coroutine</a>) <dfn class="tu decl def" id="alloc_pool" title='alloc_pool' data-type='struct (anonymous struct at /home/jon/workspace/qemu/util/qemu-coroutine.c:31:17)' data-ref="alloc_pool">alloc_pool</dfn> = <a class="macro" href="../include/qemu/queue.h.html#175" title="{ ((void*)0) }" data-ref="_M/QSLIST_HEAD_INITIALIZER">QSLIST_HEAD_INITIALIZER</a>(pool);</td></tr>
+<tr><th id="32">32</th><td><em>static</em> <b>__thread</b> <em>unsigned</em> <em>int</em> <dfn class="tu decl def" id="alloc_pool_size" title='alloc_pool_size' data-type='unsigned int' data-ref="alloc_pool_size">alloc_pool_size</dfn>;</td></tr>
+<tr><th id="33">33</th><td><em>static</em> <b>__thread</b> <a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> <dfn class="tu decl def" id="coroutine_pool_cleanup_notifier" title='coroutine_pool_cleanup_notifier' data-type='Notifier' data-ref="coroutine_pool_cleanup_notifier">coroutine_pool_cleanup_notifier</dfn>;</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="coroutine_pool_cleanup" title='coroutine_pool_cleanup' data-type='void coroutine_pool_cleanup(Notifier * n, void * value)' data-ref="coroutine_pool_cleanup">coroutine_pool_cleanup</dfn>(<a class="typedef" href="../include/qemu/notify.h.html#Notifier" title='Notifier' data-type='struct Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col1 decl" id="1n" title='n' data-type='Notifier *' data-ref="1n">n</dfn>, <em>void</em> *<dfn class="local col2 decl" id="2value" title='value' data-type='void *' data-ref="2value">value</dfn>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col3 decl" id="3co" title='co' data-type='Coroutine *' data-ref="3co">co</dfn>;</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col4 decl" id="4tmp" title='tmp' data-type='Coroutine *' data-ref="4tmp">tmp</dfn>;</td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td>    <a class="macro" href="../include/qemu/queue.h.html#224" title="for ((co) = (((&amp;alloc_pool))-&gt;slh_first); (co) &amp;&amp; ((tmp) = (((co))-&gt;pool_next.sle_next), 1); (co) = (tmp))" data-ref="_M/QSLIST_FOREACH_SAFE">QSLIST_FOREACH_SAFE</a>(<a class="local col3 ref" href="#3co" title='co' data-ref="3co">co</a>, &amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>, <a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::pool_next" title='Coroutine::pool_next' data-ref="Coroutine::pool_next">pool_next</a>, <a class="local col4 ref" href="#4tmp" title='tmp' data-ref="4tmp">tmp</a>) {</td></tr>
+<tr><th id="41">41</th><td>        <a class="macro" href="../include/qemu/queue.h.html#212" title="do { (&amp;alloc_pool)-&gt;slh_first = (&amp;alloc_pool)-&gt;slh_first-&gt;pool_next.sle_next; } while ( 0)" data-ref="_M/QSLIST_REMOVE_HEAD">QSLIST_REMOVE_HEAD</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>, <a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::pool_next" title='Coroutine::pool_next' data-ref="Coroutine::pool_next">pool_next</a>);</td></tr>
+<tr><th id="42">42</th><td>        <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_coroutine_delete" title='qemu_coroutine_delete' data-ref="qemu_coroutine_delete">qemu_coroutine_delete</a>(<a class="local col3 ref" href="#3co" title='co' data-ref="3co">co</a>);</td></tr>
+<tr><th id="43">43</th><td>    }</td></tr>
+<tr><th id="44">44</th><td>}</td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="decl def" id="qemu_coroutine_create" title='qemu_coroutine_create' data-ref="qemu_coroutine_create">qemu_coroutine_create</dfn>(<a class="typedef" href="../include/qemu/coroutine.h.html#CoroutineEntry" title='CoroutineEntry' data-type='void (void *)' data-ref="CoroutineEntry">CoroutineEntry</a> *<dfn class="local col5 decl" id="5entry" title='entry' data-type='CoroutineEntry *' data-ref="5entry">entry</dfn>, <em>void</em> *<dfn class="local col6 decl" id="6opaque" title='opaque' data-type='void *' data-ref="6opaque">opaque</dfn>)</td></tr>
+<tr><th id="47">47</th><td>{</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col7 decl" id="7co" title='co' data-type='Coroutine *' data-ref="7co">co</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td>    <b>if</b> (<a class="macro" href="../config-host.h.html#75" title="1" data-ref="_M/CONFIG_COROUTINE_POOL">CONFIG_COROUTINE_POOL</a>) {</td></tr>
+<tr><th id="51">51</th><td>        <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a> = <a class="macro" href="../include/qemu/queue.h.html#233" title="((&amp;alloc_pool)-&gt;slh_first)" data-ref="_M/QSLIST_FIRST">QSLIST_FIRST</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>);</td></tr>
+<tr><th id="52">52</th><td>        <b>if</b> (!<a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>) {</td></tr>
+<tr><th id="53">53</th><td>            <b>if</b> (<a class="tu ref" href="#release_pool_size" title='release_pool_size' data-use='r' data-ref="release_pool_size">release_pool_size</a> &gt; <a class="enum" href="#POOL_BATCH_SIZE" title='POOL_BATCH_SIZE' data-ref="POOL_BATCH_SIZE">POOL_BATCH_SIZE</a>) {</td></tr>
+<tr><th id="54">54</th><td>                <i>/* Slow path; a good place to register the destructor, too.  */</i></td></tr>
+<tr><th id="55">55</th><td>                <b>if</b> (!<a class="tu ref" href="#coroutine_pool_cleanup_notifier" title='coroutine_pool_cleanup_notifier' data-use='m' data-ref="coroutine_pool_cleanup_notifier">coroutine_pool_cleanup_notifier</a>.<a class="ref" href="../include/qemu/notify.h.html#Notifier::notify" title='Notifier::notify' data-ref="Notifier::notify">notify</a>) {</td></tr>
+<tr><th id="56">56</th><td>                    <a class="tu ref" href="#coroutine_pool_cleanup_notifier" title='coroutine_pool_cleanup_notifier' data-use='m' data-ref="coroutine_pool_cleanup_notifier">coroutine_pool_cleanup_notifier</a>.<a class="ref" href="../include/qemu/notify.h.html#Notifier::notify" title='Notifier::notify' data-ref="Notifier::notify">notify</a> = <a class="tu ref" href="#coroutine_pool_cleanup" title='coroutine_pool_cleanup' data-use='r' data-ref="coroutine_pool_cleanup">coroutine_pool_cleanup</a>;</td></tr>
+<tr><th id="57">57</th><td>                    <a class="ref" href="../include/qemu/thread.h.html#qemu_thread_atexit_add" title='qemu_thread_atexit_add' data-ref="qemu_thread_atexit_add">qemu_thread_atexit_add</a>(&amp;<a class="tu ref" href="#coroutine_pool_cleanup_notifier" title='coroutine_pool_cleanup_notifier' data-use='a' data-ref="coroutine_pool_cleanup_notifier">coroutine_pool_cleanup_notifier</a>);</td></tr>
+<tr><th id="58">58</th><td>                }</td></tr>
+<tr><th id="59">59</th><td></td></tr>
+<tr><th id="60">60</th><td>                <i>/* This is not exact; there could be a little skew between</i></td></tr>
+<tr><th id="61">61</th><td><i>                 * release_pool_size and the actual size of release_pool.  But</i></td></tr>
+<tr><th id="62">62</th><td><i>                 * it is just a heuristic, it does not need to be perfect.</i></td></tr>
+<tr><th id="63">63</th><td><i>                 */</i></td></tr>
+<tr><th id="64">64</th><td>                <a class="tu ref" href="#alloc_pool_size" title='alloc_pool_size' data-use='w' data-ref="alloc_pool_size">alloc_pool_size</a> = <a class="macro" href="../include/qemu/atomic.h.html#182" title="({ _Static_assert(!(sizeof(*&amp;release_pool_size) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;release_pool_size) &gt; ATOMIC_REG_SIZE&quot;); ({ __atomic_exchange_n(&amp;release_pool_size, (0), 5); }); })" data-ref="_M/atomic_xchg">atomic_xchg</a>(&amp;<a class="tu ref" href="#release_pool_size" title='release_pool_size' data-use='a' data-ref="release_pool_size">release_pool_size</a>, <var>0</var>);</td></tr>
+<tr><th id="65">65</th><td>                <a class="macro" href="../include/qemu/queue.h.html#208" title="do { (&amp;alloc_pool)-&gt;slh_first = ({ _Static_assert(!(sizeof(*&amp;(&amp;release_pool)-&gt;slh_first) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;(&amp;release_pool)-&gt;slh_first) &gt; ATOMIC_REG_SIZE&quot;); ({ __atomic_exchange_n(&amp;(&amp;release_pool)-&gt;slh_first, (((void*)0)), 5); }); }); } while ( 0)" data-ref="_M/QSLIST_MOVE_ATOMIC">QSLIST_MOVE_ATOMIC</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>, &amp;<a class="tu ref" href="#release_pool" title='release_pool' data-use='a' data-ref="release_pool">release_pool</a>);</td></tr>
+<tr><th id="66">66</th><td>                <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a> = <a class="macro" href="../include/qemu/queue.h.html#233" title="((&amp;alloc_pool)-&gt;slh_first)" data-ref="_M/QSLIST_FIRST">QSLIST_FIRST</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>);</td></tr>
+<tr><th id="67">67</th><td>            }</td></tr>
+<tr><th id="68">68</th><td>        }</td></tr>
+<tr><th id="69">69</th><td>        <b>if</b> (<a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>) {</td></tr>
+<tr><th id="70">70</th><td>            <a class="macro" href="../include/qemu/queue.h.html#212" title="do { (&amp;alloc_pool)-&gt;slh_first = (&amp;alloc_pool)-&gt;slh_first-&gt;pool_next.sle_next; } while ( 0)" data-ref="_M/QSLIST_REMOVE_HEAD">QSLIST_REMOVE_HEAD</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>, <a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::pool_next" title='Coroutine::pool_next' data-ref="Coroutine::pool_next">pool_next</a>);</td></tr>
+<tr><th id="71">71</th><td>            <a class="tu ref" href="#alloc_pool_size" title='alloc_pool_size' data-use='w' data-ref="alloc_pool_size">alloc_pool_size</a>--;</td></tr>
+<tr><th id="72">72</th><td>        }</td></tr>
+<tr><th id="73">73</th><td>    }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <b>if</b> (!<a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>) {</td></tr>
+<tr><th id="76">76</th><td>        <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a> = <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_coroutine_new" title='qemu_coroutine_new' data-ref="qemu_coroutine_new">qemu_coroutine_new</a>();</td></tr>
+<tr><th id="77">77</th><td>    }</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td>    <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::entry" title='Coroutine::entry' data-ref="Coroutine::entry">entry</a> = <a class="local col5 ref" href="#5entry" title='entry' data-ref="5entry">entry</a>;</td></tr>
+<tr><th id="80">80</th><td>    <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::entry_arg" title='Coroutine::entry_arg' data-ref="Coroutine::entry_arg">entry_arg</a> = <a class="local col6 ref" href="#6opaque" title='opaque' data-ref="6opaque">opaque</a>;</td></tr>
+<tr><th id="81">81</th><td>    <a class="macro" href="../include/qemu/queue.h.html#257" title="do { (&amp;co-&gt;co_queue_wakeup)-&gt;sqh_first = ((void*)0); (&amp;co-&gt;co_queue_wakeup)-&gt;sqh_last = &amp;(&amp;co-&gt;co_queue_wakeup)-&gt;sqh_first; } while ( 0)" data-ref="_M/QSIMPLEQ_INIT">QSIMPLEQ_INIT</a>(&amp;<a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::co_queue_wakeup" title='Coroutine::co_queue_wakeup' data-ref="Coroutine::co_queue_wakeup">co_queue_wakeup</a>);</td></tr>
+<tr><th id="82">82</th><td>    <b>return</b> <a class="local col7 ref" href="#7co" title='co' data-ref="7co">co</a>;</td></tr>
+<tr><th id="83">83</th><td>}</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="coroutine_delete" title='coroutine_delete' data-type='void coroutine_delete(Coroutine * co)' data-ref="coroutine_delete">coroutine_delete</dfn>(<a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col8 decl" id="8co" title='co' data-type='Coroutine *' data-ref="8co">co</dfn>)</td></tr>
+<tr><th id="86">86</th><td>{</td></tr>
+<tr><th id="87">87</th><td>    <a class="local col8 ref" href="#8co" title='co' data-ref="8co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>    <b>if</b> (<a class="macro" href="../config-host.h.html#75" title="1" data-ref="_M/CONFIG_COROUTINE_POOL">CONFIG_COROUTINE_POOL</a>) {</td></tr>
+<tr><th id="90">90</th><td>        <b>if</b> (<a class="tu ref" href="#release_pool_size" title='release_pool_size' data-use='r' data-ref="release_pool_size">release_pool_size</a> &lt; <a class="enum" href="#POOL_BATCH_SIZE" title='POOL_BATCH_SIZE' data-ref="POOL_BATCH_SIZE">POOL_BATCH_SIZE</a> * <var>2</var>) {</td></tr>
+<tr><th id="91">91</th><td>            <a class="macro" href="../include/qemu/queue.h.html#200" title="do { typeof(co) save_sle_next; do { save_sle_next = (co)-&gt;pool_next.sle_next = (&amp;release_pool)-&gt;slh_first; } while (({ _Static_assert(!(sizeof(*&amp;(&amp;release_pool)-&gt;slh_first) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;(&amp;release_pool)-&gt;slh_first) &gt; ATOMIC_REG_SIZE&quot;); ({ typeof( __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), _Bool) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const _Bool) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), volatile _Bool) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const volatile _Bool), (_Bool)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), signed char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const signed char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), volatile signed char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const volatile signed char), (signed char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), unsigned char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const unsigned char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), volatile unsigned char) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const volatile unsigned char), (unsigned char)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), signed short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const signed short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), volatile signed short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const volatile signed short), (signed short)1, __builtin_choose_expr( __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), unsigned short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const unsigned short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), volatile unsigned short) || __builtin_types_compatible_p(typeof(*&amp;(&amp;release_pool)-&gt;slh_first), const volatile unsigned short), (unsigned short)1, (*&amp;(&amp;release_pool)-&gt;slh_first)+0)))))) _old = (save_sle_next); __atomic_compare_exchange_n(&amp;(&amp;release_pool)-&gt;slh_first, &amp;_old, (co), 0, 5, 5); _old; }); }) != save_sle_next); } while ( 0)" data-ref="_M/QSLIST_INSERT_HEAD_ATOMIC">QSLIST_INSERT_HEAD_ATOMIC</a>(&amp;<a class="tu ref" href="#release_pool" title='release_pool' data-use='a' data-ref="release_pool">release_pool</a>, <a class="local col8 ref" href="#8co" title='co' data-ref="8co">co</a>, <a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::pool_next" title='Coroutine::pool_next' data-ref="Coroutine::pool_next">pool_next</a>);</td></tr>
+<tr><th id="92">92</th><td>            <a class="macro" href="../include/qemu/atomic.h.html#218" title="((void) __atomic_fetch_add(&amp;release_pool_size, 1, 5))" data-ref="_M/atomic_inc">atomic_inc</a>(&amp;<a class="tu ref" href="#release_pool_size" title='release_pool_size' data-use='a' data-ref="release_pool_size">release_pool_size</a>);</td></tr>
+<tr><th id="93">93</th><td>            <b>return</b>;</td></tr>
+<tr><th id="94">94</th><td>        }</td></tr>
+<tr><th id="95">95</th><td>        <b>if</b> (<a class="tu ref" href="#alloc_pool_size" title='alloc_pool_size' data-use='r' data-ref="alloc_pool_size">alloc_pool_size</a> &lt; <a class="enum" href="#POOL_BATCH_SIZE" title='POOL_BATCH_SIZE' data-ref="POOL_BATCH_SIZE">POOL_BATCH_SIZE</a>) {</td></tr>
+<tr><th id="96">96</th><td>            <a class="macro" href="../include/qemu/queue.h.html#195" title="do { (co)-&gt;pool_next.sle_next = (&amp;alloc_pool)-&gt;slh_first; (&amp;alloc_pool)-&gt;slh_first = (co); } while ( 0)" data-ref="_M/QSLIST_INSERT_HEAD">QSLIST_INSERT_HEAD</a>(&amp;<a class="tu ref" href="#alloc_pool" title='alloc_pool' data-use='a' data-ref="alloc_pool">alloc_pool</a>, <a class="local col8 ref" href="#8co" title='co' data-ref="8co">co</a>, <a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::pool_next" title='Coroutine::pool_next' data-ref="Coroutine::pool_next">pool_next</a>);</td></tr>
+<tr><th id="97">97</th><td>            <a class="tu ref" href="#alloc_pool_size" title='alloc_pool_size' data-use='w' data-ref="alloc_pool_size">alloc_pool_size</a>++;</td></tr>
+<tr><th id="98">98</th><td>            <b>return</b>;</td></tr>
+<tr><th id="99">99</th><td>        }</td></tr>
+<tr><th id="100">100</th><td>    }</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td>    <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_coroutine_delete" title='qemu_coroutine_delete' data-ref="qemu_coroutine_delete">qemu_coroutine_delete</a>(<a class="local col8 ref" href="#8co" title='co' data-ref="8co">co</a>);</td></tr>
+<tr><th id="103">103</th><td>}</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><em>void</em> <dfn class="decl def" id="qemu_aio_coroutine_enter" title='qemu_aio_coroutine_enter' data-ref="qemu_aio_coroutine_enter">qemu_aio_coroutine_enter</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="local col9 decl" id="9ctx" title='ctx' data-type='AioContext *' data-ref="9ctx">ctx</dfn>, <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col0 decl" id="10co" title='co' data-type='Coroutine *' data-ref="10co">co</dfn>)</td></tr>
+<tr><th id="106">106</th><td>{</td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col1 decl" id="11self" title='self' data-type='Coroutine *' data-ref="11self">self</dfn> = <a class="ref" href="../include/qemu/coroutine.h.html#qemu_coroutine_self" title='qemu_coroutine_self' data-ref="qemu_coroutine_self">qemu_coroutine_self</a>();</td></tr>
+<tr><th id="108">108</th><td>    <a class="typedef" href="../include/qemu/coroutine_int.h.html#CoroutineAction" title='CoroutineAction' data-type='enum CoroutineAction' data-ref="CoroutineAction">CoroutineAction</a> <dfn class="local col2 decl" id="12ret" title='ret' data-type='CoroutineAction' data-ref="12ret">ret</dfn>;</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <a class="ref" href="trace.h.html#trace_qemu_aio_coroutine_enter" title='trace_qemu_aio_coroutine_enter' data-ref="trace_qemu_aio_coroutine_enter">trace_qemu_aio_coroutine_enter</a>(<a class="local col9 ref" href="#9ctx" title='ctx' data-ref="9ctx">ctx</a>, <a class="local col1 ref" href="#11self" title='self' data-ref="11self">self</a>, <a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>, <a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::entry_arg" title='Coroutine::entry_arg' data-ref="Coroutine::entry_arg">entry_arg</a>);</td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td>    <b>if</b> (<a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a>) {</td></tr>
+<tr><th id="113">113</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Co-routine re-entered recursively\n"</q>);</td></tr>
+<tr><th id="114">114</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="115">115</th><td>    }</td></tr>
+<tr><th id="116">116</th><td></td></tr>
+<tr><th id="117">117</th><td>    <a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a> = <a class="local col1 ref" href="#11self" title='self' data-ref="11self">self</a>;</td></tr>
+<tr><th id="118">118</th><td>    <a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::ctx" title='Coroutine::ctx' data-ref="Coroutine::ctx">ctx</a> = <a class="local col9 ref" href="#9ctx" title='ctx' data-ref="9ctx">ctx</a>;</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <i>/* Store co-&gt;ctx before anything that stores co.  Matches</i></td></tr>
+<tr><th id="121">121</th><td><i>     * barrier in aio_co_wake and qemu_co_mutex_wake.</i></td></tr>
+<tr><th id="122">122</th><td><i>     */</i></td></tr>
+<tr><th id="123">123</th><td>    <a class="macro" href="../include/qemu/atomic.h.html#412" title="({ ({ asm volatile(&quot;&quot; ::: &quot;memory&quot;); (void)0; }); __atomic_thread_fence(3); })" data-ref="_M/smp_wmb">smp_wmb</a>();</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>    <a class="local col2 ref" href="#12ret" title='ret' data-ref="12ret">ret</a> = <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_coroutine_switch" title='qemu_coroutine_switch' data-ref="qemu_coroutine_switch">qemu_coroutine_switch</a>(<a class="local col1 ref" href="#11self" title='self' data-ref="11self">self</a>, <a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>, <a class="enum" href="../include/qemu/coroutine_int.h.html#COROUTINE_ENTER" title='COROUTINE_ENTER' data-ref="COROUTINE_ENTER">COROUTINE_ENTER</a>);</td></tr>
+<tr><th id="126">126</th><td></td></tr>
+<tr><th id="127">127</th><td>    <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_co_queue_run_restart" title='qemu_co_queue_run_restart' data-ref="qemu_co_queue_run_restart">qemu_co_queue_run_restart</a>(<a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>);</td></tr>
+<tr><th id="128">128</th><td></td></tr>
+<tr><th id="129">129</th><td>    <i>/* Beware, if ret == COROUTINE_YIELD and qemu_co_queue_run_restart()</i></td></tr>
+<tr><th id="130">130</th><td><i>     * has started any other coroutine, "co" might have been reentered</i></td></tr>
+<tr><th id="131">131</th><td><i>     * and even freed by now!  So be careful and do not touch it.</i></td></tr>
+<tr><th id="132">132</th><td><i>     */</i></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td>    <b>switch</b> (<a class="local col2 ref" href="#12ret" title='ret' data-ref="12ret">ret</a>) {</td></tr>
+<tr><th id="135">135</th><td>    <b>case</b> <a class="enum" href="../include/qemu/coroutine_int.h.html#COROUTINE_YIELD" title='COROUTINE_YIELD' data-ref="COROUTINE_YIELD">COROUTINE_YIELD</a>:</td></tr>
+<tr><th id="136">136</th><td>        <b>return</b>;</td></tr>
+<tr><th id="137">137</th><td>    <b>case</b> <a class="enum" href="../include/qemu/coroutine_int.h.html#COROUTINE_TERMINATE" title='COROUTINE_TERMINATE' data-ref="COROUTINE_TERMINATE">COROUTINE_TERMINATE</a>:</td></tr>
+<tr><th id="138">138</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((!co-&gt;locks_held) ? (void) (0) : __assert_fail (&quot;!co-&gt;locks_held&quot;, &quot;/home/jon/workspace/qemu/util/qemu-coroutine.c&quot;, 138, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::locks_held" title='Coroutine::locks_held' data-ref="Coroutine::locks_held">locks_held</a>);</td></tr>
+<tr><th id="139">139</th><td>        <a class="ref" href="trace.h.html#trace_qemu_coroutine_terminate" title='trace_qemu_coroutine_terminate' data-ref="trace_qemu_coroutine_terminate">trace_qemu_coroutine_terminate</a>(<a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>);</td></tr>
+<tr><th id="140">140</th><td>        <a class="tu ref" href="#coroutine_delete" title='coroutine_delete' data-use='c' data-ref="coroutine_delete">coroutine_delete</a>(<a class="local col0 ref" href="#10co" title='co' data-ref="10co">co</a>);</td></tr>
+<tr><th id="141">141</th><td>        <b>return</b>;</td></tr>
+<tr><th id="142">142</th><td>    <b>default</b>:</td></tr>
+<tr><th id="143">143</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><em>void</em> <dfn class="decl def" id="qemu_coroutine_enter" title='qemu_coroutine_enter' data-ref="qemu_coroutine_enter">qemu_coroutine_enter</dfn>(<a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col3 decl" id="13co" title='co' data-type='Coroutine *' data-ref="13co">co</dfn>)</td></tr>
+<tr><th id="148">148</th><td>{</td></tr>
+<tr><th id="149">149</th><td>    <a class="ref" href="#qemu_aio_coroutine_enter" title='qemu_aio_coroutine_enter' data-ref="qemu_aio_coroutine_enter">qemu_aio_coroutine_enter</a>(<a class="ref" href="../include/block/aio.h.html#qemu_get_current_aio_context" title='qemu_get_current_aio_context' data-ref="qemu_get_current_aio_context">qemu_get_current_aio_context</a>(), <a class="local col3 ref" href="#13co" title='co' data-ref="13co">co</a>);</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><em>void</em> <dfn class="decl def" id="qemu_coroutine_enter_if_inactive" title='qemu_coroutine_enter_if_inactive' data-ref="qemu_coroutine_enter_if_inactive">qemu_coroutine_enter_if_inactive</dfn>(<a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col4 decl" id="14co" title='co' data-type='Coroutine *' data-ref="14co">co</dfn>)</td></tr>
+<tr><th id="153">153</th><td>{</td></tr>
+<tr><th id="154">154</th><td>    <b>if</b> (!<a class="ref" href="#qemu_coroutine_entered" title='qemu_coroutine_entered' data-ref="qemu_coroutine_entered">qemu_coroutine_entered</a>(<a class="local col4 ref" href="#14co" title='co' data-ref="14co">co</a>)) {</td></tr>
+<tr><th id="155">155</th><td>        <a class="ref" href="#qemu_coroutine_enter" title='qemu_coroutine_enter' data-ref="qemu_coroutine_enter">qemu_coroutine_enter</a>(<a class="local col4 ref" href="#14co" title='co' data-ref="14co">co</a>);</td></tr>
+<tr><th id="156">156</th><td>    }</td></tr>
+<tr><th id="157">157</th><td>}</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <a class="macro" href="../include/qemu/coroutine.h.html#45" title="" data-ref="_M/coroutine_fn">coroutine_fn</a> <dfn class="decl def" id="qemu_coroutine_yield" title='qemu_coroutine_yield' data-ref="qemu_coroutine_yield">qemu_coroutine_yield</dfn>(<em>void</em>)</td></tr>
+<tr><th id="160">160</th><td>{</td></tr>
+<tr><th id="161">161</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col5 decl" id="15self" title='self' data-type='Coroutine *' data-ref="15self">self</dfn> = <a class="ref" href="../include/qemu/coroutine.h.html#qemu_coroutine_self" title='qemu_coroutine_self' data-ref="qemu_coroutine_self">qemu_coroutine_self</a>();</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col6 decl" id="16to" title='to' data-type='Coroutine *' data-ref="16to">to</dfn> = <a class="local col5 ref" href="#15self" title='self' data-ref="15self">self</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a>;</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td>    <a class="ref" href="trace.h.html#trace_qemu_coroutine_yield" title='trace_qemu_coroutine_yield' data-ref="trace_qemu_coroutine_yield">trace_qemu_coroutine_yield</a>(<a class="local col5 ref" href="#15self" title='self' data-ref="15self">self</a>, <a class="local col6 ref" href="#16to" title='to' data-ref="16to">to</a>);</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+<tr><th id="166">166</th><td>    <b>if</b> (!<a class="local col6 ref" href="#16to" title='to' data-ref="16to">to</a>) {</td></tr>
+<tr><th id="167">167</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Co-routine is yielding to no one\n"</q>);</td></tr>
+<tr><th id="168">168</th><td>        <a class="ref" href="../../include/stdlib.h.html#abort" title='abort' data-ref="abort">abort</a>();</td></tr>
+<tr><th id="169">169</th><td>    }</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td>    <a class="local col5 ref" href="#15self" title='self' data-ref="15self">self</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="172">172</th><td>    <a class="ref" href="../include/qemu/coroutine_int.h.html#qemu_coroutine_switch" title='qemu_coroutine_switch' data-ref="qemu_coroutine_switch">qemu_coroutine_switch</a>(<a class="local col5 ref" href="#15self" title='self' data-ref="15self">self</a>, <a class="local col6 ref" href="#16to" title='to' data-ref="16to">to</a>, <a class="enum" href="../include/qemu/coroutine_int.h.html#COROUTINE_YIELD" title='COROUTINE_YIELD' data-ref="COROUTINE_YIELD">COROUTINE_YIELD</a>);</td></tr>
+<tr><th id="173">173</th><td>}</td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qemu_coroutine_entered" title='qemu_coroutine_entered' data-ref="qemu_coroutine_entered">qemu_coroutine_entered</dfn>(<a class="typedef" href="../include/qemu/coroutine.h.html#Coroutine" title='Coroutine' data-type='struct Coroutine' data-ref="Coroutine">Coroutine</a> *<dfn class="local col7 decl" id="17co" title='co' data-type='Coroutine *' data-ref="17co">co</dfn>)</td></tr>
+<tr><th id="176">176</th><td>{</td></tr>
+<tr><th id="177">177</th><td>    <b>return</b> <a class="local col7 ref" href="#17co" title='co' data-ref="17co">co</a>-&gt;<a class="ref" href="../include/qemu/coroutine_int.h.html#Coroutine::caller" title='Coroutine::caller' data-ref="Coroutine::caller">caller</a>;</td></tr>
+<tr><th id="178">178</th><td>}</td></tr>
+<tr><th id="179">179</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,28 @@
+<dec f='codebrowser/include/exec/memory.h' l='703' type='void memory_region_init_ram(MemoryRegion * mr, struct Object * owner, const char * name, uint64_t size, Error ** errp)'/>
+<doc f='codebrowser/include/exec/memory.h' l='681'>/**
+ * memory_region_init_ram - Initialize RAM memory region.  Accesses into the
+ *                          region will modify memory directly.
+ *
+ * @mr: the #MemoryRegion to be initialized
+ * @owner: the object that tracks the region&apos;s reference count (must be
+ *         TYPE_DEVICE or a subclass of TYPE_DEVICE, or NULL)
+ * @name: name of the memory region
+ * @size: size of the region in bytes
+ * @errp: pointer to Error*, to store an error if it happens.
+ *
+ * This function allocates RAM for a board model or device, and
+ * arranges for it to be migrated (by calling vmstate_register_ram()
+ * if @owner is a DeviceState, or vmstate_register_ram_global() if
+ * @owner is NULL).
+ *
+ * TODO: Currently we restrict @owner to being either NULL (for
+ * global RAM regions with no owner) or devices, so that we can
+ * give the RAM block a unique name for migration purposes.
+ * We should lift this restriction and allow arbitrary Objects.
+ * If you pass a non-NULL non-device @owner then we will assert.
+ */</doc>
+<use f='codebrowser/hw/display/vmware_vga.c' l='1242' u='c' c='vmsvga_init'/>
+<use f='codebrowser/hw/i386/pc.c' l='1444' u='c' c='pc_memory_init'/>
+<use f='codebrowser/hw/i386/pc_sysfw.c' l='60' u='c' c='pc_isa_bios_init'/>
+<use f='codebrowser/hw/i386/pc_sysfw.c' l='197' u='c' c='old_pc_system_rom_init'/>
+<def f='codebrowser/memory.c' l='2852' ll='2874' type='void memory_region_init_ram(MemoryRegion * mr, struct Object * owner, const char * name, uint64_t size, Error ** errp)'/>

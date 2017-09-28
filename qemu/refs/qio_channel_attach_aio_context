@@ -1,0 +1,26 @@
+<dec f='codebrowser/include/io/channel.h' l='531' type='void qio_channel_attach_aio_context(QIOChannel * ioc, AioContext * ctx)'/>
+<doc f='codebrowser/include/io/channel.h' l='509'>/**
+ * qio_channel_attach_aio_context:
+ * @ioc: the channel object
+ * @ctx: the #AioContext to set the handlers on
+ *
+ * Request that qio_channel_yield() sets I/O handlers on
+ * the given #AioContext.  If @ctx is %NULL, qio_channel_yield()
+ * uses QEMU&apos;s main thread event loop.
+ *
+ * You can move a #QIOChannel from one #AioContext to another even if
+ * I/O handlers are set for a coroutine.  However, #QIOChannel provides
+ * no synchronization between the calls to qio_channel_yield() and
+ * qio_channel_attach_aio_context().
+ *
+ * Therefore you should first call qio_channel_detach_aio_context()
+ * to ensure that the coroutine is not entered concurrently.  Then,
+ * while the coroutine has yielded, call qio_channel_attach_aio_context(),
+ * and then aio_co_schedule() to place the coroutine on the new
+ * #AioContext.  The calls to qio_channel_detach_aio_context()
+ * and qio_channel_attach_aio_context() should be protected with
+ * aio_context_acquire() and aio_context_release().
+ */</doc>
+<use f='codebrowser/block/nbd-client.c' l='355' u='c' c='nbd_client_attach_aio_context'/>
+<def f='codebrowser/io/channel.c' l='279' ll='285' type='void qio_channel_attach_aio_context(QIOChannel * ioc, AioContext * ctx)'/>
+<use f='codebrowser/nbd/server.c' l='1013' u='c' c='blk_aio_attached'/>

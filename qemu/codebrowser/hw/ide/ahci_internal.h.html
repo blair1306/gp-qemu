@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>ahci_internal.h source code [codebrowser/hw/ide/ahci_internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="AHCICmdHdr,AHCIDevice,AHCIPCIState,AHCIPortRegs,AHCI_SG,NCQFrame,NCQTransferState,SDBFIS "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/ide/ahci_internal.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>ide</a>/<a href='ahci_internal.h.html'>ahci_internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU AHCI Emulation</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010 qiaochong@loongson.cn</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2010 Roland Elek &lt;elek.roland@gmail.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (c) 2010 Sebastian Herbszt &lt;herbszt@gmx.de&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> * Copyright (c) 2010 Alexander Graf &lt;agraf@suse.de&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="10">10</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="11">11</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="12">12</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="15">15</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="16">16</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="17">17</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="20">20</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="21">21</th><td><i> *</i></td></tr>
+<tr><th id="22">22</th><td><i> */</i></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="24">ifndef</span> <span class="macro" data-ref="_M/HW_IDE_AHCI_INTERNAL_H">HW_IDE_AHCI_INTERNAL_H</span></u></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/HW_IDE_AHCI_INTERNAL_H" data-ref="_M/HW_IDE_AHCI_INTERNAL_H">HW_IDE_AHCI_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="26">26</th><td></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/hw/ide/ahci.h.html">"hw/ide/ahci.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../include/hw/sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/AHCI_MEM_BAR_SIZE" data-ref="_M/AHCI_MEM_BAR_SIZE">AHCI_MEM_BAR_SIZE</dfn>         0x1000</u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/AHCI_MAX_PORTS" data-ref="_M/AHCI_MAX_PORTS">AHCI_MAX_PORTS</dfn>            32</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/AHCI_MAX_SG" data-ref="_M/AHCI_MAX_SG">AHCI_MAX_SG</dfn>               168 /* hardware max is 64K */</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/AHCI_DMA_BOUNDARY" data-ref="_M/AHCI_DMA_BOUNDARY">AHCI_DMA_BOUNDARY</dfn>         0xffffffff</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/AHCI_USE_CLUSTERING" data-ref="_M/AHCI_USE_CLUSTERING">AHCI_USE_CLUSTERING</dfn>       0</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/AHCI_MAX_CMDS" data-ref="_M/AHCI_MAX_CMDS">AHCI_MAX_CMDS</dfn>             32</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_SZ" data-ref="_M/AHCI_CMD_SZ">AHCI_CMD_SZ</dfn>               32</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_SLOT_SZ" data-ref="_M/AHCI_CMD_SLOT_SZ">AHCI_CMD_SLOT_SZ</dfn>          (AHCI_MAX_CMDS * AHCI_CMD_SZ)</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/AHCI_RX_FIS_SZ" data-ref="_M/AHCI_RX_FIS_SZ">AHCI_RX_FIS_SZ</dfn>            256</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_TBL_CDB" data-ref="_M/AHCI_CMD_TBL_CDB">AHCI_CMD_TBL_CDB</dfn>          0x40</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_TBL_HDR_SZ" data-ref="_M/AHCI_CMD_TBL_HDR_SZ">AHCI_CMD_TBL_HDR_SZ</dfn>       0x80</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_TBL_SZ" data-ref="_M/AHCI_CMD_TBL_SZ">AHCI_CMD_TBL_SZ</dfn>           (AHCI_CMD_TBL_HDR_SZ + (AHCI_MAX_SG * 16))</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_TBL_AR_SZ" data-ref="_M/AHCI_CMD_TBL_AR_SZ">AHCI_CMD_TBL_AR_SZ</dfn>        (AHCI_CMD_TBL_SZ * AHCI_MAX_CMDS)</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/AHCI_PORT_PRIV_DMA_SZ" data-ref="_M/AHCI_PORT_PRIV_DMA_SZ">AHCI_PORT_PRIV_DMA_SZ</dfn>     (AHCI_CMD_SLOT_SZ + AHCI_CMD_TBL_AR_SZ + \</u></td></tr>
+<tr><th id="44">44</th><td><u>                                   AHCI_RX_FIS_SZ)</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/AHCI_IRQ_ON_SG" data-ref="_M/AHCI_IRQ_ON_SG">AHCI_IRQ_ON_SG</dfn>            (1U &lt;&lt; 31)</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_ATAPI" data-ref="_M/AHCI_CMD_ATAPI">AHCI_CMD_ATAPI</dfn>            (1 &lt;&lt; 5)</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_WRITE" data-ref="_M/AHCI_CMD_WRITE">AHCI_CMD_WRITE</dfn>            (1 &lt;&lt; 6)</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_PREFETCH" data-ref="_M/AHCI_CMD_PREFETCH">AHCI_CMD_PREFETCH</dfn>         (1 &lt;&lt; 7)</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_RESET" data-ref="_M/AHCI_CMD_RESET">AHCI_CMD_RESET</dfn>            (1 &lt;&lt; 8)</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_CLR_BUSY" data-ref="_M/AHCI_CMD_CLR_BUSY">AHCI_CMD_CLR_BUSY</dfn>         (1 &lt;&lt; 10)</u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/RX_FIS_D2H_REG" data-ref="_M/RX_FIS_D2H_REG">RX_FIS_D2H_REG</dfn>            0x40 /* offset of D2H Register FIS data */</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/RX_FIS_SDB" data-ref="_M/RX_FIS_SDB">RX_FIS_SDB</dfn>                0x58 /* offset of SDB FIS data */</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/RX_FIS_UNK" data-ref="_M/RX_FIS_UNK">RX_FIS_UNK</dfn>                0x60 /* offset of Unknown FIS data */</u></td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><i>/* global controller registers */</i></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP" data-ref="_M/HOST_CAP">HOST_CAP</dfn>                  0x00 /* host capabilities */</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/HOST_CTL" data-ref="_M/HOST_CTL">HOST_CTL</dfn>                  0x04 /* global host control */</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/HOST_IRQ_STAT" data-ref="_M/HOST_IRQ_STAT">HOST_IRQ_STAT</dfn>             0x08 /* interrupt status */</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/HOST_PORTS_IMPL" data-ref="_M/HOST_PORTS_IMPL">HOST_PORTS_IMPL</dfn>           0x0c /* bitmap of implemented ports */</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/HOST_VERSION" data-ref="_M/HOST_VERSION">HOST_VERSION</dfn>              0x10 /* AHCI spec. version compliancy */</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><i>/* HOST_CTL bits */</i></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/HOST_CTL_RESET" data-ref="_M/HOST_CTL_RESET">HOST_CTL_RESET</dfn>            (1 &lt;&lt; 0)  /* reset controller; self-clear */</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/HOST_CTL_IRQ_EN" data-ref="_M/HOST_CTL_IRQ_EN">HOST_CTL_IRQ_EN</dfn>           (1 &lt;&lt; 1)  /* global IRQ enable */</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/HOST_CTL_AHCI_EN" data-ref="_M/HOST_CTL_AHCI_EN">HOST_CTL_AHCI_EN</dfn>          (1U &lt;&lt; 31) /* AHCI enabled */</u></td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><i>/* HOST_CAP bits */</i></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_SSC" data-ref="_M/HOST_CAP_SSC">HOST_CAP_SSC</dfn>              (1 &lt;&lt; 14) /* Slumber capable */</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_AHCI" data-ref="_M/HOST_CAP_AHCI">HOST_CAP_AHCI</dfn>             (1 &lt;&lt; 18) /* AHCI only */</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_CLO" data-ref="_M/HOST_CAP_CLO">HOST_CAP_CLO</dfn>              (1 &lt;&lt; 24) /* Command List Override support */</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_SSS" data-ref="_M/HOST_CAP_SSS">HOST_CAP_SSS</dfn>              (1 &lt;&lt; 27) /* Staggered Spin-up */</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_NCQ" data-ref="_M/HOST_CAP_NCQ">HOST_CAP_NCQ</dfn>              (1 &lt;&lt; 30) /* Native Command Queueing */</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/HOST_CAP_64" data-ref="_M/HOST_CAP_64">HOST_CAP_64</dfn>               (1U &lt;&lt; 31) /* PCI DAC (64-bit DMA) support */</u></td></tr>
+<tr><th id="76">76</th><td></td></tr>
+<tr><th id="77">77</th><td><i>/* registers for each SATA port */</i></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/PORT_LST_ADDR" data-ref="_M/PORT_LST_ADDR">PORT_LST_ADDR</dfn>             0x00 /* command list DMA addr */</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/PORT_LST_ADDR_HI" data-ref="_M/PORT_LST_ADDR_HI">PORT_LST_ADDR_HI</dfn>          0x04 /* command list DMA addr hi */</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/PORT_FIS_ADDR" data-ref="_M/PORT_FIS_ADDR">PORT_FIS_ADDR</dfn>             0x08 /* FIS rx buf addr */</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/PORT_FIS_ADDR_HI" data-ref="_M/PORT_FIS_ADDR_HI">PORT_FIS_ADDR_HI</dfn>          0x0c /* FIS rx buf addr hi */</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_STAT" data-ref="_M/PORT_IRQ_STAT">PORT_IRQ_STAT</dfn>             0x10 /* interrupt status */</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_MASK" data-ref="_M/PORT_IRQ_MASK">PORT_IRQ_MASK</dfn>             0x14 /* interrupt enable/disable mask */</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD" data-ref="_M/PORT_CMD">PORT_CMD</dfn>                  0x18 /* port command */</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/PORT_TFDATA" data-ref="_M/PORT_TFDATA">PORT_TFDATA</dfn>               0x20 /* taskfile data */</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/PORT_SIG" data-ref="_M/PORT_SIG">PORT_SIG</dfn>                  0x24 /* device TF signature */</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/PORT_SCR_STAT" data-ref="_M/PORT_SCR_STAT">PORT_SCR_STAT</dfn>             0x28 /* SATA phy register: SStatus */</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/PORT_SCR_CTL" data-ref="_M/PORT_SCR_CTL">PORT_SCR_CTL</dfn>              0x2c /* SATA phy register: SControl */</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/PORT_SCR_ERR" data-ref="_M/PORT_SCR_ERR">PORT_SCR_ERR</dfn>              0x30 /* SATA phy register: SError */</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/PORT_SCR_ACT" data-ref="_M/PORT_SCR_ACT">PORT_SCR_ACT</dfn>              0x34 /* SATA phy register: SActive */</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ISSUE" data-ref="_M/PORT_CMD_ISSUE">PORT_CMD_ISSUE</dfn>            0x38 /* command issue */</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/PORT_RESERVED" data-ref="_M/PORT_RESERVED">PORT_RESERVED</dfn>             0x3c /* reserved */</u></td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td><i>/* PORT_IRQ_{STAT,MASK} bits */</i></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_COLD_PRES" data-ref="_M/PORT_IRQ_COLD_PRES">PORT_IRQ_COLD_PRES</dfn>        (1U &lt;&lt; 31) /* cold presence detect */</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_TF_ERR" data-ref="_M/PORT_IRQ_TF_ERR">PORT_IRQ_TF_ERR</dfn>           (1 &lt;&lt; 30) /* task file error */</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_HBUS_ERR" data-ref="_M/PORT_IRQ_HBUS_ERR">PORT_IRQ_HBUS_ERR</dfn>         (1 &lt;&lt; 29) /* host bus fatal error */</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_HBUS_DATA_ERR" data-ref="_M/PORT_IRQ_HBUS_DATA_ERR">PORT_IRQ_HBUS_DATA_ERR</dfn>    (1 &lt;&lt; 28) /* host bus data error */</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_IF_ERR" data-ref="_M/PORT_IRQ_IF_ERR">PORT_IRQ_IF_ERR</dfn>           (1 &lt;&lt; 27) /* interface fatal error */</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_IF_NONFATAL" data-ref="_M/PORT_IRQ_IF_NONFATAL">PORT_IRQ_IF_NONFATAL</dfn>      (1 &lt;&lt; 26) /* interface non-fatal error */</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_OVERFLOW" data-ref="_M/PORT_IRQ_OVERFLOW">PORT_IRQ_OVERFLOW</dfn>         (1 &lt;&lt; 24) /* xfer exhausted available S/G */</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_BAD_PMP" data-ref="_M/PORT_IRQ_BAD_PMP">PORT_IRQ_BAD_PMP</dfn>          (1 &lt;&lt; 23) /* incorrect port multiplier */</u></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_PHYRDY" data-ref="_M/PORT_IRQ_PHYRDY">PORT_IRQ_PHYRDY</dfn>           (1 &lt;&lt; 22) /* PhyRdy changed */</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_DEV_ILCK" data-ref="_M/PORT_IRQ_DEV_ILCK">PORT_IRQ_DEV_ILCK</dfn>         (1 &lt;&lt; 7) /* device interlock */</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_CONNECT" data-ref="_M/PORT_IRQ_CONNECT">PORT_IRQ_CONNECT</dfn>          (1 &lt;&lt; 6) /* port connect change status */</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_SG_DONE" data-ref="_M/PORT_IRQ_SG_DONE">PORT_IRQ_SG_DONE</dfn>          (1 &lt;&lt; 5) /* descriptor processed */</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_UNK_FIS" data-ref="_M/PORT_IRQ_UNK_FIS">PORT_IRQ_UNK_FIS</dfn>          (1 &lt;&lt; 4) /* unknown FIS rx'd */</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_SDB_FIS" data-ref="_M/PORT_IRQ_SDB_FIS">PORT_IRQ_SDB_FIS</dfn>          (1 &lt;&lt; 3) /* Set Device Bits FIS rx'd */</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_DMAS_FIS" data-ref="_M/PORT_IRQ_DMAS_FIS">PORT_IRQ_DMAS_FIS</dfn>         (1 &lt;&lt; 2) /* DMA Setup FIS rx'd */</u></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_PIOS_FIS" data-ref="_M/PORT_IRQ_PIOS_FIS">PORT_IRQ_PIOS_FIS</dfn>         (1 &lt;&lt; 1) /* PIO Setup FIS rx'd */</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_D2H_REG_FIS" data-ref="_M/PORT_IRQ_D2H_REG_FIS">PORT_IRQ_D2H_REG_FIS</dfn>      (1 &lt;&lt; 0) /* D2H Register FIS rx'd */</u></td></tr>
+<tr><th id="113">113</th><td></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_FREEZE" data-ref="_M/PORT_IRQ_FREEZE">PORT_IRQ_FREEZE</dfn>           (PORT_IRQ_HBUS_ERR | PORT_IRQ_IF_ERR |   \</u></td></tr>
+<tr><th id="115">115</th><td><u>                                   PORT_IRQ_CONNECT | PORT_IRQ_PHYRDY |    \</u></td></tr>
+<tr><th id="116">116</th><td><u>                                   PORT_IRQ_UNK_FIS)</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/PORT_IRQ_ERROR" data-ref="_M/PORT_IRQ_ERROR">PORT_IRQ_ERROR</dfn>            (PORT_IRQ_FREEZE | PORT_IRQ_TF_ERR |     \</u></td></tr>
+<tr><th id="118">118</th><td><u>                                   PORT_IRQ_HBUS_DATA_ERR)</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/DEF_PORT_IRQ" data-ref="_M/DEF_PORT_IRQ">DEF_PORT_IRQ</dfn>              (PORT_IRQ_ERROR | PORT_IRQ_SG_DONE |     \</u></td></tr>
+<tr><th id="120">120</th><td><u>                                   PORT_IRQ_SDB_FIS | PORT_IRQ_DMAS_FIS |  \</u></td></tr>
+<tr><th id="121">121</th><td><u>                                   PORT_IRQ_PIOS_FIS | PORT_IRQ_D2H_REG_FIS)</u></td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><i>/* PORT_CMD bits */</i></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ATAPI" data-ref="_M/PORT_CMD_ATAPI">PORT_CMD_ATAPI</dfn>            (1 &lt;&lt; 24) /* Device is ATAPI */</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_LIST_ON" data-ref="_M/PORT_CMD_LIST_ON">PORT_CMD_LIST_ON</dfn>          (1 &lt;&lt; 15) /* cmd list DMA engine running */</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_FIS_ON" data-ref="_M/PORT_CMD_FIS_ON">PORT_CMD_FIS_ON</dfn>           (1 &lt;&lt; 14) /* FIS DMA engine running */</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_FIS_RX" data-ref="_M/PORT_CMD_FIS_RX">PORT_CMD_FIS_RX</dfn>           (1 &lt;&lt; 4) /* Enable FIS receive DMA engine */</u></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_CLO" data-ref="_M/PORT_CMD_CLO">PORT_CMD_CLO</dfn>              (1 &lt;&lt; 3) /* Command list override */</u></td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_POWER_ON" data-ref="_M/PORT_CMD_POWER_ON">PORT_CMD_POWER_ON</dfn>         (1 &lt;&lt; 2) /* Power up device */</u></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_SPIN_UP" data-ref="_M/PORT_CMD_SPIN_UP">PORT_CMD_SPIN_UP</dfn>          (1 &lt;&lt; 1) /* Spin up device */</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_START" data-ref="_M/PORT_CMD_START">PORT_CMD_START</dfn>            (1 &lt;&lt; 0) /* Enable port DMA engine */</u></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ICC_MASK" data-ref="_M/PORT_CMD_ICC_MASK">PORT_CMD_ICC_MASK</dfn>        (0xfU &lt;&lt; 28) /* i/f ICC state mask */</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ICC_ACTIVE" data-ref="_M/PORT_CMD_ICC_ACTIVE">PORT_CMD_ICC_ACTIVE</dfn>       (0x1 &lt;&lt; 28) /* Put i/f in active state */</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ICC_PARTIAL" data-ref="_M/PORT_CMD_ICC_PARTIAL">PORT_CMD_ICC_PARTIAL</dfn>      (0x2 &lt;&lt; 28) /* Put i/f in partial state */</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_ICC_SLUMBER" data-ref="_M/PORT_CMD_ICC_SLUMBER">PORT_CMD_ICC_SLUMBER</dfn>      (0x6 &lt;&lt; 28) /* Put i/f in slumber state */</u></td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/PORT_CMD_RO_MASK" data-ref="_M/PORT_CMD_RO_MASK">PORT_CMD_RO_MASK</dfn>          0x007dffe0 /* Which CMD bits are read only? */</u></td></tr>
+<tr><th id="139">139</th><td></td></tr>
+<tr><th id="140">140</th><td><i>/* ap-&gt;flags bits */</i></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/AHCI_FLAG_NO_NCQ" data-ref="_M/AHCI_FLAG_NO_NCQ">AHCI_FLAG_NO_NCQ</dfn>                  (1 &lt;&lt; 24)</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/AHCI_FLAG_IGN_IRQ_IF_ERR" data-ref="_M/AHCI_FLAG_IGN_IRQ_IF_ERR">AHCI_FLAG_IGN_IRQ_IF_ERR</dfn>          (1 &lt;&lt; 25) /* ignore IRQ_IF_ERR */</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/AHCI_FLAG_HONOR_PI" data-ref="_M/AHCI_FLAG_HONOR_PI">AHCI_FLAG_HONOR_PI</dfn>                (1 &lt;&lt; 26) /* honor PORTS_IMPL */</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/AHCI_FLAG_IGN_SERR_INTERNAL" data-ref="_M/AHCI_FLAG_IGN_SERR_INTERNAL">AHCI_FLAG_IGN_SERR_INTERNAL</dfn>       (1 &lt;&lt; 27) /* ignore SERR_INTERNAL */</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/AHCI_FLAG_32BIT_ONLY" data-ref="_M/AHCI_FLAG_32BIT_ONLY">AHCI_FLAG_32BIT_ONLY</dfn>              (1 &lt;&lt; 28) /* force 32bit */</u></td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/ATA_SRST" data-ref="_M/ATA_SRST">ATA_SRST</dfn>                          (1 &lt;&lt; 2)  /* software reset */</u></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/STATE_RUN" data-ref="_M/STATE_RUN">STATE_RUN</dfn>                         0</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/STATE_RESET" data-ref="_M/STATE_RESET">STATE_RESET</dfn>                       1</u></td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_DET_NODEV" data-ref="_M/SATA_SCR_SSTATUS_DET_NODEV">SATA_SCR_SSTATUS_DET_NODEV</dfn>        0x0</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_DET_DEV_PRESENT_PHY_UP" data-ref="_M/SATA_SCR_SSTATUS_DET_DEV_PRESENT_PHY_UP">SATA_SCR_SSTATUS_DET_DEV_PRESENT_PHY_UP</dfn> 0x3</u></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_SPD_NODEV" data-ref="_M/SATA_SCR_SSTATUS_SPD_NODEV">SATA_SCR_SSTATUS_SPD_NODEV</dfn>        0x00</u></td></tr>
+<tr><th id="156">156</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_SPD_GEN1" data-ref="_M/SATA_SCR_SSTATUS_SPD_GEN1">SATA_SCR_SSTATUS_SPD_GEN1</dfn>         0x10</u></td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_IPM_NODEV" data-ref="_M/SATA_SCR_SSTATUS_IPM_NODEV">SATA_SCR_SSTATUS_IPM_NODEV</dfn>        0x000</u></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/SATA_SCR_SSTATUS_IPM_ACTIVE" data-ref="_M/SATA_SCR_SSTATUS_IPM_ACTIVE">SATA_SCR_SSTATUS_IPM_ACTIVE</dfn>       0X100</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/AHCI_SCR_SCTL_DET" data-ref="_M/AHCI_SCR_SCTL_DET">AHCI_SCR_SCTL_DET</dfn>                 0xf</u></td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/SATA_FIS_TYPE_REGISTER_H2D" data-ref="_M/SATA_FIS_TYPE_REGISTER_H2D">SATA_FIS_TYPE_REGISTER_H2D</dfn>        0x27</u></td></tr>
+<tr><th id="164">164</th><td><u>#define   <dfn class="macro" id="_M/SATA_FIS_REG_H2D_UPDATE_COMMAND_REGISTER" data-ref="_M/SATA_FIS_REG_H2D_UPDATE_COMMAND_REGISTER">SATA_FIS_REG_H2D_UPDATE_COMMAND_REGISTER</dfn> 0x80</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/SATA_FIS_TYPE_REGISTER_D2H" data-ref="_M/SATA_FIS_TYPE_REGISTER_D2H">SATA_FIS_TYPE_REGISTER_D2H</dfn>        0x34</u></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/SATA_FIS_TYPE_PIO_SETUP" data-ref="_M/SATA_FIS_TYPE_PIO_SETUP">SATA_FIS_TYPE_PIO_SETUP</dfn>           0x5f</u></td></tr>
+<tr><th id="167">167</th><td><u>#define <dfn class="macro" id="_M/SATA_FIS_TYPE_SDB" data-ref="_M/SATA_FIS_TYPE_SDB">SATA_FIS_TYPE_SDB</dfn>                 0xA1</u></td></tr>
+<tr><th id="168">168</th><td></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_HDR_CMD_FIS_LEN" data-ref="_M/AHCI_CMD_HDR_CMD_FIS_LEN">AHCI_CMD_HDR_CMD_FIS_LEN</dfn>           0x1f</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/AHCI_CMD_HDR_PRDT_LEN" data-ref="_M/AHCI_CMD_HDR_PRDT_LEN">AHCI_CMD_HDR_PRDT_LEN</dfn>              16</u></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/SATA_SIGNATURE_CDROM" data-ref="_M/SATA_SIGNATURE_CDROM">SATA_SIGNATURE_CDROM</dfn>               0xeb140101</u></td></tr>
+<tr><th id="173">173</th><td><u>#define <dfn class="macro" id="_M/SATA_SIGNATURE_DISK" data-ref="_M/SATA_SIGNATURE_DISK">SATA_SIGNATURE_DISK</dfn>                0x00000101</u></td></tr>
+<tr><th id="174">174</th><td></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/AHCI_GENERIC_HOST_CONTROL_REGS_MAX_ADDR" data-ref="_M/AHCI_GENERIC_HOST_CONTROL_REGS_MAX_ADDR">AHCI_GENERIC_HOST_CONTROL_REGS_MAX_ADDR</dfn> 0x20</u></td></tr>
+<tr><th id="176">176</th><td>                                            <i>/* Shouldn't this be 0x2c? */</i></td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/AHCI_PORT_REGS_START_ADDR" data-ref="_M/AHCI_PORT_REGS_START_ADDR">AHCI_PORT_REGS_START_ADDR</dfn>          0x100</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/AHCI_PORT_ADDR_OFFSET_MASK" data-ref="_M/AHCI_PORT_ADDR_OFFSET_MASK">AHCI_PORT_ADDR_OFFSET_MASK</dfn>         0x7f</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/AHCI_PORT_ADDR_OFFSET_LEN" data-ref="_M/AHCI_PORT_ADDR_OFFSET_LEN">AHCI_PORT_ADDR_OFFSET_LEN</dfn>          0x80</u></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><u>#define <dfn class="macro" id="_M/AHCI_NUM_COMMAND_SLOTS" data-ref="_M/AHCI_NUM_COMMAND_SLOTS">AHCI_NUM_COMMAND_SLOTS</dfn>             31</u></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/AHCI_SUPPORTED_SPEED" data-ref="_M/AHCI_SUPPORTED_SPEED">AHCI_SUPPORTED_SPEED</dfn>               20</u></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/AHCI_SUPPORTED_SPEED_GEN1" data-ref="_M/AHCI_SUPPORTED_SPEED_GEN1">AHCI_SUPPORTED_SPEED_GEN1</dfn>          1</u></td></tr>
+<tr><th id="185">185</th><td><u>#define <dfn class="macro" id="_M/AHCI_VERSION_1_0" data-ref="_M/AHCI_VERSION_1_0">AHCI_VERSION_1_0</dfn>                   0x10000</u></td></tr>
+<tr><th id="186">186</th><td></td></tr>
+<tr><th id="187">187</th><td><u>#define <dfn class="macro" id="_M/AHCI_PROGMODE_MAJOR_REV_1" data-ref="_M/AHCI_PROGMODE_MAJOR_REV_1">AHCI_PROGMODE_MAJOR_REV_1</dfn>          1</u></td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td><u>#define <dfn class="macro" id="_M/AHCI_COMMAND_TABLE_ACMD" data-ref="_M/AHCI_COMMAND_TABLE_ACMD">AHCI_COMMAND_TABLE_ACMD</dfn>            0x40</u></td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><u>#define <dfn class="macro" id="_M/AHCI_PRDT_SIZE_MASK" data-ref="_M/AHCI_PRDT_SIZE_MASK">AHCI_PRDT_SIZE_MASK</dfn>                0x3fffff</u></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><u>#define <dfn class="macro" id="_M/IDE_FEATURE_DMA" data-ref="_M/IDE_FEATURE_DMA">IDE_FEATURE_DMA</dfn>                    1</u></td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td><u>#define <dfn class="macro" id="_M/READ_FPDMA_QUEUED" data-ref="_M/READ_FPDMA_QUEUED">READ_FPDMA_QUEUED</dfn>                  0x60</u></td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/WRITE_FPDMA_QUEUED" data-ref="_M/WRITE_FPDMA_QUEUED">WRITE_FPDMA_QUEUED</dfn>                 0x61</u></td></tr>
+<tr><th id="197">197</th><td><u>#define <dfn class="macro" id="_M/NCQ_NON_DATA" data-ref="_M/NCQ_NON_DATA">NCQ_NON_DATA</dfn>                       0x63</u></td></tr>
+<tr><th id="198">198</th><td><u>#define <dfn class="macro" id="_M/RECEIVE_FPDMA_QUEUED" data-ref="_M/RECEIVE_FPDMA_QUEUED">RECEIVE_FPDMA_QUEUED</dfn>               0x65</u></td></tr>
+<tr><th id="199">199</th><td><u>#define <dfn class="macro" id="_M/SEND_FPDMA_QUEUED" data-ref="_M/SEND_FPDMA_QUEUED">SEND_FPDMA_QUEUED</dfn>                  0x64</u></td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/NCQ_FIS_FUA_MASK" data-ref="_M/NCQ_FIS_FUA_MASK">NCQ_FIS_FUA_MASK</dfn>                   0x80</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/NCQ_FIS_RARC_MASK" data-ref="_M/NCQ_FIS_RARC_MASK">NCQ_FIS_RARC_MASK</dfn>                  0x01</u></td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><u>#define <dfn class="macro" id="_M/RES_FIS_DSFIS" data-ref="_M/RES_FIS_DSFIS">RES_FIS_DSFIS</dfn>                      0x00</u></td></tr>
+<tr><th id="205">205</th><td><u>#define <dfn class="macro" id="_M/RES_FIS_PSFIS" data-ref="_M/RES_FIS_PSFIS">RES_FIS_PSFIS</dfn>                      0x20</u></td></tr>
+<tr><th id="206">206</th><td><u>#define <dfn class="macro" id="_M/RES_FIS_RFIS" data-ref="_M/RES_FIS_RFIS">RES_FIS_RFIS</dfn>                       0x40</u></td></tr>
+<tr><th id="207">207</th><td><u>#define <dfn class="macro" id="_M/RES_FIS_SDBFIS" data-ref="_M/RES_FIS_SDBFIS">RES_FIS_SDBFIS</dfn>                     0x58</u></td></tr>
+<tr><th id="208">208</th><td><u>#define <dfn class="macro" id="_M/RES_FIS_UFIS" data-ref="_M/RES_FIS_UFIS">RES_FIS_UFIS</dfn>                       0x60</u></td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><u>#define <dfn class="macro" id="_M/SATA_CAP_SIZE" data-ref="_M/SATA_CAP_SIZE">SATA_CAP_SIZE</dfn>           0x8</u></td></tr>
+<tr><th id="211">211</th><td><u>#define <dfn class="macro" id="_M/SATA_CAP_REV" data-ref="_M/SATA_CAP_REV">SATA_CAP_REV</dfn>            0x2</u></td></tr>
+<tr><th id="212">212</th><td><u>#define <dfn class="macro" id="_M/SATA_CAP_BAR" data-ref="_M/SATA_CAP_BAR">SATA_CAP_BAR</dfn>            0x4</u></td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AHCIPortRegs" title='AHCIPortRegs' data-ref="AHCIPortRegs"><a class="type" href="#AHCIPortRegs" title='AHCIPortRegs' data-ref="AHCIPortRegs">AHCIPortRegs</a></dfn> {</td></tr>
+<tr><th id="215">215</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::lst_addr" title='AHCIPortRegs::lst_addr' data-ref="AHCIPortRegs::lst_addr">lst_addr</dfn>;</td></tr>
+<tr><th id="216">216</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::lst_addr_hi" title='AHCIPortRegs::lst_addr_hi' data-ref="AHCIPortRegs::lst_addr_hi">lst_addr_hi</dfn>;</td></tr>
+<tr><th id="217">217</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::fis_addr" title='AHCIPortRegs::fis_addr' data-ref="AHCIPortRegs::fis_addr">fis_addr</dfn>;</td></tr>
+<tr><th id="218">218</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::fis_addr_hi" title='AHCIPortRegs::fis_addr_hi' data-ref="AHCIPortRegs::fis_addr_hi">fis_addr_hi</dfn>;</td></tr>
+<tr><th id="219">219</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::irq_stat" title='AHCIPortRegs::irq_stat' data-ref="AHCIPortRegs::irq_stat">irq_stat</dfn>;</td></tr>
+<tr><th id="220">220</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::irq_mask" title='AHCIPortRegs::irq_mask' data-ref="AHCIPortRegs::irq_mask">irq_mask</dfn>;</td></tr>
+<tr><th id="221">221</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::cmd" title='AHCIPortRegs::cmd' data-ref="AHCIPortRegs::cmd">cmd</dfn>;</td></tr>
+<tr><th id="222">222</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::unused0" title='AHCIPortRegs::unused0' data-ref="AHCIPortRegs::unused0">unused0</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::tfdata" title='AHCIPortRegs::tfdata' data-ref="AHCIPortRegs::tfdata">tfdata</dfn>;</td></tr>
+<tr><th id="224">224</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::sig" title='AHCIPortRegs::sig' data-ref="AHCIPortRegs::sig">sig</dfn>;</td></tr>
+<tr><th id="225">225</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::scr_stat" title='AHCIPortRegs::scr_stat' data-ref="AHCIPortRegs::scr_stat">scr_stat</dfn>;</td></tr>
+<tr><th id="226">226</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::scr_ctl" title='AHCIPortRegs::scr_ctl' data-ref="AHCIPortRegs::scr_ctl">scr_ctl</dfn>;</td></tr>
+<tr><th id="227">227</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::scr_err" title='AHCIPortRegs::scr_err' data-ref="AHCIPortRegs::scr_err">scr_err</dfn>;</td></tr>
+<tr><th id="228">228</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::scr_act" title='AHCIPortRegs::scr_act' data-ref="AHCIPortRegs::scr_act">scr_act</dfn>;</td></tr>
+<tr><th id="229">229</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::cmd_issue" title='AHCIPortRegs::cmd_issue' data-ref="AHCIPortRegs::cmd_issue">cmd_issue</dfn>;</td></tr>
+<tr><th id="230">230</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCIPortRegs::reserved" title='AHCIPortRegs::reserved' data-ref="AHCIPortRegs::reserved">reserved</dfn>;</td></tr>
+<tr><th id="231">231</th><td>} <dfn class="typedef" id="AHCIPortRegs" title='AHCIPortRegs' data-type='struct AHCIPortRegs' data-ref="AHCIPortRegs">AHCIPortRegs</dfn>;</td></tr>
+<tr><th id="232">232</th><td></td></tr>
+<tr><th id="233">233</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AHCICmdHdr" title='AHCICmdHdr' data-ref="AHCICmdHdr"><a class="type" href="#AHCICmdHdr" title='AHCICmdHdr' data-ref="AHCICmdHdr">AHCICmdHdr</a></dfn> {</td></tr>
+<tr><th id="234">234</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>    <dfn class="decl" id="AHCICmdHdr::opts" title='AHCICmdHdr::opts' data-ref="AHCICmdHdr::opts">opts</dfn>;</td></tr>
+<tr><th id="235">235</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a>    <dfn class="decl" id="AHCICmdHdr::prdtl" title='AHCICmdHdr::prdtl' data-ref="AHCICmdHdr::prdtl">prdtl</dfn>;</td></tr>
+<tr><th id="236">236</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCICmdHdr::status" title='AHCICmdHdr::status' data-ref="AHCICmdHdr::status">status</dfn>;</td></tr>
+<tr><th id="237">237</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>    <dfn class="decl" id="AHCICmdHdr::tbl_addr" title='AHCICmdHdr::tbl_addr' data-ref="AHCICmdHdr::tbl_addr">tbl_addr</dfn>;</td></tr>
+<tr><th id="238">238</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCICmdHdr::reserved" title='AHCICmdHdr::reserved' data-ref="AHCICmdHdr::reserved">reserved</dfn>[<var>4</var>];</td></tr>
+<tr><th id="239">239</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="typedef" id="AHCICmdHdr" title='AHCICmdHdr' data-type='struct AHCICmdHdr' data-ref="AHCICmdHdr">AHCICmdHdr</dfn>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AHCI_SG" title='AHCI_SG' data-ref="AHCI_SG"><a class="type" href="#AHCI_SG" title='AHCI_SG' data-ref="AHCI_SG">AHCI_SG</a></dfn> {</td></tr>
+<tr><th id="242">242</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>    <dfn class="decl" id="AHCI_SG::addr" title='AHCI_SG::addr' data-ref="AHCI_SG::addr">addr</dfn>;</td></tr>
+<tr><th id="243">243</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCI_SG::reserved" title='AHCI_SG::reserved' data-ref="AHCI_SG::reserved">reserved</dfn>;</td></tr>
+<tr><th id="244">244</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>    <dfn class="decl" id="AHCI_SG::flags_size" title='AHCI_SG::flags_size' data-ref="AHCI_SG::flags_size">flags_size</dfn>;</td></tr>
+<tr><th id="245">245</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="typedef" id="AHCI_SG" title='AHCI_SG' data-type='struct AHCI_SG' data-ref="AHCI_SG">AHCI_SG</dfn>;</td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="NCQTransferState" title='NCQTransferState' data-ref="NCQTransferState"><a class="type" href="#NCQTransferState" title='NCQTransferState' data-ref="NCQTransferState">NCQTransferState</a></dfn> {</td></tr>
+<tr><th id="248">248</th><td>    <a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIDevice" title='AHCIDevice' data-type='struct AHCIDevice' data-ref="AHCIDevice">AHCIDevice</a> *<dfn class="decl" id="NCQTransferState::drive" title='NCQTransferState::drive' data-ref="NCQTransferState::drive">drive</dfn>;</td></tr>
+<tr><th id="249">249</th><td>    <a class="typedef" href="../../include/block/aio.h.html#BlockAIOCB" title='BlockAIOCB' data-type='struct BlockAIOCB' data-ref="BlockAIOCB">BlockAIOCB</a> *<dfn class="decl" id="NCQTransferState::aiocb" title='NCQTransferState::aiocb' data-ref="NCQTransferState::aiocb">aiocb</dfn>;</td></tr>
+<tr><th id="250">250</th><td>    <a class="typedef" href="#AHCICmdHdr" title='AHCICmdHdr' data-type='struct AHCICmdHdr' data-ref="AHCICmdHdr">AHCICmdHdr</a> *<dfn class="decl" id="NCQTransferState::cmdh" title='NCQTransferState::cmdh' data-ref="NCQTransferState::cmdh">cmdh</dfn>;</td></tr>
+<tr><th id="251">251</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUSGList" title='QEMUSGList' data-type='struct QEMUSGList' data-ref="QEMUSGList">QEMUSGList</a> <dfn class="decl" id="NCQTransferState::sglist" title='NCQTransferState::sglist' data-ref="NCQTransferState::sglist">sglist</dfn>;</td></tr>
+<tr><th id="252">252</th><td>    <a class="typedef" href="../../include/block/accounting.h.html#BlockAcctCookie" title='BlockAcctCookie' data-type='struct BlockAcctCookie' data-ref="BlockAcctCookie">BlockAcctCookie</a> <dfn class="decl" id="NCQTransferState::acct" title='NCQTransferState::acct' data-ref="NCQTransferState::acct">acct</dfn>;</td></tr>
+<tr><th id="253">253</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="NCQTransferState::sector_count" title='NCQTransferState::sector_count' data-ref="NCQTransferState::sector_count">sector_count</dfn>;</td></tr>
+<tr><th id="254">254</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="NCQTransferState::lba" title='NCQTransferState::lba' data-ref="NCQTransferState::lba">lba</dfn>;</td></tr>
+<tr><th id="255">255</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQTransferState::tag" title='NCQTransferState::tag' data-ref="NCQTransferState::tag">tag</dfn>;</td></tr>
+<tr><th id="256">256</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQTransferState::cmd" title='NCQTransferState::cmd' data-ref="NCQTransferState::cmd">cmd</dfn>;</td></tr>
+<tr><th id="257">257</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQTransferState::slot" title='NCQTransferState::slot' data-ref="NCQTransferState::slot">slot</dfn>;</td></tr>
+<tr><th id="258">258</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="NCQTransferState::used" title='NCQTransferState::used' data-ref="NCQTransferState::used">used</dfn>;</td></tr>
+<tr><th id="259">259</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="NCQTransferState::halt" title='NCQTransferState::halt' data-ref="NCQTransferState::halt">halt</dfn>;</td></tr>
+<tr><th id="260">260</th><td>} <dfn class="typedef" id="NCQTransferState" title='NCQTransferState' data-type='struct NCQTransferState' data-ref="NCQTransferState">NCQTransferState</dfn>;</td></tr>
+<tr><th id="261">261</th><td></td></tr>
+<tr><th id="262">262</th><td><b>struct</b> <dfn class="type def" id="AHCIDevice" title='AHCIDevice' data-ref="AHCIDevice">AHCIDevice</dfn> {</td></tr>
+<tr><th id="263">263</th><td>    <a class="typedef" href="../../include/hw/ide/internal.h.html#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> <dfn class="decl" id="AHCIDevice::dma" title='AHCIDevice::dma' data-ref="AHCIDevice::dma">dma</dfn>;</td></tr>
+<tr><th id="264">264</th><td>    <a class="typedef" href="../../include/hw/ide/internal.h.html#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> <dfn class="decl" id="AHCIDevice::port" title='AHCIDevice::port' data-ref="AHCIDevice::port">port</dfn>;</td></tr>
+<tr><th id="265">265</th><td>    <em>int</em> <dfn class="decl" id="AHCIDevice::port_no" title='AHCIDevice::port_no' data-ref="AHCIDevice::port_no">port_no</dfn>;</td></tr>
+<tr><th id="266">266</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AHCIDevice::port_state" title='AHCIDevice::port_state' data-ref="AHCIDevice::port_state">port_state</dfn>;</td></tr>
+<tr><th id="267">267</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AHCIDevice::finished" title='AHCIDevice::finished' data-ref="AHCIDevice::finished">finished</dfn>;</td></tr>
+<tr><th id="268">268</th><td>    <a class="typedef" href="#AHCIPortRegs" title='AHCIPortRegs' data-type='struct AHCIPortRegs' data-ref="AHCIPortRegs">AHCIPortRegs</a> <dfn class="decl" id="AHCIDevice::port_regs" title='AHCIDevice::port_regs' data-ref="AHCIDevice::port_regs">port_regs</dfn>;</td></tr>
+<tr><th id="269">269</th><td>    <b>struct</b> <a class="type" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-ref="AHCIState">AHCIState</a> *<dfn class="decl" id="AHCIDevice::hba" title='AHCIDevice::hba' data-ref="AHCIDevice::hba">hba</dfn>;</td></tr>
+<tr><th id="270">270</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="AHCIDevice::check_bh" title='AHCIDevice::check_bh' data-ref="AHCIDevice::check_bh">check_bh</dfn>;</td></tr>
+<tr><th id="271">271</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="AHCIDevice::lst" title='AHCIDevice::lst' data-ref="AHCIDevice::lst">lst</dfn>;</td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="AHCIDevice::res_fis" title='AHCIDevice::res_fis' data-ref="AHCIDevice::res_fis">res_fis</dfn>;</td></tr>
+<tr><th id="273">273</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AHCIDevice::done_atapi_packet" title='AHCIDevice::done_atapi_packet' data-ref="AHCIDevice::done_atapi_packet">done_atapi_packet</dfn>;</td></tr>
+<tr><th id="274">274</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="AHCIDevice::busy_slot" title='AHCIDevice::busy_slot' data-ref="AHCIDevice::busy_slot">busy_slot</dfn>;</td></tr>
+<tr><th id="275">275</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AHCIDevice::init_d2h_sent" title='AHCIDevice::init_d2h_sent' data-ref="AHCIDevice::init_d2h_sent">init_d2h_sent</dfn>;</td></tr>
+<tr><th id="276">276</th><td>    <a class="typedef" href="#AHCICmdHdr" title='AHCICmdHdr' data-type='struct AHCICmdHdr' data-ref="AHCICmdHdr">AHCICmdHdr</a> *<dfn class="decl" id="AHCIDevice::cur_cmd" title='AHCIDevice::cur_cmd' data-ref="AHCIDevice::cur_cmd">cur_cmd</dfn>;</td></tr>
+<tr><th id="277">277</th><td>    <a class="typedef" href="#NCQTransferState" title='NCQTransferState' data-type='struct NCQTransferState' data-ref="NCQTransferState">NCQTransferState</a> <dfn class="decl" id="AHCIDevice::ncq_tfs" title='AHCIDevice::ncq_tfs' data-ref="AHCIDevice::ncq_tfs">ncq_tfs</dfn>[<a class="macro" href="#35" title="32" data-ref="_M/AHCI_MAX_CMDS">AHCI_MAX_CMDS</a>];</td></tr>
+<tr><th id="278">278</th><td>};</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td><b>struct</b> <dfn class="type def" id="AHCIPCIState" title='AHCIPCIState' data-ref="AHCIPCIState">AHCIPCIState</dfn> {</td></tr>
+<tr><th id="281">281</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="282">282</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="AHCIPCIState::parent_obj" title='AHCIPCIState::parent_obj' data-ref="AHCIPCIState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="283">283</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>    <a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> <dfn class="decl" id="AHCIPCIState::ahci" title='AHCIPCIState::ahci' data-ref="AHCIPCIState::ahci">ahci</dfn>;</td></tr>
+<tr><th id="286">286</th><td>};</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><u>#define <dfn class="macro" id="_M/TYPE_ICH9_AHCI" data-ref="_M/TYPE_ICH9_AHCI">TYPE_ICH9_AHCI</dfn> "ich9-ahci"</u></td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><u>#define <dfn class="macro" id="_M/ICH_AHCI" data-ref="_M/ICH_AHCI">ICH_AHCI</dfn>(obj) \</u></td></tr>
+<tr><th id="291">291</th><td><u>    OBJECT_CHECK(AHCIPCIState, (obj), TYPE_ICH9_AHCI)</u></td></tr>
+<tr><th id="292">292</th><td></td></tr>
+<tr><th id="293">293</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../include/migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_ahci" title='vmstate_ahci' data-ref="vmstate_ahci">vmstate_ahci</dfn>;</td></tr>
+<tr><th id="294">294</th><td></td></tr>
+<tr><th id="295">295</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_AHCI" data-ref="_M/VMSTATE_AHCI">VMSTATE_AHCI</dfn>(_field, _state) {                               \</u></td></tr>
+<tr><th id="296">296</th><td><u>    .name       = (stringify(_field)),                               \</u></td></tr>
+<tr><th id="297">297</th><td><u>    .size       = sizeof(AHCIState),                                 \</u></td></tr>
+<tr><th id="298">298</th><td><u>    .vmsd       = &amp;vmstate_ahci,                                     \</u></td></tr>
+<tr><th id="299">299</th><td><u>    .flags      = VMS_STRUCT,                                        \</u></td></tr>
+<tr><th id="300">300</th><td><u>    .offset     = vmstate_offset_value(_state, _field, AHCIState),   \</u></td></tr>
+<tr><th id="301">301</th><td><u>}</u></td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="304">304</th><td><i class="doc"> * NCQFrame is the same as a Register H2D FIS (described in SATA 3.2),</i></td></tr>
+<tr><th id="305">305</th><td><i class="doc"> * but some fields have been re-mapped and re-purposed, as seen in</i></td></tr>
+<tr><th id="306">306</th><td><i class="doc"> * SATA 3.2 section 13.6.4.1 ("READ FPDMA QUEUED")</i></td></tr>
+<tr><th id="307">307</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="308">308</th><td><i class="doc"> * cmd_fis[3], feature 7:0, becomes sector count 7:0.</i></td></tr>
+<tr><th id="309">309</th><td><i class="doc"> * cmd_fis[7], device 7:0, uses bit 7 as the Force Unit Access bit.</i></td></tr>
+<tr><th id="310">310</th><td><i class="doc"> * cmd_fis[11], feature 15:8, becomes sector count 15:8.</i></td></tr>
+<tr><th id="311">311</th><td><i class="doc"> * cmd_fis[12], count 7:0, becomes the NCQ TAG (7:3) and RARC bit (0)</i></td></tr>
+<tr><th id="312">312</th><td><i class="doc"> * cmd_fis[13], count 15:8, becomes the priority value (7:6)</i></td></tr>
+<tr><th id="313">313</th><td><i class="doc"> * bytes 16-19 become an le32 "auxiliary" field.</i></td></tr>
+<tr><th id="314">314</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="315">315</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="NCQFrame" title='NCQFrame' data-ref="NCQFrame"><a class="type" href="#NCQFrame" title='NCQFrame' data-ref="NCQFrame">NCQFrame</a></dfn> {</td></tr>
+<tr><th id="316">316</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::fis_type" title='NCQFrame::fis_type' data-ref="NCQFrame::fis_type">fis_type</dfn>;</td></tr>
+<tr><th id="317">317</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::c" title='NCQFrame::c' data-ref="NCQFrame::c">c</dfn>;</td></tr>
+<tr><th id="318">318</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::command" title='NCQFrame::command' data-ref="NCQFrame::command">command</dfn>;</td></tr>
+<tr><th id="319">319</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::sector_count_low" title='NCQFrame::sector_count_low' data-ref="NCQFrame::sector_count_low">sector_count_low</dfn>;  <i>/* (feature 7:0) */</i></td></tr>
+<tr><th id="320">320</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba0" title='NCQFrame::lba0' data-ref="NCQFrame::lba0">lba0</dfn>;</td></tr>
+<tr><th id="321">321</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba1" title='NCQFrame::lba1' data-ref="NCQFrame::lba1">lba1</dfn>;</td></tr>
+<tr><th id="322">322</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba2" title='NCQFrame::lba2' data-ref="NCQFrame::lba2">lba2</dfn>;</td></tr>
+<tr><th id="323">323</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::fua" title='NCQFrame::fua' data-ref="NCQFrame::fua">fua</dfn>;               <i>/* (device 7:0) */</i></td></tr>
+<tr><th id="324">324</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba3" title='NCQFrame::lba3' data-ref="NCQFrame::lba3">lba3</dfn>;</td></tr>
+<tr><th id="325">325</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba4" title='NCQFrame::lba4' data-ref="NCQFrame::lba4">lba4</dfn>;</td></tr>
+<tr><th id="326">326</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::lba5" title='NCQFrame::lba5' data-ref="NCQFrame::lba5">lba5</dfn>;</td></tr>
+<tr><th id="327">327</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::sector_count_high" title='NCQFrame::sector_count_high' data-ref="NCQFrame::sector_count_high">sector_count_high</dfn>; <i>/* (feature 15:8) */</i></td></tr>
+<tr><th id="328">328</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::tag" title='NCQFrame::tag' data-ref="NCQFrame::tag">tag</dfn>;               <i>/* (count 0:7) */</i></td></tr>
+<tr><th id="329">329</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::prio" title='NCQFrame::prio' data-ref="NCQFrame::prio">prio</dfn>;              <i>/* (count 15:8) */</i></td></tr>
+<tr><th id="330">330</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::icc" title='NCQFrame::icc' data-ref="NCQFrame::icc">icc</dfn>;</td></tr>
+<tr><th id="331">331</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::control" title='NCQFrame::control' data-ref="NCQFrame::control">control</dfn>;</td></tr>
+<tr><th id="332">332</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::aux0" title='NCQFrame::aux0' data-ref="NCQFrame::aux0">aux0</dfn>;</td></tr>
+<tr><th id="333">333</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::aux1" title='NCQFrame::aux1' data-ref="NCQFrame::aux1">aux1</dfn>;</td></tr>
+<tr><th id="334">334</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::aux2" title='NCQFrame::aux2' data-ref="NCQFrame::aux2">aux2</dfn>;</td></tr>
+<tr><th id="335">335</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="NCQFrame::aux3" title='NCQFrame::aux3' data-ref="NCQFrame::aux3">aux3</dfn>;</td></tr>
+<tr><th id="336">336</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="typedef" id="NCQFrame" title='NCQFrame' data-type='struct NCQFrame' data-ref="NCQFrame">NCQFrame</dfn>;</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="SDBFIS" title='SDBFIS' data-ref="SDBFIS"><a class="type" href="#SDBFIS" title='SDBFIS' data-ref="SDBFIS">SDBFIS</a></dfn> {</td></tr>
+<tr><th id="339">339</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="SDBFIS::type" title='SDBFIS::type' data-ref="SDBFIS::type">type</dfn>;</td></tr>
+<tr><th id="340">340</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="SDBFIS::flags" title='SDBFIS::flags' data-ref="SDBFIS::flags">flags</dfn>;</td></tr>
+<tr><th id="341">341</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="SDBFIS::status" title='SDBFIS::status' data-ref="SDBFIS::status">status</dfn>;</td></tr>
+<tr><th id="342">342</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="SDBFIS::error" title='SDBFIS::error' data-ref="SDBFIS::error">error</dfn>;</td></tr>
+<tr><th id="343">343</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="SDBFIS::payload" title='SDBFIS::payload' data-ref="SDBFIS::payload">payload</dfn>;</td></tr>
+<tr><th id="344">344</th><td>} <a class="macro" href="../../include/qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="typedef" id="SDBFIS" title='SDBFIS' data-type='struct SDBFIS' data-ref="SDBFIS">SDBFIS</dfn>;</td></tr>
+<tr><th id="345">345</th><td></td></tr>
+<tr><th id="346">346</th><td><em>void</em> <a class="decl" href="ahci.c.html#ahci_realize" title='ahci_realize' data-ref="ahci_realize" id="ahci_realize">ahci_realize</a>(<a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='AHCIState *' data-ref="1s">s</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col2 decl" id="2qdev" title='qdev' data-type='DeviceState *' data-ref="2qdev">qdev</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#AddressSpace" title='AddressSpace' data-type='struct AddressSpace' data-ref="AddressSpace">AddressSpace</a> *<dfn class="local col3 decl" id="3as" title='as' data-type='AddressSpace *' data-ref="3as">as</dfn>, <em>int</em> <dfn class="local col4 decl" id="4ports" title='ports' data-type='int' data-ref="4ports">ports</dfn>);</td></tr>
+<tr><th id="347">347</th><td><em>void</em> <a class="decl" href="ahci.c.html#ahci_init" title='ahci_init' data-ref="ahci_init" id="ahci_init">ahci_init</a>(<a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> *<dfn class="local col5 decl" id="5s" title='s' data-type='AHCIState *' data-ref="5s">s</dfn>, <a class="typedef" href="../../include/qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col6 decl" id="6qdev" title='qdev' data-type='DeviceState *' data-ref="6qdev">qdev</dfn>);</td></tr>
+<tr><th id="348">348</th><td><em>void</em> <a class="decl" href="ahci.c.html#ahci_uninit" title='ahci_uninit' data-ref="ahci_uninit" id="ahci_uninit">ahci_uninit</a>(<a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> *<dfn class="local col7 decl" id="7s" title='s' data-type='AHCIState *' data-ref="7s">s</dfn>);</td></tr>
+<tr><th id="349">349</th><td></td></tr>
+<tr><th id="350">350</th><td><em>void</em> <a class="decl" href="ahci.c.html#ahci_reset" title='ahci_reset' data-ref="ahci_reset" id="ahci_reset">ahci_reset</a>(<a class="typedef" href="../../include/hw/ide/ahci.h.html#AHCIState" title='AHCIState' data-type='struct AHCIState' data-ref="AHCIState">AHCIState</a> *<dfn class="local col8 decl" id="8s" title='s' data-type='AHCIState *' data-ref="8s">s</dfn>);</td></tr>
+<tr><th id="351">351</th><td></td></tr>
+<tr><th id="352">352</th><td><u>#define <dfn class="macro" id="_M/TYPE_SYSBUS_AHCI" data-ref="_M/TYPE_SYSBUS_AHCI">TYPE_SYSBUS_AHCI</dfn> "sysbus-ahci"</u></td></tr>
+<tr><th id="353">353</th><td><u>#define <dfn class="macro" id="_M/SYSBUS_AHCI" data-ref="_M/SYSBUS_AHCI">SYSBUS_AHCI</dfn>(obj) OBJECT_CHECK(SysbusAHCIState, (obj), TYPE_SYSBUS_AHCI)</u></td></tr>
+<tr><th id="354">354</th><td></td></tr>
+<tr><th id="355">355</th><td><u>#define <dfn class="macro" id="_M/TYPE_ALLWINNER_AHCI" data-ref="_M/TYPE_ALLWINNER_AHCI">TYPE_ALLWINNER_AHCI</dfn> "allwinner-ahci"</u></td></tr>
+<tr><th id="356">356</th><td><u>#define <dfn class="macro" id="_M/ALLWINNER_AHCI" data-ref="_M/ALLWINNER_AHCI">ALLWINNER_AHCI</dfn>(obj) OBJECT_CHECK(AllwinnerAHCIState, (obj), \</u></td></tr>
+<tr><th id="357">357</th><td><u>                       TYPE_ALLWINNER_AHCI)</u></td></tr>
+<tr><th id="358">358</th><td></td></tr>
+<tr><th id="359">359</th><td><u>#<span data-ppcond="24">endif</span> /* HW_IDE_AHCI_H */</u></td></tr>
+<tr><th id="360">360</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='ahci.c.html'>codebrowser/hw/ide/ahci.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

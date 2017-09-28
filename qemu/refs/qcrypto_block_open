@@ -1,0 +1,40 @@
+<dec f='codebrowser/include/crypto/block.h' l='105' type='QCryptoBlock * qcrypto_block_open(QCryptoBlockOpenOptions * options, const char * optprefix, QCryptoBlockReadFunc readfunc, void * opaque, unsigned int flags, Error ** errp)'/>
+<use f='codebrowser/block/crypto.c' l='299' u='c' c='block_crypto_open_generic'/>
+<doc f='codebrowser/include/crypto/block.h' l='71'>/**
+ * qcrypto_block_open:
+ * @options: the encryption options
+ * @optprefix: name prefix for options
+ * @readfunc: callback for reading data from the volume
+ * @opaque: data to pass to @readfunc
+ * @flags: bitmask of QCryptoBlockOpenFlags values
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Create a new block encryption object for an existing
+ * storage volume encrypted with format identified by
+ * the parameters in @options.
+ *
+ * This will use @readfunc to initialize the encryption
+ * context based on the volume header(s), extracting the
+ * master key(s) as required.
+ *
+ * If @flags contains QCRYPTO_BLOCK_OPEN_NO_IO then
+ * the open process will be optimized to skip any parts
+ * that are only required to perform I/O. In particular
+ * this would usually avoid the need to decrypt any
+ * master keys. The only thing that can be done with
+ * the resulting QCryptoBlock object would be to query
+ * metadata such as the payload offset. There will be
+ * no cipher or ivgen objects available.
+ *
+ * If any part of initializing the encryption context
+ * fails an error will be returned. This could be due
+ * to the volume being in the wrong format, a cipher
+ * or IV generator algorithm that is not supported,
+ * or incorrect passphrases.
+ *
+ * Returns: a block encryption format, or NULL on error
+ */</doc>
+<use f='codebrowser/block/qcow.c' l='211' u='c' c='qcow_open'/>
+<use f='codebrowser/block/qcow2.c' l='289' u='c' c='qcow2_read_extensions'/>
+<use f='codebrowser/block/qcow2.c' l='1403' u='c' c='qcow2_do_open'/>
+<def f='codebrowser/crypto/block.c' l='50' ll='78' type='QCryptoBlock * qcrypto_block_open(QCryptoBlockOpenOptions * options, const char * optprefix, QCryptoBlockReadFunc readfunc, void * opaque, unsigned int flags, Error ** errp)'/>

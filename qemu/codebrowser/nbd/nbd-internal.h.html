@@ -1,0 +1,163 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>nbd-internal.h source code [codebrowser/nbd/nbd-internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="NBDTLSHandshakeData "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/nbd/nbd-internal.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>nbd</a>/<a href='nbd-internal.h.html'>nbd-internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * NBD Internal Declarations</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2016 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="7">7</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="8">8</th><td><i> */</i></td></tr>
+<tr><th id="9">9</th><td></td></tr>
+<tr><th id="10">10</th><td><u>#<span data-ppcond="10">ifndef</span> <span class="macro" data-ref="_M/NBD_INTERNAL_H">NBD_INTERNAL_H</span></u></td></tr>
+<tr><th id="11">11</th><td><u>#define <dfn class="macro" id="_M/NBD_INTERNAL_H" data-ref="_M/NBD_INTERNAL_H">NBD_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/block/nbd.h.html">"block/nbd.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/io/channel-tls.h.html">"io/channel-tls.h"</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/qemu/coroutine.h.html">"qemu/coroutine.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu/iov.h.html">"qemu/iov.h"</a></u></td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><u>#<span data-ppcond="19">ifndef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../../include/x86_64-linux-gnu/sys/ioctl.h.html">&lt;sys/ioctl.h&gt;</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="19">endif</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#<span data-ppcond="22">if</span> defined(<span class="macro" data-ref="_M/__sun__">__sun__</span>) || defined(<span class="macro" data-ref="_M/__HAIKU__">__HAIKU__</span>)</u></td></tr>
+<tr><th id="23">23</th><td><u>#include &lt;sys/ioccom.h&gt;</u></td></tr>
+<tr><th id="24">24</th><td><u>#<span data-ppcond="22">endif</span></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#<span data-ppcond="26">ifdef</span> <span class="macro" data-ref="_M/__linux__">__linux__</span></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/linux/fs.h.html">&lt;linux/fs.h&gt;</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="26">endif</span></u></td></tr>
+<tr><th id="29">29</th><td></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu/bswap.h.html">"qemu/bswap.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/qemu/queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><i>/* This is all part of the "official" NBD API.</i></td></tr>
+<tr><th id="35">35</th><td><i> *</i></td></tr>
+<tr><th id="36">36</th><td><i> * The most up-to-date documentation is available at:</i></td></tr>
+<tr><th id="37">37</th><td><i> * <a href="https://github.com/yoe/nbd/blob/master/doc/proto.md">https://github.com/yoe/nbd/blob/master/doc/proto.md</a></i></td></tr>
+<tr><th id="38">38</th><td><i> */</i></td></tr>
+<tr><th id="39">39</th><td></td></tr>
+<tr><th id="40">40</th><td><i>/* Size of all NBD_OPT_*, without payload */</i></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/NBD_REQUEST_SIZE" data-ref="_M/NBD_REQUEST_SIZE">NBD_REQUEST_SIZE</dfn>            (4 + 2 + 2 + 8 + 8 + 4)</u></td></tr>
+<tr><th id="42">42</th><td><i>/* Size of all NBD_REP_* sent in answer to most NBD_OPT_*, without payload */</i></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/NBD_REPLY_SIZE" data-ref="_M/NBD_REPLY_SIZE">NBD_REPLY_SIZE</dfn>              (4 + 4 + 8)</u></td></tr>
+<tr><th id="44">44</th><td><i>/* Size of reply to NBD_OPT_EXPORT_NAME */</i></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/NBD_REPLY_EXPORT_NAME_SIZE" data-ref="_M/NBD_REPLY_EXPORT_NAME_SIZE">NBD_REPLY_EXPORT_NAME_SIZE</dfn>  (8 + 2 + 124)</u></td></tr>
+<tr><th id="46">46</th><td><i>/* Size of oldstyle negotiation */</i></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/NBD_OLDSTYLE_NEGOTIATE_SIZE" data-ref="_M/NBD_OLDSTYLE_NEGOTIATE_SIZE">NBD_OLDSTYLE_NEGOTIATE_SIZE</dfn> (8 + 8 + 8 + 4 + 124)</u></td></tr>
+<tr><th id="48">48</th><td></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/NBD_REQUEST_MAGIC" data-ref="_M/NBD_REQUEST_MAGIC">NBD_REQUEST_MAGIC</dfn>       0x25609513</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/NBD_REPLY_MAGIC" data-ref="_M/NBD_REPLY_MAGIC">NBD_REPLY_MAGIC</dfn>         0x67446698</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/NBD_OPTS_MAGIC" data-ref="_M/NBD_OPTS_MAGIC">NBD_OPTS_MAGIC</dfn>          0x49484156454F5054LL</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/NBD_CLIENT_MAGIC" data-ref="_M/NBD_CLIENT_MAGIC">NBD_CLIENT_MAGIC</dfn>        0x0000420281861253LL</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/NBD_REP_MAGIC" data-ref="_M/NBD_REP_MAGIC">NBD_REP_MAGIC</dfn>           0x0003e889045565a9LL</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_SOCK" data-ref="_M/NBD_SET_SOCK">NBD_SET_SOCK</dfn>            _IO(0xab, 0)</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_BLKSIZE" data-ref="_M/NBD_SET_BLKSIZE">NBD_SET_BLKSIZE</dfn>         _IO(0xab, 1)</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_SIZE" data-ref="_M/NBD_SET_SIZE">NBD_SET_SIZE</dfn>            _IO(0xab, 2)</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/NBD_DO_IT" data-ref="_M/NBD_DO_IT">NBD_DO_IT</dfn>               _IO(0xab, 3)</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/NBD_CLEAR_SOCK" data-ref="_M/NBD_CLEAR_SOCK">NBD_CLEAR_SOCK</dfn>          _IO(0xab, 4)</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/NBD_CLEAR_QUE" data-ref="_M/NBD_CLEAR_QUE">NBD_CLEAR_QUE</dfn>           _IO(0xab, 5)</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/NBD_PRINT_DEBUG" data-ref="_M/NBD_PRINT_DEBUG">NBD_PRINT_DEBUG</dfn>         _IO(0xab, 6)</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_SIZE_BLOCKS" data-ref="_M/NBD_SET_SIZE_BLOCKS">NBD_SET_SIZE_BLOCKS</dfn>     _IO(0xab, 7)</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/NBD_DISCONNECT" data-ref="_M/NBD_DISCONNECT">NBD_DISCONNECT</dfn>          _IO(0xab, 8)</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_TIMEOUT" data-ref="_M/NBD_SET_TIMEOUT">NBD_SET_TIMEOUT</dfn>         _IO(0xab, 9)</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/NBD_SET_FLAGS" data-ref="_M/NBD_SET_FLAGS">NBD_SET_FLAGS</dfn>           _IO(0xab, 10)</u></td></tr>
+<tr><th id="66">66</th><td></td></tr>
+<tr><th id="67">67</th><td><i>/* NBD errors are based on errno numbers, so there is a 1:1 mapping,</i></td></tr>
+<tr><th id="68">68</th><td><i> * but only a limited set of errno values is specified in the protocol.</i></td></tr>
+<tr><th id="69">69</th><td><i> * Everything else is squashed to EINVAL.</i></td></tr>
+<tr><th id="70">70</th><td><i> */</i></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/NBD_SUCCESS" data-ref="_M/NBD_SUCCESS">NBD_SUCCESS</dfn>    0</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/NBD_EPERM" data-ref="_M/NBD_EPERM">NBD_EPERM</dfn>      1</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/NBD_EIO" data-ref="_M/NBD_EIO">NBD_EIO</dfn>        5</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/NBD_ENOMEM" data-ref="_M/NBD_ENOMEM">NBD_ENOMEM</dfn>     12</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/NBD_EINVAL" data-ref="_M/NBD_EINVAL">NBD_EINVAL</dfn>     22</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/NBD_ENOSPC" data-ref="_M/NBD_ENOSPC">NBD_ENOSPC</dfn>     28</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/NBD_ESHUTDOWN" data-ref="_M/NBD_ESHUTDOWN">NBD_ESHUTDOWN</dfn>  108</u></td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><i>/* nbd_read_eof</i></td></tr>
+<tr><th id="80">80</th><td><i> * Tries to read @size bytes from @ioc. Returns number of bytes actually read.</i></td></tr>
+<tr><th id="81">81</th><td><i> * May return a value &gt;= 0 and &lt; size only on EOF, i.e. when iteratively called</i></td></tr>
+<tr><th id="82">82</th><td><i> * qio_channel_readv() returns 0. So, there is no need to call nbd_read_eof</i></td></tr>
+<tr><th id="83">83</th><td><i> * iteratively.</i></td></tr>
+<tr><th id="84">84</th><td><i> */</i></td></tr>
+<tr><th id="85">85</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="decl def" id="nbd_read_eof" title='nbd_read_eof' data-ref="nbd_read_eof">nbd_read_eof</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col9 decl" id="229ioc" title='ioc' data-type='QIOChannel *' data-ref="229ioc">ioc</dfn>, <em>void</em> *<dfn class="local col0 decl" id="230buffer" title='buffer' data-type='void *' data-ref="230buffer">buffer</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="231size" title='size' data-type='size_t' data-ref="231size">size</dfn>,</td></tr>
+<tr><th id="86">86</th><td>                                   <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="232errp" title='errp' data-type='Error **' data-ref="232errp">errp</dfn>)</td></tr>
+<tr><th id="87">87</th><td>{</td></tr>
+<tr><th id="88">88</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="local col3 decl" id="233iov" title='iov' data-type='struct iovec' data-ref="233iov">iov</dfn> = { .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = <a class="local col0 ref" href="#230buffer" title='buffer' data-ref="230buffer">buffer</a>, .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a> = <a class="local col1 ref" href="#231size" title='size' data-ref="231size">size</a> };</td></tr>
+<tr><th id="89">89</th><td>    <i>/* Sockets are kept in blocking mode in the negotiation phase.  After</i></td></tr>
+<tr><th id="90">90</th><td><i>     * that, a non-readable socket simply means that another thread stole</i></td></tr>
+<tr><th id="91">91</th><td><i>     * our request/reply.  Synchronization is done with recv_coroutine, so</i></td></tr>
+<tr><th id="92">92</th><td><i>     * that this is coroutine-safe.</i></td></tr>
+<tr><th id="93">93</th><td><i>     */</i></td></tr>
+<tr><th id="94">94</th><td>    <b>return</b> <a class="ref" href="../include/block/nbd.h.html#nbd_rwv" title='nbd_rwv' data-ref="nbd_rwv">nbd_rwv</a>(<a class="local col9 ref" href="#229ioc" title='ioc' data-ref="229ioc">ioc</a>, &amp;<a class="local col3 ref" href="#233iov" title='iov' data-ref="233iov">iov</a>, <var>1</var>, <a class="local col1 ref" href="#231size" title='size' data-ref="231size">size</a>, <span class="macro" title="1" data-ref="_M/true">true</span>, <a class="local col2 ref" href="#232errp" title='errp' data-ref="232errp">errp</a>);</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>/* nbd_read</i></td></tr>
+<tr><th id="98">98</th><td><i> * Reads @size bytes from @ioc. Returns 0 on success.</i></td></tr>
+<tr><th id="99">99</th><td><i> */</i></td></tr>
+<tr><th id="100">100</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="nbd_read" title='nbd_read' data-ref="nbd_read">nbd_read</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col4 decl" id="234ioc" title='ioc' data-type='QIOChannel *' data-ref="234ioc">ioc</dfn>, <em>void</em> *<dfn class="local col5 decl" id="235buffer" title='buffer' data-type='void *' data-ref="235buffer">buffer</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="236size" title='size' data-type='size_t' data-ref="236size">size</dfn>,</td></tr>
+<tr><th id="101">101</th><td>                           <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col7 decl" id="237errp" title='errp' data-type='Error **' data-ref="237errp">errp</dfn>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col8 decl" id="238ret" title='ret' data-type='ssize_t' data-ref="238ret">ret</dfn> = <a class="ref" href="#nbd_read_eof" title='nbd_read_eof' data-ref="nbd_read_eof">nbd_read_eof</a>(<a class="local col4 ref" href="#234ioc" title='ioc' data-ref="234ioc">ioc</a>, <a class="local col5 ref" href="#235buffer" title='buffer' data-ref="235buffer">buffer</a>, <a class="local col6 ref" href="#236size" title='size' data-ref="236size">size</a>, <a class="local col7 ref" href="#237errp" title='errp' data-ref="237errp">errp</a>);</td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td>    <b>if</b> (<a class="local col8 ref" href="#238ret" title='ret' data-ref="238ret">ret</a> &gt;= <var>0</var> &amp;&amp; <a class="local col8 ref" href="#238ret" title='ret' data-ref="238ret">ret</a> != <a class="local col6 ref" href="#236size" title='size' data-ref="236size">size</a>) {</td></tr>
+<tr><th id="106">106</th><td>        <a class="local col8 ref" href="#238ret" title='ret' data-ref="238ret">ret</a> = -<a class="macro" href="../../include/asm-generic/errno-base.h.html#25" title="22" data-ref="_M/EINVAL">EINVAL</a>;</td></tr>
+<tr><th id="107">107</th><td>        <a class="macro" href="../include/qapi/error.h.html#160" title="error_setg_internal((errp), &quot;/home/jon/workspace/qemu/nbd/nbd-internal.h&quot;, 107, __func__, (&quot;End of file&quot;))" data-ref="_M/error_setg">error_setg</a>(<a class="local col7 ref" href="#237errp" title='errp' data-ref="237errp">errp</a>, <q>"End of file"</q>);</td></tr>
+<tr><th id="108">108</th><td>    }</td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td>    <b>return</b> <a class="local col8 ref" href="#238ret" title='ret' data-ref="238ret">ret</a> &lt; <var>0</var> ? <a class="local col8 ref" href="#238ret" title='ret' data-ref="238ret">ret</a> : <var>0</var>;</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i>/* nbd_write</i></td></tr>
+<tr><th id="114">114</th><td><i> * Writes @size bytes to @ioc. Returns 0 on success.</i></td></tr>
+<tr><th id="115">115</th><td><i> */</i></td></tr>
+<tr><th id="116">116</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="nbd_write" title='nbd_write' data-ref="nbd_write">nbd_write</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col9 decl" id="239ioc" title='ioc' data-type='QIOChannel *' data-ref="239ioc">ioc</dfn>, <em>const</em> <em>void</em> *<dfn class="local col0 decl" id="240buffer" title='buffer' data-type='const void *' data-ref="240buffer">buffer</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col1 decl" id="241size" title='size' data-type='size_t' data-ref="241size">size</dfn>,</td></tr>
+<tr><th id="117">117</th><td>                            <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col2 decl" id="242errp" title='errp' data-type='Error **' data-ref="242errp">errp</dfn>)</td></tr>
+<tr><th id="118">118</th><td>{</td></tr>
+<tr><th id="119">119</th><td>    <b>struct</b> <a class="type" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="local col3 decl" id="243iov" title='iov' data-type='struct iovec' data-ref="243iov">iov</dfn> = { .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_base" title='iovec::iov_base' data-ref="iovec::iov_base">iov_base</a> = (<em>void</em> *) <a class="local col0 ref" href="#240buffer" title='buffer' data-ref="240buffer">buffer</a>, .<a class="ref" href="../../include/x86_64-linux-gnu/bits/uio.h.html#iovec::iov_len" title='iovec::iov_len' data-ref="iovec::iov_len">iov_len</a> = <a class="local col1 ref" href="#241size" title='size' data-ref="241size">size</a> };</td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td>    <a class="typedef" href="../../include/x86_64-linux-gnu/sys/types.h.html#ssize_t" title='ssize_t' data-type='__ssize_t' data-ref="ssize_t">ssize_t</a> <dfn class="local col4 decl" id="244ret" title='ret' data-type='ssize_t' data-ref="244ret">ret</dfn> = <a class="ref" href="../include/block/nbd.h.html#nbd_rwv" title='nbd_rwv' data-ref="nbd_rwv">nbd_rwv</a>(<a class="local col9 ref" href="#239ioc" title='ioc' data-ref="239ioc">ioc</a>, &amp;<a class="local col3 ref" href="#243iov" title='iov' data-ref="243iov">iov</a>, <var>1</var>, <a class="local col1 ref" href="#241size" title='size' data-ref="241size">size</a>, <span class="macro" title="0" data-ref="_M/false">false</span>, <a class="local col2 ref" href="#242errp" title='errp' data-ref="242errp">errp</a>);</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((ret &lt; 0 || ret == size) ? (void) (0) : __assert_fail (&quot;ret &lt; 0 || ret == size&quot;, &quot;/home/jon/workspace/qemu/nbd/nbd-internal.h&quot;, 123, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col4 ref" href="#244ret" title='ret' data-ref="244ret">ret</a> &lt; <var>0</var> || <a class="local col4 ref" href="#244ret" title='ret' data-ref="244ret">ret</a> == <a class="local col1 ref" href="#241size" title='size' data-ref="241size">size</a>);</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>    <b>return</b> <a class="local col4 ref" href="#244ret" title='ret' data-ref="244ret">ret</a> &lt; <var>0</var> ? <a class="local col4 ref" href="#244ret" title='ret' data-ref="244ret">ret</a> : <var>0</var>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><b>struct</b> <dfn class="type def" id="NBDTLSHandshakeData" title='NBDTLSHandshakeData' data-ref="NBDTLSHandshakeData">NBDTLSHandshakeData</dfn> {</td></tr>
+<tr><th id="129">129</th><td>    <a class="typedef" href="../../include/glib-2.0/glib/gmain.h.html#GMainLoop" title='GMainLoop' data-type='struct _GMainLoop' data-ref="GMainLoop">GMainLoop</a> *<dfn class="decl" id="NBDTLSHandshakeData::loop" title='NBDTLSHandshakeData::loop' data-ref="NBDTLSHandshakeData::loop">loop</dfn>;</td></tr>
+<tr><th id="130">130</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="NBDTLSHandshakeData::complete" title='NBDTLSHandshakeData::complete' data-ref="NBDTLSHandshakeData::complete">complete</dfn>;</td></tr>
+<tr><th id="131">131</th><td>    <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="decl" id="NBDTLSHandshakeData::error" title='NBDTLSHandshakeData::error' data-ref="NBDTLSHandshakeData::error">error</dfn>;</td></tr>
+<tr><th id="132">132</th><td>};</td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td></td></tr>
+<tr><th id="135">135</th><td><em>void</em> <dfn class="decl" id="nbd_tls_handshake" title='nbd_tls_handshake' data-ref="nbd_tls_handshake">nbd_tls_handshake</dfn>(<a class="typedef" href="../include/io/task.h.html#QIOTask" title='QIOTask' data-type='struct QIOTask' data-ref="QIOTask">QIOTask</a> *<dfn class="local col5 decl" id="245task" title='task' data-type='QIOTask *' data-ref="245task">task</dfn>,</td></tr>
+<tr><th id="136">136</th><td>                       <em>void</em> *<dfn class="local col6 decl" id="246opaque" title='opaque' data-type='void *' data-ref="246opaque">opaque</dfn>);</td></tr>
+<tr><th id="137">137</th><td><em>const</em> <em>char</em> *<dfn class="decl" id="nbd_opt_lookup" title='nbd_opt_lookup' data-ref="nbd_opt_lookup">nbd_opt_lookup</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="247opt" title='opt' data-type='uint32_t' data-ref="247opt">opt</dfn>);</td></tr>
+<tr><th id="138">138</th><td><em>const</em> <em>char</em> *<dfn class="decl" id="nbd_rep_lookup" title='nbd_rep_lookup' data-ref="nbd_rep_lookup">nbd_rep_lookup</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col8 decl" id="248rep" title='rep' data-type='uint32_t' data-ref="248rep">rep</dfn>);</td></tr>
+<tr><th id="139">139</th><td><em>const</em> <em>char</em> *<dfn class="decl" id="nbd_info_lookup" title='nbd_info_lookup' data-ref="nbd_info_lookup">nbd_info_lookup</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col9 decl" id="249info" title='info' data-type='uint16_t' data-ref="249info">info</dfn>);</td></tr>
+<tr><th id="140">140</th><td><em>const</em> <em>char</em> *<dfn class="decl" id="nbd_cmd_lookup" title='nbd_cmd_lookup' data-ref="nbd_cmd_lookup">nbd_cmd_lookup</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="local col0 decl" id="250info" title='info' data-type='uint16_t' data-ref="250info">info</dfn>);</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><em>int</em> <dfn class="decl" id="nbd_drop" title='nbd_drop' data-ref="nbd_drop">nbd_drop</dfn>(<a class="typedef" href="../include/io/channel.h.html#QIOChannel" title='QIOChannel' data-type='struct QIOChannel' data-ref="QIOChannel">QIOChannel</a> *<dfn class="local col1 decl" id="251ioc" title='ioc' data-type='QIOChannel *' data-ref="251ioc">ioc</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col2 decl" id="252size" title='size' data-type='size_t' data-ref="252size">size</dfn>, <a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> **<dfn class="local col3 decl" id="253errp" title='errp' data-type='Error **' data-ref="253errp">errp</dfn>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><u>#<span data-ppcond="10">endif</span></u></td></tr>
+<tr><th id="145">145</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='client.c.html'>codebrowser/nbd/client.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

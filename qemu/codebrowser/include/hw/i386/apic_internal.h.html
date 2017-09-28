@@ -1,0 +1,251 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>apic_internal.h source code [codebrowser/include/hw/i386/apic_internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="APICCommonClass,APICCommonState,VAPICState "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/i386/apic_internal.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='apic_internal.h.html'>apic_internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> *  APIC support - internal interfaces</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> *  Copyright (c) 2004-2005 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *  Copyright (c) 2011      Jan Kiszka, Siemens AG</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="8">8</th><td><i> * modify it under the terms of the GNU Lesser General Public</i></td></tr>
+<tr><th id="9">9</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="10">10</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="13">13</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="14">14</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="15">15</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * You should have received a copy of the GNU Lesser General Public</i></td></tr>
+<tr><th id="18">18</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifndef</span> <span class="macro" data-ref="_M/QEMU_APIC_INTERNAL_H">QEMU_APIC_INTERNAL_H</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/QEMU_APIC_INTERNAL_H" data-ref="_M/QEMU_APIC_INTERNAL_H">QEMU_APIC_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../../target/i386/cpu.h.html">"cpu.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i>/* APIC Local Vector Table */</i></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_TIMER" data-ref="_M/APIC_LVT_TIMER">APIC_LVT_TIMER</dfn>                  0</u></td></tr>
+<tr><th id="30">30</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_THERMAL" data-ref="_M/APIC_LVT_THERMAL">APIC_LVT_THERMAL</dfn>                1</u></td></tr>
+<tr><th id="31">31</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_PERFORM" data-ref="_M/APIC_LVT_PERFORM">APIC_LVT_PERFORM</dfn>                2</u></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_LINT0" data-ref="_M/APIC_LVT_LINT0">APIC_LVT_LINT0</dfn>                  3</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_LINT1" data-ref="_M/APIC_LVT_LINT1">APIC_LVT_LINT1</dfn>                  4</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_ERROR" data-ref="_M/APIC_LVT_ERROR">APIC_LVT_ERROR</dfn>                  5</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_NB" data-ref="_M/APIC_LVT_NB">APIC_LVT_NB</dfn>                     6</u></td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><i>/* APIC delivery modes */</i></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_FIXED" data-ref="_M/APIC_DM_FIXED">APIC_DM_FIXED</dfn>                   0</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_LOWPRI" data-ref="_M/APIC_DM_LOWPRI">APIC_DM_LOWPRI</dfn>                  1</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_SMI" data-ref="_M/APIC_DM_SMI">APIC_DM_SMI</dfn>                     2</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_NMI" data-ref="_M/APIC_DM_NMI">APIC_DM_NMI</dfn>                     4</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_INIT" data-ref="_M/APIC_DM_INIT">APIC_DM_INIT</dfn>                    5</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_SIPI" data-ref="_M/APIC_DM_SIPI">APIC_DM_SIPI</dfn>                    6</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/APIC_DM_EXTINT" data-ref="_M/APIC_DM_EXTINT">APIC_DM_EXTINT</dfn>                  7</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i>/* APIC destination mode */</i></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/APIC_DESTMODE_FLAT" data-ref="_M/APIC_DESTMODE_FLAT">APIC_DESTMODE_FLAT</dfn>              0xf</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/APIC_DESTMODE_CLUSTER" data-ref="_M/APIC_DESTMODE_CLUSTER">APIC_DESTMODE_CLUSTER</dfn>           1</u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/APIC_TRIGGER_EDGE" data-ref="_M/APIC_TRIGGER_EDGE">APIC_TRIGGER_EDGE</dfn>               0</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/APIC_TRIGGER_LEVEL" data-ref="_M/APIC_TRIGGER_LEVEL">APIC_TRIGGER_LEVEL</dfn>              1</u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/APIC_VECTOR_MASK" data-ref="_M/APIC_VECTOR_MASK">APIC_VECTOR_MASK</dfn>                0xff</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/APIC_DCR_MASK" data-ref="_M/APIC_DCR_MASK">APIC_DCR_MASK</dfn>                   0xf</u></td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_TIMER_SHIFT" data-ref="_M/APIC_LVT_TIMER_SHIFT">APIC_LVT_TIMER_SHIFT</dfn>            17</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_MASKED_SHIFT" data-ref="_M/APIC_LVT_MASKED_SHIFT">APIC_LVT_MASKED_SHIFT</dfn>           16</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_LEVEL_TRIGGER_SHIFT" data-ref="_M/APIC_LVT_LEVEL_TRIGGER_SHIFT">APIC_LVT_LEVEL_TRIGGER_SHIFT</dfn>    15</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_REMOTE_IRR_SHIFT" data-ref="_M/APIC_LVT_REMOTE_IRR_SHIFT">APIC_LVT_REMOTE_IRR_SHIFT</dfn>       14</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_INT_POLARITY_SHIFT" data-ref="_M/APIC_LVT_INT_POLARITY_SHIFT">APIC_LVT_INT_POLARITY_SHIFT</dfn>     13</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_DELIV_STS_SHIFT" data-ref="_M/APIC_LVT_DELIV_STS_SHIFT">APIC_LVT_DELIV_STS_SHIFT</dfn>        12</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_DELIV_MOD_SHIFT" data-ref="_M/APIC_LVT_DELIV_MOD_SHIFT">APIC_LVT_DELIV_MOD_SHIFT</dfn>        8</u></td></tr>
+<tr><th id="63">63</th><td></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_TIMER_TSCDEADLINE" data-ref="_M/APIC_LVT_TIMER_TSCDEADLINE">APIC_LVT_TIMER_TSCDEADLINE</dfn>      (2 &lt;&lt; APIC_LVT_TIMER_SHIFT)</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_TIMER_PERIODIC" data-ref="_M/APIC_LVT_TIMER_PERIODIC">APIC_LVT_TIMER_PERIODIC</dfn>         (1 &lt;&lt; APIC_LVT_TIMER_SHIFT)</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_MASKED" data-ref="_M/APIC_LVT_MASKED">APIC_LVT_MASKED</dfn>                 (1 &lt;&lt; APIC_LVT_MASKED_SHIFT)</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_LEVEL_TRIGGER" data-ref="_M/APIC_LVT_LEVEL_TRIGGER">APIC_LVT_LEVEL_TRIGGER</dfn>          (1 &lt;&lt; APIC_LVT_LEVEL_TRIGGER_SHIFT)</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_REMOTE_IRR" data-ref="_M/APIC_LVT_REMOTE_IRR">APIC_LVT_REMOTE_IRR</dfn>             (1 &lt;&lt; APIC_LVT_REMOTE_IRR_SHIFT)</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_INT_POLARITY" data-ref="_M/APIC_LVT_INT_POLARITY">APIC_LVT_INT_POLARITY</dfn>           (1 &lt;&lt; APIC_LVT_INT_POLARITY_SHIFT)</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_DELIV_STS" data-ref="_M/APIC_LVT_DELIV_STS">APIC_LVT_DELIV_STS</dfn>              (1 &lt;&lt; APIC_LVT_DELIV_STS_SHIFT)</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/APIC_LVT_DELIV_MOD" data-ref="_M/APIC_LVT_DELIV_MOD">APIC_LVT_DELIV_MOD</dfn>              (7 &lt;&lt; APIC_LVT_DELIV_MOD_SHIFT)</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_ILL_ADDRESS_SHIFT" data-ref="_M/APIC_ESR_ILL_ADDRESS_SHIFT">APIC_ESR_ILL_ADDRESS_SHIFT</dfn>      7</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_ILL_VECT_SHIFT" data-ref="_M/APIC_ESR_RECV_ILL_VECT_SHIFT">APIC_ESR_RECV_ILL_VECT_SHIFT</dfn>    6</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_SEND_ILL_VECT_SHIFT" data-ref="_M/APIC_ESR_SEND_ILL_VECT_SHIFT">APIC_ESR_SEND_ILL_VECT_SHIFT</dfn>    5</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_ACCEPT_SHIFT" data-ref="_M/APIC_ESR_RECV_ACCEPT_SHIFT">APIC_ESR_RECV_ACCEPT_SHIFT</dfn>      3</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_SEND_ACCEPT_SHIFT" data-ref="_M/APIC_ESR_SEND_ACCEPT_SHIFT">APIC_ESR_SEND_ACCEPT_SHIFT</dfn>      2</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_CHECK_SUM_SHIFT" data-ref="_M/APIC_ESR_RECV_CHECK_SUM_SHIFT">APIC_ESR_RECV_CHECK_SUM_SHIFT</dfn>   1</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_ILLEGAL_ADDRESS" data-ref="_M/APIC_ESR_ILLEGAL_ADDRESS">APIC_ESR_ILLEGAL_ADDRESS</dfn>        (1 &lt;&lt; APIC_ESR_ILL_ADDRESS_SHIFT)</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_ILLEGAL_VECT" data-ref="_M/APIC_ESR_RECV_ILLEGAL_VECT">APIC_ESR_RECV_ILLEGAL_VECT</dfn>      (1 &lt;&lt; APIC_ESR_RECV_ILL_VECT_SHIFT)</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_SEND_ILLEGAL_VECT" data-ref="_M/APIC_ESR_SEND_ILLEGAL_VECT">APIC_ESR_SEND_ILLEGAL_VECT</dfn>      (1 &lt;&lt; APIC_ESR_SEND_ILL_VECT_SHIFT)</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_ACCEPT" data-ref="_M/APIC_ESR_RECV_ACCEPT">APIC_ESR_RECV_ACCEPT</dfn>            (1 &lt;&lt; APIC_ESR_RECV_ACCEPT_SHIFT)</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_SEND_ACCEPT" data-ref="_M/APIC_ESR_SEND_ACCEPT">APIC_ESR_SEND_ACCEPT</dfn>            (1 &lt;&lt; APIC_ESR_SEND_ACCEPT_SHIFT)</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_RECV_CHECK_SUM" data-ref="_M/APIC_ESR_RECV_CHECK_SUM">APIC_ESR_RECV_CHECK_SUM</dfn>         (1 &lt;&lt; APIC_ESR_RECV_CHECK_SUM_SHIFT)</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/APIC_ESR_SEND_CHECK_SUM" data-ref="_M/APIC_ESR_SEND_CHECK_SUM">APIC_ESR_SEND_CHECK_SUM</dfn>         1</u></td></tr>
+<tr><th id="87">87</th><td></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DEST_SHIFT" data-ref="_M/APIC_ICR_DEST_SHIFT">APIC_ICR_DEST_SHIFT</dfn>             24</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DEST_SHORT_SHIFT" data-ref="_M/APIC_ICR_DEST_SHORT_SHIFT">APIC_ICR_DEST_SHORT_SHIFT</dfn>       18</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_TRIGGER_MOD_SHIFT" data-ref="_M/APIC_ICR_TRIGGER_MOD_SHIFT">APIC_ICR_TRIGGER_MOD_SHIFT</dfn>      15</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_LEVEL_SHIFT" data-ref="_M/APIC_ICR_LEVEL_SHIFT">APIC_ICR_LEVEL_SHIFT</dfn>            14</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DELIV_STS_SHIFT" data-ref="_M/APIC_ICR_DELIV_STS_SHIFT">APIC_ICR_DELIV_STS_SHIFT</dfn>        12</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DEST_MOD_SHIFT" data-ref="_M/APIC_ICR_DEST_MOD_SHIFT">APIC_ICR_DEST_MOD_SHIFT</dfn>         11</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DELIV_MOD_SHIFT" data-ref="_M/APIC_ICR_DELIV_MOD_SHIFT">APIC_ICR_DELIV_MOD_SHIFT</dfn>        8</u></td></tr>
+<tr><th id="95">95</th><td></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DEST_SHORT" data-ref="_M/APIC_ICR_DEST_SHORT">APIC_ICR_DEST_SHORT</dfn>             (3 &lt;&lt; APIC_ICR_DEST_SHORT_SHIFT)</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_TRIGGER_MOD" data-ref="_M/APIC_ICR_TRIGGER_MOD">APIC_ICR_TRIGGER_MOD</dfn>            (1 &lt;&lt; APIC_ICR_TRIGGER_MOD_SHIFT)</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_LEVEL" data-ref="_M/APIC_ICR_LEVEL">APIC_ICR_LEVEL</dfn>                  (1 &lt;&lt; APIC_ICR_LEVEL_SHIFT)</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DELIV_STS" data-ref="_M/APIC_ICR_DELIV_STS">APIC_ICR_DELIV_STS</dfn>              (1 &lt;&lt; APIC_ICR_DELIV_STS_SHIFT)</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DEST_MOD" data-ref="_M/APIC_ICR_DEST_MOD">APIC_ICR_DEST_MOD</dfn>               (1 &lt;&lt; APIC_ICR_DEST_MOD_SHIFT)</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/APIC_ICR_DELIV_MOD" data-ref="_M/APIC_ICR_DELIV_MOD">APIC_ICR_DELIV_MOD</dfn>              (7 &lt;&lt; APIC_ICR_DELIV_MOD_SHIFT)</u></td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/APIC_PR_CLASS_SHIFT" data-ref="_M/APIC_PR_CLASS_SHIFT">APIC_PR_CLASS_SHIFT</dfn>             4</u></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/APIC_PR_SUB_CLASS" data-ref="_M/APIC_PR_SUB_CLASS">APIC_PR_SUB_CLASS</dfn>               0xf</u></td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/APIC_LOGDEST_XAPIC_SHIFT" data-ref="_M/APIC_LOGDEST_XAPIC_SHIFT">APIC_LOGDEST_XAPIC_SHIFT</dfn>        4</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/APIC_LOGDEST_XAPIC_ID" data-ref="_M/APIC_LOGDEST_XAPIC_ID">APIC_LOGDEST_XAPIC_ID</dfn>           0xf</u></td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/APIC_LOGDEST_X2APIC_SHIFT" data-ref="_M/APIC_LOGDEST_X2APIC_SHIFT">APIC_LOGDEST_X2APIC_SHIFT</dfn>       16</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/APIC_LOGDEST_X2APIC_ID" data-ref="_M/APIC_LOGDEST_X2APIC_ID">APIC_LOGDEST_X2APIC_ID</dfn>          0xffff</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/APIC_SPURIO_FOCUS_SHIFT" data-ref="_M/APIC_SPURIO_FOCUS_SHIFT">APIC_SPURIO_FOCUS_SHIFT</dfn>         9</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/APIC_SPURIO_ENABLED_SHIFT" data-ref="_M/APIC_SPURIO_ENABLED_SHIFT">APIC_SPURIO_ENABLED_SHIFT</dfn>       8</u></td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/APIC_SPURIO_FOCUS" data-ref="_M/APIC_SPURIO_FOCUS">APIC_SPURIO_FOCUS</dfn>               (1 &lt;&lt; APIC_SPURIO_FOCUS_SHIFT)</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/APIC_SPURIO_ENABLED" data-ref="_M/APIC_SPURIO_ENABLED">APIC_SPURIO_ENABLED</dfn>             (1 &lt;&lt; APIC_SPURIO_ENABLED_SHIFT)</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/APIC_SV_DIRECTED_IO" data-ref="_M/APIC_SV_DIRECTED_IO">APIC_SV_DIRECTED_IO</dfn>             (1 &lt;&lt; 12)</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/APIC_SV_ENABLE" data-ref="_M/APIC_SV_ENABLE">APIC_SV_ENABLE</dfn>                  (1 &lt;&lt; 8)</u></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/VAPIC_ENABLE_BIT" data-ref="_M/VAPIC_ENABLE_BIT">VAPIC_ENABLE_BIT</dfn>                0</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/VAPIC_ENABLE_MASK" data-ref="_M/VAPIC_ENABLE_MASK">VAPIC_ENABLE_MASK</dfn>               (1 &lt;&lt; VAPIC_ENABLE_BIT)</u></td></tr>
+<tr><th id="123">123</th><td></td></tr>
+<tr><th id="124">124</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#APICCommonState" title='APICCommonState' data-ref="APICCommonState">APICCommonState</a> <dfn class="typedef" id="APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</dfn>;</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/TYPE_APIC_COMMON" data-ref="_M/TYPE_APIC_COMMON">TYPE_APIC_COMMON</dfn> "apic-common"</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/APIC_COMMON" data-ref="_M/APIC_COMMON">APIC_COMMON</dfn>(obj) \</u></td></tr>
+<tr><th id="128">128</th><td><u>     OBJECT_CHECK(APICCommonState, (obj), TYPE_APIC_COMMON)</u></td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/APIC_COMMON_CLASS" data-ref="_M/APIC_COMMON_CLASS">APIC_COMMON_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="130">130</th><td><u>     OBJECT_CLASS_CHECK(APICCommonClass, (klass), TYPE_APIC_COMMON)</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/APIC_COMMON_GET_CLASS" data-ref="_M/APIC_COMMON_GET_CLASS">APIC_COMMON_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="132">132</th><td><u>     OBJECT_GET_CLASS(APICCommonClass, (obj), TYPE_APIC_COMMON)</u></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="APICCommonClass" title='APICCommonClass' data-ref="APICCommonClass"><a class="type" href="#APICCommonClass" title='APICCommonClass' data-ref="APICCommonClass">APICCommonClass</a></dfn></td></tr>
+<tr><th id="135">135</th><td>{</td></tr>
+<tr><th id="136">136</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="APICCommonClass::parent_class" title='APICCommonClass::parent_class' data-ref="APICCommonClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceRealize" title='DeviceRealize' data-type='void (*)(DeviceState *, Error **)' data-ref="DeviceRealize">DeviceRealize</a> <dfn class="decl" id="APICCommonClass::realize" title='APICCommonClass::realize' data-ref="APICCommonClass::realize">realize</dfn>;</td></tr>
+<tr><th id="139">139</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceUnrealize" title='DeviceUnrealize' data-type='void (*)(DeviceState *, Error **)' data-ref="DeviceUnrealize">DeviceUnrealize</a> <dfn class="decl" id="APICCommonClass::unrealize" title='APICCommonClass::unrealize' data-ref="APICCommonClass::unrealize">unrealize</dfn>;</td></tr>
+<tr><th id="140">140</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::set_base" title='APICCommonClass::set_base' data-ref="APICCommonClass::set_base">set_base</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col1 decl" id="1s" title='s' data-type='APICCommonState *' data-ref="1s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="2val" title='val' data-type='uint64_t' data-ref="2val">val</dfn>);</td></tr>
+<tr><th id="141">141</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::set_tpr" title='APICCommonClass::set_tpr' data-ref="APICCommonClass::set_tpr">set_tpr</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col3 decl" id="3s" title='s' data-type='APICCommonState *' data-ref="3s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col4 decl" id="4val" title='val' data-type='uint8_t' data-ref="4val">val</dfn>);</td></tr>
+<tr><th id="142">142</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> (*<dfn class="decl" id="APICCommonClass::get_tpr" title='APICCommonClass::get_tpr' data-ref="APICCommonClass::get_tpr">get_tpr</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col5 decl" id="5s" title='s' data-type='APICCommonState *' data-ref="5s">s</dfn>);</td></tr>
+<tr><th id="143">143</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::enable_tpr_reporting" title='APICCommonClass::enable_tpr_reporting' data-ref="APICCommonClass::enable_tpr_reporting">enable_tpr_reporting</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col6 decl" id="6s" title='s' data-type='APICCommonState *' data-ref="6s">s</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="7enable" title='enable' data-type='_Bool' data-ref="7enable">enable</dfn>);</td></tr>
+<tr><th id="144">144</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::vapic_base_update" title='APICCommonClass::vapic_base_update' data-ref="APICCommonClass::vapic_base_update">vapic_base_update</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col8 decl" id="8s" title='s' data-type='APICCommonState *' data-ref="8s">s</dfn>);</td></tr>
+<tr><th id="145">145</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::external_nmi" title='APICCommonClass::external_nmi' data-ref="APICCommonClass::external_nmi">external_nmi</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col9 decl" id="9s" title='s' data-type='APICCommonState *' data-ref="9s">s</dfn>);</td></tr>
+<tr><th id="146">146</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::pre_save" title='APICCommonClass::pre_save' data-ref="APICCommonClass::pre_save">pre_save</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col0 decl" id="10s" title='s' data-type='APICCommonState *' data-ref="10s">s</dfn>);</td></tr>
+<tr><th id="147">147</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::post_load" title='APICCommonClass::post_load' data-ref="APICCommonClass::post_load">post_load</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col1 decl" id="11s" title='s' data-type='APICCommonState *' data-ref="11s">s</dfn>);</td></tr>
+<tr><th id="148">148</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::reset" title='APICCommonClass::reset' data-ref="APICCommonClass::reset">reset</dfn>)(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col2 decl" id="12s" title='s' data-type='APICCommonState *' data-ref="12s">s</dfn>);</td></tr>
+<tr><th id="149">149</th><td>    <i>/* send_msi emulates an APIC bus and its proper place would be in a new</i></td></tr>
+<tr><th id="150">150</th><td><i>     * device, but it's convenient to have it here for now.</i></td></tr>
+<tr><th id="151">151</th><td><i>     */</i></td></tr>
+<tr><th id="152">152</th><td>    <em>void</em> (*<dfn class="decl" id="APICCommonClass::send_msi" title='APICCommonClass::send_msi' data-ref="APICCommonClass::send_msi">send_msi</dfn>)(<a class="typedef" href="../../qemu/typedefs.h.html#MSIMessage" title='MSIMessage' data-type='struct MSIMessage' data-ref="MSIMessage">MSIMessage</a> *<dfn class="local col3 decl" id="13msi" title='msi' data-type='MSIMessage *' data-ref="13msi">msi</dfn>);</td></tr>
+<tr><th id="153">153</th><td>} <dfn class="typedef" id="APICCommonClass" title='APICCommonClass' data-type='struct APICCommonClass' data-ref="APICCommonClass">APICCommonClass</dfn>;</td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><b>struct</b> <dfn class="type def" id="APICCommonState" title='APICCommonState' data-ref="APICCommonState">APICCommonState</dfn> {</td></tr>
+<tr><th id="156">156</th><td>    <i>/*&lt; private &gt;*/</i></td></tr>
+<tr><th id="157">157</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="APICCommonState::parent_obj" title='APICCommonState::parent_obj' data-ref="APICCommonState::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="158">158</th><td>    <i>/*&lt; public &gt;*/</i></td></tr>
+<tr><th id="159">159</th><td></td></tr>
+<tr><th id="160">160</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="APICCommonState::io_memory" title='APICCommonState::io_memory' data-ref="APICCommonState::io_memory">io_memory</dfn>;</td></tr>
+<tr><th id="161">161</th><td>    <a class="typedef" href="../../../target/i386/cpu-qom.h.html#X86CPU" title='X86CPU' data-type='struct X86CPU' data-ref="X86CPU">X86CPU</a> *<dfn class="decl" id="APICCommonState::cpu" title='APICCommonState::cpu' data-ref="APICCommonState::cpu">cpu</dfn>;</td></tr>
+<tr><th id="162">162</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::apicbase" title='APICCommonState::apicbase' data-ref="APICCommonState::apicbase">apicbase</dfn>;</td></tr>
+<tr><th id="163">163</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::id" title='APICCommonState::id' data-ref="APICCommonState::id">id</dfn>; <i>/* legacy APIC ID */</i></td></tr>
+<tr><th id="164">164</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::initial_apic_id" title='APICCommonState::initial_apic_id' data-ref="APICCommonState::initial_apic_id">initial_apic_id</dfn>;</td></tr>
+<tr><th id="165">165</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::version" title='APICCommonState::version' data-ref="APICCommonState::version">version</dfn>;</td></tr>
+<tr><th id="166">166</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::arb_id" title='APICCommonState::arb_id' data-ref="APICCommonState::arb_id">arb_id</dfn>;</td></tr>
+<tr><th id="167">167</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::tpr" title='APICCommonState::tpr' data-ref="APICCommonState::tpr">tpr</dfn>;</td></tr>
+<tr><th id="168">168</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::spurious_vec" title='APICCommonState::spurious_vec' data-ref="APICCommonState::spurious_vec">spurious_vec</dfn>;</td></tr>
+<tr><th id="169">169</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::log_dest" title='APICCommonState::log_dest' data-ref="APICCommonState::log_dest">log_dest</dfn>;</td></tr>
+<tr><th id="170">170</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="APICCommonState::dest_mode" title='APICCommonState::dest_mode' data-ref="APICCommonState::dest_mode">dest_mode</dfn>;</td></tr>
+<tr><th id="171">171</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::isr" title='APICCommonState::isr' data-ref="APICCommonState::isr">isr</dfn>[<var>8</var>];  <i>/* in service register */</i></td></tr>
+<tr><th id="172">172</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::tmr" title='APICCommonState::tmr' data-ref="APICCommonState::tmr">tmr</dfn>[<var>8</var>];  <i>/* trigger mode register */</i></td></tr>
+<tr><th id="173">173</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::irr" title='APICCommonState::irr' data-ref="APICCommonState::irr">irr</dfn>[<var>8</var>]; <i>/* interrupt request register */</i></td></tr>
+<tr><th id="174">174</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::lvt" title='APICCommonState::lvt' data-ref="APICCommonState::lvt">lvt</dfn>[<a class="macro" href="#35" title="6" data-ref="_M/APIC_LVT_NB">APIC_LVT_NB</a>];</td></tr>
+<tr><th id="175">175</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::esr" title='APICCommonState::esr' data-ref="APICCommonState::esr">esr</dfn>; <i>/* error register */</i></td></tr>
+<tr><th id="176">176</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::icr" title='APICCommonState::icr' data-ref="APICCommonState::icr">icr</dfn>[<var>2</var>];</td></tr>
+<tr><th id="177">177</th><td></td></tr>
+<tr><th id="178">178</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::divide_conf" title='APICCommonState::divide_conf' data-ref="APICCommonState::divide_conf">divide_conf</dfn>;</td></tr>
+<tr><th id="179">179</th><td>    <em>int</em> <dfn class="decl" id="APICCommonState::count_shift" title='APICCommonState::count_shift' data-ref="APICCommonState::count_shift">count_shift</dfn>;</td></tr>
+<tr><th id="180">180</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::initial_count" title='APICCommonState::initial_count' data-ref="APICCommonState::initial_count">initial_count</dfn>;</td></tr>
+<tr><th id="181">181</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="APICCommonState::initial_count_load_time" title='APICCommonState::initial_count_load_time' data-ref="APICCommonState::initial_count_load_time">initial_count_load_time</dfn>;</td></tr>
+<tr><th id="182">182</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="APICCommonState::next_time" title='APICCommonState::next_time' data-ref="APICCommonState::next_time">next_time</dfn>;</td></tr>
+<tr><th id="183">183</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="APICCommonState::timer" title='APICCommonState::timer' data-ref="APICCommonState::timer">timer</dfn>;</td></tr>
+<tr><th id="184">184</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="APICCommonState::timer_expiry" title='APICCommonState::timer_expiry' data-ref="APICCommonState::timer_expiry">timer_expiry</dfn>;</td></tr>
+<tr><th id="185">185</th><td>    <em>int</em> <dfn class="decl" id="APICCommonState::sipi_vector" title='APICCommonState::sipi_vector' data-ref="APICCommonState::sipi_vector">sipi_vector</dfn>;</td></tr>
+<tr><th id="186">186</th><td>    <em>int</em> <dfn class="decl" id="APICCommonState::wait_for_sipi" title='APICCommonState::wait_for_sipi' data-ref="APICCommonState::wait_for_sipi">wait_for_sipi</dfn>;</td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="APICCommonState::vapic_control" title='APICCommonState::vapic_control' data-ref="APICCommonState::vapic_control">vapic_control</dfn>;</td></tr>
+<tr><th id="189">189</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="decl" id="APICCommonState::vapic" title='APICCommonState::vapic' data-ref="APICCommonState::vapic">vapic</dfn>;</td></tr>
+<tr><th id="190">190</th><td>    <a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="APICCommonState::vapic_paddr" title='APICCommonState::vapic_paddr' data-ref="APICCommonState::vapic_paddr">vapic_paddr</dfn>; <i>/* note: persistence via kvmvapic */</i></td></tr>
+<tr><th id="191">191</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="APICCommonState::legacy_instance_id" title='APICCommonState::legacy_instance_id' data-ref="APICCommonState::legacy_instance_id">legacy_instance_id</dfn>;</td></tr>
+<tr><th id="192">192</th><td>};</td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="VAPICState" title='VAPICState' data-ref="VAPICState"><a class="type" href="#VAPICState" title='VAPICState' data-ref="VAPICState">VAPICState</a></dfn> {</td></tr>
+<tr><th id="195">195</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VAPICState::tpr" title='VAPICState::tpr' data-ref="VAPICState::tpr">tpr</dfn>;</td></tr>
+<tr><th id="196">196</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VAPICState::isr" title='VAPICState::isr' data-ref="VAPICState::isr">isr</dfn>;</td></tr>
+<tr><th id="197">197</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VAPICState::zero" title='VAPICState::zero' data-ref="VAPICState::zero">zero</dfn>;</td></tr>
+<tr><th id="198">198</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VAPICState::irr" title='VAPICState::irr' data-ref="VAPICState::irr">irr</dfn>;</td></tr>
+<tr><th id="199">199</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VAPICState::enabled" title='VAPICState::enabled' data-ref="VAPICState::enabled">enabled</dfn>;</td></tr>
+<tr><th id="200">200</th><td>} <a class="macro" href="../../qemu/compiler.h.html#40" title="__attribute__((packed))" data-ref="_M/QEMU_PACKED">QEMU_PACKED</a> <dfn class="typedef" id="VAPICState" title='VAPICState' data-type='struct VAPICState' data-ref="VAPICState">VAPICState</dfn>;</td></tr>
+<tr><th id="201">201</th><td></td></tr>
+<tr><th id="202">202</th><td><b>extern</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="apic_report_tpr_access" title='apic_report_tpr_access' data-ref="apic_report_tpr_access">apic_report_tpr_access</dfn>;</td></tr>
+<tr><th id="203">203</th><td></td></tr>
+<tr><th id="204">204</th><td><em>void</em> <dfn class="decl" id="apic_report_irq_delivered" title='apic_report_irq_delivered' data-ref="apic_report_irq_delivered">apic_report_irq_delivered</dfn>(<em>int</em> <dfn class="local col4 decl" id="14delivered" title='delivered' data-type='int' data-ref="14delivered">delivered</dfn>);</td></tr>
+<tr><th id="205">205</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="apic_next_timer" title='apic_next_timer' data-ref="apic_next_timer">apic_next_timer</dfn>(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col5 decl" id="15s" title='s' data-type='APICCommonState *' data-ref="15s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col6 decl" id="16current_time" title='current_time' data-type='int64_t' data-ref="16current_time">current_time</dfn>);</td></tr>
+<tr><th id="206">206</th><td><em>void</em> <dfn class="decl" id="apic_enable_tpr_access_reporting" title='apic_enable_tpr_access_reporting' data-ref="apic_enable_tpr_access_reporting">apic_enable_tpr_access_reporting</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="17d" title='d' data-type='DeviceState *' data-ref="17d">d</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="18enable" title='enable' data-type='_Bool' data-ref="18enable">enable</dfn>);</td></tr>
+<tr><th id="207">207</th><td><em>void</em> <dfn class="decl" id="apic_enable_vapic" title='apic_enable_vapic' data-ref="apic_enable_vapic">apic_enable_vapic</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col9 decl" id="19d" title='d' data-type='DeviceState *' data-ref="19d">d</dfn>, <a class="typedef" href="../../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col0 decl" id="20paddr" title='paddr' data-type='hwaddr' data-ref="20paddr">paddr</dfn>);</td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><em>void</em> <dfn class="decl" id="vapic_report_tpr_access" title='vapic_report_tpr_access' data-ref="vapic_report_tpr_access">vapic_report_tpr_access</dfn>(<a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col1 decl" id="21dev" title='dev' data-type='DeviceState *' data-ref="21dev">dev</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#CPUState" title='CPUState' data-type='struct CPUState' data-ref="CPUState">CPUState</a> *<dfn class="local col2 decl" id="22cpu" title='cpu' data-type='CPUState *' data-ref="22cpu">cpu</dfn>, <a class="typedef" href="../../exec/cpu-defs.h.html#target_ulong" title='target_ulong' data-type='uint64_t' data-ref="target_ulong">target_ulong</a> <dfn class="local col3 decl" id="23ip" title='ip' data-type='target_ulong' data-ref="23ip">ip</dfn>,</td></tr>
+<tr><th id="210">210</th><td>                             <a class="typedef" href="../../../target/i386/cpu.h.html#TPRAccess" title='TPRAccess' data-type='enum TPRAccess' data-ref="TPRAccess">TPRAccess</a> <dfn class="local col4 decl" id="24access" title='access' data-type='TPRAccess' data-ref="24access">access</dfn>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><em>int</em> <dfn class="decl" id="apic_get_ppr" title='apic_get_ppr' data-ref="apic_get_ppr">apic_get_ppr</dfn>(<a class="typedef" href="#APICCommonState" title='APICCommonState' data-type='struct APICCommonState' data-ref="APICCommonState">APICCommonState</a> *<dfn class="local col5 decl" id="25s" title='s' data-type='APICCommonState *' data-ref="25s">s</dfn>);</td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="apic_set_bit" title='apic_set_bit' data-ref="apic_set_bit">apic_set_bit</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col6 decl" id="26tab" title='tab' data-type='uint32_t *' data-ref="26tab">tab</dfn>, <em>int</em> <dfn class="local col7 decl" id="27index" title='index' data-type='int' data-ref="27index">index</dfn>)</td></tr>
+<tr><th id="215">215</th><td>{</td></tr>
+<tr><th id="216">216</th><td>    <em>int</em> <dfn class="local col8 decl" id="28i" title='i' data-type='int' data-ref="28i">i</dfn>, <dfn class="local col9 decl" id="29mask" title='mask' data-type='int' data-ref="29mask">mask</dfn>;</td></tr>
+<tr><th id="217">217</th><td>    <a class="local col8 ref" href="#28i" title='i' data-ref="28i">i</a> = <a class="local col7 ref" href="#27index" title='index' data-ref="27index">index</a> &gt;&gt; <var>5</var>;</td></tr>
+<tr><th id="218">218</th><td>    <a class="local col9 ref" href="#29mask" title='mask' data-ref="29mask">mask</a> = <var>1</var> &lt;&lt; (<a class="local col7 ref" href="#27index" title='index' data-ref="27index">index</a> &amp; <var>0x1f</var>);</td></tr>
+<tr><th id="219">219</th><td>    <a class="local col6 ref" href="#26tab" title='tab' data-ref="26tab">tab</a>[<a class="local col8 ref" href="#28i" title='i' data-ref="28i">i</a>] |= <a class="local col9 ref" href="#29mask" title='mask' data-ref="29mask">mask</a>;</td></tr>
+<tr><th id="220">220</th><td>}</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="apic_get_bit" title='apic_get_bit' data-ref="apic_get_bit">apic_get_bit</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col0 decl" id="30tab" title='tab' data-type='uint32_t *' data-ref="30tab">tab</dfn>, <em>int</em> <dfn class="local col1 decl" id="31index" title='index' data-type='int' data-ref="31index">index</dfn>)</td></tr>
+<tr><th id="223">223</th><td>{</td></tr>
+<tr><th id="224">224</th><td>    <em>int</em> <dfn class="local col2 decl" id="32i" title='i' data-type='int' data-ref="32i">i</dfn>, <dfn class="local col3 decl" id="33mask" title='mask' data-type='int' data-ref="33mask">mask</dfn>;</td></tr>
+<tr><th id="225">225</th><td>    <a class="local col2 ref" href="#32i" title='i' data-ref="32i">i</a> = <a class="local col1 ref" href="#31index" title='index' data-ref="31index">index</a> &gt;&gt; <var>5</var>;</td></tr>
+<tr><th id="226">226</th><td>    <a class="local col3 ref" href="#33mask" title='mask' data-ref="33mask">mask</a> = <var>1</var> &lt;&lt; (<a class="local col1 ref" href="#31index" title='index' data-ref="31index">index</a> &amp; <var>0x1f</var>);</td></tr>
+<tr><th id="227">227</th><td>    <b>return</b> !!(<a class="local col0 ref" href="#30tab" title='tab' data-ref="30tab">tab</a>[<a class="local col2 ref" href="#32i" title='i' data-ref="32i">i</a>] &amp; <a class="local col3 ref" href="#33mask" title='mask' data-ref="33mask">mask</a>);</td></tr>
+<tr><th id="228">228</th><td>}</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td><a class="typedef" href="#APICCommonClass" title='APICCommonClass' data-type='struct APICCommonClass' data-ref="APICCommonClass">APICCommonClass</a> *<dfn class="decl" id="apic_get_class" title='apic_get_class' data-ref="apic_get_class">apic_get_class</dfn>(<em>void</em>);</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><u>#<span data-ppcond="21">endif</span> /* QEMU_APIC_INTERNAL_H */</u></td></tr>
+<tr><th id="233">233</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/intel_iommu.c.html'>codebrowser/hw/i386/intel_iommu.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

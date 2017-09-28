@@ -1,0 +1,18 @@
+<dec f='codebrowser/slirp/slirp.h' l='253' type='void if_output(struct socket * , struct mbuf * )'/>
+<def f='codebrowser/slirp/if.c' l='49' ll='143' type='void if_output(struct socket * so, struct mbuf * ifm)'/>
+<doc f='codebrowser/slirp/if.c' l='36'>/*
+ * if_output: Queue packet into an output queue.
+ * There are 2 output queue&apos;s, if_fastq and if_batchq.
+ * Each output queue is a doubly linked list of double linked lists
+ * of mbufs, each list belonging to one &quot;session&quot; (socket).  This
+ * way, we can output packets fairly by sending one packet from each
+ * session, instead of all the packets from one session, then all packets
+ * from the next session, etc.  Packets on the if_fastq get absolute
+ * priority, but if one session hogs the link, it gets &quot;downgraded&quot;
+ * to the batchq until it runs out of packets, then it&apos;ll return
+ * to the fastq (eg. if the user does an ls -alR in a telnet session,
+ * it&apos;ll temporarily get downgraded to the batchq)
+ */</doc>
+<use f='codebrowser/slirp/ip6_output.c' l='36' u='c' c='ip6_output'/>
+<use f='codebrowser/slirp/ip_output.c' l='85' u='c' c='ip_output'/>
+<use f='codebrowser/slirp/ip_output.c' l='161' u='c' c='ip_output'/>

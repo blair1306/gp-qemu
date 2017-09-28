@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>replay-char.c source code [codebrowser/replay/replay-char.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="CharEvent "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/replay/replay-char.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>replay</a>/<a href='replay-char.c.html'>replay-char.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * replay-char.c</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010-2016 Institute for System Programming</i></td></tr>
+<tr><th id="5">5</th><td><i> *                         of the Russian Academy of Sciences.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="8">8</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/sysemu/replay.h.html">"sysemu/replay.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="replay-internal.h.html">"replay-internal.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/chardev/char.h.html">"chardev/char.h"</a></u></td></tr>
+<tr><th id="18">18</th><td></td></tr>
+<tr><th id="19">19</th><td><i  data-doc="char_drivers">/* Char drivers that generate qemu_chr_be_write events</i></td></tr>
+<tr><th id="20">20</th><td><i  data-doc="char_drivers">   that should be saved into the log. */</i></td></tr>
+<tr><th id="21">21</th><td><em>static</em> <a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> **<dfn class="tu decl def" id="char_drivers" title='char_drivers' data-type='Chardev **' data-ref="char_drivers">char_drivers</dfn>;</td></tr>
+<tr><th id="22">22</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="drivers_count" title='drivers_count' data-type='int' data-ref="drivers_count">drivers_count</dfn>;</td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><i>/* Char event attributes. */</i></td></tr>
+<tr><th id="25">25</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="CharEvent" title='CharEvent' data-ref="CharEvent"><a class="type" href="#CharEvent" title='CharEvent' data-ref="CharEvent">CharEvent</a></dfn> {</td></tr>
+<tr><th id="26">26</th><td>    <em>int</em> <dfn class="tu decl" id="CharEvent::id" title='CharEvent::id' data-type='int' data-ref="CharEvent::id">id</dfn>;</td></tr>
+<tr><th id="27">27</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="tu decl" id="CharEvent::buf" title='CharEvent::buf' data-type='uint8_t *' data-ref="CharEvent::buf">buf</dfn>;</td></tr>
+<tr><th id="28">28</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="tu decl" id="CharEvent::len" title='CharEvent::len' data-type='size_t' data-ref="CharEvent::len">len</dfn>;</td></tr>
+<tr><th id="29">29</th><td>} <dfn class="typedef" id="CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</dfn>;</td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="find_char_driver" title='find_char_driver' data-type='int find_char_driver(Chardev * chr)' data-ref="find_char_driver">find_char_driver</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col1 decl" id="1chr" title='chr' data-type='Chardev *' data-ref="1chr">chr</dfn>)</td></tr>
+<tr><th id="32">32</th><td>{</td></tr>
+<tr><th id="33">33</th><td>    <em>int</em> <dfn class="local col2 decl" id="2i" title='i' data-type='int' data-ref="2i">i</dfn> = <var>0</var>;</td></tr>
+<tr><th id="34">34</th><td>    <b>for</b> ( ; <a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a> &lt; <a class="tu ref" href="#drivers_count" title='drivers_count' data-use='r' data-ref="drivers_count">drivers_count</a> ; ++<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>) {</td></tr>
+<tr><th id="35">35</th><td>        <b>if</b> (<a class="tu ref" href="#char_drivers" title='char_drivers' data-use='r' data-ref="char_drivers">char_drivers</a>[<a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>] == <a class="local col1 ref" href="#1chr" title='chr' data-ref="1chr">chr</a>) {</td></tr>
+<tr><th id="36">36</th><td>            <b>return</b> <a class="local col2 ref" href="#2i" title='i' data-ref="2i">i</a>;</td></tr>
+<tr><th id="37">37</th><td>        }</td></tr>
+<tr><th id="38">38</th><td>    }</td></tr>
+<tr><th id="39">39</th><td>    <b>return</b> -<var>1</var>;</td></tr>
+<tr><th id="40">40</th><td>}</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><em>void</em> <dfn class="decl def" id="replay_register_char_driver" title='replay_register_char_driver' data-ref="replay_register_char_driver">replay_register_char_driver</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col3 decl" id="3chr" title='chr' data-type='Chardev *' data-ref="3chr">chr</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>) {</td></tr>
+<tr><th id="45">45</th><td>        <b>return</b>;</td></tr>
+<tr><th id="46">46</th><td>    }</td></tr>
+<tr><th id="47">47</th><td>    <a class="tu ref" href="#char_drivers" title='char_drivers' data-use='w' data-ref="char_drivers">char_drivers</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_realloc" title='g_realloc' data-ref="g_realloc">g_realloc</a>(<a class="tu ref" href="#char_drivers" title='char_drivers' data-use='r' data-ref="char_drivers">char_drivers</a>,</td></tr>
+<tr><th id="48">48</th><td>                             <b>sizeof</b>(*<a class="tu ref" href="#char_drivers" title='char_drivers' data-use='r' data-ref="char_drivers">char_drivers</a>) * (<a class="tu ref" href="#drivers_count" title='drivers_count' data-use='r' data-ref="drivers_count">drivers_count</a> + <var>1</var>));</td></tr>
+<tr><th id="49">49</th><td>    <a class="tu ref" href="#char_drivers" title='char_drivers' data-use='r' data-ref="char_drivers">char_drivers</a>[<a class="tu ref" href="#drivers_count" title='drivers_count' data-use='w' data-ref="drivers_count">drivers_count</a>++] = <a class="local col3 ref" href="#3chr" title='chr' data-ref="3chr">chr</a>;</td></tr>
+<tr><th id="50">50</th><td>}</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td><em>void</em> <dfn class="decl def" id="replay_chr_be_write" title='replay_chr_be_write' data-ref="replay_chr_be_write">replay_chr_be_write</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Chardev" title='Chardev' data-type='struct Chardev' data-ref="Chardev">Chardev</a> *<dfn class="local col4 decl" id="4s" title='s' data-type='Chardev *' data-ref="4s">s</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="5buf" title='buf' data-type='uint8_t *' data-ref="5buf">buf</dfn>, <em>int</em> <dfn class="local col6 decl" id="6len" title='len' data-type='int' data-ref="6len">len</dfn>)</td></tr>
+<tr><th id="53">53</th><td>{</td></tr>
+<tr><th id="54">54</th><td>    <a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *<dfn class="local col7 decl" id="7event" title='event' data-type='CharEvent *' data-ref="7event">event</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a>));</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>-&gt;<a class="tu ref" href="#CharEvent::id" title='CharEvent::id' data-use='w' data-ref="CharEvent::id">id</a> = <a class="tu ref" href="#find_char_driver" title='find_char_driver' data-use='c' data-ref="find_char_driver">find_char_driver</a>(<a class="local col4 ref" href="#4s" title='s' data-ref="4s">s</a>);</td></tr>
+<tr><th id="57">57</th><td>    <b>if</b> (<a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>-&gt;<a class="tu ref" href="#CharEvent::id" title='CharEvent::id' data-use='r' data-ref="CharEvent::id">id</a> &lt; <var>0</var>) {</td></tr>
+<tr><th id="58">58</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Replay: cannot find char driver\n"</q>);</td></tr>
+<tr><th id="59">59</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="60">60</th><td>    }</td></tr>
+<tr><th id="61">61</th><td>    <a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='w' data-ref="CharEvent::buf">buf</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc" title='g_malloc' data-ref="g_malloc">g_malloc</a>(<a class="local col6 ref" href="#6len" title='len' data-ref="6len">len</a>);</td></tr>
+<tr><th id="62">62</th><td>    <a class="ref" href="../../include/string.h.html#memcpy" title='memcpy' data-ref="memcpy">memcpy</a>(<a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='r' data-ref="CharEvent::buf">buf</a>, <a class="local col5 ref" href="#5buf" title='buf' data-ref="5buf">buf</a>, <a class="local col6 ref" href="#6len" title='len' data-ref="6len">len</a>);</td></tr>
+<tr><th id="63">63</th><td>    <a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>-&gt;<a class="tu ref" href="#CharEvent::len" title='CharEvent::len' data-use='w' data-ref="CharEvent::len">len</a> = <a class="local col6 ref" href="#6len" title='len' data-ref="6len">len</a>;</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td>    <a class="ref" href="replay-internal.h.html#replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</a>(<a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ">REPLAY_ASYNC_EVENT_CHAR_READ</a>, <a class="local col7 ref" href="#7event" title='event' data-ref="7event">event</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>);</td></tr>
+<tr><th id="66">66</th><td>}</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><em>void</em> <dfn class="decl def" id="replay_event_char_read_run" title='replay_event_char_read_run' data-ref="replay_event_char_read_run">replay_event_char_read_run</dfn>(<em>void</em> *<dfn class="local col8 decl" id="8opaque" title='opaque' data-type='void *' data-ref="8opaque">opaque</dfn>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>    <a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *<dfn class="local col9 decl" id="9event" title='event' data-type='CharEvent *' data-ref="9event">event</dfn> = (<a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *)<a class="local col8 ref" href="#8opaque" title='opaque' data-ref="8opaque">opaque</a>;</td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td>    <a class="ref" href="../include/chardev/char.h.html#qemu_chr_be_write_impl" title='qemu_chr_be_write_impl' data-ref="qemu_chr_be_write_impl">qemu_chr_be_write_impl</a>(<a class="tu ref" href="#char_drivers" title='char_drivers' data-use='r' data-ref="char_drivers">char_drivers</a>[<a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#CharEvent::id" title='CharEvent::id' data-use='r' data-ref="CharEvent::id">id</a>], <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='r' data-ref="CharEvent::buf">buf</a>,</td></tr>
+<tr><th id="73">73</th><td>                           (<em>int</em>)<a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#CharEvent::len" title='CharEvent::len' data-use='r' data-ref="CharEvent::len">len</a>);</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='r' data-ref="CharEvent::buf">buf</a>);</td></tr>
+<tr><th id="76">76</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>);</td></tr>
+<tr><th id="77">77</th><td>}</td></tr>
+<tr><th id="78">78</th><td></td></tr>
+<tr><th id="79">79</th><td><em>void</em> <dfn class="decl def" id="replay_event_char_read_save" title='replay_event_char_read_save' data-ref="replay_event_char_read_save">replay_event_char_read_save</dfn>(<em>void</em> *<dfn class="local col0 decl" id="10opaque" title='opaque' data-type='void *' data-ref="10opaque">opaque</dfn>)</td></tr>
+<tr><th id="80">80</th><td>{</td></tr>
+<tr><th id="81">81</th><td>    <a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *<dfn class="local col1 decl" id="11event" title='event' data-type='CharEvent *' data-ref="11event">event</dfn> = (<a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *)<a class="local col0 ref" href="#10opaque" title='opaque' data-ref="10opaque">opaque</a>;</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_byte" title='replay_put_byte' data-ref="replay_put_byte">replay_put_byte</a>(<a class="local col1 ref" href="#11event" title='event' data-ref="11event">event</a>-&gt;<a class="tu ref" href="#CharEvent::id" title='CharEvent::id' data-use='r' data-ref="CharEvent::id">id</a>);</td></tr>
+<tr><th id="84">84</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_array" title='replay_put_array' data-ref="replay_put_array">replay_put_array</a>(<a class="local col1 ref" href="#11event" title='event' data-ref="11event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='r' data-ref="CharEvent::buf">buf</a>, <a class="local col1 ref" href="#11event" title='event' data-ref="11event">event</a>-&gt;<a class="tu ref" href="#CharEvent::len" title='CharEvent::len' data-use='r' data-ref="CharEvent::len">len</a>);</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><em>void</em> *<dfn class="decl def" id="replay_event_char_read_load" title='replay_event_char_read_load' data-ref="replay_event_char_read_load">replay_event_char_read_load</dfn>(<em>void</em>)</td></tr>
+<tr><th id="88">88</th><td>{</td></tr>
+<tr><th id="89">89</th><td>    <a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a> *<dfn class="local col2 decl" id="12event" title='event' data-type='CharEvent *' data-ref="12event">event</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#CharEvent" title='CharEvent' data-type='struct CharEvent' data-ref="CharEvent">CharEvent</a>));</td></tr>
+<tr><th id="90">90</th><td></td></tr>
+<tr><th id="91">91</th><td>    <a class="local col2 ref" href="#12event" title='event' data-ref="12event">event</a>-&gt;<a class="tu ref" href="#CharEvent::id" title='CharEvent::id' data-use='w' data-ref="CharEvent::id">id</a> = <a class="ref" href="replay-internal.h.html#replay_get_byte" title='replay_get_byte' data-ref="replay_get_byte">replay_get_byte</a>();</td></tr>
+<tr><th id="92">92</th><td>    <a class="ref" href="replay-internal.h.html#replay_get_array_alloc" title='replay_get_array_alloc' data-ref="replay_get_array_alloc">replay_get_array_alloc</a>(&amp;<a class="local col2 ref" href="#12event" title='event' data-ref="12event">event</a>-&gt;<a class="tu ref" href="#CharEvent::buf" title='CharEvent::buf' data-use='a' data-ref="CharEvent::buf">buf</a>, &amp;<a class="local col2 ref" href="#12event" title='event' data-ref="12event">event</a>-&gt;<a class="tu ref" href="#CharEvent::len" title='CharEvent::len' data-use='a' data-ref="CharEvent::len">len</a>);</td></tr>
+<tr><th id="93">93</th><td></td></tr>
+<tr><th id="94">94</th><td>    <b>return</b> <a class="local col2 ref" href="#12event" title='event' data-ref="12event">event</a>;</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>void</em> <dfn class="decl def" id="replay_char_write_event_save" title='replay_char_write_event_save' data-ref="replay_char_write_event_save">replay_char_write_event_save</dfn>(<em>int</em> <dfn class="local col3 decl" id="13res" title='res' data-type='int' data-ref="13res">res</dfn>, <em>int</em> <dfn class="local col4 decl" id="14offset" title='offset' data-type='int' data-ref="14offset">offset</dfn>)</td></tr>
+<tr><th id="98">98</th><td>{</td></tr>
+<tr><th id="99">99</th><td>    <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="100">100</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="101">101</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_WRITE" title='ReplayEvents::EVENT_CHAR_WRITE' data-ref="ReplayEvents::EVENT_CHAR_WRITE">EVENT_CHAR_WRITE</a>);</td></tr>
+<tr><th id="102">102</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_dword" title='replay_put_dword' data-ref="replay_put_dword">replay_put_dword</a>(<a class="local col3 ref" href="#13res" title='res' data-ref="13res">res</a>);</td></tr>
+<tr><th id="103">103</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_dword" title='replay_put_dword' data-ref="replay_put_dword">replay_put_dword</a>(<a class="local col4 ref" href="#14offset" title='offset' data-ref="14offset">offset</a>);</td></tr>
+<tr><th id="104">104</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><em>void</em> <dfn class="decl def" id="replay_char_write_event_load" title='replay_char_write_event_load' data-ref="replay_char_write_event_load">replay_char_write_event_load</dfn>(<em>int</em> *<dfn class="local col5 decl" id="15res" title='res' data-type='int *' data-ref="15res">res</dfn>, <em>int</em> *<dfn class="local col6 decl" id="16offset" title='offset' data-type='int *' data-ref="16offset">offset</dfn>)</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>    <a class="ref" href="../include/sysemu/replay.h.html#replay_account_executed_instructions" title='replay_account_executed_instructions' data-ref="replay_account_executed_instructions">replay_account_executed_instructions</a>();</td></tr>
+<tr><th id="110">110</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="111">111</th><td>    <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_WRITE" title='ReplayEvents::EVENT_CHAR_WRITE' data-ref="ReplayEvents::EVENT_CHAR_WRITE">EVENT_CHAR_WRITE</a>)) {</td></tr>
+<tr><th id="112">112</th><td>        *<a class="local col5 ref" href="#15res" title='res' data-ref="15res">res</a> = <a class="ref" href="replay-internal.h.html#replay_get_dword" title='replay_get_dword' data-ref="replay_get_dword">replay_get_dword</a>();</td></tr>
+<tr><th id="113">113</th><td>        *<a class="local col6 ref" href="#16offset" title='offset' data-ref="16offset">offset</a> = <a class="ref" href="replay-internal.h.html#replay_get_dword" title='replay_get_dword' data-ref="replay_get_dword">replay_get_dword</a>();</td></tr>
+<tr><th id="114">114</th><td>        <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="115">115</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="116">116</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="117">117</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="118">118</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Missing character write event in the replay log"</q>);</td></tr>
+<tr><th id="119">119</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="120">120</th><td>    }</td></tr>
+<tr><th id="121">121</th><td>}</td></tr>
+<tr><th id="122">122</th><td></td></tr>
+<tr><th id="123">123</th><td><em>int</em> <dfn class="decl def" id="replay_char_read_all_load" title='replay_char_read_all_load' data-ref="replay_char_read_all_load">replay_char_read_all_load</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col7 decl" id="17buf" title='buf' data-type='uint8_t *' data-ref="17buf">buf</dfn>)</td></tr>
+<tr><th id="124">124</th><td>{</td></tr>
+<tr><th id="125">125</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="126">126</th><td>    <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_READ_ALL" title='ReplayEvents::EVENT_CHAR_READ_ALL' data-ref="ReplayEvents::EVENT_CHAR_READ_ALL">EVENT_CHAR_READ_ALL</a>)) {</td></tr>
+<tr><th id="127">127</th><td>        <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col8 decl" id="18size" title='size' data-type='size_t' data-ref="18size">size</dfn>;</td></tr>
+<tr><th id="128">128</th><td>        <em>int</em> <dfn class="local col9 decl" id="19res" title='res' data-type='int' data-ref="19res">res</dfn>;</td></tr>
+<tr><th id="129">129</th><td>        <a class="ref" href="replay-internal.h.html#replay_get_array" title='replay_get_array' data-ref="replay_get_array">replay_get_array</a>(<a class="local col7 ref" href="#17buf" title='buf' data-ref="17buf">buf</a>, &amp;<a class="local col8 ref" href="#18size" title='size' data-ref="18size">size</a>);</td></tr>
+<tr><th id="130">130</th><td>        <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="131">131</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="132">132</th><td>        <a class="local col9 ref" href="#19res" title='res' data-ref="19res">res</a> = (<em>int</em>)<a class="local col8 ref" href="#18size" title='size' data-ref="18size">size</a>;</td></tr>
+<tr><th id="133">133</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((res &gt;= 0) ? (void) (0) : __assert_fail (&quot;res &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/replay/replay-char.c&quot;, 133, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col9 ref" href="#19res" title='res' data-ref="19res">res</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="134">134</th><td>        <b>return</b> <a class="local col9 ref" href="#19res" title='res' data-ref="19res">res</a>;</td></tr>
+<tr><th id="135">135</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_READ_ALL_ERROR" title='ReplayEvents::EVENT_CHAR_READ_ALL_ERROR' data-ref="ReplayEvents::EVENT_CHAR_READ_ALL_ERROR">EVENT_CHAR_READ_ALL_ERROR</a>)) {</td></tr>
+<tr><th id="136">136</th><td>        <em>int</em> <dfn class="local col0 decl" id="20res" title='res' data-type='int' data-ref="20res">res</dfn> = <a class="ref" href="replay-internal.h.html#replay_get_dword" title='replay_get_dword' data-ref="replay_get_dword">replay_get_dword</a>();</td></tr>
+<tr><th id="137">137</th><td>        <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="138">138</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="139">139</th><td>        <b>return</b> <a class="local col0 ref" href="#20res" title='res' data-ref="20res">res</a>;</td></tr>
+<tr><th id="140">140</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="141">141</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="142">142</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Missing character read all event in the replay log"</q>);</td></tr>
+<tr><th id="143">143</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="144">144</th><td>    }</td></tr>
+<tr><th id="145">145</th><td>}</td></tr>
+<tr><th id="146">146</th><td></td></tr>
+<tr><th id="147">147</th><td><em>void</em> <dfn class="decl def" id="replay_char_read_all_save_error" title='replay_char_read_all_save_error' data-ref="replay_char_read_all_save_error">replay_char_read_all_save_error</dfn>(<em>int</em> <dfn class="local col1 decl" id="21res" title='res' data-type='int' data-ref="21res">res</dfn>)</td></tr>
+<tr><th id="148">148</th><td>{</td></tr>
+<tr><th id="149">149</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((res &lt; 0) ? (void) (0) : __assert_fail (&quot;res &lt; 0&quot;, &quot;/home/jon/workspace/qemu/replay/replay-char.c&quot;, 149, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col1 ref" href="#21res" title='res' data-ref="21res">res</a> &lt; <var>0</var>);</td></tr>
+<tr><th id="150">150</th><td>    <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="151">151</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="152">152</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_READ_ALL_ERROR" title='ReplayEvents::EVENT_CHAR_READ_ALL_ERROR' data-ref="ReplayEvents::EVENT_CHAR_READ_ALL_ERROR">EVENT_CHAR_READ_ALL_ERROR</a>);</td></tr>
+<tr><th id="153">153</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_dword" title='replay_put_dword' data-ref="replay_put_dword">replay_put_dword</a>(<a class="local col1 ref" href="#21res" title='res' data-ref="21res">res</a>);</td></tr>
+<tr><th id="154">154</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="155">155</th><td>}</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td><em>void</em> <dfn class="decl def" id="replay_char_read_all_save_buf" title='replay_char_read_all_save_buf' data-ref="replay_char_read_all_save_buf">replay_char_read_all_save_buf</dfn>(<a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col2 decl" id="22buf" title='buf' data-type='uint8_t *' data-ref="22buf">buf</dfn>, <em>int</em> <dfn class="local col3 decl" id="23offset" title='offset' data-type='int' data-ref="23offset">offset</dfn>)</td></tr>
+<tr><th id="158">158</th><td>{</td></tr>
+<tr><th id="159">159</th><td>    <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="160">160</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="161">161</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHAR_READ_ALL" title='ReplayEvents::EVENT_CHAR_READ_ALL' data-ref="ReplayEvents::EVENT_CHAR_READ_ALL">EVENT_CHAR_READ_ALL</a>);</td></tr>
+<tr><th id="162">162</th><td>    <a class="ref" href="replay-internal.h.html#replay_put_array" title='replay_put_array' data-ref="replay_put_array">replay_put_array</a>(<a class="local col2 ref" href="#22buf" title='buf' data-ref="22buf">buf</a>, <a class="local col3 ref" href="#23offset" title='offset' data-ref="23offset">offset</a>);</td></tr>
+<tr><th id="163">163</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="164">164</th><td>}</td></tr>
+<tr><th id="165">165</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

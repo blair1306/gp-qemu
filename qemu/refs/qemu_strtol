@@ -1,0 +1,28 @@
+<dec f='codebrowser/include/qemu/cutils.h' l='129' type='int qemu_strtol(const char * nptr, const char ** endptr, int base, long * result)'/>
+<use f='codebrowser/block/file-posix.c' l='912' u='c' c='hdev_get_max_segments'/>
+<use f='codebrowser/qemu-img.c' l='2051' u='c' c='img_convert'/>
+<def f='codebrowser/util/cutils.c' l='323' ll='338' type='int qemu_strtol(const char * nptr, const char ** endptr, int base, long * result)'/>
+<doc f='codebrowser/util/cutils.c' l='299'>/**
+ * Convert string @nptr to a long integer, and store it in @result.
+ *
+ * This is a wrapper around strtol() that is harder to misuse.
+ * Semantics of @nptr, @endptr, @base match strtol() with differences
+ * noted below.
+ *
+ * @nptr may be null, and no conversion is performed then.
+ *
+ * If no conversion is performed, store @nptr in *@endptr and return
+ * -EINVAL.
+ *
+ * If @endptr is null, and the string isn&apos;t fully converted, return
+ * -EINVAL.  This is the case when the pointer that would be stored in
+ * a non-null @endptr points to a character other than &apos;\0&apos;.
+ *
+ * If the conversion overflows @result, store LONG_MAX in @result,
+ * and return -ERANGE.
+ *
+ * If the conversion underflows @result, store LONG_MIN in @result,
+ * and return -ERANGE.
+ *
+ * Else store the converted value in @result, and return zero.
+ */</doc>

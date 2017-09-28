@@ -1,0 +1,41 @@
+<dec f='codebrowser/include/crypto/tlssession.h' l='148' type='QCryptoTLSSession * qcrypto_tls_session_new(QCryptoTLSCreds * creds, const char * hostname, const char * aclname, QCryptoTLSCredsEndpoint endpoint, Error ** errp)'/>
+<doc f='codebrowser/include/crypto/tlssession.h' l='111'>/**
+ * qcrypto_tls_session_new:
+ * @creds: pointer to a TLS credentials object
+ * @hostname: optional hostname to validate
+ * @aclname: optional ACL to validate peer credentials against
+ * @endpoint: role of the TLS session, client or server
+ * @errp: pointer to a NULL-initialized error object
+ *
+ * Create a new TLS session object that will be used to
+ * negotiate a TLS session over an arbitrary data channel.
+ * The session object can operate as either the server or
+ * client, according to the value of the @endpoint argument.
+ *
+ * For clients, the @hostname parameter should hold the full
+ * unmodified hostname as requested by the user. This will
+ * be used to verify the against the hostname reported in
+ * the server&apos;s credentials (aka x509 certificate).
+ *
+ * The @aclname parameter (optionally) specifies the name
+ * of an access control list that will be used to validate
+ * the peer&apos;s credentials. For x509 credentials, the ACL
+ * will be matched against the CommonName shown in the peer&apos;s
+ * certificate. If the session is acting as a server, setting
+ * an ACL will require that the client provide a validate
+ * x509 client certificate.
+ *
+ * After creating the session object, the I/O callbacks
+ * must be set using the qcrypto_tls_session_set_callbacks()
+ * method. A TLS handshake sequence must then be completed
+ * using qcrypto_tls_session_handshake(), before payload
+ * data is permitted to be sent/received.
+ *
+ * The session object must be released by calling
+ * qcrypto_tls_session_free() when no longer required
+ *
+ * Returns: a TLS session object, or NULL on error.
+ */</doc>
+<def f='codebrowser/crypto/tlssession.c' l='506' ll='515' type='QCryptoTLSSession * qcrypto_tls_session_new(QCryptoTLSCreds * creds, const char * hostname, const char * aclname, QCryptoTLSCredsEndpoint endpoint, Error ** errp)'/>
+<use f='codebrowser/io/channel-tls.c' l='77' u='c' c='qio_channel_tls_new_server'/>
+<use f='codebrowser/io/channel-tls.c' l='119' u='c' c='qio_channel_tls_new_client'/>

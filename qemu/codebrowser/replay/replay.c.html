@@ -1,0 +1,385 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>replay.c source code [codebrowser/replay/replay.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/replay/replay.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>replay</a>/<a href='replay.c.html'>replay.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * replay.c</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010-2015 Institute for System Programming</i></td></tr>
+<tr><th id="5">5</th><td><i> *                         of the Russian Academy of Sciences.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="8">8</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qapi/error.h.html">"qapi/error.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/sysemu/replay.h.html">"sysemu/replay.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="replay-internal.h.html">"replay-internal.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/qemu/timer.h.html">"qemu/timer.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/qemu/main-loop.h.html">"qemu/main-loop.h"</a></u></td></tr>
+<tr><th id="19">19</th><td><u>#include <a href="../include/sysemu/cpus.h.html">"sysemu/cpus.h"</a></u></td></tr>
+<tr><th id="20">20</th><td><u>#include <a href="../include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="21">21</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><i>/* Current version of the replay mechanism.</i></td></tr>
+<tr><th id="24">24</th><td><i>   Increase it when file format changes. */</i></td></tr>
+<tr><th id="25">25</th><td><u>#define <dfn class="macro" id="_M/REPLAY_VERSION" data-ref="_M/REPLAY_VERSION">REPLAY_VERSION</dfn>              0xe02006</u></td></tr>
+<tr><th id="26">26</th><td><i>/* Size of replay log header */</i></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/HEADER_SIZE" data-ref="_M/HEADER_SIZE">HEADER_SIZE</dfn>                 (sizeof(<a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>) + sizeof(<a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a>))</u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><a class="typedef" href="../qapi-types.h.html#ReplayMode" title='ReplayMode' data-type='enum ReplayMode' data-ref="ReplayMode">ReplayMode</a> <dfn class="decl def" id="replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</dfn> = <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>;</td></tr>
+<tr><th id="30">30</th><td><em>char</em> *<dfn class="decl def" id="replay_snapshot" title='replay_snapshot' data-ref="replay_snapshot">replay_snapshot</dfn>;</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i  data-doc="replay_filename">/* Name of replay file  */</i></td></tr>
+<tr><th id="33">33</th><td><em>static</em> <em>char</em> *<dfn class="tu decl def" id="replay_filename" title='replay_filename' data-type='char *' data-ref="replay_filename">replay_filename</dfn>;</td></tr>
+<tr><th id="34">34</th><td><a class="typedef" href="replay-internal.h.html#ReplayState" title='ReplayState' data-type='struct ReplayState' data-ref="ReplayState">ReplayState</a> <dfn class="decl def" id="replay_state" title='replay_state' data-ref="replay_state">replay_state</dfn>;</td></tr>
+<tr><th id="35">35</th><td><em>static</em> <a class="typedef" href="../../include/glib-2.0/glib/gslist.h.html#GSList" title='GSList' data-type='struct _GSList' data-ref="GSList">GSList</a> *<dfn class="tu decl def" id="replay_blockers" title='replay_blockers' data-type='GSList *' data-ref="replay_blockers">replay_blockers</dfn>;</td></tr>
+<tr><th id="36">36</th><td></td></tr>
+<tr><th id="37">37</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</dfn>(<em>int</em> <dfn class="local col1 decl" id="1event" title='event' data-type='int' data-ref="1event">event</dfn>)</td></tr>
+<tr><th id="38">38</th><td>{</td></tr>
+<tr><th id="39">39</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="2res" title='res' data-type='_Bool' data-ref="2res">res</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <i>/* nothing to skip - not all instructions used */</i></td></tr>
+<tr><th id="42">42</th><td>    <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a> != <var>0</var>) {</td></tr>
+<tr><th id="43">43</th><td>        <a class="macro" href="../../include/assert.h.html#88" title="((replay_state.data_kind == EVENT_INSTRUCTION) ? (void) (0) : __assert_fail (&quot;replay_state.data_kind == EVENT_INSTRUCTION&quot;, &quot;/home/jon/workspace/qemu/replay/replay.c&quot;, 43, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> == <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INSTRUCTION" title='ReplayEvents::EVENT_INSTRUCTION' data-ref="ReplayEvents::EVENT_INSTRUCTION">EVENT_INSTRUCTION</a>);</td></tr>
+<tr><th id="44">44</th><td>        <b>return</b> <a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a> == <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INSTRUCTION" title='ReplayEvents::EVENT_INSTRUCTION' data-ref="ReplayEvents::EVENT_INSTRUCTION">EVENT_INSTRUCTION</a>;</td></tr>
+<tr><th id="45">45</th><td>    }</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td>    <b>while</b> (<span class="macro" title="1" data-ref="_M/true">true</span>) {</td></tr>
+<tr><th id="48">48</th><td>        <b>if</b> (<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a> == <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a>) {</td></tr>
+<tr><th id="49">49</th><td>            <a class="local col2 ref" href="#2res" title='res' data-ref="2res">res</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="50">50</th><td>        }</td></tr>
+<tr><th id="51">51</th><td>        <b>switch</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a>) {</td></tr>
+<tr><th id="52">52</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_SHUTDOWN" title='ReplayEvents::EVENT_SHUTDOWN' data-ref="ReplayEvents::EVENT_SHUTDOWN">EVENT_SHUTDOWN</a> ... <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_SHUTDOWN_LAST" title='ReplayEvents::EVENT_SHUTDOWN_LAST' data-ref="ReplayEvents::EVENT_SHUTDOWN_LAST">EVENT_SHUTDOWN_LAST</a>:</td></tr>
+<tr><th id="53">53</th><td>            <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="54">54</th><td>            <a class="ref" href="../include/sysemu/sysemu.h.html#qemu_system_shutdown_request" title='qemu_system_shutdown_request' data-ref="qemu_system_shutdown_request">qemu_system_shutdown_request</a>(<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> -</td></tr>
+<tr><th id="55">55</th><td>                                         <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_SHUTDOWN" title='ReplayEvents::EVENT_SHUTDOWN' data-ref="ReplayEvents::EVENT_SHUTDOWN">EVENT_SHUTDOWN</a>);</td></tr>
+<tr><th id="56">56</th><td>            <b>break</b>;</td></tr>
+<tr><th id="57">57</th><td>        <b>default</b>:</td></tr>
+<tr><th id="58">58</th><td>            <i>/* clock, time_t, checkpoint and other events */</i></td></tr>
+<tr><th id="59">59</th><td>            <b>return</b> <a class="local col2 ref" href="#2res" title='res' data-ref="2res">res</a>;</td></tr>
+<tr><th id="60">60</th><td>        }</td></tr>
+<tr><th id="61">61</th><td>    }</td></tr>
+<tr><th id="62">62</th><td>    <b>return</b> <a class="local col2 ref" href="#2res" title='res' data-ref="2res">res</a>;</td></tr>
+<tr><th id="63">63</th><td>}</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="replay_get_current_step" title='replay_get_current_step' data-ref="replay_get_current_step">replay_get_current_step</dfn>(<em>void</em>)</td></tr>
+<tr><th id="66">66</th><td>{</td></tr>
+<tr><th id="67">67</th><td>    <b>return</b> <a class="ref" href="../include/qemu/timer.h.html#cpu_get_icount_raw" title='cpu_get_icount_raw' data-ref="cpu_get_icount_raw">cpu_get_icount_raw</a>();</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><em>int</em> <dfn class="decl def" id="replay_get_instructions" title='replay_get_instructions' data-ref="replay_get_instructions">replay_get_instructions</dfn>(<em>void</em>)</td></tr>
+<tr><th id="71">71</th><td>{</td></tr>
+<tr><th id="72">72</th><td>    <em>int</em> <dfn class="local col3 decl" id="3res" title='res' data-type='int' data-ref="3res">res</dfn> = <var>0</var>;</td></tr>
+<tr><th id="73">73</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="74">74</th><td>    <b>if</b> (<a class="ref" href="#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INSTRUCTION" title='ReplayEvents::EVENT_INSTRUCTION' data-ref="ReplayEvents::EVENT_INSTRUCTION">EVENT_INSTRUCTION</a>)) {</td></tr>
+<tr><th id="75">75</th><td>        <a class="local col3 ref" href="#3res" title='res' data-ref="3res">res</a> = <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a>;</td></tr>
+<tr><th id="76">76</th><td>    }</td></tr>
+<tr><th id="77">77</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="78">78</th><td>    <b>return</b> <a class="local col3 ref" href="#3res" title='res' data-ref="3res">res</a>;</td></tr>
+<tr><th id="79">79</th><td>}</td></tr>
+<tr><th id="80">80</th><td></td></tr>
+<tr><th id="81">81</th><td><em>void</em> <dfn class="decl def" id="replay_account_executed_instructions" title='replay_account_executed_instructions' data-ref="replay_account_executed_instructions">replay_account_executed_instructions</dfn>(<em>void</em>)</td></tr>
+<tr><th id="82">82</th><td>{</td></tr>
+<tr><th id="83">83</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="84">84</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="85">85</th><td>        <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a> &gt; <var>0</var>) {</td></tr>
+<tr><th id="86">86</th><td>            <em>int</em> <dfn class="local col4 decl" id="4count" title='count' data-type='int' data-ref="4count">count</dfn> = (<em>int</em>)(<a class="ref" href="#replay_get_current_step" title='replay_get_current_step' data-ref="replay_get_current_step">replay_get_current_step</a>()</td></tr>
+<tr><th id="87">87</th><td>                              - <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::current_step" title='ReplayState::current_step' data-ref="ReplayState::current_step">current_step</a>);</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td>            <i>/* Time can only go forward */</i></td></tr>
+<tr><th id="90">90</th><td>            <a class="macro" href="../../include/assert.h.html#88" title="((count &gt;= 0) ? (void) (0) : __assert_fail (&quot;count &gt;= 0&quot;, &quot;/home/jon/workspace/qemu/replay/replay.c&quot;, 90, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col4 ref" href="#4count" title='count' data-ref="4count">count</a> &gt;= <var>0</var>);</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td>            <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a> -= <a class="local col4 ref" href="#4count" title='count' data-ref="4count">count</a>;</td></tr>
+<tr><th id="93">93</th><td>            <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::current_step" title='ReplayState::current_step' data-ref="ReplayState::current_step">current_step</a> += <a class="local col4 ref" href="#4count" title='count' data-ref="4count">count</a>;</td></tr>
+<tr><th id="94">94</th><td>            <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a> == <var>0</var>) {</td></tr>
+<tr><th id="95">95</th><td>                <a class="macro" href="../../include/assert.h.html#88" title="((replay_state.data_kind == EVENT_INSTRUCTION) ? (void) (0) : __assert_fail (&quot;replay_state.data_kind == EVENT_INSTRUCTION&quot;, &quot;/home/jon/workspace/qemu/replay/replay.c&quot;, 95, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> == <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INSTRUCTION" title='ReplayEvents::EVENT_INSTRUCTION' data-ref="ReplayEvents::EVENT_INSTRUCTION">EVENT_INSTRUCTION</a>);</td></tr>
+<tr><th id="96">96</th><td>                <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="97">97</th><td>                <i>/* Wake up iothread. This is required because</i></td></tr>
+<tr><th id="98">98</th><td><i>                   timers will not expire until clock counters</i></td></tr>
+<tr><th id="99">99</th><td><i>                   will be read from the log. */</i></td></tr>
+<tr><th id="100">100</th><td>                <a class="ref" href="../include/qemu/main-loop.h.html#qemu_notify_event" title='qemu_notify_event' data-ref="qemu_notify_event">qemu_notify_event</a>();</td></tr>
+<tr><th id="101">101</th><td>            }</td></tr>
+<tr><th id="102">102</th><td>        }</td></tr>
+<tr><th id="103">103</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="104">104</th><td>    }</td></tr>
+<tr><th id="105">105</th><td>}</td></tr>
+<tr><th id="106">106</th><td></td></tr>
+<tr><th id="107">107</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_exception" title='replay_exception' data-ref="replay_exception">replay_exception</dfn>(<em>void</em>)</td></tr>
+<tr><th id="108">108</th><td>{</td></tr>
+<tr><th id="109">109</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="110">110</th><td>        <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="111">111</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="112">112</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_EXCEPTION" title='ReplayEvents::EVENT_EXCEPTION' data-ref="ReplayEvents::EVENT_EXCEPTION">EVENT_EXCEPTION</a>);</td></tr>
+<tr><th id="113">113</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="114">114</th><td>        <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="115">115</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="116">116</th><td>        <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="5res" title='res' data-type='_Bool' data-ref="5res">res</dfn> = <a class="ref" href="#replay_has_exception" title='replay_has_exception' data-ref="replay_has_exception">replay_has_exception</a>();</td></tr>
+<tr><th id="117">117</th><td>        <b>if</b> (<a class="local col5 ref" href="#5res" title='res' data-ref="5res">res</a>) {</td></tr>
+<tr><th id="118">118</th><td>            <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="119">119</th><td>            <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="120">120</th><td>            <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="121">121</th><td>        }</td></tr>
+<tr><th id="122">122</th><td>        <b>return</b> <a class="local col5 ref" href="#5res" title='res' data-ref="5res">res</a>;</td></tr>
+<tr><th id="123">123</th><td>    }</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="126">126</th><td>}</td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_has_exception" title='replay_has_exception' data-ref="replay_has_exception">replay_has_exception</dfn>(<em>void</em>)</td></tr>
+<tr><th id="129">129</th><td>{</td></tr>
+<tr><th id="130">130</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="6res" title='res' data-type='_Bool' data-ref="6res">res</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="131">131</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="132">132</th><td>        <a class="ref" href="#replay_account_executed_instructions" title='replay_account_executed_instructions' data-ref="replay_account_executed_instructions">replay_account_executed_instructions</a>();</td></tr>
+<tr><th id="133">133</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="134">134</th><td>        <a class="local col6 ref" href="#6res" title='res' data-ref="6res">res</a> = <a class="ref" href="#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_EXCEPTION" title='ReplayEvents::EVENT_EXCEPTION' data-ref="ReplayEvents::EVENT_EXCEPTION">EVENT_EXCEPTION</a>);</td></tr>
+<tr><th id="135">135</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="136">136</th><td>    }</td></tr>
+<tr><th id="137">137</th><td></td></tr>
+<tr><th id="138">138</th><td>    <b>return</b> <a class="local col6 ref" href="#6res" title='res' data-ref="6res">res</a>;</td></tr>
+<tr><th id="139">139</th><td>}</td></tr>
+<tr><th id="140">140</th><td></td></tr>
+<tr><th id="141">141</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_interrupt" title='replay_interrupt' data-ref="replay_interrupt">replay_interrupt</dfn>(<em>void</em>)</td></tr>
+<tr><th id="142">142</th><td>{</td></tr>
+<tr><th id="143">143</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="144">144</th><td>        <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="145">145</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="146">146</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INTERRUPT" title='ReplayEvents::EVENT_INTERRUPT' data-ref="ReplayEvents::EVENT_INTERRUPT">EVENT_INTERRUPT</a>);</td></tr>
+<tr><th id="147">147</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="148">148</th><td>        <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="149">149</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="150">150</th><td>        <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col7 decl" id="7res" title='res' data-type='_Bool' data-ref="7res">res</dfn> = <a class="ref" href="#replay_has_interrupt" title='replay_has_interrupt' data-ref="replay_has_interrupt">replay_has_interrupt</a>();</td></tr>
+<tr><th id="151">151</th><td>        <b>if</b> (<a class="local col7 ref" href="#7res" title='res' data-ref="7res">res</a>) {</td></tr>
+<tr><th id="152">152</th><td>            <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="153">153</th><td>            <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="154">154</th><td>            <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="155">155</th><td>        }</td></tr>
+<tr><th id="156">156</th><td>        <b>return</b> <a class="local col7 ref" href="#7res" title='res' data-ref="7res">res</a>;</td></tr>
+<tr><th id="157">157</th><td>    }</td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td>    <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="160">160</th><td>}</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_has_interrupt" title='replay_has_interrupt' data-ref="replay_has_interrupt">replay_has_interrupt</dfn>(<em>void</em>)</td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col8 decl" id="8res" title='res' data-type='_Bool' data-ref="8res">res</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="165">165</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="166">166</th><td>        <a class="ref" href="#replay_account_executed_instructions" title='replay_account_executed_instructions' data-ref="replay_account_executed_instructions">replay_account_executed_instructions</a>();</td></tr>
+<tr><th id="167">167</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="168">168</th><td>        <a class="local col8 ref" href="#8res" title='res' data-ref="8res">res</a> = <a class="ref" href="#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_INTERRUPT" title='ReplayEvents::EVENT_INTERRUPT' data-ref="ReplayEvents::EVENT_INTERRUPT">EVENT_INTERRUPT</a>);</td></tr>
+<tr><th id="169">169</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="170">170</th><td>    }</td></tr>
+<tr><th id="171">171</th><td>    <b>return</b> <a class="local col8 ref" href="#8res" title='res' data-ref="8res">res</a>;</td></tr>
+<tr><th id="172">172</th><td>}</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><em>void</em> <dfn class="decl def" id="replay_shutdown_request" title='replay_shutdown_request' data-ref="replay_shutdown_request">replay_shutdown_request</dfn>(<a class="typedef" href="../include/sysemu/sysemu.h.html#ShutdownCause" title='ShutdownCause' data-type='enum ShutdownCause' data-ref="ShutdownCause">ShutdownCause</a> <dfn class="local col9 decl" id="9cause" title='cause' data-type='ShutdownCause' data-ref="9cause">cause</dfn>)</td></tr>
+<tr><th id="175">175</th><td>{</td></tr>
+<tr><th id="176">176</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="177">177</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="178">178</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_SHUTDOWN" title='ReplayEvents::EVENT_SHUTDOWN' data-ref="ReplayEvents::EVENT_SHUTDOWN">EVENT_SHUTDOWN</a> + <a class="local col9 ref" href="#9cause" title='cause' data-ref="9cause">cause</a>);</td></tr>
+<tr><th id="179">179</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="180">180</th><td>    }</td></tr>
+<tr><th id="181">181</th><td>}</td></tr>
+<tr><th id="182">182</th><td></td></tr>
+<tr><th id="183">183</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_checkpoint" title='replay_checkpoint' data-ref="replay_checkpoint">replay_checkpoint</dfn>(<a class="typedef" href="../include/sysemu/replay.h.html#ReplayCheckpoint" title='ReplayCheckpoint' data-type='enum ReplayCheckpoint' data-ref="ReplayCheckpoint">ReplayCheckpoint</a> <dfn class="local col0 decl" id="10checkpoint" title='checkpoint' data-type='ReplayCheckpoint' data-ref="10checkpoint">checkpoint</dfn>)</td></tr>
+<tr><th id="184">184</th><td>{</td></tr>
+<tr><th id="185">185</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="11res" title='res' data-type='_Bool' data-ref="11res">res</dfn> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="186">186</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((EVENT_CHECKPOINT + checkpoint &lt;= EVENT_CHECKPOINT_LAST) ? (void) (0) : __assert_fail (&quot;EVENT_CHECKPOINT + checkpoint &lt;= EVENT_CHECKPOINT_LAST&quot;, &quot;/home/jon/workspace/qemu/replay/replay.c&quot;, 186, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHECKPOINT" title='ReplayEvents::EVENT_CHECKPOINT' data-ref="ReplayEvents::EVENT_CHECKPOINT">EVENT_CHECKPOINT</a> + <a class="local col0 ref" href="#10checkpoint" title='checkpoint' data-ref="10checkpoint">checkpoint</a> &lt;= <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHECKPOINT_LAST" title='ReplayEvents::EVENT_CHECKPOINT_LAST' data-ref="ReplayEvents::EVENT_CHECKPOINT_LAST">EVENT_CHECKPOINT_LAST</a>);</td></tr>
+<tr><th id="187">187</th><td>    <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="188">188</th><td></td></tr>
+<tr><th id="189">189</th><td>    <b>if</b> (!<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>) {</td></tr>
+<tr><th id="190">190</th><td>        <b>return</b> <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="191">191</th><td>    }</td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="194">194</th><td></td></tr>
+<tr><th id="195">195</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="196">196</th><td>        <b>if</b> (<a class="ref" href="#replay_next_event_is" title='replay_next_event_is' data-ref="replay_next_event_is">replay_next_event_is</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHECKPOINT" title='ReplayEvents::EVENT_CHECKPOINT' data-ref="ReplayEvents::EVENT_CHECKPOINT">EVENT_CHECKPOINT</a> + <a class="local col0 ref" href="#10checkpoint" title='checkpoint' data-ref="10checkpoint">checkpoint</a>)) {</td></tr>
+<tr><th id="197">197</th><td>            <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="198">198</th><td>        } <b>else</b> <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> != <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_ASYNC" title='ReplayEvents::EVENT_ASYNC' data-ref="ReplayEvents::EVENT_ASYNC">EVENT_ASYNC</a>) {</td></tr>
+<tr><th id="199">199</th><td>            <a class="local col1 ref" href="#11res" title='res' data-ref="11res">res</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="200">200</th><td>            <b>goto</b> <a class="lbl" href="#12out" data-ref="12out">out</a>;</td></tr>
+<tr><th id="201">201</th><td>        }</td></tr>
+<tr><th id="202">202</th><td>        <a class="ref" href="replay-internal.h.html#replay_read_events" title='replay_read_events' data-ref="replay_read_events">replay_read_events</a>(<a class="local col0 ref" href="#10checkpoint" title='checkpoint' data-ref="10checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="203">203</th><td>        <i>/* replay_read_events may leave some unread events.</i></td></tr>
+<tr><th id="204">204</th><td><i>           Return false if not all of the events associated with</i></td></tr>
+<tr><th id="205">205</th><td><i>           checkpoint were processed */</i></td></tr>
+<tr><th id="206">206</th><td>        <a class="local col1 ref" href="#11res" title='res' data-ref="11res">res</a> = <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> != <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_ASYNC" title='ReplayEvents::EVENT_ASYNC' data-ref="ReplayEvents::EVENT_ASYNC">EVENT_ASYNC</a>;</td></tr>
+<tr><th id="207">207</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="208">208</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_CHECKPOINT" title='ReplayEvents::EVENT_CHECKPOINT' data-ref="ReplayEvents::EVENT_CHECKPOINT">EVENT_CHECKPOINT</a> + <a class="local col0 ref" href="#10checkpoint" title='checkpoint' data-ref="10checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="209">209</th><td>        <a class="ref" href="replay-internal.h.html#replay_save_events" title='replay_save_events' data-ref="replay_save_events">replay_save_events</a>(<a class="local col0 ref" href="#10checkpoint" title='checkpoint' data-ref="10checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="210">210</th><td>        <a class="local col1 ref" href="#11res" title='res' data-ref="11res">res</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="211">211</th><td>    }</td></tr>
+<tr><th id="212">212</th><td><dfn class="lbl" id="12out" data-ref="12out">out</dfn>:</td></tr>
+<tr><th id="213">213</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="214">214</th><td>    <b>return</b> <a class="local col1 ref" href="#11res" title='res' data-ref="11res">res</a>;</td></tr>
+<tr><th id="215">215</th><td>}</td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="replay_enable" title='replay_enable' data-type='void replay_enable(const char * fname, int mode)' data-ref="replay_enable">replay_enable</dfn>(<em>const</em> <em>char</em> *<dfn class="local col3 decl" id="13fname" title='fname' data-type='const char *' data-ref="13fname">fname</dfn>, <em>int</em> <dfn class="local col4 decl" id="14mode" title='mode' data-type='int' data-ref="14mode">mode</dfn>)</td></tr>
+<tr><th id="218">218</th><td>{</td></tr>
+<tr><th id="219">219</th><td>    <em>const</em> <em>char</em> *<dfn class="local col5 decl" id="15fmode" title='fmode' data-type='const char *' data-ref="15fmode">fmode</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="220">220</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((!replay_file) ? (void) (0) : __assert_fail (&quot;!replay_file&quot;, &quot;/home/jon/workspace/qemu/replay/replay.c&quot;, 220, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>);</td></tr>
+<tr><th id="221">221</th><td></td></tr>
+<tr><th id="222">222</th><td>    <b>switch</b> (<a class="local col4 ref" href="#14mode" title='mode' data-ref="14mode">mode</a>) {</td></tr>
+<tr><th id="223">223</th><td>    <b>case</b> <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>:</td></tr>
+<tr><th id="224">224</th><td>        <a class="local col5 ref" href="#15fmode" title='fmode' data-ref="15fmode">fmode</a> = <q>"wb"</q>;</td></tr>
+<tr><th id="225">225</th><td>        <b>break</b>;</td></tr>
+<tr><th id="226">226</th><td>    <b>case</b> <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>:</td></tr>
+<tr><th id="227">227</th><td>        <a class="local col5 ref" href="#15fmode" title='fmode' data-ref="15fmode">fmode</a> = <q>"rb"</q>;</td></tr>
+<tr><th id="228">228</th><td>        <b>break</b>;</td></tr>
+<tr><th id="229">229</th><td>    <b>default</b>:</td></tr>
+<tr><th id="230">230</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Replay: internal error: invalid replay mode\n"</q>);</td></tr>
+<tr><th id="231">231</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="232">232</th><td>    }</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td>    <a class="ref" href="../../include/stdlib.h.html#atexit" title='atexit' data-ref="atexit">atexit</a>(<a class="ref" href="#replay_finish" title='replay_finish' data-ref="replay_finish">replay_finish</a>);</td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_init" title='replay_mutex_init' data-ref="replay_mutex_init">replay_mutex_init</a>();</td></tr>
+<tr><th id="237">237</th><td></td></tr>
+<tr><th id="238">238</th><td>    <a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a> = <a class="ref" href="../../include/stdio.h.html#283" title='fopen' data-ref="fopen64">fopen</a>(<a class="local col3 ref" href="#13fname" title='fname' data-ref="13fname">fname</a>, <a class="local col5 ref" href="#15fmode" title='fmode' data-ref="15fmode">fmode</a>);</td></tr>
+<tr><th id="239">239</th><td>    <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a> == <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>) {</td></tr>
+<tr><th id="240">240</th><td>        <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Replay: open %s: %s\n"</q>, <a class="local col3 ref" href="#13fname" title='fname' data-ref="13fname">fname</a>, <a class="ref" href="../../include/string.h.html#strerror" title='strerror' data-ref="strerror">strerror</a>(<a class="macro" href="../../include/x86_64-linux-gnu/bits/errno.h.html#54" title="(*__errno_location ())" data-ref="_M/errno">errno</a>));</td></tr>
+<tr><th id="241">241</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="242">242</th><td>    }</td></tr>
+<tr><th id="243">243</th><td></td></tr>
+<tr><th id="244">244</th><td>    <a class="tu ref" href="#replay_filename" title='replay_filename' data-use='w' data-ref="replay_filename">replay_filename</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="local col3 ref" href="#13fname" title='fname' data-ref="13fname">fname</a>);</td></tr>
+<tr><th id="245">245</th><td></td></tr>
+<tr><th id="246">246</th><td>    <a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> = <a class="local col4 ref" href="#14mode" title='mode' data-ref="14mode">mode</a>;</td></tr>
+<tr><th id="247">247</th><td>    <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> = -<var>1</var>;</td></tr>
+<tr><th id="248">248</th><td>    <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::instructions_count" title='ReplayState::instructions_count' data-ref="ReplayState::instructions_count">instructions_count</a> = <var>0</var>;</td></tr>
+<tr><th id="249">249</th><td>    <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::current_step" title='ReplayState::current_step' data-ref="ReplayState::current_step">current_step</a> = <var>0</var>;</td></tr>
+<tr><th id="250">250</th><td>    <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::has_unread_data" title='ReplayState::has_unread_data' data-ref="ReplayState::has_unread_data">has_unread_data</a> = <var>0</var>;</td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>    <i>/* skip file header for RECORD and check it for PLAY */</i></td></tr>
+<tr><th id="253">253</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="254">254</th><td>        <a class="ref" href="../../include/stdio.h.html#fseek" title='fseek' data-ref="fseek">fseek</a>(<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>, <a class="macro" href="#27" title="(sizeof(uint32_t) + sizeof(uint64_t))" data-ref="_M/HEADER_SIZE">HEADER_SIZE</a>, <a class="macro" href="../../include/fcntl.h.html#136" title="0" data-ref="_M/SEEK_SET">SEEK_SET</a>);</td></tr>
+<tr><th id="255">255</th><td>    } <b>else</b> <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="256">256</th><td>        <em>unsigned</em> <em>int</em> <dfn class="local col6 decl" id="16version" title='version' data-type='unsigned int' data-ref="16version">version</dfn> = <a class="ref" href="replay-internal.h.html#replay_get_dword" title='replay_get_dword' data-ref="replay_get_dword">replay_get_dword</a>();</td></tr>
+<tr><th id="257">257</th><td>        <b>if</b> (<a class="local col6 ref" href="#16version" title='version' data-ref="16version">version</a> != <a class="macro" href="#25" title="0xe02006" data-ref="_M/REPLAY_VERSION">REPLAY_VERSION</a>) {</td></tr>
+<tr><th id="258">258</th><td>            <a class="ref" href="../../include/stdio.h.html#fprintf" title='fprintf' data-ref="fprintf">fprintf</a>(<a class="macro" href="../../include/stdio.h.html#174" title="stderr" data-ref="_M/stderr">stderr</a>, <q>"Replay: invalid input log file version\n"</q>);</td></tr>
+<tr><th id="259">259</th><td>            <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="260">260</th><td>        }</td></tr>
+<tr><th id="261">261</th><td>        <i>/* go to the beginning */</i></td></tr>
+<tr><th id="262">262</th><td>        <a class="ref" href="../../include/stdio.h.html#fseek" title='fseek' data-ref="fseek">fseek</a>(<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>, <a class="macro" href="#27" title="(sizeof(uint32_t) + sizeof(uint64_t))" data-ref="_M/HEADER_SIZE">HEADER_SIZE</a>, <a class="macro" href="../../include/fcntl.h.html#136" title="0" data-ref="_M/SEEK_SET">SEEK_SET</a>);</td></tr>
+<tr><th id="263">263</th><td>        <a class="ref" href="replay-internal.h.html#replay_fetch_data_kind" title='replay_fetch_data_kind' data-ref="replay_fetch_data_kind">replay_fetch_data_kind</a>();</td></tr>
+<tr><th id="264">264</th><td>    }</td></tr>
+<tr><th id="265">265</th><td></td></tr>
+<tr><th id="266">266</th><td>    <a class="ref" href="replay-internal.h.html#replay_init_events" title='replay_init_events' data-ref="replay_init_events">replay_init_events</a>();</td></tr>
+<tr><th id="267">267</th><td>}</td></tr>
+<tr><th id="268">268</th><td></td></tr>
+<tr><th id="269">269</th><td><em>void</em> <dfn class="decl def" id="replay_configure" title='replay_configure' data-ref="replay_configure">replay_configure</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col7 decl" id="17opts" title='opts' data-type='QemuOpts *' data-ref="17opts">opts</dfn>)</td></tr>
+<tr><th id="270">270</th><td>{</td></tr>
+<tr><th id="271">271</th><td>    <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="18fname" title='fname' data-type='const char *' data-ref="18fname">fname</dfn>;</td></tr>
+<tr><th id="272">272</th><td>    <em>const</em> <em>char</em> *<dfn class="local col9 decl" id="19rr" title='rr' data-type='const char *' data-ref="19rr">rr</dfn>;</td></tr>
+<tr><th id="273">273</th><td>    <a class="typedef" href="../qapi-types.h.html#ReplayMode" title='ReplayMode' data-type='enum ReplayMode' data-ref="ReplayMode">ReplayMode</a> <dfn class="local col0 decl" id="20mode" title='mode' data-type='ReplayMode' data-ref="20mode">mode</dfn> = <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>;</td></tr>
+<tr><th id="274">274</th><td>    <a class="typedef" href="../include/qemu/error-report.h.html#Location" title='Location' data-type='struct Location' data-ref="Location">Location</a> <dfn class="local col1 decl" id="21loc" title='loc' data-type='Location' data-ref="21loc">loc</dfn>;</td></tr>
+<tr><th id="275">275</th><td></td></tr>
+<tr><th id="276">276</th><td>    <b>if</b> (!<a class="local col7 ref" href="#17opts" title='opts' data-ref="17opts">opts</a>) {</td></tr>
+<tr><th id="277">277</th><td>        <b>return</b>;</td></tr>
+<tr><th id="278">278</th><td>    }</td></tr>
+<tr><th id="279">279</th><td></td></tr>
+<tr><th id="280">280</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#loc_push_none" title='loc_push_none' data-ref="loc_push_none">loc_push_none</a>(&amp;<a class="local col1 ref" href="#21loc" title='loc' data-ref="21loc">loc</a>);</td></tr>
+<tr><th id="281">281</th><td>    <a class="ref" href="../include/qemu/option.h.html#qemu_opts_loc_restore" title='qemu_opts_loc_restore' data-ref="qemu_opts_loc_restore">qemu_opts_loc_restore</a>(<a class="local col7 ref" href="#17opts" title='opts' data-ref="17opts">opts</a>);</td></tr>
+<tr><th id="282">282</th><td></td></tr>
+<tr><th id="283">283</th><td>    <a class="local col9 ref" href="#19rr" title='rr' data-ref="19rr">rr</a> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col7 ref" href="#17opts" title='opts' data-ref="17opts">opts</a>, <q>"rr"</q>);</td></tr>
+<tr><th id="284">284</th><td>    <b>if</b> (!<a class="local col9 ref" href="#19rr" title='rr' data-ref="19rr">rr</a>) {</td></tr>
+<tr><th id="285">285</th><td>        <i>/* Just enabling icount */</i></td></tr>
+<tr><th id="286">286</th><td>        <b>goto</b> <a class="lbl" href="#22out" data-ref="22out">out</a>;</td></tr>
+<tr><th id="287">287</th><td>    } <b>else</b> <b>if</b> (!<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col9 ref" href="#19rr" title='rr' data-ref="19rr">rr</a>, <q>"record"</q>)) {</td></tr>
+<tr><th id="288">288</th><td>        <a class="local col0 ref" href="#20mode" title='mode' data-ref="20mode">mode</a> = <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>;</td></tr>
+<tr><th id="289">289</th><td>    } <b>else</b> <b>if</b> (!<a class="ref" href="../../include/string.h.html#strcmp" title='strcmp' data-ref="strcmp">strcmp</a>(<a class="local col9 ref" href="#19rr" title='rr' data-ref="19rr">rr</a>, <q>"replay"</q>)) {</td></tr>
+<tr><th id="290">290</th><td>        <a class="local col0 ref" href="#20mode" title='mode' data-ref="20mode">mode</a> = <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>;</td></tr>
+<tr><th id="291">291</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="292">292</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Invalid icount rr option: %s"</q>, <a class="local col9 ref" href="#19rr" title='rr' data-ref="19rr">rr</a>);</td></tr>
+<tr><th id="293">293</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="294">294</th><td>    }</td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td>    <a class="local col8 ref" href="#18fname" title='fname' data-ref="18fname">fname</a> = <a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col7 ref" href="#17opts" title='opts' data-ref="17opts">opts</a>, <q>"rrfile"</q>);</td></tr>
+<tr><th id="297">297</th><td>    <b>if</b> (!<a class="local col8 ref" href="#18fname" title='fname' data-ref="18fname">fname</a>) {</td></tr>
+<tr><th id="298">298</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"File name not specified for replay"</q>);</td></tr>
+<tr><th id="299">299</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="300">300</th><td>    }</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>    <a class="ref" href="../include/sysemu/replay.h.html#replay_snapshot" title='replay_snapshot' data-ref="replay_snapshot">replay_snapshot</a> = <a class="ref" href="../../include/glib-2.0/glib/gstrfuncs.h.html#g_strdup" title='g_strdup' data-ref="g_strdup">g_strdup</a>(<a class="ref" href="../include/qemu/option.h.html#qemu_opt_get" title='qemu_opt_get' data-ref="qemu_opt_get">qemu_opt_get</a>(<a class="local col7 ref" href="#17opts" title='opts' data-ref="17opts">opts</a>, <q>"rrsnapshot"</q>));</td></tr>
+<tr><th id="303">303</th><td>    <a class="ref" href="replay-internal.h.html#replay_vmstate_register" title='replay_vmstate_register' data-ref="replay_vmstate_register">replay_vmstate_register</a>();</td></tr>
+<tr><th id="304">304</th><td>    <a class="tu ref" href="#replay_enable" title='replay_enable' data-use='c' data-ref="replay_enable">replay_enable</a>(<a class="local col8 ref" href="#18fname" title='fname' data-ref="18fname">fname</a>, <a class="local col0 ref" href="#20mode" title='mode' data-ref="20mode">mode</a>);</td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td><dfn class="lbl" id="22out" data-ref="22out">out</dfn>:</td></tr>
+<tr><th id="307">307</th><td>    <a class="ref" href="../include/qemu/error-report.h.html#loc_pop" title='loc_pop' data-ref="loc_pop">loc_pop</a>(&amp;<a class="local col1 ref" href="#21loc" title='loc' data-ref="21loc">loc</a>);</td></tr>
+<tr><th id="308">308</th><td>}</td></tr>
+<tr><th id="309">309</th><td></td></tr>
+<tr><th id="310">310</th><td><em>void</em> <dfn class="decl def" id="replay_start" title='replay_start' data-ref="replay_start">replay_start</dfn>(<em>void</em>)</td></tr>
+<tr><th id="311">311</th><td>{</td></tr>
+<tr><th id="312">312</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>) {</td></tr>
+<tr><th id="313">313</th><td>        <b>return</b>;</td></tr>
+<tr><th id="314">314</th><td>    }</td></tr>
+<tr><th id="315">315</th><td></td></tr>
+<tr><th id="316">316</th><td>    <b>if</b> (<a class="tu ref" href="#replay_blockers" title='replay_blockers' data-use='r' data-ref="replay_blockers">replay_blockers</a>) {</td></tr>
+<tr><th id="317">317</th><td>        <a class="ref" href="../include/qapi/error.h.html#error_reportf_err" title='error_reportf_err' data-ref="error_reportf_err">error_reportf_err</a>(<a class="tu ref" href="#replay_blockers" title='replay_blockers' data-use='r' data-ref="replay_blockers">replay_blockers</a>-&gt;<a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#_GSList::data" title='_GSList::data' data-ref="_GSList::data">data</a>, <q>"Record/replay: "</q>);</td></tr>
+<tr><th id="318">318</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="319">319</th><td>    }</td></tr>
+<tr><th id="320">320</th><td>    <b>if</b> (!<a class="ref" href="../include/sysemu/cpus.h.html#use_icount" title='use_icount' data-ref="use_icount">use_icount</a>) {</td></tr>
+<tr><th id="321">321</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Please enable icount to use record/replay"</q>);</td></tr>
+<tr><th id="322">322</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="323">323</th><td>    }</td></tr>
+<tr><th id="324">324</th><td></td></tr>
+<tr><th id="325">325</th><td>    <i>/* Timer for snapshotting will be set up here. */</i></td></tr>
+<tr><th id="326">326</th><td></td></tr>
+<tr><th id="327">327</th><td>    <a class="ref" href="../include/sysemu/replay.h.html#replay_enable_events" title='replay_enable_events' data-ref="replay_enable_events">replay_enable_events</a>();</td></tr>
+<tr><th id="328">328</th><td>}</td></tr>
+<tr><th id="329">329</th><td></td></tr>
+<tr><th id="330">330</th><td><em>void</em> <dfn class="decl def" id="replay_finish" title='replay_finish' data-ref="replay_finish">replay_finish</dfn>(<em>void</em>)</td></tr>
+<tr><th id="331">331</th><td>{</td></tr>
+<tr><th id="332">332</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>) {</td></tr>
+<tr><th id="333">333</th><td>        <b>return</b>;</td></tr>
+<tr><th id="334">334</th><td>    }</td></tr>
+<tr><th id="335">335</th><td></td></tr>
+<tr><th id="336">336</th><td>    <a class="ref" href="replay-internal.h.html#replay_save_instructions" title='replay_save_instructions' data-ref="replay_save_instructions">replay_save_instructions</a>();</td></tr>
+<tr><th id="337">337</th><td></td></tr>
+<tr><th id="338">338</th><td>    <i>/* finalize the file */</i></td></tr>
+<tr><th id="339">339</th><td>    <b>if</b> (<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>) {</td></tr>
+<tr><th id="340">340</th><td>        <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_RECORD" title='ReplayMode::REPLAY_MODE_RECORD' data-ref="ReplayMode::REPLAY_MODE_RECORD">REPLAY_MODE_RECORD</a>) {</td></tr>
+<tr><th id="341">341</th><td>            <i>/* write end event */</i></td></tr>
+<tr><th id="342">342</th><td>            <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_END" title='ReplayEvents::EVENT_END' data-ref="ReplayEvents::EVENT_END">EVENT_END</a>);</td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td>            <i>/* write header */</i></td></tr>
+<tr><th id="345">345</th><td>            <a class="ref" href="../../include/stdio.h.html#fseek" title='fseek' data-ref="fseek">fseek</a>(<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>, <var>0</var>, <a class="macro" href="../../include/fcntl.h.html#136" title="0" data-ref="_M/SEEK_SET">SEEK_SET</a>);</td></tr>
+<tr><th id="346">346</th><td>            <a class="ref" href="replay-internal.h.html#replay_put_dword" title='replay_put_dword' data-ref="replay_put_dword">replay_put_dword</a>(<a class="macro" href="#25" title="0xe02006" data-ref="_M/REPLAY_VERSION">REPLAY_VERSION</a>);</td></tr>
+<tr><th id="347">347</th><td>        }</td></tr>
+<tr><th id="348">348</th><td></td></tr>
+<tr><th id="349">349</th><td>        <a class="ref" href="../../include/stdio.h.html#fclose" title='fclose' data-ref="fclose">fclose</a>(<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a>);</td></tr>
+<tr><th id="350">350</th><td>        <a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="351">351</th><td>    }</td></tr>
+<tr><th id="352">352</th><td>    <b>if</b> (<a class="tu ref" href="#replay_filename" title='replay_filename' data-use='r' data-ref="replay_filename">replay_filename</a>) {</td></tr>
+<tr><th id="353">353</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="tu ref" href="#replay_filename" title='replay_filename' data-use='r' data-ref="replay_filename">replay_filename</a>);</td></tr>
+<tr><th id="354">354</th><td>        <a class="tu ref" href="#replay_filename" title='replay_filename' data-use='w' data-ref="replay_filename">replay_filename</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="355">355</th><td>    }</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td>    <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="ref" href="../include/sysemu/replay.h.html#replay_snapshot" title='replay_snapshot' data-ref="replay_snapshot">replay_snapshot</a>);</td></tr>
+<tr><th id="358">358</th><td>    <a class="ref" href="../include/sysemu/replay.h.html#replay_snapshot" title='replay_snapshot' data-ref="replay_snapshot">replay_snapshot</a> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="359">359</th><td></td></tr>
+<tr><th id="360">360</th><td>    <a class="ref" href="replay-internal.h.html#replay_finish_events" title='replay_finish_events' data-ref="replay_finish_events">replay_finish_events</a>();</td></tr>
+<tr><th id="361">361</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_destroy" title='replay_mutex_destroy' data-ref="replay_mutex_destroy">replay_mutex_destroy</a>();</td></tr>
+<tr><th id="362">362</th><td>}</td></tr>
+<tr><th id="363">363</th><td></td></tr>
+<tr><th id="364">364</th><td><em>void</em> <dfn class="decl def" id="replay_add_blocker" title='replay_add_blocker' data-ref="replay_add_blocker">replay_add_blocker</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#Error" title='Error' data-type='struct Error' data-ref="Error">Error</a> *<dfn class="local col3 decl" id="23reason" title='reason' data-type='Error *' data-ref="23reason">reason</dfn>)</td></tr>
+<tr><th id="365">365</th><td>{</td></tr>
+<tr><th id="366">366</th><td>    <a class="tu ref" href="#replay_blockers" title='replay_blockers' data-use='w' data-ref="replay_blockers">replay_blockers</a> = <a class="ref" href="../../include/glib-2.0/glib/gslist.h.html#g_slist_prepend" title='g_slist_prepend' data-ref="g_slist_prepend">g_slist_prepend</a>(<a class="tu ref" href="#replay_blockers" title='replay_blockers' data-use='r' data-ref="replay_blockers">replay_blockers</a>, <a class="local col3 ref" href="#23reason" title='reason' data-ref="23reason">reason</a>);</td></tr>
+<tr><th id="367">367</th><td>}</td></tr>
+<tr><th id="368">368</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

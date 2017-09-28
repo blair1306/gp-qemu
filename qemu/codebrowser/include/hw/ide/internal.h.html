@@ -1,0 +1,658 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>internal.h source code [codebrowser/include/hw/ide/internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="IDEBufferedRequest,IDEBus,IDEDMA,IDEDMAOps,IDEDevice,IDEDeviceClass,IDEState,ide_dma_cmd,unreported_events "/>
+<link rel="stylesheet" href="../../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/ide/internal.h'; var root_path = '../../../..'; var data_path = '../../../../../data';</script>
+<script src='../../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../../..'>codebrowser</a>/<a href='../..'>include</a>/<a href='..'>hw</a>/<a href='./'>ide</a>/<a href='internal.h.html'>internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/HW_IDE_INTERNAL_H">HW_IDE_INTERNAL_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/HW_IDE_INTERNAL_H" data-ref="_M/HW_IDE_INTERNAL_H">HW_IDE_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><i>/*</i></td></tr>
+<tr><th id="5">5</th><td><i> * QEMU IDE Emulation -- internal header file</i></td></tr>
+<tr><th id="6">6</th><td><i> * only files in hw/ide/ are supposed to include this file.</i></td></tr>
+<tr><th id="7">7</th><td><i> * non-internal declarations are in hw/ide.h</i></td></tr>
+<tr><th id="8">8</th><td><i> */</i></td></tr>
+<tr><th id="9">9</th><td><u>#include <a href="../ide.h.html">"hw/ide.h"</a></u></td></tr>
+<tr><th id="10">10</th><td><u>#include <a href="../isa/isa.h.html">"hw/isa/isa.h"</a></u></td></tr>
+<tr><th id="11">11</th><td><u>#include <a href="../../sysemu/dma.h.html">"sysemu/dma.h"</a></u></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../../sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../block/block.h.html">"hw/block/block.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../../block/scsi.h.html">"block/scsi.h"</a></u></td></tr>
+<tr><th id="15">15</th><td></td></tr>
+<tr><th id="16">16</th><td><i>/* debug IDE devices */</i></td></tr>
+<tr><th id="17">17</th><td><i>//#define DEBUG_IDE</i></td></tr>
+<tr><th id="18">18</th><td><i>//#define DEBUG_IDE_ATAPI</i></td></tr>
+<tr><th id="19">19</th><td><i>//#define DEBUG_AIO</i></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/USE_DMA_CDROM" data-ref="_M/USE_DMA_CDROM">USE_DMA_CDROM</dfn></u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IDEBus" title='IDEBus' data-ref="IDEBus">IDEBus</a> <dfn class="typedef" id="IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</dfn>;</td></tr>
+<tr><th id="23">23</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IDEDevice" title='IDEDevice' data-ref="IDEDevice">IDEDevice</a> <dfn class="typedef" id="IDEDevice" title='IDEDevice' data-type='struct IDEDevice' data-ref="IDEDevice">IDEDevice</dfn>;</td></tr>
+<tr><th id="24">24</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IDEState" title='IDEState' data-ref="IDEState">IDEState</a> <dfn class="typedef" id="IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</dfn>;</td></tr>
+<tr><th id="25">25</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IDEDMA" title='IDEDMA' data-ref="IDEDMA">IDEDMA</a> <dfn class="typedef" id="IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</dfn>;</td></tr>
+<tr><th id="26">26</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#IDEDMAOps" title='IDEDMAOps' data-ref="IDEDMAOps">IDEDMAOps</a> <dfn class="typedef" id="IDEDMAOps" title='IDEDMAOps' data-type='struct IDEDMAOps' data-ref="IDEDMAOps">IDEDMAOps</dfn>;</td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#define <dfn class="macro" id="_M/TYPE_IDE_BUS" data-ref="_M/TYPE_IDE_BUS">TYPE_IDE_BUS</dfn> "IDE"</u></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/IDE_BUS" data-ref="_M/IDE_BUS">IDE_BUS</dfn>(obj) OBJECT_CHECK(IDEBus, (obj), TYPE_IDE_BUS)</u></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><i>/* Bits of HD_STATUS */</i></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/ERR_STAT" data-ref="_M/ERR_STAT">ERR_STAT</dfn>		0x01</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/INDEX_STAT" data-ref="_M/INDEX_STAT">INDEX_STAT</dfn>		0x02</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/ECC_STAT" data-ref="_M/ECC_STAT">ECC_STAT</dfn>		0x04	/* Corrected error */</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/DRQ_STAT" data-ref="_M/DRQ_STAT">DRQ_STAT</dfn>		0x08</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/SEEK_STAT" data-ref="_M/SEEK_STAT">SEEK_STAT</dfn>		0x10</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/SRV_STAT" data-ref="_M/SRV_STAT">SRV_STAT</dfn>		0x10</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/WRERR_STAT" data-ref="_M/WRERR_STAT">WRERR_STAT</dfn>		0x20</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/READY_STAT" data-ref="_M/READY_STAT">READY_STAT</dfn>		0x40</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/BUSY_STAT" data-ref="_M/BUSY_STAT">BUSY_STAT</dfn>		0x80</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* Bits for HD_ERROR */</i></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/MARK_ERR" data-ref="_M/MARK_ERR">MARK_ERR</dfn>		0x01	/* Bad address mark */</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/TRK0_ERR" data-ref="_M/TRK0_ERR">TRK0_ERR</dfn>		0x02	/* couldn't find track 0 */</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/ABRT_ERR" data-ref="_M/ABRT_ERR">ABRT_ERR</dfn>		0x04	/* Command aborted */</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/MCR_ERR" data-ref="_M/MCR_ERR">MCR_ERR</dfn>			0x08	/* media change request */</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/ID_ERR" data-ref="_M/ID_ERR">ID_ERR</dfn>			0x10	/* ID field not found */</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/MC_ERR" data-ref="_M/MC_ERR">MC_ERR</dfn>			0x20	/* media changed */</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/ECC_ERR" data-ref="_M/ECC_ERR">ECC_ERR</dfn>			0x40	/* Uncorrectable ECC error */</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/BBD_ERR" data-ref="_M/BBD_ERR">BBD_ERR</dfn>			0x80	/* pre-EIDE meaning:  block marked bad */</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/ICRC_ERR" data-ref="_M/ICRC_ERR">ICRC_ERR</dfn>		0x80	/* new meaning:  CRC error during transfer */</u></td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td><i>/* Bits of HD_NSECTOR */</i></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/CD" data-ref="_M/CD">CD</dfn>			0x01</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/IO" data-ref="_M/IO">IO</dfn>			0x02</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/REL" data-ref="_M/REL">REL</dfn>			0x04</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/TAG_MASK" data-ref="_M/TAG_MASK">TAG_MASK</dfn>		0xf8</u></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/IDE_CMD_RESET" data-ref="_M/IDE_CMD_RESET">IDE_CMD_RESET</dfn>           0x04</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/IDE_CMD_DISABLE_IRQ" data-ref="_M/IDE_CMD_DISABLE_IRQ">IDE_CMD_DISABLE_IRQ</dfn>     0x02</u></td></tr>
+<tr><th id="61">61</th><td></td></tr>
+<tr><th id="62">62</th><td><i>/* ACS-2 T13/2015-D Table B.2 Command codes */</i></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/WIN_NOP" data-ref="_M/WIN_NOP">WIN_NOP</dfn>				0x00</u></td></tr>
+<tr><th id="64">64</th><td><i>/* reserved                             0x01..0x02 */</i></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/CFA_REQ_EXT_ERROR_CODE" data-ref="_M/CFA_REQ_EXT_ERROR_CODE">CFA_REQ_EXT_ERROR_CODE</dfn>		0x03 /* CFA Request Extended Error Code */</u></td></tr>
+<tr><th id="66">66</th><td><i>/* reserved                             0x04..0x05 */</i></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/WIN_DSM" data-ref="_M/WIN_DSM">WIN_DSM</dfn>                         0x06</u></td></tr>
+<tr><th id="68">68</th><td><i>/* reserved                             0x07 */</i></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/WIN_DEVICE_RESET" data-ref="_M/WIN_DEVICE_RESET">WIN_DEVICE_RESET</dfn>		0x08</u></td></tr>
+<tr><th id="70">70</th><td><i>/* reserved                             0x09..0x0a */</i></td></tr>
+<tr><th id="71">71</th><td><i>/* REQUEST SENSE DATA EXT               0x0B */</i></td></tr>
+<tr><th id="72">72</th><td><i>/* reserved                             0x0C..0x0F */</i></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/WIN_RECAL" data-ref="_M/WIN_RECAL">WIN_RECAL</dfn>                       0x10 /* obsolete since ATA4 */</u></td></tr>
+<tr><th id="74">74</th><td><i>/* obsolete since ATA3, retired in ATA4 0x11..0x1F */</i></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/WIN_READ" data-ref="_M/WIN_READ">WIN_READ</dfn>			0x20 /* 28-Bit */</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/WIN_READ_ONCE" data-ref="_M/WIN_READ_ONCE">WIN_READ_ONCE</dfn>                   0x21 /* 28-Bit w/o retries, obsolete since ATA5 */</u></td></tr>
+<tr><th id="77">77</th><td><i>/* obsolete since ATA4                  0x22..0x23 */</i></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/WIN_READ_EXT" data-ref="_M/WIN_READ_EXT">WIN_READ_EXT</dfn>			0x24 /* 48-Bit */</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/WIN_READDMA_EXT" data-ref="_M/WIN_READDMA_EXT">WIN_READDMA_EXT</dfn>			0x25 /* 48-Bit */</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/WIN_READDMA_QUEUED_EXT" data-ref="_M/WIN_READDMA_QUEUED_EXT">WIN_READDMA_QUEUED_EXT</dfn>          0x26 /* 48-Bit, obsolete since ACS2 */</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/WIN_READ_NATIVE_MAX_EXT" data-ref="_M/WIN_READ_NATIVE_MAX_EXT">WIN_READ_NATIVE_MAX_EXT</dfn>		0x27 /* 48-Bit */</u></td></tr>
+<tr><th id="82">82</th><td><i>/* reserved                             0x28 */</i></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/WIN_MULTREAD_EXT" data-ref="_M/WIN_MULTREAD_EXT">WIN_MULTREAD_EXT</dfn>		0x29 /* 48-Bit */</u></td></tr>
+<tr><th id="84">84</th><td><i>/* READ STREAM DMA EXT                  0x2A */</i></td></tr>
+<tr><th id="85">85</th><td><i>/* READ STREAM EXT                      0x2B */</i></td></tr>
+<tr><th id="86">86</th><td><i>/* reserved                             0x2C..0x2E */</i></td></tr>
+<tr><th id="87">87</th><td><i>/* READ LOG EXT                         0x2F */</i></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITE" data-ref="_M/WIN_WRITE">WIN_WRITE</dfn>			0x30 /* 28-Bit */</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITE_ONCE" data-ref="_M/WIN_WRITE_ONCE">WIN_WRITE_ONCE</dfn>                  0x31 /* 28-Bit w/o retries, obsolete since ATA5 */</u></td></tr>
+<tr><th id="90">90</th><td><i>/* obsolete since ATA4                  0x32..0x33 */</i></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITE_EXT" data-ref="_M/WIN_WRITE_EXT">WIN_WRITE_EXT</dfn>			0x34 /* 48-Bit */</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITEDMA_EXT" data-ref="_M/WIN_WRITEDMA_EXT">WIN_WRITEDMA_EXT</dfn>		0x35 /* 48-Bit */</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITEDMA_QUEUED_EXT" data-ref="_M/WIN_WRITEDMA_QUEUED_EXT">WIN_WRITEDMA_QUEUED_EXT</dfn>		0x36 /* 48-Bit */</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/WIN_SET_MAX_EXT" data-ref="_M/WIN_SET_MAX_EXT">WIN_SET_MAX_EXT</dfn>                 0x37 /* 48-Bit, obsolete since ACS2 */</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/WIN_SET_MAX_EXT" data-ref="_M/WIN_SET_MAX_EXT">WIN_SET_MAX_EXT</dfn>			0x37 /* 48-Bit */</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/CFA_WRITE_SECT_WO_ERASE" data-ref="_M/CFA_WRITE_SECT_WO_ERASE">CFA_WRITE_SECT_WO_ERASE</dfn>		0x38 /* CFA Write Sectors without erase */</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/WIN_MULTWRITE_EXT" data-ref="_M/WIN_MULTWRITE_EXT">WIN_MULTWRITE_EXT</dfn>		0x39 /* 48-Bit */</u></td></tr>
+<tr><th id="98">98</th><td><i>/* WRITE STREAM DMA EXT                 0x3A */</i></td></tr>
+<tr><th id="99">99</th><td><i>/* WRITE STREAM EXT                     0x3B */</i></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITE_VERIFY" data-ref="_M/WIN_WRITE_VERIFY">WIN_WRITE_VERIFY</dfn>                0x3C /* 28-Bit, obsolete since ATA4 */</u></td></tr>
+<tr><th id="101">101</th><td><i>/* WRITE DMA FUA EXT                    0x3D */</i></td></tr>
+<tr><th id="102">102</th><td><i>/* obsolete since ACS2                  0x3E */</i></td></tr>
+<tr><th id="103">103</th><td><i>/* WRITE LOG EXT                        0x3F */</i></td></tr>
+<tr><th id="104">104</th><td><u>#define <dfn class="macro" id="_M/WIN_VERIFY" data-ref="_M/WIN_VERIFY">WIN_VERIFY</dfn>			0x40 /* 28-Bit - Read Verify Sectors */</u></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/WIN_VERIFY_ONCE" data-ref="_M/WIN_VERIFY_ONCE">WIN_VERIFY_ONCE</dfn>                 0x41 /* 28-Bit - w/o retries, obsolete since ATA5 */</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/WIN_VERIFY_EXT" data-ref="_M/WIN_VERIFY_EXT">WIN_VERIFY_EXT</dfn>			0x42 /* 48-Bit */</u></td></tr>
+<tr><th id="107">107</th><td><i>/* reserved                             0x43..0x44 */</i></td></tr>
+<tr><th id="108">108</th><td><i>/* WRITE UNCORRECTABLE EXT              0x45 */</i></td></tr>
+<tr><th id="109">109</th><td><i>/* reserved                             0x46 */</i></td></tr>
+<tr><th id="110">110</th><td><i>/* READ LOG DMA EXT                     0x47 */</i></td></tr>
+<tr><th id="111">111</th><td><i>/* reserved                             0x48..0x4F */</i></td></tr>
+<tr><th id="112">112</th><td><i>/* obsolete since ATA4                  0x50 */</i></td></tr>
+<tr><th id="113">113</th><td><i>/* CONFIGURE STREAM                     0x51 */</i></td></tr>
+<tr><th id="114">114</th><td><i>/* reserved                             0x52..0x56 */</i></td></tr>
+<tr><th id="115">115</th><td><i>/* WRITE LOG DMA EXT                    0x57 */</i></td></tr>
+<tr><th id="116">116</th><td><i>/* reserved                             0x58..0x5A */</i></td></tr>
+<tr><th id="117">117</th><td><i>/* TRUSTED NON DATA                     0x5B */</i></td></tr>
+<tr><th id="118">118</th><td><i>/* TRUSTED RECEIVE                      0x5C */</i></td></tr>
+<tr><th id="119">119</th><td><i>/* TRUSTED RECEIVE DMA                  0x5D */</i></td></tr>
+<tr><th id="120">120</th><td><i>/* TRUSTED SEND                         0x5E */</i></td></tr>
+<tr><th id="121">121</th><td><i>/* TRUSTED SEND DMA                     0x5F */</i></td></tr>
+<tr><th id="122">122</th><td><i>/* READ FPDMA QUEUED                    0x60 */</i></td></tr>
+<tr><th id="123">123</th><td><i>/* WRITE FPDMA QUEUED                   0x61 */</i></td></tr>
+<tr><th id="124">124</th><td><i>/* reserved                             0x62-&gt;0x6F */</i></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/WIN_SEEK" data-ref="_M/WIN_SEEK">WIN_SEEK</dfn>                        0x70 /* obsolete since ATA7 */</u></td></tr>
+<tr><th id="126">126</th><td><i>/* reserved                             0x71-0x7F */</i></td></tr>
+<tr><th id="127">127</th><td><i>/* vendor specific                      0x80-0x86 */</i></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/CFA_TRANSLATE_SECTOR" data-ref="_M/CFA_TRANSLATE_SECTOR">CFA_TRANSLATE_SECTOR</dfn>		0x87 /* CFA Translate Sector */</u></td></tr>
+<tr><th id="129">129</th><td><i>/* vendor specific                      0x88-0x8F */</i></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/WIN_DIAGNOSE" data-ref="_M/WIN_DIAGNOSE">WIN_DIAGNOSE</dfn>			0x90</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/WIN_SPECIFY" data-ref="_M/WIN_SPECIFY">WIN_SPECIFY</dfn>                     0x91 /* set drive geometry translation, obsolete since ATA6 */</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/WIN_DOWNLOAD_MICROCODE" data-ref="_M/WIN_DOWNLOAD_MICROCODE">WIN_DOWNLOAD_MICROCODE</dfn>		0x92</u></td></tr>
+<tr><th id="133">133</th><td><i>/* DOWNLOAD MICROCODE DMA               0x93 */</i></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/WIN_STANDBYNOW2" data-ref="_M/WIN_STANDBYNOW2">WIN_STANDBYNOW2</dfn>                 0x94 /* retired in ATA4 */</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/WIN_IDLEIMMEDIATE2" data-ref="_M/WIN_IDLEIMMEDIATE2">WIN_IDLEIMMEDIATE2</dfn>              0x95 /* force drive to become "ready", retired in ATA4 */</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/WIN_STANDBY2" data-ref="_M/WIN_STANDBY2">WIN_STANDBY2</dfn>                    0x96 /* retired in ATA4 */</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/WIN_SETIDLE2" data-ref="_M/WIN_SETIDLE2">WIN_SETIDLE2</dfn>                    0x97 /* retired in ATA4 */</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/WIN_CHECKPOWERMODE2" data-ref="_M/WIN_CHECKPOWERMODE2">WIN_CHECKPOWERMODE2</dfn>             0x98 /* retired in ATA4 */</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/WIN_SLEEPNOW2" data-ref="_M/WIN_SLEEPNOW2">WIN_SLEEPNOW2</dfn>                   0x99 /* retired in ATA4 */</u></td></tr>
+<tr><th id="140">140</th><td><i>/* vendor specific                      0x9A */</i></td></tr>
+<tr><th id="141">141</th><td><i>/* reserved                             0x9B..0x9F */</i></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/WIN_PACKETCMD" data-ref="_M/WIN_PACKETCMD">WIN_PACKETCMD</dfn>			0xA0 /* Send a packet command. */</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/WIN_PIDENTIFY" data-ref="_M/WIN_PIDENTIFY">WIN_PIDENTIFY</dfn>			0xA1 /* identify ATAPI device	*/</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/WIN_QUEUED_SERVICE" data-ref="_M/WIN_QUEUED_SERVICE">WIN_QUEUED_SERVICE</dfn>              0xA2 /* obsolete since ACS2 */</u></td></tr>
+<tr><th id="145">145</th><td><i>/* reserved                             0xA3..0xAF */</i></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/WIN_SMART" data-ref="_M/WIN_SMART">WIN_SMART</dfn>			0xB0 /* self-monitoring and reporting */</u></td></tr>
+<tr><th id="147">147</th><td><i>/* Device Configuration Overlay         0xB1 */</i></td></tr>
+<tr><th id="148">148</th><td><i>/* reserved                             0xB2..0xB3 */</i></td></tr>
+<tr><th id="149">149</th><td><i>/* Sanitize Device                      0xB4 */</i></td></tr>
+<tr><th id="150">150</th><td><i>/* reserved                             0xB5 */</i></td></tr>
+<tr><th id="151">151</th><td><i>/* NV Cache                             0xB6 */</i></td></tr>
+<tr><th id="152">152</th><td><i>/* reserved for CFA                     0xB7..0xBB */</i></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/CFA_ACCESS_METADATA_STORAGE" data-ref="_M/CFA_ACCESS_METADATA_STORAGE">CFA_ACCESS_METADATA_STORAGE</dfn>	0xB8</u></td></tr>
+<tr><th id="154">154</th><td><i>/* reserved                             0xBC..0xBF */</i></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/CFA_ERASE_SECTORS" data-ref="_M/CFA_ERASE_SECTORS">CFA_ERASE_SECTORS</dfn>       	0xC0 /* microdrives implement as NOP */</u></td></tr>
+<tr><th id="156">156</th><td><i>/* vendor specific                      0xC1..0xC3 */</i></td></tr>
+<tr><th id="157">157</th><td><u>#define <dfn class="macro" id="_M/WIN_MULTREAD" data-ref="_M/WIN_MULTREAD">WIN_MULTREAD</dfn>			0xC4 /* read sectors using multiple mode*/</u></td></tr>
+<tr><th id="158">158</th><td><u>#define <dfn class="macro" id="_M/WIN_MULTWRITE" data-ref="_M/WIN_MULTWRITE">WIN_MULTWRITE</dfn>			0xC5 /* write sectors using multiple mode */</u></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/WIN_SETMULT" data-ref="_M/WIN_SETMULT">WIN_SETMULT</dfn>			0xC6 /* enable/disable multiple mode */</u></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/WIN_READDMA_QUEUED" data-ref="_M/WIN_READDMA_QUEUED">WIN_READDMA_QUEUED</dfn>              0xC7 /* read sectors using Queued DMA transfers, obsolete since ACS2 */</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/WIN_READDMA" data-ref="_M/WIN_READDMA">WIN_READDMA</dfn>			0xC8 /* read sectors using DMA transfers */</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/WIN_READDMA_ONCE" data-ref="_M/WIN_READDMA_ONCE">WIN_READDMA_ONCE</dfn>                0xC9 /* 28-Bit - w/o retries, obsolete since ATA5 */</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITEDMA" data-ref="_M/WIN_WRITEDMA">WIN_WRITEDMA</dfn>			0xCA /* write sectors using DMA transfers */</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITEDMA_ONCE" data-ref="_M/WIN_WRITEDMA_ONCE">WIN_WRITEDMA_ONCE</dfn>               0xCB /* 28-Bit - w/o retries, obsolete since ATA5 */</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITEDMA_QUEUED" data-ref="_M/WIN_WRITEDMA_QUEUED">WIN_WRITEDMA_QUEUED</dfn>		0xCC /* write sectors using Queued DMA transfers, obsolete since ACS2 */</u></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/CFA_WRITE_MULTI_WO_ERASE" data-ref="_M/CFA_WRITE_MULTI_WO_ERASE">CFA_WRITE_MULTI_WO_ERASE</dfn>	0xCD /* CFA Write multiple without erase */</u></td></tr>
+<tr><th id="167">167</th><td><i>/* WRITE MULTIPLE FUA EXT               0xCE */</i></td></tr>
+<tr><th id="168">168</th><td><i>/* reserved                             0xCF..0xDO */</i></td></tr>
+<tr><th id="169">169</th><td><i>/* CHECK MEDIA CARD TYPE                0xD1 */</i></td></tr>
+<tr><th id="170">170</th><td><i>/* reserved for media card pass through 0xD2..0xD4 */</i></td></tr>
+<tr><th id="171">171</th><td><i>/* reserved                             0xD5..0xD9 */</i></td></tr>
+<tr><th id="172">172</th><td><u>#define <dfn class="macro" id="_M/WIN_GETMEDIASTATUS" data-ref="_M/WIN_GETMEDIASTATUS">WIN_GETMEDIASTATUS</dfn>              0xDA /* obsolete since ATA8 */</u></td></tr>
+<tr><th id="173">173</th><td><i>/* obsolete since ATA3, retired in ATA4 0xDB..0xDD */</i></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/WIN_DOORLOCK" data-ref="_M/WIN_DOORLOCK">WIN_DOORLOCK</dfn>                    0xDE /* lock door on removable drives, obsolete since ATA8 */</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/WIN_DOORUNLOCK" data-ref="_M/WIN_DOORUNLOCK">WIN_DOORUNLOCK</dfn>                  0xDF /* unlock door on removable drives, obsolete since ATA8 */</u></td></tr>
+<tr><th id="176">176</th><td><u>#define <dfn class="macro" id="_M/WIN_STANDBYNOW1" data-ref="_M/WIN_STANDBYNOW1">WIN_STANDBYNOW1</dfn>			0xE0</u></td></tr>
+<tr><th id="177">177</th><td><u>#define <dfn class="macro" id="_M/WIN_IDLEIMMEDIATE" data-ref="_M/WIN_IDLEIMMEDIATE">WIN_IDLEIMMEDIATE</dfn>		0xE1 /* force drive to become "ready" */</u></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/WIN_STANDBY" data-ref="_M/WIN_STANDBY">WIN_STANDBY</dfn>             	0xE2 /* Set device in Standby Mode */</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/WIN_SETIDLE1" data-ref="_M/WIN_SETIDLE1">WIN_SETIDLE1</dfn>			0xE3</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/WIN_READ_BUFFER" data-ref="_M/WIN_READ_BUFFER">WIN_READ_BUFFER</dfn>			0xE4 /* force read only 1 sector */</u></td></tr>
+<tr><th id="181">181</th><td><u>#define <dfn class="macro" id="_M/WIN_CHECKPOWERMODE1" data-ref="_M/WIN_CHECKPOWERMODE1">WIN_CHECKPOWERMODE1</dfn>		0xE5</u></td></tr>
+<tr><th id="182">182</th><td><u>#define <dfn class="macro" id="_M/WIN_SLEEPNOW1" data-ref="_M/WIN_SLEEPNOW1">WIN_SLEEPNOW1</dfn>			0xE6</u></td></tr>
+<tr><th id="183">183</th><td><u>#define <dfn class="macro" id="_M/WIN_FLUSH_CACHE" data-ref="_M/WIN_FLUSH_CACHE">WIN_FLUSH_CACHE</dfn>			0xE7</u></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/WIN_WRITE_BUFFER" data-ref="_M/WIN_WRITE_BUFFER">WIN_WRITE_BUFFER</dfn>		0xE8 /* force write only 1 sector */</u></td></tr>
+<tr><th id="185">185</th><td><i>/* READ BUFFER DMA                      0xE9 */</i></td></tr>
+<tr><th id="186">186</th><td><u>#define <dfn class="macro" id="_M/WIN_FLUSH_CACHE_EXT" data-ref="_M/WIN_FLUSH_CACHE_EXT">WIN_FLUSH_CACHE_EXT</dfn>		0xEA /* 48-Bit */</u></td></tr>
+<tr><th id="187">187</th><td><i>/* WRITE BUFFER DMA                     0xEB */</i></td></tr>
+<tr><th id="188">188</th><td><u>#define <dfn class="macro" id="_M/WIN_IDENTIFY" data-ref="_M/WIN_IDENTIFY">WIN_IDENTIFY</dfn>			0xEC /* ask drive to identify itself	*/</u></td></tr>
+<tr><th id="189">189</th><td><u>#define <dfn class="macro" id="_M/WIN_MEDIAEJECT" data-ref="_M/WIN_MEDIAEJECT">WIN_MEDIAEJECT</dfn>                  0xED /* obsolete since ATA8 */</u></td></tr>
+<tr><th id="190">190</th><td><i>/* obsolete since ATA4                  0xEE */</i></td></tr>
+<tr><th id="191">191</th><td><u>#define <dfn class="macro" id="_M/WIN_SETFEATURES" data-ref="_M/WIN_SETFEATURES">WIN_SETFEATURES</dfn>			0xEF /* set special drive features */</u></td></tr>
+<tr><th id="192">192</th><td><u>#define <dfn class="macro" id="_M/IBM_SENSE_CONDITION" data-ref="_M/IBM_SENSE_CONDITION">IBM_SENSE_CONDITION</dfn>             0xF0 /* measure disk temperature, vendor specific */</u></td></tr>
+<tr><th id="193">193</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_SET_PASS" data-ref="_M/WIN_SECURITY_SET_PASS">WIN_SECURITY_SET_PASS</dfn>		0xF1</u></td></tr>
+<tr><th id="194">194</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_UNLOCK" data-ref="_M/WIN_SECURITY_UNLOCK">WIN_SECURITY_UNLOCK</dfn>		0xF2</u></td></tr>
+<tr><th id="195">195</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_ERASE_PREPARE" data-ref="_M/WIN_SECURITY_ERASE_PREPARE">WIN_SECURITY_ERASE_PREPARE</dfn>	0xF3</u></td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_ERASE_UNIT" data-ref="_M/WIN_SECURITY_ERASE_UNIT">WIN_SECURITY_ERASE_UNIT</dfn>		0xF4</u></td></tr>
+<tr><th id="197">197</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_FREEZE_LOCK" data-ref="_M/WIN_SECURITY_FREEZE_LOCK">WIN_SECURITY_FREEZE_LOCK</dfn>	0xF5</u></td></tr>
+<tr><th id="198">198</th><td><u>#define <dfn class="macro" id="_M/CFA_WEAR_LEVEL" data-ref="_M/CFA_WEAR_LEVEL">CFA_WEAR_LEVEL</dfn>                  0xF5 /* microdrives implement as NOP; not specified in T13! */</u></td></tr>
+<tr><th id="199">199</th><td><u>#define <dfn class="macro" id="_M/WIN_SECURITY_DISABLE" data-ref="_M/WIN_SECURITY_DISABLE">WIN_SECURITY_DISABLE</dfn>		0xF6</u></td></tr>
+<tr><th id="200">200</th><td><i>/* vendor specific                      0xF7 */</i></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/WIN_READ_NATIVE_MAX" data-ref="_M/WIN_READ_NATIVE_MAX">WIN_READ_NATIVE_MAX</dfn>		0xF8 /* return the native maximum address */</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/WIN_SET_MAX" data-ref="_M/WIN_SET_MAX">WIN_SET_MAX</dfn>			0xF9</u></td></tr>
+<tr><th id="203">203</th><td><i>/* vendor specific                      0xFA..0xFF */</i></td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>/* set to 1 set disable mult support */</i></td></tr>
+<tr><th id="206">206</th><td><u>#define <dfn class="macro" id="_M/MAX_MULT_SECTORS" data-ref="_M/MAX_MULT_SECTORS">MAX_MULT_SECTORS</dfn> 16</u></td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><u>#define <dfn class="macro" id="_M/IDE_DMA_BUF_SECTORS" data-ref="_M/IDE_DMA_BUF_SECTORS">IDE_DMA_BUF_SECTORS</dfn> 256</u></td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><i>/* feature values for Data Set Management */</i></td></tr>
+<tr><th id="211">211</th><td><u>#define <dfn class="macro" id="_M/DSM_TRIM" data-ref="_M/DSM_TRIM">DSM_TRIM</dfn>                        0x01</u></td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><u>#<span data-ppcond="213">if</span> (<a class="macro" href="#208" title="256" data-ref="_M/IDE_DMA_BUF_SECTORS">IDE_DMA_BUF_SECTORS</a> &lt; <a class="macro" href="#206" title="16" data-ref="_M/MAX_MULT_SECTORS">MAX_MULT_SECTORS</a>)</u></td></tr>
+<tr><th id="214">214</th><td><u>#error "IDE_DMA_BUF_SECTORS must be bigger or equal to MAX_MULT_SECTORS"</u></td></tr>
+<tr><th id="215">215</th><td><u>#<span data-ppcond="213">endif</span></u></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><i>/* ATAPI defines */</i></td></tr>
+<tr><th id="218">218</th><td></td></tr>
+<tr><th id="219">219</th><td><u>#define <dfn class="macro" id="_M/ATAPI_PACKET_SIZE" data-ref="_M/ATAPI_PACKET_SIZE">ATAPI_PACKET_SIZE</dfn> 12</u></td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><i>/* The generic packet command opcodes for CD/DVD Logical Units,</i></td></tr>
+<tr><th id="222">222</th><td><i> * From Table 57 of the SFF8090 Ver. 3 (Mt. Fuji) draft standard. */</i></td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/GPCMD_BLANK" data-ref="_M/GPCMD_BLANK">GPCMD_BLANK</dfn>			    0xa1</u></td></tr>
+<tr><th id="224">224</th><td><u>#define <dfn class="macro" id="_M/GPCMD_CLOSE_TRACK" data-ref="_M/GPCMD_CLOSE_TRACK">GPCMD_CLOSE_TRACK</dfn>		    0x5b</u></td></tr>
+<tr><th id="225">225</th><td><u>#define <dfn class="macro" id="_M/GPCMD_FLUSH_CACHE" data-ref="_M/GPCMD_FLUSH_CACHE">GPCMD_FLUSH_CACHE</dfn>		    0x35</u></td></tr>
+<tr><th id="226">226</th><td><u>#define <dfn class="macro" id="_M/GPCMD_FORMAT_UNIT" data-ref="_M/GPCMD_FORMAT_UNIT">GPCMD_FORMAT_UNIT</dfn>		    0x04</u></td></tr>
+<tr><th id="227">227</th><td><u>#define <dfn class="macro" id="_M/GPCMD_GET_CONFIGURATION" data-ref="_M/GPCMD_GET_CONFIGURATION">GPCMD_GET_CONFIGURATION</dfn>		    0x46</u></td></tr>
+<tr><th id="228">228</th><td><u>#define <dfn class="macro" id="_M/GPCMD_GET_EVENT_STATUS_NOTIFICATION" data-ref="_M/GPCMD_GET_EVENT_STATUS_NOTIFICATION">GPCMD_GET_EVENT_STATUS_NOTIFICATION</dfn> 0x4a</u></td></tr>
+<tr><th id="229">229</th><td><u>#define <dfn class="macro" id="_M/GPCMD_GET_PERFORMANCE" data-ref="_M/GPCMD_GET_PERFORMANCE">GPCMD_GET_PERFORMANCE</dfn>		    0xac</u></td></tr>
+<tr><th id="230">230</th><td><u>#define <dfn class="macro" id="_M/GPCMD_INQUIRY" data-ref="_M/GPCMD_INQUIRY">GPCMD_INQUIRY</dfn>			    0x12</u></td></tr>
+<tr><th id="231">231</th><td><u>#define <dfn class="macro" id="_M/GPCMD_LOAD_UNLOAD" data-ref="_M/GPCMD_LOAD_UNLOAD">GPCMD_LOAD_UNLOAD</dfn>		    0xa6</u></td></tr>
+<tr><th id="232">232</th><td><u>#define <dfn class="macro" id="_M/GPCMD_MECHANISM_STATUS" data-ref="_M/GPCMD_MECHANISM_STATUS">GPCMD_MECHANISM_STATUS</dfn>		    0xbd</u></td></tr>
+<tr><th id="233">233</th><td><u>#define <dfn class="macro" id="_M/GPCMD_MODE_SELECT_10" data-ref="_M/GPCMD_MODE_SELECT_10">GPCMD_MODE_SELECT_10</dfn>		    0x55</u></td></tr>
+<tr><th id="234">234</th><td><u>#define <dfn class="macro" id="_M/GPCMD_MODE_SENSE_10" data-ref="_M/GPCMD_MODE_SENSE_10">GPCMD_MODE_SENSE_10</dfn>		    0x5a</u></td></tr>
+<tr><th id="235">235</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PAUSE_RESUME" data-ref="_M/GPCMD_PAUSE_RESUME">GPCMD_PAUSE_RESUME</dfn>		    0x4b</u></td></tr>
+<tr><th id="236">236</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PLAY_AUDIO_10" data-ref="_M/GPCMD_PLAY_AUDIO_10">GPCMD_PLAY_AUDIO_10</dfn>		    0x45</u></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PLAY_AUDIO_MSF" data-ref="_M/GPCMD_PLAY_AUDIO_MSF">GPCMD_PLAY_AUDIO_MSF</dfn>		    0x47</u></td></tr>
+<tr><th id="238">238</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PLAY_AUDIO_TI" data-ref="_M/GPCMD_PLAY_AUDIO_TI">GPCMD_PLAY_AUDIO_TI</dfn>		    0x48</u></td></tr>
+<tr><th id="239">239</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PLAY_CD" data-ref="_M/GPCMD_PLAY_CD">GPCMD_PLAY_CD</dfn>			    0xbc</u></td></tr>
+<tr><th id="240">240</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PREVENT_ALLOW_MEDIUM_REMOVAL" data-ref="_M/GPCMD_PREVENT_ALLOW_MEDIUM_REMOVAL">GPCMD_PREVENT_ALLOW_MEDIUM_REMOVAL</dfn>  0x1e</u></td></tr>
+<tr><th id="241">241</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_10" data-ref="_M/GPCMD_READ_10">GPCMD_READ_10</dfn>			    0x28</u></td></tr>
+<tr><th id="242">242</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_12" data-ref="_M/GPCMD_READ_12">GPCMD_READ_12</dfn>			    0xa8</u></td></tr>
+<tr><th id="243">243</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_CDVD_CAPACITY" data-ref="_M/GPCMD_READ_CDVD_CAPACITY">GPCMD_READ_CDVD_CAPACITY</dfn>	    0x25</u></td></tr>
+<tr><th id="244">244</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_CD" data-ref="_M/GPCMD_READ_CD">GPCMD_READ_CD</dfn>			    0xbe</u></td></tr>
+<tr><th id="245">245</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_CD_MSF" data-ref="_M/GPCMD_READ_CD_MSF">GPCMD_READ_CD_MSF</dfn>		    0xb9</u></td></tr>
+<tr><th id="246">246</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_DISC_INFO" data-ref="_M/GPCMD_READ_DISC_INFO">GPCMD_READ_DISC_INFO</dfn>		    0x51</u></td></tr>
+<tr><th id="247">247</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_DVD_STRUCTURE" data-ref="_M/GPCMD_READ_DVD_STRUCTURE">GPCMD_READ_DVD_STRUCTURE</dfn>	    0xad</u></td></tr>
+<tr><th id="248">248</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_FORMAT_CAPACITIES" data-ref="_M/GPCMD_READ_FORMAT_CAPACITIES">GPCMD_READ_FORMAT_CAPACITIES</dfn>	    0x23</u></td></tr>
+<tr><th id="249">249</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_HEADER" data-ref="_M/GPCMD_READ_HEADER">GPCMD_READ_HEADER</dfn>		    0x44</u></td></tr>
+<tr><th id="250">250</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_TRACK_RZONE_INFO" data-ref="_M/GPCMD_READ_TRACK_RZONE_INFO">GPCMD_READ_TRACK_RZONE_INFO</dfn>	    0x52</u></td></tr>
+<tr><th id="251">251</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_SUBCHANNEL" data-ref="_M/GPCMD_READ_SUBCHANNEL">GPCMD_READ_SUBCHANNEL</dfn>		    0x42</u></td></tr>
+<tr><th id="252">252</th><td><u>#define <dfn class="macro" id="_M/GPCMD_READ_TOC_PMA_ATIP" data-ref="_M/GPCMD_READ_TOC_PMA_ATIP">GPCMD_READ_TOC_PMA_ATIP</dfn>		    0x43</u></td></tr>
+<tr><th id="253">253</th><td><u>#define <dfn class="macro" id="_M/GPCMD_REPAIR_RZONE_TRACK" data-ref="_M/GPCMD_REPAIR_RZONE_TRACK">GPCMD_REPAIR_RZONE_TRACK</dfn>	    0x58</u></td></tr>
+<tr><th id="254">254</th><td><u>#define <dfn class="macro" id="_M/GPCMD_REPORT_KEY" data-ref="_M/GPCMD_REPORT_KEY">GPCMD_REPORT_KEY</dfn>		    0xa4</u></td></tr>
+<tr><th id="255">255</th><td><u>#define <dfn class="macro" id="_M/GPCMD_REQUEST_SENSE" data-ref="_M/GPCMD_REQUEST_SENSE">GPCMD_REQUEST_SENSE</dfn>		    0x03</u></td></tr>
+<tr><th id="256">256</th><td><u>#define <dfn class="macro" id="_M/GPCMD_RESERVE_RZONE_TRACK" data-ref="_M/GPCMD_RESERVE_RZONE_TRACK">GPCMD_RESERVE_RZONE_TRACK</dfn>	    0x53</u></td></tr>
+<tr><th id="257">257</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SCAN" data-ref="_M/GPCMD_SCAN">GPCMD_SCAN</dfn>			    0xba</u></td></tr>
+<tr><th id="258">258</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SEEK" data-ref="_M/GPCMD_SEEK">GPCMD_SEEK</dfn>			    0x2b</u></td></tr>
+<tr><th id="259">259</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SEND_DVD_STRUCTURE" data-ref="_M/GPCMD_SEND_DVD_STRUCTURE">GPCMD_SEND_DVD_STRUCTURE</dfn>	    0xad</u></td></tr>
+<tr><th id="260">260</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SEND_EVENT" data-ref="_M/GPCMD_SEND_EVENT">GPCMD_SEND_EVENT</dfn>		    0xa2</u></td></tr>
+<tr><th id="261">261</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SEND_KEY" data-ref="_M/GPCMD_SEND_KEY">GPCMD_SEND_KEY</dfn>			    0xa3</u></td></tr>
+<tr><th id="262">262</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SEND_OPC" data-ref="_M/GPCMD_SEND_OPC">GPCMD_SEND_OPC</dfn>			    0x54</u></td></tr>
+<tr><th id="263">263</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SET_READ_AHEAD" data-ref="_M/GPCMD_SET_READ_AHEAD">GPCMD_SET_READ_AHEAD</dfn>		    0xa7</u></td></tr>
+<tr><th id="264">264</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SET_STREAMING" data-ref="_M/GPCMD_SET_STREAMING">GPCMD_SET_STREAMING</dfn>		    0xb6</u></td></tr>
+<tr><th id="265">265</th><td><u>#define <dfn class="macro" id="_M/GPCMD_START_STOP_UNIT" data-ref="_M/GPCMD_START_STOP_UNIT">GPCMD_START_STOP_UNIT</dfn>		    0x1b</u></td></tr>
+<tr><th id="266">266</th><td><u>#define <dfn class="macro" id="_M/GPCMD_STOP_PLAY_SCAN" data-ref="_M/GPCMD_STOP_PLAY_SCAN">GPCMD_STOP_PLAY_SCAN</dfn>		    0x4e</u></td></tr>
+<tr><th id="267">267</th><td><u>#define <dfn class="macro" id="_M/GPCMD_TEST_UNIT_READY" data-ref="_M/GPCMD_TEST_UNIT_READY">GPCMD_TEST_UNIT_READY</dfn>		    0x00</u></td></tr>
+<tr><th id="268">268</th><td><u>#define <dfn class="macro" id="_M/GPCMD_VERIFY_10" data-ref="_M/GPCMD_VERIFY_10">GPCMD_VERIFY_10</dfn>			    0x2f</u></td></tr>
+<tr><th id="269">269</th><td><u>#define <dfn class="macro" id="_M/GPCMD_WRITE_10" data-ref="_M/GPCMD_WRITE_10">GPCMD_WRITE_10</dfn>			    0x2a</u></td></tr>
+<tr><th id="270">270</th><td><u>#define <dfn class="macro" id="_M/GPCMD_WRITE_AND_VERIFY_10" data-ref="_M/GPCMD_WRITE_AND_VERIFY_10">GPCMD_WRITE_AND_VERIFY_10</dfn>	    0x2e</u></td></tr>
+<tr><th id="271">271</th><td><i>/* This is listed as optional in ATAPI 2.6, but is (curiously)</i></td></tr>
+<tr><th id="272">272</th><td><i> * missing from Mt. Fuji, Table 57.  It _is_ mentioned in Mt. Fuji</i></td></tr>
+<tr><th id="273">273</th><td><i> * Table 377 as an MMC command for SCSi devices though...  Most ATAPI</i></td></tr>
+<tr><th id="274">274</th><td><i> * drives support it. */</i></td></tr>
+<tr><th id="275">275</th><td><u>#define <dfn class="macro" id="_M/GPCMD_SET_SPEED" data-ref="_M/GPCMD_SET_SPEED">GPCMD_SET_SPEED</dfn>			    0xbb</u></td></tr>
+<tr><th id="276">276</th><td><i>/* This seems to be a SCSI specific CD-ROM opcode</i></td></tr>
+<tr><th id="277">277</th><td><i> * to play data at track/index */</i></td></tr>
+<tr><th id="278">278</th><td><u>#define <dfn class="macro" id="_M/GPCMD_PLAYAUDIO_TI" data-ref="_M/GPCMD_PLAYAUDIO_TI">GPCMD_PLAYAUDIO_TI</dfn>		    0x48</u></td></tr>
+<tr><th id="279">279</th><td><i>/*</i></td></tr>
+<tr><th id="280">280</th><td><i> * From MS Media Status Notification Support Specification. For</i></td></tr>
+<tr><th id="281">281</th><td><i> * older drives only.</i></td></tr>
+<tr><th id="282">282</th><td><i> */</i></td></tr>
+<tr><th id="283">283</th><td><u>#define <dfn class="macro" id="_M/GPCMD_GET_MEDIA_STATUS" data-ref="_M/GPCMD_GET_MEDIA_STATUS">GPCMD_GET_MEDIA_STATUS</dfn>		    0xda</u></td></tr>
+<tr><th id="284">284</th><td><u>#define <dfn class="macro" id="_M/GPCMD_MODE_SENSE_6" data-ref="_M/GPCMD_MODE_SENSE_6">GPCMD_MODE_SENSE_6</dfn>		    0x1a</u></td></tr>
+<tr><th id="285">285</th><td></td></tr>
+<tr><th id="286">286</th><td><u>#define <dfn class="macro" id="_M/ATAPI_INT_REASON_CD" data-ref="_M/ATAPI_INT_REASON_CD">ATAPI_INT_REASON_CD</dfn>             0x01 /* 0 = data transfer */</u></td></tr>
+<tr><th id="287">287</th><td><u>#define <dfn class="macro" id="_M/ATAPI_INT_REASON_IO" data-ref="_M/ATAPI_INT_REASON_IO">ATAPI_INT_REASON_IO</dfn>             0x02 /* 1 = transfer to the host */</u></td></tr>
+<tr><th id="288">288</th><td><u>#define <dfn class="macro" id="_M/ATAPI_INT_REASON_REL" data-ref="_M/ATAPI_INT_REASON_REL">ATAPI_INT_REASON_REL</dfn>            0x04</u></td></tr>
+<tr><th id="289">289</th><td><u>#define <dfn class="macro" id="_M/ATAPI_INT_REASON_TAG" data-ref="_M/ATAPI_INT_REASON_TAG">ATAPI_INT_REASON_TAG</dfn>            0xf8</u></td></tr>
+<tr><th id="290">290</th><td></td></tr>
+<tr><th id="291">291</th><td><i>/* same constants as bochs */</i></td></tr>
+<tr><th id="292">292</th><td><u>#define <dfn class="macro" id="_M/ASC_NO_SEEK_COMPLETE" data-ref="_M/ASC_NO_SEEK_COMPLETE">ASC_NO_SEEK_COMPLETE</dfn>                 0x02</u></td></tr>
+<tr><th id="293">293</th><td><u>#define <dfn class="macro" id="_M/ASC_ILLEGAL_OPCODE" data-ref="_M/ASC_ILLEGAL_OPCODE">ASC_ILLEGAL_OPCODE</dfn>                   0x20</u></td></tr>
+<tr><th id="294">294</th><td><u>#define <dfn class="macro" id="_M/ASC_LOGICAL_BLOCK_OOR" data-ref="_M/ASC_LOGICAL_BLOCK_OOR">ASC_LOGICAL_BLOCK_OOR</dfn>                0x21</u></td></tr>
+<tr><th id="295">295</th><td><u>#define <dfn class="macro" id="_M/ASC_INV_FIELD_IN_CMD_PACKET" data-ref="_M/ASC_INV_FIELD_IN_CMD_PACKET">ASC_INV_FIELD_IN_CMD_PACKET</dfn>          0x24</u></td></tr>
+<tr><th id="296">296</th><td><u>#define <dfn class="macro" id="_M/ASC_MEDIUM_MAY_HAVE_CHANGED" data-ref="_M/ASC_MEDIUM_MAY_HAVE_CHANGED">ASC_MEDIUM_MAY_HAVE_CHANGED</dfn>          0x28</u></td></tr>
+<tr><th id="297">297</th><td><u>#define <dfn class="macro" id="_M/ASC_INCOMPATIBLE_FORMAT" data-ref="_M/ASC_INCOMPATIBLE_FORMAT">ASC_INCOMPATIBLE_FORMAT</dfn>              0x30</u></td></tr>
+<tr><th id="298">298</th><td><u>#define <dfn class="macro" id="_M/ASC_MEDIUM_NOT_PRESENT" data-ref="_M/ASC_MEDIUM_NOT_PRESENT">ASC_MEDIUM_NOT_PRESENT</dfn>               0x3a</u></td></tr>
+<tr><th id="299">299</th><td><u>#define <dfn class="macro" id="_M/ASC_SAVING_PARAMETERS_NOT_SUPPORTED" data-ref="_M/ASC_SAVING_PARAMETERS_NOT_SUPPORTED">ASC_SAVING_PARAMETERS_NOT_SUPPORTED</dfn>  0x39</u></td></tr>
+<tr><th id="300">300</th><td><u>#define <dfn class="macro" id="_M/ASC_DATA_PHASE_ERROR" data-ref="_M/ASC_DATA_PHASE_ERROR">ASC_DATA_PHASE_ERROR</dfn>                 0x4b</u></td></tr>
+<tr><th id="301">301</th><td><u>#define <dfn class="macro" id="_M/ASC_MEDIA_REMOVAL_PREVENTED" data-ref="_M/ASC_MEDIA_REMOVAL_PREVENTED">ASC_MEDIA_REMOVAL_PREVENTED</dfn>          0x53</u></td></tr>
+<tr><th id="302">302</th><td></td></tr>
+<tr><th id="303">303</th><td><u>#define <dfn class="macro" id="_M/CFA_NO_ERROR" data-ref="_M/CFA_NO_ERROR">CFA_NO_ERROR</dfn>            0x00</u></td></tr>
+<tr><th id="304">304</th><td><u>#define <dfn class="macro" id="_M/CFA_MISC_ERROR" data-ref="_M/CFA_MISC_ERROR">CFA_MISC_ERROR</dfn>          0x09</u></td></tr>
+<tr><th id="305">305</th><td><u>#define <dfn class="macro" id="_M/CFA_INVALID_COMMAND" data-ref="_M/CFA_INVALID_COMMAND">CFA_INVALID_COMMAND</dfn>     0x20</u></td></tr>
+<tr><th id="306">306</th><td><u>#define <dfn class="macro" id="_M/CFA_INVALID_ADDRESS" data-ref="_M/CFA_INVALID_ADDRESS">CFA_INVALID_ADDRESS</dfn>     0x21</u></td></tr>
+<tr><th id="307">307</th><td><u>#define <dfn class="macro" id="_M/CFA_ADDRESS_OVERFLOW" data-ref="_M/CFA_ADDRESS_OVERFLOW">CFA_ADDRESS_OVERFLOW</dfn>    0x2f</u></td></tr>
+<tr><th id="308">308</th><td></td></tr>
+<tr><th id="309">309</th><td><u>#define <dfn class="macro" id="_M/SMART_READ_DATA" data-ref="_M/SMART_READ_DATA">SMART_READ_DATA</dfn>       0xd0</u></td></tr>
+<tr><th id="310">310</th><td><u>#define <dfn class="macro" id="_M/SMART_READ_THRESH" data-ref="_M/SMART_READ_THRESH">SMART_READ_THRESH</dfn>     0xd1</u></td></tr>
+<tr><th id="311">311</th><td><u>#define <dfn class="macro" id="_M/SMART_ATTR_AUTOSAVE" data-ref="_M/SMART_ATTR_AUTOSAVE">SMART_ATTR_AUTOSAVE</dfn>   0xd2</u></td></tr>
+<tr><th id="312">312</th><td><u>#define <dfn class="macro" id="_M/SMART_SAVE_ATTR" data-ref="_M/SMART_SAVE_ATTR">SMART_SAVE_ATTR</dfn>       0xd3</u></td></tr>
+<tr><th id="313">313</th><td><u>#define <dfn class="macro" id="_M/SMART_EXECUTE_OFFLINE" data-ref="_M/SMART_EXECUTE_OFFLINE">SMART_EXECUTE_OFFLINE</dfn> 0xd4</u></td></tr>
+<tr><th id="314">314</th><td><u>#define <dfn class="macro" id="_M/SMART_READ_LOG" data-ref="_M/SMART_READ_LOG">SMART_READ_LOG</dfn>        0xd5</u></td></tr>
+<tr><th id="315">315</th><td><u>#define <dfn class="macro" id="_M/SMART_WRITE_LOG" data-ref="_M/SMART_WRITE_LOG">SMART_WRITE_LOG</dfn>       0xd6</u></td></tr>
+<tr><th id="316">316</th><td><u>#define <dfn class="macro" id="_M/SMART_ENABLE" data-ref="_M/SMART_ENABLE">SMART_ENABLE</dfn>          0xd8</u></td></tr>
+<tr><th id="317">317</th><td><u>#define <dfn class="macro" id="_M/SMART_DISABLE" data-ref="_M/SMART_DISABLE">SMART_DISABLE</dfn>         0xd9</u></td></tr>
+<tr><th id="318">318</th><td><u>#define <dfn class="macro" id="_M/SMART_STATUS" data-ref="_M/SMART_STATUS">SMART_STATUS</dfn>          0xda</u></td></tr>
+<tr><th id="319">319</th><td></td></tr>
+<tr><th id="320">320</th><td><b>typedef</b> <b>enum</b> { <dfn class="enum" id="IDE_HD" title='IDE_HD' data-ref="IDE_HD">IDE_HD</dfn>, <dfn class="enum" id="IDE_CD" title='IDE_CD' data-ref="IDE_CD">IDE_CD</dfn>, <dfn class="enum" id="IDE_CFATA" title='IDE_CFATA' data-ref="IDE_CFATA">IDE_CFATA</dfn> } <dfn class="typedef" id="IDEDriveKind" title='IDEDriveKind' data-type='enum IDEDriveKind' data-ref="IDEDriveKind">IDEDriveKind</dfn>;</td></tr>
+<tr><th id="321">321</th><td></td></tr>
+<tr><th id="322">322</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="EndTransferFunc" title='EndTransferFunc' data-type='void (IDEState *)' data-ref="EndTransferFunc">EndTransferFunc</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *);</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="DMAStartFunc" title='DMAStartFunc' data-type='void (IDEDMA *, IDEState *, BlockCompletionFunc *)' data-ref="DMAStartFunc">DMAStartFunc</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *, <a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *, <a class="typedef" href="../../block/aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *);</td></tr>
+<tr><th id="325">325</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *);</td></tr>
+<tr><th id="326">326</th><td><b>typedef</b> <em>int</em> <dfn class="typedef" id="DMAIntFunc" title='DMAIntFunc' data-type='int (IDEDMA *, int)' data-ref="DMAIntFunc">DMAIntFunc</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *, <em>int</em>);</td></tr>
+<tr><th id="327">327</th><td><b>typedef</b> <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="typedef" id="DMAInt32Func" title='DMAInt32Func' data-type='int32_t (IDEDMA *, int32_t)' data-ref="DMAInt32Func">DMAInt32Func</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *, <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="local col1 decl" id="1len" title='len' data-type='int32_t' data-ref="1len">len</dfn>);</td></tr>
+<tr><th id="328">328</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="DMAu32Func" title='DMAu32Func' data-type='void (IDEDMA *, uint32_t)' data-ref="DMAu32Func">DMAu32Func</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a>);</td></tr>
+<tr><th id="329">329</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="DMAStopFunc" title='DMAStopFunc' data-type='void (IDEDMA *, _Bool)' data-ref="DMAStopFunc">DMAStopFunc</dfn>(<a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span>);</td></tr>
+<tr><th id="330">330</th><td><b>typedef</b> <em>void</em> <dfn class="typedef" id="DMARestartFunc" title='DMARestartFunc' data-type='void (void *, int, RunState)' data-ref="DMARestartFunc">DMARestartFunc</dfn>(<em>void</em> *, <em>int</em>, <a class="typedef" href="../../../qapi-types.h.html#RunState" title='RunState' data-type='enum RunState' data-ref="RunState">RunState</a>);</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+<tr><th id="332">332</th><td><b>struct</b> <dfn class="type def" id="unreported_events" title='unreported_events' data-ref="unreported_events">unreported_events</dfn> {</td></tr>
+<tr><th id="333">333</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="unreported_events::eject_request" title='unreported_events::eject_request' data-ref="unreported_events::eject_request">eject_request</dfn>;</td></tr>
+<tr><th id="334">334</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="unreported_events::new_media" title='unreported_events::new_media' data-ref="unreported_events::new_media">new_media</dfn>;</td></tr>
+<tr><th id="335">335</th><td>};</td></tr>
+<tr><th id="336">336</th><td></td></tr>
+<tr><th id="337">337</th><td><b>enum</b> <dfn class="type def" id="ide_dma_cmd" title='ide_dma_cmd' data-ref="ide_dma_cmd">ide_dma_cmd</dfn> {</td></tr>
+<tr><th id="338">338</th><td>    <dfn class="enum" id="ide_dma_cmd::IDE_DMA_READ" title='ide_dma_cmd::IDE_DMA_READ' data-ref="ide_dma_cmd::IDE_DMA_READ">IDE_DMA_READ</dfn>,</td></tr>
+<tr><th id="339">339</th><td>    <dfn class="enum" id="ide_dma_cmd::IDE_DMA_WRITE" title='ide_dma_cmd::IDE_DMA_WRITE' data-ref="ide_dma_cmd::IDE_DMA_WRITE">IDE_DMA_WRITE</dfn>,</td></tr>
+<tr><th id="340">340</th><td>    <dfn class="enum" id="ide_dma_cmd::IDE_DMA_TRIM" title='ide_dma_cmd::IDE_DMA_TRIM' data-ref="ide_dma_cmd::IDE_DMA_TRIM">IDE_DMA_TRIM</dfn>,</td></tr>
+<tr><th id="341">341</th><td>    <dfn class="enum" id="ide_dma_cmd::IDE_DMA_ATAPI" title='ide_dma_cmd::IDE_DMA_ATAPI' data-ref="ide_dma_cmd::IDE_DMA_ATAPI">IDE_DMA_ATAPI</dfn>,</td></tr>
+<tr><th id="342">342</th><td>};</td></tr>
+<tr><th id="343">343</th><td></td></tr>
+<tr><th id="344">344</th><td><u>#define <dfn class="macro" id="_M/ide_cmd_is_read" data-ref="_M/ide_cmd_is_read">ide_cmd_is_read</dfn>(s) \</u></td></tr>
+<tr><th id="345">345</th><td><u>	((s)-&gt;dma_cmd == IDE_DMA_READ)</u></td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IDEBufferedRequest" title='IDEBufferedRequest' data-ref="IDEBufferedRequest"><a class="type" href="#IDEBufferedRequest" title='IDEBufferedRequest' data-ref="IDEBufferedRequest">IDEBufferedRequest</a></dfn> {</td></tr>
+<tr><th id="348">348</th><td>    <a class="macro" href="../../qemu/queue.h.html#94" title="struct { struct IDEBufferedRequest *le_next; struct IDEBufferedRequest **le_prev; }" data-ref="_M/QLIST_ENTRY">QLIST_ENTRY</a>(<a class="type" href="#IDEBufferedRequest" title='IDEBufferedRequest' data-ref="IDEBufferedRequest">IDEBufferedRequest</a>) <dfn class="decl" id="IDEBufferedRequest::list" title='IDEBufferedRequest::list' data-ref="IDEBufferedRequest::list">list</dfn>;</td></tr>
+<tr><th id="349">349</th><td>    <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="decl" id="IDEBufferedRequest::iov" title='IDEBufferedRequest::iov' data-ref="IDEBufferedRequest::iov">iov</dfn>;</td></tr>
+<tr><th id="350">350</th><td>    <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> <dfn class="decl" id="IDEBufferedRequest::qiov" title='IDEBufferedRequest::qiov' data-ref="IDEBufferedRequest::qiov">qiov</dfn>;</td></tr>
+<tr><th id="351">351</th><td>    <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> *<dfn class="decl" id="IDEBufferedRequest::original_qiov" title='IDEBufferedRequest::original_qiov' data-ref="IDEBufferedRequest::original_qiov">original_qiov</dfn>;</td></tr>
+<tr><th id="352">352</th><td>    <a class="typedef" href="../../block/aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *<dfn class="decl" id="IDEBufferedRequest::original_cb" title='IDEBufferedRequest::original_cb' data-ref="IDEBufferedRequest::original_cb">original_cb</dfn>;</td></tr>
+<tr><th id="353">353</th><td>    <em>void</em> *<dfn class="decl" id="IDEBufferedRequest::original_opaque" title='IDEBufferedRequest::original_opaque' data-ref="IDEBufferedRequest::original_opaque">original_opaque</dfn>;</td></tr>
+<tr><th id="354">354</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IDEBufferedRequest::orphaned" title='IDEBufferedRequest::orphaned' data-ref="IDEBufferedRequest::orphaned">orphaned</dfn>;</td></tr>
+<tr><th id="355">355</th><td>} <dfn class="typedef" id="IDEBufferedRequest" title='IDEBufferedRequest' data-type='struct IDEBufferedRequest' data-ref="IDEBufferedRequest">IDEBufferedRequest</dfn>;</td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td><i>/* NOTE: IDEState represents in fact one drive */</i></td></tr>
+<tr><th id="358">358</th><td><b>struct</b> <dfn class="type def" id="IDEState" title='IDEState' data-ref="IDEState">IDEState</dfn> {</td></tr>
+<tr><th id="359">359</th><td>    <a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="decl" id="IDEState::bus" title='IDEState::bus' data-ref="IDEState::bus">bus</dfn>;</td></tr>
+<tr><th id="360">360</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::unit" title='IDEState::unit' data-ref="IDEState::unit">unit</dfn>;</td></tr>
+<tr><th id="361">361</th><td>    <i>/* ide config */</i></td></tr>
+<tr><th id="362">362</th><td>    <a class="typedef" href="#IDEDriveKind" title='IDEDriveKind' data-type='enum IDEDriveKind' data-ref="IDEDriveKind">IDEDriveKind</a> <dfn class="decl" id="IDEState::drive_kind" title='IDEState::drive_kind' data-ref="IDEState::drive_kind">drive_kind</dfn>;</td></tr>
+<tr><th id="363">363</th><td>    <em>int</em> <dfn class="decl" id="IDEState::cylinders" title='IDEState::cylinders' data-ref="IDEState::cylinders">cylinders</dfn>, <dfn class="decl" id="IDEState::heads" title='IDEState::heads' data-ref="IDEState::heads">heads</dfn>, <dfn class="decl" id="IDEState::sectors" title='IDEState::sectors' data-ref="IDEState::sectors">sectors</dfn>, <dfn class="decl" id="IDEState::chs_trans" title='IDEState::chs_trans' data-ref="IDEState::chs_trans">chs_trans</dfn>;</td></tr>
+<tr><th id="364">364</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="IDEState::nb_sectors" title='IDEState::nb_sectors' data-ref="IDEState::nb_sectors">nb_sectors</dfn>;</td></tr>
+<tr><th id="365">365</th><td>    <em>int</em> <dfn class="decl" id="IDEState::mult_sectors" title='IDEState::mult_sectors' data-ref="IDEState::mult_sectors">mult_sectors</dfn>;</td></tr>
+<tr><th id="366">366</th><td>    <em>int</em> <dfn class="decl" id="IDEState::identify_set" title='IDEState::identify_set' data-ref="IDEState::identify_set">identify_set</dfn>;</td></tr>
+<tr><th id="367">367</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::identify_data" title='IDEState::identify_data' data-ref="IDEState::identify_data">identify_data</dfn>[<var>512</var>];</td></tr>
+<tr><th id="368">368</th><td>    <em>int</em> <dfn class="decl" id="IDEState::drive_serial" title='IDEState::drive_serial' data-ref="IDEState::drive_serial">drive_serial</dfn>;</td></tr>
+<tr><th id="369">369</th><td>    <em>char</em> <dfn class="decl" id="IDEState::drive_serial_str" title='IDEState::drive_serial_str' data-ref="IDEState::drive_serial_str">drive_serial_str</dfn>[<var>21</var>];</td></tr>
+<tr><th id="370">370</th><td>    <em>char</em> <dfn class="decl" id="IDEState::drive_model_str" title='IDEState::drive_model_str' data-ref="IDEState::drive_model_str">drive_model_str</dfn>[<var>41</var>];</td></tr>
+<tr><th id="371">371</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IDEState::wwn" title='IDEState::wwn' data-ref="IDEState::wwn">wwn</dfn>;</td></tr>
+<tr><th id="372">372</th><td>    <i>/* ide regs */</i></td></tr>
+<tr><th id="373">373</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::feature" title='IDEState::feature' data-ref="IDEState::feature">feature</dfn>;</td></tr>
+<tr><th id="374">374</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::error" title='IDEState::error' data-ref="IDEState::error">error</dfn>;</td></tr>
+<tr><th id="375">375</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IDEState::nsector" title='IDEState::nsector' data-ref="IDEState::nsector">nsector</dfn>;</td></tr>
+<tr><th id="376">376</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::sector" title='IDEState::sector' data-ref="IDEState::sector">sector</dfn>;</td></tr>
+<tr><th id="377">377</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::lcyl" title='IDEState::lcyl' data-ref="IDEState::lcyl">lcyl</dfn>;</td></tr>
+<tr><th id="378">378</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hcyl" title='IDEState::hcyl' data-ref="IDEState::hcyl">hcyl</dfn>;</td></tr>
+<tr><th id="379">379</th><td>    <i>/* other part of tf for lba48 support */</i></td></tr>
+<tr><th id="380">380</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hob_feature" title='IDEState::hob_feature' data-ref="IDEState::hob_feature">hob_feature</dfn>;</td></tr>
+<tr><th id="381">381</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hob_nsector" title='IDEState::hob_nsector' data-ref="IDEState::hob_nsector">hob_nsector</dfn>;</td></tr>
+<tr><th id="382">382</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hob_sector" title='IDEState::hob_sector' data-ref="IDEState::hob_sector">hob_sector</dfn>;</td></tr>
+<tr><th id="383">383</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hob_lcyl" title='IDEState::hob_lcyl' data-ref="IDEState::hob_lcyl">hob_lcyl</dfn>;</td></tr>
+<tr><th id="384">384</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::hob_hcyl" title='IDEState::hob_hcyl' data-ref="IDEState::hob_hcyl">hob_hcyl</dfn>;</td></tr>
+<tr><th id="385">385</th><td></td></tr>
+<tr><th id="386">386</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::select" title='IDEState::select' data-ref="IDEState::select">select</dfn>;</td></tr>
+<tr><th id="387">387</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::status" title='IDEState::status' data-ref="IDEState::status">status</dfn>;</td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td>    <i>/* set for lba48 access */</i></td></tr>
+<tr><th id="390">390</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::lba48" title='IDEState::lba48' data-ref="IDEState::lba48">lba48</dfn>;</td></tr>
+<tr><th id="391">391</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="decl" id="IDEState::blk" title='IDEState::blk' data-ref="IDEState::blk">blk</dfn>;</td></tr>
+<tr><th id="392">392</th><td>    <em>char</em> <dfn class="decl" id="IDEState::version" title='IDEState::version' data-ref="IDEState::version">version</dfn>[<var>9</var>];</td></tr>
+<tr><th id="393">393</th><td>    <i>/* ATAPI specific */</i></td></tr>
+<tr><th id="394">394</th><td>    <b>struct</b> <a class="type" href="#unreported_events" title='unreported_events' data-ref="unreported_events">unreported_events</a> <dfn class="decl" id="IDEState::events" title='IDEState::events' data-ref="IDEState::events">events</dfn>;</td></tr>
+<tr><th id="395">395</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::sense_key" title='IDEState::sense_key' data-ref="IDEState::sense_key">sense_key</dfn>;</td></tr>
+<tr><th id="396">396</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::asc" title='IDEState::asc' data-ref="IDEState::asc">asc</dfn>;</td></tr>
+<tr><th id="397">397</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IDEState::tray_open" title='IDEState::tray_open' data-ref="IDEState::tray_open">tray_open</dfn>;</td></tr>
+<tr><th id="398">398</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="IDEState::tray_locked" title='IDEState::tray_locked' data-ref="IDEState::tray_locked">tray_locked</dfn>;</td></tr>
+<tr><th id="399">399</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::cdrom_changed" title='IDEState::cdrom_changed' data-ref="IDEState::cdrom_changed">cdrom_changed</dfn>;</td></tr>
+<tr><th id="400">400</th><td>    <em>int</em> <dfn class="decl" id="IDEState::packet_transfer_size" title='IDEState::packet_transfer_size' data-ref="IDEState::packet_transfer_size">packet_transfer_size</dfn>;</td></tr>
+<tr><th id="401">401</th><td>    <em>int</em> <dfn class="decl" id="IDEState::elementary_transfer_size" title='IDEState::elementary_transfer_size' data-ref="IDEState::elementary_transfer_size">elementary_transfer_size</dfn>;</td></tr>
+<tr><th id="402">402</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="IDEState::io_buffer_index" title='IDEState::io_buffer_index' data-ref="IDEState::io_buffer_index">io_buffer_index</dfn>;</td></tr>
+<tr><th id="403">403</th><td>    <em>int</em> <dfn class="decl" id="IDEState::lba" title='IDEState::lba' data-ref="IDEState::lba">lba</dfn>;</td></tr>
+<tr><th id="404">404</th><td>    <em>int</em> <dfn class="decl" id="IDEState::cd_sector_size" title='IDEState::cd_sector_size' data-ref="IDEState::cd_sector_size">cd_sector_size</dfn>;</td></tr>
+<tr><th id="405">405</th><td>    <em>int</em> <dfn class="decl" id="IDEState::atapi_dma" title='IDEState::atapi_dma' data-ref="IDEState::atapi_dma">atapi_dma</dfn>; <i>/* true if dma is requested for the packet cmd */</i></td></tr>
+<tr><th id="406">406</th><td>    <a class="typedef" href="../../block/accounting.h.html#BlockAcctCookie" title='BlockAcctCookie' data-type='struct BlockAcctCookie' data-ref="BlockAcctCookie">BlockAcctCookie</a> <dfn class="decl" id="IDEState::acct" title='IDEState::acct' data-ref="IDEState::acct">acct</dfn>;</td></tr>
+<tr><th id="407">407</th><td>    <a class="typedef" href="../../block/aio.h.html#BlockAIOCB" title='BlockAIOCB' data-type='struct BlockAIOCB' data-ref="BlockAIOCB">BlockAIOCB</a> *<dfn class="decl" id="IDEState::pio_aiocb" title='IDEState::pio_aiocb' data-ref="IDEState::pio_aiocb">pio_aiocb</dfn>;</td></tr>
+<tr><th id="408">408</th><td>    <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="decl" id="IDEState::iov" title='IDEState::iov' data-ref="IDEState::iov">iov</dfn>;</td></tr>
+<tr><th id="409">409</th><td>    <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> <dfn class="decl" id="IDEState::qiov" title='IDEState::qiov' data-ref="IDEState::qiov">qiov</dfn>;</td></tr>
+<tr><th id="410">410</th><td>    <a class="macro" href="../../qemu/queue.h.html#86" title="struct { struct IDEBufferedRequest *lh_first; }" data-ref="_M/QLIST_HEAD">QLIST_HEAD</a>(, <a class="type" href="#IDEBufferedRequest" title='IDEBufferedRequest' data-ref="IDEBufferedRequest">IDEBufferedRequest</a>) <dfn class="decl" id="IDEState::buffered_requests" title='IDEState::buffered_requests' data-ref="IDEState::buffered_requests">buffered_requests</dfn>;</td></tr>
+<tr><th id="411">411</th><td>    <i>/* ATA DMA state */</i></td></tr>
+<tr><th id="412">412</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IDEState::io_buffer_offset" title='IDEState::io_buffer_offset' data-ref="IDEState::io_buffer_offset">io_buffer_offset</dfn>;</td></tr>
+<tr><th id="413">413</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="IDEState::io_buffer_size" title='IDEState::io_buffer_size' data-ref="IDEState::io_buffer_size">io_buffer_size</dfn>;</td></tr>
+<tr><th id="414">414</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUSGList" title='QEMUSGList' data-type='struct QEMUSGList' data-ref="QEMUSGList">QEMUSGList</a> <dfn class="decl" id="IDEState::sg" title='IDEState::sg' data-ref="IDEState::sg">sg</dfn>;</td></tr>
+<tr><th id="415">415</th><td>    <i>/* PIO transfer handling */</i></td></tr>
+<tr><th id="416">416</th><td>    <em>int</em> <dfn class="decl" id="IDEState::req_nb_sectors" title='IDEState::req_nb_sectors' data-ref="IDEState::req_nb_sectors">req_nb_sectors</dfn>; <i>/* number of sectors per interrupt */</i></td></tr>
+<tr><th id="417">417</th><td>    <a class="typedef" href="#EndTransferFunc" title='EndTransferFunc' data-type='void (IDEState *)' data-ref="EndTransferFunc">EndTransferFunc</a> *<dfn class="decl" id="IDEState::end_transfer_func" title='IDEState::end_transfer_func' data-ref="IDEState::end_transfer_func">end_transfer_func</dfn>;</td></tr>
+<tr><th id="418">418</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="IDEState::data_ptr" title='IDEState::data_ptr' data-ref="IDEState::data_ptr">data_ptr</dfn>;</td></tr>
+<tr><th id="419">419</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="IDEState::data_end" title='IDEState::data_end' data-ref="IDEState::data_end">data_end</dfn>;</td></tr>
+<tr><th id="420">420</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="IDEState::io_buffer" title='IDEState::io_buffer' data-ref="IDEState::io_buffer">io_buffer</dfn>;</td></tr>
+<tr><th id="421">421</th><td>    <i>/* PIO save/restore */</i></td></tr>
+<tr><th id="422">422</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="IDEState::io_buffer_total_len" title='IDEState::io_buffer_total_len' data-ref="IDEState::io_buffer_total_len">io_buffer_total_len</dfn>;</td></tr>
+<tr><th id="423">423</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="IDEState::cur_io_buffer_offset" title='IDEState::cur_io_buffer_offset' data-ref="IDEState::cur_io_buffer_offset">cur_io_buffer_offset</dfn>;</td></tr>
+<tr><th id="424">424</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int32_t" title='int32_t' data-type='int' data-ref="int32_t">int32_t</a> <dfn class="decl" id="IDEState::cur_io_buffer_len" title='IDEState::cur_io_buffer_len' data-ref="IDEState::cur_io_buffer_len">cur_io_buffer_len</dfn>;</td></tr>
+<tr><th id="425">425</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::end_transfer_fn_idx" title='IDEState::end_transfer_fn_idx' data-ref="IDEState::end_transfer_fn_idx">end_transfer_fn_idx</dfn>;</td></tr>
+<tr><th id="426">426</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUTimer" title='QEMUTimer' data-type='struct QEMUTimer' data-ref="QEMUTimer">QEMUTimer</a> *<dfn class="decl" id="IDEState::sector_write_timer" title='IDEState::sector_write_timer' data-ref="IDEState::sector_write_timer">sector_write_timer</dfn>; <i>/* only used for win2k install hack */</i></td></tr>
+<tr><th id="427">427</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IDEState::irq_count" title='IDEState::irq_count' data-ref="IDEState::irq_count">irq_count</dfn>; <i>/* counts IRQs when using win2k install hack */</i></td></tr>
+<tr><th id="428">428</th><td>    <i>/* CF-ATA extended error */</i></td></tr>
+<tr><th id="429">429</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::ext_error" title='IDEState::ext_error' data-ref="IDEState::ext_error">ext_error</dfn>;</td></tr>
+<tr><th id="430">430</th><td>    <i>/* CF-ATA metadata storage */</i></td></tr>
+<tr><th id="431">431</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IDEState::mdata_size" title='IDEState::mdata_size' data-ref="IDEState::mdata_size">mdata_size</dfn>;</td></tr>
+<tr><th id="432">432</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="IDEState::mdata_storage" title='IDEState::mdata_storage' data-ref="IDEState::mdata_storage">mdata_storage</dfn>;</td></tr>
+<tr><th id="433">433</th><td>    <em>int</em> <dfn class="decl" id="IDEState::media_changed" title='IDEState::media_changed' data-ref="IDEState::media_changed">media_changed</dfn>;</td></tr>
+<tr><th id="434">434</th><td>    <b>enum</b> <a class="type" href="#ide_dma_cmd" title='ide_dma_cmd' data-ref="ide_dma_cmd">ide_dma_cmd</a> <dfn class="decl" id="IDEState::dma_cmd" title='IDEState::dma_cmd' data-ref="IDEState::dma_cmd">dma_cmd</dfn>;</td></tr>
+<tr><th id="435">435</th><td>    <i>/* SMART */</i></td></tr>
+<tr><th id="436">436</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::smart_enabled" title='IDEState::smart_enabled' data-ref="IDEState::smart_enabled">smart_enabled</dfn>;</td></tr>
+<tr><th id="437">437</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::smart_autosave" title='IDEState::smart_autosave' data-ref="IDEState::smart_autosave">smart_autosave</dfn>;</td></tr>
+<tr><th id="438">438</th><td>    <em>int</em> <dfn class="decl" id="IDEState::smart_errors" title='IDEState::smart_errors' data-ref="IDEState::smart_errors">smart_errors</dfn>;</td></tr>
+<tr><th id="439">439</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEState::smart_selftest_count" title='IDEState::smart_selftest_count' data-ref="IDEState::smart_selftest_count">smart_selftest_count</dfn>;</td></tr>
+<tr><th id="440">440</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="IDEState::smart_selftest_data" title='IDEState::smart_selftest_data' data-ref="IDEState::smart_selftest_data">smart_selftest_data</dfn>;</td></tr>
+<tr><th id="441">441</th><td>    <i>/* AHCI */</i></td></tr>
+<tr><th id="442">442</th><td>    <em>int</em> <dfn class="decl" id="IDEState::ncq_queues" title='IDEState::ncq_queues' data-ref="IDEState::ncq_queues">ncq_queues</dfn>;</td></tr>
+<tr><th id="443">443</th><td>};</td></tr>
+<tr><th id="444">444</th><td></td></tr>
+<tr><th id="445">445</th><td><b>struct</b> <dfn class="type def" id="IDEDMAOps" title='IDEDMAOps' data-ref="IDEDMAOps">IDEDMAOps</dfn> {</td></tr>
+<tr><th id="446">446</th><td>    <a class="typedef" href="#DMAStartFunc" title='DMAStartFunc' data-type='void (IDEDMA *, IDEState *, BlockCompletionFunc *)' data-ref="DMAStartFunc">DMAStartFunc</a> *<dfn class="decl" id="IDEDMAOps::start_dma" title='IDEDMAOps::start_dma' data-ref="IDEDMAOps::start_dma">start_dma</dfn>;</td></tr>
+<tr><th id="447">447</th><td>    <a class="typedef" href="#DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</a> *<dfn class="decl" id="IDEDMAOps::start_transfer" title='IDEDMAOps::start_transfer' data-ref="IDEDMAOps::start_transfer">start_transfer</dfn>;</td></tr>
+<tr><th id="448">448</th><td>    <a class="typedef" href="#DMAInt32Func" title='DMAInt32Func' data-type='int32_t (IDEDMA *, int32_t)' data-ref="DMAInt32Func">DMAInt32Func</a> *<dfn class="decl" id="IDEDMAOps::prepare_buf" title='IDEDMAOps::prepare_buf' data-ref="IDEDMAOps::prepare_buf">prepare_buf</dfn>;</td></tr>
+<tr><th id="449">449</th><td>    <a class="typedef" href="#DMAu32Func" title='DMAu32Func' data-type='void (IDEDMA *, uint32_t)' data-ref="DMAu32Func">DMAu32Func</a> *<dfn class="decl" id="IDEDMAOps::commit_buf" title='IDEDMAOps::commit_buf' data-ref="IDEDMAOps::commit_buf">commit_buf</dfn>;</td></tr>
+<tr><th id="450">450</th><td>    <a class="typedef" href="#DMAIntFunc" title='DMAIntFunc' data-type='int (IDEDMA *, int)' data-ref="DMAIntFunc">DMAIntFunc</a> *<dfn class="decl" id="IDEDMAOps::rw_buf" title='IDEDMAOps::rw_buf' data-ref="IDEDMAOps::rw_buf">rw_buf</dfn>;</td></tr>
+<tr><th id="451">451</th><td>    <a class="typedef" href="#DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</a> *<dfn class="decl" id="IDEDMAOps::restart" title='IDEDMAOps::restart' data-ref="IDEDMAOps::restart">restart</dfn>;</td></tr>
+<tr><th id="452">452</th><td>    <a class="typedef" href="#DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</a> *<dfn class="decl" id="IDEDMAOps::restart_dma" title='IDEDMAOps::restart_dma' data-ref="IDEDMAOps::restart_dma">restart_dma</dfn>;</td></tr>
+<tr><th id="453">453</th><td>    <a class="typedef" href="#DMAStopFunc" title='DMAStopFunc' data-type='void (IDEDMA *, _Bool)' data-ref="DMAStopFunc">DMAStopFunc</a> *<dfn class="decl" id="IDEDMAOps::set_inactive" title='IDEDMAOps::set_inactive' data-ref="IDEDMAOps::set_inactive">set_inactive</dfn>;</td></tr>
+<tr><th id="454">454</th><td>    <a class="typedef" href="#DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</a> *<dfn class="decl" id="IDEDMAOps::cmd_done" title='IDEDMAOps::cmd_done' data-ref="IDEDMAOps::cmd_done">cmd_done</dfn>;</td></tr>
+<tr><th id="455">455</th><td>    <a class="typedef" href="#DMAVoidFunc" title='DMAVoidFunc' data-type='void (IDEDMA *)' data-ref="DMAVoidFunc">DMAVoidFunc</a> *<dfn class="decl" id="IDEDMAOps::reset" title='IDEDMAOps::reset' data-ref="IDEDMAOps::reset">reset</dfn>;</td></tr>
+<tr><th id="456">456</th><td>};</td></tr>
+<tr><th id="457">457</th><td></td></tr>
+<tr><th id="458">458</th><td><b>struct</b> <dfn class="type def" id="IDEDMA" title='IDEDMA' data-ref="IDEDMA">IDEDMA</dfn> {</td></tr>
+<tr><th id="459">459</th><td>    <em>const</em> <b>struct</b> <a class="type" href="#IDEDMAOps" title='IDEDMAOps' data-ref="IDEDMAOps">IDEDMAOps</a> *<dfn class="decl" id="IDEDMA::ops" title='IDEDMA::ops' data-ref="IDEDMA::ops">ops</dfn>;</td></tr>
+<tr><th id="460">460</th><td>    <b>struct</b> <a class="type" href="../../../../include/x86_64-linux-gnu/bits/uio.h.html#iovec" title='iovec' data-ref="iovec">iovec</a> <dfn class="decl" id="IDEDMA::iov" title='IDEDMA::iov' data-ref="IDEDMA::iov">iov</dfn>;</td></tr>
+<tr><th id="461">461</th><td>    <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> <dfn class="decl" id="IDEDMA::qiov" title='IDEDMA::qiov' data-ref="IDEDMA::qiov">qiov</dfn>;</td></tr>
+<tr><th id="462">462</th><td>    <a class="typedef" href="../../block/aio.h.html#BlockAIOCB" title='BlockAIOCB' data-type='struct BlockAIOCB' data-ref="BlockAIOCB">BlockAIOCB</a> *<dfn class="decl" id="IDEDMA::aiocb" title='IDEDMA::aiocb' data-ref="IDEDMA::aiocb">aiocb</dfn>;</td></tr>
+<tr><th id="463">463</th><td>};</td></tr>
+<tr><th id="464">464</th><td></td></tr>
+<tr><th id="465">465</th><td><b>struct</b> <dfn class="type def" id="IDEBus" title='IDEBus' data-ref="IDEBus">IDEBus</dfn> {</td></tr>
+<tr><th id="466">466</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#BusState" title='BusState' data-type='struct BusState' data-ref="BusState">BusState</a> <dfn class="decl" id="IDEBus::qbus" title='IDEBus::qbus' data-ref="IDEBus::qbus">qbus</dfn>;</td></tr>
+<tr><th id="467">467</th><td>    <a class="typedef" href="#IDEDevice" title='IDEDevice' data-type='struct IDEDevice' data-ref="IDEDevice">IDEDevice</a> *<dfn class="decl" id="IDEBus::master" title='IDEBus::master' data-ref="IDEBus::master">master</dfn>;</td></tr>
+<tr><th id="468">468</th><td>    <a class="typedef" href="#IDEDevice" title='IDEDevice' data-type='struct IDEDevice' data-ref="IDEDevice">IDEDevice</a> *<dfn class="decl" id="IDEBus::slave" title='IDEBus::slave' data-ref="IDEBus::slave">slave</dfn>;</td></tr>
+<tr><th id="469">469</th><td>    <a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> <dfn class="decl" id="IDEBus::ifs" title='IDEBus::ifs' data-ref="IDEBus::ifs">ifs</dfn>[<var>2</var>];</td></tr>
+<tr><th id="470">470</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="decl" id="IDEBus::bh" title='IDEBus::bh' data-ref="IDEBus::bh">bh</dfn>;</td></tr>
+<tr><th id="471">471</th><td></td></tr>
+<tr><th id="472">472</th><td>    <em>int</em> <dfn class="decl" id="IDEBus::bus_id" title='IDEBus::bus_id' data-ref="IDEBus::bus_id">bus_id</dfn>;</td></tr>
+<tr><th id="473">473</th><td>    <em>int</em> <dfn class="decl" id="IDEBus::max_units" title='IDEBus::max_units' data-ref="IDEBus::max_units">max_units</dfn>;</td></tr>
+<tr><th id="474">474</th><td>    <a class="typedef" href="#IDEDMA" title='IDEDMA' data-type='struct IDEDMA' data-ref="IDEDMA">IDEDMA</a> *<dfn class="decl" id="IDEBus::dma" title='IDEBus::dma' data-ref="IDEBus::dma">dma</dfn>;</td></tr>
+<tr><th id="475">475</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEBus::unit" title='IDEBus::unit' data-ref="IDEBus::unit">unit</dfn>;</td></tr>
+<tr><th id="476">476</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEBus::cmd" title='IDEBus::cmd' data-ref="IDEBus::cmd">cmd</dfn>;</td></tr>
+<tr><th id="477">477</th><td>    <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="decl" id="IDEBus::irq" title='IDEBus::irq' data-ref="IDEBus::irq">irq</dfn>;</td></tr>
+<tr><th id="478">478</th><td></td></tr>
+<tr><th id="479">479</th><td>    <em>int</em> <dfn class="decl" id="IDEBus::error_status" title='IDEBus::error_status' data-ref="IDEBus::error_status">error_status</dfn>;</td></tr>
+<tr><th id="480">480</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="IDEBus::retry_unit" title='IDEBus::retry_unit' data-ref="IDEBus::retry_unit">retry_unit</dfn>;</td></tr>
+<tr><th id="481">481</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="IDEBus::retry_sector_num" title='IDEBus::retry_sector_num' data-ref="IDEBus::retry_sector_num">retry_sector_num</dfn>;</td></tr>
+<tr><th id="482">482</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IDEBus::retry_nsector" title='IDEBus::retry_nsector' data-ref="IDEBus::retry_nsector">retry_nsector</dfn>;</td></tr>
+<tr><th id="483">483</th><td>    <a class="typedef" href="../../exec/ioport.h.html#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> <dfn class="decl" id="IDEBus::portio_list" title='IDEBus::portio_list' data-ref="IDEBus::portio_list">portio_list</dfn>;</td></tr>
+<tr><th id="484">484</th><td>    <a class="typedef" href="../../exec/ioport.h.html#PortioList" title='PortioList' data-type='struct PortioList' data-ref="PortioList">PortioList</a> <dfn class="decl" id="IDEBus::portio2_list" title='IDEBus::portio2_list' data-ref="IDEBus::portio2_list">portio2_list</dfn>;</td></tr>
+<tr><th id="485">485</th><td>    <a class="typedef" href="../../sysemu/sysemu.h.html#VMChangeStateEntry" title='VMChangeStateEntry' data-type='struct vm_change_state_entry' data-ref="VMChangeStateEntry">VMChangeStateEntry</a> *<dfn class="decl" id="IDEBus::vmstate" title='IDEBus::vmstate' data-ref="IDEBus::vmstate">vmstate</dfn>;</td></tr>
+<tr><th id="486">486</th><td>};</td></tr>
+<tr><th id="487">487</th><td></td></tr>
+<tr><th id="488">488</th><td><u>#define <dfn class="macro" id="_M/TYPE_IDE_DEVICE" data-ref="_M/TYPE_IDE_DEVICE">TYPE_IDE_DEVICE</dfn> "ide-device"</u></td></tr>
+<tr><th id="489">489</th><td><u>#define <dfn class="macro" id="_M/IDE_DEVICE" data-ref="_M/IDE_DEVICE">IDE_DEVICE</dfn>(obj) \</u></td></tr>
+<tr><th id="490">490</th><td><u>     OBJECT_CHECK(IDEDevice, (obj), TYPE_IDE_DEVICE)</u></td></tr>
+<tr><th id="491">491</th><td><u>#define <dfn class="macro" id="_M/IDE_DEVICE_CLASS" data-ref="_M/IDE_DEVICE_CLASS">IDE_DEVICE_CLASS</dfn>(klass) \</u></td></tr>
+<tr><th id="492">492</th><td><u>     OBJECT_CLASS_CHECK(IDEDeviceClass, (klass), TYPE_IDE_DEVICE)</u></td></tr>
+<tr><th id="493">493</th><td><u>#define <dfn class="macro" id="_M/IDE_DEVICE_GET_CLASS" data-ref="_M/IDE_DEVICE_GET_CLASS">IDE_DEVICE_GET_CLASS</dfn>(obj) \</u></td></tr>
+<tr><th id="494">494</th><td><u>     OBJECT_GET_CLASS(IDEDeviceClass, (obj), TYPE_IDE_DEVICE)</u></td></tr>
+<tr><th id="495">495</th><td></td></tr>
+<tr><th id="496">496</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="IDEDeviceClass" title='IDEDeviceClass' data-ref="IDEDeviceClass"><a class="type" href="#IDEDeviceClass" title='IDEDeviceClass' data-ref="IDEDeviceClass">IDEDeviceClass</a></dfn> {</td></tr>
+<tr><th id="497">497</th><td>    <a class="typedef" href="../qdev-core.h.html#DeviceClass" title='DeviceClass' data-type='struct DeviceClass' data-ref="DeviceClass">DeviceClass</a> <dfn class="decl" id="IDEDeviceClass::parent_class" title='IDEDeviceClass::parent_class' data-ref="IDEDeviceClass::parent_class">parent_class</dfn>;</td></tr>
+<tr><th id="498">498</th><td>    <em>int</em> (*<dfn class="decl" id="IDEDeviceClass::init" title='IDEDeviceClass::init' data-ref="IDEDeviceClass::init">init</dfn>)(<a class="typedef" href="#IDEDevice" title='IDEDevice' data-type='struct IDEDevice' data-ref="IDEDevice">IDEDevice</a> *<dfn class="local col2 decl" id="2dev" title='dev' data-type='IDEDevice *' data-ref="2dev">dev</dfn>);</td></tr>
+<tr><th id="499">499</th><td>} <dfn class="typedef" id="IDEDeviceClass" title='IDEDeviceClass' data-type='struct IDEDeviceClass' data-ref="IDEDeviceClass">IDEDeviceClass</dfn>;</td></tr>
+<tr><th id="500">500</th><td></td></tr>
+<tr><th id="501">501</th><td><b>struct</b> <dfn class="type def" id="IDEDevice" title='IDEDevice' data-ref="IDEDevice">IDEDevice</dfn> {</td></tr>
+<tr><th id="502">502</th><td>    <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="IDEDevice::qdev" title='IDEDevice::qdev' data-ref="IDEDevice::qdev">qdev</dfn>;</td></tr>
+<tr><th id="503">503</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="IDEDevice::unit" title='IDEDevice::unit' data-ref="IDEDevice::unit">unit</dfn>;</td></tr>
+<tr><th id="504">504</th><td>    <a class="typedef" href="../block/block.h.html#BlockConf" title='BlockConf' data-type='struct BlockConf' data-ref="BlockConf">BlockConf</a> <dfn class="decl" id="IDEDevice::conf" title='IDEDevice::conf' data-ref="IDEDevice::conf">conf</dfn>;</td></tr>
+<tr><th id="505">505</th><td>    <em>int</em> <dfn class="decl" id="IDEDevice::chs_trans" title='IDEDevice::chs_trans' data-ref="IDEDevice::chs_trans">chs_trans</dfn>;</td></tr>
+<tr><th id="506">506</th><td>    <em>char</em> *<dfn class="decl" id="IDEDevice::version" title='IDEDevice::version' data-ref="IDEDevice::version">version</dfn>;</td></tr>
+<tr><th id="507">507</th><td>    <em>char</em> *<dfn class="decl" id="IDEDevice::serial" title='IDEDevice::serial' data-ref="IDEDevice::serial">serial</dfn>;</td></tr>
+<tr><th id="508">508</th><td>    <em>char</em> *<dfn class="decl" id="IDEDevice::model" title='IDEDevice::model' data-ref="IDEDevice::model">model</dfn>;</td></tr>
+<tr><th id="509">509</th><td>    <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="IDEDevice::wwn" title='IDEDevice::wwn' data-ref="IDEDevice::wwn">wwn</dfn>;</td></tr>
+<tr><th id="510">510</th><td>};</td></tr>
+<tr><th id="511">511</th><td></td></tr>
+<tr><th id="512">512</th><td><i>/* These are used for the error_status field of IDEBus */</i></td></tr>
+<tr><th id="513">513</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_MASK" data-ref="_M/IDE_RETRY_MASK">IDE_RETRY_MASK</dfn> 0xf8</u></td></tr>
+<tr><th id="514">514</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_DMA" data-ref="_M/IDE_RETRY_DMA">IDE_RETRY_DMA</dfn>  0x08</u></td></tr>
+<tr><th id="515">515</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_PIO" data-ref="_M/IDE_RETRY_PIO">IDE_RETRY_PIO</dfn>  0x10</u></td></tr>
+<tr><th id="516">516</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_ATAPI" data-ref="_M/IDE_RETRY_ATAPI">IDE_RETRY_ATAPI</dfn> 0x20 /* reused IDE_RETRY_READ bit */</u></td></tr>
+<tr><th id="517">517</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_READ" data-ref="_M/IDE_RETRY_READ">IDE_RETRY_READ</dfn>  0x20</u></td></tr>
+<tr><th id="518">518</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_FLUSH" data-ref="_M/IDE_RETRY_FLUSH">IDE_RETRY_FLUSH</dfn> 0x40</u></td></tr>
+<tr><th id="519">519</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_TRIM" data-ref="_M/IDE_RETRY_TRIM">IDE_RETRY_TRIM</dfn> 0x80</u></td></tr>
+<tr><th id="520">520</th><td><u>#define <dfn class="macro" id="_M/IDE_RETRY_HBA" data-ref="_M/IDE_RETRY_HBA">IDE_RETRY_HBA</dfn>  0x100</u></td></tr>
+<tr><th id="521">521</th><td></td></tr>
+<tr><th id="522">522</th><td><u>#define <dfn class="macro" id="_M/IS_IDE_RETRY_DMA" data-ref="_M/IS_IDE_RETRY_DMA">IS_IDE_RETRY_DMA</dfn>(_status) \</u></td></tr>
+<tr><th id="523">523</th><td><u>    ((_status) &amp; IDE_RETRY_DMA)</u></td></tr>
+<tr><th id="524">524</th><td></td></tr>
+<tr><th id="525">525</th><td><u>#define <dfn class="macro" id="_M/IS_IDE_RETRY_PIO" data-ref="_M/IS_IDE_RETRY_PIO">IS_IDE_RETRY_PIO</dfn>(_status) \</u></td></tr>
+<tr><th id="526">526</th><td><u>    ((_status) &amp; IDE_RETRY_PIO)</u></td></tr>
+<tr><th id="527">527</th><td></td></tr>
+<tr><th id="528">528</th><td><i>/*</i></td></tr>
+<tr><th id="529">529</th><td><i> * The method of the IDE_RETRY_ATAPI determination is to use a previously</i></td></tr>
+<tr><th id="530">530</th><td><i> * impossible bit combination as a new status value.</i></td></tr>
+<tr><th id="531">531</th><td><i> */</i></td></tr>
+<tr><th id="532">532</th><td><u>#define <dfn class="macro" id="_M/IS_IDE_RETRY_ATAPI" data-ref="_M/IS_IDE_RETRY_ATAPI">IS_IDE_RETRY_ATAPI</dfn>(_status)   \</u></td></tr>
+<tr><th id="533">533</th><td><u>    (((_status) &amp; IDE_RETRY_MASK) == IDE_RETRY_ATAPI)</u></td></tr>
+<tr><th id="534">534</th><td></td></tr>
+<tr><th id="535">535</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl def" id="ide_dma_cmd_to_retry" title='ide_dma_cmd_to_retry' data-ref="ide_dma_cmd_to_retry">ide_dma_cmd_to_retry</dfn>(<a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="local col3 decl" id="3dma_cmd" title='dma_cmd' data-type='uint8_t' data-ref="3dma_cmd">dma_cmd</dfn>)</td></tr>
+<tr><th id="536">536</th><td>{</td></tr>
+<tr><th id="537">537</th><td>    <b>switch</b> (<a class="local col3 ref" href="#3dma_cmd" title='dma_cmd' data-ref="3dma_cmd">dma_cmd</a>) {</td></tr>
+<tr><th id="538">538</th><td>    <b>case</b> <a class="enum" href="#ide_dma_cmd::IDE_DMA_READ" title='ide_dma_cmd::IDE_DMA_READ' data-ref="ide_dma_cmd::IDE_DMA_READ">IDE_DMA_READ</a>:</td></tr>
+<tr><th id="539">539</th><td>        <b>return</b> <a class="macro" href="#514" title="0x08" data-ref="_M/IDE_RETRY_DMA">IDE_RETRY_DMA</a> | <a class="macro" href="#517" title="0x20" data-ref="_M/IDE_RETRY_READ">IDE_RETRY_READ</a>;</td></tr>
+<tr><th id="540">540</th><td>    <b>case</b> <a class="enum" href="#ide_dma_cmd::IDE_DMA_WRITE" title='ide_dma_cmd::IDE_DMA_WRITE' data-ref="ide_dma_cmd::IDE_DMA_WRITE">IDE_DMA_WRITE</a>:</td></tr>
+<tr><th id="541">541</th><td>        <b>return</b> <a class="macro" href="#514" title="0x08" data-ref="_M/IDE_RETRY_DMA">IDE_RETRY_DMA</a>;</td></tr>
+<tr><th id="542">542</th><td>    <b>case</b> <a class="enum" href="#ide_dma_cmd::IDE_DMA_TRIM" title='ide_dma_cmd::IDE_DMA_TRIM' data-ref="ide_dma_cmd::IDE_DMA_TRIM">IDE_DMA_TRIM</a>:</td></tr>
+<tr><th id="543">543</th><td>        <b>return</b> <a class="macro" href="#514" title="0x08" data-ref="_M/IDE_RETRY_DMA">IDE_RETRY_DMA</a> | <a class="macro" href="#519" title="0x80" data-ref="_M/IDE_RETRY_TRIM">IDE_RETRY_TRIM</a>;</td></tr>
+<tr><th id="544">544</th><td>    <b>case</b> <a class="enum" href="#ide_dma_cmd::IDE_DMA_ATAPI" title='ide_dma_cmd::IDE_DMA_ATAPI' data-ref="ide_dma_cmd::IDE_DMA_ATAPI">IDE_DMA_ATAPI</a>:</td></tr>
+<tr><th id="545">545</th><td>        <b>return</b> <a class="macro" href="#516" title="0x20" data-ref="_M/IDE_RETRY_ATAPI">IDE_RETRY_ATAPI</a>;</td></tr>
+<tr><th id="546">546</th><td>    <b>default</b>:</td></tr>
+<tr><th id="547">547</th><td>        <b>break</b>;</td></tr>
+<tr><th id="548">548</th><td>    }</td></tr>
+<tr><th id="549">549</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="550">550</th><td>}</td></tr>
+<tr><th id="551">551</th><td></td></tr>
+<tr><th id="552">552</th><td><em>static</em> <b>inline</b> <a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="decl def" id="idebus_active_if" title='idebus_active_if' data-ref="idebus_active_if">idebus_active_if</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col4 decl" id="4bus" title='bus' data-type='IDEBus *' data-ref="4bus">bus</dfn>)</td></tr>
+<tr><th id="553">553</th><td>{</td></tr>
+<tr><th id="554">554</th><td>    <b>return</b> <a class="local col4 ref" href="#4bus" title='bus' data-ref="4bus">bus</a>-&gt;<a class="ref" href="#IDEBus::ifs" title='IDEBus::ifs' data-ref="IDEBus::ifs">ifs</a> + <a class="local col4 ref" href="#4bus" title='bus' data-ref="4bus">bus</a>-&gt;<a class="ref" href="#IDEBus::unit" title='IDEBus::unit' data-ref="IDEBus::unit">unit</a>;</td></tr>
+<tr><th id="555">555</th><td>}</td></tr>
+<tr><th id="556">556</th><td></td></tr>
+<tr><th id="557">557</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="ide_set_irq" title='ide_set_irq' data-ref="ide_set_irq">ide_set_irq</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col5 decl" id="5bus" title='bus' data-type='IDEBus *' data-ref="5bus">bus</dfn>)</td></tr>
+<tr><th id="558">558</th><td>{</td></tr>
+<tr><th id="559">559</th><td>    <b>if</b> (!(<a class="local col5 ref" href="#5bus" title='bus' data-ref="5bus">bus</a>-&gt;<a class="ref" href="#IDEBus::cmd" title='IDEBus::cmd' data-ref="IDEBus::cmd">cmd</a> &amp; <a class="macro" href="#60" title="0x02" data-ref="_M/IDE_CMD_DISABLE_IRQ">IDE_CMD_DISABLE_IRQ</a>)) {</td></tr>
+<tr><th id="560">560</th><td>        <a class="ref" href="../irq.h.html#qemu_irq_raise" title='qemu_irq_raise' data-ref="qemu_irq_raise">qemu_irq_raise</a>(<a class="local col5 ref" href="#5bus" title='bus' data-ref="5bus">bus</a>-&gt;<a class="ref" href="#IDEBus::irq" title='IDEBus::irq' data-ref="IDEBus::irq">irq</a>);</td></tr>
+<tr><th id="561">561</th><td>    }</td></tr>
+<tr><th id="562">562</th><td>}</td></tr>
+<tr><th id="563">563</th><td></td></tr>
+<tr><th id="564">564</th><td><i>/* hw/ide/core.c */</i></td></tr>
+<tr><th id="565">565</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_ide_bus" title='vmstate_ide_bus' data-ref="vmstate_ide_bus">vmstate_ide_bus</dfn>;</td></tr>
+<tr><th id="566">566</th><td></td></tr>
+<tr><th id="567">567</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_IDE_BUS" data-ref="_M/VMSTATE_IDE_BUS">VMSTATE_IDE_BUS</dfn>(_field, _state)                          \</u></td></tr>
+<tr><th id="568">568</th><td><u>    VMSTATE_STRUCT(_field, _state, 1, vmstate_ide_bus, IDEBus)</u></td></tr>
+<tr><th id="569">569</th><td></td></tr>
+<tr><th id="570">570</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_IDE_BUS_ARRAY" data-ref="_M/VMSTATE_IDE_BUS_ARRAY">VMSTATE_IDE_BUS_ARRAY</dfn>(_field, _state, _num)              \</u></td></tr>
+<tr><th id="571">571</th><td><u>    VMSTATE_STRUCT_ARRAY(_field, _state, _num, 1, vmstate_ide_bus, IDEBus)</u></td></tr>
+<tr><th id="572">572</th><td></td></tr>
+<tr><th id="573">573</th><td><b>extern</b> <em>const</em> <a class="typedef" href="../../migration/vmstate.h.html#VMStateDescription" title='VMStateDescription' data-type='struct VMStateDescription' data-ref="VMStateDescription">VMStateDescription</a> <dfn class="decl" id="vmstate_ide_drive" title='vmstate_ide_drive' data-ref="vmstate_ide_drive">vmstate_ide_drive</dfn>;</td></tr>
+<tr><th id="574">574</th><td></td></tr>
+<tr><th id="575">575</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_IDE_DRIVES" data-ref="_M/VMSTATE_IDE_DRIVES">VMSTATE_IDE_DRIVES</dfn>(_field, _state) \</u></td></tr>
+<tr><th id="576">576</th><td><u>    VMSTATE_STRUCT_ARRAY(_field, _state, 2, 3, vmstate_ide_drive, IDEState)</u></td></tr>
+<tr><th id="577">577</th><td></td></tr>
+<tr><th id="578">578</th><td><u>#define <dfn class="macro" id="_M/VMSTATE_IDE_DRIVE" data-ref="_M/VMSTATE_IDE_DRIVE">VMSTATE_IDE_DRIVE</dfn>(_field, _state) \</u></td></tr>
+<tr><th id="579">579</th><td><u>    VMSTATE_STRUCT(_field, _state, 1, vmstate_ide_drive, IDEState)</u></td></tr>
+<tr><th id="580">580</th><td></td></tr>
+<tr><th id="581">581</th><td><em>void</em> <dfn class="decl" id="ide_bus_reset" title='ide_bus_reset' data-ref="ide_bus_reset">ide_bus_reset</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col6 decl" id="6bus" title='bus' data-type='IDEBus *' data-ref="6bus">bus</dfn>);</td></tr>
+<tr><th id="582">582</th><td><a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="ide_get_sector" title='ide_get_sector' data-ref="ide_get_sector">ide_get_sector</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col7 decl" id="7s" title='s' data-type='IDEState *' data-ref="7s">s</dfn>);</td></tr>
+<tr><th id="583">583</th><td><em>void</em> <dfn class="decl" id="ide_set_sector" title='ide_set_sector' data-ref="ide_set_sector">ide_set_sector</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col8 decl" id="8s" title='s' data-type='IDEState *' data-ref="8s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col9 decl" id="9sector_num" title='sector_num' data-type='int64_t' data-ref="9sector_num">sector_num</dfn>);</td></tr>
+<tr><th id="584">584</th><td></td></tr>
+<tr><th id="585">585</th><td><em>void</em> <dfn class="decl" id="ide_start_dma" title='ide_start_dma' data-ref="ide_start_dma">ide_start_dma</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col0 decl" id="10s" title='s' data-type='IDEState *' data-ref="10s">s</dfn>, <a class="typedef" href="../../block/aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *<dfn class="local col1 decl" id="11cb" title='cb' data-type='BlockCompletionFunc *' data-ref="11cb">cb</dfn>);</td></tr>
+<tr><th id="586">586</th><td><em>void</em> <dfn class="decl" id="dma_buf_commit" title='dma_buf_commit' data-ref="dma_buf_commit">dma_buf_commit</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col2 decl" id="12s" title='s' data-type='IDEState *' data-ref="12s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="13tx_bytes" title='tx_bytes' data-type='uint32_t' data-ref="13tx_bytes">tx_bytes</dfn>);</td></tr>
+<tr><th id="587">587</th><td><em>void</em> <dfn class="decl" id="ide_dma_error" title='ide_dma_error' data-ref="ide_dma_error">ide_dma_error</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col4 decl" id="14s" title='s' data-type='IDEState *' data-ref="14s">s</dfn>);</td></tr>
+<tr><th id="588">588</th><td><em>void</em> <dfn class="decl" id="ide_abort_command" title='ide_abort_command' data-ref="ide_abort_command">ide_abort_command</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col5 decl" id="15s" title='s' data-type='IDEState *' data-ref="15s">s</dfn>);</td></tr>
+<tr><th id="589">589</th><td></td></tr>
+<tr><th id="590">590</th><td><em>void</em> <dfn class="decl" id="ide_atapi_cmd_ok" title='ide_atapi_cmd_ok' data-ref="ide_atapi_cmd_ok">ide_atapi_cmd_ok</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col6 decl" id="16s" title='s' data-type='IDEState *' data-ref="16s">s</dfn>);</td></tr>
+<tr><th id="591">591</th><td><em>void</em> <dfn class="decl" id="ide_atapi_cmd_error" title='ide_atapi_cmd_error' data-ref="ide_atapi_cmd_error">ide_atapi_cmd_error</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col7 decl" id="17s" title='s' data-type='IDEState *' data-ref="17s">s</dfn>, <em>int</em> <dfn class="local col8 decl" id="18sense_key" title='sense_key' data-type='int' data-ref="18sense_key">sense_key</dfn>, <em>int</em> <dfn class="local col9 decl" id="19asc" title='asc' data-type='int' data-ref="19asc">asc</dfn>);</td></tr>
+<tr><th id="592">592</th><td><em>void</em> <dfn class="decl" id="ide_atapi_dma_restart" title='ide_atapi_dma_restart' data-ref="ide_atapi_dma_restart">ide_atapi_dma_restart</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col0 decl" id="20s" title='s' data-type='IDEState *' data-ref="20s">s</dfn>);</td></tr>
+<tr><th id="593">593</th><td><em>void</em> <dfn class="decl" id="ide_atapi_io_error" title='ide_atapi_io_error' data-ref="ide_atapi_io_error">ide_atapi_io_error</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col1 decl" id="21s" title='s' data-type='IDEState *' data-ref="21s">s</dfn>, <em>int</em> <dfn class="local col2 decl" id="22ret" title='ret' data-type='int' data-ref="22ret">ret</dfn>);</td></tr>
+<tr><th id="594">594</th><td></td></tr>
+<tr><th id="595">595</th><td><em>void</em> <dfn class="decl" id="ide_ioport_write" title='ide_ioport_write' data-ref="ide_ioport_write">ide_ioport_write</dfn>(<em>void</em> *<dfn class="local col3 decl" id="23opaque" title='opaque' data-type='void *' data-ref="23opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="24addr" title='addr' data-type='uint32_t' data-ref="24addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="25val" title='val' data-type='uint32_t' data-ref="25val">val</dfn>);</td></tr>
+<tr><th id="596">596</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ide_ioport_read" title='ide_ioport_read' data-ref="ide_ioport_read">ide_ioport_read</dfn>(<em>void</em> *<dfn class="local col6 decl" id="26opaque" title='opaque' data-type='void *' data-ref="26opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="27addr1" title='addr1' data-type='uint32_t' data-ref="27addr1">addr1</dfn>);</td></tr>
+<tr><th id="597">597</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ide_status_read" title='ide_status_read' data-ref="ide_status_read">ide_status_read</dfn>(<em>void</em> *<dfn class="local col8 decl" id="28opaque" title='opaque' data-type='void *' data-ref="28opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="29addr" title='addr' data-type='uint32_t' data-ref="29addr">addr</dfn>);</td></tr>
+<tr><th id="598">598</th><td><em>void</em> <dfn class="decl" id="ide_cmd_write" title='ide_cmd_write' data-ref="ide_cmd_write">ide_cmd_write</dfn>(<em>void</em> *<dfn class="local col0 decl" id="30opaque" title='opaque' data-type='void *' data-ref="30opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="31addr" title='addr' data-type='uint32_t' data-ref="31addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="32val" title='val' data-type='uint32_t' data-ref="32val">val</dfn>);</td></tr>
+<tr><th id="599">599</th><td><em>void</em> <dfn class="decl" id="ide_data_writew" title='ide_data_writew' data-ref="ide_data_writew">ide_data_writew</dfn>(<em>void</em> *<dfn class="local col3 decl" id="33opaque" title='opaque' data-type='void *' data-ref="33opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col4 decl" id="34addr" title='addr' data-type='uint32_t' data-ref="34addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col5 decl" id="35val" title='val' data-type='uint32_t' data-ref="35val">val</dfn>);</td></tr>
+<tr><th id="600">600</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ide_data_readw" title='ide_data_readw' data-ref="ide_data_readw">ide_data_readw</dfn>(<em>void</em> *<dfn class="local col6 decl" id="36opaque" title='opaque' data-type='void *' data-ref="36opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col7 decl" id="37addr" title='addr' data-type='uint32_t' data-ref="37addr">addr</dfn>);</td></tr>
+<tr><th id="601">601</th><td><em>void</em> <dfn class="decl" id="ide_data_writel" title='ide_data_writel' data-ref="ide_data_writel">ide_data_writel</dfn>(<em>void</em> *<dfn class="local col8 decl" id="38opaque" title='opaque' data-type='void *' data-ref="38opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col9 decl" id="39addr" title='addr' data-type='uint32_t' data-ref="39addr">addr</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="40val" title='val' data-type='uint32_t' data-ref="40val">val</dfn>);</td></tr>
+<tr><th id="602">602</th><td><a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="ide_data_readl" title='ide_data_readl' data-ref="ide_data_readl">ide_data_readl</dfn>(<em>void</em> *<dfn class="local col1 decl" id="41opaque" title='opaque' data-type='void *' data-ref="41opaque">opaque</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="42addr" title='addr' data-type='uint32_t' data-ref="42addr">addr</dfn>);</td></tr>
+<tr><th id="603">603</th><td></td></tr>
+<tr><th id="604">604</th><td><em>int</em> <dfn class="decl" id="ide_init_drive" title='ide_init_drive' data-ref="ide_init_drive">ide_init_drive</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col3 decl" id="43s" title='s' data-type='IDEState *' data-ref="43s">s</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col4 decl" id="44blk" title='blk' data-type='BlockBackend *' data-ref="44blk">blk</dfn>, <a class="typedef" href="#IDEDriveKind" title='IDEDriveKind' data-type='enum IDEDriveKind' data-ref="IDEDriveKind">IDEDriveKind</a> <dfn class="local col5 decl" id="45kind" title='kind' data-type='IDEDriveKind' data-ref="45kind">kind</dfn>,</td></tr>
+<tr><th id="605">605</th><td>                   <em>const</em> <em>char</em> *<dfn class="local col6 decl" id="46version" title='version' data-type='const char *' data-ref="46version">version</dfn>, <em>const</em> <em>char</em> *<dfn class="local col7 decl" id="47serial" title='serial' data-type='const char *' data-ref="47serial">serial</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="48model" title='model' data-type='const char *' data-ref="48model">model</dfn>,</td></tr>
+<tr><th id="606">606</th><td>                   <a class="typedef" href="../../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="49wwn" title='wwn' data-type='uint64_t' data-ref="49wwn">wwn</dfn>,</td></tr>
+<tr><th id="607">607</th><td>                   <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col0 decl" id="50cylinders" title='cylinders' data-type='uint32_t' data-ref="50cylinders">cylinders</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col1 decl" id="51heads" title='heads' data-type='uint32_t' data-ref="51heads">heads</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col2 decl" id="52secs" title='secs' data-type='uint32_t' data-ref="52secs">secs</dfn>,</td></tr>
+<tr><th id="608">608</th><td>                   <em>int</em> <dfn class="local col3 decl" id="53chs_trans" title='chs_trans' data-type='int' data-ref="53chs_trans">chs_trans</dfn>);</td></tr>
+<tr><th id="609">609</th><td><em>void</em> <dfn class="decl" id="ide_init2" title='ide_init2' data-ref="ide_init2">ide_init2</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col4 decl" id="54bus" title='bus' data-type='IDEBus *' data-ref="54bus">bus</dfn>, <a class="typedef" href="../irq.h.html#qemu_irq" title='qemu_irq' data-type='struct IRQState *' data-ref="qemu_irq">qemu_irq</a> <dfn class="local col5 decl" id="55irq" title='irq' data-type='qemu_irq' data-ref="55irq">irq</dfn>);</td></tr>
+<tr><th id="610">610</th><td><em>void</em> <dfn class="decl" id="ide_exit" title='ide_exit' data-ref="ide_exit">ide_exit</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col6 decl" id="56s" title='s' data-type='IDEState *' data-ref="56s">s</dfn>);</td></tr>
+<tr><th id="611">611</th><td><em>void</em> <dfn class="decl" id="ide_init_ioport" title='ide_init_ioport' data-ref="ide_init_ioport">ide_init_ioport</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col7 decl" id="57bus" title='bus' data-type='IDEBus *' data-ref="57bus">bus</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#ISADevice" title='ISADevice' data-type='struct ISADevice' data-ref="ISADevice">ISADevice</a> *<dfn class="local col8 decl" id="58isa" title='isa' data-type='ISADevice *' data-ref="58isa">isa</dfn>, <em>int</em> <dfn class="local col9 decl" id="59iobase" title='iobase' data-type='int' data-ref="59iobase">iobase</dfn>, <em>int</em> <dfn class="local col0 decl" id="60iobase2" title='iobase2' data-type='int' data-ref="60iobase2">iobase2</dfn>);</td></tr>
+<tr><th id="612">612</th><td><em>void</em> <dfn class="decl" id="ide_register_restart_cb" title='ide_register_restart_cb' data-ref="ide_register_restart_cb">ide_register_restart_cb</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col1 decl" id="61bus" title='bus' data-type='IDEBus *' data-ref="61bus">bus</dfn>);</td></tr>
+<tr><th id="613">613</th><td></td></tr>
+<tr><th id="614">614</th><td><em>void</em> <dfn class="decl" id="ide_exec_cmd" title='ide_exec_cmd' data-ref="ide_exec_cmd">ide_exec_cmd</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col2 decl" id="62bus" title='bus' data-type='IDEBus *' data-ref="62bus">bus</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="local col3 decl" id="63val" title='val' data-type='uint32_t' data-ref="63val">val</dfn>);</td></tr>
+<tr><th id="615">615</th><td></td></tr>
+<tr><th id="616">616</th><td><em>void</em> <dfn class="decl" id="ide_transfer_start" title='ide_transfer_start' data-ref="ide_transfer_start">ide_transfer_start</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col4 decl" id="64s" title='s' data-type='IDEState *' data-ref="64s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="local col5 decl" id="65buf" title='buf' data-type='uint8_t *' data-ref="65buf">buf</dfn>, <em>int</em> <dfn class="local col6 decl" id="66size" title='size' data-type='int' data-ref="66size">size</dfn>,</td></tr>
+<tr><th id="617">617</th><td>                        <a class="typedef" href="#EndTransferFunc" title='EndTransferFunc' data-type='void (IDEState *)' data-ref="EndTransferFunc">EndTransferFunc</a> *<dfn class="local col7 decl" id="67end_transfer_func" title='end_transfer_func' data-type='EndTransferFunc *' data-ref="67end_transfer_func">end_transfer_func</dfn>);</td></tr>
+<tr><th id="618">618</th><td><em>void</em> <dfn class="decl" id="ide_transfer_stop" title='ide_transfer_stop' data-ref="ide_transfer_stop">ide_transfer_stop</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col8 decl" id="68s" title='s' data-type='IDEState *' data-ref="68s">s</dfn>);</td></tr>
+<tr><th id="619">619</th><td><em>void</em> <dfn class="decl" id="ide_set_inactive" title='ide_set_inactive' data-ref="ide_set_inactive">ide_set_inactive</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col9 decl" id="69s" title='s' data-type='IDEState *' data-ref="69s">s</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col0 decl" id="70more" title='more' data-type='_Bool' data-ref="70more">more</dfn>);</td></tr>
+<tr><th id="620">620</th><td><a class="typedef" href="../../block/aio.h.html#BlockAIOCB" title='BlockAIOCB' data-type='struct BlockAIOCB' data-ref="BlockAIOCB">BlockAIOCB</a> *<dfn class="decl" id="ide_issue_trim" title='ide_issue_trim' data-ref="ide_issue_trim">ide_issue_trim</dfn>(</td></tr>
+<tr><th id="621">621</th><td>        <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col1 decl" id="71offset" title='offset' data-type='int64_t' data-ref="71offset">offset</dfn>, <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> *<dfn class="local col2 decl" id="72qiov" title='qiov' data-type='QEMUIOVector *' data-ref="72qiov">qiov</dfn>,</td></tr>
+<tr><th id="622">622</th><td>        <a class="typedef" href="../../block/aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *<dfn class="local col3 decl" id="73cb" title='cb' data-type='BlockCompletionFunc *' data-ref="73cb">cb</dfn>, <em>void</em> *<dfn class="local col4 decl" id="74cb_opaque" title='cb_opaque' data-type='void *' data-ref="74cb_opaque">cb_opaque</dfn>, <em>void</em> *<dfn class="local col5 decl" id="75opaque" title='opaque' data-type='void *' data-ref="75opaque">opaque</dfn>);</td></tr>
+<tr><th id="623">623</th><td><a class="typedef" href="../../block/aio.h.html#BlockAIOCB" title='BlockAIOCB' data-type='struct BlockAIOCB' data-ref="BlockAIOCB">BlockAIOCB</a> *<dfn class="decl" id="ide_buffered_readv" title='ide_buffered_readv' data-ref="ide_buffered_readv">ide_buffered_readv</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col6 decl" id="76s" title='s' data-type='IDEState *' data-ref="76s">s</dfn>, <a class="typedef" href="../../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="local col7 decl" id="77sector_num" title='sector_num' data-type='int64_t' data-ref="77sector_num">sector_num</dfn>,</td></tr>
+<tr><th id="624">624</th><td>                               <a class="typedef" href="../../qemu/iov.h.html#QEMUIOVector" title='QEMUIOVector' data-type='struct QEMUIOVector' data-ref="QEMUIOVector">QEMUIOVector</a> *<dfn class="local col8 decl" id="78iov" title='iov' data-type='QEMUIOVector *' data-ref="78iov">iov</dfn>, <em>int</em> <dfn class="local col9 decl" id="79nb_sectors" title='nb_sectors' data-type='int' data-ref="79nb_sectors">nb_sectors</dfn>,</td></tr>
+<tr><th id="625">625</th><td>                               <a class="typedef" href="../../block/aio.h.html#BlockCompletionFunc" title='BlockCompletionFunc' data-type='void (void *, int)' data-ref="BlockCompletionFunc">BlockCompletionFunc</a> *<dfn class="local col0 decl" id="80cb" title='cb' data-type='BlockCompletionFunc *' data-ref="80cb">cb</dfn>, <em>void</em> *<dfn class="local col1 decl" id="81opaque" title='opaque' data-type='void *' data-ref="81opaque">opaque</dfn>);</td></tr>
+<tr><th id="626">626</th><td><em>void</em> <dfn class="decl" id="ide_cancel_dma_sync" title='ide_cancel_dma_sync' data-ref="ide_cancel_dma_sync">ide_cancel_dma_sync</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col2 decl" id="82s" title='s' data-type='IDEState *' data-ref="82s">s</dfn>);</td></tr>
+<tr><th id="627">627</th><td></td></tr>
+<tr><th id="628">628</th><td><i>/* hw/ide/atapi.c */</i></td></tr>
+<tr><th id="629">629</th><td><em>void</em> <dfn class="decl" id="ide_atapi_cmd" title='ide_atapi_cmd' data-ref="ide_atapi_cmd">ide_atapi_cmd</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col3 decl" id="83s" title='s' data-type='IDEState *' data-ref="83s">s</dfn>);</td></tr>
+<tr><th id="630">630</th><td><em>void</em> <dfn class="decl" id="ide_atapi_cmd_reply_end" title='ide_atapi_cmd_reply_end' data-ref="ide_atapi_cmd_reply_end">ide_atapi_cmd_reply_end</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col4 decl" id="84s" title='s' data-type='IDEState *' data-ref="84s">s</dfn>);</td></tr>
+<tr><th id="631">631</th><td></td></tr>
+<tr><th id="632">632</th><td><i>/* hw/ide/qdev.c */</i></td></tr>
+<tr><th id="633">633</th><td><em>void</em> <dfn class="decl" id="ide_bus_new" title='ide_bus_new' data-ref="ide_bus_new">ide_bus_new</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col5 decl" id="85idebus" title='idebus' data-type='IDEBus *' data-ref="85idebus">idebus</dfn>, <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="local col6 decl" id="86idebus_size" title='idebus_size' data-type='size_t' data-ref="86idebus_size">idebus_size</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col7 decl" id="87dev" title='dev' data-type='DeviceState *' data-ref="87dev">dev</dfn>,</td></tr>
+<tr><th id="634">634</th><td>                 <em>int</em> <dfn class="local col8 decl" id="88bus_id" title='bus_id' data-type='int' data-ref="88bus_id">bus_id</dfn>, <em>int</em> <dfn class="local col9 decl" id="89max_units" title='max_units' data-type='int' data-ref="89max_units">max_units</dfn>);</td></tr>
+<tr><th id="635">635</th><td><a class="typedef" href="#IDEDevice" title='IDEDevice' data-type='struct IDEDevice' data-ref="IDEDevice">IDEDevice</a> *<dfn class="decl" id="ide_create_drive" title='ide_create_drive' data-ref="ide_create_drive">ide_create_drive</dfn>(<a class="typedef" href="#IDEBus" title='IDEBus' data-type='struct IDEBus' data-ref="IDEBus">IDEBus</a> *<dfn class="local col0 decl" id="90bus" title='bus' data-type='IDEBus *' data-ref="90bus">bus</dfn>, <em>int</em> <dfn class="local col1 decl" id="91unit" title='unit' data-type='int' data-ref="91unit">unit</dfn>, <a class="typedef" href="../../qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="local col2 decl" id="92drive" title='drive' data-type='DriveInfo *' data-ref="92drive">drive</dfn>);</td></tr>
+<tr><th id="636">636</th><td></td></tr>
+<tr><th id="637">637</th><td><em>int</em> <dfn class="decl" id="ide_handle_rw_error" title='ide_handle_rw_error' data-ref="ide_handle_rw_error">ide_handle_rw_error</dfn>(<a class="typedef" href="#IDEState" title='IDEState' data-type='struct IDEState' data-ref="IDEState">IDEState</a> *<dfn class="local col3 decl" id="93s" title='s' data-type='IDEState *' data-ref="93s">s</dfn>, <em>int</em> <dfn class="local col4 decl" id="94error" title='error' data-type='int' data-ref="94error">error</dfn>, <em>int</em> <dfn class="local col5 decl" id="95op" title='op' data-type='int' data-ref="95op">op</dfn>);</td></tr>
+<tr><th id="638">638</th><td></td></tr>
+<tr><th id="639">639</th><td><u>#<span data-ppcond="1">endif</span> /* HW_IDE_INTERNAL_H */</u></td></tr>
+<tr><th id="640">640</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../../hw/i386/pc_q35.c.html'>codebrowser/hw/i386/pc_q35.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

@@ -1,0 +1,229 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>register.h source code [codebrowser/include/hw/register.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="RegisterAccessInfo,RegisterInfo,RegisterInfoArray "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/hw/register.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>hw</a>/<a href='register.h.html'>register.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Register Definition API</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2016 Xilinx Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2013 Peter Crosthwaite &lt;peter.crosthwaite@xilinx.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2.  See</i></td></tr>
+<tr><th id="8">8</th><td><i> * the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> */</i></td></tr>
+<tr><th id="10">10</th><td></td></tr>
+<tr><th id="11">11</th><td><u>#<span data-ppcond="11">ifndef</span> <span class="macro" data-ref="_M/REGISTER_H">REGISTER_H</span></u></td></tr>
+<tr><th id="12">12</th><td><u>#define <dfn class="macro" id="_M/REGISTER_H" data-ref="_M/REGISTER_H">REGISTER_H</dfn></u></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="qdev-core.h.html">"hw/qdev-core.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../exec/memory.h.html">"exec/memory.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="registerfields.h.html">"hw/registerfields.h"</a></u></td></tr>
+<tr><th id="17">17</th><td></td></tr>
+<tr><th id="18">18</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#RegisterInfo" title='RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> <dfn class="typedef" id="RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</dfn>;</td></tr>
+<tr><th id="19">19</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#RegisterAccessInfo" title='RegisterAccessInfo' data-ref="RegisterAccessInfo">RegisterAccessInfo</a> <dfn class="typedef" id="RegisterAccessInfo" title='RegisterAccessInfo' data-type='struct RegisterAccessInfo' data-ref="RegisterAccessInfo">RegisterAccessInfo</dfn>;</td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#RegisterInfoArray" title='RegisterInfoArray' data-ref="RegisterInfoArray">RegisterInfoArray</a> <dfn class="typedef" id="RegisterInfoArray" title='RegisterInfoArray' data-type='struct RegisterInfoArray' data-ref="RegisterInfoArray">RegisterInfoArray</dfn>;</td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="23">23</th><td><i class="doc"> * Access description for a register that is part of guest accessible device</i></td></tr>
+<tr><th id="24">24</th><td><i class="doc"> * state.</i></td></tr>
+<tr><th id="25">25</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="26">26</th><td><i class="doc"> * <span class="command">@name</span>:<span class="verb"> String name of the register</span></i></td></tr>
+<tr><th id="27">27</th><td><i class="doc"> *<span class="command"> @ro</span>: whether or not the bit is read-only</i></td></tr>
+<tr><th id="28">28</th><td><i class="doc"> *<span class="command"> @w1c</span>: bits with the common write 1 to clear semantic.</i></td></tr>
+<tr><th id="29">29</th><td><i class="doc"> *<span class="command"> @reset</span>: reset value.</i></td></tr>
+<tr><th id="30">30</th><td><i class="doc"> *<span class="command"> @cor</span>: Bits that are clear on read</i></td></tr>
+<tr><th id="31">31</th><td><i class="doc"> *<span class="command"> @rsvd</span>: Bits that are reserved and should not be changed</i></td></tr>
+<tr><th id="32">32</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="33">33</th><td><i class="doc"> * <span class="command">@pre</span>_write: Pre write callback. Passed the value that's to be written,</i></td></tr>
+<tr><th id="34">34</th><td><i class="doc"> * immediately before the actual write. The returned value is what is written,</i></td></tr>
+<tr><th id="35">35</th><td><i class="doc"> * giving the handler a chance to modify the written value.</i></td></tr>
+<tr><th id="36">36</th><td><i class="doc"> * <span class="command">@post</span>_write: Post write callback. Passed the written value. Most write side</i></td></tr>
+<tr><th id="37">37</th><td><i class="doc"> * effects should be implemented here.</i></td></tr>
+<tr><th id="38">38</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="39">39</th><td><i class="doc"> * <span class="command">@post</span>_read: Post read callback. Passes the value that is about to be returned</i></td></tr>
+<tr><th id="40">40</th><td><i class="doc"> * for a read. The return value from this function is what is ultimately read,</i></td></tr>
+<tr><th id="41">41</th><td><i class="doc"> * allowing this function to modify the value before return to the client.</i></td></tr>
+<tr><th id="42">42</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><b>struct</b> <dfn class="type def" id="RegisterAccessInfo" title='RegisterAccessInfo' data-ref="RegisterAccessInfo">RegisterAccessInfo</dfn> {</td></tr>
+<tr><th id="45">45</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="RegisterAccessInfo::name" title='RegisterAccessInfo::name' data-ref="RegisterAccessInfo::name">name</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::ro" title='RegisterAccessInfo::ro' data-ref="RegisterAccessInfo::ro">ro</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::w1c" title='RegisterAccessInfo::w1c' data-ref="RegisterAccessInfo::w1c">w1c</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::reset" title='RegisterAccessInfo::reset' data-ref="RegisterAccessInfo::reset">reset</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::cor" title='RegisterAccessInfo::cor' data-ref="RegisterAccessInfo::cor">cor</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::rsvd" title='RegisterAccessInfo::rsvd' data-ref="RegisterAccessInfo::rsvd">rsvd</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="RegisterAccessInfo::unimp" title='RegisterAccessInfo::unimp' data-ref="RegisterAccessInfo::unimp">unimp</dfn>;</td></tr>
+<tr><th id="52">52</th><td></td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> (*<dfn class="decl" id="RegisterAccessInfo::pre_write" title='RegisterAccessInfo::pre_write' data-ref="RegisterAccessInfo::pre_write">pre_write</dfn>)(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col1 decl" id="1reg" title='reg' data-type='RegisterInfo *' data-ref="1reg">reg</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="2val" title='val' data-type='uint64_t' data-ref="2val">val</dfn>);</td></tr>
+<tr><th id="54">54</th><td>    <em>void</em> (*<dfn class="decl" id="RegisterAccessInfo::post_write" title='RegisterAccessInfo::post_write' data-ref="RegisterAccessInfo::post_write">post_write</dfn>)(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col3 decl" id="3reg" title='reg' data-type='RegisterInfo *' data-ref="3reg">reg</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="4val" title='val' data-type='uint64_t' data-ref="4val">val</dfn>);</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> (*<dfn class="decl" id="RegisterAccessInfo::post_read" title='RegisterAccessInfo::post_read' data-ref="RegisterAccessInfo::post_read">post_read</dfn>)(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col5 decl" id="5reg" title='reg' data-type='RegisterInfo *' data-ref="5reg">reg</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="6val" title='val' data-type='uint64_t' data-ref="6val">val</dfn>);</td></tr>
+<tr><th id="57">57</th><td></td></tr>
+<tr><th id="58">58</th><td>    <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="RegisterAccessInfo::addr" title='RegisterAccessInfo::addr' data-ref="RegisterAccessInfo::addr">addr</dfn>;</td></tr>
+<tr><th id="59">59</th><td>};</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="62">62</th><td><i class="doc"> * A register that is part of guest accessible state</i></td></tr>
+<tr><th id="63">63</th><td><i class="doc"> * <span class="command">@data</span>: pointer to the register data. Will be cast</i></td></tr>
+<tr><th id="64">64</th><td><i class="doc"> * to the relevant uint type depending on data_size.</i></td></tr>
+<tr><th id="65">65</th><td><i class="doc"> * <span class="command">@data</span>_size: Size of the register in bytes. Must be</i></td></tr>
+<tr><th id="66">66</th><td><i class="doc"> * 1, 2, 4 or 8</i></td></tr>
+<tr><th id="67">67</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="68">68</th><td><i class="doc"> *<span class="command"> @access</span>: Access description of this register</i></td></tr>
+<tr><th id="69">69</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="70">70</th><td><i class="doc"> *<span class="command"> @debug</span>: Whether or not verbose debug is enabled</i></td></tr>
+<tr><th id="71">71</th><td><i class="doc"> *<span class="command"> @prefix</span>: String prefix for log and debug messages</i></td></tr>
+<tr><th id="72">72</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="73">73</th><td><i class="doc"> *<span class="command"> @opaque</span>: Opaque data for the register</i></td></tr>
+<tr><th id="74">74</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="75">75</th><td></td></tr>
+<tr><th id="76">76</th><td><b>struct</b> <dfn class="type def" id="RegisterInfo" title='RegisterInfo' data-ref="RegisterInfo">RegisterInfo</dfn> {</td></tr>
+<tr><th id="77">77</th><td>    <i>/* &lt;private&gt; */</i></td></tr>
+<tr><th id="78">78</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> <dfn class="decl" id="RegisterInfo::parent_obj" title='RegisterInfo::parent_obj' data-ref="RegisterInfo::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td>    <i>/* &lt;public&gt; */</i></td></tr>
+<tr><th id="81">81</th><td>    <em>void</em> *<dfn class="decl" id="RegisterInfo::data" title='RegisterInfo::data' data-ref="RegisterInfo::data">data</dfn>;</td></tr>
+<tr><th id="82">82</th><td>    <em>int</em> <dfn class="decl" id="RegisterInfo::data_size" title='RegisterInfo::data_size' data-ref="RegisterInfo::data_size">data_size</dfn>;</td></tr>
+<tr><th id="83">83</th><td></td></tr>
+<tr><th id="84">84</th><td>    <em>const</em> <a class="typedef" href="#RegisterAccessInfo" title='RegisterAccessInfo' data-type='struct RegisterAccessInfo' data-ref="RegisterAccessInfo">RegisterAccessInfo</a> *<dfn class="decl" id="RegisterInfo::access" title='RegisterInfo::access' data-ref="RegisterInfo::access">access</dfn>;</td></tr>
+<tr><th id="85">85</th><td></td></tr>
+<tr><th id="86">86</th><td>    <em>void</em> *<dfn class="decl" id="RegisterInfo::opaque" title='RegisterInfo::opaque' data-ref="RegisterInfo::opaque">opaque</dfn>;</td></tr>
+<tr><th id="87">87</th><td>};</td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/TYPE_REGISTER" data-ref="_M/TYPE_REGISTER">TYPE_REGISTER</dfn> "qemu,register"</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/REGISTER" data-ref="_M/REGISTER">REGISTER</dfn>(obj) OBJECT_CHECK(RegisterInfo, (obj), TYPE_REGISTER)</u></td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="93">93</th><td><i class="doc"> * This structure is used to group all of the individual registers which are</i></td></tr>
+<tr><th id="94">94</th><td><i class="doc"> * modeled using the RegisterInfo structure.</i></td></tr>
+<tr><th id="95">95</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="96">96</th><td><i class="doc"> *<span class="command"> @r</span> is an array containing of all the relevant RegisterInfo structures.</i></td></tr>
+<tr><th id="97">97</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="98">98</th><td><i class="doc"> * <span class="command">@num_</span><span class="verb">elements is the number of elements in the array r</span></i></td></tr>
+<tr><th id="99">99</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="100">100</th><td><i class="doc"> *<span class="command"> @mem</span><span class="arg">:</span> optional Memory region for the register</i></td></tr>
+<tr><th id="101">101</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="102">102</th><td></td></tr>
+<tr><th id="103">103</th><td><b>struct</b> <dfn class="type def" id="RegisterInfoArray" title='RegisterInfoArray' data-ref="RegisterInfoArray">RegisterInfoArray</dfn> {</td></tr>
+<tr><th id="104">104</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="RegisterInfoArray::mem" title='RegisterInfoArray::mem' data-ref="RegisterInfoArray::mem">mem</dfn>;</td></tr>
+<tr><th id="105">105</th><td></td></tr>
+<tr><th id="106">106</th><td>    <em>int</em> <dfn class="decl" id="RegisterInfoArray::num_elements" title='RegisterInfoArray::num_elements' data-ref="RegisterInfoArray::num_elements">num_elements</dfn>;</td></tr>
+<tr><th id="107">107</th><td>    <a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> **<dfn class="decl" id="RegisterInfoArray::r" title='RegisterInfoArray::r' data-ref="RegisterInfoArray::r">r</dfn>;</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="RegisterInfoArray::debug" title='RegisterInfoArray::debug' data-ref="RegisterInfoArray::debug">debug</dfn>;</td></tr>
+<tr><th id="110">110</th><td>    <em>const</em> <em>char</em> *<dfn class="decl" id="RegisterInfoArray::prefix" title='RegisterInfoArray::prefix' data-ref="RegisterInfoArray::prefix">prefix</dfn>;</td></tr>
+<tr><th id="111">111</th><td>};</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> * write a value to a register, subject to its restrictions</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> * <span class="command">@reg</span>:<span class="verb"> register to write to</span></i></td></tr>
+<tr><th id="116">116</th><td><i class="doc"> * <span class="command">@val</span>:<span class="verb"> value to write</span></i></td></tr>
+<tr><th id="117">117</th><td><i class="doc"> *<span class="command"> @we</span><span class="arg">:</span> write enable mask</i></td></tr>
+<tr><th id="118">118</th><td><i class="doc"> *<span class="command"> @prefix</span>: The device prefix that should be printed before the register name</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> *<span class="command"> @debug</span>: Should the write operation debug information be printed?</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="121">121</th><td></td></tr>
+<tr><th id="122">122</th><td><em>void</em> <a class="decl" href="../../hw/core/register.c.html#register_write" title='register_write' data-ref="register_write" id="register_write">register_write</a>(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col7 decl" id="7reg" title='reg' data-type='RegisterInfo *' data-ref="7reg">reg</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="8val" title='val' data-type='uint64_t' data-ref="8val">val</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="9we" title='we' data-type='uint64_t' data-ref="9we">we</dfn>,</td></tr>
+<tr><th id="123">123</th><td>                    <em>const</em> <em>char</em> *<dfn class="local col0 decl" id="10prefix" title='prefix' data-type='const char *' data-ref="10prefix">prefix</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="11debug" title='debug' data-type='_Bool' data-ref="11debug">debug</dfn>);</td></tr>
+<tr><th id="124">124</th><td></td></tr>
+<tr><th id="125">125</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="126">126</th><td><i class="doc"> * read a value from a register, subject to its restrictions</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> * <span class="command">@reg</span>:<span class="verb"> register to read from</span></i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> *<span class="command"> @re</span>: read enable mask</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> *<span class="command"> @prefix</span>: The device prefix that should be printed before the register name</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> *<span class="command"> @debug</span>: Should the read operation debug information be printed?</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> * returns: value read</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="133">133</th><td></td></tr>
+<tr><th id="134">134</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <a class="decl" href="../../hw/core/register.c.html#register_read" title='register_read' data-ref="register_read" id="register_read">register_read</a>(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col2 decl" id="12reg" title='reg' data-type='RegisterInfo *' data-ref="12reg">reg</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="13re" title='re' data-type='uint64_t' data-ref="13re">re</dfn>, <em>const</em> <em>char</em>* <dfn class="local col4 decl" id="14prefix" title='prefix' data-type='const char *' data-ref="14prefix">prefix</dfn>,</td></tr>
+<tr><th id="135">135</th><td>                       <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col5 decl" id="15debug" title='debug' data-type='_Bool' data-ref="15debug">debug</dfn>);</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> * reset a register</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"> * <span class="command">@reg</span>:<span class="verb"> register to reset</span></i></td></tr>
+<tr><th id="140">140</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><em>void</em> <a class="decl" href="../../hw/core/register.c.html#register_reset" title='register_reset' data-ref="register_reset" id="register_reset">register_reset</a>(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col6 decl" id="16reg" title='reg' data-type='RegisterInfo *' data-ref="16reg">reg</dfn>);</td></tr>
+<tr><th id="143">143</th><td></td></tr>
+<tr><th id="144">144</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> * Initialize a register.</i></td></tr>
+<tr><th id="146">146</th><td><i class="doc"> * <span class="command">@reg</span>:<span class="verb"> Register to initialize</span></i></td></tr>
+<tr><th id="147">147</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="148">148</th><td></td></tr>
+<tr><th id="149">149</th><td><em>void</em> <a class="decl" href="../../hw/core/register.c.html#register_init" title='register_init' data-ref="register_init" id="register_init">register_init</a>(<a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col7 decl" id="17reg" title='reg' data-type='RegisterInfo *' data-ref="17reg">reg</dfn>);</td></tr>
+<tr><th id="150">150</th><td></td></tr>
+<tr><th id="151">151</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="152">152</th><td><i class="doc"> * Memory API MMIO write handler that will write to a Register API register.</i></td></tr>
+<tr><th id="153">153</th><td><i class="doc"> *<span class="command"> @opaque</span>: RegisterInfo to write to</i></td></tr>
+<tr><th id="154">154</th><td><i class="doc"> *<span class="command"> @addr</span>: Address to write</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * <span class="command">@value</span>: Value to write</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> *<span class="command"> @size</span>: Number of bytes to write</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><em>void</em> <a class="decl" href="../../hw/core/register.c.html#register_write_memory" title='register_write_memory' data-ref="register_write_memory" id="register_write_memory">register_write_memory</a>(<em>void</em> *<dfn class="local col8 decl" id="18opaque" title='opaque' data-type='void *' data-ref="18opaque">opaque</dfn>, <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col9 decl" id="19addr" title='addr' data-type='hwaddr' data-ref="19addr">addr</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="20value" title='value' data-type='uint64_t' data-ref="20value">value</dfn>,</td></tr>
+<tr><th id="160">160</th><td>                           <em>unsigned</em> <dfn class="local col1 decl" id="21size" title='size' data-type='unsigned int' data-ref="21size">size</dfn>);</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="163">163</th><td><i class="doc"> * Memory API MMIO read handler that will read from a Register API register.</i></td></tr>
+<tr><th id="164">164</th><td><i class="doc"> *<span class="command"> @opaque</span>: RegisterInfo to read from</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> *<span class="command"> @addr</span>: Address to read</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> *<span class="command"> @size</span>: Number of bytes to read</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> * returns: Value read from register</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="169">169</th><td></td></tr>
+<tr><th id="170">170</th><td><a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <a class="decl" href="../../hw/core/register.c.html#register_read_memory" title='register_read_memory' data-ref="register_read_memory" id="register_read_memory">register_read_memory</a>(<em>void</em> *<dfn class="local col2 decl" id="22opaque" title='opaque' data-type='void *' data-ref="22opaque">opaque</dfn>, <a class="typedef" href="../exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="local col3 decl" id="23addr" title='addr' data-type='hwaddr' data-ref="23addr">addr</dfn>, <em>unsigned</em> <dfn class="local col4 decl" id="24size" title='size' data-type='unsigned int' data-ref="24size">size</dfn>);</td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="173">173</th><td><i class="doc"> * Init a block of registers into a container MemoryRegion. A</i></td></tr>
+<tr><th id="174">174</th><td><i class="doc"> * number of constant register definitions are parsed to create a corresponding</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> * array of RegisterInfo's.</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> *<span class="command"> @owner</span>: device owning the registers</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> *<span class="command"> @rae</span>: Register definitions to init</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> * <span class="command">@num:</span><span class="verb"> number of registers to init (length of @rae)</span></i></td></tr>
+<tr><th id="180">180</th><td><i class="doc"> * <span class="command">@ri</span>: Register array to init, must already be allocated</i></td></tr>
+<tr><th id="181">181</th><td><i class="doc"> * <span class="command">@data</span>: Array to use for register data, must already be allocated</i></td></tr>
+<tr><th id="182">182</th><td><i class="doc"> *<span class="command"> @ops</span>: Memory region ops to access registers.</i></td></tr>
+<tr><th id="183">183</th><td><i class="doc"> *<span class="command"> @debug</span> enabled: turn on/off verbose debug information</i></td></tr>
+<tr><th id="184">184</th><td><i class="doc"> * returns: A structure containing all of the registers and an initialized</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> *          memory region (r_array-&gt;mem) the caller should add to a container.</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="187">187</th><td></td></tr>
+<tr><th id="188">188</th><td><a class="typedef" href="#RegisterInfoArray" title='RegisterInfoArray' data-type='struct RegisterInfoArray' data-ref="RegisterInfoArray">RegisterInfoArray</a> *<a class="decl" href="../../hw/core/register.c.html#register_init_block32" title='register_init_block32' data-ref="register_init_block32" id="register_init_block32">register_init_block32</a>(<a class="typedef" href="../qemu/typedefs.h.html#DeviceState" title='DeviceState' data-type='struct DeviceState' data-ref="DeviceState">DeviceState</a> *<dfn class="local col5 decl" id="25owner" title='owner' data-type='DeviceState *' data-ref="25owner">owner</dfn>,</td></tr>
+<tr><th id="189">189</th><td>                                         <em>const</em> <a class="typedef" href="#RegisterAccessInfo" title='RegisterAccessInfo' data-type='struct RegisterAccessInfo' data-ref="RegisterAccessInfo">RegisterAccessInfo</a> *<dfn class="local col6 decl" id="26rae" title='rae' data-type='const RegisterAccessInfo *' data-ref="26rae">rae</dfn>,</td></tr>
+<tr><th id="190">190</th><td>                                         <em>int</em> <dfn class="local col7 decl" id="27num" title='num' data-type='int' data-ref="27num">num</dfn>, <a class="typedef" href="#RegisterInfo" title='RegisterInfo' data-type='struct RegisterInfo' data-ref="RegisterInfo">RegisterInfo</a> *<dfn class="local col8 decl" id="28ri" title='ri' data-type='RegisterInfo *' data-ref="28ri">ri</dfn>,</td></tr>
+<tr><th id="191">191</th><td>                                         <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="local col9 decl" id="29data" title='data' data-type='uint32_t *' data-ref="29data">data</dfn>,</td></tr>
+<tr><th id="192">192</th><td>                                         <em>const</em> <a class="typedef" href="../exec/memory.h.html#MemoryRegionOps" title='MemoryRegionOps' data-type='struct MemoryRegionOps' data-ref="MemoryRegionOps">MemoryRegionOps</a> *<dfn class="local col0 decl" id="30ops" title='ops' data-type='const MemoryRegionOps *' data-ref="30ops">ops</dfn>,</td></tr>
+<tr><th id="193">193</th><td>                                         <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col1 decl" id="31debug_enabled" title='debug_enabled' data-type='_Bool' data-ref="31debug_enabled">debug_enabled</dfn>,</td></tr>
+<tr><th id="194">194</th><td>                                         <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="32memory_size" title='memory_size' data-type='uint64_t' data-ref="32memory_size">memory_size</dfn>);</td></tr>
+<tr><th id="195">195</th><td></td></tr>
+<tr><th id="196">196</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> * This function should be called to cleanup the registers that were initialized</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> * when calling register_init_block32(). This function should only be called</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> * from the device's instance_finalize function.</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="201">201</th><td><i class="doc"> * Any memory operations that the device performed that require cleanup (such</i></td></tr>
+<tr><th id="202">202</th><td><i class="doc"> * as creating subregions) need to be called before calling this function.</i></td></tr>
+<tr><th id="203">203</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> *<span class="command"> @r</span>_array: A structure containing all of the registers, as returned by</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> *           register_init_block32()</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><em>void</em> <a class="decl" href="../../hw/core/register.c.html#register_finalize_block" title='register_finalize_block' data-ref="register_finalize_block" id="register_finalize_block">register_finalize_block</a>(<a class="typedef" href="#RegisterInfoArray" title='RegisterInfoArray' data-type='struct RegisterInfoArray' data-ref="RegisterInfoArray">RegisterInfoArray</a> *<dfn class="local col3 decl" id="33r_array" title='r_array' data-type='RegisterInfoArray *' data-ref="33r_array">r_array</dfn>);</td></tr>
+<tr><th id="209">209</th><td></td></tr>
+<tr><th id="210">210</th><td><u>#<span data-ppcond="11">endif</span></u></td></tr>
+<tr><th id="211">211</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../hw/core/register.c.html'>codebrowser/hw/core/register.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

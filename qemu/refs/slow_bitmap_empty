@@ -1,0 +1,26 @@
+<dec f='codebrowser/include/qemu/bitmap.h' l='69' type='int slow_bitmap_empty(const unsigned long * bitmap, long bits)'/>
+<use f='codebrowser/include/qemu/bitmap.h' l='196' u='c' c='bitmap_empty'/>
+<def f='codebrowser/util/bitmap.c' l='41' ll='57' type='int slow_bitmap_empty(const unsigned long * bitmap, long bits)'/>
+<doc f='codebrowser/util/bitmap.c' l='17'>/*
+ * bitmaps provide an array of bits, implemented using an
+ * array of unsigned longs.  The number of valid bits in a
+ * given bitmap does _not_ need to be an exact multiple of
+ * BITS_PER_LONG.
+ *
+ * The possible unused bits in the last, partially used word
+ * of a bitmap are &apos;don&apos;t care&apos;.  The implementation makes
+ * no particular effort to keep them zero.  It ensures that
+ * their value will not affect the results of any operation.
+ * The bitmap operations that return Boolean (bitmap_empty,
+ * for example) or scalar (bitmap_weight, for example) results
+ * carefully filter out these unused bits from impacting their
+ * results.
+ *
+ * These operations actually hold to a slightly stronger rule:
+ * if you don&apos;t input any bitmaps to these ops that have some
+ * unused bits set, then they won&apos;t output any set unused bits
+ * in output bitmaps.
+ *
+ * The byte ordering of bitmaps is more natural on little
+ * endian architectures.
+ */</doc>

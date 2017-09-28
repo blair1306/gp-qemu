@@ -1,0 +1,109 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>device-hotplug.c source code [codebrowser/device-hotplug.c] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/device-hotplug.c'; var root_path = '..'; var data_path = '../../data';</script>
+<script src='../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='./'>codebrowser</a>/<a href='device-hotplug.c.html'>device-hotplug.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU device hotplug helpers</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2004 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="7">7</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="8">8</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="9">9</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="10">10</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="11">11</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="12">12</th><td><i> *</i></td></tr>
+<tr><th id="13">13</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="14">14</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="17">17</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="18">18</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="19">19</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="20">20</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="21">21</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="22">22</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="23">23</th><td><i> */</i></td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="include/hw/boards.h.html">"hw/boards.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="include/sysemu/block-backend.h.html">"sysemu/block-backend.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="include/sysemu/blockdev.h.html">"sysemu/blockdev.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="include/qemu/config-file.h.html">"qemu/config-file.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="include/sysemu/sysemu.h.html">"sysemu/sysemu.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="include/monitor/monitor.h.html">"monitor/monitor.h"</a></u></td></tr>
+<tr><th id="33">33</th><td><u>#include <a href="include/block/block_int.h.html">"block/block_int.h"</a></u></td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><em>static</em> <a class="typedef" href="include/qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="tu decl def" id="add_init_drive" title='add_init_drive' data-type='DriveInfo * add_init_drive(const char * optstr)' data-ref="add_init_drive">add_init_drive</dfn>(<em>const</em> <em>char</em> *<dfn class="local col1 decl" id="1optstr" title='optstr' data-type='const char *' data-ref="1optstr">optstr</dfn>)</td></tr>
+<tr><th id="36">36</th><td>{</td></tr>
+<tr><th id="37">37</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="local col2 decl" id="2dinfo" title='dinfo' data-type='DriveInfo *' data-ref="2dinfo">dinfo</dfn>;</td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#QemuOpts" title='QemuOpts' data-type='struct QemuOpts' data-ref="QemuOpts">QemuOpts</a> *<dfn class="local col3 decl" id="3opts" title='opts' data-type='QemuOpts *' data-ref="3opts">opts</dfn>;</td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#MachineClass" title='MachineClass' data-type='struct MachineClass' data-ref="MachineClass">MachineClass</a> *<dfn class="local col4 decl" id="4mc" title='mc' data-type='MachineClass *' data-ref="4mc">mc</dfn>;</td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td>    <a class="local col3 ref" href="#3opts" title='opts' data-ref="3opts">opts</a> = <a class="ref" href="include/sysemu/blockdev.h.html#drive_def" title='drive_def' data-ref="drive_def">drive_def</a>(<a class="local col1 ref" href="#1optstr" title='optstr' data-ref="1optstr">optstr</a>);</td></tr>
+<tr><th id="42">42</th><td>    <b>if</b> (!<a class="local col3 ref" href="#3opts" title='opts' data-ref="3opts">opts</a>)</td></tr>
+<tr><th id="43">43</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td>    <a class="local col4 ref" href="#4mc" title='mc' data-ref="4mc">mc</a> = <a class="macro" href="include/hw/boards.h.html#56" title="((MachineClass *)object_class_dynamic_cast_assert(((ObjectClass *)(object_get_class(((Object *)((current_machine)))))), (&quot;machine&quot;), &quot;/home/jon/workspace/qemu/device-hotplug.c&quot;, 45, __func__))" data-ref="_M/MACHINE_GET_CLASS">MACHINE_GET_CLASS</a>(<a class="ref" href="include/hw/boards.h.html#current_machine" title='current_machine' data-ref="current_machine">current_machine</a>);</td></tr>
+<tr><th id="46">46</th><td>    <a class="local col2 ref" href="#2dinfo" title='dinfo' data-ref="2dinfo">dinfo</a> = <a class="ref" href="include/sysemu/blockdev.h.html#drive_new" title='drive_new' data-ref="drive_new">drive_new</a>(<a class="local col3 ref" href="#3opts" title='opts' data-ref="3opts">opts</a>, <a class="local col4 ref" href="#4mc" title='mc' data-ref="4mc">mc</a>-&gt;<a class="ref" href="include/hw/boards.h.html#MachineClass::block_default_type" title='MachineClass::block_default_type' data-ref="MachineClass::block_default_type">block_default_type</a>);</td></tr>
+<tr><th id="47">47</th><td>    <b>if</b> (!<a class="local col2 ref" href="#2dinfo" title='dinfo' data-ref="2dinfo">dinfo</a>) {</td></tr>
+<tr><th id="48">48</th><td>        <a class="ref" href="include/qemu/option.h.html#qemu_opts_del" title='qemu_opts_del' data-ref="qemu_opts_del">qemu_opts_del</a>(<a class="local col3 ref" href="#3opts" title='opts' data-ref="3opts">opts</a>);</td></tr>
+<tr><th id="49">49</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="50">50</th><td>    }</td></tr>
+<tr><th id="51">51</th><td></td></tr>
+<tr><th id="52">52</th><td>    <b>return</b> <a class="local col2 ref" href="#2dinfo" title='dinfo' data-ref="2dinfo">dinfo</a>;</td></tr>
+<tr><th id="53">53</th><td>}</td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><em>void</em> <dfn class="decl def" id="hmp_drive_add" title='hmp_drive_add' data-ref="hmp_drive_add">hmp_drive_add</dfn>(<a class="typedef" href="include/qemu/typedefs.h.html#Monitor" title='Monitor' data-type='struct Monitor' data-ref="Monitor">Monitor</a> *<dfn class="local col5 decl" id="5mon" title='mon' data-type='Monitor *' data-ref="5mon">mon</dfn>, <em>const</em> <a class="typedef" href="include/qapi/qmp/qdict.h.html#QDict" title='QDict' data-type='struct QDict' data-ref="QDict">QDict</a> *<dfn class="local col6 decl" id="6qdict" title='qdict' data-type='const QDict *' data-ref="6qdict">qdict</dfn>)</td></tr>
+<tr><th id="56">56</th><td>{</td></tr>
+<tr><th id="57">57</th><td>    <a class="typedef" href="include/qemu/typedefs.h.html#DriveInfo" title='DriveInfo' data-type='struct DriveInfo' data-ref="DriveInfo">DriveInfo</a> *<dfn class="local col7 decl" id="7dinfo" title='dinfo' data-type='DriveInfo *' data-ref="7dinfo">dinfo</dfn> = <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="58">58</th><td>    <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="8opts" title='opts' data-type='const char *' data-ref="8opts">opts</dfn> = <a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_get_str" title='qdict_get_str' data-ref="qdict_get_str">qdict_get_str</a>(<a class="local col6 ref" href="#6qdict" title='qdict' data-ref="6qdict">qdict</a>, <q>"opts"</q>);</td></tr>
+<tr><th id="59">59</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col9 decl" id="9node" title='node' data-type='_Bool' data-ref="9node">node</dfn> = <a class="ref" href="include/qapi/qmp/qdict.h.html#qdict_get_try_bool" title='qdict_get_try_bool' data-ref="qdict_get_try_bool">qdict_get_try_bool</a>(<a class="local col6 ref" href="#6qdict" title='qdict' data-ref="6qdict">qdict</a>, <q>"node"</q>, <span class="macro" title="0" data-ref="_M/false">false</span>);</td></tr>
+<tr><th id="60">60</th><td></td></tr>
+<tr><th id="61">61</th><td>    <b>if</b> (<a class="local col9 ref" href="#9node" title='node' data-ref="9node">node</a>) {</td></tr>
+<tr><th id="62">62</th><td>        <a class="ref" href="include/block/block_int.h.html#hmp_drive_add_node" title='hmp_drive_add_node' data-ref="hmp_drive_add_node">hmp_drive_add_node</a>(<a class="local col5 ref" href="#5mon" title='mon' data-ref="5mon">mon</a>, <a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>);</td></tr>
+<tr><th id="63">63</th><td>        <b>return</b>;</td></tr>
+<tr><th id="64">64</th><td>    }</td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td>    <a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a> = <a class="tu ref" href="#add_init_drive" title='add_init_drive' data-use='c' data-ref="add_init_drive">add_init_drive</a>(<a class="local col8 ref" href="#8opts" title='opts' data-ref="8opts">opts</a>);</td></tr>
+<tr><th id="67">67</th><td>    <b>if</b> (!<a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>) {</td></tr>
+<tr><th id="68">68</th><td>        <b>goto</b> <a class="lbl" href="#10err" data-ref="10err">err</a>;</td></tr>
+<tr><th id="69">69</th><td>    }</td></tr>
+<tr><th id="70">70</th><td>    <b>if</b> (<a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>-&gt;<a class="ref" href="include/sysemu/blockdev.h.html#DriveInfo::devaddr" title='DriveInfo::devaddr' data-ref="DriveInfo::devaddr">devaddr</a>) {</td></tr>
+<tr><th id="71">71</th><td>        <a class="ref" href="include/monitor/monitor.h.html#monitor_printf" title='monitor_printf' data-ref="monitor_printf">monitor_printf</a>(<a class="local col5 ref" href="#5mon" title='mon' data-ref="5mon">mon</a>, <q>"Parameter addr not supported\n"</q>);</td></tr>
+<tr><th id="72">72</th><td>        <b>goto</b> <a class="lbl" href="#10err" data-ref="10err">err</a>;</td></tr>
+<tr><th id="73">73</th><td>    }</td></tr>
+<tr><th id="74">74</th><td></td></tr>
+<tr><th id="75">75</th><td>    <b>switch</b> (<a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>-&gt;<a class="ref" href="include/sysemu/blockdev.h.html#DriveInfo::type" title='DriveInfo::type' data-ref="DriveInfo::type">type</a>) {</td></tr>
+<tr><th id="76">76</th><td>    <b>case</b> <a class="enum" href="include/sysemu/blockdev.h.html#IF_NONE" title='IF_NONE' data-ref="IF_NONE">IF_NONE</a>:</td></tr>
+<tr><th id="77">77</th><td>        <a class="ref" href="include/monitor/monitor.h.html#monitor_printf" title='monitor_printf' data-ref="monitor_printf">monitor_printf</a>(<a class="local col5 ref" href="#5mon" title='mon' data-ref="5mon">mon</a>, <q>"OK\n"</q>);</td></tr>
+<tr><th id="78">78</th><td>        <b>break</b>;</td></tr>
+<tr><th id="79">79</th><td>    <b>default</b>:</td></tr>
+<tr><th id="80">80</th><td>        <a class="ref" href="include/monitor/monitor.h.html#monitor_printf" title='monitor_printf' data-ref="monitor_printf">monitor_printf</a>(<a class="local col5 ref" href="#5mon" title='mon' data-ref="5mon">mon</a>, <q>"Can't hot-add drive to type %d\n"</q>, <a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>-&gt;<a class="ref" href="include/sysemu/blockdev.h.html#DriveInfo::type" title='DriveInfo::type' data-ref="DriveInfo::type">type</a>);</td></tr>
+<tr><th id="81">81</th><td>        <b>goto</b> <a class="lbl" href="#10err" data-ref="10err">err</a>;</td></tr>
+<tr><th id="82">82</th><td>    }</td></tr>
+<tr><th id="83">83</th><td>    <b>return</b>;</td></tr>
+<tr><th id="84">84</th><td></td></tr>
+<tr><th id="85">85</th><td><dfn class="lbl" id="10err" data-ref="10err">err</dfn>:</td></tr>
+<tr><th id="86">86</th><td>    <b>if</b> (<a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>) {</td></tr>
+<tr><th id="87">87</th><td>        <a class="typedef" href="include/qemu/typedefs.h.html#BlockBackend" title='BlockBackend' data-type='struct BlockBackend' data-ref="BlockBackend">BlockBackend</a> *<dfn class="local col1 decl" id="11blk" title='blk' data-type='BlockBackend *' data-ref="11blk">blk</dfn> = <a class="ref" href="include/sysemu/blockdev.h.html#blk_by_legacy_dinfo" title='blk_by_legacy_dinfo' data-ref="blk_by_legacy_dinfo">blk_by_legacy_dinfo</a>(<a class="local col7 ref" href="#7dinfo" title='dinfo' data-ref="7dinfo">dinfo</a>);</td></tr>
+<tr><th id="88">88</th><td>        <a class="ref" href="include/sysemu/block-backend.h.html#monitor_remove_blk" title='monitor_remove_blk' data-ref="monitor_remove_blk">monitor_remove_blk</a>(<a class="local col1 ref" href="#11blk" title='blk' data-ref="11blk">blk</a>);</td></tr>
+<tr><th id="89">89</th><td>        <a class="ref" href="include/sysemu/block-backend.h.html#blk_unref" title='blk_unref' data-ref="blk_unref">blk_unref</a>(<a class="local col1 ref" href="#11blk" title='blk' data-ref="11blk">blk</a>);</td></tr>
+<tr><th id="90">90</th><td>    }</td></tr>
+<tr><th id="91">91</th><td>}</td></tr>
+<tr><th id="92">92</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

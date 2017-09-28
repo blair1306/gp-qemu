@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>iothread.h source code [codebrowser/include/sysemu/iothread.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/sysemu/iothread.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>sysemu</a>/<a href='iothread.h.html'>iothread.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Event loop thread</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright Red Hat Inc., 2013</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Authors:</i></td></tr>
+<tr><th id="7">7</th><td><i> *  Stefan Hajnoczi   &lt;stefanha@redhat.com&gt;</i></td></tr>
+<tr><th id="8">8</th><td><i> *</i></td></tr>
+<tr><th id="9">9</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="10">10</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="11">11</th><td><i> *</i></td></tr>
+<tr><th id="12">12</th><td><i> */</i></td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifndef</span> <span class="macro" data-ref="_M/IOTHREAD_H">IOTHREAD_H</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#define <dfn class="macro" id="_M/IOTHREAD_H" data-ref="_M/IOTHREAD_H">IOTHREAD_H</dfn></u></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../qemu/thread.h.html">"qemu/thread.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/TYPE_IOTHREAD" data-ref="_M/TYPE_IOTHREAD">TYPE_IOTHREAD</dfn> "iothread"</u></td></tr>
+<tr><th id="21">21</th><td></td></tr>
+<tr><th id="22">22</th><td><b>typedef</b> <b>struct</b> {</td></tr>
+<tr><th id="23">23</th><td>    <a class="typedef" href="../qom/object.h.html#Object" title='Object' data-type='struct Object' data-ref="Object">Object</a> <dfn class="decl" id="(anonymous)::parent_obj" title='(anonymous struct)::parent_obj' data-ref="(anonymous)::parent_obj">parent_obj</dfn>;</td></tr>
+<tr><th id="24">24</th><td></td></tr>
+<tr><th id="25">25</th><td>    <a class="typedef" href="../qemu/thread.h.html#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> <dfn class="decl" id="(anonymous)::thread" title='(anonymous struct)::thread' data-ref="(anonymous)::thread">thread</dfn>;</td></tr>
+<tr><th id="26">26</th><td>    <a class="typedef" href="../qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl" id="(anonymous)::ctx" title='(anonymous struct)::ctx' data-ref="(anonymous)::ctx">ctx</dfn>;</td></tr>
+<tr><th id="27">27</th><td>    <a class="typedef" href="../qemu/thread.h.html#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> <dfn class="decl" id="(anonymous)::init_done_lock" title='(anonymous struct)::init_done_lock' data-ref="(anonymous)::init_done_lock">init_done_lock</dfn>;</td></tr>
+<tr><th id="28">28</th><td>    <a class="typedef" href="../qemu/thread.h.html#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> <dfn class="decl" id="(anonymous)::init_done_cond" title='(anonymous struct)::init_done_cond' data-ref="(anonymous)::init_done_cond">init_done_cond</dfn>;    <i>/* is thread initialization done? */</i></td></tr>
+<tr><th id="29">29</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="(anonymous)::stopping" title='(anonymous struct)::stopping' data-ref="(anonymous)::stopping">stopping</dfn>;</td></tr>
+<tr><th id="30">30</th><td>    <em>int</em> <dfn class="decl" id="(anonymous)::thread_id" title='(anonymous struct)::thread_id' data-ref="(anonymous)::thread_id">thread_id</dfn>;</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td>    <i>/* AioContext poll parameters */</i></td></tr>
+<tr><th id="33">33</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="(anonymous)::poll_max_ns" title='(anonymous struct)::poll_max_ns' data-ref="(anonymous)::poll_max_ns">poll_max_ns</dfn>;</td></tr>
+<tr><th id="34">34</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="(anonymous)::poll_grow" title='(anonymous struct)::poll_grow' data-ref="(anonymous)::poll_grow">poll_grow</dfn>;</td></tr>
+<tr><th id="35">35</th><td>    <a class="typedef" href="../../../include/stdint.h.html#int64_t" title='int64_t' data-type='long' data-ref="int64_t">int64_t</a> <dfn class="decl" id="(anonymous)::poll_shrink" title='(anonymous struct)::poll_shrink' data-ref="(anonymous)::poll_shrink">poll_shrink</dfn>;</td></tr>
+<tr><th id="36">36</th><td>} <dfn class="typedef" id="IOThread" title='IOThread' data-type='struct IOThread' data-ref="IOThread">IOThread</dfn>;</td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/IOTHREAD" data-ref="_M/IOTHREAD">IOTHREAD</dfn>(obj) \</u></td></tr>
+<tr><th id="39">39</th><td><u>   OBJECT_CHECK(IOThread, obj, TYPE_IOTHREAD)</u></td></tr>
+<tr><th id="40">40</th><td></td></tr>
+<tr><th id="41">41</th><td><em>char</em> *<dfn class="decl" id="iothread_get_id" title='iothread_get_id' data-ref="iothread_get_id">iothread_get_id</dfn>(<a class="typedef" href="#IOThread" title='IOThread' data-type='struct IOThread' data-ref="IOThread">IOThread</a> *<dfn class="local col5 decl" id="3165iothread" title='iothread' data-type='IOThread *' data-ref="3165iothread">iothread</dfn>);</td></tr>
+<tr><th id="42">42</th><td><a class="typedef" href="../qemu/typedefs.h.html#AioContext" title='AioContext' data-type='struct AioContext' data-ref="AioContext">AioContext</a> *<dfn class="decl" id="iothread_get_aio_context" title='iothread_get_aio_context' data-ref="iothread_get_aio_context">iothread_get_aio_context</dfn>(<a class="typedef" href="#IOThread" title='IOThread' data-type='struct IOThread' data-ref="IOThread">IOThread</a> *<dfn class="local col6 decl" id="3166iothread" title='iothread' data-type='IOThread *' data-ref="3166iothread">iothread</dfn>);</td></tr>
+<tr><th id="43">43</th><td><em>void</em> <dfn class="decl" id="iothread_stop_all" title='iothread_stop_all' data-ref="iothread_stop_all">iothread_stop_all</dfn>(<em>void</em>);</td></tr>
+<tr><th id="44">44</th><td></td></tr>
+<tr><th id="45">45</th><td><u>#<span data-ppcond="14">endif</span> /* IOTHREAD_H */</u></td></tr>
+<tr><th id="46">46</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../backends/cryptodev.c.html'>codebrowser/backends/cryptodev.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

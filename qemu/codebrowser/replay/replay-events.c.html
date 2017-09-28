@@ -1,0 +1,349 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>replay-events.c source code [codebrowser/replay/replay-events.c] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="Event "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/replay/replay-events.c'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>replay</a>/<a href='replay-events.c.html'>replay-events.c</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * replay-events.c</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2010-2015 Institute for System Programming</i></td></tr>
+<tr><th id="5">5</th><td><i> *                         of the Russian Academy of Sciences.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This work is licensed under the terms of the GNU GPL, version 2 or later.</i></td></tr>
+<tr><th id="8">8</th><td><i> * See the COPYING file in the top-level directory.</i></td></tr>
+<tr><th id="9">9</th><td><i> *</i></td></tr>
+<tr><th id="10">10</th><td><i> */</i></td></tr>
+<tr><th id="11">11</th><td></td></tr>
+<tr><th id="12">12</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="13">13</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="14">14</th><td><u>#include <a href="../include/qemu/error-report.h.html">"qemu/error-report.h"</a></u></td></tr>
+<tr><th id="15">15</th><td><u>#include <a href="../include/sysemu/replay.h.html">"sysemu/replay.h"</a></u></td></tr>
+<tr><th id="16">16</th><td><u>#include <a href="replay-internal.h.html">"replay-internal.h"</a></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="../include/block/aio.h.html">"block/aio.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#include <a href="../include/ui/input.h.html">"ui/input.h"</a></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="Event" title='Event' data-ref="Event"><a class="type" href="#Event" title='Event' data-ref="Event">Event</a></dfn> {</td></tr>
+<tr><th id="21">21</th><td>    <a class="typedef" href="replay-internal.h.html#ReplayAsyncEventKind" title='ReplayAsyncEventKind' data-type='enum ReplayAsyncEventKind' data-ref="ReplayAsyncEventKind">ReplayAsyncEventKind</a> <dfn class="tu decl" id="Event::event_kind" title='Event::event_kind' data-type='ReplayAsyncEventKind' data-ref="Event::event_kind">event_kind</dfn>;</td></tr>
+<tr><th id="22">22</th><td>    <em>void</em> *<dfn class="tu decl" id="Event::opaque" title='Event::opaque' data-type='void *' data-ref="Event::opaque">opaque</dfn>;</td></tr>
+<tr><th id="23">23</th><td>    <em>void</em> *<dfn class="tu decl" id="Event::opaque2" title='Event::opaque2' data-type='void *' data-ref="Event::opaque2">opaque2</dfn>;</td></tr>
+<tr><th id="24">24</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="tu decl" id="Event::id" title='Event::id' data-type='uint64_t' data-ref="Event::id">id</dfn>;</td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td>    <a class="macro" href="../include/qemu/queue.h.html#359" title="struct { struct Event *tqe_next; struct Event * *tqe_prev; }" data-ref="_M/QTAILQ_ENTRY">QTAILQ_ENTRY</a>(<a class="type" href="#Event" title='Event' data-ref="Event">Event</a>) <dfn class="tu decl" id="Event::events" title='Event::events' data-type='struct (anonymous struct at /home/jon/workspace/qemu/replay/replay-events.c:26:5)' data-ref="Event::events">events</dfn>;</td></tr>
+<tr><th id="27">27</th><td>} <dfn class="typedef" id="Event" title='Event' data-type='struct Event' data-ref="Event">Event</dfn>;</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><em>static</em> <a class="macro" href="../include/qemu/queue.h.html#349" title="struct { struct Event *tqh_first; struct Event * *tqh_last; }" data-ref="_M/QTAILQ_HEAD">QTAILQ_HEAD</a>(, <a class="type" href="#Event" title='Event' data-ref="Event">Event</a>) <dfn class="tu decl def" id="events_list" title='events_list' data-type='struct (anonymous struct at /home/jon/workspace/qemu/replay/replay-events.c:29:8)' data-ref="events_list">events_list</dfn> = <a class="macro" href="../include/qemu/queue.h.html#351" title="{ ((void*)0), &amp;(events_list).tqh_first }" data-ref="_M/QTAILQ_HEAD_INITIALIZER">QTAILQ_HEAD_INITIALIZER</a>(<a class="tu ref" href="#events_list" title='events_list' data-use='m' data-ref="events_list">events_list</a>);</td></tr>
+<tr><th id="30">30</th><td><em>static</em> <em>unsigned</em> <em>int</em> <dfn class="tu decl def" id="read_event_kind" title='read_event_kind' data-type='unsigned int' data-ref="read_event_kind">read_event_kind</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="31">31</th><td><em>static</em> <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="tu decl def" id="read_id" title='read_id' data-type='uint64_t' data-ref="read_id">read_id</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="32">32</th><td><em>static</em> <em>int</em> <dfn class="tu decl def" id="read_checkpoint" title='read_checkpoint' data-type='int' data-ref="read_checkpoint">read_checkpoint</dfn> = -<var>1</var>;</td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><em>static</em> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="tu decl def" id="events_enabled" title='events_enabled' data-type='_Bool' data-ref="events_enabled">events_enabled</dfn>;</td></tr>
+<tr><th id="35">35</th><td></td></tr>
+<tr><th id="36">36</th><td><i  data-doc="replay_run_event">/* Functions */</i></td></tr>
+<tr><th id="37">37</th><td></td></tr>
+<tr><th id="38">38</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="replay_run_event" title='replay_run_event' data-type='void replay_run_event(Event * event)' data-ref="replay_run_event">replay_run_event</dfn>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col1 decl" id="1event" title='event' data-type='Event *' data-ref="1event">event</dfn>)</td></tr>
+<tr><th id="39">39</th><td>{</td></tr>
+<tr><th id="40">40</th><td>    <b>switch</b> (<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='r' data-ref="Event::event_kind">event_kind</a>) {</td></tr>
+<tr><th id="41">41</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH">REPLAY_ASYNC_EVENT_BH</a>:</td></tr>
+<tr><th id="42">42</th><td>        <a class="ref" href="../include/block/aio.h.html#aio_bh_call" title='aio_bh_call' data-ref="aio_bh_call">aio_bh_call</a>(<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="43">43</th><td>        <b>break</b>;</td></tr>
+<tr><th id="44">44</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT">REPLAY_ASYNC_EVENT_INPUT</a>:</td></tr>
+<tr><th id="45">45</th><td>        <a class="ref" href="../include/ui/input.h.html#qemu_input_event_send_impl" title='qemu_input_event_send_impl' data-ref="qemu_input_event_send_impl">qemu_input_event_send_impl</a>(<span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, (<a class="typedef" href="../qapi-types.h.html#InputEvent" title='InputEvent' data-type='struct InputEvent' data-ref="InputEvent">InputEvent</a> *)<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="46">46</th><td>        <a class="ref" href="../qapi-types.h.html#qapi_free_InputEvent" title='qapi_free_InputEvent' data-ref="qapi_free_InputEvent">qapi_free_InputEvent</a>((<a class="typedef" href="../qapi-types.h.html#InputEvent" title='InputEvent' data-type='struct InputEvent' data-ref="InputEvent">InputEvent</a> *)<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="47">47</th><td>        <b>break</b>;</td></tr>
+<tr><th id="48">48</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC">REPLAY_ASYNC_EVENT_INPUT_SYNC</a>:</td></tr>
+<tr><th id="49">49</th><td>        <a class="ref" href="../include/ui/input.h.html#qemu_input_event_sync_impl" title='qemu_input_event_sync_impl' data-ref="qemu_input_event_sync_impl">qemu_input_event_sync_impl</a>();</td></tr>
+<tr><th id="50">50</th><td>        <b>break</b>;</td></tr>
+<tr><th id="51">51</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ">REPLAY_ASYNC_EVENT_CHAR_READ</a>:</td></tr>
+<tr><th id="52">52</th><td>        <a class="ref" href="replay-internal.h.html#replay_event_char_read_run" title='replay_event_char_read_run' data-ref="replay_event_char_read_run">replay_event_char_read_run</a>(<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="53">53</th><td>        <b>break</b>;</td></tr>
+<tr><th id="54">54</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK">REPLAY_ASYNC_EVENT_BLOCK</a>:</td></tr>
+<tr><th id="55">55</th><td>        <a class="ref" href="../include/block/aio.h.html#aio_bh_call" title='aio_bh_call' data-ref="aio_bh_call">aio_bh_call</a>(<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="56">56</th><td>        <b>break</b>;</td></tr>
+<tr><th id="57">57</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET">REPLAY_ASYNC_EVENT_NET</a>:</td></tr>
+<tr><th id="58">58</th><td>        <a class="ref" href="replay-internal.h.html#replay_event_net_run" title='replay_event_net_run' data-ref="replay_event_net_run">replay_event_net_run</a>(<a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="59">59</th><td>        <b>break</b>;</td></tr>
+<tr><th id="60">60</th><td>    <b>default</b>:</td></tr>
+<tr><th id="61">61</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Replay: invalid async event ID (%d) in the queue"</q>,</td></tr>
+<tr><th id="62">62</th><td>                    <a class="local col1 ref" href="#1event" title='event' data-ref="1event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='r' data-ref="Event::event_kind">event_kind</a>);</td></tr>
+<tr><th id="63">63</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="64">64</th><td>        <b>break</b>;</td></tr>
+<tr><th id="65">65</th><td>    }</td></tr>
+<tr><th id="66">66</th><td>}</td></tr>
+<tr><th id="67">67</th><td></td></tr>
+<tr><th id="68">68</th><td><em>void</em> <dfn class="decl def" id="replay_enable_events" title='replay_enable_events' data-ref="replay_enable_events">replay_enable_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="69">69</th><td>{</td></tr>
+<tr><th id="70">70</th><td>    <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='w' data-ref="events_enabled">events_enabled</a> = <span class="macro" title="1" data-ref="_M/true">true</span>;</td></tr>
+<tr><th id="71">71</th><td>}</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_has_events" title='replay_has_events' data-ref="replay_has_events">replay_has_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>    <b>return</b> !<a class="macro" href="../include/qemu/queue.h.html#431" title="((&amp;events_list)-&gt;tqh_first == ((void*)0))" data-ref="_M/QTAILQ_EMPTY">QTAILQ_EMPTY</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>);</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><em>void</em> <dfn class="decl def" id="replay_flush_events" title='replay_flush_events' data-ref="replay_flush_events">replay_flush_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="79">79</th><td>{</td></tr>
+<tr><th id="80">80</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="81">81</th><td>    <b>while</b> (!<a class="macro" href="../include/qemu/queue.h.html#431" title="((&amp;events_list)-&gt;tqh_first == ((void*)0))" data-ref="_M/QTAILQ_EMPTY">QTAILQ_EMPTY</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>)) {</td></tr>
+<tr><th id="82">82</th><td>        <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col2 decl" id="2event" title='event' data-type='Event *' data-ref="2event">event</dfn> = <a class="macro" href="../include/qemu/queue.h.html#432" title="((&amp;events_list)-&gt;tqh_first)" data-ref="_M/QTAILQ_FIRST">QTAILQ_FIRST</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>);</td></tr>
+<tr><th id="83">83</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="84">84</th><td>        <a class="tu ref" href="#replay_run_event" title='replay_run_event' data-use='c' data-ref="replay_run_event">replay_run_event</a>(<a class="local col2 ref" href="#2event" title='event' data-ref="2event">event</a>);</td></tr>
+<tr><th id="85">85</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="86">86</th><td>        <a class="macro" href="../include/qemu/queue.h.html#403" title="do { if (((event)-&gt;events.tqe_next) != ((void*)0)) (event)-&gt;events.tqe_next-&gt;events.tqe_prev = (event)-&gt;events.tqe_prev; else (&amp;events_list)-&gt;tqh_last = (event)-&gt;events.tqe_prev; *(event)-&gt;events.tqe_prev = (event)-&gt;events.tqe_next; (event)-&gt;events.tqe_prev = ((void*)0); } while ( 0)" data-ref="_M/QTAILQ_REMOVE">QTAILQ_REMOVE</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="local col2 ref" href="#2event" title='event' data-ref="2event">event</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>);</td></tr>
+<tr><th id="87">87</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col2 ref" href="#2event" title='event' data-ref="2event">event</a>);</td></tr>
+<tr><th id="88">88</th><td>    }</td></tr>
+<tr><th id="89">89</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><em>void</em> <dfn class="decl def" id="replay_disable_events" title='replay_disable_events' data-ref="replay_disable_events">replay_disable_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="93">93</th><td>{</td></tr>
+<tr><th id="94">94</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> != <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a>) {</td></tr>
+<tr><th id="95">95</th><td>        <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='w' data-ref="events_enabled">events_enabled</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="96">96</th><td>        <i>/* Flush events queue before waiting of completion */</i></td></tr>
+<tr><th id="97">97</th><td>        <a class="ref" href="#replay_flush_events" title='replay_flush_events' data-ref="replay_flush_events">replay_flush_events</a>();</td></tr>
+<tr><th id="98">98</th><td>    }</td></tr>
+<tr><th id="99">99</th><td>}</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><em>void</em> <dfn class="decl def" id="replay_clear_events" title='replay_clear_events' data-ref="replay_clear_events">replay_clear_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="102">102</th><td>{</td></tr>
+<tr><th id="103">103</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="104">104</th><td>    <b>while</b> (!<a class="macro" href="../include/qemu/queue.h.html#431" title="((&amp;events_list)-&gt;tqh_first == ((void*)0))" data-ref="_M/QTAILQ_EMPTY">QTAILQ_EMPTY</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>)) {</td></tr>
+<tr><th id="105">105</th><td>        <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col3 decl" id="3event" title='event' data-type='Event *' data-ref="3event">event</dfn> = <a class="macro" href="../include/qemu/queue.h.html#432" title="((&amp;events_list)-&gt;tqh_first)" data-ref="_M/QTAILQ_FIRST">QTAILQ_FIRST</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>);</td></tr>
+<tr><th id="106">106</th><td>        <a class="macro" href="../include/qemu/queue.h.html#403" title="do { if (((event)-&gt;events.tqe_next) != ((void*)0)) (event)-&gt;events.tqe_next-&gt;events.tqe_prev = (event)-&gt;events.tqe_prev; else (&amp;events_list)-&gt;tqh_last = (event)-&gt;events.tqe_prev; *(event)-&gt;events.tqe_prev = (event)-&gt;events.tqe_next; (event)-&gt;events.tqe_prev = ((void*)0); } while ( 0)" data-ref="_M/QTAILQ_REMOVE">QTAILQ_REMOVE</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="local col3 ref" href="#3event" title='event' data-ref="3event">event</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>);</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col3 ref" href="#3event" title='event' data-ref="3event">event</a>);</td></tr>
+<tr><th id="109">109</th><td>    }</td></tr>
+<tr><th id="110">110</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="111">111</th><td>}</td></tr>
+<tr><th id="112">112</th><td></td></tr>
+<tr><th id="113">113</th><td><i class="doc">/*! Adds specified async event to the queue */</i></td></tr>
+<tr><th id="114">114</th><td><em>void</em> <dfn class="decl def" id="replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</dfn>(<a class="typedef" href="replay-internal.h.html#ReplayAsyncEventKind" title='ReplayAsyncEventKind' data-type='enum ReplayAsyncEventKind' data-ref="ReplayAsyncEventKind">ReplayAsyncEventKind</a> <dfn class="local col4 decl" id="4event_kind" title='event_kind' data-type='ReplayAsyncEventKind' data-ref="4event_kind">event_kind</dfn>,</td></tr>
+<tr><th id="115">115</th><td>                      <em>void</em> *<dfn class="local col5 decl" id="5opaque" title='opaque' data-type='void *' data-ref="5opaque">opaque</dfn>,</td></tr>
+<tr><th id="116">116</th><td>                      <em>void</em> *<dfn class="local col6 decl" id="6opaque2" title='opaque2' data-type='void *' data-ref="6opaque2">opaque2</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="7id" title='id' data-type='uint64_t' data-ref="7id">id</dfn>)</td></tr>
+<tr><th id="117">117</th><td>{</td></tr>
+<tr><th id="118">118</th><td>    <a class="macro" href="../../include/assert.h.html#88" title="((event_kind &lt; REPLAY_ASYNC_COUNT) ? (void) (0) : __assert_fail (&quot;event_kind &lt; REPLAY_ASYNC_COUNT&quot;, &quot;/home/jon/workspace/qemu/replay/replay-events.c&quot;, 118, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col4 ref" href="#4event_kind" title='event_kind' data-ref="4event_kind">event_kind</a> &lt; <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_COUNT" title='ReplayAsyncEventKind::REPLAY_ASYNC_COUNT' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_COUNT">REPLAY_ASYNC_COUNT</a>);</td></tr>
+<tr><th id="119">119</th><td></td></tr>
+<tr><th id="120">120</th><td>    <b>if</b> (!<a class="ref" href="replay-internal.h.html#replay_file" title='replay_file' data-ref="replay_file">replay_file</a> || <a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> == <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a></td></tr>
+<tr><th id="121">121</th><td>        || !<a class="tu ref" href="#events_enabled" title='events_enabled' data-use='r' data-ref="events_enabled">events_enabled</a>) {</td></tr>
+<tr><th id="122">122</th><td>        <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> <dfn class="local col8 decl" id="8e" title='e' data-type='Event' data-ref="8e">e</dfn>;</td></tr>
+<tr><th id="123">123</th><td>        <a class="local col8 ref" href="#8e" title='e' data-ref="8e">e</a>.<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="local col4 ref" href="#4event_kind" title='event_kind' data-ref="4event_kind">event_kind</a>;</td></tr>
+<tr><th id="124">124</th><td>        <a class="local col8 ref" href="#8e" title='e' data-ref="8e">e</a>.<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <a class="local col5 ref" href="#5opaque" title='opaque' data-ref="5opaque">opaque</a>;</td></tr>
+<tr><th id="125">125</th><td>        <a class="local col8 ref" href="#8e" title='e' data-ref="8e">e</a>.<a class="tu ref" href="#Event::opaque2" title='Event::opaque2' data-use='w' data-ref="Event::opaque2">opaque2</a> = <a class="local col6 ref" href="#6opaque2" title='opaque2' data-ref="6opaque2">opaque2</a>;</td></tr>
+<tr><th id="126">126</th><td>        <a class="local col8 ref" href="#8e" title='e' data-ref="8e">e</a>.<a class="tu ref" href="#Event::id" title='Event::id' data-use='w' data-ref="Event::id">id</a> = <a class="local col7 ref" href="#7id" title='id' data-ref="7id">id</a>;</td></tr>
+<tr><th id="127">127</th><td>        <a class="tu ref" href="#replay_run_event" title='replay_run_event' data-use='c' data-ref="replay_run_event">replay_run_event</a>(&amp;<a class="local col8 ref" href="#8e" title='e' data-ref="8e">e</a>);</td></tr>
+<tr><th id="128">128</th><td>        <b>return</b>;</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td></td></tr>
+<tr><th id="131">131</th><td>    <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col9 decl" id="9event" title='event' data-type='Event *' data-ref="9event">event</dfn> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a>));</td></tr>
+<tr><th id="132">132</th><td>    <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="local col4 ref" href="#4event_kind" title='event_kind' data-ref="4event_kind">event_kind</a>;</td></tr>
+<tr><th id="133">133</th><td>    <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <a class="local col5 ref" href="#5opaque" title='opaque' data-ref="5opaque">opaque</a>;</td></tr>
+<tr><th id="134">134</th><td>    <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#Event::opaque2" title='Event::opaque2' data-use='w' data-ref="Event::opaque2">opaque2</a> = <a class="local col6 ref" href="#6opaque2" title='opaque2' data-ref="6opaque2">opaque2</a>;</td></tr>
+<tr><th id="135">135</th><td>    <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>-&gt;<a class="tu ref" href="#Event::id" title='Event::id' data-use='w' data-ref="Event::id">id</a> = <a class="local col7 ref" href="#7id" title='id' data-ref="7id">id</a>;</td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="138">138</th><td>    <a class="macro" href="../include/qemu/queue.h.html#379" title="do { (event)-&gt;events.tqe_next = ((void*)0); (event)-&gt;events.tqe_prev = (&amp;events_list)-&gt;tqh_last; *(&amp;events_list)-&gt;tqh_last = (event); (&amp;events_list)-&gt;tqh_last = &amp;(event)-&gt;events.tqe_next; } while ( 0)" data-ref="_M/QTAILQ_INSERT_TAIL">QTAILQ_INSERT_TAIL</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="local col9 ref" href="#9event" title='event' data-ref="9event">event</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>);</td></tr>
+<tr><th id="139">139</th><td>    <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="140">140</th><td>}</td></tr>
+<tr><th id="141">141</th><td></td></tr>
+<tr><th id="142">142</th><td><em>void</em> <dfn class="decl def" id="replay_bh_schedule_event" title='replay_bh_schedule_event' data-ref="replay_bh_schedule_event">replay_bh_schedule_event</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="local col0 decl" id="10bh" title='bh' data-type='QEMUBH *' data-ref="10bh">bh</dfn>)</td></tr>
+<tr><th id="143">143</th><td>{</td></tr>
+<tr><th id="144">144</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> != <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a> &amp;&amp; <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='r' data-ref="events_enabled">events_enabled</a>) {</td></tr>
+<tr><th id="145">145</th><td>        <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="11id" title='id' data-type='uint64_t' data-ref="11id">id</dfn> = <a class="ref" href="../include/sysemu/replay.h.html#replay_get_current_step" title='replay_get_current_step' data-ref="replay_get_current_step">replay_get_current_step</a>();</td></tr>
+<tr><th id="146">146</th><td>        <a class="ref" href="#replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</a>(<a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH">REPLAY_ASYNC_EVENT_BH</a>, <a class="local col0 ref" href="#10bh" title='bh' data-ref="10bh">bh</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col1 ref" href="#11id" title='id' data-ref="11id">id</a>);</td></tr>
+<tr><th id="147">147</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="148">148</th><td>        <a class="ref" href="../include/block/aio.h.html#qemu_bh_schedule" title='qemu_bh_schedule' data-ref="qemu_bh_schedule">qemu_bh_schedule</a>(<a class="local col0 ref" href="#10bh" title='bh' data-ref="10bh">bh</a>);</td></tr>
+<tr><th id="149">149</th><td>    }</td></tr>
+<tr><th id="150">150</th><td>}</td></tr>
+<tr><th id="151">151</th><td></td></tr>
+<tr><th id="152">152</th><td><em>void</em> <dfn class="decl def" id="replay_add_input_event" title='replay_add_input_event' data-ref="replay_add_input_event">replay_add_input_event</dfn>(<b>struct</b> <a class="type" href="../qapi-types.h.html#InputEvent" title='InputEvent' data-ref="InputEvent">InputEvent</a> *<dfn class="local col2 decl" id="12event" title='event' data-type='struct InputEvent *' data-ref="12event">event</dfn>)</td></tr>
+<tr><th id="153">153</th><td>{</td></tr>
+<tr><th id="154">154</th><td>    <a class="ref" href="#replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</a>(<a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT">REPLAY_ASYNC_EVENT_INPUT</a>, <a class="local col2 ref" href="#12event" title='event' data-ref="12event">event</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>);</td></tr>
+<tr><th id="155">155</th><td>}</td></tr>
+<tr><th id="156">156</th><td></td></tr>
+<tr><th id="157">157</th><td><em>void</em> <dfn class="decl def" id="replay_add_input_sync_event" title='replay_add_input_sync_event' data-ref="replay_add_input_sync_event">replay_add_input_sync_event</dfn>(<em>void</em>)</td></tr>
+<tr><th id="158">158</th><td>{</td></tr>
+<tr><th id="159">159</th><td>    <a class="ref" href="#replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</a>(<a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC">REPLAY_ASYNC_EVENT_INPUT_SYNC</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <var>0</var>);</td></tr>
+<tr><th id="160">160</th><td>}</td></tr>
+<tr><th id="161">161</th><td></td></tr>
+<tr><th id="162">162</th><td><em>void</em> <dfn class="decl def" id="replay_block_event" title='replay_block_event' data-ref="replay_block_event">replay_block_event</dfn>(<a class="typedef" href="../include/qemu/typedefs.h.html#QEMUBH" title='QEMUBH' data-type='struct QEMUBH' data-ref="QEMUBH">QEMUBH</a> *<dfn class="local col3 decl" id="13bh" title='bh' data-type='QEMUBH *' data-ref="13bh">bh</dfn>, <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="14id" title='id' data-type='uint64_t' data-ref="14id">id</dfn>)</td></tr>
+<tr><th id="163">163</th><td>{</td></tr>
+<tr><th id="164">164</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> != <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_NONE" title='ReplayMode::REPLAY_MODE_NONE' data-ref="ReplayMode::REPLAY_MODE_NONE">REPLAY_MODE_NONE</a> &amp;&amp; <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='r' data-ref="events_enabled">events_enabled</a>) {</td></tr>
+<tr><th id="165">165</th><td>        <a class="ref" href="#replay_add_event" title='replay_add_event' data-ref="replay_add_event">replay_add_event</a>(<a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK">REPLAY_ASYNC_EVENT_BLOCK</a>, <a class="local col3 ref" href="#13bh" title='bh' data-ref="13bh">bh</a>, <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>, <a class="local col4 ref" href="#14id" title='id' data-ref="14id">id</a>);</td></tr>
+<tr><th id="166">166</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="167">167</th><td>        <a class="ref" href="../include/block/aio.h.html#qemu_bh_schedule" title='qemu_bh_schedule' data-ref="qemu_bh_schedule">qemu_bh_schedule</a>(<a class="local col3 ref" href="#13bh" title='bh' data-ref="13bh">bh</a>);</td></tr>
+<tr><th id="168">168</th><td>    }</td></tr>
+<tr><th id="169">169</th><td>}</td></tr>
+<tr><th id="170">170</th><td></td></tr>
+<tr><th id="171">171</th><td><em>static</em> <em>void</em> <dfn class="tu decl def" id="replay_save_event" title='replay_save_event' data-type='void replay_save_event(Event * event, int checkpoint)' data-ref="replay_save_event">replay_save_event</dfn>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col5 decl" id="15event" title='event' data-type='Event *' data-ref="15event">event</dfn>, <em>int</em> <dfn class="local col6 decl" id="16checkpoint" title='checkpoint' data-type='int' data-ref="16checkpoint">checkpoint</dfn>)</td></tr>
+<tr><th id="172">172</th><td>{</td></tr>
+<tr><th id="173">173</th><td>    <b>if</b> (<a class="ref" href="../include/sysemu/replay.h.html#replay_mode" title='replay_mode' data-ref="replay_mode">replay_mode</a> != <a class="enum" href="../qapi-types.h.html#ReplayMode::REPLAY_MODE_PLAY" title='ReplayMode::REPLAY_MODE_PLAY' data-ref="ReplayMode::REPLAY_MODE_PLAY">REPLAY_MODE_PLAY</a>) {</td></tr>
+<tr><th id="174">174</th><td>        <i>/* put the event into the file */</i></td></tr>
+<tr><th id="175">175</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_event" title='replay_put_event' data-ref="replay_put_event">replay_put_event</a>(<a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_ASYNC" title='ReplayEvents::EVENT_ASYNC' data-ref="ReplayEvents::EVENT_ASYNC">EVENT_ASYNC</a>);</td></tr>
+<tr><th id="176">176</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_byte" title='replay_put_byte' data-ref="replay_put_byte">replay_put_byte</a>(<a class="local col6 ref" href="#16checkpoint" title='checkpoint' data-ref="16checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="177">177</th><td>        <a class="ref" href="replay-internal.h.html#replay_put_byte" title='replay_put_byte' data-ref="replay_put_byte">replay_put_byte</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='r' data-ref="Event::event_kind">event_kind</a>);</td></tr>
+<tr><th id="178">178</th><td></td></tr>
+<tr><th id="179">179</th><td>        <i>/* save event-specific data */</i></td></tr>
+<tr><th id="180">180</th><td>        <b>switch</b> (<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='r' data-ref="Event::event_kind">event_kind</a>) {</td></tr>
+<tr><th id="181">181</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH">REPLAY_ASYNC_EVENT_BH</a>:</td></tr>
+<tr><th id="182">182</th><td>            <a class="ref" href="replay-internal.h.html#replay_put_qword" title='replay_put_qword' data-ref="replay_put_qword">replay_put_qword</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::id" title='Event::id' data-use='r' data-ref="Event::id">id</a>);</td></tr>
+<tr><th id="183">183</th><td>            <b>break</b>;</td></tr>
+<tr><th id="184">184</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT">REPLAY_ASYNC_EVENT_INPUT</a>:</td></tr>
+<tr><th id="185">185</th><td>            <a class="ref" href="replay-internal.h.html#replay_save_input_event" title='replay_save_input_event' data-ref="replay_save_input_event">replay_save_input_event</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="186">186</th><td>            <b>break</b>;</td></tr>
+<tr><th id="187">187</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC">REPLAY_ASYNC_EVENT_INPUT_SYNC</a>:</td></tr>
+<tr><th id="188">188</th><td>            <b>break</b>;</td></tr>
+<tr><th id="189">189</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ">REPLAY_ASYNC_EVENT_CHAR_READ</a>:</td></tr>
+<tr><th id="190">190</th><td>            <a class="ref" href="replay-internal.h.html#replay_event_char_read_save" title='replay_event_char_read_save' data-ref="replay_event_char_read_save">replay_event_char_read_save</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="191">191</th><td>            <b>break</b>;</td></tr>
+<tr><th id="192">192</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK">REPLAY_ASYNC_EVENT_BLOCK</a>:</td></tr>
+<tr><th id="193">193</th><td>            <a class="ref" href="replay-internal.h.html#replay_put_qword" title='replay_put_qword' data-ref="replay_put_qword">replay_put_qword</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::id" title='Event::id' data-use='r' data-ref="Event::id">id</a>);</td></tr>
+<tr><th id="194">194</th><td>            <b>break</b>;</td></tr>
+<tr><th id="195">195</th><td>        <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET">REPLAY_ASYNC_EVENT_NET</a>:</td></tr>
+<tr><th id="196">196</th><td>            <a class="ref" href="replay-internal.h.html#replay_event_net_save" title='replay_event_net_save' data-ref="replay_event_net_save">replay_event_net_save</a>(<a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='r' data-ref="Event::opaque">opaque</a>);</td></tr>
+<tr><th id="197">197</th><td>            <b>break</b>;</td></tr>
+<tr><th id="198">198</th><td>        <b>default</b>:</td></tr>
+<tr><th id="199">199</th><td>            <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Unknown ID %"</q> <a class="macro" href="../../include/inttypes.h.html#57" title="&quot;l&quot; &quot;d&quot;" data-ref="_M/PRId64">PRId64</a> <q>" of replay event"</q>, <a class="local col5 ref" href="#15event" title='event' data-ref="15event">event</a>-&gt;<a class="tu ref" href="#Event::id" title='Event::id' data-use='r' data-ref="Event::id">id</a>);</td></tr>
+<tr><th id="200">200</th><td>            <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="201">201</th><td>        }</td></tr>
+<tr><th id="202">202</th><td>    }</td></tr>
+<tr><th id="203">203</th><td>}</td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>/* Called with replay mutex locked */</i></td></tr>
+<tr><th id="206">206</th><td><em>void</em> <dfn class="decl def" id="replay_save_events" title='replay_save_events' data-ref="replay_save_events">replay_save_events</dfn>(<em>int</em> <dfn class="local col7 decl" id="17checkpoint" title='checkpoint' data-type='int' data-ref="17checkpoint">checkpoint</dfn>)</td></tr>
+<tr><th id="207">207</th><td>{</td></tr>
+<tr><th id="208">208</th><td>    <b>while</b> (!<a class="macro" href="../include/qemu/queue.h.html#431" title="((&amp;events_list)-&gt;tqh_first == ((void*)0))" data-ref="_M/QTAILQ_EMPTY">QTAILQ_EMPTY</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>)) {</td></tr>
+<tr><th id="209">209</th><td>        <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col8 decl" id="18event" title='event' data-type='Event *' data-ref="18event">event</dfn> = <a class="macro" href="../include/qemu/queue.h.html#432" title="((&amp;events_list)-&gt;tqh_first)" data-ref="_M/QTAILQ_FIRST">QTAILQ_FIRST</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>);</td></tr>
+<tr><th id="210">210</th><td>        <a class="tu ref" href="#replay_save_event" title='replay_save_event' data-use='c' data-ref="replay_save_event">replay_save_event</a>(<a class="local col8 ref" href="#18event" title='event' data-ref="18event">event</a>, <a class="local col7 ref" href="#17checkpoint" title='checkpoint' data-ref="17checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="213">213</th><td>        <a class="tu ref" href="#replay_run_event" title='replay_run_event' data-use='c' data-ref="replay_run_event">replay_run_event</a>(<a class="local col8 ref" href="#18event" title='event' data-ref="18event">event</a>);</td></tr>
+<tr><th id="214">214</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="215">215</th><td>        <a class="macro" href="../include/qemu/queue.h.html#403" title="do { if (((event)-&gt;events.tqe_next) != ((void*)0)) (event)-&gt;events.tqe_next-&gt;events.tqe_prev = (event)-&gt;events.tqe_prev; else (&amp;events_list)-&gt;tqh_last = (event)-&gt;events.tqe_prev; *(event)-&gt;events.tqe_prev = (event)-&gt;events.tqe_next; (event)-&gt;events.tqe_prev = ((void*)0); } while ( 0)" data-ref="_M/QTAILQ_REMOVE">QTAILQ_REMOVE</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="local col8 ref" href="#18event" title='event' data-ref="18event">event</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>);</td></tr>
+<tr><th id="216">216</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col8 ref" href="#18event" title='event' data-ref="18event">event</a>);</td></tr>
+<tr><th id="217">217</th><td>    }</td></tr>
+<tr><th id="218">218</th><td>}</td></tr>
+<tr><th id="219">219</th><td></td></tr>
+<tr><th id="220">220</th><td><em>static</em> <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="tu decl def" id="replay_read_event" title='replay_read_event' data-type='Event * replay_read_event(int checkpoint)' data-ref="replay_read_event">replay_read_event</dfn>(<em>int</em> <dfn class="local col9 decl" id="19checkpoint" title='checkpoint' data-type='int' data-ref="19checkpoint">checkpoint</dfn>)</td></tr>
+<tr><th id="221">221</th><td>{</td></tr>
+<tr><th id="222">222</th><td>    <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col0 decl" id="20event" title='event' data-type='Event *' data-ref="20event">event</dfn>;</td></tr>
+<tr><th id="223">223</th><td>    <b>if</b> (<a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a> == -<var>1</var>) {</td></tr>
+<tr><th id="224">224</th><td>        <a class="tu ref" href="#read_checkpoint" title='read_checkpoint' data-use='w' data-ref="read_checkpoint">read_checkpoint</a> = <a class="ref" href="replay-internal.h.html#replay_get_byte" title='replay_get_byte' data-ref="replay_get_byte">replay_get_byte</a>();</td></tr>
+<tr><th id="225">225</th><td>        <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='w' data-ref="read_event_kind">read_event_kind</a> = <a class="ref" href="replay-internal.h.html#replay_get_byte" title='replay_get_byte' data-ref="replay_get_byte">replay_get_byte</a>();</td></tr>
+<tr><th id="226">226</th><td>        <a class="tu ref" href="#read_id" title='read_id' data-use='w' data-ref="read_id">read_id</a> = -<var>1</var>;</td></tr>
+<tr><th id="227">227</th><td>        <a class="ref" href="replay-internal.h.html#replay_check_error" title='replay_check_error' data-ref="replay_check_error">replay_check_error</a>();</td></tr>
+<tr><th id="228">228</th><td>    }</td></tr>
+<tr><th id="229">229</th><td></td></tr>
+<tr><th id="230">230</th><td>    <b>if</b> (<a class="local col9 ref" href="#19checkpoint" title='checkpoint' data-ref="19checkpoint">checkpoint</a> != <a class="tu ref" href="#read_checkpoint" title='read_checkpoint' data-use='r' data-ref="read_checkpoint">read_checkpoint</a>) {</td></tr>
+<tr><th id="231">231</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="232">232</th><td>    }</td></tr>
+<tr><th id="233">233</th><td></td></tr>
+<tr><th id="234">234</th><td>    <i>/* Events that has not to be in the queue */</i></td></tr>
+<tr><th id="235">235</th><td>    <b>switch</b> (<a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>) {</td></tr>
+<tr><th id="236">236</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BH">REPLAY_ASYNC_EVENT_BH</a>:</td></tr>
+<tr><th id="237">237</th><td>        <b>if</b> (<a class="tu ref" href="#read_id" title='read_id' data-use='r' data-ref="read_id">read_id</a> == -<var>1</var>) {</td></tr>
+<tr><th id="238">238</th><td>            <a class="tu ref" href="#read_id" title='read_id' data-use='w' data-ref="read_id">read_id</a> = <a class="ref" href="replay-internal.h.html#replay_get_qword" title='replay_get_qword' data-ref="replay_get_qword">replay_get_qword</a>();</td></tr>
+<tr><th id="239">239</th><td>        }</td></tr>
+<tr><th id="240">240</th><td>        <b>break</b>;</td></tr>
+<tr><th id="241">241</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT">REPLAY_ASYNC_EVENT_INPUT</a>:</td></tr>
+<tr><th id="242">242</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a>));</td></tr>
+<tr><th id="243">243</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>;</td></tr>
+<tr><th id="244">244</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <a class="ref" href="replay-internal.h.html#replay_read_input_event" title='replay_read_input_event' data-ref="replay_read_input_event">replay_read_input_event</a>();</td></tr>
+<tr><th id="245">245</th><td>        <b>return</b> <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>;</td></tr>
+<tr><th id="246">246</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_INPUT_SYNC">REPLAY_ASYNC_EVENT_INPUT_SYNC</a>:</td></tr>
+<tr><th id="247">247</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a>));</td></tr>
+<tr><th id="248">248</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>;</td></tr>
+<tr><th id="249">249</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <var>0</var>;</td></tr>
+<tr><th id="250">250</th><td>        <b>return</b> <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>;</td></tr>
+<tr><th id="251">251</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_CHAR_READ">REPLAY_ASYNC_EVENT_CHAR_READ</a>:</td></tr>
+<tr><th id="252">252</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a>));</td></tr>
+<tr><th id="253">253</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>;</td></tr>
+<tr><th id="254">254</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <a class="ref" href="replay-internal.h.html#replay_event_char_read_load" title='replay_event_char_read_load' data-ref="replay_event_char_read_load">replay_event_char_read_load</a>();</td></tr>
+<tr><th id="255">255</th><td>        <b>return</b> <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>;</td></tr>
+<tr><th id="256">256</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_BLOCK">REPLAY_ASYNC_EVENT_BLOCK</a>:</td></tr>
+<tr><th id="257">257</th><td>        <b>if</b> (<a class="tu ref" href="#read_id" title='read_id' data-use='r' data-ref="read_id">read_id</a> == -<var>1</var>) {</td></tr>
+<tr><th id="258">258</th><td>            <a class="tu ref" href="#read_id" title='read_id' data-use='w' data-ref="read_id">read_id</a> = <a class="ref" href="replay-internal.h.html#replay_get_qword" title='replay_get_qword' data-ref="replay_get_qword">replay_get_qword</a>();</td></tr>
+<tr><th id="259">259</th><td>        }</td></tr>
+<tr><th id="260">260</th><td>        <b>break</b>;</td></tr>
+<tr><th id="261">261</th><td>    <b>case</b> <a class="enum" href="replay-internal.h.html#ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET" title='ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET' data-ref="ReplayAsyncEventKind::REPLAY_ASYNC_EVENT_NET">REPLAY_ASYNC_EVENT_NET</a>:</td></tr>
+<tr><th id="262">262</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a> = <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_malloc0" title='g_malloc0' data-ref="g_malloc0">g_malloc0</a>(<b>sizeof</b>(<a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a>));</td></tr>
+<tr><th id="263">263</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='w' data-ref="Event::event_kind">event_kind</a> = <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>;</td></tr>
+<tr><th id="264">264</th><td>        <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::opaque" title='Event::opaque' data-use='w' data-ref="Event::opaque">opaque</a> = <a class="ref" href="replay-internal.h.html#replay_event_net_load" title='replay_event_net_load' data-ref="replay_event_net_load">replay_event_net_load</a>();</td></tr>
+<tr><th id="265">265</th><td>        <b>return</b> <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>;</td></tr>
+<tr><th id="266">266</th><td>    <b>default</b>:</td></tr>
+<tr><th id="267">267</th><td>        <a class="ref" href="../include/qemu/error-report.h.html#error_report" title='error_report' data-ref="error_report">error_report</a>(<q>"Unknown ID %d of replay event"</q>, <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a>);</td></tr>
+<tr><th id="268">268</th><td>        <a class="ref" href="../../include/stdlib.h.html#exit" title='exit' data-ref="exit">exit</a>(<var>1</var>);</td></tr>
+<tr><th id="269">269</th><td>        <b>break</b>;</td></tr>
+<tr><th id="270">270</th><td>    }</td></tr>
+<tr><th id="271">271</th><td></td></tr>
+<tr><th id="272">272</th><td>    <a class="macro" href="../include/qemu/queue.h.html#413" title="for ((event) = ((&amp;events_list)-&gt;tqh_first); (event); (event) = ((event)-&gt;events.tqe_next))" data-ref="_M/QTAILQ_FOREACH">QTAILQ_FOREACH</a>(<a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>, &amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>) {</td></tr>
+<tr><th id="273">273</th><td>        <b>if</b> (<a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::event_kind" title='Event::event_kind' data-use='r' data-ref="Event::event_kind">event_kind</a> == <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='r' data-ref="read_event_kind">read_event_kind</a></td></tr>
+<tr><th id="274">274</th><td>            &amp;&amp; (<a class="tu ref" href="#read_id" title='read_id' data-use='r' data-ref="read_id">read_id</a> == -<var>1</var> || <a class="tu ref" href="#read_id" title='read_id' data-use='r' data-ref="read_id">read_id</a> == <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>-&gt;<a class="tu ref" href="#Event::id" title='Event::id' data-use='r' data-ref="Event::id">id</a>)) {</td></tr>
+<tr><th id="275">275</th><td>            <b>break</b>;</td></tr>
+<tr><th id="276">276</th><td>        }</td></tr>
+<tr><th id="277">277</th><td>    }</td></tr>
+<tr><th id="278">278</th><td></td></tr>
+<tr><th id="279">279</th><td>    <b>if</b> (<a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>) {</td></tr>
+<tr><th id="280">280</th><td>        <a class="macro" href="../include/qemu/queue.h.html#403" title="do { if (((event)-&gt;events.tqe_next) != ((void*)0)) (event)-&gt;events.tqe_next-&gt;events.tqe_prev = (event)-&gt;events.tqe_prev; else (&amp;events_list)-&gt;tqh_last = (event)-&gt;events.tqe_prev; *(event)-&gt;events.tqe_prev = (event)-&gt;events.tqe_next; (event)-&gt;events.tqe_prev = ((void*)0); } while ( 0)" data-ref="_M/QTAILQ_REMOVE">QTAILQ_REMOVE</a>(&amp;<a class="tu ref" href="#events_list" title='events_list' data-use='a' data-ref="events_list">events_list</a>, <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>, <a class="tu ref" href="#Event::events" title='Event::events' data-use='m' data-ref="Event::events">events</a>);</td></tr>
+<tr><th id="281">281</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="282">282</th><td>        <b>return</b> <span class="macro" title="((void*)0)" data-ref="_M/NULL">NULL</span>;</td></tr>
+<tr><th id="283">283</th><td>    }</td></tr>
+<tr><th id="284">284</th><td></td></tr>
+<tr><th id="285">285</th><td>    <i>/* Read event-specific data */</i></td></tr>
+<tr><th id="286">286</th><td></td></tr>
+<tr><th id="287">287</th><td>    <b>return</b> <a class="local col0 ref" href="#20event" title='event' data-ref="20event">event</a>;</td></tr>
+<tr><th id="288">288</th><td>}</td></tr>
+<tr><th id="289">289</th><td></td></tr>
+<tr><th id="290">290</th><td><i>/* Called with replay mutex locked */</i></td></tr>
+<tr><th id="291">291</th><td><em>void</em> <dfn class="decl def" id="replay_read_events" title='replay_read_events' data-ref="replay_read_events">replay_read_events</dfn>(<em>int</em> <dfn class="local col1 decl" id="21checkpoint" title='checkpoint' data-type='int' data-ref="21checkpoint">checkpoint</dfn>)</td></tr>
+<tr><th id="292">292</th><td>{</td></tr>
+<tr><th id="293">293</th><td>    <b>while</b> (<a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::data_kind" title='ReplayState::data_kind' data-ref="ReplayState::data_kind">data_kind</a> == <a class="enum" href="replay-internal.h.html#ReplayEvents::EVENT_ASYNC" title='ReplayEvents::EVENT_ASYNC' data-ref="ReplayEvents::EVENT_ASYNC">EVENT_ASYNC</a>) {</td></tr>
+<tr><th id="294">294</th><td>        <a class="typedef" href="#Event" title='Event' data-type='struct Event' data-ref="Event">Event</a> *<dfn class="local col2 decl" id="22event" title='event' data-type='Event *' data-ref="22event">event</dfn> = <a class="tu ref" href="#replay_read_event" title='replay_read_event' data-use='c' data-ref="replay_read_event">replay_read_event</a>(<a class="local col1 ref" href="#21checkpoint" title='checkpoint' data-ref="21checkpoint">checkpoint</a>);</td></tr>
+<tr><th id="295">295</th><td>        <b>if</b> (!<a class="local col2 ref" href="#22event" title='event' data-ref="22event">event</a>) {</td></tr>
+<tr><th id="296">296</th><td>            <b>break</b>;</td></tr>
+<tr><th id="297">297</th><td>        }</td></tr>
+<tr><th id="298">298</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_unlock" title='replay_mutex_unlock' data-ref="replay_mutex_unlock">replay_mutex_unlock</a>();</td></tr>
+<tr><th id="299">299</th><td>        <a class="tu ref" href="#replay_run_event" title='replay_run_event' data-use='c' data-ref="replay_run_event">replay_run_event</a>(<a class="local col2 ref" href="#22event" title='event' data-ref="22event">event</a>);</td></tr>
+<tr><th id="300">300</th><td>        <a class="ref" href="replay-internal.h.html#replay_mutex_lock" title='replay_mutex_lock' data-ref="replay_mutex_lock">replay_mutex_lock</a>();</td></tr>
+<tr><th id="301">301</th><td></td></tr>
+<tr><th id="302">302</th><td>        <a class="ref" href="../../include/glib-2.0/glib/gmem.h.html#g_free" title='g_free' data-ref="g_free">g_free</a>(<a class="local col2 ref" href="#22event" title='event' data-ref="22event">event</a>);</td></tr>
+<tr><th id="303">303</th><td>        <a class="ref" href="replay-internal.h.html#replay_finish_event" title='replay_finish_event' data-ref="replay_finish_event">replay_finish_event</a>();</td></tr>
+<tr><th id="304">304</th><td>        <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='w' data-ref="read_event_kind">read_event_kind</a> = -<var>1</var>;</td></tr>
+<tr><th id="305">305</th><td>    }</td></tr>
+<tr><th id="306">306</th><td>}</td></tr>
+<tr><th id="307">307</th><td></td></tr>
+<tr><th id="308">308</th><td><em>void</em> <dfn class="decl def" id="replay_init_events" title='replay_init_events' data-ref="replay_init_events">replay_init_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="309">309</th><td>{</td></tr>
+<tr><th id="310">310</th><td>    <a class="tu ref" href="#read_event_kind" title='read_event_kind' data-use='w' data-ref="read_event_kind">read_event_kind</a> = -<var>1</var>;</td></tr>
+<tr><th id="311">311</th><td>}</td></tr>
+<tr><th id="312">312</th><td></td></tr>
+<tr><th id="313">313</th><td><em>void</em> <dfn class="decl def" id="replay_finish_events" title='replay_finish_events' data-ref="replay_finish_events">replay_finish_events</dfn>(<em>void</em>)</td></tr>
+<tr><th id="314">314</th><td>{</td></tr>
+<tr><th id="315">315</th><td>    <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='w' data-ref="events_enabled">events_enabled</a> = <span class="macro" title="0" data-ref="_M/false">false</span>;</td></tr>
+<tr><th id="316">316</th><td>    <a class="ref" href="#replay_clear_events" title='replay_clear_events' data-ref="replay_clear_events">replay_clear_events</a>();</td></tr>
+<tr><th id="317">317</th><td>}</td></tr>
+<tr><th id="318">318</th><td></td></tr>
+<tr><th id="319">319</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="replay_events_enabled" title='replay_events_enabled' data-ref="replay_events_enabled">replay_events_enabled</dfn>(<em>void</em>)</td></tr>
+<tr><th id="320">320</th><td>{</td></tr>
+<tr><th id="321">321</th><td>    <b>return</b> <a class="tu ref" href="#events_enabled" title='events_enabled' data-use='r' data-ref="events_enabled">events_enabled</a>;</td></tr>
+<tr><th id="322">322</th><td>}</td></tr>
+<tr><th id="323">323</th><td></td></tr>
+<tr><th id="324">324</th><td><a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="blkreplay_next_id" title='blkreplay_next_id' data-ref="blkreplay_next_id">blkreplay_next_id</dfn>(<em>void</em>)</td></tr>
+<tr><th id="325">325</th><td>{</td></tr>
+<tr><th id="326">326</th><td>    <b>if</b> (<a class="ref" href="#replay_events_enabled" title='replay_events_enabled' data-ref="replay_events_enabled">replay_events_enabled</a>()) {</td></tr>
+<tr><th id="327">327</th><td>        <b>return</b> <a class="ref" href="replay-internal.h.html#replay_state" title='replay_state' data-ref="replay_state">replay_state</a>.<a class="ref" href="replay-internal.h.html#ReplayState::block_request_id" title='ReplayState::block_request_id' data-ref="ReplayState::block_request_id">block_request_id</a>++;</td></tr>
+<tr><th id="328">328</th><td>    }</td></tr>
+<tr><th id="329">329</th><td>    <b>return</b> <var>0</var>;</td></tr>
+<tr><th id="330">330</th><td>}</td></tr>
+<tr><th id="331">331</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

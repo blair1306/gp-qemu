@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>thread.h source code [codebrowser/include/qemu/thread.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="QemuLockCnt,QemuSpin "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/thread.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='thread.h.html'>thread.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><u>#<span data-ppcond="1">ifndef</span> <span class="macro" data-ref="_M/QEMU_THREAD_H">QEMU_THREAD_H</span></u></td></tr>
+<tr><th id="2">2</th><td><u>#define <dfn class="macro" id="_M/QEMU_THREAD_H" data-ref="_M/QEMU_THREAD_H">QEMU_THREAD_H</dfn></u></td></tr>
+<tr><th id="3">3</th><td></td></tr>
+<tr><th id="4">4</th><td><u>#include <a href="processor.h.html">"qemu/processor.h"</a></u></td></tr>
+<tr><th id="5">5</th><td><u>#include <a href="atomic.h.html">"qemu/atomic.h"</a></u></td></tr>
+<tr><th id="6">6</th><td></td></tr>
+<tr><th id="7">7</th><td><b>typedef</b> <b>struct</b> <a class="type" href="thread-posix.h.html#QemuMutex" title='QemuMutex' data-ref="QemuMutex" id="QemuMutex"><a class="type" href="thread-posix.h.html#QemuMutex" title='QemuMutex' data-ref="QemuMutex">QemuMutex</a></a> <dfn class="typedef" id="QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</dfn>;</td></tr>
+<tr><th id="8">8</th><td><b>typedef</b> <b>struct</b> <a class="type" href="thread-posix.h.html#QemuCond" title='QemuCond' data-ref="QemuCond" id="QemuCond"><a class="type" href="thread-posix.h.html#QemuCond" title='QemuCond' data-ref="QemuCond">QemuCond</a></a> <dfn class="typedef" id="QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</dfn>;</td></tr>
+<tr><th id="9">9</th><td><b>typedef</b> <b>struct</b> <a class="type" href="thread-posix.h.html#QemuSemaphore" title='QemuSemaphore' data-ref="QemuSemaphore" id="QemuSemaphore"><a class="type" href="thread-posix.h.html#QemuSemaphore" title='QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a></a> <dfn class="typedef" id="QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</dfn>;</td></tr>
+<tr><th id="10">10</th><td><b>typedef</b> <b>struct</b> <a class="type" href="thread-posix.h.html#QemuEvent" title='QemuEvent' data-ref="QemuEvent" id="QemuEvent"><a class="type" href="thread-posix.h.html#QemuEvent" title='QemuEvent' data-ref="QemuEvent">QemuEvent</a></a> <dfn class="typedef" id="QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</dfn>;</td></tr>
+<tr><th id="11">11</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#QemuLockCnt" title='QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> <dfn class="typedef" id="QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</dfn>;</td></tr>
+<tr><th id="12">12</th><td><b>typedef</b> <b>struct</b> <a class="type" href="thread-posix.h.html#QemuThread" title='QemuThread' data-ref="QemuThread" id="QemuThread"><a class="type" href="thread-posix.h.html#QemuThread" title='QemuThread' data-ref="QemuThread">QemuThread</a></a> <dfn class="typedef" id="QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</dfn>;</td></tr>
+<tr><th id="13">13</th><td></td></tr>
+<tr><th id="14">14</th><td><u>#<span data-ppcond="14">ifdef</span> <span class="macro" data-ref="_M/_WIN32">_WIN32</span></u></td></tr>
+<tr><th id="15">15</th><td><u>#include "qemu/thread-win32.h"</u></td></tr>
+<tr><th id="16">16</th><td><u>#<span data-ppcond="14">else</span></u></td></tr>
+<tr><th id="17">17</th><td><u>#include <a href="thread-posix.h.html">"qemu/thread-posix.h"</a></u></td></tr>
+<tr><th id="18">18</th><td><u>#<span data-ppcond="14">endif</span></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><u>#define <dfn class="macro" id="_M/QEMU_THREAD_JOINABLE" data-ref="_M/QEMU_THREAD_JOINABLE">QEMU_THREAD_JOINABLE</dfn> 0</u></td></tr>
+<tr><th id="21">21</th><td><u>#define <dfn class="macro" id="_M/QEMU_THREAD_DETACHED" data-ref="_M/QEMU_THREAD_DETACHED">QEMU_THREAD_DETACHED</dfn> 1</u></td></tr>
+<tr><th id="22">22</th><td></td></tr>
+<tr><th id="23">23</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_init" title='qemu_mutex_init' data-ref="qemu_mutex_init">qemu_mutex_init</dfn>(<a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col2 decl" id="7112mutex" title='mutex' data-type='QemuMutex *' data-ref="7112mutex">mutex</dfn>);</td></tr>
+<tr><th id="24">24</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_destroy" title='qemu_mutex_destroy' data-ref="qemu_mutex_destroy">qemu_mutex_destroy</dfn>(<a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col3 decl" id="7113mutex" title='mutex' data-type='QemuMutex *' data-ref="7113mutex">mutex</dfn>);</td></tr>
+<tr><th id="25">25</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_lock" title='qemu_mutex_lock' data-ref="qemu_mutex_lock">qemu_mutex_lock</dfn>(<a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col4 decl" id="7114mutex" title='mutex' data-type='QemuMutex *' data-ref="7114mutex">mutex</dfn>);</td></tr>
+<tr><th id="26">26</th><td><em>int</em> <dfn class="decl" id="qemu_mutex_trylock" title='qemu_mutex_trylock' data-ref="qemu_mutex_trylock">qemu_mutex_trylock</dfn>(<a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col5 decl" id="7115mutex" title='mutex' data-type='QemuMutex *' data-ref="7115mutex">mutex</dfn>);</td></tr>
+<tr><th id="27">27</th><td><em>void</em> <dfn class="decl" id="qemu_mutex_unlock" title='qemu_mutex_unlock' data-ref="qemu_mutex_unlock">qemu_mutex_unlock</dfn>(<a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col6 decl" id="7116mutex" title='mutex' data-type='QemuMutex *' data-ref="7116mutex">mutex</dfn>);</td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><i>/* Prototypes for other functions are in thread-posix.h/thread-win32.h.  */</i></td></tr>
+<tr><th id="30">30</th><td><em>void</em> <dfn class="decl" id="qemu_rec_mutex_init" title='qemu_rec_mutex_init' data-ref="qemu_rec_mutex_init">qemu_rec_mutex_init</dfn>(<a class="typedef" href="thread-posix.h.html#QemuRecMutex" title='QemuRecMutex' data-type='QemuMutex' data-ref="QemuRecMutex">QemuRecMutex</a> *<dfn class="local col7 decl" id="7117mutex" title='mutex' data-type='QemuRecMutex *' data-ref="7117mutex">mutex</dfn>);</td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><em>void</em> <dfn class="decl" id="qemu_cond_init" title='qemu_cond_init' data-ref="qemu_cond_init">qemu_cond_init</dfn>(<a class="typedef" href="#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="local col8 decl" id="7118cond" title='cond' data-type='QemuCond *' data-ref="7118cond">cond</dfn>);</td></tr>
+<tr><th id="33">33</th><td><em>void</em> <dfn class="decl" id="qemu_cond_destroy" title='qemu_cond_destroy' data-ref="qemu_cond_destroy">qemu_cond_destroy</dfn>(<a class="typedef" href="#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="local col9 decl" id="7119cond" title='cond' data-type='QemuCond *' data-ref="7119cond">cond</dfn>);</td></tr>
+<tr><th id="34">34</th><td></td></tr>
+<tr><th id="35">35</th><td><i>/*</i></td></tr>
+<tr><th id="36">36</th><td><i> * IMPORTANT: The implementation does not guarantee that pthread_cond_signal</i></td></tr>
+<tr><th id="37">37</th><td><i> * and pthread_cond_broadcast can be called except while the same mutex is</i></td></tr>
+<tr><th id="38">38</th><td><i> * held as in the corresponding pthread_cond_wait calls!</i></td></tr>
+<tr><th id="39">39</th><td><i> */</i></td></tr>
+<tr><th id="40">40</th><td><em>void</em> <dfn class="decl" id="qemu_cond_signal" title='qemu_cond_signal' data-ref="qemu_cond_signal">qemu_cond_signal</dfn>(<a class="typedef" href="#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="local col0 decl" id="7120cond" title='cond' data-type='QemuCond *' data-ref="7120cond">cond</dfn>);</td></tr>
+<tr><th id="41">41</th><td><em>void</em> <dfn class="decl" id="qemu_cond_broadcast" title='qemu_cond_broadcast' data-ref="qemu_cond_broadcast">qemu_cond_broadcast</dfn>(<a class="typedef" href="#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="local col1 decl" id="7121cond" title='cond' data-type='QemuCond *' data-ref="7121cond">cond</dfn>);</td></tr>
+<tr><th id="42">42</th><td><em>void</em> <dfn class="decl" id="qemu_cond_wait" title='qemu_cond_wait' data-ref="qemu_cond_wait">qemu_cond_wait</dfn>(<a class="typedef" href="#QemuCond" title='QemuCond' data-type='struct QemuCond' data-ref="QemuCond">QemuCond</a> *<dfn class="local col2 decl" id="7122cond" title='cond' data-type='QemuCond *' data-ref="7122cond">cond</dfn>, <a class="typedef" href="#QemuMutex" title='QemuMutex' data-type='struct QemuMutex' data-ref="QemuMutex">QemuMutex</a> *<dfn class="local col3 decl" id="7123mutex" title='mutex' data-type='QemuMutex *' data-ref="7123mutex">mutex</dfn>);</td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td><em>void</em> <dfn class="decl" id="qemu_sem_init" title='qemu_sem_init' data-ref="qemu_sem_init">qemu_sem_init</dfn>(<a class="typedef" href="#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> *<dfn class="local col4 decl" id="7124sem" title='sem' data-type='QemuSemaphore *' data-ref="7124sem">sem</dfn>, <em>int</em> <dfn class="local col5 decl" id="7125init" title='init' data-type='int' data-ref="7125init">init</dfn>);</td></tr>
+<tr><th id="45">45</th><td><em>void</em> <dfn class="decl" id="qemu_sem_post" title='qemu_sem_post' data-ref="qemu_sem_post">qemu_sem_post</dfn>(<a class="typedef" href="#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> *<dfn class="local col6 decl" id="7126sem" title='sem' data-type='QemuSemaphore *' data-ref="7126sem">sem</dfn>);</td></tr>
+<tr><th id="46">46</th><td><em>void</em> <dfn class="decl" id="qemu_sem_wait" title='qemu_sem_wait' data-ref="qemu_sem_wait">qemu_sem_wait</dfn>(<a class="typedef" href="#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> *<dfn class="local col7 decl" id="7127sem" title='sem' data-type='QemuSemaphore *' data-ref="7127sem">sem</dfn>);</td></tr>
+<tr><th id="47">47</th><td><em>int</em> <dfn class="decl" id="qemu_sem_timedwait" title='qemu_sem_timedwait' data-ref="qemu_sem_timedwait">qemu_sem_timedwait</dfn>(<a class="typedef" href="#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> *<dfn class="local col8 decl" id="7128sem" title='sem' data-type='QemuSemaphore *' data-ref="7128sem">sem</dfn>, <em>int</em> <dfn class="local col9 decl" id="7129ms" title='ms' data-type='int' data-ref="7129ms">ms</dfn>);</td></tr>
+<tr><th id="48">48</th><td><em>void</em> <dfn class="decl" id="qemu_sem_destroy" title='qemu_sem_destroy' data-ref="qemu_sem_destroy">qemu_sem_destroy</dfn>(<a class="typedef" href="#QemuSemaphore" title='QemuSemaphore' data-type='struct QemuSemaphore' data-ref="QemuSemaphore">QemuSemaphore</a> *<dfn class="local col0 decl" id="7130sem" title='sem' data-type='QemuSemaphore *' data-ref="7130sem">sem</dfn>);</td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><em>void</em> <dfn class="decl" id="qemu_event_init" title='qemu_event_init' data-ref="qemu_event_init">qemu_event_init</dfn>(<a class="typedef" href="#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> *<dfn class="local col1 decl" id="7131ev" title='ev' data-type='QemuEvent *' data-ref="7131ev">ev</dfn>, <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col2 decl" id="7132init" title='init' data-type='_Bool' data-ref="7132init">init</dfn>);</td></tr>
+<tr><th id="51">51</th><td><em>void</em> <dfn class="decl" id="qemu_event_set" title='qemu_event_set' data-ref="qemu_event_set">qemu_event_set</dfn>(<a class="typedef" href="#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> *<dfn class="local col3 decl" id="7133ev" title='ev' data-type='QemuEvent *' data-ref="7133ev">ev</dfn>);</td></tr>
+<tr><th id="52">52</th><td><em>void</em> <dfn class="decl" id="qemu_event_reset" title='qemu_event_reset' data-ref="qemu_event_reset">qemu_event_reset</dfn>(<a class="typedef" href="#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> *<dfn class="local col4 decl" id="7134ev" title='ev' data-type='QemuEvent *' data-ref="7134ev">ev</dfn>);</td></tr>
+<tr><th id="53">53</th><td><em>void</em> <dfn class="decl" id="qemu_event_wait" title='qemu_event_wait' data-ref="qemu_event_wait">qemu_event_wait</dfn>(<a class="typedef" href="#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> *<dfn class="local col5 decl" id="7135ev" title='ev' data-type='QemuEvent *' data-ref="7135ev">ev</dfn>);</td></tr>
+<tr><th id="54">54</th><td><em>void</em> <dfn class="decl" id="qemu_event_destroy" title='qemu_event_destroy' data-ref="qemu_event_destroy">qemu_event_destroy</dfn>(<a class="typedef" href="#QemuEvent" title='QemuEvent' data-type='struct QemuEvent' data-ref="QemuEvent">QemuEvent</a> *<dfn class="local col6 decl" id="7136ev" title='ev' data-type='QemuEvent *' data-ref="7136ev">ev</dfn>);</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><em>void</em> <dfn class="decl" id="qemu_thread_create" title='qemu_thread_create' data-ref="qemu_thread_create">qemu_thread_create</dfn>(<a class="typedef" href="#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> *<dfn class="local col7 decl" id="7137thread" title='thread' data-type='QemuThread *' data-ref="7137thread">thread</dfn>, <em>const</em> <em>char</em> *<dfn class="local col8 decl" id="7138name" title='name' data-type='const char *' data-ref="7138name">name</dfn>,</td></tr>
+<tr><th id="57">57</th><td>                        <em>void</em> *(*<dfn class="local col9 decl" id="7139start_routine" title='start_routine' data-type='void *(*)(void *)' data-ref="7139start_routine">start_routine</dfn>)(<em>void</em> *),</td></tr>
+<tr><th id="58">58</th><td>                        <em>void</em> *<dfn class="local col0 decl" id="7140arg" title='arg' data-type='void *' data-ref="7140arg">arg</dfn>, <em>int</em> <dfn class="local col1 decl" id="7141mode" title='mode' data-type='int' data-ref="7141mode">mode</dfn>);</td></tr>
+<tr><th id="59">59</th><td><em>void</em> *<dfn class="decl" id="qemu_thread_join" title='qemu_thread_join' data-ref="qemu_thread_join">qemu_thread_join</dfn>(<a class="typedef" href="#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> *<dfn class="local col2 decl" id="7142thread" title='thread' data-type='QemuThread *' data-ref="7142thread">thread</dfn>);</td></tr>
+<tr><th id="60">60</th><td><em>void</em> <dfn class="decl" id="qemu_thread_get_self" title='qemu_thread_get_self' data-ref="qemu_thread_get_self">qemu_thread_get_self</dfn>(<a class="typedef" href="#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> *<dfn class="local col3 decl" id="7143thread" title='thread' data-type='QemuThread *' data-ref="7143thread">thread</dfn>);</td></tr>
+<tr><th id="61">61</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_thread_is_self" title='qemu_thread_is_self' data-ref="qemu_thread_is_self">qemu_thread_is_self</dfn>(<a class="typedef" href="#QemuThread" title='QemuThread' data-type='struct QemuThread' data-ref="QemuThread">QemuThread</a> *<dfn class="local col4 decl" id="7144thread" title='thread' data-type='QemuThread *' data-ref="7144thread">thread</dfn>);</td></tr>
+<tr><th id="62">62</th><td><em>void</em> <dfn class="decl" id="qemu_thread_exit" title='qemu_thread_exit' data-ref="qemu_thread_exit">qemu_thread_exit</dfn>(<em>void</em> *<dfn class="local col5 decl" id="7145retval" title='retval' data-type='void *' data-ref="7145retval">retval</dfn>);</td></tr>
+<tr><th id="63">63</th><td><em>void</em> <dfn class="decl" id="qemu_thread_naming" title='qemu_thread_naming' data-ref="qemu_thread_naming">qemu_thread_naming</dfn>(<span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="local col6 decl" id="7146enable" title='enable' data-type='_Bool' data-ref="7146enable">enable</dfn>);</td></tr>
+<tr><th id="64">64</th><td></td></tr>
+<tr><th id="65">65</th><td><b>struct</b> <a class="type" href="notify.h.html#Notifier" title='Notifier' data-ref="Notifier" id="Notifier">Notifier</a>;</td></tr>
+<tr><th id="66">66</th><td><em>void</em> <dfn class="decl" id="qemu_thread_atexit_add" title='qemu_thread_atexit_add' data-ref="qemu_thread_atexit_add">qemu_thread_atexit_add</dfn>(<b>struct</b> <a class="type" href="notify.h.html#Notifier" title='Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col7 decl" id="7147notifier" title='notifier' data-type='struct Notifier *' data-ref="7147notifier">notifier</dfn>);</td></tr>
+<tr><th id="67">67</th><td><em>void</em> <dfn class="decl" id="qemu_thread_atexit_remove" title='qemu_thread_atexit_remove' data-ref="qemu_thread_atexit_remove">qemu_thread_atexit_remove</dfn>(<b>struct</b> <a class="type" href="notify.h.html#Notifier" title='Notifier' data-ref="Notifier">Notifier</a> *<dfn class="local col8 decl" id="7148notifier" title='notifier' data-type='struct Notifier *' data-ref="7148notifier">notifier</dfn>);</td></tr>
+<tr><th id="68">68</th><td></td></tr>
+<tr><th id="69">69</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="QemuSpin" title='QemuSpin' data-ref="QemuSpin"><a class="type" href="#QemuSpin" title='QemuSpin' data-ref="QemuSpin">QemuSpin</a></dfn> {</td></tr>
+<tr><th id="70">70</th><td>    <em>int</em> <dfn class="decl" id="QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</dfn>;</td></tr>
+<tr><th id="71">71</th><td>} <dfn class="typedef" id="QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</dfn>;</td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="qemu_spin_init" title='qemu_spin_init' data-ref="qemu_spin_init">qemu_spin_init</dfn>(<a class="typedef" href="#QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</a> *<dfn class="local col9 decl" id="7149spin" title='spin' data-type='QemuSpin *' data-ref="7149spin">spin</dfn>)</td></tr>
+<tr><th id="74">74</th><td>{</td></tr>
+<tr><th id="75">75</th><td>    <a class="ref" href="#75" title='__sync_lock_release_4' data-ref="__sync_lock_release_4">__sync_lock_release</a>(&amp;<a class="local col9 ref" href="#7149spin" title='spin' data-ref="7149spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>);</td></tr>
+<tr><th id="76">76</th><td>}</td></tr>
+<tr><th id="77">77</th><td></td></tr>
+<tr><th id="78">78</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="qemu_spin_lock" title='qemu_spin_lock' data-ref="qemu_spin_lock">qemu_spin_lock</dfn>(<a class="typedef" href="#QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</a> *<dfn class="local col0 decl" id="7150spin" title='spin' data-type='QemuSpin *' data-ref="7150spin">spin</dfn>)</td></tr>
+<tr><th id="79">79</th><td>{</td></tr>
+<tr><th id="80">80</th><td>    <b>while</b> (<a class="macro" href="compiler.h.html#58" title="__builtin_expect(!!(__sync_lock_test_and_set(&amp;spin-&gt;value, 1)), 0)" data-ref="_M/unlikely">unlikely</a>(<a class="ref" href="#80" title='__sync_lock_test_and_set_4' data-ref="__sync_lock_test_and_set_4">__sync_lock_test_and_set</a>(&amp;<a class="local col0 ref" href="#7150spin" title='spin' data-ref="7150spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>, <span class="macro" title="1" data-ref="_M/true">true</span>))) {</td></tr>
+<tr><th id="81">81</th><td>        <b>while</b> (<a class="macro" href="atomic.h.html#123" title="({ _Static_assert(!(sizeof(*&amp;spin-&gt;value) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;spin-&gt;value) &gt; ATOMIC_REG_SIZE&quot;); __atomic_load_n(&amp;spin-&gt;value, 0); })" data-ref="_M/atomic_read">atomic_read</a>(&amp;<a class="local col0 ref" href="#7150spin" title='spin' data-ref="7150spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>)) {</td></tr>
+<tr><th id="82">82</th><td>            <a class="macro" href="processor.h.html#13" title="asm volatile(&quot;rep; nop&quot; ::: &quot;memory&quot;)" data-ref="_M/cpu_relax">cpu_relax</a>();</td></tr>
+<tr><th id="83">83</th><td>        }</td></tr>
+<tr><th id="84">84</th><td>    }</td></tr>
+<tr><th id="85">85</th><td>}</td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qemu_spin_trylock" title='qemu_spin_trylock' data-ref="qemu_spin_trylock">qemu_spin_trylock</dfn>(<a class="typedef" href="#QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</a> *<dfn class="local col1 decl" id="7151spin" title='spin' data-type='QemuSpin *' data-ref="7151spin">spin</dfn>)</td></tr>
+<tr><th id="88">88</th><td>{</td></tr>
+<tr><th id="89">89</th><td>    <b>return</b> <a class="ref" href="#80" title='__sync_lock_test_and_set_4' data-ref="__sync_lock_test_and_set_4">__sync_lock_test_and_set</a>(&amp;<a class="local col1 ref" href="#7151spin" title='spin' data-ref="7151spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>, <span class="macro" title="1" data-ref="_M/true">true</span>);</td></tr>
+<tr><th id="90">90</th><td>}</td></tr>
+<tr><th id="91">91</th><td></td></tr>
+<tr><th id="92">92</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="qemu_spin_locked" title='qemu_spin_locked' data-ref="qemu_spin_locked">qemu_spin_locked</dfn>(<a class="typedef" href="#QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</a> *<dfn class="local col2 decl" id="7152spin" title='spin' data-type='QemuSpin *' data-ref="7152spin">spin</dfn>)</td></tr>
+<tr><th id="93">93</th><td>{</td></tr>
+<tr><th id="94">94</th><td>    <b>return</b> <a class="macro" href="atomic.h.html#123" title="({ _Static_assert(!(sizeof(*&amp;spin-&gt;value) &gt; 8), &quot;not expecting: &quot; &quot;sizeof(*&amp;spin-&gt;value) &gt; ATOMIC_REG_SIZE&quot;); __atomic_load_n(&amp;spin-&gt;value, 0); })" data-ref="_M/atomic_read">atomic_read</a>(&amp;<a class="local col2 ref" href="#7152spin" title='spin' data-ref="7152spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>);</td></tr>
+<tr><th id="95">95</th><td>}</td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="qemu_spin_unlock" title='qemu_spin_unlock' data-ref="qemu_spin_unlock">qemu_spin_unlock</dfn>(<a class="typedef" href="#QemuSpin" title='QemuSpin' data-type='struct QemuSpin' data-ref="QemuSpin">QemuSpin</a> *<dfn class="local col3 decl" id="7153spin" title='spin' data-type='QemuSpin *' data-ref="7153spin">spin</dfn>)</td></tr>
+<tr><th id="98">98</th><td>{</td></tr>
+<tr><th id="99">99</th><td>    <a class="ref" href="#75" title='__sync_lock_release_4' data-ref="__sync_lock_release_4">__sync_lock_release</a>(&amp;<a class="local col3 ref" href="#7153spin" title='spin' data-ref="7153spin">spin</a>-&gt;<a class="ref" href="#QemuSpin::value" title='QemuSpin::value' data-ref="QemuSpin::value">value</a>);</td></tr>
+<tr><th id="100">100</th><td>}</td></tr>
+<tr><th id="101">101</th><td></td></tr>
+<tr><th id="102">102</th><td><b>struct</b> <dfn class="type def" id="QemuLockCnt" title='QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</dfn> {</td></tr>
+<tr><th id="103">103</th><td><u>#<span data-ppcond="103">ifndef</span> <a class="macro" href="../../config-host.h.html#12" data-ref="_M/CONFIG_LINUX">CONFIG_LINUX</a></u></td></tr>
+<tr><th id="104">104</th><td>    QemuMutex mutex;</td></tr>
+<tr><th id="105">105</th><td><u>#<span data-ppcond="103">endif</span></u></td></tr>
+<tr><th id="106">106</th><td>    <em>unsigned</em> <dfn class="decl" id="QemuLockCnt::count" title='QemuLockCnt::count' data-ref="QemuLockCnt::count">count</dfn>;</td></tr>
+<tr><th id="107">107</th><td>};</td></tr>
+<tr><th id="108">108</th><td></td></tr>
+<tr><th id="109">109</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="110">110</th><td><i class="doc"> * qemu_lockcnt_init: initialize a QemuLockcnt</i></td></tr>
+<tr><th id="111">111</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to initialize</i></td></tr>
+<tr><th id="112">112</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="113">113</th><td><i class="doc"> * Initialize lockcnt's counter to zero and prepare its mutex</i></td></tr>
+<tr><th id="114">114</th><td><i class="doc"> * for usage.</i></td></tr>
+<tr><th id="115">115</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="116">116</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_init" title='qemu_lockcnt_init' data-ref="qemu_lockcnt_init">qemu_lockcnt_init</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col4 decl" id="7154lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7154lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="119">119</th><td><i class="doc"> * qemu_lockcnt_destroy: destroy a QemuLockcnt</i></td></tr>
+<tr><th id="120">120</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to destruct</i></td></tr>
+<tr><th id="121">121</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="122">122</th><td><i class="doc"> * Destroy lockcnt's mutex.</i></td></tr>
+<tr><th id="123">123</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="124">124</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_destroy" title='qemu_lockcnt_destroy' data-ref="qemu_lockcnt_destroy">qemu_lockcnt_destroy</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col5 decl" id="7155lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7155lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="125">125</th><td></td></tr>
+<tr><th id="126">126</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="127">127</th><td><i class="doc"> * qemu_lockcnt_inc: increment a QemuLockCnt's counter</i></td></tr>
+<tr><th id="128">128</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on</i></td></tr>
+<tr><th id="129">129</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="130">130</th><td><i class="doc"> * If the lockcnt's count is zero, wait for critical sections</i></td></tr>
+<tr><th id="131">131</th><td><i class="doc"> * to finish and increment lockcnt's count to 1.  If the count</i></td></tr>
+<tr><th id="132">132</th><td><i class="doc"> * is not zero, just increment it.</i></td></tr>
+<tr><th id="133">133</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="134">134</th><td><i class="doc"> * Because this function can wait on the mutex, it must not be</i></td></tr>
+<tr><th id="135">135</th><td><i class="doc"> * called while the lockcnt's mutex is held by the current thread.</i></td></tr>
+<tr><th id="136">136</th><td><i class="doc"> * For the same reason, qemu_lockcnt_inc can also contribute to</i></td></tr>
+<tr><th id="137">137</th><td><i class="doc"> * AB-BA deadlocks.  This is a sample deadlock scenario:</i></td></tr>
+<tr><th id="138">138</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="139">139</th><td><i class="doc"> *            thread 1                      thread 2</i></td></tr>
+<tr><th id="140">140</th><td><i class="doc"> *            -------------------------------------------------------</i></td></tr>
+<tr><th id="141">141</th><td><i class="doc"> *            qemu_lockcnt_lock(&amp;lc1);</i></td></tr>
+<tr><th id="142">142</th><td><i class="doc"> *                                          qemu_lockcnt_lock(&amp;lc2);</i></td></tr>
+<tr><th id="143">143</th><td><i class="doc"> *            qemu_lockcnt_inc(&amp;lc2);</i></td></tr>
+<tr><th id="144">144</th><td><i class="doc"> *                                          qemu_lockcnt_inc(&amp;lc1);</i></td></tr>
+<tr><th id="145">145</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="146">146</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_inc" title='qemu_lockcnt_inc' data-ref="qemu_lockcnt_inc">qemu_lockcnt_inc</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col6 decl" id="7156lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7156lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="149">149</th><td><i class="doc"> * qemu_lockcnt_dec: decrement a QemuLockCnt's counter</i></td></tr>
+<tr><th id="150">150</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on</i></td></tr>
+<tr><th id="151">151</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="152">152</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_dec" title='qemu_lockcnt_dec' data-ref="qemu_lockcnt_dec">qemu_lockcnt_dec</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col7 decl" id="7157lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7157lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="153">153</th><td></td></tr>
+<tr><th id="154">154</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="155">155</th><td><i class="doc"> * qemu_lockcnt_dec_and_lock: decrement a QemuLockCnt's counter and</i></td></tr>
+<tr><th id="156">156</th><td><i class="doc"> * possibly lock it.</i></td></tr>
+<tr><th id="157">157</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on</i></td></tr>
+<tr><th id="158">158</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="159">159</th><td><i class="doc"> * Decrement lockcnt's count.  If the new count is zero, lock</i></td></tr>
+<tr><th id="160">160</th><td><i class="doc"> * the mutex and return true.  Otherwise, return false.</i></td></tr>
+<tr><th id="161">161</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="162">162</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_lockcnt_dec_and_lock" title='qemu_lockcnt_dec_and_lock' data-ref="qemu_lockcnt_dec_and_lock">qemu_lockcnt_dec_and_lock</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col8 decl" id="7158lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7158lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="163">163</th><td></td></tr>
+<tr><th id="164">164</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="165">165</th><td><i class="doc"> * qemu_lockcnt_dec_if_lock: possibly decrement a QemuLockCnt's counter and</i></td></tr>
+<tr><th id="166">166</th><td><i class="doc"> * lock it.</i></td></tr>
+<tr><th id="167">167</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on</i></td></tr>
+<tr><th id="168">168</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="169">169</th><td><i class="doc"> * If the count is 1, decrement the count to zero, lock</i></td></tr>
+<tr><th id="170">170</th><td><i class="doc"> * the mutex and return true.  Otherwise, return false.</i></td></tr>
+<tr><th id="171">171</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="172">172</th><td><span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="qemu_lockcnt_dec_if_lock" title='qemu_lockcnt_dec_if_lock' data-ref="qemu_lockcnt_dec_if_lock">qemu_lockcnt_dec_if_lock</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col9 decl" id="7159lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7159lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="173">173</th><td></td></tr>
+<tr><th id="174">174</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="175">175</th><td><i class="doc"> * qemu_lockcnt_lock: lock a QemuLockCnt's mutex.</i></td></tr>
+<tr><th id="176">176</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on</i></td></tr>
+<tr><th id="177">177</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="178">178</th><td><i class="doc"> * Remember that concurrent visits are not blocked unless the count is</i></td></tr>
+<tr><th id="179">179</th><td><i class="doc"> * also zero.  You can use qemu_lockcnt_count to check for this inside a</i></td></tr>
+<tr><th id="180">180</th><td><i class="doc"> * critical section.</i></td></tr>
+<tr><th id="181">181</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="182">182</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_lock" title='qemu_lockcnt_lock' data-ref="qemu_lockcnt_lock">qemu_lockcnt_lock</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col0 decl" id="7160lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7160lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="183">183</th><td></td></tr>
+<tr><th id="184">184</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="185">185</th><td><i class="doc"> * qemu_lockcnt_unlock: release a QemuLockCnt's mutex.</i></td></tr>
+<tr><th id="186">186</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on.</i></td></tr>
+<tr><th id="187">187</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="188">188</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_unlock" title='qemu_lockcnt_unlock' data-ref="qemu_lockcnt_unlock">qemu_lockcnt_unlock</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col1 decl" id="7161lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7161lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="189">189</th><td></td></tr>
+<tr><th id="190">190</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="191">191</th><td><i class="doc"> * qemu_lockcnt_inc_and_unlock: combined unlock/increment on a QemuLockCnt.</i></td></tr>
+<tr><th id="192">192</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to operate on.</i></td></tr>
+<tr><th id="193">193</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="194">194</th><td><i class="doc"> * This is the same as</i></td></tr>
+<tr><th id="195">195</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="196">196</th><td><i class="doc"> *     qemu_lockcnt_unlock(lockcnt);</i></td></tr>
+<tr><th id="197">197</th><td><i class="doc"> *     qemu_lockcnt_inc(lockcnt);</i></td></tr>
+<tr><th id="198">198</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="199">199</th><td><i class="doc"> * but more efficient.</i></td></tr>
+<tr><th id="200">200</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="201">201</th><td><em>void</em> <dfn class="decl" id="qemu_lockcnt_inc_and_unlock" title='qemu_lockcnt_inc_and_unlock' data-ref="qemu_lockcnt_inc_and_unlock">qemu_lockcnt_inc_and_unlock</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col2 decl" id="7162lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7162lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="202">202</th><td></td></tr>
+<tr><th id="203">203</th><td><i class="doc">/**</i></td></tr>
+<tr><th id="204">204</th><td><i class="doc"> * qemu_lockcnt_count: query a LockCnt's count.</i></td></tr>
+<tr><th id="205">205</th><td><i class="doc"> *<span class="command"> @lockcnt</span>: the lockcnt to query.</i></td></tr>
+<tr><th id="206">206</th><td><i class="doc"> *</i></td></tr>
+<tr><th id="207">207</th><td><i class="doc"> * Note that the count can change at any time.  Still, while the</i></td></tr>
+<tr><th id="208">208</th><td><i class="doc"> * lockcnt is locked, one can usefully check whether the count</i></td></tr>
+<tr><th id="209">209</th><td><i class="doc"> * is non-zero.</i></td></tr>
+<tr><th id="210">210</th><td><i class="doc"> */</i></td></tr>
+<tr><th id="211">211</th><td><em>unsigned</em> <dfn class="decl" id="qemu_lockcnt_count" title='qemu_lockcnt_count' data-ref="qemu_lockcnt_count">qemu_lockcnt_count</dfn>(<a class="typedef" href="#QemuLockCnt" title='QemuLockCnt' data-type='struct QemuLockCnt' data-ref="QemuLockCnt">QemuLockCnt</a> *<dfn class="local col3 decl" id="7163lockcnt" title='lockcnt' data-type='QemuLockCnt *' data-ref="7163lockcnt">lockcnt</dfn>);</td></tr>
+<tr><th id="212">212</th><td></td></tr>
+<tr><th id="213">213</th><td><u>#<span data-ppcond="1">endif</span></u></td></tr>
+<tr><th id="214">214</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../accel/accel.c.html'>codebrowser/accel/accel.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

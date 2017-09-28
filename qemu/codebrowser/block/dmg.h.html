@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>dmg.h source code [codebrowser/block/dmg.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="BDRVDMGState "/>
+<link rel="stylesheet" href="../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/block/dmg.h'; var root_path = '../..'; var data_path = '../../../data';</script>
+<script src='../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='..'>codebrowser</a>/<a href='./'>block</a>/<a href='dmg.h.html'>dmg.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * Header for DMG driver</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2004-2006 Fabrice Bellard</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (c) 2016 Red hat, Inc.</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * Permission is hereby granted, free of charge, to any person obtaining a copy</i></td></tr>
+<tr><th id="8">8</th><td><i> * of this software and associated documentation files (the "Software"), to deal</i></td></tr>
+<tr><th id="9">9</th><td><i> * in the Software without restriction, including without limitation the rights</i></td></tr>
+<tr><th id="10">10</th><td><i> * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</i></td></tr>
+<tr><th id="11">11</th><td><i> * copies of the Software, and to permit persons to whom the Software is</i></td></tr>
+<tr><th id="12">12</th><td><i> * furnished to do so, subject to the following conditions:</i></td></tr>
+<tr><th id="13">13</th><td><i> *</i></td></tr>
+<tr><th id="14">14</th><td><i> * The above copyright notice and this permission notice shall be included in</i></td></tr>
+<tr><th id="15">15</th><td><i> * all copies or substantial portions of the Software.</i></td></tr>
+<tr><th id="16">16</th><td><i> *</i></td></tr>
+<tr><th id="17">17</th><td><i> * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</i></td></tr>
+<tr><th id="18">18</th><td><i> * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</i></td></tr>
+<tr><th id="19">19</th><td><i> * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL</i></td></tr>
+<tr><th id="20">20</th><td><i> * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</i></td></tr>
+<tr><th id="21">21</th><td><i> * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</i></td></tr>
+<tr><th id="22">22</th><td><i> * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN</i></td></tr>
+<tr><th id="23">23</th><td><i> * THE SOFTWARE.</i></td></tr>
+<tr><th id="24">24</th><td><i> */</i></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><u>#<span data-ppcond="26">ifndef</span> <span class="macro" data-ref="_M/BLOCK_DMG_H">BLOCK_DMG_H</span></u></td></tr>
+<tr><th id="27">27</th><td><u>#define <dfn class="macro" id="_M/BLOCK_DMG_H" data-ref="_M/BLOCK_DMG_H">BLOCK_DMG_H</dfn></u></td></tr>
+<tr><th id="28">28</th><td></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../include/qemu/osdep.h.html">"qemu/osdep.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../include/qemu-common.h.html">"qemu-common.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../include/block/block_int.h.html">"block/block_int.h"</a></u></td></tr>
+<tr><th id="32">32</th><td><u>#include <a href="../../include/zlib.h.html">&lt;zlib.h&gt;</a></u></td></tr>
+<tr><th id="33">33</th><td></td></tr>
+<tr><th id="34">34</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="BDRVDMGState" title='BDRVDMGState' data-ref="BDRVDMGState"><a class="type" href="#BDRVDMGState" title='BDRVDMGState' data-ref="BDRVDMGState">BDRVDMGState</a></dfn> {</td></tr>
+<tr><th id="35">35</th><td>    <a class="typedef" href="../include/qemu/coroutine.h.html#CoMutex" title='CoMutex' data-type='struct CoMutex' data-ref="CoMutex">CoMutex</a> <dfn class="decl" id="BDRVDMGState::lock" title='BDRVDMGState::lock' data-ref="BDRVDMGState::lock">lock</dfn>;</td></tr>
+<tr><th id="36">36</th><td>    <i>/* each chunk contains a certain number of sectors,</i></td></tr>
+<tr><th id="37">37</th><td><i>     * offsets[i] is the offset in the .dmg file,</i></td></tr>
+<tr><th id="38">38</th><td><i>     * lengths[i] is the length of the compressed chunk,</i></td></tr>
+<tr><th id="39">39</th><td><i>     * sectors[i] is the sector beginning at offsets[i],</i></td></tr>
+<tr><th id="40">40</th><td><i>     * sectorcounts[i] is the number of sectors in that chunk,</i></td></tr>
+<tr><th id="41">41</th><td><i>     * the sectors array is ordered</i></td></tr>
+<tr><th id="42">42</th><td><i>     * 0&lt;=i&lt;n_chunks */</i></td></tr>
+<tr><th id="43">43</th><td></td></tr>
+<tr><th id="44">44</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="BDRVDMGState::n_chunks" title='BDRVDMGState::n_chunks' data-ref="BDRVDMGState::n_chunks">n_chunks</dfn>;</td></tr>
+<tr><th id="45">45</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> *<dfn class="decl" id="BDRVDMGState::types" title='BDRVDMGState::types' data-ref="BDRVDMGState::types">types</dfn>;</td></tr>
+<tr><th id="46">46</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="decl" id="BDRVDMGState::offsets" title='BDRVDMGState::offsets' data-ref="BDRVDMGState::offsets">offsets</dfn>;</td></tr>
+<tr><th id="47">47</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="decl" id="BDRVDMGState::lengths" title='BDRVDMGState::lengths' data-ref="BDRVDMGState::lengths">lengths</dfn>;</td></tr>
+<tr><th id="48">48</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="decl" id="BDRVDMGState::sectors" title='BDRVDMGState::sectors' data-ref="BDRVDMGState::sectors">sectors</dfn>;</td></tr>
+<tr><th id="49">49</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> *<dfn class="decl" id="BDRVDMGState::sectorcounts" title='BDRVDMGState::sectorcounts' data-ref="BDRVDMGState::sectorcounts">sectorcounts</dfn>;</td></tr>
+<tr><th id="50">50</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="BDRVDMGState::current_chunk" title='BDRVDMGState::current_chunk' data-ref="BDRVDMGState::current_chunk">current_chunk</dfn>;</td></tr>
+<tr><th id="51">51</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="BDRVDMGState::compressed_chunk" title='BDRVDMGState::compressed_chunk' data-ref="BDRVDMGState::compressed_chunk">compressed_chunk</dfn>;</td></tr>
+<tr><th id="52">52</th><td>    <a class="typedef" href="../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> *<dfn class="decl" id="BDRVDMGState::uncompressed_chunk" title='BDRVDMGState::uncompressed_chunk' data-ref="BDRVDMGState::uncompressed_chunk">uncompressed_chunk</dfn>;</td></tr>
+<tr><th id="53">53</th><td>    <a class="typedef" href="../../include/zlib.h.html#z_stream" title='z_stream' data-type='struct z_stream_s' data-ref="z_stream">z_stream</a> <dfn class="decl" id="BDRVDMGState::zstream" title='BDRVDMGState::zstream' data-ref="BDRVDMGState::zstream">zstream</dfn>;</td></tr>
+<tr><th id="54">54</th><td>} <dfn class="typedef" id="BDRVDMGState" title='BDRVDMGState' data-type='struct BDRVDMGState' data-ref="BDRVDMGState">BDRVDMGState</dfn>;</td></tr>
+<tr><th id="55">55</th><td></td></tr>
+<tr><th id="56">56</th><td><b>extern</b> <em>int</em> (*<dfn class="decl" id="dmg_uncompress_bz2" title='dmg_uncompress_bz2' data-ref="dmg_uncompress_bz2">dmg_uncompress_bz2</dfn>)(<em>char</em> *<dfn class="local col1 decl" id="1next_in" title='next_in' data-type='char *' data-ref="1next_in">next_in</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col2 decl" id="2avail_in" title='avail_in' data-type='unsigned int' data-ref="2avail_in">avail_in</dfn>,</td></tr>
+<tr><th id="57">57</th><td>                                 <em>char</em> *<dfn class="local col3 decl" id="3next_out" title='next_out' data-type='char *' data-ref="3next_out">next_out</dfn>, <em>unsigned</em> <em>int</em> <dfn class="local col4 decl" id="4avail_out" title='avail_out' data-type='unsigned int' data-ref="4avail_out">avail_out</dfn>);</td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><u>#<span data-ppcond="26">endif</span></u></td></tr>
+<tr><th id="60">60</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='dmg.c.html'>codebrowser/block/dmg.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

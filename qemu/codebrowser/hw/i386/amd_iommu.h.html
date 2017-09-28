@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>amd_iommu.h source code [codebrowser/hw/i386/amd_iommu.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="AMDVIPCIState,AMDVIState "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/i386/amd_iommu.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='amd_iommu.h.html'>amd_iommu.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU emulation of an AMD IOMMU (AMD-Vi)</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (C) 2011 Eduard - Gabriel Munteanu</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2015 David Kiarie, &lt;davidkiarie4@gmail.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> *</i></td></tr>
+<tr><th id="7">7</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="8">8</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="9">9</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="10">10</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="11">11</th><td><i></i></td></tr>
+<tr><th id="12">12</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="13">13</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="14">14</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="15">15</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="16">16</th><td><i></i></td></tr>
+<tr><th id="17">17</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="18">18</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifndef</span> <span class="macro" data-ref="_M/AMD_IOMMU_H_">AMD_IOMMU_H_</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/AMD_IOMMU_H_" data-ref="_M/AMD_IOMMU_H_">AMD_IOMMU_H_</dfn></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="../../include/hw/hw.h.html">"hw/hw.h"</a></u></td></tr>
+<tr><th id="25">25</th><td><u>#include <a href="../../include/hw/pci/pci.h.html">"hw/pci/pci.h"</a></u></td></tr>
+<tr><th id="26">26</th><td><u>#include <a href="../../include/hw/pci/msi.h.html">"hw/pci/msi.h"</a></u></td></tr>
+<tr><th id="27">27</th><td><u>#include <a href="../../include/hw/sysbus.h.html">"hw/sysbus.h"</a></u></td></tr>
+<tr><th id="28">28</th><td><u>#include <a href="../../include/sysemu/dma.h.html">"sysemu/dma.h"</a></u></td></tr>
+<tr><th id="29">29</th><td><u>#include <a href="../../include/hw/i386/pc.h.html">"hw/i386/pc.h"</a></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../include/hw/pci/pci_bus.h.html">"hw/pci/pci_bus.h"</a></u></td></tr>
+<tr><th id="31">31</th><td><u>#include <a href="../../include/hw/i386/x86-iommu.h.html">"hw/i386/x86-iommu.h"</a></u></td></tr>
+<tr><th id="32">32</th><td></td></tr>
+<tr><th id="33">33</th><td><i>/* Capability registers */</i></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_BAR_LOW" data-ref="_M/AMDVI_CAPAB_BAR_LOW">AMDVI_CAPAB_BAR_LOW</dfn>           0x04</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_BAR_HIGH" data-ref="_M/AMDVI_CAPAB_BAR_HIGH">AMDVI_CAPAB_BAR_HIGH</dfn>          0x08</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_RANGE" data-ref="_M/AMDVI_CAPAB_RANGE">AMDVI_CAPAB_RANGE</dfn>             0x0C</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_MISC" data-ref="_M/AMDVI_CAPAB_MISC">AMDVI_CAPAB_MISC</dfn>              0x10</u></td></tr>
+<tr><th id="38">38</th><td></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_SIZE" data-ref="_M/AMDVI_CAPAB_SIZE">AMDVI_CAPAB_SIZE</dfn>              0x18</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_REG_SIZE" data-ref="_M/AMDVI_CAPAB_REG_SIZE">AMDVI_CAPAB_REG_SIZE</dfn>          0x04</u></td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><i>/* Capability header data */</i></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_ID_SEC" data-ref="_M/AMDVI_CAPAB_ID_SEC">AMDVI_CAPAB_ID_SEC</dfn>            0xf</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_FLAT_EXT" data-ref="_M/AMDVI_CAPAB_FLAT_EXT">AMDVI_CAPAB_FLAT_EXT</dfn>          (1 &lt;&lt; 28)</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_EFR_SUP" data-ref="_M/AMDVI_CAPAB_EFR_SUP">AMDVI_CAPAB_EFR_SUP</dfn>           (1 &lt;&lt; 27)</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_FLAG_NPCACHE" data-ref="_M/AMDVI_CAPAB_FLAG_NPCACHE">AMDVI_CAPAB_FLAG_NPCACHE</dfn>      (1 &lt;&lt; 26)</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_FLAG_HTTUNNEL" data-ref="_M/AMDVI_CAPAB_FLAG_HTTUNNEL">AMDVI_CAPAB_FLAG_HTTUNNEL</dfn>     (1 &lt;&lt; 25)</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_FLAG_IOTLBSUP" data-ref="_M/AMDVI_CAPAB_FLAG_IOTLBSUP">AMDVI_CAPAB_FLAG_IOTLBSUP</dfn>     (1 &lt;&lt; 24)</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_INIT_TYPE" data-ref="_M/AMDVI_CAPAB_INIT_TYPE">AMDVI_CAPAB_INIT_TYPE</dfn>         (3 &lt;&lt; 16)</u></td></tr>
+<tr><th id="50">50</th><td></td></tr>
+<tr><th id="51">51</th><td><i>/* No. of used MMIO registers */</i></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_REGS_HIGH" data-ref="_M/AMDVI_MMIO_REGS_HIGH">AMDVI_MMIO_REGS_HIGH</dfn>  7</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_REGS_LOW" data-ref="_M/AMDVI_MMIO_REGS_LOW">AMDVI_MMIO_REGS_LOW</dfn>   8</u></td></tr>
+<tr><th id="54">54</th><td></td></tr>
+<tr><th id="55">55</th><td><i>/* MMIO registers */</i></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_DEVICE_TABLE" data-ref="_M/AMDVI_MMIO_DEVICE_TABLE">AMDVI_MMIO_DEVICE_TABLE</dfn>       0x0000</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_COMMAND_BASE" data-ref="_M/AMDVI_MMIO_COMMAND_BASE">AMDVI_MMIO_COMMAND_BASE</dfn>       0x0008</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVENT_BASE" data-ref="_M/AMDVI_MMIO_EVENT_BASE">AMDVI_MMIO_EVENT_BASE</dfn>         0x0010</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL" data-ref="_M/AMDVI_MMIO_CONTROL">AMDVI_MMIO_CONTROL</dfn>            0x0018</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_BASE" data-ref="_M/AMDVI_MMIO_EXCL_BASE">AMDVI_MMIO_EXCL_BASE</dfn>          0x0020</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_LIMIT" data-ref="_M/AMDVI_MMIO_EXCL_LIMIT">AMDVI_MMIO_EXCL_LIMIT</dfn>         0x0028</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXT_FEATURES" data-ref="_M/AMDVI_MMIO_EXT_FEATURES">AMDVI_MMIO_EXT_FEATURES</dfn>       0x0030</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_COMMAND_HEAD" data-ref="_M/AMDVI_MMIO_COMMAND_HEAD">AMDVI_MMIO_COMMAND_HEAD</dfn>       0x2000</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_COMMAND_TAIL" data-ref="_M/AMDVI_MMIO_COMMAND_TAIL">AMDVI_MMIO_COMMAND_TAIL</dfn>       0x2008</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVENT_HEAD" data-ref="_M/AMDVI_MMIO_EVENT_HEAD">AMDVI_MMIO_EVENT_HEAD</dfn>         0x2010</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVENT_TAIL" data-ref="_M/AMDVI_MMIO_EVENT_TAIL">AMDVI_MMIO_EVENT_TAIL</dfn>         0x2018</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_STATUS" data-ref="_M/AMDVI_MMIO_STATUS">AMDVI_MMIO_STATUS</dfn>             0x2020</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPR_BASE" data-ref="_M/AMDVI_MMIO_PPR_BASE">AMDVI_MMIO_PPR_BASE</dfn>           0x0038</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPR_HEAD" data-ref="_M/AMDVI_MMIO_PPR_HEAD">AMDVI_MMIO_PPR_HEAD</dfn>           0x2030</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPR_TAIL" data-ref="_M/AMDVI_MMIO_PPR_TAIL">AMDVI_MMIO_PPR_TAIL</dfn>           0x2038</u></td></tr>
+<tr><th id="71">71</th><td></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_SIZE" data-ref="_M/AMDVI_MMIO_SIZE">AMDVI_MMIO_SIZE</dfn>               0x4000</u></td></tr>
+<tr><th id="73">73</th><td></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_DEVTAB_SIZE_MASK" data-ref="_M/AMDVI_MMIO_DEVTAB_SIZE_MASK">AMDVI_MMIO_DEVTAB_SIZE_MASK</dfn>   ((1ULL &lt;&lt; 12) - 1)</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_DEVTAB_BASE_MASK" data-ref="_M/AMDVI_MMIO_DEVTAB_BASE_MASK">AMDVI_MMIO_DEVTAB_BASE_MASK</dfn>   (((1ULL &lt;&lt; 52) - 1) &amp; ~ \</u></td></tr>
+<tr><th id="76">76</th><td><u>                                       AMDVI_MMIO_DEVTAB_SIZE_MASK)</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_DEVTAB_ENTRY_SIZE" data-ref="_M/AMDVI_MMIO_DEVTAB_ENTRY_SIZE">AMDVI_MMIO_DEVTAB_ENTRY_SIZE</dfn>  32</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_DEVTAB_SIZE_UNIT" data-ref="_M/AMDVI_MMIO_DEVTAB_SIZE_UNIT">AMDVI_MMIO_DEVTAB_SIZE_UNIT</dfn>   4096</u></td></tr>
+<tr><th id="79">79</th><td></td></tr>
+<tr><th id="80">80</th><td><i>/* some of this are similar but just for readability */</i></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CMDBUF_SIZE_BYTE" data-ref="_M/AMDVI_MMIO_CMDBUF_SIZE_BYTE">AMDVI_MMIO_CMDBUF_SIZE_BYTE</dfn>       (AMDVI_MMIO_COMMAND_BASE + 7)</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CMDBUF_SIZE_MASK" data-ref="_M/AMDVI_MMIO_CMDBUF_SIZE_MASK">AMDVI_MMIO_CMDBUF_SIZE_MASK</dfn>       0x0f</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CMDBUF_BASE_MASK" data-ref="_M/AMDVI_MMIO_CMDBUF_BASE_MASK">AMDVI_MMIO_CMDBUF_BASE_MASK</dfn>       AMDVI_MMIO_DEVTAB_BASE_MASK</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CMDBUF_HEAD_MASK" data-ref="_M/AMDVI_MMIO_CMDBUF_HEAD_MASK">AMDVI_MMIO_CMDBUF_HEAD_MASK</dfn>       (((1ULL &lt;&lt; 19) - 1) &amp; ~0x0f)</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CMDBUF_TAIL_MASK" data-ref="_M/AMDVI_MMIO_CMDBUF_TAIL_MASK">AMDVI_MMIO_CMDBUF_TAIL_MASK</dfn>       AMDVI_MMIO_EVTLOG_HEAD_MASK</u></td></tr>
+<tr><th id="86">86</th><td></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVTLOG_SIZE_BYTE" data-ref="_M/AMDVI_MMIO_EVTLOG_SIZE_BYTE">AMDVI_MMIO_EVTLOG_SIZE_BYTE</dfn>       (AMDVI_MMIO_EVENT_BASE + 7)</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVTLOG_SIZE_MASK" data-ref="_M/AMDVI_MMIO_EVTLOG_SIZE_MASK">AMDVI_MMIO_EVTLOG_SIZE_MASK</dfn>       AMDVI_MMIO_CMDBUF_SIZE_MASK</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVTLOG_BASE_MASK" data-ref="_M/AMDVI_MMIO_EVTLOG_BASE_MASK">AMDVI_MMIO_EVTLOG_BASE_MASK</dfn>       AMDVI_MMIO_CMDBUF_BASE_MASK</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVTLOG_HEAD_MASK" data-ref="_M/AMDVI_MMIO_EVTLOG_HEAD_MASK">AMDVI_MMIO_EVTLOG_HEAD_MASK</dfn>       (((1ULL &lt;&lt; 19) - 1) &amp; ~0x0f)</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EVTLOG_TAIL_MASK" data-ref="_M/AMDVI_MMIO_EVTLOG_TAIL_MASK">AMDVI_MMIO_EVTLOG_TAIL_MASK</dfn>       AMDVI_MMIO_EVTLOG_HEAD_MASK</u></td></tr>
+<tr><th id="92">92</th><td></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPRLOG_SIZE_BYTE" data-ref="_M/AMDVI_MMIO_PPRLOG_SIZE_BYTE">AMDVI_MMIO_PPRLOG_SIZE_BYTE</dfn>       (AMDVI_MMIO_EVENT_BASE + 7)</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPRLOG_HEAD_MASK" data-ref="_M/AMDVI_MMIO_PPRLOG_HEAD_MASK">AMDVI_MMIO_PPRLOG_HEAD_MASK</dfn>       AMDVI_MMIO_EVTLOG_HEAD_MASK</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPRLOG_TAIL_MASK" data-ref="_M/AMDVI_MMIO_PPRLOG_TAIL_MASK">AMDVI_MMIO_PPRLOG_TAIL_MASK</dfn>       AMDVI_MMIO_EVTLOG_HEAD_MASK</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPRLOG_BASE_MASK" data-ref="_M/AMDVI_MMIO_PPRLOG_BASE_MASK">AMDVI_MMIO_PPRLOG_BASE_MASK</dfn>       AMDVI_MMIO_EVTLOG_BASE_MASK</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_PPRLOG_SIZE_MASK" data-ref="_M/AMDVI_MMIO_PPRLOG_SIZE_MASK">AMDVI_MMIO_PPRLOG_SIZE_MASK</dfn>       AMDVI_MMIO_EVTLOG_SIZE_MASK</u></td></tr>
+<tr><th id="98">98</th><td></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_ENABLED_MASK" data-ref="_M/AMDVI_MMIO_EXCL_ENABLED_MASK">AMDVI_MMIO_EXCL_ENABLED_MASK</dfn>      (1ULL &lt;&lt; 0)</u></td></tr>
+<tr><th id="100">100</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_ALLOW_MASK" data-ref="_M/AMDVI_MMIO_EXCL_ALLOW_MASK">AMDVI_MMIO_EXCL_ALLOW_MASK</dfn>        (1ULL &lt;&lt; 1)</u></td></tr>
+<tr><th id="101">101</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_LIMIT_MASK" data-ref="_M/AMDVI_MMIO_EXCL_LIMIT_MASK">AMDVI_MMIO_EXCL_LIMIT_MASK</dfn>        AMDVI_MMIO_DEVTAB_BASE_MASK</u></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_EXCL_LIMIT_LOW" data-ref="_M/AMDVI_MMIO_EXCL_LIMIT_LOW">AMDVI_MMIO_EXCL_LIMIT_LOW</dfn>         0xfff</u></td></tr>
+<tr><th id="103">103</th><td></td></tr>
+<tr><th id="104">104</th><td><i>/* mmio control register flags */</i></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_AMDVIEN" data-ref="_M/AMDVI_MMIO_CONTROL_AMDVIEN">AMDVI_MMIO_CONTROL_AMDVIEN</dfn>        (1ULL &lt;&lt; 0)</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_HTTUNEN" data-ref="_M/AMDVI_MMIO_CONTROL_HTTUNEN">AMDVI_MMIO_CONTROL_HTTUNEN</dfn>        (1ULL &lt;&lt; 1)</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_EVENTLOGEN" data-ref="_M/AMDVI_MMIO_CONTROL_EVENTLOGEN">AMDVI_MMIO_CONTROL_EVENTLOGEN</dfn>     (1ULL &lt;&lt; 2)</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_EVENTINTEN" data-ref="_M/AMDVI_MMIO_CONTROL_EVENTINTEN">AMDVI_MMIO_CONTROL_EVENTINTEN</dfn>     (1ULL &lt;&lt; 3)</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_COMWAITINTEN" data-ref="_M/AMDVI_MMIO_CONTROL_COMWAITINTEN">AMDVI_MMIO_CONTROL_COMWAITINTEN</dfn>   (1ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_CONTROL_CMDBUFLEN" data-ref="_M/AMDVI_MMIO_CONTROL_CMDBUFLEN">AMDVI_MMIO_CONTROL_CMDBUFLEN</dfn>      (1ULL &lt;&lt; 12)</u></td></tr>
+<tr><th id="111">111</th><td></td></tr>
+<tr><th id="112">112</th><td><i>/* MMIO status register bits */</i></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_STATUS_CMDBUF_RUN" data-ref="_M/AMDVI_MMIO_STATUS_CMDBUF_RUN">AMDVI_MMIO_STATUS_CMDBUF_RUN</dfn>  (1 &lt;&lt; 4)</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_STATUS_EVT_RUN" data-ref="_M/AMDVI_MMIO_STATUS_EVT_RUN">AMDVI_MMIO_STATUS_EVT_RUN</dfn>     (1 &lt;&lt; 3)</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_STATUS_COMP_INT" data-ref="_M/AMDVI_MMIO_STATUS_COMP_INT">AMDVI_MMIO_STATUS_COMP_INT</dfn>    (1 &lt;&lt; 2)</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MMIO_STATUS_EVT_OVF" data-ref="_M/AMDVI_MMIO_STATUS_EVT_OVF">AMDVI_MMIO_STATUS_EVT_OVF</dfn>     (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="117">117</th><td></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMDBUF_ID_BYTE" data-ref="_M/AMDVI_CMDBUF_ID_BYTE">AMDVI_CMDBUF_ID_BYTE</dfn>              0x07</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMDBUF_ID_RSHIFT" data-ref="_M/AMDVI_CMDBUF_ID_RSHIFT">AMDVI_CMDBUF_ID_RSHIFT</dfn>            4</u></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_COMPLETION_WAIT" data-ref="_M/AMDVI_CMD_COMPLETION_WAIT">AMDVI_CMD_COMPLETION_WAIT</dfn>         0x01</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_INVAL_DEVTAB_ENTRY" data-ref="_M/AMDVI_CMD_INVAL_DEVTAB_ENTRY">AMDVI_CMD_INVAL_DEVTAB_ENTRY</dfn>      0x02</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_INVAL_AMDVI_PAGES" data-ref="_M/AMDVI_CMD_INVAL_AMDVI_PAGES">AMDVI_CMD_INVAL_AMDVI_PAGES</dfn>       0x03</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_INVAL_IOTLB_PAGES" data-ref="_M/AMDVI_CMD_INVAL_IOTLB_PAGES">AMDVI_CMD_INVAL_IOTLB_PAGES</dfn>       0x04</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_INVAL_INTR_TABLE" data-ref="_M/AMDVI_CMD_INVAL_INTR_TABLE">AMDVI_CMD_INVAL_INTR_TABLE</dfn>        0x05</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_PREFETCH_AMDVI_PAGES" data-ref="_M/AMDVI_CMD_PREFETCH_AMDVI_PAGES">AMDVI_CMD_PREFETCH_AMDVI_PAGES</dfn>    0x06</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_COMPLETE_PPR_REQUEST" data-ref="_M/AMDVI_CMD_COMPLETE_PPR_REQUEST">AMDVI_CMD_COMPLETE_PPR_REQUEST</dfn>    0x07</u></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CMD_INVAL_AMDVI_ALL" data-ref="_M/AMDVI_CMD_INVAL_AMDVI_ALL">AMDVI_CMD_INVAL_AMDVI_ALL</dfn>         0x08</u></td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEVTAB_ENTRY_SIZE" data-ref="_M/AMDVI_DEVTAB_ENTRY_SIZE">AMDVI_DEVTAB_ENTRY_SIZE</dfn>           32</u></td></tr>
+<tr><th id="131">131</th><td></td></tr>
+<tr><th id="132">132</th><td><i>/* Device table entry bits 0:63 */</i></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_VALID" data-ref="_M/AMDVI_DEV_VALID">AMDVI_DEV_VALID</dfn>                   (1ULL &lt;&lt; 0)</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_TRANSLATION_VALID" data-ref="_M/AMDVI_DEV_TRANSLATION_VALID">AMDVI_DEV_TRANSLATION_VALID</dfn>       (1ULL &lt;&lt; 1)</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_MODE_MASK" data-ref="_M/AMDVI_DEV_MODE_MASK">AMDVI_DEV_MODE_MASK</dfn>               0x7</u></td></tr>
+<tr><th id="136">136</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_MODE_RSHIFT" data-ref="_M/AMDVI_DEV_MODE_RSHIFT">AMDVI_DEV_MODE_RSHIFT</dfn>             9</u></td></tr>
+<tr><th id="137">137</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_PT_ROOT_MASK" data-ref="_M/AMDVI_DEV_PT_ROOT_MASK">AMDVI_DEV_PT_ROOT_MASK</dfn>            0xffffffffff000</u></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_PT_ROOT_RSHIFT" data-ref="_M/AMDVI_DEV_PT_ROOT_RSHIFT">AMDVI_DEV_PT_ROOT_RSHIFT</dfn>          12</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_PERM_SHIFT" data-ref="_M/AMDVI_DEV_PERM_SHIFT">AMDVI_DEV_PERM_SHIFT</dfn>              61</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_PERM_READ" data-ref="_M/AMDVI_DEV_PERM_READ">AMDVI_DEV_PERM_READ</dfn>               (1ULL &lt;&lt; 61)</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_PERM_WRITE" data-ref="_M/AMDVI_DEV_PERM_WRITE">AMDVI_DEV_PERM_WRITE</dfn>              (1ULL &lt;&lt; 62)</u></td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><i>/* Device table entry bits 64:127 */</i></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEV_DOMID_ID_MASK" data-ref="_M/AMDVI_DEV_DOMID_ID_MASK">AMDVI_DEV_DOMID_ID_MASK</dfn>          ((1ULL &lt;&lt; 16) - 1)</u></td></tr>
+<tr><th id="145">145</th><td></td></tr>
+<tr><th id="146">146</th><td><i>/* Event codes and flags, as stored in the info field */</i></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_ILLEGAL_DEVTAB_ENTRY" data-ref="_M/AMDVI_EVENT_ILLEGAL_DEVTAB_ENTRY">AMDVI_EVENT_ILLEGAL_DEVTAB_ENTRY</dfn>  (0x1U &lt;&lt; 12)</u></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_IOPF" data-ref="_M/AMDVI_EVENT_IOPF">AMDVI_EVENT_IOPF</dfn>                  (0x2U &lt;&lt; 12)</u></td></tr>
+<tr><th id="149">149</th><td><u>#define   <dfn class="macro" id="_M/AMDVI_EVENT_IOPF_I" data-ref="_M/AMDVI_EVENT_IOPF_I">AMDVI_EVENT_IOPF_I</dfn>              (1U &lt;&lt; 3)</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_DEV_TAB_HW_ERROR" data-ref="_M/AMDVI_EVENT_DEV_TAB_HW_ERROR">AMDVI_EVENT_DEV_TAB_HW_ERROR</dfn>      (0x3U &lt;&lt; 12)</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_PAGE_TAB_HW_ERROR" data-ref="_M/AMDVI_EVENT_PAGE_TAB_HW_ERROR">AMDVI_EVENT_PAGE_TAB_HW_ERROR</dfn>     (0x4U &lt;&lt; 12)</u></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_ILLEGAL_COMMAND_ERROR" data-ref="_M/AMDVI_EVENT_ILLEGAL_COMMAND_ERROR">AMDVI_EVENT_ILLEGAL_COMMAND_ERROR</dfn> (0x5U &lt;&lt; 12)</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_COMMAND_HW_ERROR" data-ref="_M/AMDVI_EVENT_COMMAND_HW_ERROR">AMDVI_EVENT_COMMAND_HW_ERROR</dfn>      (0x6U &lt;&lt; 12)</u></td></tr>
+<tr><th id="154">154</th><td></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EVENT_LEN" data-ref="_M/AMDVI_EVENT_LEN">AMDVI_EVENT_LEN</dfn>                  16</u></td></tr>
+<tr><th id="156">156</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PERM_READ" data-ref="_M/AMDVI_PERM_READ">AMDVI_PERM_READ</dfn>             (1 &lt;&lt; 0)</u></td></tr>
+<tr><th id="157">157</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PERM_WRITE" data-ref="_M/AMDVI_PERM_WRITE">AMDVI_PERM_WRITE</dfn>            (1 &lt;&lt; 1)</u></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_PREFETCH" data-ref="_M/AMDVI_FEATURE_PREFETCH">AMDVI_FEATURE_PREFETCH</dfn>            (1ULL &lt;&lt; 0) /* page prefetch       */</u></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_PPR" data-ref="_M/AMDVI_FEATURE_PPR">AMDVI_FEATURE_PPR</dfn>                 (1ULL &lt;&lt; 1) /* PPR Support         */</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_GT" data-ref="_M/AMDVI_FEATURE_GT">AMDVI_FEATURE_GT</dfn>                  (1ULL &lt;&lt; 4) /* Guest Translation   */</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_IA" data-ref="_M/AMDVI_FEATURE_IA">AMDVI_FEATURE_IA</dfn>                  (1ULL &lt;&lt; 6) /* inval all support   */</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_GA" data-ref="_M/AMDVI_FEATURE_GA">AMDVI_FEATURE_GA</dfn>                  (1ULL &lt;&lt; 7) /* guest VAPIC support */</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_HE" data-ref="_M/AMDVI_FEATURE_HE">AMDVI_FEATURE_HE</dfn>                  (1ULL &lt;&lt; 8) /* hardware error regs */</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/AMDVI_FEATURE_PC" data-ref="_M/AMDVI_FEATURE_PC">AMDVI_FEATURE_PC</dfn>                  (1ULL &lt;&lt; 9) /* Perf counters       */</u></td></tr>
+<tr><th id="166">166</th><td></td></tr>
+<tr><th id="167">167</th><td><i>/* reserved DTE bits */</i></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DTE_LOWER_QUAD_RESERVED" data-ref="_M/AMDVI_DTE_LOWER_QUAD_RESERVED">AMDVI_DTE_LOWER_QUAD_RESERVED</dfn>  0x80300000000000fc</u></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DTE_MIDDLE_QUAD_RESERVED" data-ref="_M/AMDVI_DTE_MIDDLE_QUAD_RESERVED">AMDVI_DTE_MIDDLE_QUAD_RESERVED</dfn> 0x0000000000000100</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DTE_UPPER_QUAD_RESERVED" data-ref="_M/AMDVI_DTE_UPPER_QUAD_RESERVED">AMDVI_DTE_UPPER_QUAD_RESERVED</dfn>  0x08f0000000000000</u></td></tr>
+<tr><th id="171">171</th><td></td></tr>
+<tr><th id="172">172</th><td><i>/* AMDVI paging mode */</i></td></tr>
+<tr><th id="173">173</th><td><u>#define <dfn class="macro" id="_M/AMDVI_GATS_MODE" data-ref="_M/AMDVI_GATS_MODE">AMDVI_GATS_MODE</dfn>                 (6ULL &lt;&lt;  12)</u></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/AMDVI_HATS_MODE" data-ref="_M/AMDVI_HATS_MODE">AMDVI_HATS_MODE</dfn>                 (6ULL &lt;&lt;  10)</u></td></tr>
+<tr><th id="175">175</th><td></td></tr>
+<tr><th id="176">176</th><td><i>/* IOTLB */</i></td></tr>
+<tr><th id="177">177</th><td><u>#define <dfn class="macro" id="_M/AMDVI_IOTLB_MAX_SIZE" data-ref="_M/AMDVI_IOTLB_MAX_SIZE">AMDVI_IOTLB_MAX_SIZE</dfn> 1024</u></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/AMDVI_DEVID_SHIFT" data-ref="_M/AMDVI_DEVID_SHIFT">AMDVI_DEVID_SHIFT</dfn>    36</u></td></tr>
+<tr><th id="179">179</th><td></td></tr>
+<tr><th id="180">180</th><td><i>/* extended feature support */</i></td></tr>
+<tr><th id="181">181</th><td><u>#define <dfn class="macro" id="_M/AMDVI_EXT_FEATURES" data-ref="_M/AMDVI_EXT_FEATURES">AMDVI_EXT_FEATURES</dfn> (AMDVI_FEATURE_PREFETCH | AMDVI_FEATURE_PPR | \</u></td></tr>
+<tr><th id="182">182</th><td><u>        AMDVI_FEATURE_IA | AMDVI_FEATURE_GT | AMDVI_FEATURE_HE | \</u></td></tr>
+<tr><th id="183">183</th><td><u>        AMDVI_GATS_MODE | AMDVI_HATS_MODE)</u></td></tr>
+<tr><th id="184">184</th><td></td></tr>
+<tr><th id="185">185</th><td><i>/* capabilities header */</i></td></tr>
+<tr><th id="186">186</th><td><u>#define <dfn class="macro" id="_M/AMDVI_CAPAB_FEATURES" data-ref="_M/AMDVI_CAPAB_FEATURES">AMDVI_CAPAB_FEATURES</dfn> (AMDVI_CAPAB_FLAT_EXT | \</u></td></tr>
+<tr><th id="187">187</th><td><u>        AMDVI_CAPAB_FLAG_NPCACHE | AMDVI_CAPAB_FLAG_IOTLBSUP \</u></td></tr>
+<tr><th id="188">188</th><td><u>        | AMDVI_CAPAB_ID_SEC | AMDVI_CAPAB_INIT_TYPE | \</u></td></tr>
+<tr><th id="189">189</th><td><u>        AMDVI_CAPAB_FLAG_HTTUNNEL |  AMDVI_CAPAB_EFR_SUP)</u></td></tr>
+<tr><th id="190">190</th><td></td></tr>
+<tr><th id="191">191</th><td><i>/* AMDVI default address */</i></td></tr>
+<tr><th id="192">192</th><td><u>#define <dfn class="macro" id="_M/AMDVI_BASE_ADDR" data-ref="_M/AMDVI_BASE_ADDR">AMDVI_BASE_ADDR</dfn> 0xfed80000</u></td></tr>
+<tr><th id="193">193</th><td></td></tr>
+<tr><th id="194">194</th><td><i>/* page management constants */</i></td></tr>
+<tr><th id="195">195</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PAGE_SHIFT" data-ref="_M/AMDVI_PAGE_SHIFT">AMDVI_PAGE_SHIFT</dfn> 12</u></td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PAGE_SIZE" data-ref="_M/AMDVI_PAGE_SIZE">AMDVI_PAGE_SIZE</dfn>  (1ULL &lt;&lt; AMDVI_PAGE_SHIFT)</u></td></tr>
+<tr><th id="197">197</th><td></td></tr>
+<tr><th id="198">198</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PAGE_SHIFT_4K" data-ref="_M/AMDVI_PAGE_SHIFT_4K">AMDVI_PAGE_SHIFT_4K</dfn> 12</u></td></tr>
+<tr><th id="199">199</th><td><u>#define <dfn class="macro" id="_M/AMDVI_PAGE_MASK_4K" data-ref="_M/AMDVI_PAGE_MASK_4K">AMDVI_PAGE_MASK_4K</dfn>  (~((1ULL &lt;&lt; AMDVI_PAGE_SHIFT_4K) - 1))</u></td></tr>
+<tr><th id="200">200</th><td></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MAX_VA_ADDR" data-ref="_M/AMDVI_MAX_VA_ADDR">AMDVI_MAX_VA_ADDR</dfn>          (48UL &lt;&lt; 5)</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MAX_PH_ADDR" data-ref="_M/AMDVI_MAX_PH_ADDR">AMDVI_MAX_PH_ADDR</dfn>          (40UL &lt;&lt; 8)</u></td></tr>
+<tr><th id="203">203</th><td><u>#define <dfn class="macro" id="_M/AMDVI_MAX_GVA_ADDR" data-ref="_M/AMDVI_MAX_GVA_ADDR">AMDVI_MAX_GVA_ADDR</dfn>         (48UL &lt;&lt; 15)</u></td></tr>
+<tr><th id="204">204</th><td></td></tr>
+<tr><th id="205">205</th><td><i>/* Completion Wait data size */</i></td></tr>
+<tr><th id="206">206</th><td><u>#define <dfn class="macro" id="_M/AMDVI_COMPLETION_DATA_SIZE" data-ref="_M/AMDVI_COMPLETION_DATA_SIZE">AMDVI_COMPLETION_DATA_SIZE</dfn>    8</u></td></tr>
+<tr><th id="207">207</th><td></td></tr>
+<tr><th id="208">208</th><td><u>#define <dfn class="macro" id="_M/AMDVI_COMMAND_SIZE" data-ref="_M/AMDVI_COMMAND_SIZE">AMDVI_COMMAND_SIZE</dfn>   16</u></td></tr>
+<tr><th id="209">209</th><td><i>/* Completion Wait data size */</i></td></tr>
+<tr><th id="210">210</th><td><u>#define <dfn class="macro" id="_M/AMDVI_COMPLETION_DATA_SIZE" data-ref="_M/AMDVI_COMPLETION_DATA_SIZE">AMDVI_COMPLETION_DATA_SIZE</dfn>    8</u></td></tr>
+<tr><th id="211">211</th><td></td></tr>
+<tr><th id="212">212</th><td><u>#define <dfn class="macro" id="_M/AMDVI_COMMAND_SIZE" data-ref="_M/AMDVI_COMMAND_SIZE">AMDVI_COMMAND_SIZE</dfn>   16</u></td></tr>
+<tr><th id="213">213</th><td></td></tr>
+<tr><th id="214">214</th><td><u>#define <dfn class="macro" id="_M/AMDVI_INT_ADDR_FIRST" data-ref="_M/AMDVI_INT_ADDR_FIRST">AMDVI_INT_ADDR_FIRST</dfn> 0xfee00000</u></td></tr>
+<tr><th id="215">215</th><td><u>#define <dfn class="macro" id="_M/AMDVI_INT_ADDR_LAST" data-ref="_M/AMDVI_INT_ADDR_LAST">AMDVI_INT_ADDR_LAST</dfn>  0xfeefffff</u></td></tr>
+<tr><th id="216">216</th><td></td></tr>
+<tr><th id="217">217</th><td><u>#define <dfn class="macro" id="_M/TYPE_AMD_IOMMU_DEVICE" data-ref="_M/TYPE_AMD_IOMMU_DEVICE">TYPE_AMD_IOMMU_DEVICE</dfn> "amd-iommu"</u></td></tr>
+<tr><th id="218">218</th><td><u>#define <dfn class="macro" id="_M/AMD_IOMMU_DEVICE" data-ref="_M/AMD_IOMMU_DEVICE">AMD_IOMMU_DEVICE</dfn>(obj)\</u></td></tr>
+<tr><th id="219">219</th><td><u>    OBJECT_CHECK(AMDVIState, (obj), TYPE_AMD_IOMMU_DEVICE)</u></td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><u>#define <dfn class="macro" id="_M/TYPE_AMD_IOMMU_PCI" data-ref="_M/TYPE_AMD_IOMMU_PCI">TYPE_AMD_IOMMU_PCI</dfn> "AMDVI-PCI"</u></td></tr>
+<tr><th id="222">222</th><td></td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/TYPE_AMD_IOMMU_MEMORY_REGION" data-ref="_M/TYPE_AMD_IOMMU_MEMORY_REGION">TYPE_AMD_IOMMU_MEMORY_REGION</dfn> "amd-iommu-iommu-memory-region"</u></td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><b>typedef</b> <b>struct</b> <dfn class="type" id="AMDVIAddressSpace" title='AMDVIAddressSpace' data-ref="AMDVIAddressSpace"><a class="type" href="#AMDVIAddressSpace" title='AMDVIAddressSpace' data-ref="AMDVIAddressSpace">AMDVIAddressSpace</a></dfn> <dfn class="typedef" id="AMDVIAddressSpace" title='AMDVIAddressSpace' data-type='struct AMDVIAddressSpace' data-ref="AMDVIAddressSpace">AMDVIAddressSpace</dfn>;</td></tr>
+<tr><th id="226">226</th><td></td></tr>
+<tr><th id="227">227</th><td><i>/* functions to steal PCI config space */</i></td></tr>
+<tr><th id="228">228</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AMDVIPCIState" title='AMDVIPCIState' data-ref="AMDVIPCIState"><a class="type" href="#AMDVIPCIState" title='AMDVIPCIState' data-ref="AMDVIPCIState">AMDVIPCIState</a></dfn> {</td></tr>
+<tr><th id="229">229</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#PCIDevice" title='PCIDevice' data-type='struct PCIDevice' data-ref="PCIDevice">PCIDevice</a> <dfn class="decl" id="AMDVIPCIState::dev" title='AMDVIPCIState::dev' data-ref="AMDVIPCIState::dev">dev</dfn>;               <i>/* The PCI device itself        */</i></td></tr>
+<tr><th id="230">230</th><td>} <dfn class="typedef" id="AMDVIPCIState" title='AMDVIPCIState' data-type='struct AMDVIPCIState' data-ref="AMDVIPCIState">AMDVIPCIState</dfn>;</td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><b>typedef</b> <b>struct</b> <dfn class="type def" id="AMDVIState" title='AMDVIState' data-ref="AMDVIState"><a class="type" href="#AMDVIState" title='AMDVIState' data-ref="AMDVIState">AMDVIState</a></dfn> {</td></tr>
+<tr><th id="233">233</th><td>    <a class="typedef" href="../../include/hw/i386/x86-iommu.h.html#X86IOMMUState" title='X86IOMMUState' data-type='struct X86IOMMUState' data-ref="X86IOMMUState">X86IOMMUState</a> <dfn class="decl" id="AMDVIState::iommu" title='AMDVIState::iommu' data-ref="AMDVIState::iommu">iommu</dfn>;        <i>/* IOMMU bus device             */</i></td></tr>
+<tr><th id="234">234</th><td>    <a class="typedef" href="#AMDVIPCIState" title='AMDVIPCIState' data-type='struct AMDVIPCIState' data-ref="AMDVIPCIState">AMDVIPCIState</a> <dfn class="decl" id="AMDVIState::pci" title='AMDVIState::pci' data-ref="AMDVIState::pci">pci</dfn>;          <i>/* IOMMU PCI device             */</i></td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::version" title='AMDVIState::version' data-ref="AMDVIState::version">version</dfn>;</td></tr>
+<tr><th id="237">237</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::capab_offset" title='AMDVIState::capab_offset' data-ref="AMDVIState::capab_offset">capab_offset</dfn>;       <i>/* capability offset pointer    */</i></td></tr>
+<tr><th id="238">238</th><td></td></tr>
+<tr><th id="239">239</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="AMDVIState::mmio_addr" title='AMDVIState::mmio_addr' data-ref="AMDVIState::mmio_addr">mmio_addr</dfn>;</td></tr>
+<tr><th id="240">240</th><td></td></tr>
+<tr><th id="241">241</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::devid" title='AMDVIState::devid' data-ref="AMDVIState::devid">devid</dfn>;              <i>/* auto-assigned devid          */</i></td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::enabled" title='AMDVIState::enabled' data-ref="AMDVIState::enabled">enabled</dfn>;                <i>/* IOMMU enabled                */</i></td></tr>
+<tr><th id="244">244</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::ats_enabled" title='AMDVIState::ats_enabled' data-ref="AMDVIState::ats_enabled">ats_enabled</dfn>;            <i>/* address translation enabled  */</i></td></tr>
+<tr><th id="245">245</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::cmdbuf_enabled" title='AMDVIState::cmdbuf_enabled' data-ref="AMDVIState::cmdbuf_enabled">cmdbuf_enabled</dfn>;         <i>/* command buffer enabled       */</i></td></tr>
+<tr><th id="246">246</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::evtlog_enabled" title='AMDVIState::evtlog_enabled' data-ref="AMDVIState::evtlog_enabled">evtlog_enabled</dfn>;         <i>/* event log enabled            */</i></td></tr>
+<tr><th id="247">247</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::excl_enabled" title='AMDVIState::excl_enabled' data-ref="AMDVIState::excl_enabled">excl_enabled</dfn>;</td></tr>
+<tr><th id="248">248</th><td></td></tr>
+<tr><th id="249">249</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::devtab" title='AMDVIState::devtab' data-ref="AMDVIState::devtab">devtab</dfn>;               <i>/* base address device table    */</i></td></tr>
+<tr><th id="250">250</th><td>    <span class='typedef' title='size_t' data-type='unsigned long' data-ref="size_t">size_t</span> <dfn class="decl" id="AMDVIState::devtab_len" title='AMDVIState::devtab_len' data-ref="AMDVIState::devtab_len">devtab_len</dfn>;           <i>/* device table length          */</i></td></tr>
+<tr><th id="251">251</th><td></td></tr>
+<tr><th id="252">252</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::cmdbuf" title='AMDVIState::cmdbuf' data-ref="AMDVIState::cmdbuf">cmdbuf</dfn>;               <i>/* command buffer base address  */</i></td></tr>
+<tr><th id="253">253</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="AMDVIState::cmdbuf_len" title='AMDVIState::cmdbuf_len' data-ref="AMDVIState::cmdbuf_len">cmdbuf_len</dfn>;         <i>/* command buffer length        */</i></td></tr>
+<tr><th id="254">254</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::cmdbuf_head" title='AMDVIState::cmdbuf_head' data-ref="AMDVIState::cmdbuf_head">cmdbuf_head</dfn>;        <i>/* current IOMMU read position  */</i></td></tr>
+<tr><th id="255">255</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::cmdbuf_tail" title='AMDVIState::cmdbuf_tail' data-ref="AMDVIState::cmdbuf_tail">cmdbuf_tail</dfn>;        <i>/* next Software write position */</i></td></tr>
+<tr><th id="256">256</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::completion_wait_intr" title='AMDVIState::completion_wait_intr' data-ref="AMDVIState::completion_wait_intr">completion_wait_intr</dfn>;</td></tr>
+<tr><th id="257">257</th><td></td></tr>
+<tr><th id="258">258</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::evtlog" title='AMDVIState::evtlog' data-ref="AMDVIState::evtlog">evtlog</dfn>;               <i>/* base address event log       */</i></td></tr>
+<tr><th id="259">259</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::evtlog_intr" title='AMDVIState::evtlog_intr' data-ref="AMDVIState::evtlog_intr">evtlog_intr</dfn>;</td></tr>
+<tr><th id="260">260</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::evtlog_len" title='AMDVIState::evtlog_len' data-ref="AMDVIState::evtlog_len">evtlog_len</dfn>;         <i>/* event log length             */</i></td></tr>
+<tr><th id="261">261</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::evtlog_head" title='AMDVIState::evtlog_head' data-ref="AMDVIState::evtlog_head">evtlog_head</dfn>;        <i>/* current IOMMU write position */</i></td></tr>
+<tr><th id="262">262</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::evtlog_tail" title='AMDVIState::evtlog_tail' data-ref="AMDVIState::evtlog_tail">evtlog_tail</dfn>;        <i>/* current Software read position */</i></td></tr>
+<tr><th id="263">263</th><td></td></tr>
+<tr><th id="264">264</th><td>    <i>/* unused for now */</i></td></tr>
+<tr><th id="265">265</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::excl_base" title='AMDVIState::excl_base' data-ref="AMDVIState::excl_base">excl_base</dfn>;            <i>/* base DVA - IOMMU exclusion range */</i></td></tr>
+<tr><th id="266">266</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::excl_limit" title='AMDVIState::excl_limit' data-ref="AMDVIState::excl_limit">excl_limit</dfn>;           <i>/* limit of IOMMU exclusion range   */</i></td></tr>
+<tr><th id="267">267</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::excl_allow" title='AMDVIState::excl_allow' data-ref="AMDVIState::excl_allow">excl_allow</dfn>;             <i>/* translate accesses to the exclusion range */</i></td></tr>
+<tr><th id="268">268</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::excl_enable" title='AMDVIState::excl_enable' data-ref="AMDVIState::excl_enable">excl_enable</dfn>;            <i>/* exclusion range enabled          */</i></td></tr>
+<tr><th id="269">269</th><td></td></tr>
+<tr><th id="270">270</th><td>    <a class="typedef" href="../../include/exec/hwaddr.h.html#hwaddr" title='hwaddr' data-type='uint64_t' data-ref="hwaddr">hwaddr</a> <dfn class="decl" id="AMDVIState::ppr_log" title='AMDVIState::ppr_log' data-ref="AMDVIState::ppr_log">ppr_log</dfn>;              <i>/* base address ppr log */</i></td></tr>
+<tr><th id="271">271</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::pprlog_len" title='AMDVIState::pprlog_len' data-ref="AMDVIState::pprlog_len">pprlog_len</dfn>;         <i>/* ppr log len  */</i></td></tr>
+<tr><th id="272">272</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::pprlog_head" title='AMDVIState::pprlog_head' data-ref="AMDVIState::pprlog_head">pprlog_head</dfn>;        <i>/* ppr log head */</i></td></tr>
+<tr><th id="273">273</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="AMDVIState::pprlog_tail" title='AMDVIState::pprlog_tail' data-ref="AMDVIState::pprlog_tail">pprlog_tail</dfn>;        <i>/* ppr log tail */</i></td></tr>
+<tr><th id="274">274</th><td></td></tr>
+<tr><th id="275">275</th><td>    <a class="typedef" href="../../include/qemu/typedefs.h.html#MemoryRegion" title='MemoryRegion' data-type='struct MemoryRegion' data-ref="MemoryRegion">MemoryRegion</a> <dfn class="decl" id="AMDVIState::mmio" title='AMDVIState::mmio' data-ref="AMDVIState::mmio">mmio</dfn>;                 <i>/* MMIO region                  */</i></td></tr>
+<tr><th id="276">276</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="AMDVIState::mmior" title='AMDVIState::mmior' data-ref="AMDVIState::mmior">mmior</dfn>[<a class="macro" href="#72" title="0x4000" data-ref="_M/AMDVI_MMIO_SIZE">AMDVI_MMIO_SIZE</a>];    <i>/* read/write MMIO              */</i></td></tr>
+<tr><th id="277">277</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="AMDVIState::w1cmask" title='AMDVIState::w1cmask' data-ref="AMDVIState::w1cmask">w1cmask</dfn>[<a class="macro" href="#72" title="0x4000" data-ref="_M/AMDVI_MMIO_SIZE">AMDVI_MMIO_SIZE</a>];  <i>/* read/write 1 clear mask      */</i></td></tr>
+<tr><th id="278">278</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="AMDVIState::romask" title='AMDVIState::romask' data-ref="AMDVIState::romask">romask</dfn>[<a class="macro" href="#72" title="0x4000" data-ref="_M/AMDVI_MMIO_SIZE">AMDVI_MMIO_SIZE</a>];   <i>/* MMIO read/only mask          */</i></td></tr>
+<tr><th id="279">279</th><td>    <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl" id="AMDVIState::mmio_enabled" title='AMDVIState::mmio_enabled' data-ref="AMDVIState::mmio_enabled">mmio_enabled</dfn>;</td></tr>
+<tr><th id="280">280</th><td></td></tr>
+<tr><th id="281">281</th><td>    <i>/* for each served device */</i></td></tr>
+<tr><th id="282">282</th><td>    <a class="typedef" href="#AMDVIAddressSpace" title='AMDVIAddressSpace' data-type='struct AMDVIAddressSpace' data-ref="AMDVIAddressSpace">AMDVIAddressSpace</a> **<dfn class="decl" id="AMDVIState::address_spaces" title='AMDVIState::address_spaces' data-ref="AMDVIState::address_spaces">address_spaces</dfn>[<a class="macro" href="../../include/hw/pci/pci.h.html#20" title="256" data-ref="_M/PCI_BUS_MAX">PCI_BUS_MAX</a>];</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>    <i>/* IOTLB */</i></td></tr>
+<tr><th id="285">285</th><td>    <a class="typedef" href="../../../include/glib-2.0/glib/ghash.h.html#GHashTable" title='GHashTable' data-type='struct _GHashTable' data-ref="GHashTable">GHashTable</a> *<dfn class="decl" id="AMDVIState::iotlb" title='AMDVIState::iotlb' data-ref="AMDVIState::iotlb">iotlb</dfn>;</td></tr>
+<tr><th id="286">286</th><td>} <dfn class="typedef" id="AMDVIState" title='AMDVIState' data-type='struct AMDVIState' data-ref="AMDVIState">AMDVIState</dfn>;</td></tr>
+<tr><th id="287">287</th><td></td></tr>
+<tr><th id="288">288</th><td><u>#<span data-ppcond="21">endif</span></u></td></tr>
+<tr><th id="289">289</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='acpi-build.c.html'>codebrowser/hw/i386/acpi-build.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

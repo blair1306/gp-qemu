@@ -1,0 +1,465 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>intel_iommu_internal.h source code [codebrowser/hw/i386/intel_iommu_internal.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="VTDFaultReason,VTDIOTLBPageInvInfo,VTDInvDesc,VTDInvDescIEC,VTDRootEntry "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/i386/intel_iommu_internal.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>i386</a>/<a href='intel_iommu_internal.h.html'>intel_iommu_internal.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU emulation of an Intel IOMMU (VT-d)</i></td></tr>
+<tr><th id="3">3</th><td><i> *   (DMA Remapping device)</i></td></tr>
+<tr><th id="4">4</th><td><i> *</i></td></tr>
+<tr><th id="5">5</th><td><i> * Copyright (C) 2013 Knut Omang, Oracle &lt;knut.omang@oracle.com&gt;</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright (C) 2014 Le Tan, &lt;tamlokveer@gmail.com&gt;</i></td></tr>
+<tr><th id="7">7</th><td><i> *</i></td></tr>
+<tr><th id="8">8</th><td><i> * This program is free software; you can redistribute it and/or modify</i></td></tr>
+<tr><th id="9">9</th><td><i> * it under the terms of the GNU General Public License as published by</i></td></tr>
+<tr><th id="10">10</th><td><i> * the Free Software Foundation; either version 2 of the License, or</i></td></tr>
+<tr><th id="11">11</th><td><i> * (at your option) any later version.</i></td></tr>
+<tr><th id="12">12</th><td><i></i></td></tr>
+<tr><th id="13">13</th><td><i> * This program is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="14">14</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="15">15</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</i></td></tr>
+<tr><th id="16">16</th><td><i> * GNU General Public License for more details.</i></td></tr>
+<tr><th id="17">17</th><td><i></i></td></tr>
+<tr><th id="18">18</th><td><i> * You should have received a copy of the GNU General Public License along</i></td></tr>
+<tr><th id="19">19</th><td><i> * with this program; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="20">20</th><td><i> *</i></td></tr>
+<tr><th id="21">21</th><td><i> * Lots of defines copied from kernel/include/linux/intel-iommu.h:</i></td></tr>
+<tr><th id="22">22</th><td><i> *   Copyright (C) 2006-2008 Intel Corporation</i></td></tr>
+<tr><th id="23">23</th><td><i> *   Author: Ashok Raj &lt;ashok.raj@intel.com&gt;</i></td></tr>
+<tr><th id="24">24</th><td><i> *   Author: Anil S Keshavamurthy &lt;anil.s.keshavamurthy@intel.com&gt;</i></td></tr>
+<tr><th id="25">25</th><td><i> *</i></td></tr>
+<tr><th id="26">26</th><td><i> */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><u>#<span data-ppcond="28">ifndef</span> <span class="macro" data-ref="_M/HW_I386_INTEL_IOMMU_INTERNAL_H">HW_I386_INTEL_IOMMU_INTERNAL_H</span></u></td></tr>
+<tr><th id="29">29</th><td><u>#define <dfn class="macro" id="_M/HW_I386_INTEL_IOMMU_INTERNAL_H" data-ref="_M/HW_I386_INTEL_IOMMU_INTERNAL_H">HW_I386_INTEL_IOMMU_INTERNAL_H</dfn></u></td></tr>
+<tr><th id="30">30</th><td><u>#include <a href="../../include/hw/i386/intel_iommu.h.html">"hw/i386/intel_iommu.h"</a></u></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><i>/*</i></td></tr>
+<tr><th id="33">33</th><td><i> * Intel IOMMU register specification</i></td></tr>
+<tr><th id="34">34</th><td><i> */</i></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/DMAR_VER_REG" data-ref="_M/DMAR_VER_REG">DMAR_VER_REG</dfn>            0x0  /* Arch version supported by this IOMMU */</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/DMAR_CAP_REG" data-ref="_M/DMAR_CAP_REG">DMAR_CAP_REG</dfn>            0x8  /* Hardware supported capabilities */</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/DMAR_CAP_REG_HI" data-ref="_M/DMAR_CAP_REG_HI">DMAR_CAP_REG_HI</dfn>         0xc  /* High 32-bit of DMAR_CAP_REG */</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/DMAR_ECAP_REG" data-ref="_M/DMAR_ECAP_REG">DMAR_ECAP_REG</dfn>           0x10 /* Extended capabilities supported */</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/DMAR_ECAP_REG_HI" data-ref="_M/DMAR_ECAP_REG_HI">DMAR_ECAP_REG_HI</dfn>        0X14</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/DMAR_GCMD_REG" data-ref="_M/DMAR_GCMD_REG">DMAR_GCMD_REG</dfn>           0x18 /* Global command */</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/DMAR_GSTS_REG" data-ref="_M/DMAR_GSTS_REG">DMAR_GSTS_REG</dfn>           0x1c /* Global status */</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/DMAR_RTADDR_REG" data-ref="_M/DMAR_RTADDR_REG">DMAR_RTADDR_REG</dfn>         0x20 /* Root entry table */</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/DMAR_RTADDR_REG_HI" data-ref="_M/DMAR_RTADDR_REG_HI">DMAR_RTADDR_REG_HI</dfn>      0X24</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/DMAR_CCMD_REG" data-ref="_M/DMAR_CCMD_REG">DMAR_CCMD_REG</dfn>           0x28 /* Context command */</u></td></tr>
+<tr><th id="45">45</th><td><u>#define <dfn class="macro" id="_M/DMAR_CCMD_REG_HI" data-ref="_M/DMAR_CCMD_REG_HI">DMAR_CCMD_REG_HI</dfn>        0x2c</u></td></tr>
+<tr><th id="46">46</th><td><u>#define <dfn class="macro" id="_M/DMAR_FSTS_REG" data-ref="_M/DMAR_FSTS_REG">DMAR_FSTS_REG</dfn>           0x34 /* Fault status */</u></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/DMAR_FECTL_REG" data-ref="_M/DMAR_FECTL_REG">DMAR_FECTL_REG</dfn>          0x38 /* Fault control */</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/DMAR_FEDATA_REG" data-ref="_M/DMAR_FEDATA_REG">DMAR_FEDATA_REG</dfn>         0x3c /* Fault event interrupt data */</u></td></tr>
+<tr><th id="49">49</th><td><u>#define <dfn class="macro" id="_M/DMAR_FEADDR_REG" data-ref="_M/DMAR_FEADDR_REG">DMAR_FEADDR_REG</dfn>         0x40 /* Fault event interrupt addr */</u></td></tr>
+<tr><th id="50">50</th><td><u>#define <dfn class="macro" id="_M/DMAR_FEUADDR_REG" data-ref="_M/DMAR_FEUADDR_REG">DMAR_FEUADDR_REG</dfn>        0x44 /* Upper address */</u></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/DMAR_AFLOG_REG" data-ref="_M/DMAR_AFLOG_REG">DMAR_AFLOG_REG</dfn>          0x58 /* Advanced fault control */</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/DMAR_AFLOG_REG_HI" data-ref="_M/DMAR_AFLOG_REG_HI">DMAR_AFLOG_REG_HI</dfn>       0X5c</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/DMAR_PMEN_REG" data-ref="_M/DMAR_PMEN_REG">DMAR_PMEN_REG</dfn>           0x64 /* Enable protected memory region */</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/DMAR_PLMBASE_REG" data-ref="_M/DMAR_PLMBASE_REG">DMAR_PLMBASE_REG</dfn>        0x68 /* PMRR low addr */</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/DMAR_PLMLIMIT_REG" data-ref="_M/DMAR_PLMLIMIT_REG">DMAR_PLMLIMIT_REG</dfn>       0x6c /* PMRR low limit */</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/DMAR_PHMBASE_REG" data-ref="_M/DMAR_PHMBASE_REG">DMAR_PHMBASE_REG</dfn>        0x70 /* PMRR high base addr */</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/DMAR_PHMBASE_REG_HI" data-ref="_M/DMAR_PHMBASE_REG_HI">DMAR_PHMBASE_REG_HI</dfn>     0X74</u></td></tr>
+<tr><th id="58">58</th><td><u>#define <dfn class="macro" id="_M/DMAR_PHMLIMIT_REG" data-ref="_M/DMAR_PHMLIMIT_REG">DMAR_PHMLIMIT_REG</dfn>       0x78 /* PMRR high limit */</u></td></tr>
+<tr><th id="59">59</th><td><u>#define <dfn class="macro" id="_M/DMAR_PHMLIMIT_REG_HI" data-ref="_M/DMAR_PHMLIMIT_REG_HI">DMAR_PHMLIMIT_REG_HI</dfn>    0x7c</u></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQH_REG" data-ref="_M/DMAR_IQH_REG">DMAR_IQH_REG</dfn>            0x80 /* Invalidation queue head */</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQH_REG_HI" data-ref="_M/DMAR_IQH_REG_HI">DMAR_IQH_REG_HI</dfn>         0X84</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQT_REG" data-ref="_M/DMAR_IQT_REG">DMAR_IQT_REG</dfn>            0x88 /* Invalidation queue tail */</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQT_REG_HI" data-ref="_M/DMAR_IQT_REG_HI">DMAR_IQT_REG_HI</dfn>         0X8c</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQA_REG" data-ref="_M/DMAR_IQA_REG">DMAR_IQA_REG</dfn>            0x90 /* Invalidation queue addr */</u></td></tr>
+<tr><th id="65">65</th><td><u>#define <dfn class="macro" id="_M/DMAR_IQA_REG_HI" data-ref="_M/DMAR_IQA_REG_HI">DMAR_IQA_REG_HI</dfn>         0x94</u></td></tr>
+<tr><th id="66">66</th><td><u>#define <dfn class="macro" id="_M/DMAR_ICS_REG" data-ref="_M/DMAR_ICS_REG">DMAR_ICS_REG</dfn>            0x9c /* Invalidation complete status */</u></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/DMAR_IRTA_REG" data-ref="_M/DMAR_IRTA_REG">DMAR_IRTA_REG</dfn>           0xb8 /* Interrupt remapping table addr */</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/DMAR_IRTA_REG_HI" data-ref="_M/DMAR_IRTA_REG_HI">DMAR_IRTA_REG_HI</dfn>        0xbc</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/DMAR_IECTL_REG" data-ref="_M/DMAR_IECTL_REG">DMAR_IECTL_REG</dfn>          0xa0 /* Invalidation event control */</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/DMAR_IEDATA_REG" data-ref="_M/DMAR_IEDATA_REG">DMAR_IEDATA_REG</dfn>         0xa4 /* Invalidation event data */</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/DMAR_IEADDR_REG" data-ref="_M/DMAR_IEADDR_REG">DMAR_IEADDR_REG</dfn>         0xa8 /* Invalidation event address */</u></td></tr>
+<tr><th id="72">72</th><td><u>#define <dfn class="macro" id="_M/DMAR_IEUADDR_REG" data-ref="_M/DMAR_IEUADDR_REG">DMAR_IEUADDR_REG</dfn>        0xac /* Invalidation event address */</u></td></tr>
+<tr><th id="73">73</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQH_REG" data-ref="_M/DMAR_PQH_REG">DMAR_PQH_REG</dfn>            0xc0 /* Page request queue head */</u></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQH_REG_HI" data-ref="_M/DMAR_PQH_REG_HI">DMAR_PQH_REG_HI</dfn>         0xc4</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQT_REG" data-ref="_M/DMAR_PQT_REG">DMAR_PQT_REG</dfn>            0xc8 /* Page request queue tail*/</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQT_REG_HI" data-ref="_M/DMAR_PQT_REG_HI">DMAR_PQT_REG_HI</dfn>         0xcc</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQA_REG" data-ref="_M/DMAR_PQA_REG">DMAR_PQA_REG</dfn>            0xd0 /* Page request queue address */</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/DMAR_PQA_REG_HI" data-ref="_M/DMAR_PQA_REG_HI">DMAR_PQA_REG_HI</dfn>         0xd4</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/DMAR_PRS_REG" data-ref="_M/DMAR_PRS_REG">DMAR_PRS_REG</dfn>            0xdc /* Page request status */</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/DMAR_PECTL_REG" data-ref="_M/DMAR_PECTL_REG">DMAR_PECTL_REG</dfn>          0xe0 /* Page request event control */</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/DMAR_PEDATA_REG" data-ref="_M/DMAR_PEDATA_REG">DMAR_PEDATA_REG</dfn>         0xe4 /* Page request event data */</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/DMAR_PEADDR_REG" data-ref="_M/DMAR_PEADDR_REG">DMAR_PEADDR_REG</dfn>         0xe8 /* Page request event address */</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/DMAR_PEUADDR_REG" data-ref="_M/DMAR_PEUADDR_REG">DMAR_PEUADDR_REG</dfn>        0xec /* Page event upper address */</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/DMAR_MTRRCAP_REG" data-ref="_M/DMAR_MTRRCAP_REG">DMAR_MTRRCAP_REG</dfn>        0x100 /* MTRR capability */</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/DMAR_MTRRCAP_REG_HI" data-ref="_M/DMAR_MTRRCAP_REG_HI">DMAR_MTRRCAP_REG_HI</dfn>     0x104</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/DMAR_MTRRDEF_REG" data-ref="_M/DMAR_MTRRDEF_REG">DMAR_MTRRDEF_REG</dfn>        0x108 /* MTRR default type */</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/DMAR_MTRRDEF_REG_HI" data-ref="_M/DMAR_MTRRDEF_REG_HI">DMAR_MTRRDEF_REG_HI</dfn>     0x10c</u></td></tr>
+<tr><th id="88">88</th><td></td></tr>
+<tr><th id="89">89</th><td><i>/* IOTLB registers */</i></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/DMAR_IOTLB_REG_OFFSET" data-ref="_M/DMAR_IOTLB_REG_OFFSET">DMAR_IOTLB_REG_OFFSET</dfn>   0xf0 /* Offset to the IOTLB registers */</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/DMAR_IVA_REG" data-ref="_M/DMAR_IVA_REG">DMAR_IVA_REG</dfn>            DMAR_IOTLB_REG_OFFSET /* Invalidate address */</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/DMAR_IVA_REG_HI" data-ref="_M/DMAR_IVA_REG_HI">DMAR_IVA_REG_HI</dfn>         (DMAR_IVA_REG + 4)</u></td></tr>
+<tr><th id="93">93</th><td><i>/* IOTLB invalidate register */</i></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/DMAR_IOTLB_REG" data-ref="_M/DMAR_IOTLB_REG">DMAR_IOTLB_REG</dfn>          (DMAR_IOTLB_REG_OFFSET + 0x8)</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/DMAR_IOTLB_REG_HI" data-ref="_M/DMAR_IOTLB_REG_HI">DMAR_IOTLB_REG_HI</dfn>       (DMAR_IOTLB_REG + 4)</u></td></tr>
+<tr><th id="96">96</th><td></td></tr>
+<tr><th id="97">97</th><td><i>/* FRCD */</i></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_OFFSET" data-ref="_M/DMAR_FRCD_REG_OFFSET">DMAR_FRCD_REG_OFFSET</dfn>    0x220 /* Offset to the fault recording regs */</u></td></tr>
+<tr><th id="99">99</th><td><i>/* NOTICE: If you change the DMAR_FRCD_REG_NR, please remember to change the</i></td></tr>
+<tr><th id="100">100</th><td><i> * DMAR_REG_SIZE in include/hw/i386/intel_iommu.h.</i></td></tr>
+<tr><th id="101">101</th><td><i> * #define DMAR_REG_SIZE   (DMAR_FRCD_REG_OFFSET + 16 * DMAR_FRCD_REG_NR)</i></td></tr>
+<tr><th id="102">102</th><td><i> */</i></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_NR" data-ref="_M/DMAR_FRCD_REG_NR">DMAR_FRCD_REG_NR</dfn>        1ULL /* Num of fault recording regs */</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_0_0" data-ref="_M/DMAR_FRCD_REG_0_0">DMAR_FRCD_REG_0_0</dfn>       0x220 /* The 0th fault recording regs */</u></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_0_1" data-ref="_M/DMAR_FRCD_REG_0_1">DMAR_FRCD_REG_0_1</dfn>       0x224</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_0_2" data-ref="_M/DMAR_FRCD_REG_0_2">DMAR_FRCD_REG_0_2</dfn>       0x228</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/DMAR_FRCD_REG_0_3" data-ref="_M/DMAR_FRCD_REG_0_3">DMAR_FRCD_REG_0_3</dfn>       0x22c</u></td></tr>
+<tr><th id="109">109</th><td></td></tr>
+<tr><th id="110">110</th><td><i>/* Interrupt Address Range */</i></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/VTD_INTERRUPT_ADDR_FIRST" data-ref="_M/VTD_INTERRUPT_ADDR_FIRST">VTD_INTERRUPT_ADDR_FIRST</dfn>    0xfee00000ULL</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/VTD_INTERRUPT_ADDR_LAST" data-ref="_M/VTD_INTERRUPT_ADDR_LAST">VTD_INTERRUPT_ADDR_LAST</dfn>     0xfeefffffULL</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/VTD_INTERRUPT_ADDR_SIZE" data-ref="_M/VTD_INTERRUPT_ADDR_SIZE">VTD_INTERRUPT_ADDR_SIZE</dfn>     (VTD_INTERRUPT_ADDR_LAST - \</u></td></tr>
+<tr><th id="114">114</th><td><u>                                     VTD_INTERRUPT_ADDR_FIRST + 1)</u></td></tr>
+<tr><th id="115">115</th><td></td></tr>
+<tr><th id="116">116</th><td><i>/* The shift of source_id in the key of IOTLB hash table */</i></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/VTD_IOTLB_SID_SHIFT" data-ref="_M/VTD_IOTLB_SID_SHIFT">VTD_IOTLB_SID_SHIFT</dfn>         36</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/VTD_IOTLB_LVL_SHIFT" data-ref="_M/VTD_IOTLB_LVL_SHIFT">VTD_IOTLB_LVL_SHIFT</dfn>         52</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/VTD_IOTLB_MAX_SIZE" data-ref="_M/VTD_IOTLB_MAX_SIZE">VTD_IOTLB_MAX_SIZE</dfn>          1024    /* Max size of the hash table */</u></td></tr>
+<tr><th id="120">120</th><td></td></tr>
+<tr><th id="121">121</th><td><i>/* IOTLB_REG */</i></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_GLOBAL_FLUSH" data-ref="_M/VTD_TLB_GLOBAL_FLUSH">VTD_TLB_GLOBAL_FLUSH</dfn>        (1ULL &lt;&lt; 60) /* Global invalidation */</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_DSI_FLUSH" data-ref="_M/VTD_TLB_DSI_FLUSH">VTD_TLB_DSI_FLUSH</dfn>           (2ULL &lt;&lt; 60) /* Domain-selective */</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_PSI_FLUSH" data-ref="_M/VTD_TLB_PSI_FLUSH">VTD_TLB_PSI_FLUSH</dfn>           (3ULL &lt;&lt; 60) /* Page-selective */</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_FLUSH_GRANU_MASK" data-ref="_M/VTD_TLB_FLUSH_GRANU_MASK">VTD_TLB_FLUSH_GRANU_MASK</dfn>    (3ULL &lt;&lt; 60)</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_GLOBAL_FLUSH_A" data-ref="_M/VTD_TLB_GLOBAL_FLUSH_A">VTD_TLB_GLOBAL_FLUSH_A</dfn>      (1ULL &lt;&lt; 57)</u></td></tr>
+<tr><th id="127">127</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_DSI_FLUSH_A" data-ref="_M/VTD_TLB_DSI_FLUSH_A">VTD_TLB_DSI_FLUSH_A</dfn>         (2ULL &lt;&lt; 57)</u></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_PSI_FLUSH_A" data-ref="_M/VTD_TLB_PSI_FLUSH_A">VTD_TLB_PSI_FLUSH_A</dfn>         (3ULL &lt;&lt; 57)</u></td></tr>
+<tr><th id="129">129</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_FLUSH_GRANU_MASK_A" data-ref="_M/VTD_TLB_FLUSH_GRANU_MASK_A">VTD_TLB_FLUSH_GRANU_MASK_A</dfn>  (3ULL &lt;&lt; 57)</u></td></tr>
+<tr><th id="130">130</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_IVT" data-ref="_M/VTD_TLB_IVT">VTD_TLB_IVT</dfn>                 (1ULL &lt;&lt; 63)</u></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/VTD_TLB_DID" data-ref="_M/VTD_TLB_DID">VTD_TLB_DID</dfn>(val)            (((val) &gt;&gt; 32) &amp; VTD_DOMAIN_ID_MASK)</u></td></tr>
+<tr><th id="132">132</th><td></td></tr>
+<tr><th id="133">133</th><td><i>/* IVA_REG */</i></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/VTD_IVA_ADDR" data-ref="_M/VTD_IVA_ADDR">VTD_IVA_ADDR</dfn>(val)       ((val) &amp; ~0xfffULL &amp; ((1ULL &lt;&lt; VTD_MGAW) - 1))</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/VTD_IVA_AM" data-ref="_M/VTD_IVA_AM">VTD_IVA_AM</dfn>(val)         ((val) &amp; 0x3fULL)</u></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i>/* GCMD_REG */</i></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_TE" data-ref="_M/VTD_GCMD_TE">VTD_GCMD_TE</dfn>                 (1UL &lt;&lt; 31)</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_SRTP" data-ref="_M/VTD_GCMD_SRTP">VTD_GCMD_SRTP</dfn>               (1UL &lt;&lt; 30)</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_SFL" data-ref="_M/VTD_GCMD_SFL">VTD_GCMD_SFL</dfn>                (1UL &lt;&lt; 29)</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_EAFL" data-ref="_M/VTD_GCMD_EAFL">VTD_GCMD_EAFL</dfn>               (1UL &lt;&lt; 28)</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_WBF" data-ref="_M/VTD_GCMD_WBF">VTD_GCMD_WBF</dfn>                (1UL &lt;&lt; 27)</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_QIE" data-ref="_M/VTD_GCMD_QIE">VTD_GCMD_QIE</dfn>                (1UL &lt;&lt; 26)</u></td></tr>
+<tr><th id="144">144</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_IRE" data-ref="_M/VTD_GCMD_IRE">VTD_GCMD_IRE</dfn>                (1UL &lt;&lt; 25)</u></td></tr>
+<tr><th id="145">145</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_SIRTP" data-ref="_M/VTD_GCMD_SIRTP">VTD_GCMD_SIRTP</dfn>              (1UL &lt;&lt; 24)</u></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/VTD_GCMD_CFI" data-ref="_M/VTD_GCMD_CFI">VTD_GCMD_CFI</dfn>                (1UL &lt;&lt; 23)</u></td></tr>
+<tr><th id="147">147</th><td></td></tr>
+<tr><th id="148">148</th><td><i>/* GSTS_REG */</i></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_TES" data-ref="_M/VTD_GSTS_TES">VTD_GSTS_TES</dfn>                (1UL &lt;&lt; 31)</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_RTPS" data-ref="_M/VTD_GSTS_RTPS">VTD_GSTS_RTPS</dfn>               (1UL &lt;&lt; 30)</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_FLS" data-ref="_M/VTD_GSTS_FLS">VTD_GSTS_FLS</dfn>                (1UL &lt;&lt; 29)</u></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_AFLS" data-ref="_M/VTD_GSTS_AFLS">VTD_GSTS_AFLS</dfn>               (1UL &lt;&lt; 28)</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_WBFS" data-ref="_M/VTD_GSTS_WBFS">VTD_GSTS_WBFS</dfn>               (1UL &lt;&lt; 27)</u></td></tr>
+<tr><th id="154">154</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_QIES" data-ref="_M/VTD_GSTS_QIES">VTD_GSTS_QIES</dfn>               (1UL &lt;&lt; 26)</u></td></tr>
+<tr><th id="155">155</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_IRES" data-ref="_M/VTD_GSTS_IRES">VTD_GSTS_IRES</dfn>               (1UL &lt;&lt; 25)</u></td></tr>
+<tr><th id="156">156</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_IRTPS" data-ref="_M/VTD_GSTS_IRTPS">VTD_GSTS_IRTPS</dfn>              (1UL &lt;&lt; 24)</u></td></tr>
+<tr><th id="157">157</th><td><u>#define <dfn class="macro" id="_M/VTD_GSTS_CFIS" data-ref="_M/VTD_GSTS_CFIS">VTD_GSTS_CFIS</dfn>               (1UL &lt;&lt; 23)</u></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><i>/* CCMD_REG */</i></td></tr>
+<tr><th id="160">160</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_ICC" data-ref="_M/VTD_CCMD_ICC">VTD_CCMD_ICC</dfn>                (1ULL &lt;&lt; 63)</u></td></tr>
+<tr><th id="161">161</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_GLOBAL_INVL" data-ref="_M/VTD_CCMD_GLOBAL_INVL">VTD_CCMD_GLOBAL_INVL</dfn>        (1ULL &lt;&lt; 61)</u></td></tr>
+<tr><th id="162">162</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_DOMAIN_INVL" data-ref="_M/VTD_CCMD_DOMAIN_INVL">VTD_CCMD_DOMAIN_INVL</dfn>        (2ULL &lt;&lt; 61)</u></td></tr>
+<tr><th id="163">163</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_DEVICE_INVL" data-ref="_M/VTD_CCMD_DEVICE_INVL">VTD_CCMD_DEVICE_INVL</dfn>        (3ULL &lt;&lt; 61)</u></td></tr>
+<tr><th id="164">164</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_CIRG_MASK" data-ref="_M/VTD_CCMD_CIRG_MASK">VTD_CCMD_CIRG_MASK</dfn>          (3ULL &lt;&lt; 61)</u></td></tr>
+<tr><th id="165">165</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_GLOBAL_INVL_A" data-ref="_M/VTD_CCMD_GLOBAL_INVL_A">VTD_CCMD_GLOBAL_INVL_A</dfn>      (1ULL &lt;&lt; 59)</u></td></tr>
+<tr><th id="166">166</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_DOMAIN_INVL_A" data-ref="_M/VTD_CCMD_DOMAIN_INVL_A">VTD_CCMD_DOMAIN_INVL_A</dfn>      (2ULL &lt;&lt; 59)</u></td></tr>
+<tr><th id="167">167</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_DEVICE_INVL_A" data-ref="_M/VTD_CCMD_DEVICE_INVL_A">VTD_CCMD_DEVICE_INVL_A</dfn>      (3ULL &lt;&lt; 59)</u></td></tr>
+<tr><th id="168">168</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_CAIG_MASK" data-ref="_M/VTD_CCMD_CAIG_MASK">VTD_CCMD_CAIG_MASK</dfn>          (3ULL &lt;&lt; 59)</u></td></tr>
+<tr><th id="169">169</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_DID" data-ref="_M/VTD_CCMD_DID">VTD_CCMD_DID</dfn>(val)           ((val) &amp; VTD_DOMAIN_ID_MASK)</u></td></tr>
+<tr><th id="170">170</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_SID" data-ref="_M/VTD_CCMD_SID">VTD_CCMD_SID</dfn>(val)           (((val) &gt;&gt; 16) &amp; 0xffffULL)</u></td></tr>
+<tr><th id="171">171</th><td><u>#define <dfn class="macro" id="_M/VTD_CCMD_FM" data-ref="_M/VTD_CCMD_FM">VTD_CCMD_FM</dfn>(val)            (((val) &gt;&gt; 32) &amp; 3ULL)</u></td></tr>
+<tr><th id="172">172</th><td></td></tr>
+<tr><th id="173">173</th><td><i>/* RTADDR_REG */</i></td></tr>
+<tr><th id="174">174</th><td><u>#define <dfn class="macro" id="_M/VTD_RTADDR_RTT" data-ref="_M/VTD_RTADDR_RTT">VTD_RTADDR_RTT</dfn>              (1ULL &lt;&lt; 11)</u></td></tr>
+<tr><th id="175">175</th><td><u>#define <dfn class="macro" id="_M/VTD_RTADDR_ADDR_MASK" data-ref="_M/VTD_RTADDR_ADDR_MASK">VTD_RTADDR_ADDR_MASK</dfn>        (VTD_HAW_MASK ^ 0xfffULL)</u></td></tr>
+<tr><th id="176">176</th><td></td></tr>
+<tr><th id="177">177</th><td><i>/* IRTA_REG */</i></td></tr>
+<tr><th id="178">178</th><td><u>#define <dfn class="macro" id="_M/VTD_IRTA_ADDR_MASK" data-ref="_M/VTD_IRTA_ADDR_MASK">VTD_IRTA_ADDR_MASK</dfn>          (VTD_HAW_MASK ^ 0xfffULL)</u></td></tr>
+<tr><th id="179">179</th><td><u>#define <dfn class="macro" id="_M/VTD_IRTA_EIME" data-ref="_M/VTD_IRTA_EIME">VTD_IRTA_EIME</dfn>               (1ULL &lt;&lt; 11)</u></td></tr>
+<tr><th id="180">180</th><td><u>#define <dfn class="macro" id="_M/VTD_IRTA_SIZE_MASK" data-ref="_M/VTD_IRTA_SIZE_MASK">VTD_IRTA_SIZE_MASK</dfn>          (0xfULL)</u></td></tr>
+<tr><th id="181">181</th><td></td></tr>
+<tr><th id="182">182</th><td><i>/* ECAP_REG */</i></td></tr>
+<tr><th id="183">183</th><td><i>/* (offset &gt;&gt; 4) &lt;&lt; 8 */</i></td></tr>
+<tr><th id="184">184</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_IRO" data-ref="_M/VTD_ECAP_IRO">VTD_ECAP_IRO</dfn>                (DMAR_IOTLB_REG_OFFSET &lt;&lt; 4)</u></td></tr>
+<tr><th id="185">185</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_QI" data-ref="_M/VTD_ECAP_QI">VTD_ECAP_QI</dfn>                 (1ULL &lt;&lt; 1)</u></td></tr>
+<tr><th id="186">186</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_DT" data-ref="_M/VTD_ECAP_DT">VTD_ECAP_DT</dfn>                 (1ULL &lt;&lt; 2)</u></td></tr>
+<tr><th id="187">187</th><td><i>/* Interrupt Remapping support */</i></td></tr>
+<tr><th id="188">188</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_IR" data-ref="_M/VTD_ECAP_IR">VTD_ECAP_IR</dfn>                 (1ULL &lt;&lt; 3)</u></td></tr>
+<tr><th id="189">189</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_EIM" data-ref="_M/VTD_ECAP_EIM">VTD_ECAP_EIM</dfn>                (1ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="190">190</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_PT" data-ref="_M/VTD_ECAP_PT">VTD_ECAP_PT</dfn>                 (1ULL &lt;&lt; 6)</u></td></tr>
+<tr><th id="191">191</th><td><u>#define <dfn class="macro" id="_M/VTD_ECAP_MHMV" data-ref="_M/VTD_ECAP_MHMV">VTD_ECAP_MHMV</dfn>               (15ULL &lt;&lt; 20)</u></td></tr>
+<tr><th id="192">192</th><td></td></tr>
+<tr><th id="193">193</th><td><i>/* CAP_REG */</i></td></tr>
+<tr><th id="194">194</th><td><i>/* (offset &gt;&gt; 4) &lt;&lt; 24 */</i></td></tr>
+<tr><th id="195">195</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_FRO" data-ref="_M/VTD_CAP_FRO">VTD_CAP_FRO</dfn>                 (DMAR_FRCD_REG_OFFSET &lt;&lt; 20)</u></td></tr>
+<tr><th id="196">196</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_NFR" data-ref="_M/VTD_CAP_NFR">VTD_CAP_NFR</dfn>                 ((DMAR_FRCD_REG_NR - 1) &lt;&lt; 40)</u></td></tr>
+<tr><th id="197">197</th><td><u>#define <dfn class="macro" id="_M/VTD_DOMAIN_ID_SHIFT" data-ref="_M/VTD_DOMAIN_ID_SHIFT">VTD_DOMAIN_ID_SHIFT</dfn>         16  /* 16-bit domain id for 64K domains */</u></td></tr>
+<tr><th id="198">198</th><td><u>#define <dfn class="macro" id="_M/VTD_DOMAIN_ID_MASK" data-ref="_M/VTD_DOMAIN_ID_MASK">VTD_DOMAIN_ID_MASK</dfn>          ((1UL &lt;&lt; VTD_DOMAIN_ID_SHIFT) - 1)</u></td></tr>
+<tr><th id="199">199</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_ND" data-ref="_M/VTD_CAP_ND">VTD_CAP_ND</dfn>                  (((VTD_DOMAIN_ID_SHIFT - 4) / 2) &amp; 7ULL)</u></td></tr>
+<tr><th id="200">200</th><td><u>#define <dfn class="macro" id="_M/VTD_MGAW" data-ref="_M/VTD_MGAW">VTD_MGAW</dfn>                    39  /* Maximum Guest Address Width */</u></td></tr>
+<tr><th id="201">201</th><td><u>#define <dfn class="macro" id="_M/VTD_ADDRESS_SIZE" data-ref="_M/VTD_ADDRESS_SIZE">VTD_ADDRESS_SIZE</dfn>            (1ULL &lt;&lt; VTD_MGAW)</u></td></tr>
+<tr><th id="202">202</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_MGAW" data-ref="_M/VTD_CAP_MGAW">VTD_CAP_MGAW</dfn>                (((VTD_MGAW - 1) &amp; 0x3fULL) &lt;&lt; 16)</u></td></tr>
+<tr><th id="203">203</th><td><u>#define <dfn class="macro" id="_M/VTD_MAMV" data-ref="_M/VTD_MAMV">VTD_MAMV</dfn>                    18ULL</u></td></tr>
+<tr><th id="204">204</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_MAMV" data-ref="_M/VTD_CAP_MAMV">VTD_CAP_MAMV</dfn>                (VTD_MAMV &lt;&lt; 48)</u></td></tr>
+<tr><th id="205">205</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_PSI" data-ref="_M/VTD_CAP_PSI">VTD_CAP_PSI</dfn>                 (1ULL &lt;&lt; 39)</u></td></tr>
+<tr><th id="206">206</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SLLPS" data-ref="_M/VTD_CAP_SLLPS">VTD_CAP_SLLPS</dfn>               ((1ULL &lt;&lt; 34) | (1ULL &lt;&lt; 35))</u></td></tr>
+<tr><th id="207">207</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_CM" data-ref="_M/VTD_CAP_CM">VTD_CAP_CM</dfn>                  (1ULL &lt;&lt; 7)</u></td></tr>
+<tr><th id="208">208</th><td></td></tr>
+<tr><th id="209">209</th><td><i>/* Supported Adjusted Guest Address Widths */</i></td></tr>
+<tr><th id="210">210</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SAGAW_SHIFT" data-ref="_M/VTD_CAP_SAGAW_SHIFT">VTD_CAP_SAGAW_SHIFT</dfn>         8</u></td></tr>
+<tr><th id="211">211</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SAGAW_MASK" data-ref="_M/VTD_CAP_SAGAW_MASK">VTD_CAP_SAGAW_MASK</dfn>          (0x1fULL &lt;&lt; VTD_CAP_SAGAW_SHIFT)</u></td></tr>
+<tr><th id="212">212</th><td> <i>/* 39-bit AGAW, 3-level page-table */</i></td></tr>
+<tr><th id="213">213</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SAGAW_39bit" data-ref="_M/VTD_CAP_SAGAW_39bit">VTD_CAP_SAGAW_39bit</dfn>         (0x2ULL &lt;&lt; VTD_CAP_SAGAW_SHIFT)</u></td></tr>
+<tr><th id="214">214</th><td> <i>/* 48-bit AGAW, 4-level page-table */</i></td></tr>
+<tr><th id="215">215</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SAGAW_48bit" data-ref="_M/VTD_CAP_SAGAW_48bit">VTD_CAP_SAGAW_48bit</dfn>         (0x4ULL &lt;&lt; VTD_CAP_SAGAW_SHIFT)</u></td></tr>
+<tr><th id="216">216</th><td><u>#define <dfn class="macro" id="_M/VTD_CAP_SAGAW" data-ref="_M/VTD_CAP_SAGAW">VTD_CAP_SAGAW</dfn>               VTD_CAP_SAGAW_39bit</u></td></tr>
+<tr><th id="217">217</th><td></td></tr>
+<tr><th id="218">218</th><td><i>/* IQT_REG */</i></td></tr>
+<tr><th id="219">219</th><td><u>#define <dfn class="macro" id="_M/VTD_IQT_QT" data-ref="_M/VTD_IQT_QT">VTD_IQT_QT</dfn>(val)             (((val) &gt;&gt; 4) &amp; 0x7fffULL)</u></td></tr>
+<tr><th id="220">220</th><td></td></tr>
+<tr><th id="221">221</th><td><i>/* IQA_REG */</i></td></tr>
+<tr><th id="222">222</th><td><u>#define <dfn class="macro" id="_M/VTD_IQA_IQA_MASK" data-ref="_M/VTD_IQA_IQA_MASK">VTD_IQA_IQA_MASK</dfn>            (VTD_HAW_MASK ^ 0xfffULL)</u></td></tr>
+<tr><th id="223">223</th><td><u>#define <dfn class="macro" id="_M/VTD_IQA_QS" data-ref="_M/VTD_IQA_QS">VTD_IQA_QS</dfn>                  0x7ULL</u></td></tr>
+<tr><th id="224">224</th><td></td></tr>
+<tr><th id="225">225</th><td><i>/* IQH_REG */</i></td></tr>
+<tr><th id="226">226</th><td><u>#define <dfn class="macro" id="_M/VTD_IQH_QH_SHIFT" data-ref="_M/VTD_IQH_QH_SHIFT">VTD_IQH_QH_SHIFT</dfn>            4</u></td></tr>
+<tr><th id="227">227</th><td><u>#define <dfn class="macro" id="_M/VTD_IQH_QH_MASK" data-ref="_M/VTD_IQH_QH_MASK">VTD_IQH_QH_MASK</dfn>             0x7fff0ULL</u></td></tr>
+<tr><th id="228">228</th><td></td></tr>
+<tr><th id="229">229</th><td><i>/* ICS_REG */</i></td></tr>
+<tr><th id="230">230</th><td><u>#define <dfn class="macro" id="_M/VTD_ICS_IWC" data-ref="_M/VTD_ICS_IWC">VTD_ICS_IWC</dfn>                 1UL</u></td></tr>
+<tr><th id="231">231</th><td></td></tr>
+<tr><th id="232">232</th><td><i>/* IECTL_REG */</i></td></tr>
+<tr><th id="233">233</th><td><u>#define <dfn class="macro" id="_M/VTD_IECTL_IM" data-ref="_M/VTD_IECTL_IM">VTD_IECTL_IM</dfn>                (1UL &lt;&lt; 31)</u></td></tr>
+<tr><th id="234">234</th><td><u>#define <dfn class="macro" id="_M/VTD_IECTL_IP" data-ref="_M/VTD_IECTL_IP">VTD_IECTL_IP</dfn>                (1UL &lt;&lt; 30)</u></td></tr>
+<tr><th id="235">235</th><td></td></tr>
+<tr><th id="236">236</th><td><i>/* FSTS_REG */</i></td></tr>
+<tr><th id="237">237</th><td><u>#define <dfn class="macro" id="_M/VTD_FSTS_FRI_MASK" data-ref="_M/VTD_FSTS_FRI_MASK">VTD_FSTS_FRI_MASK</dfn>       0xff00UL</u></td></tr>
+<tr><th id="238">238</th><td><u>#define <dfn class="macro" id="_M/VTD_FSTS_FRI" data-ref="_M/VTD_FSTS_FRI">VTD_FSTS_FRI</dfn>(val)       ((((uint32_t)(val)) &lt;&lt; 8) &amp; VTD_FSTS_FRI_MASK)</u></td></tr>
+<tr><th id="239">239</th><td><u>#define <dfn class="macro" id="_M/VTD_FSTS_IQE" data-ref="_M/VTD_FSTS_IQE">VTD_FSTS_IQE</dfn>            (1UL &lt;&lt; 4)</u></td></tr>
+<tr><th id="240">240</th><td><u>#define <dfn class="macro" id="_M/VTD_FSTS_PPF" data-ref="_M/VTD_FSTS_PPF">VTD_FSTS_PPF</dfn>            (1UL &lt;&lt; 1)</u></td></tr>
+<tr><th id="241">241</th><td><u>#define <dfn class="macro" id="_M/VTD_FSTS_PFO" data-ref="_M/VTD_FSTS_PFO">VTD_FSTS_PFO</dfn>            1UL</u></td></tr>
+<tr><th id="242">242</th><td></td></tr>
+<tr><th id="243">243</th><td><i>/* FECTL_REG */</i></td></tr>
+<tr><th id="244">244</th><td><u>#define <dfn class="macro" id="_M/VTD_FECTL_IM" data-ref="_M/VTD_FECTL_IM">VTD_FECTL_IM</dfn>            (1UL &lt;&lt; 31)</u></td></tr>
+<tr><th id="245">245</th><td><u>#define <dfn class="macro" id="_M/VTD_FECTL_IP" data-ref="_M/VTD_FECTL_IP">VTD_FECTL_IP</dfn>            (1UL &lt;&lt; 30)</u></td></tr>
+<tr><th id="246">246</th><td></td></tr>
+<tr><th id="247">247</th><td><i>/* Fault Recording Register */</i></td></tr>
+<tr><th id="248">248</th><td><i>/* For the high 64-bit of 128-bit */</i></td></tr>
+<tr><th id="249">249</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_F" data-ref="_M/VTD_FRCD_F">VTD_FRCD_F</dfn>              (1ULL &lt;&lt; 63)</u></td></tr>
+<tr><th id="250">250</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_T" data-ref="_M/VTD_FRCD_T">VTD_FRCD_T</dfn>              (1ULL &lt;&lt; 62)</u></td></tr>
+<tr><th id="251">251</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_FR" data-ref="_M/VTD_FRCD_FR">VTD_FRCD_FR</dfn>(val)        (((val) &amp; 0xffULL) &lt;&lt; 32)</u></td></tr>
+<tr><th id="252">252</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_SID_MASK" data-ref="_M/VTD_FRCD_SID_MASK">VTD_FRCD_SID_MASK</dfn>       0xffffULL</u></td></tr>
+<tr><th id="253">253</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_SID" data-ref="_M/VTD_FRCD_SID">VTD_FRCD_SID</dfn>(val)       ((val) &amp; VTD_FRCD_SID_MASK)</u></td></tr>
+<tr><th id="254">254</th><td><i>/* For the low 64-bit of 128-bit */</i></td></tr>
+<tr><th id="255">255</th><td><u>#define <dfn class="macro" id="_M/VTD_FRCD_FI" data-ref="_M/VTD_FRCD_FI">VTD_FRCD_FI</dfn>(val)        ((val) &amp; (((1ULL &lt;&lt; VTD_MGAW) - 1) ^ 0xfffULL))</u></td></tr>
+<tr><th id="256">256</th><td></td></tr>
+<tr><th id="257">257</th><td><i>/* DMA Remapping Fault Conditions */</i></td></tr>
+<tr><th id="258">258</th><td><b>typedef</b> <b>enum</b> <dfn class="type def" id="VTDFaultReason" title='VTDFaultReason' data-ref="VTDFaultReason"><a class="type" href="#VTDFaultReason" title='VTDFaultReason' data-ref="VTDFaultReason">VTDFaultReason</a></dfn> {</td></tr>
+<tr><th id="259">259</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_RESERVED" title='VTDFaultReason::VTD_FR_RESERVED' data-ref="VTDFaultReason::VTD_FR_RESERVED">VTD_FR_RESERVED</dfn> = <var>0</var>,        <i>/* Reserved for Advanced Fault logging */</i></td></tr>
+<tr><th id="260">260</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_ROOT_ENTRY_P" title='VTDFaultReason::VTD_FR_ROOT_ENTRY_P' data-ref="VTDFaultReason::VTD_FR_ROOT_ENTRY_P">VTD_FR_ROOT_ENTRY_P</dfn> = <var>1</var>,    <i>/* The Present(P) field of root-entry is 0 */</i></td></tr>
+<tr><th id="261">261</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_P" title='VTDFaultReason::VTD_FR_CONTEXT_ENTRY_P' data-ref="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_P">VTD_FR_CONTEXT_ENTRY_P</dfn>,     <i>/* The Present(P) field of context-entry is 0 */</i></td></tr>
+<tr><th id="262">262</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_INV" title='VTDFaultReason::VTD_FR_CONTEXT_ENTRY_INV' data-ref="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_INV">VTD_FR_CONTEXT_ENTRY_INV</dfn>,   <i>/* Invalid programming of a context-entry */</i></td></tr>
+<tr><th id="263">263</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_ADDR_BEYOND_MGAW" title='VTDFaultReason::VTD_FR_ADDR_BEYOND_MGAW' data-ref="VTDFaultReason::VTD_FR_ADDR_BEYOND_MGAW">VTD_FR_ADDR_BEYOND_MGAW</dfn>,    <i>/* Input-address above (2^x-1) */</i></td></tr>
+<tr><th id="264">264</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_WRITE" title='VTDFaultReason::VTD_FR_WRITE' data-ref="VTDFaultReason::VTD_FR_WRITE">VTD_FR_WRITE</dfn>,               <i>/* No write permission */</i></td></tr>
+<tr><th id="265">265</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_READ" title='VTDFaultReason::VTD_FR_READ' data-ref="VTDFaultReason::VTD_FR_READ">VTD_FR_READ</dfn>,                <i>/* No read permission */</i></td></tr>
+<tr><th id="266">266</th><td>    <i>/* Fail to access a second-level paging entry (not SL_PML4E) */</i></td></tr>
+<tr><th id="267">267</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_PAGING_ENTRY_INV" title='VTDFaultReason::VTD_FR_PAGING_ENTRY_INV' data-ref="VTDFaultReason::VTD_FR_PAGING_ENTRY_INV">VTD_FR_PAGING_ENTRY_INV</dfn>,</td></tr>
+<tr><th id="268">268</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_ROOT_TABLE_INV" title='VTDFaultReason::VTD_FR_ROOT_TABLE_INV' data-ref="VTDFaultReason::VTD_FR_ROOT_TABLE_INV">VTD_FR_ROOT_TABLE_INV</dfn>,      <i>/* Fail to access a root-entry */</i></td></tr>
+<tr><th id="269">269</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_CONTEXT_TABLE_INV" title='VTDFaultReason::VTD_FR_CONTEXT_TABLE_INV' data-ref="VTDFaultReason::VTD_FR_CONTEXT_TABLE_INV">VTD_FR_CONTEXT_TABLE_INV</dfn>,   <i>/* Fail to access a context-entry */</i></td></tr>
+<tr><th id="270">270</th><td>    <i>/* Non-zero reserved field in a present root-entry */</i></td></tr>
+<tr><th id="271">271</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_ROOT_ENTRY_RSVD" title='VTDFaultReason::VTD_FR_ROOT_ENTRY_RSVD' data-ref="VTDFaultReason::VTD_FR_ROOT_ENTRY_RSVD">VTD_FR_ROOT_ENTRY_RSVD</dfn>,</td></tr>
+<tr><th id="272">272</th><td>    <i>/* Non-zero reserved field in a present context-entry */</i></td></tr>
+<tr><th id="273">273</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_RSVD" title='VTDFaultReason::VTD_FR_CONTEXT_ENTRY_RSVD' data-ref="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_RSVD">VTD_FR_CONTEXT_ENTRY_RSVD</dfn>,</td></tr>
+<tr><th id="274">274</th><td>    <i>/* Non-zero reserved field in a second-level paging entry with at lease one</i></td></tr>
+<tr><th id="275">275</th><td><i>     * Read(R) and Write(W) or Execute(E) field is Set.</i></td></tr>
+<tr><th id="276">276</th><td><i>     */</i></td></tr>
+<tr><th id="277">277</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_PAGING_ENTRY_RSVD" title='VTDFaultReason::VTD_FR_PAGING_ENTRY_RSVD' data-ref="VTDFaultReason::VTD_FR_PAGING_ENTRY_RSVD">VTD_FR_PAGING_ENTRY_RSVD</dfn>,</td></tr>
+<tr><th id="278">278</th><td>    <i>/* Translation request or translated request explicitly blocked dut to the</i></td></tr>
+<tr><th id="279">279</th><td><i>     * programming of the Translation Type (T) field in the present</i></td></tr>
+<tr><th id="280">280</th><td><i>     * context-entry.</i></td></tr>
+<tr><th id="281">281</th><td><i>     */</i></td></tr>
+<tr><th id="282">282</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_TT" title='VTDFaultReason::VTD_FR_CONTEXT_ENTRY_TT' data-ref="VTDFaultReason::VTD_FR_CONTEXT_ENTRY_TT">VTD_FR_CONTEXT_ENTRY_TT</dfn>,</td></tr>
+<tr><th id="283">283</th><td></td></tr>
+<tr><th id="284">284</th><td>    <i>/* Interrupt remapping transition faults */</i></td></tr>
+<tr><th id="285">285</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_REQ_RSVD" title='VTDFaultReason::VTD_FR_IR_REQ_RSVD' data-ref="VTDFaultReason::VTD_FR_IR_REQ_RSVD">VTD_FR_IR_REQ_RSVD</dfn> = <var>0x20</var>, <i>/* One or more IR request reserved</i></td></tr>
+<tr><th id="286">286</th><td><i>                                * fields set */</i></td></tr>
+<tr><th id="287">287</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_INDEX_OVER" title='VTDFaultReason::VTD_FR_IR_INDEX_OVER' data-ref="VTDFaultReason::VTD_FR_IR_INDEX_OVER">VTD_FR_IR_INDEX_OVER</dfn> = <var>0x21</var>, <i>/* Index value greater than max */</i></td></tr>
+<tr><th id="288">288</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_ENTRY_P" title='VTDFaultReason::VTD_FR_IR_ENTRY_P' data-ref="VTDFaultReason::VTD_FR_IR_ENTRY_P">VTD_FR_IR_ENTRY_P</dfn> = <var>0x22</var>,    <i>/* Present (P) not set in IRTE */</i></td></tr>
+<tr><th id="289">289</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_ROOT_INVAL" title='VTDFaultReason::VTD_FR_IR_ROOT_INVAL' data-ref="VTDFaultReason::VTD_FR_IR_ROOT_INVAL">VTD_FR_IR_ROOT_INVAL</dfn> = <var>0x23</var>, <i>/* IR Root table invalid */</i></td></tr>
+<tr><th id="290">290</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_IRTE_RSVD" title='VTDFaultReason::VTD_FR_IR_IRTE_RSVD' data-ref="VTDFaultReason::VTD_FR_IR_IRTE_RSVD">VTD_FR_IR_IRTE_RSVD</dfn> = <var>0x24</var>,  <i>/* IRTE Rsvd field non-zero with</i></td></tr>
+<tr><th id="291">291</th><td><i>                                  * Present flag set */</i></td></tr>
+<tr><th id="292">292</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_REQ_COMPAT" title='VTDFaultReason::VTD_FR_IR_REQ_COMPAT' data-ref="VTDFaultReason::VTD_FR_IR_REQ_COMPAT">VTD_FR_IR_REQ_COMPAT</dfn> = <var>0x25</var>, <i>/* Encountered compatible IR</i></td></tr>
+<tr><th id="293">293</th><td><i>                                  * request while disabled */</i></td></tr>
+<tr><th id="294">294</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_IR_SID_ERR" title='VTDFaultReason::VTD_FR_IR_SID_ERR' data-ref="VTDFaultReason::VTD_FR_IR_SID_ERR">VTD_FR_IR_SID_ERR</dfn> = <var>0x26</var>,   <i>/* Invalid Source-ID */</i></td></tr>
+<tr><th id="295">295</th><td></td></tr>
+<tr><th id="296">296</th><td>    <i>/* This is not a normal fault reason. We use this to indicate some faults</i></td></tr>
+<tr><th id="297">297</th><td><i>     * that are not referenced by the VT-d specification.</i></td></tr>
+<tr><th id="298">298</th><td><i>     * Fault event with such reason should not be recorded.</i></td></tr>
+<tr><th id="299">299</th><td><i>     */</i></td></tr>
+<tr><th id="300">300</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_RESERVED_ERR" title='VTDFaultReason::VTD_FR_RESERVED_ERR' data-ref="VTDFaultReason::VTD_FR_RESERVED_ERR">VTD_FR_RESERVED_ERR</dfn>,</td></tr>
+<tr><th id="301">301</th><td>    <dfn class="enum" id="VTDFaultReason::VTD_FR_MAX" title='VTDFaultReason::VTD_FR_MAX' data-ref="VTDFaultReason::VTD_FR_MAX">VTD_FR_MAX</dfn>,                 <i>/* Guard */</i></td></tr>
+<tr><th id="302">302</th><td>} <dfn class="typedef" id="VTDFaultReason" title='VTDFaultReason' data-type='enum VTDFaultReason' data-ref="VTDFaultReason">VTDFaultReason</dfn>;</td></tr>
+<tr><th id="303">303</th><td></td></tr>
+<tr><th id="304">304</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_CACHE_GEN_MAX" data-ref="_M/VTD_CONTEXT_CACHE_GEN_MAX">VTD_CONTEXT_CACHE_GEN_MAX</dfn>       0xffffffffUL</u></td></tr>
+<tr><th id="305">305</th><td></td></tr>
+<tr><th id="306">306</th><td><i>/* Interrupt Entry Cache Invalidation Descriptor: VT-d 6.5.2.7. */</i></td></tr>
+<tr><th id="307">307</th><td><b>struct</b> <dfn class="type def" id="VTDInvDescIEC" title='VTDInvDescIEC' data-ref="VTDInvDescIEC">VTDInvDescIEC</dfn> {</td></tr>
+<tr><th id="308">308</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::type" title='VTDInvDescIEC::type' data-ref="VTDInvDescIEC::type">type</dfn>:<var>4</var>;            <i>/* Should always be 0x4 */</i></td></tr>
+<tr><th id="309">309</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::granularity" title='VTDInvDescIEC::granularity' data-ref="VTDInvDescIEC::granularity">granularity</dfn>:<var>1</var>;     <i>/* If set, it's global IR invalidation */</i></td></tr>
+<tr><th id="310">310</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::resved_1" title='VTDInvDescIEC::resved_1' data-ref="VTDInvDescIEC::resved_1">resved_1</dfn>:<var>22</var>;</td></tr>
+<tr><th id="311">311</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::index_mask" title='VTDInvDescIEC::index_mask' data-ref="VTDInvDescIEC::index_mask">index_mask</dfn>:<var>5</var>;      <i>/* 2^N for continuous int invalidation */</i></td></tr>
+<tr><th id="312">312</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::index" title='VTDInvDescIEC::index' data-ref="VTDInvDescIEC::index">index</dfn>:<var>16</var>;          <i>/* Start index to invalidate */</i></td></tr>
+<tr><th id="313">313</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint32_t" title='uint32_t' data-type='unsigned int' data-ref="uint32_t">uint32_t</a> <dfn class="decl" id="VTDInvDescIEC::reserved_2" title='VTDInvDescIEC::reserved_2' data-ref="VTDInvDescIEC::reserved_2">reserved_2</dfn>:<var>16</var>;</td></tr>
+<tr><th id="314">314</th><td>};</td></tr>
+<tr><th id="315">315</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDInvDescIEC" title='VTDInvDescIEC' data-ref="VTDInvDescIEC">VTDInvDescIEC</a> <dfn class="typedef" id="VTDInvDescIEC" title='VTDInvDescIEC' data-type='struct VTDInvDescIEC' data-ref="VTDInvDescIEC">VTDInvDescIEC</dfn>;</td></tr>
+<tr><th id="316">316</th><td></td></tr>
+<tr><th id="317">317</th><td><i>/* Queued Invalidation Descriptor */</i></td></tr>
+<tr><th id="318">318</th><td><b>union</b> <dfn class="type def" id="VTDInvDesc" title='VTDInvDesc' data-ref="VTDInvDesc">VTDInvDesc</dfn> {</td></tr>
+<tr><th id="319">319</th><td>    <b>struct</b> {</td></tr>
+<tr><th id="320">320</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDInvDesc::(anonymous)::lo" title='VTDInvDesc::(anonymous struct)::lo' data-ref="VTDInvDesc::(anonymous)::lo">lo</dfn>;</td></tr>
+<tr><th id="321">321</th><td>        <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDInvDesc::(anonymous)::hi" title='VTDInvDesc::(anonymous struct)::hi' data-ref="VTDInvDesc::(anonymous)::hi">hi</dfn>;</td></tr>
+<tr><th id="322">322</th><td>    };</td></tr>
+<tr><th id="323">323</th><td>    <b>union</b> {</td></tr>
+<tr><th id="324">324</th><td>        <a class="typedef" href="#VTDInvDescIEC" title='VTDInvDescIEC' data-type='struct VTDInvDescIEC' data-ref="VTDInvDescIEC">VTDInvDescIEC</a> <dfn class="decl" id="VTDInvDesc::(anonymous)::iec" title='VTDInvDesc::(anonymous union)::iec' data-ref="VTDInvDesc::(anonymous)::iec">iec</dfn>;</td></tr>
+<tr><th id="325">325</th><td>    };</td></tr>
+<tr><th id="326">326</th><td>};</td></tr>
+<tr><th id="327">327</th><td><b>typedef</b> <b>union</b> <a class="type" href="#VTDInvDesc" title='VTDInvDesc' data-ref="VTDInvDesc">VTDInvDesc</a> <dfn class="typedef" id="VTDInvDesc" title='VTDInvDesc' data-type='union VTDInvDesc' data-ref="VTDInvDesc">VTDInvDesc</dfn>;</td></tr>
+<tr><th id="328">328</th><td></td></tr>
+<tr><th id="329">329</th><td><i>/* Masks for struct VTDInvDesc */</i></td></tr>
+<tr><th id="330">330</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_TYPE" data-ref="_M/VTD_INV_DESC_TYPE">VTD_INV_DESC_TYPE</dfn>               0xf</u></td></tr>
+<tr><th id="331">331</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC" data-ref="_M/VTD_INV_DESC_CC">VTD_INV_DESC_CC</dfn>                 0x1 /* Context-cache Invalidate Desc */</u></td></tr>
+<tr><th id="332">332</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB" data-ref="_M/VTD_INV_DESC_IOTLB">VTD_INV_DESC_IOTLB</dfn>              0x2</u></td></tr>
+<tr><th id="333">333</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE" data-ref="_M/VTD_INV_DESC_DEVICE">VTD_INV_DESC_DEVICE</dfn>             0x3</u></td></tr>
+<tr><th id="334">334</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IEC" data-ref="_M/VTD_INV_DESC_IEC">VTD_INV_DESC_IEC</dfn>                0x4 /* Interrupt Entry Cache</u></td></tr>
+<tr><th id="335">335</th><td><u>                                               Invalidate Descriptor */</u></td></tr>
+<tr><th id="336">336</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT" data-ref="_M/VTD_INV_DESC_WAIT">VTD_INV_DESC_WAIT</dfn>               0x5 /* Invalidation Wait Descriptor */</u></td></tr>
+<tr><th id="337">337</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_NONE" data-ref="_M/VTD_INV_DESC_NONE">VTD_INV_DESC_NONE</dfn>               0   /* Not an Invalidate Descriptor */</u></td></tr>
+<tr><th id="338">338</th><td></td></tr>
+<tr><th id="339">339</th><td><i>/* Masks for Invalidation Wait Descriptor*/</i></td></tr>
+<tr><th id="340">340</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_SW" data-ref="_M/VTD_INV_DESC_WAIT_SW">VTD_INV_DESC_WAIT_SW</dfn>            (1ULL &lt;&lt; 5)</u></td></tr>
+<tr><th id="341">341</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_IF" data-ref="_M/VTD_INV_DESC_WAIT_IF">VTD_INV_DESC_WAIT_IF</dfn>            (1ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="342">342</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_FN" data-ref="_M/VTD_INV_DESC_WAIT_FN">VTD_INV_DESC_WAIT_FN</dfn>            (1ULL &lt;&lt; 6)</u></td></tr>
+<tr><th id="343">343</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_DATA_SHIFT" data-ref="_M/VTD_INV_DESC_WAIT_DATA_SHIFT">VTD_INV_DESC_WAIT_DATA_SHIFT</dfn>    32</u></td></tr>
+<tr><th id="344">344</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_RSVD_LO" data-ref="_M/VTD_INV_DESC_WAIT_RSVD_LO">VTD_INV_DESC_WAIT_RSVD_LO</dfn>       0Xffffff80ULL</u></td></tr>
+<tr><th id="345">345</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_WAIT_RSVD_HI" data-ref="_M/VTD_INV_DESC_WAIT_RSVD_HI">VTD_INV_DESC_WAIT_RSVD_HI</dfn>       3ULL</u></td></tr>
+<tr><th id="346">346</th><td></td></tr>
+<tr><th id="347">347</th><td><i>/* Masks for Context-cache Invalidation Descriptor */</i></td></tr>
+<tr><th id="348">348</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_G" data-ref="_M/VTD_INV_DESC_CC_G">VTD_INV_DESC_CC_G</dfn>               (3ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="349">349</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_GLOBAL" data-ref="_M/VTD_INV_DESC_CC_GLOBAL">VTD_INV_DESC_CC_GLOBAL</dfn>          (1ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="350">350</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_DOMAIN" data-ref="_M/VTD_INV_DESC_CC_DOMAIN">VTD_INV_DESC_CC_DOMAIN</dfn>          (2ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="351">351</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_DEVICE" data-ref="_M/VTD_INV_DESC_CC_DEVICE">VTD_INV_DESC_CC_DEVICE</dfn>          (3ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="352">352</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_DID" data-ref="_M/VTD_INV_DESC_CC_DID">VTD_INV_DESC_CC_DID</dfn>(val)        (((val) &gt;&gt; 16) &amp; VTD_DOMAIN_ID_MASK)</u></td></tr>
+<tr><th id="353">353</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_SID" data-ref="_M/VTD_INV_DESC_CC_SID">VTD_INV_DESC_CC_SID</dfn>(val)        (((val) &gt;&gt; 32) &amp; 0xffffUL)</u></td></tr>
+<tr><th id="354">354</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_FM" data-ref="_M/VTD_INV_DESC_CC_FM">VTD_INV_DESC_CC_FM</dfn>(val)         (((val) &gt;&gt; 48) &amp; 3UL)</u></td></tr>
+<tr><th id="355">355</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_CC_RSVD" data-ref="_M/VTD_INV_DESC_CC_RSVD">VTD_INV_DESC_CC_RSVD</dfn>            0xfffc00000000ffc0ULL</u></td></tr>
+<tr><th id="356">356</th><td></td></tr>
+<tr><th id="357">357</th><td><i>/* Masks for IOTLB Invalidate Descriptor */</i></td></tr>
+<tr><th id="358">358</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_G" data-ref="_M/VTD_INV_DESC_IOTLB_G">VTD_INV_DESC_IOTLB_G</dfn>            (3ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="359">359</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_GLOBAL" data-ref="_M/VTD_INV_DESC_IOTLB_GLOBAL">VTD_INV_DESC_IOTLB_GLOBAL</dfn>       (1ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="360">360</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_DOMAIN" data-ref="_M/VTD_INV_DESC_IOTLB_DOMAIN">VTD_INV_DESC_IOTLB_DOMAIN</dfn>       (2ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="361">361</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_PAGE" data-ref="_M/VTD_INV_DESC_IOTLB_PAGE">VTD_INV_DESC_IOTLB_PAGE</dfn>         (3ULL &lt;&lt; 4)</u></td></tr>
+<tr><th id="362">362</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_DID" data-ref="_M/VTD_INV_DESC_IOTLB_DID">VTD_INV_DESC_IOTLB_DID</dfn>(val)     (((val) &gt;&gt; 16) &amp; VTD_DOMAIN_ID_MASK)</u></td></tr>
+<tr><th id="363">363</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_ADDR" data-ref="_M/VTD_INV_DESC_IOTLB_ADDR">VTD_INV_DESC_IOTLB_ADDR</dfn>(val)    ((val) &amp; ~0xfffULL &amp; \</u></td></tr>
+<tr><th id="364">364</th><td><u>                                         ((1ULL &lt;&lt; VTD_MGAW) - 1))</u></td></tr>
+<tr><th id="365">365</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_AM" data-ref="_M/VTD_INV_DESC_IOTLB_AM">VTD_INV_DESC_IOTLB_AM</dfn>(val)      ((val) &amp; 0x3fULL)</u></td></tr>
+<tr><th id="366">366</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_RSVD_LO" data-ref="_M/VTD_INV_DESC_IOTLB_RSVD_LO">VTD_INV_DESC_IOTLB_RSVD_LO</dfn>      0xffffffff0000ff00ULL</u></td></tr>
+<tr><th id="367">367</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_IOTLB_RSVD_HI" data-ref="_M/VTD_INV_DESC_IOTLB_RSVD_HI">VTD_INV_DESC_IOTLB_RSVD_HI</dfn>      0xf80ULL</u></td></tr>
+<tr><th id="368">368</th><td></td></tr>
+<tr><th id="369">369</th><td><i>/* Mask for Device IOTLB Invalidate Descriptor */</i></td></tr>
+<tr><th id="370">370</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE_IOTLB_ADDR" data-ref="_M/VTD_INV_DESC_DEVICE_IOTLB_ADDR">VTD_INV_DESC_DEVICE_IOTLB_ADDR</dfn>(val) ((val) &amp; 0xfffffffffffff000ULL)</u></td></tr>
+<tr><th id="371">371</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE_IOTLB_SIZE" data-ref="_M/VTD_INV_DESC_DEVICE_IOTLB_SIZE">VTD_INV_DESC_DEVICE_IOTLB_SIZE</dfn>(val) ((val) &amp; 0x1)</u></td></tr>
+<tr><th id="372">372</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE_IOTLB_SID" data-ref="_M/VTD_INV_DESC_DEVICE_IOTLB_SID">VTD_INV_DESC_DEVICE_IOTLB_SID</dfn>(val) (((val) &gt;&gt; 32) &amp; 0xFFFFULL)</u></td></tr>
+<tr><th id="373">373</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI" data-ref="_M/VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI">VTD_INV_DESC_DEVICE_IOTLB_RSVD_HI</dfn> 0xffeULL</u></td></tr>
+<tr><th id="374">374</th><td><u>#define <dfn class="macro" id="_M/VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO" data-ref="_M/VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO">VTD_INV_DESC_DEVICE_IOTLB_RSVD_LO</dfn> 0xffff0000ffe0fff8</u></td></tr>
+<tr><th id="375">375</th><td></td></tr>
+<tr><th id="376">376</th><td><i>/* Information about page-selective IOTLB invalidate */</i></td></tr>
+<tr><th id="377">377</th><td><b>struct</b> <dfn class="type def" id="VTDIOTLBPageInvInfo" title='VTDIOTLBPageInvInfo' data-ref="VTDIOTLBPageInvInfo">VTDIOTLBPageInvInfo</dfn> {</td></tr>
+<tr><th id="378">378</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint16_t" title='uint16_t' data-type='unsigned short' data-ref="uint16_t">uint16_t</a> <dfn class="decl" id="VTDIOTLBPageInvInfo::domain_id" title='VTDIOTLBPageInvInfo::domain_id' data-ref="VTDIOTLBPageInvInfo::domain_id">domain_id</dfn>;</td></tr>
+<tr><th id="379">379</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDIOTLBPageInvInfo::addr" title='VTDIOTLBPageInvInfo::addr' data-ref="VTDIOTLBPageInvInfo::addr">addr</dfn>;</td></tr>
+<tr><th id="380">380</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint8_t" title='uint8_t' data-type='unsigned char' data-ref="uint8_t">uint8_t</a> <dfn class="decl" id="VTDIOTLBPageInvInfo::mask" title='VTDIOTLBPageInvInfo::mask' data-ref="VTDIOTLBPageInvInfo::mask">mask</dfn>;</td></tr>
+<tr><th id="381">381</th><td>};</td></tr>
+<tr><th id="382">382</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDIOTLBPageInvInfo" title='VTDIOTLBPageInvInfo' data-ref="VTDIOTLBPageInvInfo">VTDIOTLBPageInvInfo</a> <dfn class="typedef" id="VTDIOTLBPageInvInfo" title='VTDIOTLBPageInvInfo' data-type='struct VTDIOTLBPageInvInfo' data-ref="VTDIOTLBPageInvInfo">VTDIOTLBPageInvInfo</dfn>;</td></tr>
+<tr><th id="383">383</th><td></td></tr>
+<tr><th id="384">384</th><td><i>/* Pagesize of VTD paging structures, including root and context tables */</i></td></tr>
+<tr><th id="385">385</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_SHIFT" data-ref="_M/VTD_PAGE_SHIFT">VTD_PAGE_SHIFT</dfn>              12</u></td></tr>
+<tr><th id="386">386</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_SIZE" data-ref="_M/VTD_PAGE_SIZE">VTD_PAGE_SIZE</dfn>               (1ULL &lt;&lt; VTD_PAGE_SHIFT)</u></td></tr>
+<tr><th id="387">387</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_MASK" data-ref="_M/VTD_PAGE_MASK">VTD_PAGE_MASK</dfn>               (VTD_PAGE_SIZE - 1)</u></td></tr>
+<tr><th id="388">388</th><td></td></tr>
+<tr><th id="389">389</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_SHIFT_4K" data-ref="_M/VTD_PAGE_SHIFT_4K">VTD_PAGE_SHIFT_4K</dfn>           12</u></td></tr>
+<tr><th id="390">390</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_MASK_4K" data-ref="_M/VTD_PAGE_MASK_4K">VTD_PAGE_MASK_4K</dfn>            (~((1ULL &lt;&lt; VTD_PAGE_SHIFT_4K) - 1))</u></td></tr>
+<tr><th id="391">391</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_SHIFT_2M" data-ref="_M/VTD_PAGE_SHIFT_2M">VTD_PAGE_SHIFT_2M</dfn>           21</u></td></tr>
+<tr><th id="392">392</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_MASK_2M" data-ref="_M/VTD_PAGE_MASK_2M">VTD_PAGE_MASK_2M</dfn>            (~((1ULL &lt;&lt; VTD_PAGE_SHIFT_2M) - 1))</u></td></tr>
+<tr><th id="393">393</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_SHIFT_1G" data-ref="_M/VTD_PAGE_SHIFT_1G">VTD_PAGE_SHIFT_1G</dfn>           30</u></td></tr>
+<tr><th id="394">394</th><td><u>#define <dfn class="macro" id="_M/VTD_PAGE_MASK_1G" data-ref="_M/VTD_PAGE_MASK_1G">VTD_PAGE_MASK_1G</dfn>            (~((1ULL &lt;&lt; VTD_PAGE_SHIFT_1G) - 1))</u></td></tr>
+<tr><th id="395">395</th><td></td></tr>
+<tr><th id="396">396</th><td><b>struct</b> <dfn class="type def" id="VTDRootEntry" title='VTDRootEntry' data-ref="VTDRootEntry">VTDRootEntry</dfn> {</td></tr>
+<tr><th id="397">397</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDRootEntry::val" title='VTDRootEntry::val' data-ref="VTDRootEntry::val">val</dfn>;</td></tr>
+<tr><th id="398">398</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="VTDRootEntry::rsvd" title='VTDRootEntry::rsvd' data-ref="VTDRootEntry::rsvd">rsvd</dfn>;</td></tr>
+<tr><th id="399">399</th><td>};</td></tr>
+<tr><th id="400">400</th><td><b>typedef</b> <b>struct</b> <a class="type" href="#VTDRootEntry" title='VTDRootEntry' data-ref="VTDRootEntry">VTDRootEntry</a> <dfn class="typedef" id="VTDRootEntry" title='VTDRootEntry' data-type='struct VTDRootEntry' data-ref="VTDRootEntry">VTDRootEntry</dfn>;</td></tr>
+<tr><th id="401">401</th><td></td></tr>
+<tr><th id="402">402</th><td><i>/* Masks for struct VTDRootEntry */</i></td></tr>
+<tr><th id="403">403</th><td><u>#define <dfn class="macro" id="_M/VTD_ROOT_ENTRY_P" data-ref="_M/VTD_ROOT_ENTRY_P">VTD_ROOT_ENTRY_P</dfn>            1ULL</u></td></tr>
+<tr><th id="404">404</th><td><u>#define <dfn class="macro" id="_M/VTD_ROOT_ENTRY_CTP" data-ref="_M/VTD_ROOT_ENTRY_CTP">VTD_ROOT_ENTRY_CTP</dfn>          (~0xfffULL)</u></td></tr>
+<tr><th id="405">405</th><td></td></tr>
+<tr><th id="406">406</th><td><u>#define <dfn class="macro" id="_M/VTD_ROOT_ENTRY_NR" data-ref="_M/VTD_ROOT_ENTRY_NR">VTD_ROOT_ENTRY_NR</dfn>           (VTD_PAGE_SIZE / sizeof(VTDRootEntry))</u></td></tr>
+<tr><th id="407">407</th><td><u>#define <dfn class="macro" id="_M/VTD_ROOT_ENTRY_RSVD" data-ref="_M/VTD_ROOT_ENTRY_RSVD">VTD_ROOT_ENTRY_RSVD</dfn>         (0xffeULL | ~VTD_HAW_MASK)</u></td></tr>
+<tr><th id="408">408</th><td></td></tr>
+<tr><th id="409">409</th><td><i>/* Masks for struct VTDContextEntry */</i></td></tr>
+<tr><th id="410">410</th><td><i>/* lo */</i></td></tr>
+<tr><th id="411">411</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_P" data-ref="_M/VTD_CONTEXT_ENTRY_P">VTD_CONTEXT_ENTRY_P</dfn>         (1ULL &lt;&lt; 0)</u></td></tr>
+<tr><th id="412">412</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_FPD" data-ref="_M/VTD_CONTEXT_ENTRY_FPD">VTD_CONTEXT_ENTRY_FPD</dfn>       (1ULL &lt;&lt; 1) /* Fault Processing Disable */</u></td></tr>
+<tr><th id="413">413</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_TT" data-ref="_M/VTD_CONTEXT_ENTRY_TT">VTD_CONTEXT_ENTRY_TT</dfn>        (3ULL &lt;&lt; 2) /* Translation Type */</u></td></tr>
+<tr><th id="414">414</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_TT_MULTI_LEVEL" data-ref="_M/VTD_CONTEXT_TT_MULTI_LEVEL">VTD_CONTEXT_TT_MULTI_LEVEL</dfn>  0</u></td></tr>
+<tr><th id="415">415</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_TT_DEV_IOTLB" data-ref="_M/VTD_CONTEXT_TT_DEV_IOTLB">VTD_CONTEXT_TT_DEV_IOTLB</dfn>    (1ULL &lt;&lt; 2)</u></td></tr>
+<tr><th id="416">416</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_TT_PASS_THROUGH" data-ref="_M/VTD_CONTEXT_TT_PASS_THROUGH">VTD_CONTEXT_TT_PASS_THROUGH</dfn> (2ULL &lt;&lt; 2)</u></td></tr>
+<tr><th id="417">417</th><td><i>/* Second Level Page Translation Pointer*/</i></td></tr>
+<tr><th id="418">418</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_SLPTPTR" data-ref="_M/VTD_CONTEXT_ENTRY_SLPTPTR">VTD_CONTEXT_ENTRY_SLPTPTR</dfn>   (~0xfffULL)</u></td></tr>
+<tr><th id="419">419</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_RSVD_LO" data-ref="_M/VTD_CONTEXT_ENTRY_RSVD_LO">VTD_CONTEXT_ENTRY_RSVD_LO</dfn>   (0xff0ULL | ~VTD_HAW_MASK)</u></td></tr>
+<tr><th id="420">420</th><td><i>/* hi */</i></td></tr>
+<tr><th id="421">421</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_AW" data-ref="_M/VTD_CONTEXT_ENTRY_AW">VTD_CONTEXT_ENTRY_AW</dfn>        7ULL /* Adjusted guest-address-width */</u></td></tr>
+<tr><th id="422">422</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_DID" data-ref="_M/VTD_CONTEXT_ENTRY_DID">VTD_CONTEXT_ENTRY_DID</dfn>(val)  (((val) &gt;&gt; 8) &amp; VTD_DOMAIN_ID_MASK)</u></td></tr>
+<tr><th id="423">423</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_RSVD_HI" data-ref="_M/VTD_CONTEXT_ENTRY_RSVD_HI">VTD_CONTEXT_ENTRY_RSVD_HI</dfn>   0xffffffffff000080ULL</u></td></tr>
+<tr><th id="424">424</th><td></td></tr>
+<tr><th id="425">425</th><td><u>#define <dfn class="macro" id="_M/VTD_CONTEXT_ENTRY_NR" data-ref="_M/VTD_CONTEXT_ENTRY_NR">VTD_CONTEXT_ENTRY_NR</dfn>        (VTD_PAGE_SIZE / sizeof(VTDContextEntry))</u></td></tr>
+<tr><th id="426">426</th><td></td></tr>
+<tr><th id="427">427</th><td><i>/* Paging Structure common */</i></td></tr>
+<tr><th id="428">428</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PT_PAGE_SIZE_MASK" data-ref="_M/VTD_SL_PT_PAGE_SIZE_MASK">VTD_SL_PT_PAGE_SIZE_MASK</dfn>    (1ULL &lt;&lt; 7)</u></td></tr>
+<tr><th id="429">429</th><td><i>/* Bits to decide the offset for each level */</i></td></tr>
+<tr><th id="430">430</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_LEVEL_BITS" data-ref="_M/VTD_SL_LEVEL_BITS">VTD_SL_LEVEL_BITS</dfn>           9</u></td></tr>
+<tr><th id="431">431</th><td></td></tr>
+<tr><th id="432">432</th><td><i>/* Second Level Paging Structure */</i></td></tr>
+<tr><th id="433">433</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PML4_LEVEL" data-ref="_M/VTD_SL_PML4_LEVEL">VTD_SL_PML4_LEVEL</dfn>           4</u></td></tr>
+<tr><th id="434">434</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PDP_LEVEL" data-ref="_M/VTD_SL_PDP_LEVEL">VTD_SL_PDP_LEVEL</dfn>            3</u></td></tr>
+<tr><th id="435">435</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PD_LEVEL" data-ref="_M/VTD_SL_PD_LEVEL">VTD_SL_PD_LEVEL</dfn>             2</u></td></tr>
+<tr><th id="436">436</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PT_LEVEL" data-ref="_M/VTD_SL_PT_LEVEL">VTD_SL_PT_LEVEL</dfn>             1</u></td></tr>
+<tr><th id="437">437</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PT_ENTRY_NR" data-ref="_M/VTD_SL_PT_ENTRY_NR">VTD_SL_PT_ENTRY_NR</dfn>          512</u></td></tr>
+<tr><th id="438">438</th><td></td></tr>
+<tr><th id="439">439</th><td><i>/* Masks for Second Level Paging Entry */</i></td></tr>
+<tr><th id="440">440</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_RW_MASK" data-ref="_M/VTD_SL_RW_MASK">VTD_SL_RW_MASK</dfn>              3ULL</u></td></tr>
+<tr><th id="441">441</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_R" data-ref="_M/VTD_SL_R">VTD_SL_R</dfn>                    1ULL</u></td></tr>
+<tr><th id="442">442</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_W" data-ref="_M/VTD_SL_W">VTD_SL_W</dfn>                    (1ULL &lt;&lt; 1)</u></td></tr>
+<tr><th id="443">443</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_PT_BASE_ADDR_MASK" data-ref="_M/VTD_SL_PT_BASE_ADDR_MASK">VTD_SL_PT_BASE_ADDR_MASK</dfn>    (~(VTD_PAGE_SIZE - 1) &amp; VTD_HAW_MASK)</u></td></tr>
+<tr><th id="444">444</th><td><u>#define <dfn class="macro" id="_M/VTD_SL_IGN_COM" data-ref="_M/VTD_SL_IGN_COM">VTD_SL_IGN_COM</dfn>              0xbff0000000000000ULL</u></td></tr>
+<tr><th id="445">445</th><td></td></tr>
+<tr><th id="446">446</th><td><u>#<span data-ppcond="28">endif</span></u></td></tr>
+<tr><th id="447">447</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='intel_iommu.c.html'>codebrowser/hw/i386/intel_iommu.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

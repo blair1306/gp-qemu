@@ -1,0 +1,177 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>vga.h source code [codebrowser/hw/display/vga.h] - Woboq Code Browser</title>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/hw/display/vga.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>hw</a>/<a href='./'>display</a>/<a href='vga.h.html'>vga.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * linux/include/video/vga.h -- standard VGA chipset interaction</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright 1999 Jeff Garzik &lt;jgarzik@pobox.com&gt;</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * Copyright history from vga16fb.c:</i></td></tr>
+<tr><th id="7">7</th><td><i> *	Copyright 1999 Ben Pfaff and Petr Vandrovec</i></td></tr>
+<tr><th id="8">8</th><td><i> *	Based on VGA info at <a href="http://www.osdever.net/FreeVGA/home.htm">http://www.osdever.net/FreeVGA/home.htm</a></i></td></tr>
+<tr><th id="9">9</th><td><i> *	Based on VESA framebuffer (c) 1998 Gerd Knorr</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This file is subject to the terms and conditions of the GNU General</i></td></tr>
+<tr><th id="12">12</th><td><i> * Public License.  See the file COPYING in the main directory of this</i></td></tr>
+<tr><th id="13">13</th><td><i> * archive for more details.</i></td></tr>
+<tr><th id="14">14</th><td><i> *</i></td></tr>
+<tr><th id="15">15</th><td><i> */</i></td></tr>
+<tr><th id="16">16</th><td></td></tr>
+<tr><th id="17">17</th><td><u>#<span data-ppcond="17">ifndef</span> <span class="macro" data-ref="_M/LINUX_VIDEO_VGA_H">LINUX_VIDEO_VGA_H</span></u></td></tr>
+<tr><th id="18">18</th><td><u>#define <dfn class="macro" id="_M/LINUX_VIDEO_VGA_H" data-ref="_M/LINUX_VIDEO_VGA_H">LINUX_VIDEO_VGA_H</dfn></u></td></tr>
+<tr><th id="19">19</th><td></td></tr>
+<tr><th id="20">20</th><td><i>/* Some of the code below is taken from SVGAlib.  The original,</i></td></tr>
+<tr><th id="21">21</th><td><i>   unmodified copyright notice for that code is below. */</i></td></tr>
+<tr><th id="22">22</th><td><i>/* VGAlib version 1.2 - (c) 1993 Tommy Frandsen                    */</i></td></tr>
+<tr><th id="23">23</th><td><i>/*                                                                 */</i></td></tr>
+<tr><th id="24">24</th><td><i>/* This library is free software; you can redistribute it and/or   */</i></td></tr>
+<tr><th id="25">25</th><td><i>/* modify it without any restrictions. This library is distributed */</i></td></tr>
+<tr><th id="26">26</th><td><i>/* in the hope that it will be useful, but without any warranty.   */</i></td></tr>
+<tr><th id="27">27</th><td></td></tr>
+<tr><th id="28">28</th><td><i>/* Multi-chipset support Copyright 1993 Harm Hanemaayer */</i></td></tr>
+<tr><th id="29">29</th><td><i>/* partially copyrighted (C) 1993 by Hartmut Schirmer */</i></td></tr>
+<tr><th id="30">30</th><td></td></tr>
+<tr><th id="31">31</th><td><i>/* VGA data register ports */</i></td></tr>
+<tr><th id="32">32</th><td><u>#define <dfn class="macro" id="_M/VGA_CRT_DC" data-ref="_M/VGA_CRT_DC">VGA_CRT_DC</dfn>      0x3D5   /* CRT Controller Data Register - color emulation */</u></td></tr>
+<tr><th id="33">33</th><td><u>#define <dfn class="macro" id="_M/VGA_CRT_DM" data-ref="_M/VGA_CRT_DM">VGA_CRT_DM</dfn>      0x3B5   /* CRT Controller Data Register - mono emulation */</u></td></tr>
+<tr><th id="34">34</th><td><u>#define <dfn class="macro" id="_M/VGA_ATT_R" data-ref="_M/VGA_ATT_R">VGA_ATT_R</dfn>       0x3C1   /* Attribute Controller Data Read Register */</u></td></tr>
+<tr><th id="35">35</th><td><u>#define <dfn class="macro" id="_M/VGA_ATT_W" data-ref="_M/VGA_ATT_W">VGA_ATT_W</dfn>       0x3C0   /* Attribute Controller Data Write Register */</u></td></tr>
+<tr><th id="36">36</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_D" data-ref="_M/VGA_GFX_D">VGA_GFX_D</dfn>       0x3CF   /* Graphics Controller Data Register */</u></td></tr>
+<tr><th id="37">37</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_D" data-ref="_M/VGA_SEQ_D">VGA_SEQ_D</dfn>       0x3C5   /* Sequencer Data Register */</u></td></tr>
+<tr><th id="38">38</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_R" data-ref="_M/VGA_MIS_R">VGA_MIS_R</dfn>       0x3CC   /* Misc Output Read Register */</u></td></tr>
+<tr><th id="39">39</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_W" data-ref="_M/VGA_MIS_W">VGA_MIS_W</dfn>       0x3C2   /* Misc Output Write Register */</u></td></tr>
+<tr><th id="40">40</th><td><u>#define <dfn class="macro" id="_M/VGA_FTC_R" data-ref="_M/VGA_FTC_R">VGA_FTC_R</dfn>       0x3CA   /* Feature Control Read Register */</u></td></tr>
+<tr><th id="41">41</th><td><u>#define <dfn class="macro" id="_M/VGA_IS1_RC" data-ref="_M/VGA_IS1_RC">VGA_IS1_RC</dfn>      0x3DA   /* Input Status Register 1 - color emulation */</u></td></tr>
+<tr><th id="42">42</th><td><u>#define <dfn class="macro" id="_M/VGA_IS1_RM" data-ref="_M/VGA_IS1_RM">VGA_IS1_RM</dfn>      0x3BA   /* Input Status Register 1 - mono emulation */</u></td></tr>
+<tr><th id="43">43</th><td><u>#define <dfn class="macro" id="_M/VGA_PEL_D" data-ref="_M/VGA_PEL_D">VGA_PEL_D</dfn>       0x3C9   /* PEL Data Register */</u></td></tr>
+<tr><th id="44">44</th><td><u>#define <dfn class="macro" id="_M/VGA_PEL_MSK" data-ref="_M/VGA_PEL_MSK">VGA_PEL_MSK</dfn>     0x3C6   /* PEL mask register */</u></td></tr>
+<tr><th id="45">45</th><td></td></tr>
+<tr><th id="46">46</th><td><i>/* EGA-specific registers */</i></td></tr>
+<tr><th id="47">47</th><td><u>#define <dfn class="macro" id="_M/EGA_GFX_E0" data-ref="_M/EGA_GFX_E0">EGA_GFX_E0</dfn>      0x3CC   /* Graphics enable processor 0 */</u></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/EGA_GFX_E1" data-ref="_M/EGA_GFX_E1">EGA_GFX_E1</dfn>      0x3CA   /* Graphics enable processor 1 */</u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><i>/* VGA index register ports */</i></td></tr>
+<tr><th id="51">51</th><td><u>#define <dfn class="macro" id="_M/VGA_CRT_IC" data-ref="_M/VGA_CRT_IC">VGA_CRT_IC</dfn>      0x3D4   /* CRT Controller Index - color emulation */</u></td></tr>
+<tr><th id="52">52</th><td><u>#define <dfn class="macro" id="_M/VGA_CRT_IM" data-ref="_M/VGA_CRT_IM">VGA_CRT_IM</dfn>      0x3B4   /* CRT Controller Index - mono emulation */</u></td></tr>
+<tr><th id="53">53</th><td><u>#define <dfn class="macro" id="_M/VGA_ATT_IW" data-ref="_M/VGA_ATT_IW">VGA_ATT_IW</dfn>      0x3C0   /* Attribute Controller Index &amp; Data Write Register */</u></td></tr>
+<tr><th id="54">54</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_I" data-ref="_M/VGA_GFX_I">VGA_GFX_I</dfn>       0x3CE   /* Graphics Controller Index */</u></td></tr>
+<tr><th id="55">55</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_I" data-ref="_M/VGA_SEQ_I">VGA_SEQ_I</dfn>       0x3C4   /* Sequencer Index */</u></td></tr>
+<tr><th id="56">56</th><td><u>#define <dfn class="macro" id="_M/VGA_PEL_IW" data-ref="_M/VGA_PEL_IW">VGA_PEL_IW</dfn>      0x3C8   /* PEL Write Index */</u></td></tr>
+<tr><th id="57">57</th><td><u>#define <dfn class="macro" id="_M/VGA_PEL_IR" data-ref="_M/VGA_PEL_IR">VGA_PEL_IR</dfn>      0x3C7   /* PEL Read Index */</u></td></tr>
+<tr><th id="58">58</th><td></td></tr>
+<tr><th id="59">59</th><td><i>/* standard VGA indexes max counts */</i></td></tr>
+<tr><th id="60">60</th><td><u>#define <dfn class="macro" id="_M/VGA_CRT_C" data-ref="_M/VGA_CRT_C">VGA_CRT_C</dfn>       0x19    /* Number of CRT Controller Registers */</u></td></tr>
+<tr><th id="61">61</th><td><u>#define <dfn class="macro" id="_M/VGA_ATT_C" data-ref="_M/VGA_ATT_C">VGA_ATT_C</dfn>       0x15    /* Number of Attribute Controller Registers */</u></td></tr>
+<tr><th id="62">62</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_C" data-ref="_M/VGA_GFX_C">VGA_GFX_C</dfn>       0x09    /* Number of Graphics Controller Registers */</u></td></tr>
+<tr><th id="63">63</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_C" data-ref="_M/VGA_SEQ_C">VGA_SEQ_C</dfn>       0x05    /* Number of Sequencer Registers */</u></td></tr>
+<tr><th id="64">64</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_C" data-ref="_M/VGA_MIS_C">VGA_MIS_C</dfn>       0x01    /* Number of Misc Output Register */</u></td></tr>
+<tr><th id="65">65</th><td></td></tr>
+<tr><th id="66">66</th><td><i>/* VGA misc register bit masks */</i></td></tr>
+<tr><th id="67">67</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_COLOR" data-ref="_M/VGA_MIS_COLOR">VGA_MIS_COLOR</dfn>           0x01</u></td></tr>
+<tr><th id="68">68</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_ENB_MEM_ACCESS" data-ref="_M/VGA_MIS_ENB_MEM_ACCESS">VGA_MIS_ENB_MEM_ACCESS</dfn>  0x02</u></td></tr>
+<tr><th id="69">69</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_DCLK_28322_720" data-ref="_M/VGA_MIS_DCLK_28322_720">VGA_MIS_DCLK_28322_720</dfn>  0x04</u></td></tr>
+<tr><th id="70">70</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_ENB_PLL_LOAD" data-ref="_M/VGA_MIS_ENB_PLL_LOAD">VGA_MIS_ENB_PLL_LOAD</dfn>    (0x04 | 0x08)</u></td></tr>
+<tr><th id="71">71</th><td><u>#define <dfn class="macro" id="_M/VGA_MIS_SEL_HIGH_PAGE" data-ref="_M/VGA_MIS_SEL_HIGH_PAGE">VGA_MIS_SEL_HIGH_PAGE</dfn>   0x20</u></td></tr>
+<tr><th id="72">72</th><td></td></tr>
+<tr><th id="73">73</th><td><i>/* VGA CRT controller register indices */</i></td></tr>
+<tr><th id="74">74</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_TOTAL" data-ref="_M/VGA_CRTC_H_TOTAL">VGA_CRTC_H_TOTAL</dfn>        0</u></td></tr>
+<tr><th id="75">75</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_DISP" data-ref="_M/VGA_CRTC_H_DISP">VGA_CRTC_H_DISP</dfn>         1</u></td></tr>
+<tr><th id="76">76</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_BLANK_START" data-ref="_M/VGA_CRTC_H_BLANK_START">VGA_CRTC_H_BLANK_START</dfn>  2</u></td></tr>
+<tr><th id="77">77</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_BLANK_END" data-ref="_M/VGA_CRTC_H_BLANK_END">VGA_CRTC_H_BLANK_END</dfn>    3</u></td></tr>
+<tr><th id="78">78</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_SYNC_START" data-ref="_M/VGA_CRTC_H_SYNC_START">VGA_CRTC_H_SYNC_START</dfn>   4</u></td></tr>
+<tr><th id="79">79</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_H_SYNC_END" data-ref="_M/VGA_CRTC_H_SYNC_END">VGA_CRTC_H_SYNC_END</dfn>     5</u></td></tr>
+<tr><th id="80">80</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_TOTAL" data-ref="_M/VGA_CRTC_V_TOTAL">VGA_CRTC_V_TOTAL</dfn>        6</u></td></tr>
+<tr><th id="81">81</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_OVERFLOW" data-ref="_M/VGA_CRTC_OVERFLOW">VGA_CRTC_OVERFLOW</dfn>       7</u></td></tr>
+<tr><th id="82">82</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_PRESET_ROW" data-ref="_M/VGA_CRTC_PRESET_ROW">VGA_CRTC_PRESET_ROW</dfn>     8</u></td></tr>
+<tr><th id="83">83</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_MAX_SCAN" data-ref="_M/VGA_CRTC_MAX_SCAN">VGA_CRTC_MAX_SCAN</dfn>       9</u></td></tr>
+<tr><th id="84">84</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_CURSOR_START" data-ref="_M/VGA_CRTC_CURSOR_START">VGA_CRTC_CURSOR_START</dfn>   0x0A</u></td></tr>
+<tr><th id="85">85</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_CURSOR_END" data-ref="_M/VGA_CRTC_CURSOR_END">VGA_CRTC_CURSOR_END</dfn>     0x0B</u></td></tr>
+<tr><th id="86">86</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_START_HI" data-ref="_M/VGA_CRTC_START_HI">VGA_CRTC_START_HI</dfn>       0x0C</u></td></tr>
+<tr><th id="87">87</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_START_LO" data-ref="_M/VGA_CRTC_START_LO">VGA_CRTC_START_LO</dfn>       0x0D</u></td></tr>
+<tr><th id="88">88</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_CURSOR_HI" data-ref="_M/VGA_CRTC_CURSOR_HI">VGA_CRTC_CURSOR_HI</dfn>      0x0E</u></td></tr>
+<tr><th id="89">89</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_CURSOR_LO" data-ref="_M/VGA_CRTC_CURSOR_LO">VGA_CRTC_CURSOR_LO</dfn>      0x0F</u></td></tr>
+<tr><th id="90">90</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_SYNC_START" data-ref="_M/VGA_CRTC_V_SYNC_START">VGA_CRTC_V_SYNC_START</dfn>   0x10</u></td></tr>
+<tr><th id="91">91</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_SYNC_END" data-ref="_M/VGA_CRTC_V_SYNC_END">VGA_CRTC_V_SYNC_END</dfn>     0x11</u></td></tr>
+<tr><th id="92">92</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_DISP_END" data-ref="_M/VGA_CRTC_V_DISP_END">VGA_CRTC_V_DISP_END</dfn>     0x12</u></td></tr>
+<tr><th id="93">93</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_OFFSET" data-ref="_M/VGA_CRTC_OFFSET">VGA_CRTC_OFFSET</dfn>         0x13</u></td></tr>
+<tr><th id="94">94</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_UNDERLINE" data-ref="_M/VGA_CRTC_UNDERLINE">VGA_CRTC_UNDERLINE</dfn>      0x14</u></td></tr>
+<tr><th id="95">95</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_BLANK_START" data-ref="_M/VGA_CRTC_V_BLANK_START">VGA_CRTC_V_BLANK_START</dfn>  0x15</u></td></tr>
+<tr><th id="96">96</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_V_BLANK_END" data-ref="_M/VGA_CRTC_V_BLANK_END">VGA_CRTC_V_BLANK_END</dfn>    0x16</u></td></tr>
+<tr><th id="97">97</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_MODE" data-ref="_M/VGA_CRTC_MODE">VGA_CRTC_MODE</dfn>           0x17</u></td></tr>
+<tr><th id="98">98</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_LINE_COMPARE" data-ref="_M/VGA_CRTC_LINE_COMPARE">VGA_CRTC_LINE_COMPARE</dfn>   0x18</u></td></tr>
+<tr><th id="99">99</th><td><u>#define <dfn class="macro" id="_M/VGA_CRTC_REGS" data-ref="_M/VGA_CRTC_REGS">VGA_CRTC_REGS</dfn>           VGA_CRT_C</u></td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><i>/* VGA CRT controller bit masks */</i></td></tr>
+<tr><th id="102">102</th><td><u>#define <dfn class="macro" id="_M/VGA_CR11_LOCK_CR0_CR7" data-ref="_M/VGA_CR11_LOCK_CR0_CR7">VGA_CR11_LOCK_CR0_CR7</dfn>   0x80 /* lock writes to CR0 - CR7 */</u></td></tr>
+<tr><th id="103">103</th><td><u>#define <dfn class="macro" id="_M/VGA_CR17_H_V_SIGNALS_ENABLED" data-ref="_M/VGA_CR17_H_V_SIGNALS_ENABLED">VGA_CR17_H_V_SIGNALS_ENABLED</dfn> 0x80</u></td></tr>
+<tr><th id="104">104</th><td></td></tr>
+<tr><th id="105">105</th><td><i>/* VGA attribute controller register indices */</i></td></tr>
+<tr><th id="106">106</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE0" data-ref="_M/VGA_ATC_PALETTE0">VGA_ATC_PALETTE0</dfn>        0x00</u></td></tr>
+<tr><th id="107">107</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE1" data-ref="_M/VGA_ATC_PALETTE1">VGA_ATC_PALETTE1</dfn>        0x01</u></td></tr>
+<tr><th id="108">108</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE2" data-ref="_M/VGA_ATC_PALETTE2">VGA_ATC_PALETTE2</dfn>        0x02</u></td></tr>
+<tr><th id="109">109</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE3" data-ref="_M/VGA_ATC_PALETTE3">VGA_ATC_PALETTE3</dfn>        0x03</u></td></tr>
+<tr><th id="110">110</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE4" data-ref="_M/VGA_ATC_PALETTE4">VGA_ATC_PALETTE4</dfn>        0x04</u></td></tr>
+<tr><th id="111">111</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE5" data-ref="_M/VGA_ATC_PALETTE5">VGA_ATC_PALETTE5</dfn>        0x05</u></td></tr>
+<tr><th id="112">112</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE6" data-ref="_M/VGA_ATC_PALETTE6">VGA_ATC_PALETTE6</dfn>        0x06</u></td></tr>
+<tr><th id="113">113</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE7" data-ref="_M/VGA_ATC_PALETTE7">VGA_ATC_PALETTE7</dfn>        0x07</u></td></tr>
+<tr><th id="114">114</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE8" data-ref="_M/VGA_ATC_PALETTE8">VGA_ATC_PALETTE8</dfn>        0x08</u></td></tr>
+<tr><th id="115">115</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTE9" data-ref="_M/VGA_ATC_PALETTE9">VGA_ATC_PALETTE9</dfn>        0x09</u></td></tr>
+<tr><th id="116">116</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTEA" data-ref="_M/VGA_ATC_PALETTEA">VGA_ATC_PALETTEA</dfn>        0x0A</u></td></tr>
+<tr><th id="117">117</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTEB" data-ref="_M/VGA_ATC_PALETTEB">VGA_ATC_PALETTEB</dfn>        0x0B</u></td></tr>
+<tr><th id="118">118</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTEC" data-ref="_M/VGA_ATC_PALETTEC">VGA_ATC_PALETTEC</dfn>        0x0C</u></td></tr>
+<tr><th id="119">119</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTED" data-ref="_M/VGA_ATC_PALETTED">VGA_ATC_PALETTED</dfn>        0x0D</u></td></tr>
+<tr><th id="120">120</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTEE" data-ref="_M/VGA_ATC_PALETTEE">VGA_ATC_PALETTEE</dfn>        0x0E</u></td></tr>
+<tr><th id="121">121</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PALETTEF" data-ref="_M/VGA_ATC_PALETTEF">VGA_ATC_PALETTEF</dfn>        0x0F</u></td></tr>
+<tr><th id="122">122</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_MODE" data-ref="_M/VGA_ATC_MODE">VGA_ATC_MODE</dfn>            0x10</u></td></tr>
+<tr><th id="123">123</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_OVERSCAN" data-ref="_M/VGA_ATC_OVERSCAN">VGA_ATC_OVERSCAN</dfn>        0x11</u></td></tr>
+<tr><th id="124">124</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PLANE_ENABLE" data-ref="_M/VGA_ATC_PLANE_ENABLE">VGA_ATC_PLANE_ENABLE</dfn>    0x12</u></td></tr>
+<tr><th id="125">125</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_PEL" data-ref="_M/VGA_ATC_PEL">VGA_ATC_PEL</dfn>             0x13</u></td></tr>
+<tr><th id="126">126</th><td><u>#define <dfn class="macro" id="_M/VGA_ATC_COLOR_PAGE" data-ref="_M/VGA_ATC_COLOR_PAGE">VGA_ATC_COLOR_PAGE</dfn>      0x14</u></td></tr>
+<tr><th id="127">127</th><td></td></tr>
+<tr><th id="128">128</th><td><u>#define <dfn class="macro" id="_M/VGA_AR_ENABLE_DISPLAY" data-ref="_M/VGA_AR_ENABLE_DISPLAY">VGA_AR_ENABLE_DISPLAY</dfn>   0x20</u></td></tr>
+<tr><th id="129">129</th><td></td></tr>
+<tr><th id="130">130</th><td><i>/* VGA sequencer register indices */</i></td></tr>
+<tr><th id="131">131</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_RESET" data-ref="_M/VGA_SEQ_RESET">VGA_SEQ_RESET</dfn>           0x00</u></td></tr>
+<tr><th id="132">132</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_CLOCK_MODE" data-ref="_M/VGA_SEQ_CLOCK_MODE">VGA_SEQ_CLOCK_MODE</dfn>      0x01</u></td></tr>
+<tr><th id="133">133</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_PLANE_WRITE" data-ref="_M/VGA_SEQ_PLANE_WRITE">VGA_SEQ_PLANE_WRITE</dfn>     0x02</u></td></tr>
+<tr><th id="134">134</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_CHARACTER_MAP" data-ref="_M/VGA_SEQ_CHARACTER_MAP">VGA_SEQ_CHARACTER_MAP</dfn>   0x03</u></td></tr>
+<tr><th id="135">135</th><td><u>#define <dfn class="macro" id="_M/VGA_SEQ_MEMORY_MODE" data-ref="_M/VGA_SEQ_MEMORY_MODE">VGA_SEQ_MEMORY_MODE</dfn>     0x04</u></td></tr>
+<tr><th id="136">136</th><td></td></tr>
+<tr><th id="137">137</th><td><i>/* VGA sequencer register bit masks */</i></td></tr>
+<tr><th id="138">138</th><td><u>#define <dfn class="macro" id="_M/VGA_SR01_CHAR_CLK_8DOTS" data-ref="_M/VGA_SR01_CHAR_CLK_8DOTS">VGA_SR01_CHAR_CLK_8DOTS</dfn> 0x01 /* bit 0: character clocks 8 dots wide are generated */</u></td></tr>
+<tr><th id="139">139</th><td><u>#define <dfn class="macro" id="_M/VGA_SR01_SCREEN_OFF" data-ref="_M/VGA_SR01_SCREEN_OFF">VGA_SR01_SCREEN_OFF</dfn>     0x20 /* bit 5: Screen is off */</u></td></tr>
+<tr><th id="140">140</th><td><u>#define <dfn class="macro" id="_M/VGA_SR02_ALL_PLANES" data-ref="_M/VGA_SR02_ALL_PLANES">VGA_SR02_ALL_PLANES</dfn>     0x0F /* bits 3-0: enable access to all planes */</u></td></tr>
+<tr><th id="141">141</th><td><u>#define <dfn class="macro" id="_M/VGA_SR04_EXT_MEM" data-ref="_M/VGA_SR04_EXT_MEM">VGA_SR04_EXT_MEM</dfn>        0x02 /* bit 1: allows complete mem access to 256K */</u></td></tr>
+<tr><th id="142">142</th><td><u>#define <dfn class="macro" id="_M/VGA_SR04_SEQ_MODE" data-ref="_M/VGA_SR04_SEQ_MODE">VGA_SR04_SEQ_MODE</dfn>       0x04 /* bit 2: directs system to use a sequential addressing mode */</u></td></tr>
+<tr><th id="143">143</th><td><u>#define <dfn class="macro" id="_M/VGA_SR04_CHN_4M" data-ref="_M/VGA_SR04_CHN_4M">VGA_SR04_CHN_4M</dfn>         0x08 /* bit 3: selects modulo 4 addressing for CPU access to display memory */</u></td></tr>
+<tr><th id="144">144</th><td></td></tr>
+<tr><th id="145">145</th><td><i>/* VGA graphics controller register indices */</i></td></tr>
+<tr><th id="146">146</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_SR_VALUE" data-ref="_M/VGA_GFX_SR_VALUE">VGA_GFX_SR_VALUE</dfn>        0x00</u></td></tr>
+<tr><th id="147">147</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_SR_ENABLE" data-ref="_M/VGA_GFX_SR_ENABLE">VGA_GFX_SR_ENABLE</dfn>       0x01</u></td></tr>
+<tr><th id="148">148</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_COMPARE_VALUE" data-ref="_M/VGA_GFX_COMPARE_VALUE">VGA_GFX_COMPARE_VALUE</dfn>   0x02</u></td></tr>
+<tr><th id="149">149</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_DATA_ROTATE" data-ref="_M/VGA_GFX_DATA_ROTATE">VGA_GFX_DATA_ROTATE</dfn>     0x03</u></td></tr>
+<tr><th id="150">150</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_PLANE_READ" data-ref="_M/VGA_GFX_PLANE_READ">VGA_GFX_PLANE_READ</dfn>      0x04</u></td></tr>
+<tr><th id="151">151</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_MODE" data-ref="_M/VGA_GFX_MODE">VGA_GFX_MODE</dfn>            0x05</u></td></tr>
+<tr><th id="152">152</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_MISC" data-ref="_M/VGA_GFX_MISC">VGA_GFX_MISC</dfn>            0x06</u></td></tr>
+<tr><th id="153">153</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_COMPARE_MASK" data-ref="_M/VGA_GFX_COMPARE_MASK">VGA_GFX_COMPARE_MASK</dfn>    0x07</u></td></tr>
+<tr><th id="154">154</th><td><u>#define <dfn class="macro" id="_M/VGA_GFX_BIT_MASK" data-ref="_M/VGA_GFX_BIT_MASK">VGA_GFX_BIT_MASK</dfn>        0x08</u></td></tr>
+<tr><th id="155">155</th><td></td></tr>
+<tr><th id="156">156</th><td><i>/* VGA graphics controller bit masks */</i></td></tr>
+<tr><th id="157">157</th><td><u>#define <dfn class="macro" id="_M/VGA_GR06_GRAPHICS_MODE" data-ref="_M/VGA_GR06_GRAPHICS_MODE">VGA_GR06_GRAPHICS_MODE</dfn>  0x01</u></td></tr>
+<tr><th id="158">158</th><td></td></tr>
+<tr><th id="159">159</th><td><u>#<span data-ppcond="17">endif</span> /* LINUX_VIDEO_VGA_H */</u></td></tr>
+<tr><th id="160">160</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='vga.c.html'>codebrowser/hw/display/vga.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

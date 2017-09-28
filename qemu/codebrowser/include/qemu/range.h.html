@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"><title>range.h source code [codebrowser/include/qemu/range.h] - Woboq Code Browser</title>
+<meta name="woboq:interestingDefinitions" content="Range "/>
+<link rel="stylesheet" href="../../../../data/qtcreator.css" title="QtCreator"/>
+<link rel="alternate stylesheet" href="../../../../data/kdevelop.css" title="KDevelop"/>
+<script type="text/javascript" src="../../../../data/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../../../data/jquery/jquery-ui.min.js"></script>
+<script>var file = 'codebrowser/include/qemu/range.h'; var root_path = '../../..'; var data_path = '../../../../data';</script>
+<script src='../../../../data/codebrowser.js'></script>
+</head>
+<body><div id='header'><h1 id='breadcrumb'><span>Browse the source code of </span><a href='../..'>codebrowser</a>/<a href='..'>include</a>/<a href='./'>qemu</a>/<a href='range.h.html'>range.h</a></h1></div>
+<hr/><div id='content'><table class="code">
+<tr><th id="1">1</th><td><i>/*</i></td></tr>
+<tr><th id="2">2</th><td><i> * QEMU 64-bit address ranges</i></td></tr>
+<tr><th id="3">3</th><td><i> *</i></td></tr>
+<tr><th id="4">4</th><td><i> * Copyright (c) 2015-2016 Red Hat, Inc.</i></td></tr>
+<tr><th id="5">5</th><td><i> *</i></td></tr>
+<tr><th id="6">6</th><td><i> * This library is free software; you can redistribute it and/or</i></td></tr>
+<tr><th id="7">7</th><td><i> * modify it under the terms of the GNU General Public</i></td></tr>
+<tr><th id="8">8</th><td><i> * License as published by the Free Software Foundation; either</i></td></tr>
+<tr><th id="9">9</th><td><i> * version 2 of the License, or (at your option) any later version.</i></td></tr>
+<tr><th id="10">10</th><td><i> *</i></td></tr>
+<tr><th id="11">11</th><td><i> * This library is distributed in the hope that it will be useful,</i></td></tr>
+<tr><th id="12">12</th><td><i> * but WITHOUT ANY WARRANTY; without even the implied warranty of</i></td></tr>
+<tr><th id="13">13</th><td><i> * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU</i></td></tr>
+<tr><th id="14">14</th><td><i> * Lesser General Public License for more details.</i></td></tr>
+<tr><th id="15">15</th><td><i> *</i></td></tr>
+<tr><th id="16">16</th><td><i> * You should have received a copy of the GNU General Public</i></td></tr>
+<tr><th id="17">17</th><td><i> * License along with this library; if not, see &lt;<a href="http://www.gnu.org/licenses/">http://www.gnu.org/licenses/</a>&gt;.</i></td></tr>
+<tr><th id="18">18</th><td><i> *</i></td></tr>
+<tr><th id="19">19</th><td><i> */</i></td></tr>
+<tr><th id="20">20</th><td></td></tr>
+<tr><th id="21">21</th><td><u>#<span data-ppcond="21">ifndef</span> <span class="macro" data-ref="_M/QEMU_RANGE_H">QEMU_RANGE_H</span></u></td></tr>
+<tr><th id="22">22</th><td><u>#define <dfn class="macro" id="_M/QEMU_RANGE_H" data-ref="_M/QEMU_RANGE_H">QEMU_RANGE_H</dfn></u></td></tr>
+<tr><th id="23">23</th><td></td></tr>
+<tr><th id="24">24</th><td><u>#include <a href="queue.h.html">"qemu/queue.h"</a></u></td></tr>
+<tr><th id="25">25</th><td></td></tr>
+<tr><th id="26">26</th><td><i>/*</i></td></tr>
+<tr><th id="27">27</th><td><i> * Operations on 64 bit address ranges.</i></td></tr>
+<tr><th id="28">28</th><td><i> * Notes:</i></td></tr>
+<tr><th id="29">29</th><td><i> * - Ranges must not wrap around 0, but can include UINT64_MAX.</i></td></tr>
+<tr><th id="30">30</th><td><i> */</i></td></tr>
+<tr><th id="31">31</th><td></td></tr>
+<tr><th id="32">32</th><td><b>struct</b> <dfn class="type def" id="Range" title='Range' data-ref="Range">Range</dfn> {</td></tr>
+<tr><th id="33">33</th><td>    <i>/*</i></td></tr>
+<tr><th id="34">34</th><td><i>     * Do not access members directly, use the functions!</i></td></tr>
+<tr><th id="35">35</th><td><i>     * A non-empty range has @lob &lt;= @upb.</i></td></tr>
+<tr><th id="36">36</th><td><i>     * An empty range has @lob == @upb + 1.</i></td></tr>
+<tr><th id="37">37</th><td><i>     */</i></td></tr>
+<tr><th id="38">38</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="Range::lob" title='Range::lob' data-ref="Range::lob">lob</dfn>;        <i>/* inclusive lower bound */</i></td></tr>
+<tr><th id="39">39</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl" id="Range::upb" title='Range::upb' data-ref="Range::upb">upb</dfn>;        <i>/* inclusive upper bound */</i></td></tr>
+<tr><th id="40">40</th><td>};</td></tr>
+<tr><th id="41">41</th><td></td></tr>
+<tr><th id="42">42</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="range_invariant" title='range_invariant' data-ref="range_invariant">range_invariant</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col1 decl" id="1range" title='range' data-type='Range *' data-ref="1range">range</dfn>)</td></tr>
+<tr><th id="43">43</th><td>{</td></tr>
+<tr><th id="44">44</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((range-&gt;lob &lt;= range-&gt;upb || range-&gt;lob == range-&gt;upb + 1) ? (void) (0) : __assert_fail (&quot;range-&gt;lob &lt;= range-&gt;upb || range-&gt;lob == range-&gt;upb + 1&quot;, &quot;/home/jon/workspace/qemu/include/qemu/range.h&quot;, 44, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="local col1 ref" href="#1range" title='range' data-ref="1range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> &lt;= <a class="local col1 ref" href="#1range" title='range' data-ref="1range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> || <a class="local col1 ref" href="#1range" title='range' data-ref="1range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> == <a class="local col1 ref" href="#1range" title='range' data-ref="1range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> + <var>1</var>);</td></tr>
+<tr><th id="45">45</th><td>}</td></tr>
+<tr><th id="46">46</th><td></td></tr>
+<tr><th id="47">47</th><td><i>/* Compound literal encoding the empty range */</i></td></tr>
+<tr><th id="48">48</th><td><u>#define <dfn class="macro" id="_M/range_empty" data-ref="_M/range_empty">range_empty</dfn> ((<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a>){ .<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> = 1, .<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> = 0 })</u></td></tr>
+<tr><th id="49">49</th><td></td></tr>
+<tr><th id="50">50</th><td><i>/* Is @range empty? */</i></td></tr>
+<tr><th id="51">51</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col2 decl" id="2range" title='range' data-type='Range *' data-ref="2range">range</dfn>)</td></tr>
+<tr><th id="52">52</th><td>{</td></tr>
+<tr><th id="53">53</th><td>    <a class="ref" href="#range_invariant" title='range_invariant' data-ref="range_invariant">range_invariant</a>(<a class="local col2 ref" href="#2range" title='range' data-ref="2range">range</a>);</td></tr>
+<tr><th id="54">54</th><td>    <b>return</b> <a class="local col2 ref" href="#2range" title='range' data-ref="2range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> &gt; <a class="local col2 ref" href="#2range" title='range' data-ref="2range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a>;</td></tr>
+<tr><th id="55">55</th><td>}</td></tr>
+<tr><th id="56">56</th><td></td></tr>
+<tr><th id="57">57</th><td><i>/* Does @range contain @val? */</i></td></tr>
+<tr><th id="58">58</th><td><em>static</em> <b>inline</b> <span class="macro" title="_Bool" data-ref="_M/bool">bool</span> <dfn class="decl def" id="range_contains" title='range_contains' data-ref="range_contains">range_contains</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col3 decl" id="3range" title='range' data-type='Range *' data-ref="3range">range</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="4val" title='val' data-type='uint64_t' data-ref="4val">val</dfn>)</td></tr>
+<tr><th id="59">59</th><td>{</td></tr>
+<tr><th id="60">60</th><td>    <b>return</b> <a class="local col4 ref" href="#4val" title='val' data-ref="4val">val</a> &gt;= <a class="local col3 ref" href="#3range" title='range' data-ref="3range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> &amp;&amp; <a class="local col4 ref" href="#4val" title='val' data-ref="4val">val</a> &lt;= <a class="local col3 ref" href="#3range" title='range' data-ref="3range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a>;</td></tr>
+<tr><th id="61">61</th><td>}</td></tr>
+<tr><th id="62">62</th><td></td></tr>
+<tr><th id="63">63</th><td><i>/* Initialize @range to the empty range */</i></td></tr>
+<tr><th id="64">64</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="range_make_empty" title='range_make_empty' data-ref="range_make_empty">range_make_empty</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col5 decl" id="5range" title='range' data-type='Range *' data-ref="5range">range</dfn>)</td></tr>
+<tr><th id="65">65</th><td>{</td></tr>
+<tr><th id="66">66</th><td>    *<a class="local col5 ref" href="#5range" title='range' data-ref="5range">range</a> = <a class="macro" href="#48" title="((Range){ .lob = 1, .upb = 0 })" data-ref="_M/range_empty">range_empty</a>;</td></tr>
+<tr><th id="67">67</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((range_is_empty(range)) ? (void) (0) : __assert_fail (&quot;range_is_empty(range)&quot;, &quot;/home/jon/workspace/qemu/include/qemu/range.h&quot;, 67, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col5 ref" href="#5range" title='range' data-ref="5range">range</a>));</td></tr>
+<tr><th id="68">68</th><td>}</td></tr>
+<tr><th id="69">69</th><td></td></tr>
+<tr><th id="70">70</th><td><i>/*</i></td></tr>
+<tr><th id="71">71</th><td><i> * Initialize @range to span the interval [@lob,@upb].</i></td></tr>
+<tr><th id="72">72</th><td><i> * Both bounds are inclusive.</i></td></tr>
+<tr><th id="73">73</th><td><i> * The interval must not be empty, i.e. @lob must be less than or</i></td></tr>
+<tr><th id="74">74</th><td><i> * equal @upb.</i></td></tr>
+<tr><th id="75">75</th><td><i> */</i></td></tr>
+<tr><th id="76">76</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="range_set_bounds" title='range_set_bounds' data-ref="range_set_bounds">range_set_bounds</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col6 decl" id="6range" title='range' data-type='Range *' data-ref="6range">range</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="7lob" title='lob' data-type='uint64_t' data-ref="7lob">lob</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="8upb" title='upb' data-type='uint64_t' data-ref="8upb">upb</dfn>)</td></tr>
+<tr><th id="77">77</th><td>{</td></tr>
+<tr><th id="78">78</th><td>    <a class="local col6 ref" href="#6range" title='range' data-ref="6range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> = <a class="local col7 ref" href="#7lob" title='lob' data-ref="7lob">lob</a>;</td></tr>
+<tr><th id="79">79</th><td>    <a class="local col6 ref" href="#6range" title='range' data-ref="6range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> = <a class="local col8 ref" href="#8upb" title='upb' data-ref="8upb">upb</a>;</td></tr>
+<tr><th id="80">80</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((!range_is_empty(range)) ? (void) (0) : __assert_fail (&quot;!range_is_empty(range)&quot;, &quot;/home/jon/workspace/qemu/include/qemu/range.h&quot;, 80, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col6 ref" href="#6range" title='range' data-ref="6range">range</a>));</td></tr>
+<tr><th id="81">81</th><td>}</td></tr>
+<tr><th id="82">82</th><td></td></tr>
+<tr><th id="83">83</th><td><i>/*</i></td></tr>
+<tr><th id="84">84</th><td><i> * Initialize @range to span the interval [@lob,@upb_plus1).</i></td></tr>
+<tr><th id="85">85</th><td><i> * The lower bound is inclusive, the upper bound is exclusive.</i></td></tr>
+<tr><th id="86">86</th><td><i> * Zero @upb_plus1 is special: if @lob is also zero, set @range to the</i></td></tr>
+<tr><th id="87">87</th><td><i> * empty range.  Else, set @range to [@lob,UINT64_MAX].</i></td></tr>
+<tr><th id="88">88</th><td><i> */</i></td></tr>
+<tr><th id="89">89</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="range_set_bounds1" title='range_set_bounds1' data-ref="range_set_bounds1">range_set_bounds1</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col9 decl" id="9range" title='range' data-type='Range *' data-ref="9range">range</dfn>,</td></tr>
+<tr><th id="90">90</th><td>                                     <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="10lob" title='lob' data-type='uint64_t' data-ref="10lob">lob</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="11upb_plus1" title='upb_plus1' data-type='uint64_t' data-ref="11upb_plus1">upb_plus1</dfn>)</td></tr>
+<tr><th id="91">91</th><td>{</td></tr>
+<tr><th id="92">92</th><td>    <b>if</b> (!<a class="local col0 ref" href="#10lob" title='lob' data-ref="10lob">lob</a> &amp;&amp; !<a class="local col1 ref" href="#11upb_plus1" title='upb_plus1' data-ref="11upb_plus1">upb_plus1</a>) {</td></tr>
+<tr><th id="93">93</th><td>        *<a class="local col9 ref" href="#9range" title='range' data-ref="9range">range</a> = <a class="macro" href="#48" title="((Range){ .lob = 1, .upb = 0 })" data-ref="_M/range_empty">range_empty</a>;</td></tr>
+<tr><th id="94">94</th><td>    } <b>else</b> {</td></tr>
+<tr><th id="95">95</th><td>        <a class="local col9 ref" href="#9range" title='range' data-ref="9range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> = <a class="local col0 ref" href="#10lob" title='lob' data-ref="10lob">lob</a>;</td></tr>
+<tr><th id="96">96</th><td>        <a class="local col9 ref" href="#9range" title='range' data-ref="9range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> = <a class="local col1 ref" href="#11upb_plus1" title='upb_plus1' data-ref="11upb_plus1">upb_plus1</a> - <var>1</var>;</td></tr>
+<tr><th id="97">97</th><td>    }</td></tr>
+<tr><th id="98">98</th><td>    <a class="ref" href="#range_invariant" title='range_invariant' data-ref="range_invariant">range_invariant</a>(<a class="local col9 ref" href="#9range" title='range' data-ref="9range">range</a>);</td></tr>
+<tr><th id="99">99</th><td>}</td></tr>
+<tr><th id="100">100</th><td></td></tr>
+<tr><th id="101">101</th><td><i>/* Return @range's lower bound.  @range must not be empty. */</i></td></tr>
+<tr><th id="102">102</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="range_lob" title='range_lob' data-ref="range_lob">range_lob</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col2 decl" id="12range" title='range' data-type='Range *' data-ref="12range">range</dfn>)</td></tr>
+<tr><th id="103">103</th><td>{</td></tr>
+<tr><th id="104">104</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((!range_is_empty(range)) ? (void) (0) : __assert_fail (&quot;!range_is_empty(range)&quot;, &quot;/home/jon/workspace/qemu/include/qemu/range.h&quot;, 104, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col2 ref" href="#12range" title='range' data-ref="12range">range</a>));</td></tr>
+<tr><th id="105">105</th><td>    <b>return</b> <a class="local col2 ref" href="#12range" title='range' data-ref="12range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a>;</td></tr>
+<tr><th id="106">106</th><td>}</td></tr>
+<tr><th id="107">107</th><td></td></tr>
+<tr><th id="108">108</th><td><i>/* Return @range's upper bound.  @range must not be empty. */</i></td></tr>
+<tr><th id="109">109</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="range_upb" title='range_upb' data-ref="range_upb">range_upb</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col3 decl" id="13range" title='range' data-type='Range *' data-ref="13range">range</dfn>)</td></tr>
+<tr><th id="110">110</th><td>{</td></tr>
+<tr><th id="111">111</th><td>    <a class="macro" href="../../../include/assert.h.html#88" title="((!range_is_empty(range)) ? (void) (0) : __assert_fail (&quot;!range_is_empty(range)&quot;, &quot;/home/jon/workspace/qemu/include/qemu/range.h&quot;, 111, __PRETTY_FUNCTION__))" data-ref="_M/assert">assert</a>(!<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col3 ref" href="#13range" title='range' data-ref="13range">range</a>));</td></tr>
+<tr><th id="112">112</th><td>    <b>return</b> <a class="local col3 ref" href="#13range" title='range' data-ref="13range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a>;</td></tr>
+<tr><th id="113">113</th><td>}</td></tr>
+<tr><th id="114">114</th><td></td></tr>
+<tr><th id="115">115</th><td><i>/*</i></td></tr>
+<tr><th id="116">116</th><td><i> * Extend @range to the smallest interval that includes @extend_by, too.</i></td></tr>
+<tr><th id="117">117</th><td><i> */</i></td></tr>
+<tr><th id="118">118</th><td><em>static</em> <b>inline</b> <em>void</em> <dfn class="decl def" id="range_extend" title='range_extend' data-ref="range_extend">range_extend</dfn>(<a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col4 decl" id="14range" title='range' data-type='Range *' data-ref="14range">range</dfn>, <a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col5 decl" id="15extend_by" title='extend_by' data-type='Range *' data-ref="15extend_by">extend_by</dfn>)</td></tr>
+<tr><th id="119">119</th><td>{</td></tr>
+<tr><th id="120">120</th><td>    <b>if</b> (<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>)) {</td></tr>
+<tr><th id="121">121</th><td>        <b>return</b>;</td></tr>
+<tr><th id="122">122</th><td>    }</td></tr>
+<tr><th id="123">123</th><td>    <b>if</b> (<a class="ref" href="#range_is_empty" title='range_is_empty' data-ref="range_is_empty">range_is_empty</a>(<a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>)) {</td></tr>
+<tr><th id="124">124</th><td>        *<a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a> = *<a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>;</td></tr>
+<tr><th id="125">125</th><td>        <b>return</b>;</td></tr>
+<tr><th id="126">126</th><td>    }</td></tr>
+<tr><th id="127">127</th><td>    <b>if</b> (<a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> &gt; <a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a>) {</td></tr>
+<tr><th id="128">128</th><td>        <a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a> = <a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>-&gt;<a class="ref" href="#Range::lob" title='Range::lob' data-ref="Range::lob">lob</a>;</td></tr>
+<tr><th id="129">129</th><td>    }</td></tr>
+<tr><th id="130">130</th><td>    <b>if</b> (<a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> &lt; <a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a>) {</td></tr>
+<tr><th id="131">131</th><td>        <a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a> = <a class="local col5 ref" href="#15extend_by" title='extend_by' data-ref="15extend_by">extend_by</a>-&gt;<a class="ref" href="#Range::upb" title='Range::upb' data-ref="Range::upb">upb</a>;</td></tr>
+<tr><th id="132">132</th><td>    }</td></tr>
+<tr><th id="133">133</th><td>    <a class="ref" href="#range_invariant" title='range_invariant' data-ref="range_invariant">range_invariant</a>(<a class="local col4 ref" href="#14range" title='range' data-ref="14range">range</a>);</td></tr>
+<tr><th id="134">134</th><td>}</td></tr>
+<tr><th id="135">135</th><td></td></tr>
+<tr><th id="136">136</th><td><i>/* Get last byte of a range from offset + length.</i></td></tr>
+<tr><th id="137">137</th><td><i> * Undefined for ranges that wrap around 0. */</i></td></tr>
+<tr><th id="138">138</th><td><em>static</em> <b>inline</b> <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="decl def" id="range_get_last" title='range_get_last' data-ref="range_get_last">range_get_last</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="16offset" title='offset' data-type='uint64_t' data-ref="16offset">offset</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col7 decl" id="17len" title='len' data-type='uint64_t' data-ref="17len">len</dfn>)</td></tr>
+<tr><th id="139">139</th><td>{</td></tr>
+<tr><th id="140">140</th><td>    <b>return</b> <a class="local col6 ref" href="#16offset" title='offset' data-ref="16offset">offset</a> + <a class="local col7 ref" href="#17len" title='len' data-ref="17len">len</a> - <var>1</var>;</td></tr>
+<tr><th id="141">141</th><td>}</td></tr>
+<tr><th id="142">142</th><td></td></tr>
+<tr><th id="143">143</th><td><i>/* Check whether a given range covers a given byte. */</i></td></tr>
+<tr><th id="144">144</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="range_covers_byte" title='range_covers_byte' data-ref="range_covers_byte">range_covers_byte</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col8 decl" id="18offset" title='offset' data-type='uint64_t' data-ref="18offset">offset</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col9 decl" id="19len" title='len' data-type='uint64_t' data-ref="19len">len</dfn>,</td></tr>
+<tr><th id="145">145</th><td>                                    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col0 decl" id="20byte" title='byte' data-type='uint64_t' data-ref="20byte">byte</dfn>)</td></tr>
+<tr><th id="146">146</th><td>{</td></tr>
+<tr><th id="147">147</th><td>    <b>return</b> <a class="local col8 ref" href="#18offset" title='offset' data-ref="18offset">offset</a> &lt;= <a class="local col0 ref" href="#20byte" title='byte' data-ref="20byte">byte</a> &amp;&amp; <a class="local col0 ref" href="#20byte" title='byte' data-ref="20byte">byte</a> &lt;= <a class="ref" href="#range_get_last" title='range_get_last' data-ref="range_get_last">range_get_last</a>(<a class="local col8 ref" href="#18offset" title='offset' data-ref="18offset">offset</a>, <a class="local col9 ref" href="#19len" title='len' data-ref="19len">len</a>);</td></tr>
+<tr><th id="148">148</th><td>}</td></tr>
+<tr><th id="149">149</th><td></td></tr>
+<tr><th id="150">150</th><td><i>/* Check whether 2 given ranges overlap.</i></td></tr>
+<tr><th id="151">151</th><td><i> * Undefined if ranges that wrap around 0. */</i></td></tr>
+<tr><th id="152">152</th><td><em>static</em> <b>inline</b> <em>int</em> <dfn class="decl def" id="ranges_overlap" title='ranges_overlap' data-ref="ranges_overlap">ranges_overlap</dfn>(<a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col1 decl" id="21first1" title='first1' data-type='uint64_t' data-ref="21first1">first1</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col2 decl" id="22len1" title='len1' data-type='uint64_t' data-ref="22len1">len1</dfn>,</td></tr>
+<tr><th id="153">153</th><td>                                 <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col3 decl" id="23first2" title='first2' data-type='uint64_t' data-ref="23first2">first2</dfn>, <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col4 decl" id="24len2" title='len2' data-type='uint64_t' data-ref="24len2">len2</dfn>)</td></tr>
+<tr><th id="154">154</th><td>{</td></tr>
+<tr><th id="155">155</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col5 decl" id="25last1" title='last1' data-type='uint64_t' data-ref="25last1">last1</dfn> = <a class="ref" href="#range_get_last" title='range_get_last' data-ref="range_get_last">range_get_last</a>(<a class="local col1 ref" href="#21first1" title='first1' data-ref="21first1">first1</a>, <a class="local col2 ref" href="#22len1" title='len1' data-ref="22len1">len1</a>);</td></tr>
+<tr><th id="156">156</th><td>    <a class="typedef" href="../../../include/stdint.h.html#uint64_t" title='uint64_t' data-type='unsigned long' data-ref="uint64_t">uint64_t</a> <dfn class="local col6 decl" id="26last2" title='last2' data-type='uint64_t' data-ref="26last2">last2</dfn> = <a class="ref" href="#range_get_last" title='range_get_last' data-ref="range_get_last">range_get_last</a>(<a class="local col3 ref" href="#23first2" title='first2' data-ref="23first2">first2</a>, <a class="local col4 ref" href="#24len2" title='len2' data-ref="24len2">len2</a>);</td></tr>
+<tr><th id="157">157</th><td></td></tr>
+<tr><th id="158">158</th><td>    <b>return</b> !(<a class="local col6 ref" href="#26last2" title='last2' data-ref="26last2">last2</a> &lt; <a class="local col1 ref" href="#21first1" title='first1' data-ref="21first1">first1</a> || <a class="local col5 ref" href="#25last1" title='last1' data-ref="25last1">last1</a> &lt; <a class="local col3 ref" href="#23first2" title='first2' data-ref="23first2">first2</a>);</td></tr>
+<tr><th id="159">159</th><td>}</td></tr>
+<tr><th id="160">160</th><td></td></tr>
+<tr><th id="161">161</th><td><a class="typedef" href="../../../include/glib-2.0/glib/glist.h.html#GList" title='GList' data-type='struct _GList' data-ref="GList">GList</a> *<dfn class="decl" id="range_list_insert" title='range_list_insert' data-ref="range_list_insert">range_list_insert</dfn>(<a class="typedef" href="../../../include/glib-2.0/glib/glist.h.html#GList" title='GList' data-type='struct _GList' data-ref="GList">GList</a> *<dfn class="local col7 decl" id="27list" title='list' data-type='GList *' data-ref="27list">list</dfn>, <a class="typedef" href="typedefs.h.html#Range" title='Range' data-type='struct Range' data-ref="Range">Range</a> *<dfn class="local col8 decl" id="28data" title='data' data-type='Range *' data-ref="28data">data</dfn>);</td></tr>
+<tr><th id="162">162</th><td></td></tr>
+<tr><th id="163">163</th><td><u>#<span data-ppcond="21">endif</span></u></td></tr>
+<tr><th id="164">164</th><td></td></tr>
+</table><hr/><p id='footer'>
+Generated while processing <a href='../../block/qcow2-refcount.c.html'>codebrowser/block/qcow2-refcount.c</a><br/>Generated on <em>2017-Aug-28</em> from project codebrowser revision <em>v2.10.0-rc0-7-g6be37cc</em><br />Powered by <a href='https://woboq.com'><img alt='Woboq' src='https://code.woboq.org/woboq-16.png' width='41' height='16' /></a> <a href='https://code.woboq.org'>Code Browser</a> 2.1
+<br/>Generator usage only permitted with license.</p>
+</div></body></html>

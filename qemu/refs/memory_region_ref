@@ -1,0 +1,31 @@
+<dec f='codebrowser/include/exec/memory.h' l='387' type='void memory_region_ref(MemoryRegion * mr)'/>
+<doc f='codebrowser/include/exec/memory.h' l='372'>/**
+ * memory_region_ref: Add 1 to a memory region&apos;s reference count
+ *
+ * Whenever memory regions are accessed outside the BQL, they need to be
+ * preserved against hot-unplug.  MemoryRegions actually do not have their
+ * own reference count; they piggyback on a QOM object, their &quot;owner&quot;.
+ * This function adds a reference to the owner.
+ *
+ * All MemoryRegions must have an owner if they can disappear, even if the
+ * device they belong to operates exclusively under the BQL.  This is because
+ * the region could be returned at any time by memory_region_find, and this
+ * is usually under guest control.
+ *
+ * @mr: the #MemoryRegion
+ */</doc>
+<use f='codebrowser/accel/kvm/kvm-all.c' l='862' u='c' c='kvm_region_add'/>
+<use f='codebrowser/exec.c' l='1279' u='c' c='phys_section_add'/>
+<use f='codebrowser/exec.c' l='3337' u='c' c='address_space_map'/>
+<use f='codebrowser/exec.c' l='3350' u='c' c='address_space_map'/>
+<use f='codebrowser/hw/vfio/common.c' l='478' u='c' c='vfio_listener_region_add'/>
+<use f='codebrowser/hw/vfio/spapr.c' l='72' u='c' c='vfio_prereg_listener_region_add'/>
+<use f='codebrowser/hw/virtio/vhost.c' l='693' u='c' c='vhost_region_add'/>
+<use f='codebrowser/memory.c' l='282' u='c' c='flatview_insert'/>
+<def f='codebrowser/memory.c' l='1561' ll='1576' type='void memory_region_ref(MemoryRegion * mr)'/>
+<use f='codebrowser/memory.c' l='2122' u='c' c='memory_region_update_container_subregions'/>
+<use f='codebrowser/memory.c' l='2207' u='c' c='memory_region_readd_subregion'/>
+<use f='codebrowser/memory.c' l='2321' u='c' c='memory_region_find'/>
+<use f='codebrowser/memory.c' l='2578' u='c' c='address_space_init'/>
+<use f='codebrowser/memory_mapping.c' l='246' u='c' c='guest_phys_blocks_region_add'/>
+<use f='codebrowser/migration/ram.c' l='1179' u='c' c='ram_save_queue_pages'/>
